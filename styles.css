@@ -1692,7 +1692,7 @@ body.hero-animate .slide-buttons {
 .event-title {
     font-size: 24px;
     margin-bottom: 15px;
-    font-family: 'Merriweather', serif;
+    /* font-family: 'Merriweather', serif; Removed to use global Inter font */
 }
 
 .event-meta {
