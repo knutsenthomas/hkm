@@ -1277,6 +1277,7 @@ class AdminManager {
                 };
             } else {
                 console.error('Editor.js: Embed tool missing! Script might not be loaded.');
+                alert('Advarsel: Videoverktøyet (Embed) ble ikke lastet inn. Sjekk internettforbindelsen eller prøv å oppdatere siden.');
             }
 
             const editor = new EditorJS({
