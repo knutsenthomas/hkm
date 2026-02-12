@@ -2315,6 +2315,11 @@ body.hero-animate .slide-buttons {
     .container {
         padding: 0 10px;
     }
+
+    .logo {
+        font-size: 18px;
+        /* Reduced from 20px */
+    }
 }
 
 @media (max-width: 768px) {

@@ -15,6 +15,7 @@ class ContentManager {
         }
 
         this.init();
+        this.agendaMonthsToShow = 1;
     }
 
     setLoading(isLoading) {
@@ -257,16 +258,19 @@ class ContentManager {
 
         if (prevBtn) prevBtn.onclick = async () => {
             this.currentDate.setMonth(this.currentDate.getMonth() - 1);
+            this.agendaMonthsToShow = 1; // Reset
             await this.refreshCalendarView();
         };
 
         if (nextBtn) nextBtn.onclick = async () => {
             this.currentDate.setMonth(this.currentDate.getMonth() + 1);
+            this.agendaMonthsToShow = 1; // Reset
             await this.refreshCalendarView();
         };
 
         if (todayBtn) todayBtn.onclick = async () => {
             this.currentDate = new Date();
+            this.agendaMonthsToShow = 1; // Reset
             await this.refreshCalendarView();
         };
     }
@@ -601,7 +605,21 @@ class ContentManager {
             return aTime - bTime;
         });
 
-        container.innerHTML = sorted.slice(0, 10).map(event => {
+        // Calculate cutoff date based on agendaMonthsToShow
+        const cutoffDate = new Date(this.currentDate);
+        cutoffDate.setMonth(cutoffDate.getMonth() + this.agendaMonthsToShow);
+        // Set to first day of next month after range
+        cutoffDate.setDate(1);
+        cutoffDate.setHours(0, 0, 0, 0);
+
+        const visibleEvents = sorted.filter(e => {
+            const d = this.parseEventDate(e.start || e.date);
+            return d && d < cutoffDate;
+        });
+
+        const hasMore = visibleEvents.length < sorted.length;
+
+        const listHtml = visibleEvents.map(event => {
             const eventKey = this.getEventKey(event);
             const startValue = event.start || event.date;
             const startDate = this.parseEventDate(startValue);
@@ -640,6 +658,28 @@ class ContentManager {
                 </li>
             `;
         }).join('');
+
+        container.innerHTML = listHtml;
+
+        if (hasMore) {
+            const btnContainer = document.createElement('li');
+            btnContainer.style.textAlign = 'center';
+            btnContainer.style.padding = '15px';
+            btnContainer.style.listStyle = 'none';
+
+            const loadMoreBtn = document.createElement('button');
+            loadMoreBtn.className = 'btn btn-outline'; // Reuse existing class
+            loadMoreBtn.innerText = 'Last flere arrangementer';
+            loadMoreBtn.style.fontSize = '14px';
+
+            loadMoreBtn.onclick = () => {
+                this.agendaMonthsToShow++;
+                this.renderAgenda(events, selector);
+            };
+
+            btnContainer.appendChild(loadMoreBtn);
+            container.appendChild(btnContainer);
+        }
 
         this.bindEventModalTriggers(container);
     }
@@ -855,7 +895,8 @@ class ContentManager {
         const year = date.getFullYear();
         const month = date.getMonth();
         const start = new Date(year, month, 1, 0, 0, 0);
-        const end = new Date(year, month + 1, 0, 23, 59, 59, 999);
+        // Fetch 12 months ahead to populate agenda with future events
+        const end = new Date(year, month + 12, 0, 23, 59, 59, 999);
         return {
             startIso: start.toISOString(),
             endIso: end.toISOString()
