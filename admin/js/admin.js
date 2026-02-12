@@ -1393,20 +1393,33 @@ class AdminManager {
     }
 
     async addNewItem(collectionId) {
-        const title = prompt(`Tittel på ny ${collectionId === 'blog' ? 'bloggpost' : (collectionId === 'teaching' ? 'undervisning' : 'arrangement')}:`);
-        if (!title) return;
-
+        // Create new item with empty title (no prompt)
         const newItem = {
-            title: title,
+            title: '',
             date: new Date().toISOString().split('T')[0],
             content: ''
         };
 
-        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-        const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
-        items.unshift(newItem);
-        await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
-        this.loadCollection(collectionId);
+        try {
+            const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+            const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+
+            // Add to beginning of list
+            items.unshift(newItem);
+
+            // Save to Firebase
+            await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
+
+            // Refresh the list in the background
+            await this.loadCollection(collectionId);
+
+            // Immediately open the editor for this new item (index 0)
+            this.editCollectionItem(collectionId, 0);
+
+        } catch (error) {
+            console.error('Error creating new item:', error);
+            alert('Kunne ikke opprette nytt element. Sjekk konsollen.');
+        }
     }
 
     async deleteItem(collectionId, index) {
