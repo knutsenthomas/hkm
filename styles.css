@@ -473,6 +473,7 @@ section {
     /* Keep grid layout on mobile */
     .calendar-grid {
         gap: 1px;
+        grid-template-columns: repeat(7, 1fr) !important;
     }
 
     .cal-day-header {
