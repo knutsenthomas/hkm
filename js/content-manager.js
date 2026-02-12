@@ -668,7 +668,7 @@ class ContentManager {
             btnContainer.style.listStyle = 'none';
 
             const loadMoreBtn = document.createElement('button');
-            loadMoreBtn.className = 'btn btn-outline'; // Reuse existing class
+            loadMoreBtn.className = 'btn btn-agenda-load'; // Specific class for visibility
             loadMoreBtn.innerText = 'Last flere arrangementer';
             loadMoreBtn.style.fontSize = '14px';
 

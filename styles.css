@@ -643,6 +643,18 @@ section {
     color: #64748b;
 }
 
+.btn-agenda-load {
+    color: var(--primary-orange);
+    border-color: var(--primary-orange);
+    background: transparent;
+    margin-top: 10px;
+}
+
+.btn-agenda-load:hover {
+    background: var(--primary-orange);
+    color: white;
+}
+
 .agenda-link {
     font-size: 13px;
     color: var(--primary-color);

@@ -128,7 +128,7 @@ if (headerActions) {
     if (navList) {
         const mobileSearchItem = document.createElement('li');
         mobileSearchItem.className = 'mobile-only mobile-search-item';
-        mobileSearchItem.innerHTML = `<button type="button" class="nav-link" style="background:none; border:none; padding:0; font:inherit; cursor:pointer; display:flex; align-items:center; gap:10px; width:100%;"><i class="fas fa-search"></i> Søk</button>`;
+        mobileSearchItem.innerHTML = `<button type="button" class="nav-link" style="background:none; border:none; padding:0; font:inherit; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:10px; width:100%;"><i class="fas fa-search"></i> Søk</button>`;
 
         // Add to nav list
         navList.appendChild(mobileSearchItem);
