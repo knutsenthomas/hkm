@@ -123,6 +123,32 @@ if (headerActions) {
         }
     });
 
+    // Mobile Search Injection
+    const navList = document.querySelector('.nav-list');
+    if (navList) {
+        const mobileSearchItem = document.createElement('li');
+        mobileSearchItem.className = 'mobile-only mobile-search-item';
+        mobileSearchItem.innerHTML = `<button type="button" class="nav-link" style="background:none; border:none; padding:0; font:inherit; cursor:pointer; display:flex; align-items:center; gap:10px; width:100%;"><i class="fas fa-search"></i> Søk</button>`;
+
+        // Add to nav list
+        navList.appendChild(mobileSearchItem);
+
+        // Attach click handler
+        const btn = mobileSearchItem.querySelector('button');
+        if (btn) {
+            btn.addEventListener('click', () => {
+                // Close mobile menu first
+                nav.classList.remove('active');
+                mobileToggle.classList.remove('active');
+                document.body.style.paddingRight = '';
+                document.body.style.overflow = '';
+
+                // Open search
+                openSearch();
+            });
+        }
+    }
+
     if (searchInput) {
         let searchDebounceId = null;
 

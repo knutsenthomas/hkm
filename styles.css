@@ -2258,7 +2258,9 @@ body.hero-animate .slide-buttons {
 
 
 @media (max-width: 992px) {
-    .header-actions .btn-primary {
+
+    .header-actions .btn-primary,
+    .header-search-btn {
         display: none;
         /* Hide in header on mobile to save space */
     }
