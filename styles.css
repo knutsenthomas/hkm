@@ -3614,3 +3614,14 @@ ol.block-list {
     color: var(--primary-orange);
     background: #fffaf5;
 }
+
+/* Blog Navigation Button Fix */
+.blog-navigation .btn-outline {
+    color: var(--primary-orange);
+    border-color: var(--primary-orange);
+}
+
+.blog-navigation .btn-outline:hover {
+    background: var(--primary-orange);
+    color: white;
+}
