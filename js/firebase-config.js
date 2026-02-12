@@ -7,7 +7,7 @@
  * You can find this in the Firebase Console: 
  * Project Settings > General > Your apps
  */
-export const firebaseConfig = {
+window.firebaseConfig = {
     apiKey: "AIzaSyAelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE",
     authDomain: "his-kingdom-ministry.firebaseapp.com",
     projectId: "his-kingdom-ministry",

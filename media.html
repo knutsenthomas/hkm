@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Media | His Kingdom Ministry</title>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Inter for hele siden -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Open+Sans:wght@300;400;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -94,72 +92,16 @@
         <div class="container">
             <div class="section-header">
                 <span class="section-label">YouTube</span>
-                <h2 class="section-title" data-content-key="youtube.title">Siste Videoer</h2>
+                <h2 class="section-title" data-content-key="youtube.title">Siste videoer</h2>
                 <p class="section-description" data-content-key="youtube.description">Se våre nyeste videoer og
                     undervisninger</p>
             </div>
 
             <div class="media-grid" id="youtube-grid">
-                <!-- YouTube videos will be loaded here -->
-                <!-- Placeholder content -->
-                <div class="media-card" data-category="youtube">
-                    <div class="media-thumbnail">
-                        <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop"
-                            alt="Video">
-                        <div class="media-play-button">
-                            <i class="fab fa-youtube"></i>
-                        </div>
-                        <span class="media-duration">15:24</span>
-                    </div>
-                    <div class="media-content">
-                        <h3 class="media-title">Tro og Åndelig Vekst</h3>
-                        <p class="media-description">En dyptgående undervisning om hvordan vi kan vokse i vår tro og
-                            relasjon til Gud.</p>
-                        <div class="media-meta">
-                            <span><i class="far fa-calendar"></i> 5. feb 2025</span>
-                            <span><i class="far fa-eye"></i> 1.2k visninger</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="media-card" data-category="youtube">
-                    <div class="media-thumbnail">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop"
-                            alt="Video">
-                        <div class="media-play-button">
-                            <i class="fab fa-youtube"></i>
-                        </div>
-                        <span class="media-duration">22:15</span>
-                    </div>
-                    <div class="media-content">
-                        <h3 class="media-title">Bønnens Kraft</h3>
-                        <p class="media-description">Oppdag hvordan bønn kan transformere ditt liv og din relasjon til
-                            Gud.</p>
-                        <div class="media-meta">
-                            <span><i class="far fa-calendar"></i> 1. feb 2025</span>
-                            <span><i class="far fa-eye"></i> 856 visninger</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="media-card" data-category="youtube">
-                    <div class="media-thumbnail">
-                        <img src="https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&h=400&fit=crop"
-                            alt="Video">
-                        <div class="media-play-button">
-                            <i class="fab fa-youtube"></i>
-                        </div>
-                        <span class="media-duration">18:45</span>
-                    </div>
-                    <div class="media-content">
-                        <h3 class="media-title">Guds Nåde</h3>
-                        <p class="media-description">En inspirerende tale om Guds ubegrensede nåde og kjærlighet til
-                            oss.</p>
-                        <div class="media-meta">
-                            <span><i class="far fa-calendar"></i> 28. jan 2025</span>
-                            <span><i class="far fa-eye"></i> 2.1k visninger</span>
-                        </div>
-                    </div>
+                <!-- YouTube videos will be loaded here dynamisk -->
+                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <div class="loader"></div>
+                    <p style="margin-top: 15px; color: var(--text-muted);">Henter videoer fra YouTube...</p>
                 </div>
             </div>
 
@@ -176,105 +118,16 @@
         <div class="container">
             <div class="section-header">
                 <span class="section-label">Podcast</span>
-                <h2 class="section-title" data-content-key="podcast.title">Siste Episoder</h2>
+                <h2 class="section-title" data-content-key="podcast.title">Siste episoder</h2>
                 <p class="section-description" data-content-key="podcast.description">Lytt til våre podcaster om tro,
                     liv og åndelig vekst</p>
             </div>
 
             <div class="podcast-grid" id="podcast-grid">
-                <!-- Podcast episodes will be loaded here -->
-                <!-- Placeholder content -->
-                <div class="podcast-card" data-category="podcast">
-                    <div class="podcast-artwork">
-                        <img src="https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=400&fit=crop"
-                            alt="Podcast">
-                        <div class="podcast-play-button">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
-                    <div class="podcast-content">
-                        <span class="podcast-episode">Episode 42</span>
-                        <h3 class="podcast-title">Å Leve i Guds Vilje</h3>
-                        <p class="podcast-description">I denne episoden utforsker vi hva det betyr å leve i Guds vilje
-                            og hvordan vi kan søke Hans veiledning i hverdagen.</p>
-                        <div class="podcast-meta">
-                            <span><i class="far fa-clock"></i> 45 min</span>
-                            <span><i class="far fa-calendar"></i> 7. feb 2025</span>
-                        </div>
-                        <div class="podcast-actions">
-                            <button class="btn-icon" title="Spill av">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <button class="btn-icon" title="Last ned">
-                                <i class="fas fa-download"></i>
-                            </button>
-                            <button class="btn-icon" title="Del">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="podcast-card" data-category="podcast">
-                    <div class="podcast-artwork">
-                        <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=400&h=400&fit=crop"
-                            alt="Podcast">
-                        <div class="podcast-play-button">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
-                    <div class="podcast-content">
-                        <span class="podcast-episode">Episode 41</span>
-                        <h3 class="podcast-title">Tro i Hverdagen</h3>
-                        <p class="podcast-description">Hvordan kan vi praktisere vår tro i det daglige liv? Vi deler
-                            praktiske tips og erfaringer.</p>
-                        <div class="podcast-meta">
-                            <span><i class="far fa-clock"></i> 38 min</span>
-                            <span><i class="far fa-calendar"></i> 31. jan 2025</span>
-                        </div>
-                        <div class="podcast-actions">
-                            <button class="btn-icon" title="Spill av">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <button class="btn-icon" title="Last ned">
-                                <i class="fas fa-download"></i>
-                            </button>
-                            <button class="btn-icon" title="Del">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="podcast-card" data-category="podcast">
-                    <div class="podcast-artwork">
-                        <img src="https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=400&h=400&fit=crop"
-                            alt="Podcast">
-                        <div class="podcast-play-button">
-                            <i class="fas fa-play"></i>
-                        </div>
-                    </div>
-                    <div class="podcast-content">
-                        <span class="podcast-episode">Episode 40</span>
-                        <h3 class="podcast-title">Fellesskap og Tilhørighet</h3>
-                        <p class="podcast-description">Viktigheten av kristent fellesskap og hvordan vi kan bygge
-                            meningsfulle relasjoner.</p>
-                        <div class="podcast-meta">
-                            <span><i class="far fa-clock"></i> 52 min</span>
-                            <span><i class="far fa-calendar"></i> 24. jan 2025</span>
-                        </div>
-                        <div class="podcast-actions">
-                            <button class="btn-icon" title="Spill av">
-                                <i class="fas fa-play"></i>
-                            </button>
-                            <button class="btn-icon" title="Last ned">
-                                <i class="fas fa-download"></i>
-                            </button>
-                            <button class="btn-icon" title="Del">
-                                <i class="fas fa-share-alt"></i>
-                            </button>
-                        </div>
-                    </div>
+                <!-- Podcast episodes will be loaded here dynamisk -->
+                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 50px;">
+                    <div class="loader"></div>
+                    <p style="margin-top: 15px; color: var(--text-muted);">Henter podcast-episoder...</p>
                 </div>
             </div>
 
@@ -284,15 +137,15 @@
                         <i class="fas fa-podcast"></i> Se alle episoder
                     </a>
                     <div class="podcast-platforms">
-                        <a href="https://open.spotify.com" target="_blank" class="platform-link" title="Spotify">
+                        <a href="https://open.spotify.com/show/3gk4nt7v5hy6yGB4k1QYGU?si=021c69679bdd49ac" target="_blank" class="platform-link platform-spotify" title="Spotify" rel="noopener noreferrer">
                             <i class="fab fa-spotify"></i>
                         </a>
-                        <a href="https://podcasts.apple.com" target="_blank" class="platform-link"
-                            title="Apple Podcasts">
+                        <a href="https://podcasts.apple.com/us/podcast/tro-og-liv/id1753117158" target="_blank" class="platform-link platform-apple"
+                            title="Apple Podcasts" rel="noopener noreferrer">
                             <i class="fas fa-podcast"></i>
                         </a>
-                        <a href="#" class="platform-link" title="RSS Feed">
-                            <i class="fas fa-rss"></i>
+                        <a href="https://www.youtube.com/playlist?list=PL7aC7oqEJFeXLnkmFQzPOOvWcnAIfjTGv" class="platform-link platform-youtube" title="YouTube" target="_blank" rel="noopener noreferrer">
+                            <i class="fab fa-youtube"></i>
                         </a>
                     </div>
                 </div>
@@ -378,9 +231,9 @@
                     <p class="footer-text">Et felleskap for vekst, bønn og undervisning. Vi ønsker å utruste mennesker
                         til et dypere liv med Gud.</p>
                     <div class="footer-social">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/hiskingdomdesigns/" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/@HisKingdomMinistry" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
 
@@ -409,26 +262,32 @@
                     <h4 class="footer-title">Kontakt</h4>
                     <ul class="footer-contact">
                         <li><i class="fas fa-envelope"></i> post@hiskingdomministry.no</li>
-                        <li><i class="fas fa-phone"></i> +47 123 45 678</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Oslo, Norge</li>
+                        <li><i class="fas fa-phone"></i> +47 930 94 615</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Norge</li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                <p>&copy; <span id="copyright-year">2024</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Firebase Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/firebase-service.js"></script>
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
-    <!-- JavaScript -->
+    <!-- Firebase Config & Service -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
+
+    <!-- App Scripts -->
     <script src="script.js"></script>
-    <script type="module" src="js/content-manager.js"></script>
-    <script type="module" src="media.js"></script>
+    <script src="js/content-manager.js"></script>
+    <script src="media.js"></script>
 </body>
 
 </html>

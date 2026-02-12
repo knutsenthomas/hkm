@@ -164,6 +164,45 @@ body.admin-body {
     align-items: center;
 }
 
+.notification-bell {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.notification-bell .material-symbols-outlined {
+    font-size: 22px;
+}
+
+.notification-bell.has-unread {
+    background-color: rgba(249, 115, 22, 0.08);
+    color: #f97316;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Mobile nav toggle is hidden by default (desktop/tablet) */
 .mobile-nav-toggle {
     display: none;
@@ -415,6 +454,25 @@ body.admin-body {
     margin-bottom: 20px;
 }
 
+.upload-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.file-input {
+    min-width: 220px;
+}
+
+.helper-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
 .form-group label {
     display: block;
     font-size: 13px;
@@ -513,6 +571,168 @@ textarea.form-control {
     width: 28px;
     height: 28px;
     padding: 0;
+}
+
+/* Notification bell */
+.notification-btn {
+    position: relative;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    margin-right: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification-btn .material-symbols-outlined {
+    font-size: 24px;
+    color: var(--text-muted);
+    transition: var(--transition);
+}
+
+.notification-btn .material-symbols-outlined.has-unread {
+    color: var(--accent-color);
+}
+
+.notification-dot {
+    position: absolute;
+    top: 4px;
+    right: 2px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background-color: #ef4444;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 700;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Messages list */
+.message-item {
+    border-bottom: 1px solid #e5e7eb;
+    padding: 16px 0;
+}
+
+.message-item:last-child {
+    border-bottom: none;
+}
+
+.message-header-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.message-name {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.message-meta {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+.message-time {
+    font-size: 12px;
+    color: #9ca3af;
+    text-align: right;
+}
+
+.message-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-top: 4px;
+    justify-content: flex-end;
+}
+
+.btn-sm {
+    padding: 6px 10px;
+    font-size: 12px;
+    border-radius: 999px;
+}
+
+.message-badge {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    font-weight: 600;
+}
+
+.message-badge-new {
+    background-color: #fee2e2;
+    color: #b91c1c;
+}
+
+.message-badge-read {
+    background-color: #e5f9ef;
+    color: #15803d;
+}
+
+.message-subject {
+    margin-top: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.message-body {
+    margin-top: 4px;
+    font-size: 14px;
+    color: #334155;
+    white-space: pre-wrap;
+}
+
+.message-read {
+    opacity: 0.8;
+}
+
+/* Search results */
+.search-result {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.search-result:last-child {
+    border-bottom: none;
+}
+
+.search-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.search-result-type {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent-color);
+}
+
+.search-result-meta {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.search-result-title {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
+.search-result-snippet {
+    font-size: 13px;
+    color: #475569;
 }
 
 /* Collection Manager Enhancements */

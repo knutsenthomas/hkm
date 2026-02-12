@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | His Kingdom Ministry</title>
 
+    <!--Preload av fonter-->
+    <link rel="preload" href="/fonts/min-font.woff2" as="font" type="font/woff2" crossorigin>
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,6 +56,12 @@
                     <a href="#" class="nav-link" data-section="events">
                         <span class="material-symbols-outlined">calendar_today</span>
                         <span>Arrangementer</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="messages">
+                        <span class="material-symbols-outlined">mail</span>
+                        <span>Meldinger</span>
                     </a>
                 </li>
                 <li class="nav-item">
@@ -124,6 +133,10 @@
                 <input type="text" placeholder="Søk i innhold...">
             </div>
             <div class="header-actions">
+                <button class="notification-btn" id="notification-btn" title="Meldinger">
+                    <span class="material-symbols-outlined" id="notification-icon">notifications</span>
+                    <span class="notification-dot" id="notification-dot"></span>
+                </button>
                 <div class="user-profile">
                     <div class="user-info">
                         <span class="user-name" id="admin-name">Laster...</span>
@@ -157,6 +170,18 @@
                 </div>
             </div>
 
+            <div id="search-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Søk</h2>
+                    <p class="section-subtitle">Resultater for søk.</p>
+                </div>
+                <div class="card">
+                    <div class="card-body" id="search-results">
+                        <p class="section-subtitle">Skriv inn et søkeord i feltet øverst og trykk Enter.</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Pre-rendered Placeholders for Dynamic Content -->
             <div id="content-section" class="section-content">
                 <div class="section-header">
@@ -178,6 +203,14 @@
                 <div class="section-header">
                     <h2 class="section-title">Arrangementer</h2>
                     <p class="section-subtitle">Laster arrangementer...</p>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="messages-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Meldinger</h2>
+                    <p class="section-subtitle">Laster meldinger...</p>
                 </div>
                 <div class="loader"></div>
             </div>
@@ -267,6 +300,8 @@
             });
 
             const navLinks = document.querySelectorAll('.nav-link[data-section]');
+            const messagesNavLink = document.querySelector('.nav-link[data-section="messages"]');
+            const notificationBtn = document.getElementById('notification-btn');
 
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -300,11 +335,52 @@
                     });
                 });
             });
+
+            if (notificationBtn && messagesNavLink) {
+                notificationBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+
+                    // Marker meldingsmenyen som aktiv
+                    navLinks.forEach(l => l.classList.remove('active'));
+                    messagesNavLink.classList.add('active');
+
+                    // Bytt til meldingsseksjonen
+                    if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
+                        window.adminManager.onSectionSwitch('messages');
+                    }
+
+                    const sections = document.querySelectorAll('.section-content');
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === 'messages-section') {
+                            section.classList.add('active');
+                        }
+                    });
+                });
+            }
         });
     </script>
 
-    <!-- Firebase Scripts (Module) -->
-    <script type="module" src="js/admin.js"></script>
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/firebase-service.js"></script>
+
+    <!-- Admin Logic -->
+    <script src="js/admin.js"></script>
+    <script>
+        // Initialize Admin Manager after scripts load
+        window.addEventListener('load', () => {
+            if (!window.adminManager) {
+                window.adminManager = new AdminManager();
+            }
+        });
+    </script>
 </body>
 
 </html>

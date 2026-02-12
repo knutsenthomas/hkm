@@ -177,63 +177,79 @@
         <a href="../index.html" class="back-link">Tilbake til nettsiden</a>
     </div>
 
-    <!-- Firebase Auth Logic -->
-    <script type="module">
-        import { firebaseService } from "../js/firebase-service.js";
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
-        const loginForm = document.getElementById('login-form');
-        const errorBox = document.getElementById('error-box');
+    <!-- Firebase Config & Service -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/firebase-service.js"></script>
 
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+    <!-- Auth Logic -->
+    <script>
+        (function () {
+            const firebaseService = window.firebaseService;
+            const loginForm = document.getElementById('login-form');
+            const errorBox = document.getElementById('error-box');
 
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const btn = loginForm.querySelector('button');
+            if (!loginForm) return;
 
-            const originalText = btn.textContent;
-            btn.textContent = 'Logger inn...';
-            btn.disabled = true;
-            errorBox.style.display = 'none';
+            loginForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
 
-            if (!firebaseService.isInitialized) {
-                alert("⚠️ Firebase er ikke konfigurert! Vennligst gå til 'admin/index.html' og bruk Innstiling-siden for å koble til først (eller bruk admin/admin123 for lokal testing).");
-                // Fallback for development if not configured
-                if (email === 'thomas@hiskingdomministry.no' && password === 'Thomas2026!') {
-                    window.location.href = 'index.html';
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                const btn = loginForm.querySelector('button');
+
+                const originalText = btn.textContent;
+                btn.textContent = 'Logger inn...';
+                btn.disabled = true;
+                errorBox.style.display = 'none';
+
+                if (!firebaseService.isInitialized) {
+                    alert("⚠️ Firebase er ikke konfigurert! Vennligst gå til 'admin/index.html' og bruk Innstiling-siden for å koble til først (eller bruk admin/admin123 for lokal testing).");
+                    // Fallback for development if not configured
+                    if (email === 'thomas@hiskingdomministry.no' && password === 'Thomas2026!') {
+                        window.location.href = 'index.html';
+                    }
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    return;
                 }
-                btn.textContent = originalText;
-                btn.disabled = false;
-                return;
-            }
 
-            try {
-                await firebaseService.login(email, password);
-                window.location.href = 'index.html';
-            } catch (err) {
-                console.error("Login error:", err);
-                errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
-                errorBox.style.display = 'block';
-                btn.textContent = originalText;
-                btn.disabled = false;
-            }
-        });
+                try {
+                    await firebaseService.login(email, password);
+                    window.location.href = 'index.html';
+                } catch (err) {
+                    console.error("Login error:", err);
+                    errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
+                    errorBox.style.display = 'block';
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            });
 
-        document.getElementById('google-login').addEventListener('click', async () => {
-            if (!firebaseService.isInitialized) {
-                alert("⚠️ Firebase er ikke konfigurert!");
-                return;
-            }
+            const googleBtn = document.getElementById('google-login');
+            if (googleBtn) {
+                googleBtn.addEventListener('click', async () => {
+                    if (!firebaseService.isInitialized) {
+                        alert("⚠️ Firebase er ikke konfigurert!");
+                        return;
+                    }
 
-            try {
-                await firebaseService.loginWithGoogle();
-                window.location.href = 'index.html';
-            } catch (err) {
-                console.error("Google login error:", err);
-                errorBox.textContent = "Kunne ikke logge inn med Google.";
-                errorBox.style.display = 'block';
+                    try {
+                        await firebaseService.loginWithGoogle();
+                        window.location.href = 'index.html';
+                    } catch (err) {
+                        console.error("Google login error:", err);
+                        errorBox.textContent = "Kunne ikke logge inn med Google.";
+                        errorBox.style.display = 'block';
+                    }
+                });
             }
-        });
+        })();
     </script>
 </body>
 

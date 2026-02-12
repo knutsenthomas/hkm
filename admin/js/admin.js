@@ -1,18 +1,21 @@
 // ===================================
-// Admin Dashboard - His Kingdom Ministry
+// Admin Dashboard - His Kingdom Ministry (Global version)
 // Core Logic & Firebase Integration
 // ===================================
-import { firebaseService } from "../../js/firebase-service.js";
+const firebaseService = window.firebaseService;
 
 class AdminManager {
     constructor() {
         this.currentSection = 'overview';
+        this.unreadMessageCount = 0;
+        this.messagesUnsub = null;
         this.init();
     }
 
     init() {
         this.initAuth();
         this.initDashboard();
+        this.initMessageListener();
 
         // Expose to window for the inline navigation script
         window.adminManager = this;
@@ -94,6 +97,12 @@ class AdminManager {
         // Render initial overview
         this.renderOverview();
         console.log("Dashboard initialized.");
+
+        // Start lytter for uleste meldinger (for bjelle)
+        this.initMessageNotifications();
+
+        // Søke-funksjon i toppfeltet
+        this.initSearch();
     }
 
     async logout() {
@@ -103,6 +112,62 @@ class AdminManager {
         } catch (error) {
             console.error("Error signing out:", error);
             alert("Failed to log out. Please try again.");
+        }
+    }
+
+    initMessageListener() {
+        if (!firebaseService.isInitialized || !firebaseService.db) return;
+
+        const bell = document.getElementById('messages-bell');
+        if (bell) {
+            bell.addEventListener('click', () => {
+                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
+                    window.adminManager.onSectionSwitch('messages');
+                }
+
+                const navLinks = document.querySelectorAll('.nav-link[data-section]');
+                navLinks.forEach(l => {
+                    l.classList.toggle('active', l.getAttribute('data-section') === 'messages');
+                });
+
+                const sections = document.querySelectorAll('.section-content');
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === 'messages-section') {
+                        section.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        try {
+            this.messagesUnsub = firebaseService.db
+                .collection('contactMessages')
+                .where('status', '==', 'ny')
+                .onSnapshot((snapshot) => {
+                    const count = snapshot.size;
+                    this.unreadMessageCount = count;
+                    this.updateMessageBell(count);
+                }, (err) => {
+                    console.error('Feil i meldings-lytter:', err);
+                });
+        } catch (err) {
+            console.error('Kunne ikke starte meldings-lytter:', err);
+        }
+    }
+
+    updateMessageBell(count) {
+        const bell = document.getElementById('messages-bell');
+        const badge = document.getElementById('messages-badge');
+        if (!bell || !badge) return;
+
+        if (count > 0) {
+            bell.classList.add('has-unread');
+            badge.style.display = 'flex';
+            badge.textContent = count > 9 ? '9+' : String(count);
+        } else {
+            bell.classList.remove('has-unread');
+            badge.style.display = 'none';
         }
     }
 
@@ -125,6 +190,9 @@ class AdminManager {
                     break;
                 case 'events':
                     this.renderCollectionEditor('events', 'Arrangementer');
+                    break;
+                case 'messages':
+                    this.renderMessagesSection();
                     break;
                 case 'media':
                     this.renderMediaManager();
@@ -155,6 +223,260 @@ class AdminManager {
                     break;
             }
         }
+    }
+
+    initMessageNotifications() {
+        if (!firebaseService.isInitialized || !firebaseService.db) return;
+
+        const icon = document.getElementById('notification-icon');
+        const dot = document.getElementById('notification-dot');
+
+        if (!icon || !dot) return;
+
+        try {
+            // Lytt på alle meldinger med status 'ny'
+            this.unsubscribeMessagesListener = firebaseService.db
+                .collection('contactMessages')
+                .where('status', '==', 'ny')
+                .onSnapshot((snapshot) => {
+                    const unreadCount = snapshot.size;
+
+                    if (unreadCount > 0) {
+                        dot.style.display = 'block';
+                        icon.classList.add('has-unread');
+                        dot.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
+                    } else {
+                        dot.style.display = 'none';
+                        icon.classList.remove('has-unread');
+                        dot.textContent = '';
+                    }
+                }, (err) => {
+                    console.error('Feil ved melding-notifikasjoner:', err);
+                });
+        } catch (err) {
+            console.error('Kunne ikke starte melding-notifikasjoner:', err);
+        }
+    }
+
+    initSearch() {
+        const searchInput = document.querySelector('.header-search input');
+        if (!searchInput) return;
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (query) {
+                    this.performSearch(query);
+                }
+            }
+        });
+    }
+
+    async performSearch(query) {
+        const q = (query || '').trim();
+        if (!q) return;
+
+        const section = document.getElementById('search-section');
+        if (!section) return;
+
+        // Vis søke-seksjonen
+        const allSections = document.querySelectorAll('.section-content');
+        allSections.forEach(s => s.classList.remove('active'));
+        section.classList.add('active');
+
+        section.innerHTML = `
+            <div class="section-header">
+                <h2 class="section-title">Søk</h2>
+                <p class="section-subtitle">Resultater for "${this.escapeHtml(q)}"</p>
+            </div>
+            <div class="card">
+                <div class="card-body" id="search-results">
+                    <p style="font-size:14px; color:#64748b;">Søker i dashboard-innhold...</p>
+                </div>
+            </div>
+        `;
+        section.setAttribute('data-rendered', 'true');
+
+        const resultsEl = document.getElementById('search-results');
+        if (!resultsEl) return;
+
+        if (!firebaseService.isInitialized) {
+            resultsEl.innerHTML = '<p style="color:#ef4444; font-size:14px;">Firebase er ikke konfigurert, kan ikke søke i innhold.</p>';
+            return;
+        }
+
+        const results = [];
+        const qLower = q.toLowerCase();
+
+        try {
+            // 1) Faste sider (content)
+            const pages = [
+                { id: 'index', label: 'Forside' },
+                { id: 'om-oss', label: 'Om oss' },
+                { id: 'media', label: 'Media' },
+                { id: 'arrangementer', label: 'Arrangementer' },
+                { id: 'blogg', label: 'Blogg' },
+                { id: 'kontakt', label: 'Kontakt' },
+                { id: 'donasjoner', label: 'Donasjoner' },
+                { id: 'undervisning', label: 'Undervisning' },
+                { id: 'reisevirksomhet', label: 'Reisevirksomhet' },
+                { id: 'bibelstudier', label: 'Bibelstudier' },
+                { id: 'seminarer', label: 'Seminarer' },
+                { id: 'podcast', label: 'Podcast' }
+            ];
+
+            for (const page of pages) {
+                const data = await firebaseService.getPageContent(page.id);
+                if (!data) continue;
+
+                const entries = this.collectTextEntries(data);
+                const hit = entries.find(entry => entry.text && entry.text.toLowerCase().includes(qLower));
+                if (hit) {
+                    results.push({
+                        type: 'Sideinnhold',
+                        title: page.label,
+                        meta: hit.path,
+                        snippet: this.makeSnippet(hit.text, q)
+                    });
+                }
+            }
+
+            // 2) Samlinger: blogg, arrangementer, undervisning
+            const collections = [
+                { id: 'blog', docId: 'collection_blog', label: 'Blogginnlegg' },
+                { id: 'events', docId: 'collection_events', label: 'Arrangementer' },
+                { id: 'teaching', docId: 'collection_teaching', label: 'Undervisning' }
+            ];
+
+            for (const col of collections) {
+                const raw = await firebaseService.getPageContent(col.docId);
+                const items = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : []);
+
+                items.forEach((item) => {
+                    const combined = [
+                        item.title,
+                        item.content,
+                        item.category,
+                        item.author,
+                        item.seoTitle,
+                        item.seoDescription
+                    ].filter(Boolean).join(' ').toLowerCase();
+
+                    if (combined.includes(qLower)) {
+                        results.push({
+                            type: col.label,
+                            title: item.title || '(uten tittel)',
+                            meta: item.date || item.category || '',
+                            snippet: this.makeSnippet(item.content || item.seoDescription || '', q)
+                        });
+                    }
+                });
+            }
+
+            // 3) Kontaktmeldinger (nyere)
+            if (firebaseService.db) {
+                const snapshot = await firebaseService.db
+                    .collection('contactMessages')
+                    .orderBy('createdAt', 'desc')
+                    .limit(100)
+                    .get();
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data() || {};
+                    const combined = [
+                        data.name,
+                        data.email,
+                        data.phone,
+                        data.subject,
+                        data.message
+                    ].filter(Boolean).join(' ').toLowerCase();
+
+                    if (combined.includes(qLower)) {
+                        results.push({
+                            type: 'Melding',
+                            title: data.subject || '(ingen emne)',
+                            meta: data.name || data.email || '',
+                            snippet: this.makeSnippet(data.message || '', q)
+                        });
+                    }
+                });
+            }
+        } catch (err) {
+            console.error('Feil ved søk:', err);
+            resultsEl.innerHTML = '<p style="color:#ef4444; font-size:14px;">Det oppstod en feil under søk. Prøv igjen.</p>';
+            return;
+        }
+
+        if (!results.length) {
+            resultsEl.innerHTML = '<p style="font-size:14px; color:#64748b;">Ingen treff for dette søket.</p>';
+            return;
+        }
+
+        const html = results.map((r) => `
+            <div class="search-result">
+                <div class="search-result-header">
+                    <span class="search-result-type">${this.escapeHtml(r.type)}</span>
+                    ${r.meta ? `<span class="search-result-meta">${this.escapeHtml(r.meta)}</span>` : ''}
+                </div>
+                <div class="search-result-title">${this.escapeHtml(r.title)}</div>
+                ${r.snippet ? `<div class="search-result-snippet">${this.escapeHtml(r.snippet)}</div>` : ''}
+            </div>
+        `).join('');
+
+        resultsEl.innerHTML = html;
+    }
+
+    collectTextEntries(obj, path = '') {
+        const entries = [];
+        if (!obj || typeof obj !== 'object') return entries;
+
+        Object.keys(obj).forEach((key) => {
+            const value = obj[key];
+            const currentPath = path ? `${path}.${key}` : key;
+
+            if (typeof value === 'string') {
+                entries.push({ text: value, path: currentPath });
+            } else if (value && typeof value === 'object') {
+                entries.push(...this.collectTextEntries(value, currentPath));
+            }
+        });
+
+        return entries;
+    }
+
+    makeSnippet(text, query) {
+        if (!text) return '';
+        const str = String(text).replace(/\s+/g, ' ').trim();
+        if (str.length <= 160) return str;
+
+        const lower = str.toLowerCase();
+        const qLower = query.toLowerCase();
+        const idx = lower.indexOf(qLower);
+
+        if (idx === -1) {
+            return str.substring(0, 157) + '...';
+        }
+
+        const start = Math.max(0, idx - 40);
+        const end = Math.min(str.length, idx + qLower.length + 60);
+        const prefix = start > 0 ? '...' : '';
+        const suffix = end < str.length ? '...' : '';
+        return prefix + str.substring(start, end) + suffix;
+    }
+
+    escapeHtml(str) {
+        if (str == null) return '';
+        return String(str).replace(/[&<>"']/g, (c) => {
+            switch (c) {
+                case '&': return '&amp;';
+                case '<': return '&lt;';
+                case '>': return '&gt;';
+                case '"': return '&quot;';
+                case "'": return '&#39;';
+                default: return c;
+            }
+        });
     }
 
     async renderOverview() {
@@ -317,78 +639,333 @@ class AdminManager {
                 <h2 class="section-title">Media-integrasjoner</h2>
                 <p class="section-subtitle">Koble til YouTube og Podcast-strømmer.</p>
             </div>
-            <div class="card" style="max-width: 800px;">
-                <div class="card-body">
-                    <div class="form-section">
-                        <h4>YouTube Innstillinger</h4>
-                        <div class="form-group">
-                            <label>YouTube Channel ID</label>
-                            <input type="text" id="yt-channel-id" class="form-control" placeholder="f.eks. UCxxxxxxxxxxxx">
-                            <small style="color: #64748b; margin-top: 4px; display: block;">ID-en til kanalen din.</small>
+            
+            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title">YouTube & RSS</h3></div>
+                    <div class="card-body">
+                        <div class="form-section">
+                            <h4>YouTube Innstillinger</h4>
+                            <div class="form-group">
+                                <label>YouTube Channel ID</label>
+                                <input type="text" id="yt-channel-id" class="form-control" placeholder="f.eks. UCxxxxxxxxxxxx">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>YouTube Kategorier (Playlister)</label>
+                                <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)"></textarea>
+                            </div>
                         </div>
-                        <div class="form-group" style="margin-top: 15px;">
-                            <label>YouTube Kategorier (Playlister)</label>
-                            <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)&#10;Tro: PLxxxxxxxxxxxx&#10;Bønn: PLyyyyyyyyyyyy"></textarea>
-                            <small style="color: #64748b; margin-top: 4px; display: block;">Organiser videoer i kategorier ved å legge til spilleliste-IDer.</small>
+                        
+                        <div class="divider"></div>
+
+                        <div class="form-section">
+                            <h4>Podcast Innstillinger</h4>
+                            <div class="form-group">
+                                <label>RSS Feed URL</label>
+                                <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://feeds.simplecast.com/xxxxxx">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Spotify Podcast URL</label>
+                                <input type="text" id="podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Apple Podcasts URL</label>
+                                <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 30px;">
+                            <button class="btn-primary" id="save-media-settings">Lagre media-innstillinger</button>
                         </div>
                     </div>
-                    
-                    <div class="divider"></div>
+                </div>
 
-                    <div class="form-section">
-                        <h4>Podcast Innstillinger</h4>
-                        <div class="form-group">
-                            <label>RSS Feed URL</label>
-                            <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://feeds.simplecast.com/xxxxxx">
-                            <small style="color: #64748b; margin-top: 4px; display: block;">RSS-lenken fra din podcast-leverandør.</small>
-                        </div>
+                <div class="card">
+                    <div class="card-header flex-between">
+                        <h3 class="card-title">Podcast-kategorier (Manuell overstyring)</h3>
+                        <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater liste</button>
                     </div>
-
-                    <div style="margin-top: 30px;">
-                        <button class="btn-primary" id="save-media-settings">Lagre media-innstillinger</button>
+                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Her kan du manuelt overstyre kategorien for hver episode. Hvis ingen er valgt, brukes automatisk kategorisering.</p>
+                        <div id="podcast-overrides-list">
+                            <div class="loader">Henter episoder...</div>
+                        </div>
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <button class="btn-primary" id="save-podcast-overrides" style="width: 100%;">Lagre overstyringer</button>
+                        </div>
                     </div>
                 </div>
             </div>
         `;
         section.setAttribute('data-rendered', 'true');
 
-        // Load existing settings
+        // Initial Load
+        this.loadMediaSettings();
+        this.loadPodcastOverrides();
+
+        // Listeners
+        document.getElementById('save-media-settings').addEventListener('click', () => this.saveMediaSettings());
+        document.getElementById('save-podcast-overrides').addEventListener('click', () => this.savePodcastOverrides());
+        document.getElementById('refresh-podcast-list').addEventListener('click', () => this.loadPodcastOverrides());
+    }
+
+    async renderMessagesSection() {
+        const section = document.getElementById('messages-section');
+        if (!section) return;
+
+        section.setAttribute('data-rendered', 'true');
+
+        // Basisoppsett
+        section.innerHTML = `
+            <div class="section-header">
+                <h2 class="section-title">Meldinger fra kontaktskjema</h2>
+                <p class="section-subtitle">Alle henvendelser som er sendt inn via kontaktskjemaet.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header flex-between">
+                    <h3 class="card-title">Innboks</h3>
+                </div>
+                <div class="card-body" id="messages-list">
+                    <p style="font-size:14px; color:#64748b;">Laster meldinger...</p>
+                </div>
+            </div>
+        `;
+
+        const listEl = document.getElementById('messages-list');
+
+        if (!firebaseService.isInitialized) {
+            if (listEl) {
+                listEl.innerHTML = '<p style="color:#ef4444; font-size:14px;">Firebase er ikke konfigurert. Meldinger kan ikke hentes.</p>';
+            }
+            return;
+        }
+
+        try {
+            const snapshot = await firebaseService.db
+                .collection('contactMessages')
+                .orderBy('createdAt', 'desc')
+                .limit(100)
+                .get();
+
+            if (!listEl) return;
+
+            if (snapshot.empty) {
+                listEl.innerHTML = '<p style="font-size:14px; color:#64748b;">Ingen meldinger er sendt inn ennå.</p>';
+                return;
+            }
+
+            const itemsHtml = [];
+            snapshot.forEach(doc => {
+                const data = doc.data() || {};
+                const createdAt = data.createdAt && typeof data.createdAt.toDate === 'function'
+                    ? data.createdAt.toDate().toLocaleString('no-NO')
+                    : '';
+
+                const name = data.name || 'Ukjent';
+                const email = data.email || '';
+                const phone = data.phone || '';
+                const subject = data.subject || '(ingen emne)';
+                const message = data.message || '';
+
+                const isRead = data.status === 'lest';
+
+                const statusBadge = isRead
+                    ? '<span class="message-badge message-badge-read">Lest</span>'
+                    : '<span class="message-badge message-badge-new">Ny</span>';
+
+                const markReadButton = isRead
+                    ? ''
+                    : `<button class="btn-secondary btn-sm message-mark-read" data-id="${doc.id}">Marker som lest</button>`;
+
+                itemsHtml.push(`
+                    <div class="message-item ${isRead ? 'message-read' : 'message-new'}" data-id="${doc.id}">
+                        <div class="message-header-row">
+                            <div>
+                                <div class="message-name">${name}</div>
+                                <div class="message-meta">
+                                    ${email ? `<span>${email}</span>` : ''}
+                                    ${email && phone ? ' · ' : ''}
+                                    ${phone ? `<span>${phone}</span>` : ''}
+                                </div>
+                            </div>
+                            <div class="message-header-right">
+                                <div class="message-time">${createdAt}</div>
+                                <div class="message-actions">
+                                    ${statusBadge}
+                                    ${markReadButton}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="message-subject">${subject}</div>
+                        <div class="message-body">${message}</div>
+                    </div>
+                `);
+            });
+
+            listEl.innerHTML = itemsHtml.join('');
+
+            // Klikk-håndtering for "marker som lest"
+            listEl.addEventListener('click', async (event) => {
+                const btn = event.target.closest('.message-mark-read');
+                if (!btn) return;
+
+                const id = btn.getAttribute('data-id');
+                if (!id) return;
+
+                try {
+                    await firebaseService.db.collection('contactMessages').doc(id).update({
+                        status: 'lest',
+                        readAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    const item = btn.closest('.message-item');
+                    if (item) {
+                        item.classList.remove('message-new');
+                        item.classList.add('message-read');
+                        const badge = item.querySelector('.message-badge');
+                        if (badge) {
+                            badge.textContent = 'Lest';
+                            badge.classList.remove('message-badge-new');
+                            badge.classList.add('message-badge-read');
+                        }
+                    }
+
+                    btn.remove();
+                } catch (err) {
+                    console.error('Kunne ikke oppdatere melding som lest:', err);
+                    alert('Kunne ikke markere melding som lest. Prøv igjen.');
+                }
+            }, { once: false });
+        } catch (err) {
+            console.error('Kunne ikke hente kontaktmeldinger:', err);
+            if (listEl) {
+                listEl.innerHTML = '<p style="color:#ef4444; font-size:14px;">Feil ved henting av meldinger. Prøv igjen senere.</p>';
+            }
+        }
+    }
+
+    async loadMediaSettings() {
         try {
             const settings = await firebaseService.getPageContent('settings_media');
             if (settings) {
                 if (settings.youtubeChannelId) document.getElementById('yt-channel-id').value = settings.youtubeChannelId;
                 if (settings.youtubePlaylists) document.getElementById('yt-playlists').value = settings.youtubePlaylists;
                 if (settings.podcastRssUrl) document.getElementById('podcast-rss-url').value = settings.podcastRssUrl;
+                if (settings.spotifyUrl) document.getElementById('podcast-spotify-url').value = settings.spotifyUrl;
+                if (settings.appleUrl) document.getElementById('podcast-apple-url').value = settings.appleUrl;
             }
         } catch (e) {
             console.error("Load media settings error:", e);
         }
+    }
 
-        document.getElementById('save-media-settings').addEventListener('click', async () => {
-            const btn = document.getElementById('save-media-settings');
-            const ytChannelId = document.getElementById('yt-channel-id').value.trim();
-            const youtubePlaylists = document.getElementById('yt-playlists').value.trim();
-            const podcastRssUrl = document.getElementById('podcast-rss-url').value.trim();
+    async saveMediaSettings() {
+        const btn = document.getElementById('save-media-settings');
+        const ytChannelId = document.getElementById('yt-channel-id').value.trim();
+        const youtubePlaylists = document.getElementById('yt-playlists').value.trim();
+        const podcastRssUrl = document.getElementById('podcast-rss-url').value.trim();
+        const spotifyUrl = document.getElementById('podcast-spotify-url').value.trim();
+        const appleUrl = document.getElementById('podcast-apple-url').value.trim();
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+        btn.textContent = 'Lagrer...';
+        btn.disabled = true;
 
-            try {
-                await firebaseService.savePageContent('settings_media', {
-                    youtubeChannelId: ytChannelId,
-                    youtubePlaylists: youtubePlaylists,
-                    podcastRssUrl: podcastRssUrl,
-                    updatedAt: new Date().toISOString()
-                });
-                alert('✅ Media-innstillinger er lagret!');
-            } catch (err) {
-                console.error("Save media settings error:", err);
-                alert('❌ Feil ved lagring: ' + err.message);
-            } finally {
-                btn.textContent = 'Lagre media-innstillinger';
-                btn.disabled = false;
+        try {
+            await firebaseService.savePageContent('settings_media', {
+                youtubeChannelId: ytChannelId,
+                youtubePlaylists: youtubePlaylists,
+                podcastRssUrl: podcastRssUrl,
+                spotifyUrl: spotifyUrl,
+                appleUrl: appleUrl,
+                updatedAt: new Date().toISOString()
+            });
+            alert('✅ Media-innstillinger er lagret!');
+        } catch (err) {
+            console.error("Save media settings error:", err);
+            alert('❌ Feil ved lagring: ' + err.message);
+        } finally {
+            btn.textContent = 'Lagre media-innstillinger';
+            btn.disabled = false;
+        }
+    }
+
+    async loadPodcastOverrides() {
+        const listContainer = document.getElementById('podcast-overrides-list');
+        if (!listContainer) return;
+
+        listContainer.innerHTML = '<div class="loader">Henter episoder...</div>';
+
+        try {
+            // 1. Fetch current overrides from Firebase
+            const overridesData = await firebaseService.getPageContent('settings_podcast_overrides') || {};
+            const overrides = overridesData.overrides || {};
+
+            // 2. Fetch episodes from RSS (via proxy)
+            const settings = await firebaseService.getPageContent('settings_media');
+            const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
+            const items = data.rss?.channel?.item;
+
+            if (items) {
+                const episodes = Array.isArray(items) ? items : [items];
+
+                listContainer.innerHTML = episodes.map((ep, idx) => {
+                    const id = ep.guid?._ || ep.guid || ep.link; // Use guid as unique key
+                    const currentCat = overrides[id] || '';
+
+                    return `
+                        <div class="podcast-override-item" style="padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px;">
+                            <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${ep.title}">${ep.title}</div>
+                            <div style="display: flex; align-items: center; gap: 10px;">
+                                <select class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 4px 8px; height: auto;">
+                                    <option value="">Auto (Nøkkelord)</option>
+                                    <option value="tro" ${currentCat === 'tro' ? 'selected' : ''}>Tro</option>
+                                    <option value="bibel" ${currentCat === 'bibel' ? 'selected' : ''}>Bibel</option>
+                                    <option value="bønn" ${currentCat === 'bønn' ? 'selected' : ''}>Bønn</option>
+                                    <option value="undervisning" ${currentCat === 'undervisning' ? 'selected' : ''}>Undervisning</option>
+                                </select>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                listContainer.innerHTML = '<p class="text-muted">Ingen episoder funnet.</p>';
+            }
+        } catch (err) {
+            console.error("Load podcast overrides error:", err);
+            listContainer.innerHTML = '<p class="text-danger">Kunne ikke laste episoder.</p>';
+        }
+    }
+
+    async savePodcastOverrides() {
+        const btn = document.getElementById('save-podcast-overrides');
+        const selects = document.querySelectorAll('.override-select');
+        const overrides = {};
+
+        selects.forEach(select => {
+            if (select.value) {
+                overrides[select.getAttribute('data-id')] = select.value;
             }
         });
+
+        btn.textContent = 'Lagrer...';
+        btn.disabled = true;
+
+        try {
+            await firebaseService.savePageContent('settings_podcast_overrides', {
+                overrides: overrides,
+                updatedAt: new Date().toISOString()
+            });
+            alert('✅ Podcast-overstyringer er lagret!');
+        } catch (err) {
+            console.error("Save overrides error:", err);
+            alert('❌ Feil ved lagring: ' + err.message);
+        } finally {
+            btn.textContent = 'Lagre overstyringer';
+            btn.disabled = false;
+        }
     }
 
     /**
@@ -414,6 +991,7 @@ class AdminManager {
                         <li class="page-item" data-page="kontakt">Kontakt</li>
                         <li class="page-item" data-page="donasjoner">Donasjoner</li>
                         <li class="page-item" data-page="undervisning">Undervisning</li>
+                        <li class="page-item" data-page="reisevirksomhet">Reisevirksomhet</li>
                         <li class="page-item" data-page="bibelstudier">Bibelstudier</li>
                         <li class="page-item" data-page="seminarer">Seminarer</li>
                         <li class="page-item" data-page="podcast">Podcast</li>
@@ -643,7 +1221,7 @@ class AdminManager {
 
         const newItem = {
             title: title,
-            date: new Date().toLocaleDateString('no-NO'),
+            date: new Date().toISOString().split('T')[0],
             content: ''
         };
 
@@ -682,11 +1260,26 @@ class AdminManager {
                         <div class="form-group">
                             <label>Logo URL</label>
                             <input type="text" id="site-logo-url" class="form-control" placeholder="https://...">
+                            <div class="upload-row">
+                                <input type="file" id="site-logo-file" class="form-control file-input" accept="image/*">
+                                <button class="btn-secondary" id="upload-logo-btn" type="button">Last opp logo</button>
+                            </div>
+                            <small class="helper-text">Anbefalt: PNG/SVG, maks 1 MB.</small>
                             <div class="preview-container" id="logo-preview-container"></div>
+                        </div>
+                        <div class="form-group">
+                            <label>Tekst ved siden av logo</label>
+                            <input type="text" id="site-logo-text" class="form-control" placeholder="His Kingdom Ministry">
+                            <small class="helper-text">Brukes hvis logoen er et ikon uten tekst.</small>
                         </div>
                         <div class="form-group">
                             <label>Favicon URL</label>
                             <input type="text" id="site-favicon-url" class="form-control" placeholder="https://...">
+                            <div class="upload-row">
+                                <input type="file" id="site-favicon-file" class="form-control file-input" accept="image/png,image/x-icon,image/svg+xml">
+                                <button class="btn-secondary" id="upload-favicon-btn" type="button">Last opp favicon</button>
+                            </div>
+                            <small class="helper-text">Anbefalt: 512x512 PNG eller ICO, maks 200 KB.</small>
                             <div class="preview-container" id="favicon-preview-container"></div>
                         </div>
                         <div class="form-group">
@@ -764,6 +1357,7 @@ class AdminManager {
                     this.updatePreview('favicon-preview-container', data.faviconUrl);
                 }
                 if (data.siteTitle) document.getElementById('site-title-seo').value = data.siteTitle;
+                if (data.logoText) document.getElementById('site-logo-text').value = data.logoText;
                 if (data.mainFont) document.getElementById('main-font-select').value = data.mainFont;
                 if (data.fontSizeBase) {
                     document.getElementById('font-size-base').value = data.fontSizeBase;
@@ -783,6 +1377,7 @@ class AdminManager {
             const data = {
                 logoUrl: document.getElementById('site-logo-url').value,
                 faviconUrl: document.getElementById('site-favicon-url').value,
+                logoText: document.getElementById('site-logo-text').value,
                 siteTitle: document.getElementById('site-title-seo').value,
                 mainFont: document.getElementById('main-font-select').value,
                 fontSizeBase: document.getElementById('font-size-base').value,
@@ -807,6 +1402,47 @@ class AdminManager {
         // Preview URL inputs
         document.getElementById('site-logo-url').onchange = (e) => this.updatePreview('logo-preview-container', e.target.value);
         document.getElementById('site-favicon-url').onchange = (e) => this.updatePreview('favicon-preview-container', e.target.value);
+
+        const wireUpload = (fileInputId, buttonId, urlInputId, previewId, pathPrefix, idleText) => {
+            const fileInput = document.getElementById(fileInputId);
+            const button = document.getElementById(buttonId);
+            const urlInput = document.getElementById(urlInputId);
+
+            if (!fileInput || !button || !urlInput) return;
+
+            button.onclick = async () => {
+                if (!firebaseService.isInitialized) {
+                    alert('Firebase er ikke konfigurert. Kan ikke laste opp.');
+                    return;
+                }
+
+                const file = fileInput.files && fileInput.files[0];
+                if (!file) {
+                    alert('Velg en fil for opplasting.');
+                    return;
+                }
+
+                button.disabled = true;
+                button.textContent = 'Laster opp...';
+
+                try {
+                    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                    const uploadPath = `${pathPrefix}/${Date.now()}-${safeName}`;
+                    const url = await firebaseService.uploadImage(file, uploadPath);
+                    urlInput.value = url;
+                    this.updatePreview(previewId, url);
+                } catch (err) {
+                    console.error('Upload error:', err);
+                    alert('Feil ved opplasting. Proev igjen.');
+                } finally {
+                    button.disabled = false;
+                    button.textContent = idleText;
+                }
+            };
+        };
+
+        wireUpload('site-logo-file', 'upload-logo-btn', 'site-logo-url', 'logo-preview-container', 'branding/logo', 'Last opp logo');
+        wireUpload('site-favicon-file', 'upload-favicon-btn', 'site-favicon-url', 'favicon-preview-container', 'branding/favicon', 'Last opp favicon');
     }
 
     updatePreview(containerId, url) {
@@ -897,11 +1533,11 @@ class AdminManager {
                         </div>
                         <div class="form-group" style="margin-top: 16px;">
                             <label>Adresse</label>
-                            <input type="text" id="profile-address" class="form-control" placeholder="Gateveien 12, 0123 Oslo">
+                            <input type="text" id="profile-address" class="form-control" placeholder="Norge">
                         </div>
                         <div class="form-group" style="margin-top: 16px;">
                             <label>Telefon</label>
-                            <input type="tel" id="profile-phone" class="form-control" placeholder="+47 123 45 678">
+                            <input type="tel" id="profile-phone" class="form-control" placeholder="+47 930 94 615">
                         </div>
                         <div class="form-group" style="margin-top: 16px;">
                             <label>Om meg / Bio</label>
@@ -1377,8 +2013,9 @@ class AdminManager {
                         
                         <div class="form-group">
                             <label>Calendar ID</label>
-                            <input type="text" id="gcal-id" class="form-control" placeholder="f.eks. dinadresse@gmail.com">
-                            <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Du finner denne i kalenderinnstillingene under 'Integrer kalender'.</p>
+                            <div id="gcal-list" class="gcal-list"></div>
+                            <button type="button" class="btn btn-outline" id="add-gcal" style="margin-top: 10px;">Legg til kalender</button>
+                            <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Legg inn flere kalendere for filtrering. Calendar ID finner du under "Integrer kalender".</p>
                         </div>
 
                         <div style="margin-top: 24px;">
@@ -1409,9 +2046,45 @@ class AdminManager {
         const gcal = settings.googleCalendar || {};
 
         document.getElementById('gcal-api-key').value = gcal.apiKey || '';
-        document.getElementById('gcal-id').value = gcal.calendarId || '';
 
-        if (gcal.apiKey && gcal.calendarId) {
+        const listEl = document.getElementById('gcal-list');
+        const addBtn = document.getElementById('add-gcal');
+        const savedCalendars = Array.isArray(settings.googleCalendars)
+            ? settings.googleCalendars
+            : (gcal.calendarId ? [{ id: gcal.calendarId, label: gcal.label || '' }] : []);
+
+        const renderCalendarRow = (value = {}) => {
+            const row = document.createElement('div');
+            row.className = 'gcal-row';
+            row.style.display = 'grid';
+            row.style.gridTemplateColumns = '1fr 2fr auto';
+            row.style.gap = '8px';
+            row.style.marginBottom = '8px';
+
+            row.innerHTML = `
+                <input type="text" class="form-control gcal-label" placeholder="Navn (f.eks. Moter)" value="${this.escapeHtml(value.label || '')}">
+                <input type="text" class="form-control gcal-id" placeholder="Calendar ID" value="${this.escapeHtml(value.id || '')}">
+                <button type="button" class="btn btn-outline gcal-remove">Fjern</button>
+            `;
+
+            row.querySelector('.gcal-remove').addEventListener('click', () => {
+                row.remove();
+            });
+
+            listEl.appendChild(row);
+        };
+
+        if (savedCalendars.length > 0) {
+            savedCalendars.forEach(renderCalendarRow);
+        } else {
+            renderCalendarRow();
+        }
+
+        if (addBtn) {
+            addBtn.addEventListener('click', () => renderCalendarRow());
+        }
+
+        if (gcal.apiKey && (savedCalendars.length > 0 || gcal.calendarId)) {
             const statusBadge = document.getElementById('gcal-status');
             statusBadge.textContent = 'Konfigurert';
             statusBadge.style.background = '#dcfce7';
@@ -1421,7 +2094,12 @@ class AdminManager {
         document.getElementById('save-gcal-settings').onclick = async (e) => {
             const btn = e.target;
             const apiKey = document.getElementById('gcal-api-key').value.trim();
-            const calendarId = document.getElementById('gcal-id').value.trim();
+            const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
+            const calendars = rows.map(row => {
+                const label = row.querySelector('.gcal-label')?.value.trim();
+                const id = row.querySelector('.gcal-id')?.value.trim();
+                return { label, id };
+            }).filter(item => item.id);
 
             btn.textContent = 'Lagrer...';
             btn.disabled = true;
@@ -1431,16 +2109,18 @@ class AdminManager {
                     ...settings,
                     googleCalendar: {
                         apiKey,
-                        calendarId,
+                        calendarId: calendars[0]?.id || '',
+                        label: calendars[0]?.label || '',
                         lastUpdated: new Date().toISOString()
-                    }
+                    },
+                    googleCalendars: calendars
                 };
 
                 await firebaseService.savePageContent('settings_integrations', newSettings);
 
                 btn.textContent = 'Lagret!';
                 const statusBadge = document.getElementById('gcal-status');
-                if (apiKey && calendarId) {
+                if (apiKey && calendars.length > 0) {
                     statusBadge.textContent = 'Konfigurert';
                     statusBadge.style.background = '#dcfce7';
                     statusBadge.style.color = '#166534';
@@ -1748,8 +2428,8 @@ class AdminManager {
                     title: 'Ta Kontakt',
                     text: 'Har du spørsmål, bønnebehov eller ønsker du å vite mer om vår tjeneste? Ikke nøl med å ta kontakt med oss.',
                     email: 'post@hiskingdomministry.no',
-                    phone: '+47 123 45 678',
-                    address: 'Oslo, Norge'
+                    phone: '+47 930 94 615',
+                    address: 'Norge'
                 }
             };
             await firebaseService.savePageContent('kontakt', kontaktContent);

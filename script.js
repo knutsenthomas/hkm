@@ -8,6 +8,7 @@ const header = document.getElementById('header');
 const mobileToggle = document.getElementById('mobile-toggle');
 const nav = document.getElementById('nav');
 const navLinks = document.querySelectorAll('.nav-link');
+const headerActions = document.querySelector('.header-actions');
 
 // ===================================
 // Header Scroll Effect
@@ -53,6 +54,109 @@ navLinks.forEach(link => {
         document.body.style.overflow = '';
     });
 });
+
+// ===================================
+// Global Site Search (magnifying glass in header)
+// ===================================
+
+// Only initialize if header actions exist
+if (headerActions) {
+    // Create search toggle button
+    const searchBtn = document.createElement('button');
+    searchBtn.type = 'button';
+    searchBtn.className = 'header-search-btn';
+    searchBtn.innerHTML = '<i class="fas fa-search"></i>';
+
+    // Insert before main CTA button (if finnes), ellers først i actions
+    const firstChild = headerActions.firstElementChild;
+    if (firstChild) {
+        headerActions.insertBefore(searchBtn, firstChild);
+    } else {
+        headerActions.appendChild(searchBtn);
+    }
+
+    // Create overlay for search UI
+    const overlay = document.createElement('div');
+    overlay.className = 'site-search-overlay';
+    overlay.innerHTML = `
+        <div class="site-search-dialog">
+            <div class="site-search-header">
+                <div class="site-search-input-wrapper">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="site-search-input" placeholder="Søk i innhold..." autocomplete="off" />
+                </div>
+                <button class="site-search-close" id="site-search-close" type="button" aria-label="Lukk søk">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="site-search-results" id="site-search-results">
+                <p class="site-search-helper">Skriv inn et søkeord og trykk Enter.</p>
+            </div>
+        </div>`;
+
+    document.body.appendChild(overlay);
+
+    const searchInput = document.getElementById('site-search-input');
+    const searchResults = document.getElementById('site-search-results');
+    const searchClose = document.getElementById('site-search-close');
+
+    function openSearch() {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        if (searchInput) {
+            searchInput.value = '';
+            searchResults.innerHTML = '<p class="site-search-helper">Skriv inn et søkeord og trykk Enter.</p>';
+            setTimeout(() => searchInput.focus(), 50);
+        }
+    }
+
+    function closeSearch() {
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    searchBtn.addEventListener('click', openSearch);
+    searchClose.addEventListener('click', closeSearch);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) {
+            closeSearch();
+        }
+    });
+
+    if (searchInput) {
+        let searchDebounceId = null;
+
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                closeSearch();
+                return;
+            }
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const query = searchInput.value.trim();
+                if (query.length >= 1) {
+                    performSiteSearch(query, searchResults);
+                }
+            }
+        });
+
+        searchInput.addEventListener('input', () => {
+            const value = searchInput.value.trim();
+
+            if (value.length < 3) {
+                searchResults.innerHTML = '<p class="site-search-helper">Skriv minst 3 bokstaver for å søke.</p>';
+                if (searchDebounceId) clearTimeout(searchDebounceId);
+                return;
+            }
+
+            if (searchDebounceId) clearTimeout(searchDebounceId);
+            searchDebounceId = setTimeout(() => {
+                performSiteSearch(value, searchResults);
+            }, 250);
+        });
+    }
+}
 
 // ===================================
 // Hero Slider
@@ -173,6 +277,292 @@ window.addEventListener('scroll', () => {
 });
 
 // ===================================
+// Site-wide search helpers
+// ===================================
+
+async function performSiteSearch(query, resultsEl) {
+    if (!resultsEl) return;
+
+    const q = (query || '').trim();
+    if (!q) {
+        resultsEl.innerHTML = '<p class="site-search-helper">Skriv inn et søkeord og trykk Enter.</p>';
+        return;
+    }
+
+    resultsEl.innerHTML = '<p class="site-search-helper">Søker i innhold...</p>';
+
+    if (!window.firebaseService || !window.firebaseService.isInitialized) {
+        resultsEl.innerHTML = '<p class="site-search-helper">Innhold kan ikke søkes akkurat nå. Prøv igjen senere.</p>';
+        return;
+    }
+
+    const firebaseService = window.firebaseService;
+    const results = [];
+    const qLower = q.toLowerCase();
+
+    try {
+        // 1) Faste sider
+        const pages = [
+            { id: 'index', label: 'Forside', url: 'index.html' },
+            { id: 'om-oss', label: 'Om oss', url: 'om-oss.html' },
+            { id: 'media', label: 'Media', url: 'media.html' },
+            { id: 'arrangementer', label: 'Arrangementer', url: 'arrangementer.html' },
+            { id: 'blogg', label: 'Blogg', url: 'blogg.html' },
+            { id: 'kontakt', label: 'Kontakt', url: 'kontakt.html' },
+            { id: 'donasjoner', label: 'Donasjoner', url: 'donasjoner.html' },
+            { id: 'undervisning', label: 'Undervisning', url: 'undervisning.html' },
+            { id: 'reisevirksomhet', label: 'Reisevirksomhet', url: 'reisevirksomhet.html' },
+            { id: 'bibelstudier', label: 'Bibelstudier', url: 'bibelstudier.html' },
+            { id: 'seminarer', label: 'Seminarer', url: 'seminarer.html' },
+            { id: 'podcast', label: 'Podcast', url: 'podcast.html' }
+        ];
+
+        for (const page of pages) {
+            const data = await firebaseService.getPageContent(page.id);
+            if (!data) continue;
+
+            const entries = collectTextEntries(data);
+            const hit = entries.find(entry => entry.text && entry.text.toLowerCase().includes(qLower));
+            if (hit) {
+                results.push({
+                    type: 'Side',
+                    title: page.label,
+                    meta: hit.path,
+                    url: page.url,
+                    snippet: makeSnippet(hit.text, q)
+                });
+            }
+        }
+
+        // 2) Samlinger: blogg, arrangementer, undervisning
+        const collections = [
+            { id: 'blog', docId: 'collection_blog', label: 'Blogginnlegg', url: 'blogg.html' },
+            { id: 'events', docId: 'collection_events', label: 'Arrangementer', url: 'arrangementer.html' },
+            { id: 'teaching', docId: 'collection_teaching', label: 'Undervisning', url: 'undervisningsserier.html' }
+        ];
+
+        for (const col of collections) {
+            const raw = await firebaseService.getPageContent(col.docId);
+            const items = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : []);
+
+            items.forEach((item) => {
+                const combined = [
+                    item.title,
+                    item.content,
+                    item.category,
+                    item.author,
+                    item.seoTitle,
+                    item.seoDescription
+                ].filter(Boolean).join(' ').toLowerCase();
+
+                if (combined.includes(qLower)) {
+                    results.push({
+                        type: col.label,
+                        title: item.title || '(uten tittel)',
+                        meta: item.date || item.category || '',
+                        url: col.url,
+                        snippet: makeSnippet(item.content || item.seoDescription || '', q)
+                    });
+                }
+            });
+        }
+
+        // 3) Podcast-episoder (via felles RSS-proxy)
+        let podcastEpisodes = window._siteSearchPodcasts;
+        if (!podcastEpisodes) {
+            try {
+                const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+                const resp = await fetch(proxyUrl);
+                const data = await resp.json();
+                const items = data?.rss?.channel?.item;
+                if (items) {
+                    const episodes = Array.isArray(items) ? items : [items];
+                    podcastEpisodes = episodes.map(ep => ({
+                        title: ep.title,
+                        description: typeof ep.description === 'string' ? ep.description : (ep.description?._ || ''),
+                        pubDate: ep.pubDate,
+                        link: ep.link
+                    }));
+                } else {
+                    podcastEpisodes = [];
+                }
+                window._siteSearchPodcasts = podcastEpisodes;
+            } catch (e) {
+                console.warn('Kunne ikke hente podcast for søk:', e);
+                podcastEpisodes = [];
+                window._siteSearchPodcasts = podcastEpisodes;
+            }
+        }
+
+        if (Array.isArray(podcastEpisodes) && podcastEpisodes.length) {
+            podcastEpisodes.forEach(ep => {
+                const combined = [ep.title, ep.description].filter(Boolean).join(' ').toLowerCase();
+                if (combined.includes(qLower)) {
+                    results.push({
+                        type: 'Podcast',
+                        title: ep.title || '(uten tittel)',
+                        meta: ep.pubDate ? new Date(ep.pubDate).toLocaleDateString('no-NO') : '',
+                        url: ep.link || 'podcast.html',
+                        snippet: makeSnippet(ep.description || '', q)
+                    });
+                }
+            });
+        }
+
+        // 4) YouTube-videoer (kanal-feed via RSS2JSON)
+        let youtubeVideos = window._siteSearchYouTubeVideos;
+        if (!youtubeVideos) {
+            try {
+                const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
+                const rssFeedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+                const resp = await fetch(proxyUrl);
+                const data = await resp.json();
+                youtubeVideos = (data && Array.isArray(data.items)) ? data.items : (data && data.items ? [data.items] : []);
+                window._siteSearchYouTubeVideos = youtubeVideos;
+            } catch (e) {
+                console.warn('Kunne ikke hente YouTube-videoer for søk:', e);
+                youtubeVideos = [];
+                window._siteSearchYouTubeVideos = youtubeVideos;
+            }
+        }
+
+        if (Array.isArray(youtubeVideos) && youtubeVideos.length) {
+            youtubeVideos.forEach(v => {
+                const title = v.title;
+                const description = v.description || '';
+                const combined = [title, description].filter(Boolean).join(' ').toLowerCase();
+                if (combined.includes(qLower)) {
+                    results.push({
+                        type: 'YouTube',
+                        title: title || '(uten tittel)',
+                        meta: v.pubDate ? new Date(v.pubDate).toLocaleDateString('no-NO') : '',
+                        url: v.link || 'youtube.html',
+                        snippet: makeSnippet(description, q)
+                    });
+                }
+            });
+        }
+
+        // 5) Kalender-hendelser (Google Calendar via settings_gcal)
+        let calendarEvents = window._siteSearchCalendarEvents;
+        if (typeof calendarEvents === 'undefined') {
+            calendarEvents = [];
+            window._siteSearchCalendarEvents = calendarEvents;
+            try {
+                const settings = await firebaseService.getPageContent('settings_gcal');
+                if (settings && settings.apiKey && settings.calendarId) {
+                    const nowIso = new Date().toISOString();
+                    const url = `https://www.googleapis.com/calendar/v3/calendars/${settings.calendarId}/events?key=${settings.apiKey}&timeMin=${nowIso}&singleEvents=true&orderBy=startTime&maxResults=50`;
+                    const resp = await fetch(url);
+                    if (resp.ok) {
+                        const data = await resp.json();
+                        calendarEvents = data.items || [];
+                        window._siteSearchCalendarEvents = calendarEvents;
+                    }
+                }
+            } catch (e) {
+                console.warn('Kunne ikke hente kalender-hendelser for søk:', e);
+            }
+        }
+
+        if (Array.isArray(calendarEvents) && calendarEvents.length) {
+            calendarEvents.forEach(ev => {
+                const summary = ev.summary || '';
+                const description = ev.description || '';
+                const location = ev.location || '';
+                const combined = [summary, description, location].filter(Boolean).join(' ').toLowerCase();
+                if (combined.includes(qLower)) {
+                    const start = ev.start && (ev.start.dateTime || ev.start.date);
+                    const dateLabel = start ? new Date(start).toLocaleString('no-NO') : '';
+                    results.push({
+                        type: 'Kalender',
+                        title: summary || '(uten tittel)',
+                        meta: dateLabel,
+                        url: 'kalender.html',
+                        snippet: makeSnippet(description || location || '', q)
+                    });
+                }
+            });
+        }
+    } catch (err) {
+        console.error('Feil ved søk:', err);
+        resultsEl.innerHTML = '<p class="site-search-helper">Det oppstod en feil ved søk. Prøv igjen senere.</p>';
+        return;
+    }
+
+    if (!results.length) {
+        resultsEl.innerHTML = '<p class="site-search-helper">Ingen treff for dette søket.</p>';
+        return;
+    }
+
+    const html = results.map((r) => `
+        <a href="${r.url}" class="site-search-result">
+            <div class="site-search-result-header">
+                <span class="site-search-result-type">${escapeHtml(r.type)}</span>
+                ${r.meta ? `<span class="site-search-result-meta">${escapeHtml(r.meta)}</span>` : ''}
+            </div>
+            <div class="site-search-result-title">${escapeHtml(r.title)}</div>
+            ${r.snippet ? `<div class="site-search-result-snippet">${escapeHtml(r.snippet)}</div>` : ''}
+        </a>
+    `).join('');
+
+    resultsEl.innerHTML = html;
+}
+
+function collectTextEntries(obj, path = '') {
+    const entries = [];
+    if (!obj || typeof obj !== 'object') return entries;
+
+    Object.keys(obj).forEach((key) => {
+        const value = obj[key];
+        const currentPath = path ? `${path}.${key}` : key;
+
+        if (typeof value === 'string') {
+            entries.push({ text: value, path: currentPath });
+        } else if (value && typeof value === 'object') {
+            entries.push(...collectTextEntries(value, currentPath));
+        }
+    });
+
+    return entries;
+}
+
+function makeSnippet(text, query) {
+    if (!text) return '';
+    const str = String(text).replace(/\s+/g, ' ').trim();
+    if (str.length <= 160) return str;
+
+    const lower = str.toLowerCase();
+    const qLower = query.toLowerCase();
+    const idx = lower.indexOf(qLower);
+
+    if (idx === -1) {
+        return str.substring(0, 157) + '...';
+    }
+
+    const start = Math.max(0, idx - 40);
+    const end = Math.min(str.length, idx + qLower.length + 60);
+    const prefix = start > 0 ? '...' : '';
+    const suffix = end < str.length ? '...' : '';
+    return prefix + str.substring(start, end) + suffix;
+}
+
+function escapeHtml(str) {
+    if (str == null) return '';
+    return String(str).replace(/[&<>"']/g, (c) => {
+        switch (c) {
+            case '&': return '&amp;';
+            case '<': return '&lt;';
+            case '>': return '&gt;';
+            case '"': return '&quot;';
+            case "'": return '&#39;';
+            default: return c;
+        }
+    });
+}
+
+// ===================================
 // Counter Animation (Fun Facts)
 // ===================================
 class CounterAnimation {
@@ -212,6 +602,7 @@ class CounterAnimation {
                     requestAnimationFrame(updateCounter);
                 } else {
                     counter.textContent = target;
+                    counter.dataset.animated = 'true';
                 }
             };
 
@@ -222,6 +613,71 @@ class CounterAnimation {
 
 // Initialize Counter Animation
 new CounterAnimation();
+
+// ===================================
+// YouTube Stats (Fun Facts)
+// ===================================
+function initYouTubeStats() {
+    const videoEl = document.getElementById('yt-video-count');
+    const viewEl = document.getElementById('yt-view-count');
+    if (!videoEl && !viewEl) return;
+
+    const apiKey = 'AIzaSyD622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
+    const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
+    const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${apiKey}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            const stats = data && data.items && data.items[0] && data.items[0].statistics;
+            if (!stats) return;
+
+            const videoCount = Number(stats.videoCount || 0);
+            const viewCount = Number(stats.viewCount || 0);
+
+            const applyCount = (el, value) => {
+                if (!el) return;
+                el.setAttribute('data-target', String(value));
+                if (el.dataset.animated === 'true') {
+                    el.textContent = value;
+                }
+            };
+
+            applyCount(videoEl, videoCount);
+            applyCount(viewEl, viewCount);
+        })
+        .catch((err) => {
+            console.warn('Kunne ikke hente YouTube-statistikk:', err);
+        });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initYouTubeStats();
+    initPodcastStats();
+});
+
+function initPodcastStats() {
+    const podcastEl = document.getElementById('podcast-episode-count');
+    if (!podcastEl) return;
+
+    const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+
+    fetch(proxyUrl)
+        .then(response => response.json())
+        .then(data => {
+            const items = data && data.rss && data.rss.channel && data.rss.channel.item;
+            if (!items) return;
+
+            const count = Array.isArray(items) ? items.length : 1;
+            podcastEl.setAttribute('data-target', String(count));
+            if (podcastEl.dataset.animated === 'true') {
+                podcastEl.textContent = count;
+            }
+        })
+        .catch((err) => {
+            console.warn('Kunne ikke hente podcast-statistikk:', err);
+        });
+}
 
 // ===================================
 // Progress Bars Animation
@@ -338,16 +794,6 @@ if (footerNewsletterForm) {
 }
 
 // ===================================
-// Video Play Button
-// ===================================
-const playButton = document.querySelector('.play-button');
-if (playButton) {
-    playButton.addEventListener('click', () => {
-        alert('Video-funksjonalitet vil bli implementert her. Du kan koble til YouTube eller Vimeo.');
-    });
-}
-
-// ===================================
 // Lazy Loading Images
 // ===================================
 if ('IntersectionObserver' in window) {
@@ -393,6 +839,44 @@ document.querySelectorAll('.feature-box, .cause-card, .event-card, .blog-card').
 });
 
 // ===================================
+// Team Cards (Om oss-siden)
+// ===================================
+function initTeamCards() {
+    const members = document.querySelectorAll('.team-section .team-member');
+    if (!members.length) return;
+
+    members.forEach(member => {
+        const toggleBtn = member.querySelector('.team-toggle');
+        const nameEl = member.querySelector('.team-name');
+        const imageEl = member.querySelector('.team-image');
+
+        const toggle = () => {
+            const expanded = member.classList.toggle('expanded');
+            if (toggleBtn) {
+                toggleBtn.textContent = expanded ? 'Vis mindre' : 'Les mer';
+            }
+        };
+
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                toggle();
+            });
+        }
+
+        if (nameEl) {
+            nameEl.style.cursor = 'pointer';
+            nameEl.addEventListener('click', toggle);
+        }
+
+        if (imageEl) {
+            imageEl.style.cursor = 'pointer';
+            imageEl.addEventListener('click', toggle);
+        }
+    });
+}
+
+// ===================================
 // Dynamic Year in Footer
 // ===================================
 const yearElement = document.getElementById('year');
@@ -428,12 +912,6 @@ document.addEventListener('keydown', (e) => {
         heroSlider.nextSlide();
     }
 });
-
-// ===================================
-// Console Welcome Message
-// ===================================
-console.log('%c His Kingdom Ministry ', 'background: linear-gradient(135deg, #FF8C42, #E74C3C); color: white; font-size: 20px; padding: 10px; border-radius: 5px;');
-console.log('%c Website built with Wishon Template ', 'color: #FF8C42; font-size: 14px;');
 
 // ===================================
 // Performance: Preload Critical Images
@@ -587,7 +1065,19 @@ function initCalendarViewToggle() {
     });
 }
 
+// ===================================
+// Copyright Year Auto-Update
+// ===================================
+function updateCopyrightYear() {
+    const yearElement = document.getElementById('copyright-year');
+    if (yearElement) {
+        yearElement.textContent = new Date().getFullYear();
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     initCalendarTabs();
     initCalendarViewToggle();
+    initTeamCards();
+    updateCopyrightYear();
 });

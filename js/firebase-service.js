@@ -1,36 +1,13 @@
 // ===================================
-// Firebase Service Wrapper
+// Firebase Service Wrapper (Compat Version)
 // ===================================
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-    getFirestore,
-    doc,
-    getDoc,
-    setDoc,
-    updateDoc,
-    onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import {
-    getAuth,
-    onAuthStateChanged,
-    signInWithEmailAndPassword,
-    signInWithPopup,
-    GoogleAuthProvider,
-    signOut
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import {
-    getStorage,
-    ref,
-    uploadBytes,
-    getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
-import { firebaseConfig } from "./firebase-config.js";
 
 class FirebaseService {
     constructor() {
         this.app = null;
         this.db = null;
         this.auth = null;
+        this.storage = null;
         this.isInitialized = false;
 
         // Try load from localStorage first
@@ -46,19 +23,31 @@ class FirebaseService {
         }
 
         // Only initialize if static config is provided
-        if (firebaseConfig && firebaseConfig.apiKey !== "YOUR_API_KEY") {
-            this.init(firebaseConfig);
+        if (window.firebaseConfig && window.firebaseConfig.apiKey !== "YOUR_API_KEY") {
+            this.init(window.firebaseConfig);
         }
     }
 
     init(config) {
         try {
-            this.app = initializeApp(config);
-            this.db = getFirestore(this.app);
-            this.auth = getAuth(this.app);
-            this.storage = getStorage(this.app);
+            // Check if firebase is available globally (from script tag)
+            if (typeof firebase === 'undefined') {
+                console.error("❌ Firebase SDK not found. Make sure compat scripts are loaded.");
+                return;
+            }
+
+            // In Compat mode, we check if app is already initialized
+            if (!firebase.apps.length) {
+                this.app = firebase.initializeApp(config);
+            } else {
+                this.app = firebase.app();
+            }
+
+            this.db = firebase.firestore();
+            this.auth = firebase.auth();
+            this.storage = firebase.storage();
             this.isInitialized = true;
-            console.log("🔥 Firebase initialized successfully.");
+            console.log("✅ Firebase initialized (Compat)");
         } catch (error) {
             console.error("❌ Firebase initialization failed:", error);
         }
@@ -69,19 +58,13 @@ class FirebaseService {
      * @param {string} pageId - e.g., 'index'
      */
     async getPageContent(pageId) {
-        if (!this.isInitialized) {
-            console.warn(`⚠️ Firebase not initialized. getPageContent('${pageId}') returns null.`);
-            return null;
-        }
+        if (!this.isInitialized) return null;
 
         try {
-            const docRef = doc(this.db, "content", pageId);
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
+            const docSnap = await this.db.collection("content").doc(pageId).get();
+            if (docSnap.exists) {
                 return docSnap.data();
             } else {
-                console.warn(`⚠️ No content found for page: ${pageId}`);
                 return null;
             }
         } catch (error) {
@@ -97,14 +80,9 @@ class FirebaseService {
      */
     async updatePageContent(pageId, data) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        const docRef = doc(this.db, "content", pageId);
-        await setDoc(docRef, data, { merge: true });
+        await this.db.collection("content").doc(pageId).set(data, { merge: true });
     }
 
-    /**
-     * Backwards-compatible alias for saving page content.
-     * Some callers use `savePageContent` — keep that working.
-     */
     async savePageContent(pageId, data) {
         return this.updatePageContent(pageId, data);
     }
@@ -115,15 +93,11 @@ class FirebaseService {
      * @param {function} callback 
      */
     subscribeToPage(pageId, callback) {
-        if (!this.isInitialized) {
-            console.warn(`⚠️ Firebase not initialized. subscribeToPage('${pageId}') is a no-op.`);
-            return null;
-        }
+        if (!this.isInitialized) return null;
 
         try {
-            const docRef = doc(this.db, "content", pageId);
-            return onSnapshot(docRef, (doc) => {
-                if (doc.exists()) {
+            return this.db.collection("content").doc(pageId).onSnapshot((doc) => {
+                if (doc.exists) {
                     callback(doc.data());
                 }
             });
@@ -137,33 +111,64 @@ class FirebaseService {
      * Auth Methods
      */
     async login(email, password) {
-        return signInWithEmailAndPassword(this.auth, email, password);
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        return this.auth.signInWithEmailAndPassword(email, password);
     }
 
     async loginWithGoogle() {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        const provider = new GoogleAuthProvider();
-        return signInWithPopup(this.auth, provider);
+        const provider = new firebase.auth.GoogleAuthProvider();
+        return this.auth.signInWithPopup(provider);
     }
 
     async logout() {
-        return signOut(this.auth);
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        return this.auth.signOut();
     }
 
     /**
      * Storage Methods
      */
-    async uploadImage(file, path) {
+    async uploadImage(file, path, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        const storageRef = ref(this.storage, path);
-        const snapshot = await uploadBytes(storageRef, file);
-        return getDownloadURL(snapshot.ref);
+        const storageRef = this.storage.ref(path);
+        const timeoutMs = typeof options.timeoutMs === 'number' ? options.timeoutMs : 45000;
+
+        return new Promise((resolve, reject) => {
+            const uploadTask = storageRef.put(file);
+            let didTimeout = false;
+
+            const timeoutId = setTimeout(() => {
+                didTimeout = true;
+                uploadTask.cancel();
+                reject(new Error('Upload timeout'));
+            }, timeoutMs);
+
+            uploadTask.on(
+                'state_changed',
+                null,
+                (error) => {
+                    clearTimeout(timeoutId);
+                    if (!didTimeout) reject(error);
+                },
+                async () => {
+                    clearTimeout(timeoutId);
+                    try {
+                        const url = await storageRef.getDownloadURL();
+                        resolve(url);
+                    } catch (error) {
+                        reject(error);
+                    }
+                }
+            );
+        });
     }
 
     onAuthChange(callback) {
         if (!this.isInitialized) return;
-        onAuthStateChanged(this.auth, callback);
+        this.auth.onAuthStateChanged(callback);
     }
 }
 
-export const firebaseService = new FirebaseService();
+// Global instance
+window.firebaseService = new FirebaseService();

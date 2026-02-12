@@ -6,12 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Podcast | His Kingdom Ministry</title>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Inter for hele siden -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700;900&family=Open+Sans:wght@300;400;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -75,8 +73,30 @@
         <div class="container">
             <div class="section-header">
                 <span class="section-label">Episodearkiv</span>
-                <h2 class="section-title">Alle Episoder</h2>
+                <h2 class="section-title">Alle episoder</h2>
                 <p class="section-description">Her kan du høre på alle våre podcast-episoder direkte i nettleseren.</p>
+            </div>
+
+            <!-- Podcast Filters & Sorting -->
+            <div class="podcast-controls"
+                style="margin-bottom: 40px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;">
+                <div id="podcast-categories" class="youtube-categories"
+                    style="margin-bottom: 0; display: flex; flex-wrap: wrap; gap: 12px;">
+                    <button class="category-btn active" data-filter="all">Alle</button>
+                    <button class="category-btn" data-filter="tro">Tro</button>
+                    <button class="category-btn" data-filter="bibel">Bibel</button>
+                    <button class="category-btn" data-filter="bønn">Bønn</button>
+                    <button class="category-btn" data-filter="undervisning">Undervisning</button>
+                </div>
+
+                <div class="podcast-sort" style="display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 0.9rem; color: var(--text-light); font-weight: 600;">Sorter etter:</span>
+                    <select id="podcast-sort-select"
+                        style="padding: 8px 15px; border-radius: 20px; border: 2px solid var(--border-color); background: white; font-family: inherit; font-size: 0.9rem; color: var(--text-dark); outline: none; cursor: pointer;">
+                        <option value="newest">Nyeste først</option>
+                        <option value="oldest">Eldste først</option>
+                    </select>
+                </div>
             </div>
 
             <div class="podcast-grid" id="podcast-grid">
@@ -87,12 +107,14 @@
                 </div>
             </div>
 
-            <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <h3 style="margin-bottom: 20px;">Lytt på din favoritt-plattform</h3>
-                <div class="podcast-platforms" id="podcast-links-container">
-                    <a href="#" class="platform-link" title="Spotify"><i class="fab fa-spotify"></i></a>
-                    <a href="#" class="platform-link" title="Apple Podcasts"><i class="fas fa-podcast"></i></a>
-                    <a href="#" class="platform-link" title="RSS Feed"><i class="fas fa-rss"></i></a>
+            <div class="section-footer" style="margin-top: 50px;">
+                <div class="footer-flex">
+                    <h3 style="margin-bottom: 0; text-align: center;">Lytt på din favoritt-plattform</h3>
+                    <div class="podcast-platforms" id="podcast-links-container">
+                        <a href="https://open.spotify.com/show/3gk4nt7v5hy6yGB4k1QYGU?si=021c69679bdd49ac" class="platform-link platform-spotify" title="Spotify" target="_blank" rel="noopener noreferrer"><i class="fab fa-spotify"></i></a>
+                        <a href="https://podcasts.apple.com/us/podcast/tro-og-liv/id1753117158" class="platform-link platform-apple" title="Apple Podcasts" target="_blank" rel="noopener noreferrer"><i class="fas fa-podcast"></i></a>
+                        <a href="https://www.youtube.com/playlist?list=PL7aC7oqEJFeXLnkmFQzPOOvWcnAIfjTGv" class="platform-link platform-youtube" title="YouTube" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -112,9 +134,9 @@
                     <p class="footer-text">Et felleskap for vekst, bønn og undervisning. Vi ønsker å utruste mennesker
                         til et dypere liv med Gud.</p>
                     <div class="footer-social">
-                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+                        <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
+                        <a href="https://www.instagram.com/hiskingdomdesigns/" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
+                        <a href="https://www.youtube.com/@HisKingdomMinistry" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
                     </div>
                 </div>
 
@@ -143,26 +165,32 @@
                     <h4 class="footer-title">Kontakt</h4>
                     <ul class="footer-contact">
                         <li><i class="fas fa-envelope"></i> post@hiskingdomministry.no</li>
-                        <li><i class="fas fa-phone"></i> +47 123 45 678</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Oslo, Norge</li>
+                        <li><i class="fas fa-phone"></i> +47 930 94 615</li>
+                        <li><i class="fas fa-map-marker-alt"></i> Norge</li>
                     </ul>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; 2024 His Kingdom Ministry. Alle rettigheter reservert.</p>
+                <p>&copy; <span id="copyright-year">2024</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
             </div>
         </div>
     </footer>
 
-    <!-- Firebase Scripts -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/firebase-service.js"></script>
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
-    <!-- JavaScript -->
+    <!-- Firebase Config & Service -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
+
+    <!-- App Scripts -->
     <script src="script.js"></script>
-    <script type="module" src="media.js"></script>
-    <script type="module" src="js/content-manager.js"></script>
+    <script src="media.js"></script>
+    <script src="js/content-manager.js"></script>
 </body>
 
 </html>
