@@ -3488,3 +3488,105 @@ body {
         display: none;
     }
 }
+
+/* =================================== 
+   Blog Post Content Styles (Editor.js) 
+   =================================== */
+
+.block-header {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    line-height: 1.3;
+    color: var(--text-dark);
+}
+
+h2.block-header {
+    font-size: 1.75rem;
+    font-weight: 700;
+}
+
+h3.block-header {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+h4.block-header {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.block-paragraph {
+    margin-bottom: 1.5rem;
+    line-height: 1.8;
+    color: #4a5568;
+    font-size: 1.05rem;
+}
+
+.block-list {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    color: #4a5568;
+}
+
+.block-list li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+}
+
+ul.block-list {
+    list-style-type: disc;
+}
+
+ol.block-list {
+    list-style-type: decimal;
+}
+
+.block-quote {
+    border-left: 4px solid var(--primary-orange);
+    padding: 1.5rem 2rem;
+    background: var(--bg-light);
+    margin: 2rem 0;
+    border-radius: 0 8px 8px 0;
+}
+
+.block-quote p {
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+}
+
+.block-quote cite {
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-style: normal;
+    font-weight: 600;
+}
+
+.block-delimiter {
+    text-align: center;
+    font-size: 2rem;
+    line-height: 1;
+    margin: 3rem 0;
+    color: var(--border-color);
+    letter-spacing: 0.5rem;
+}
+
+.block-image {
+    margin: 2rem 0;
+}
+
+.block-image img {
+    border-radius: 8px;
+    width: 100%;
+    height: auto;
+    box-shadow: var(--shadow);
+}
+
+.block-image figcaption {
+    text-align: center;
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
