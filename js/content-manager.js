@@ -195,8 +195,14 @@ class ContentManager {
             dateEl.innerHTML = `<i class="far fa-calendar"></i> ${dateStr}`;
         }
 
+        const authorEl = document.getElementById('single-post-author');
+        if (authorEl) {
+            const auth = item.author || 'Ukjent forfatter';
+            authorEl.innerHTML = `<i class="fas fa-user"></i> ${auth}`;
+        }
+
         if (categoryEl) {
-            const cat = item.category || '';
+            const cat = item.category || 'Ukategorisert';
             categoryEl.innerHTML = cat ? `<i class="fas fa-tag"></i> ${cat}` : '';
         }
 
