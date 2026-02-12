@@ -1210,52 +1210,61 @@ class AdminManager {
             }
 
             // --- Initialize Editor.js ---
+            // --- Initialize Editor.js ---
+
+            // Defines tools conditionally to prevent crashes if scripts fail to load
+            const toolsConfig = {};
+
+            if (typeof Header !== 'undefined') {
+                toolsConfig.header = {
+                    class: Header,
+                    inlineToolbar: true,
+                    config: { placeholder: 'Overskrift', levels: [2, 3, 4], defaultLevel: 2 }
+                };
+            } else console.warn('Editor.js: Header tool missing');
+
+            if (typeof List !== 'undefined') {
+                toolsConfig.list = {
+                    class: List,
+                    inlineToolbar: true,
+                    config: { defaultStyle: 'unordered' }
+                };
+            } else console.warn('Editor.js: List tool missing');
+
+            if (typeof ImageTool !== 'undefined') {
+                toolsConfig.image = {
+                    class: ImageTool,
+                    config: {
+                        uploader: {
+                            uploadByFile(file) {
+                                alert("Filopplasting er ikke implementert. Bruk URL.");
+                                return Promise.resolve({ success: 0 });
+                            },
+                            uploadByUrl(url) {
+                                return Promise.resolve({ success: 1, file: { url: url } });
+                            }
+                        }
+                    }
+                };
+            } else console.warn('Editor.js: ImageTool missing');
+
+            if (typeof Quote !== 'undefined') {
+                toolsConfig.quote = {
+                    class: Quote,
+                    inlineToolbar: true,
+                    config: { quotePlaceholder: 'Sitat tekst', captionPlaceholder: 'Forfatter' }
+                };
+            } else console.warn('Editor.js: Quote tool missing');
+
+            if (typeof Delimiter !== 'undefined') {
+                toolsConfig.delimiter = Delimiter;
+            } else console.warn('Editor.js: Delimiter tool missing');
+
             const editor = new EditorJS({
                 holder: 'editorjs-container',
                 data: editorData,
                 placeholder: 'Trykk "/" for å velge blokker (overskrift, bilde, sitat...)',
-                tools: {
-                    header: {
-                        class: Header,
-                        inlineToolbar: true,
-                        config: {
-                            placeholder: 'Overskrift',
-                            levels: [2, 3, 4],
-                            defaultLevel: 2
-                        }
-                    },
-                    list: {
-                        class: List,
-                        inlineToolbar: true,
-                        config: { defaultStyle: 'unordered' }
-                    },
-                    image: {
-                        class: ImageTool,
-                        config: {
-                            uploader: {
-                                uploadByFile(file) {
-                                    alert("Filopplasting er ikke implementert. Bruk URL.");
-                                    return Promise.resolve({ success: 0 });
-                                },
-                                uploadByUrl(url) {
-                                    return Promise.resolve({
-                                        success: 1,
-                                        file: { url: url }
-                                    });
-                                }
-                            }
-                        }
-                    },
-                    quote: {
-                        class: Quote,
-                        inlineToolbar: true,
-                        config: {
-                            quotePlaceholder: 'Sitat tekst',
-                            captionPlaceholder: 'Forfatter'
-                        }
-                    },
-                    delimiter: Delimiter
-                }
+                tools: toolsConfig
             });
 
             // --- Tag Management Logic ---
