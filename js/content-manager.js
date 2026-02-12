@@ -212,6 +212,33 @@ class ContentManager {
         }
 
         container.innerHTML = this.parseBlocks(item.content) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+
+        // Populate Author Bio / Bottom Section
+        const authorBox = document.getElementById('single-post-author-box');
+        if (authorBox) {
+            const initial = item.author ? item.author.charAt(0).toUpperCase() : 'A';
+            const catBadge = item.category ? `<span style="background: var(--primary-orange); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem; margin-left: 10px; vertical-align: middle;">${item.category}</span>` : '';
+
+            let tagsHtml = '';
+            if (item.tags && Array.isArray(item.tags) && item.tags.length > 0) {
+                tagsHtml = `<div style="margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;">
+                    ${item.tags.map(t => `<span style="background: #e2e8f0; padding: 2px 8px; border-radius: 12px; font-size: 0.8rem; color: #475569;">#${t}</span>`).join('')}
+                </div>`;
+            }
+
+            authorBox.innerHTML = `
+                <div style="width: 60px; height: 60px; background: #cbd5e1; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; font-weight: bold; flex-shrink: 0;">
+                    ${initial}
+                </div>
+                <div>
+                    <h4 style="margin: 0; font-size: 1.1rem; color: #1e293b;">
+                        ${item.author || 'Anonym'} ${catBadge}
+                    </h4>
+                    <p style="margin: 4px 0 0 0; font-size: 0.9rem; color: #64748b;">Forfatter</p>
+                    ${tagsHtml}
+                </div>
+            `;
+        }
     }
 
     async loadEvents() {
