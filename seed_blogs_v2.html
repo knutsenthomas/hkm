@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Seed Blog Content V2</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        .status {
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        pre {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Oppdaterer Blogg Database (V2)...</h1>
+    <p>Forsøker igjen med nye URL-er for å omgå cache.</p>
+    <div id="log" class="status">Klargjør...</div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- Config -->
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        const log = document.getElementById('log');
+        function logMsg(msg, type = '') {
+            log.innerHTML += `<div class="${type}">${msg}</div>`;
+            console.log(msg);
+        }
+
+        async function seedContent() {
+            try {
+                if (typeof firebase === 'undefined') {
+                    throw new Error("Firebase SDK ikke lastet.");
+                }
+
+                firebase.initializeApp(firebaseConfig);
+                const db = firebase.firestore();
+
+                logMsg("Koblet til Firebase Firestore...", "info");
+
+                const newBlogs = [
+                    {
+                        id: 'friheten-ved-a-tilgi',
+                        title: 'Friheten ved å tilgi',
+                        author: 'Hilde Karin Knutsen',
+                        date: new Date().toISOString(),
+                        category: 'Undervisning',
+                        imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=800&h=600&fit=crop&q=80', // Prayer image
+                        content: `Tilgivelse. Selve ordet kan føles lett for noen, og som en uoverkommelig byrde for andre. Vi lever i en verden hvor urett skjer, og hvor sårene fra andre menneskers feil – eller våre egne – kan føles tunge. Men midt i dette tilbyr Bibelen en radikal vei ut: Tilgivelse er ikke bare en fin tanke, men en frigjørende kraft som er helt sentral i den kristne troen.<br><br>
+
+Hva betyr det egentlig å tilgi, ifølge Bibelen? Det handler om å gi slipp på retten til å hevne seg eller holde nag mot den som har gjort oss urett. Det er en handling av nåde og barmhjertighet, som speiler den tilgivelsen vi selv har fått.<br><br>
+
+<strong>Guds Eksempel: Den Totale Tilgivelsen</strong><br>
+Bibelen er krystallklar: Vår evne til å tilgi springer ut fra Guds ufattelige tilgivelse for oss. Dette er selve grunnlaget for evangeliet, og hvor vi finner kraften selv til å tilgi.<br>
+Se bare på disse mektige versene:<br>
+«Dersom vi bekjenner våre synder, er han trofast og rettferdig, så han forlater oss syndene og renser oss fra all urettferdighet.» (1. Johannes 1:9)<br>
+Når vi vender oss til Gud og bekjenner våre feil, er Hans tilgivelse fullstendig. Han er ikke en regnskapsfører som teller våre feil; Han sletter dem helt. Profeten Mika beskriver det så vakkert:<br>
+«Hvem er en Gud som du, en Gud som tar bort misgjerning og går overtredelse forbi... Du skal kaste alle deres synder i havets dyp.» (Mikas bok 7:18-19)<br><br>
+
+<strong>Vårt ansvar: Tilgi hverandre</strong><br>
+Men Bibelen stanser ikke der. Den viser at vårt forhold til Gud er uløselig knyttet til hvordan vi behandler våre medmennesker.<br>
+Jesus selv gjorde dette veldig tydelig. Når Peter spurte hvor mange ganger han skulle tilgi sin bror, svarte Jesus:<br>
+«Ikke sju ganger, sier jeg deg, men sytti ganger sju!» (Matteus 18:21-22)<br><br>
+
+Dette er ikke et tall du skal telle til 490 ganger, men et uttrykk for ubegrenset tilgivelse. Tilgivelse er derfor ikke en følelse – det er en beslutning. Det er et valg om å la Gud ta seg av dommen, slik at du kan finne fred. Tilgivelse frigjør deg. Den fjerner ikke alltid smerten fra det som har skjedd, men det fjerner byrden av bitterhet fra ditt hjerte.`,
+                        published: true
+                    },
+                    {
+                        id: 'sann-ydmykhet',
+                        title: 'Sann ydmykhet',
+                        author: 'Thomas Knutsen',
+                        date: new Date(Date.now() - 86400000).toISOString(), // Yesterday
+                        category: 'Undervisning',
+                        imageUrl: 'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop&q=80', // Community image
+                        content: `Når du tenker på ydmykhet, hva kommer til tankene?<br>
+<em>“Ydmyk dere derfor under Guds veldige hånd, for at han kan opphøye dere i sin tid.”</em> (1 Peter 5:6)<br><br>
+
+I vår verden blir ydmykhet ofte sett på som et selvnedverdigende konsept som avslører våre usikkerheter og hindrer oss i å bli vårt beste. Men sann ydmykhet fører aldri til usikkerhet, fordi usikkerhet er en form for stolthet.<br><br>
+
+Stolthet enten blåser oss opp eller river oss ned. Stolthet er selvtilstrekkelig, men også selvdestruktivt. Hvis vi gjør det bra, får stolthet selvtilliten vår til å skyte i været. Men hvis vi går gjennom en tøff periode, gjør stolthet oss følsomme for våre feil. Stolthet knytter vår verdi til våre prestasjoner og hindrer oss i å se hvem vi virkelig er.<br><br>
+
+Stolthet får oss til å tro at hvis vi prøver hardt nok, kan vi bli gode nok. Ydmykhet hjelper oss å innse at vi ikke er nok – men Gud er nok for oss. Ydmykhet vil ofte be oss om å risikere noe. Det kan bety å legge ned vår sosiale status, vårt rykte, vår økonomiske sikkerhet eller vår følelse av autoritet.<br>
+Men å overgi vår selvtilstrekkelighet lar oss omfavne Guds autoritet. Når vi overgir oss til Gud, lar vi Ham bli æret gjennom oss. Ydmykhet kan koste oss noe – men det fører til et overflod av liv.`,
+                        published: true
+                    },
+                    {
+                        id: 'lys-kilden-til-liv',
+                        title: 'Lys - kilden til liv',
+                        author: 'Thomas Knutsen',
+                        date: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+                        category: 'Undervisning',
+                        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&h=600&fit=crop&q=80', // Worship image
+                        content: `Lys er selve kilden til liv. Tenk på det: Uten solen ville det ikke vært liv på jorden. Alt hadde vært mørkt, kaldt og ubeboelig. På samme måte er det åndelig. Jesus sier om seg selv at han er "Verdens lys". Når vi slipper lyset inn i livene våre, driver det ut mørket, gir varme og viser oss veien vi skal gå. Uten dette lyset vandrer vi i blinde, men med Ham har vi livets lys.`,
+                        published: true
+                    },
+                    {
+                        id: 'makten-i-ordene',
+                        title: 'Makten i ordene',
+                        author: 'Hilde Karin Knutsen',
+                        date: new Date(Date.now() - 259200000).toISOString(), // 3 days ago
+                        category: 'Undervisning',
+                        imageUrl: 'https://images.unsplash.com/photo-1524178232363-1fb2b075b655?w=800&h=600&fit=crop&q=80', // Teaching image
+                        content: `Har du noen gang tenkt over hvilken enorm kraft som ligger i ordene vi bruker? De kan bygge opp eller rive ned, gi håp eller knuse drømmer. Bibelen sier at "død og liv er i tungens vold". Det vi sier til oss selv og andre har direkte innvirkning på vår hverdag og vår psykiske helse. La oss velge å tale liv, tale oppmuntring og tale Guds sannhet over våre liv.<br><br>
+
+<em>Merk: Flere av innleggene på siden er korte introduksjoner til podcast-episoder eller lydbøker (som Jeremia-serien), og inneholder derfor hovedsakelig en invitasjon til å lytte fremfor en lang tekstlig utgreiing.</em>`,
+                        published: true
+                    }
+                ];
+
+                logMsg("Lagrer til 'content/collection_blog'...", "info");
+
+                await db.collection("content").doc("collection_blog").set({
+                    items: newBlogs,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                logMsg("✅ Suksess! Blogginnleggene er oppdatert.", "success");
+                logMsg("Du kan nå sjekke verify_images.html igjen.", "success");
+
+            } catch (e) {
+                logMsg(`❌ Feil: ${e.message}`, "error");
+                console.error(e);
+            }
+        }
+
+        // Run immediately
+        seedContent();
+    </script>
+</body>
+
+</html>
