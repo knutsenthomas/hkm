@@ -1061,7 +1061,16 @@ class AdminManager {
     async loadCollection(collectionId) {
         const listContainer = document.getElementById(`${collectionId}-list`);
         if (!firebaseService.isInitialized) {
-            listContainer.innerHTML = '<p class="text-muted">Firebase er ikke tilkoblet.</p>';
+            const debugInfo = [
+                `Config: ${!!window.firebaseConfig}`,
+                `SDK: ${typeof firebase !== 'undefined'}`,
+                `Service: ${!!firebaseService}`
+            ].join(', ');
+            listContainer.innerHTML = `<div class="text-danger" style="padding: 20px;">
+                <p><strong>Firebase er ikke tilkoblet.</strong></p>
+                <code style="display:block; margin-top:10px; font-size: 12px; background: #eee; padding: 10px;">Debug: ${debugInfo}</code>
+                <p>Prøv å laste siden på nytt (Shift + R).</p>
+            </div>`;
             return;
         }
 
