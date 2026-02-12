@@ -1354,7 +1354,8 @@ class AdminManager {
             };
         } catch (err) {
             console.error('Error opening editor:', err);
-            alert('Kunne ikke åpne elementet. Sjekk konsollen for detaljer.');
+            const errorMsg = err.message || JSON.stringify(err);
+            alert(`Kunne ikke åpne elementet.\nFeilmelding: ${errorMsg}\n\nSjekk at Editor.js scriptet er lastet.`);
         }
     }
 
