@@ -228,8 +228,8 @@ class ContentManager {
                 authorBox.style.background = '#f8fafc';
                 authorBox.style.padding = '20px';
 
-                const tagsHtml = `<div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px;">
-                    ${item.tags.map(t => `<span style="background: white; border: 1px solid #e2e8f0; padding: 4px 12px; border-radius: 12px; font-size: 0.9rem; color: #475569;">#${t}</span>`).join('')}
+                const tagsHtml = `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                    ${item.tags.map(t => `<span class="blog-tag">#${t}</span>`).join('')}
                 </div>`;
 
                 authorBox.innerHTML = `
