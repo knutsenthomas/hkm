@@ -1267,7 +1267,10 @@ class AdminManager {
                     config: {
                         services: {
                             youtube: true,
-                            vimeo: true
+                            vimeo: true,
+                            facebook: true,
+                            instagram: true,
+                            twitter: true
                         }
                     }
                 };

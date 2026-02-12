@@ -3516,8 +3516,8 @@ h4.block-header {
 }
 
 .block-paragraph {
-    margin-bottom: 1.5rem;
-    line-height: 1.8;
+    margin-bottom: 1rem;
+    line-height: 1.5;
     color: #4a5568;
     font-size: 1.05rem;
 }
