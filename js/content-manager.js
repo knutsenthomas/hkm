@@ -210,12 +210,7 @@ class ContentManager {
             heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${item.imageUrl}')`;
         }
 
-        const tagsEl = document.getElementById('single-post-tags');
-        if (tagsEl && item.tags && Array.isArray(item.tags)) {
-            tagsEl.innerHTML = item.tags.map(tag =>
-                `<span style="background: rgba(255,255,255,0.2); color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; backdrop-filter: blur(4px);">#${tag}</span>`
-            ).join('');
-        }
+
 
         container.innerHTML = this.parseBlocks(item.content) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
