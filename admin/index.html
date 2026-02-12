@@ -388,11 +388,30 @@
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@2.9.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.6.0"></script>
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@1.4.0"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"></script>
+    <style>
+        /* FORCE SINGLE SPACING */
+        .ce-block {
+            margin-bottom: 0px !important;
+        }
+
+        .ce-paragraph {
+            line-height: 1.25 !important;
+            margin-bottom: 0px !important;
+            padding-bottom: 0px !important;
+        }
+
+        .ce-header {
+            margin-bottom: 0px !important;
+            padding-bottom: 0px !important;
+            margin-top: 10px !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"
+        onerror="alert('FEIL: Videoverktøyet ble blokkert! Har du en ad-blocker på?');"></script>
 
     <!-- Admin Logic -->
     <!-- Admin Logic -->
-    <script src="js/admin.js?v=video_fallback_1"></script>
+    <script src="js/admin.js?v=adblock_check"></script>
     <script>
         // Initialize Admin Manager after scripts load
         window.addEventListener('load', () => {

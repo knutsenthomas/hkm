@@ -1273,7 +1273,7 @@ class AdminManager {
                         }
                     },
                     toolbox: {
-                        title: 'YouTube / Video'
+                        title: 'YouTube'
                     }
                 };
             } else {
