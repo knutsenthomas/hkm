@@ -1258,182 +1258,186 @@ class AdminManager {
 
             if (typeof Delimiter !== 'undefined') {
                 toolsConfig.delimiter = Delimiter;
-            } else console.warn('Editor.js: Delimiter tool missing');
+                console.log('Checking for Embed class...');
+                console.log('window.Embed:', window.Embed);
+                // Log all properties on window that start with 'E' to see if it's named differently
+                console.log('Window properties starting with E:', Object.keys(window).filter(k => k.startsWith('E')));
 
-            if (typeof Embed !== 'undefined') {
-                console.log('Editor.js: Embed tool loaded');
-                toolsConfig.embed = {
-                    class: Embed,
-                    inlineToolbar: true,
-                    config: {
-                        services: {
-                            youtube: true,
-                            vimeo: true,
-                            facebook: true
+                if (typeof Embed !== 'undefined' || window.Embed) {
+                    console.log('Editor.js: Embed tool loaded');
+                    const EmbedClass = window.Embed || Embed;
+                    toolsConfig.embed = {
+                        class: EmbedClass,
+                        inlineToolbar: true,
+                        config: {
+                            services: {
+                                youtube: true,
+                                vimeo: true,
+                                facebook: true
+                            }
+                        },
+                        toolbox: {
+                            title: 'YouTube'
                         }
-                    },
-                    toolbox: {
-                        title: 'YouTube'
-                    }
-                };
-            } else {
-                console.error('Editor.js: Embed tool missing');
-            }
+                    };
+                } else {
+                    console.error('Editor.js: Embed tool missing');
+                }
 
-            const editor = new EditorJS({
-                holder: 'editorjs-container',
-                data: editorData,
-                placeholder: 'Trykk "/" for å velge blokker...',
-                tools: toolsConfig,
-                logLevel: 'VERBOSE' // Enable verbose logging
-            });
+                const editor = new EditorJS({
+                    holder: 'editorjs-container',
+                    data: editorData,
+                    placeholder: 'Trykk "/" for å velge blokker...',
+                    tools: toolsConfig,
+                    logLevel: 'VERBOSE' // Enable verbose logging
+                });
 
-            // --- Tag Management Logic ---
-            let currentTags = [...existingTags];
-            const tagsContainer = document.getElementById('active-tags');
-            const tagInput = document.getElementById('tag-input');
+                // --- Tag Management Logic ---
+                let currentTags = [...existingTags];
+                const tagsContainer = document.getElementById('active-tags');
+                const tagInput = document.getElementById('tag-input');
 
-            const renderTags = () => {
-                tagsContainer.innerHTML = currentTags.map(tag => `
+                const renderTags = () => {
+                    tagsContainer.innerHTML = currentTags.map(tag => `
                     <span class="tag-badge">
                         ${tag}
                         <button type="button" class="remove-tag" data-tag="${tag}">&times;</button>
                     </span>
                 `).join('');
 
-                // Add remove listeners
-                document.querySelectorAll('.remove-tag').forEach(btn => {
-                    btn.onclick = () => {
-                        const tagToRemove = btn.getAttribute('data-tag');
-                        currentTags = currentTags.filter(t => t !== tagToRemove);
-                        renderTags();
-                    };
-                });
-            };
+                    // Add remove listeners
+                    document.querySelectorAll('.remove-tag').forEach(btn => {
+                        btn.onclick = () => {
+                            const tagToRemove = btn.getAttribute('data-tag');
+                            currentTags = currentTags.filter(t => t !== tagToRemove);
+                            renderTags();
+                        };
+                    });
+                };
 
-            // Render initial tags
-            renderTags();
+                // Render initial tags
+                renderTags();
 
-            // Add Tag Listener
-            tagInput.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' || e.key === ',') {
-                    e.preventDefault();
-                    const val = tagInput.value.trim().replace(',', '');
-                    if (val && !currentTags.includes(val)) {
-                        currentTags.push(val);
-                        renderTags();
-                        tagInput.value = '';
+                // Add Tag Listener
+                tagInput.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ',') {
+                        e.preventDefault();
+                        const val = tagInput.value.trim().replace(',', '');
+                        if (val && !currentTags.includes(val)) {
+                            currentTags.push(val);
+                            renderTags();
+                            tagInput.value = '';
+                        }
                     }
-                }
-            });
+                });
 
-            // Image Preview Listener
-            document.getElementById('col-item-img').addEventListener('input', (e) => {
-                const url = e.target.value;
-                const box = document.getElementById('img-preview-box');
-                if (url && url.length > 10) {
-                    box.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
-                } else {
-                    box.innerHTML = '<span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 48px;">image</span>';
-                }
-            });
+                // Image Preview Listener
+                document.getElementById('col-item-img').addEventListener('input', (e) => {
+                    const url = e.target.value;
+                    const box = document.getElementById('img-preview-box');
+                    if (url && url.length > 10) {
+                        box.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+                    } else {
+                        box.innerHTML = '<span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 48px;">image</span>';
+                    }
+                });
 
-            document.getElementById('close-col-modal').onclick = () => modal.remove();
+                document.getElementById('close-col-modal').onclick = () => modal.remove();
 
-            document.getElementById('save-col-item').onclick = async () => {
-                const btn = document.getElementById('save-col-item');
+                document.getElementById('save-col-item').onclick = async () => {
+                    const btn = document.getElementById('save-col-item');
 
-                // Get JSON data from Editor.js
-                let savedData;
-                try {
-                    savedData = await editor.save();
-                } catch (error) {
-                    console.error('Saving failed', error);
-                    alert('Kunne ikke hente innhold fra editor.');
-                    return;
-                }
+                    // Get JSON data from Editor.js
+                    let savedData;
+                    try {
+                        savedData = await editor.save();
+                    } catch (error) {
+                        console.error('Saving failed', error);
+                        alert('Kunne ikke hente innhold fra editor.');
+                        return;
+                    }
 
-                item.title = document.getElementById('col-item-title').value;
-                item.content = savedData; // Store as JSON object
+                    item.title = document.getElementById('col-item-title').value;
+                    item.content = savedData; // Store as JSON object
 
-                item.date = document.getElementById('col-item-date').value;
-                item.imageUrl = document.getElementById('col-item-img').value;
-                item.author = document.getElementById('col-item-author').value;
-                item.category = document.getElementById('col-item-cat').value;
-                item.seoTitle = document.getElementById('col-item-seo-title').value;
-                item.seoDescription = document.getElementById('col-item-seo-desc').value;
-                item.tags = currentTags;
+                    item.date = document.getElementById('col-item-date').value;
+                    item.imageUrl = document.getElementById('col-item-img').value;
+                    item.author = document.getElementById('col-item-author').value;
+                    item.category = document.getElementById('col-item-cat').value;
+                    item.seoTitle = document.getElementById('col-item-seo-title').value;
+                    item.seoDescription = document.getElementById('col-item-seo-desc').value;
+                    item.tags = currentTags;
 
-                btn.textContent = 'Lagrer...';
-                btn.disabled = true;
+                    btn.textContent = 'Lagrer...';
+                    btn.disabled = true;
 
-                try {
-                    const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                    const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
-                    list[index] = item;
-                    await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
-                    modal.remove();
-                    this.loadCollection(collectionId);
-                } catch (err) {
-                    console.error('Error saving item:', err);
-                    alert('Kunne ikke lagre. Sjekk konsollen for detaljer.');
-                } finally {
-                    btn.textContent = 'Lagre endringer';
-                    btn.disabled = false;
-                }
-            };
-        } catch (err) {
-            console.error('Error opening editor:', err);
-            const errorMsg = err.message || JSON.stringify(err);
-            alert(`Kunne ikke åpne elementet.\nFeilmelding: ${errorMsg}\n\nSjekk at Editor.js scriptet er lastet.`);
+                    try {
+                        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                        const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+                        list[index] = item;
+                        await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+                        modal.remove();
+                        this.loadCollection(collectionId);
+                    } catch (err) {
+                        console.error('Error saving item:', err);
+                        alert('Kunne ikke lagre. Sjekk konsollen for detaljer.');
+                    } finally {
+                        btn.textContent = 'Lagre endringer';
+                        btn.disabled = false;
+                    }
+                };
+            } catch (err) {
+                console.error('Error opening editor:', err);
+                const errorMsg = err.message || JSON.stringify(err);
+                alert(`Kunne ikke åpne elementet.\nFeilmelding: ${errorMsg}\n\nSjekk at Editor.js scriptet er lastet.`);
+            }
         }
-    }
 
     async addNewItem(collectionId) {
-        // Create new item with empty title (no prompt)
-        const newItem = {
-            title: '',
-            date: new Date().toISOString().split('T')[0],
-            content: ''
-        };
+            // Create new item with empty title (no prompt)
+            const newItem = {
+                title: '',
+                date: new Date().toISOString().split('T')[0],
+                content: ''
+            };
 
-        try {
-            const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-            const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+            try {
+                const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
-            // Add to beginning of list
-            items.unshift(newItem);
+                // Add to beginning of list
+                items.unshift(newItem);
 
-            // Save to Firebase
-            await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
+                // Save to Firebase
+                await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
 
-            // Refresh the list in the background
-            await this.loadCollection(collectionId);
+                // Refresh the list in the background
+                await this.loadCollection(collectionId);
 
-            // Immediately open the editor for this new item (index 0)
-            this.editCollectionItem(collectionId, 0);
+                // Immediately open the editor for this new item (index 0)
+                this.editCollectionItem(collectionId, 0);
 
-        } catch (error) {
-            console.error('Error creating new item:', error);
-            alert('Kunne ikke opprette nytt element. Sjekk konsollen.');
+            } catch (error) {
+                console.error('Error creating new item:', error);
+                alert('Kunne ikke opprette nytt element. Sjekk konsollen.');
+            }
         }
-    }
 
     async deleteItem(collectionId, index) {
-        if (!confirm('Er du sikker på at du vil slette dette elementet?')) return;
+            if (!confirm('Er du sikker på at du vil slette dette elementet?')) return;
 
-        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-        const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
-        items.splice(index, 1);
-        await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
-        this.loadCollection(collectionId);
-    }
+            const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+            const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+            items.splice(index, 1);
+            await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
+            this.loadCollection(collectionId);
+        }
 
     async renderDesignSection() {
-        const section = document.getElementById('design-section');
-        if (!section) return;
+            const section = document.getElementById('design-section');
+            if (!section) return;
 
-        section.innerHTML = `
+            section.innerHTML = `
             <div class="section-header">
                 <h2 class="section-title">Design & Identitet</h2>
                 <p class="section-subtitle">Administrer logo, favicon, fonter og globale farger.</p>
@@ -1513,139 +1517,139 @@ class AdminManager {
                 <button class="btn-primary" id="save-design-settings">Lagre design-innstillinger</button>
             </div>
         `;
-        section.setAttribute('data-rendered', 'true');
+            section.setAttribute('data-rendered', 'true');
 
-        // Add Listeners
-        const syncRange = (id) => {
-            const el = document.getElementById(id);
-            const valEl = document.getElementById(`${id}-val`);
-            el.oninput = () => valEl.textContent = `${el.value}px`;
-        };
-        syncRange('font-size-base');
-
-        const syncColor = (pickerId, hexId) => {
-            const picker = document.getElementById(pickerId);
-            const hex = document.getElementById(hexId);
-            picker.oninput = () => hex.value = picker.value.toUpperCase();
-            hex.oninput = () => picker.value = hex.value;
-        };
-        syncColor('primary-color-picker', 'primary-color-hex');
-
-        // Load existing
-        try {
-            const data = await firebaseService.getPageContent('settings_design');
-            if (data) {
-                if (data.logoUrl) {
-                    document.getElementById('site-logo-url').value = data.logoUrl;
-                    this.updatePreview('logo-preview-container', data.logoUrl);
-                }
-                if (data.faviconUrl) {
-                    document.getElementById('site-favicon-url').value = data.faviconUrl;
-                    this.updatePreview('favicon-preview-container', data.faviconUrl);
-                }
-                if (data.siteTitle) document.getElementById('site-title-seo').value = data.siteTitle;
-                if (data.logoText) document.getElementById('site-logo-text').value = data.logoText;
-                if (data.mainFont) document.getElementById('main-font-select').value = data.mainFont;
-                if (data.fontSizeBase) {
-                    document.getElementById('font-size-base').value = data.fontSizeBase;
-                    document.getElementById('font-size-base-val').textContent = `${data.fontSizeBase}px`;
-                }
-                if (data.primaryColor) {
-                    document.getElementById('primary-color-picker').value = data.primaryColor;
-                    document.getElementById('primary-color-hex').value = data.primaryColor;
-                }
-            }
-        } catch (e) {
-            console.error("Load design error:", e);
-        }
-
-        document.getElementById('save-design-settings').onclick = async () => {
-            const btn = document.getElementById('save-design-settings');
-            const data = {
-                logoUrl: document.getElementById('site-logo-url').value,
-                faviconUrl: document.getElementById('site-favicon-url').value,
-                logoText: document.getElementById('site-logo-text').value,
-                siteTitle: document.getElementById('site-title-seo').value,
-                mainFont: document.getElementById('main-font-select').value,
-                fontSizeBase: document.getElementById('font-size-base').value,
-                primaryColor: document.getElementById('primary-color-hex').value,
-                updatedAt: new Date().toISOString()
+            // Add Listeners
+            const syncRange = (id) => {
+                const el = document.getElementById(id);
+                const valEl = document.getElementById(`${id}-val`);
+                el.oninput = () => valEl.textContent = `${el.value}px`;
             };
+            syncRange('font-size-base');
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+            const syncColor = (pickerId, hexId) => {
+                const picker = document.getElementById(pickerId);
+                const hex = document.getElementById(hexId);
+                picker.oninput = () => hex.value = picker.value.toUpperCase();
+                hex.oninput = () => picker.value = hex.value;
+            };
+            syncColor('primary-color-picker', 'primary-color-hex');
 
+            // Load existing
             try {
-                await firebaseService.savePageContent('settings_design', data);
-                alert('✅ Design-innstillinger er lagret!');
-            } catch (err) {
-                alert('❌ Feil ved lagring');
-            } finally {
-                btn.textContent = 'Lagre design-innstillinger';
-                btn.disabled = false;
+                const data = await firebaseService.getPageContent('settings_design');
+                if (data) {
+                    if (data.logoUrl) {
+                        document.getElementById('site-logo-url').value = data.logoUrl;
+                        this.updatePreview('logo-preview-container', data.logoUrl);
+                    }
+                    if (data.faviconUrl) {
+                        document.getElementById('site-favicon-url').value = data.faviconUrl;
+                        this.updatePreview('favicon-preview-container', data.faviconUrl);
+                    }
+                    if (data.siteTitle) document.getElementById('site-title-seo').value = data.siteTitle;
+                    if (data.logoText) document.getElementById('site-logo-text').value = data.logoText;
+                    if (data.mainFont) document.getElementById('main-font-select').value = data.mainFont;
+                    if (data.fontSizeBase) {
+                        document.getElementById('font-size-base').value = data.fontSizeBase;
+                        document.getElementById('font-size-base-val').textContent = `${data.fontSizeBase}px`;
+                    }
+                    if (data.primaryColor) {
+                        document.getElementById('primary-color-picker').value = data.primaryColor;
+                        document.getElementById('primary-color-hex').value = data.primaryColor;
+                    }
+                }
+            } catch (e) {
+                console.error("Load design error:", e);
             }
-        };
 
-        // Preview URL inputs
-        document.getElementById('site-logo-url').onchange = (e) => this.updatePreview('logo-preview-container', e.target.value);
-        document.getElementById('site-favicon-url').onchange = (e) => this.updatePreview('favicon-preview-container', e.target.value);
+            document.getElementById('save-design-settings').onclick = async () => {
+                const btn = document.getElementById('save-design-settings');
+                const data = {
+                    logoUrl: document.getElementById('site-logo-url').value,
+                    faviconUrl: document.getElementById('site-favicon-url').value,
+                    logoText: document.getElementById('site-logo-text').value,
+                    siteTitle: document.getElementById('site-title-seo').value,
+                    mainFont: document.getElementById('main-font-select').value,
+                    fontSizeBase: document.getElementById('font-size-base').value,
+                    primaryColor: document.getElementById('primary-color-hex').value,
+                    updatedAt: new Date().toISOString()
+                };
 
-        const wireUpload = (fileInputId, buttonId, urlInputId, previewId, pathPrefix, idleText) => {
-            const fileInput = document.getElementById(fileInputId);
-            const button = document.getElementById(buttonId);
-            const urlInput = document.getElementById(urlInputId);
-
-            if (!fileInput || !button || !urlInput) return;
-
-            button.onclick = async () => {
-                if (!firebaseService.isInitialized) {
-                    alert('Firebase er ikke konfigurert. Kan ikke laste opp.');
-                    return;
-                }
-
-                const file = fileInput.files && fileInput.files[0];
-                if (!file) {
-                    alert('Velg en fil for opplasting.');
-                    return;
-                }
-
-                button.disabled = true;
-                button.textContent = 'Laster opp...';
+                btn.textContent = 'Lagrer...';
+                btn.disabled = true;
 
                 try {
-                    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
-                    const uploadPath = `${pathPrefix}/${Date.now()}-${safeName}`;
-                    const url = await firebaseService.uploadImage(file, uploadPath);
-                    urlInput.value = url;
-                    this.updatePreview(previewId, url);
+                    await firebaseService.savePageContent('settings_design', data);
+                    alert('✅ Design-innstillinger er lagret!');
                 } catch (err) {
-                    console.error('Upload error:', err);
-                    alert('Feil ved opplasting. Proev igjen.');
+                    alert('❌ Feil ved lagring');
                 } finally {
-                    button.disabled = false;
-                    button.textContent = idleText;
+                    btn.textContent = 'Lagre design-innstillinger';
+                    btn.disabled = false;
                 }
             };
-        };
 
-        wireUpload('site-logo-file', 'upload-logo-btn', 'site-logo-url', 'logo-preview-container', 'branding/logo', 'Last opp logo');
-        wireUpload('site-favicon-file', 'upload-favicon-btn', 'site-favicon-url', 'favicon-preview-container', 'branding/favicon', 'Last opp favicon');
-    }
+            // Preview URL inputs
+            document.getElementById('site-logo-url').onchange = (e) => this.updatePreview('logo-preview-container', e.target.value);
+            document.getElementById('site-favicon-url').onchange = (e) => this.updatePreview('favicon-preview-container', e.target.value);
 
-    updatePreview(containerId, url) {
-        const container = document.getElementById(containerId);
-        if (url && url.startsWith('http')) {
-            container.innerHTML = `<img src="${url}" class="preview-img" style="margin-top: 10px; max-height: 100px; border-radius: 4px; border: 1px solid #ddd;">`;
-        } else {
-            container.innerHTML = '';
+            const wireUpload = (fileInputId, buttonId, urlInputId, previewId, pathPrefix, idleText) => {
+                const fileInput = document.getElementById(fileInputId);
+                const button = document.getElementById(buttonId);
+                const urlInput = document.getElementById(urlInputId);
+
+                if (!fileInput || !button || !urlInput) return;
+
+                button.onclick = async () => {
+                    if (!firebaseService.isInitialized) {
+                        alert('Firebase er ikke konfigurert. Kan ikke laste opp.');
+                        return;
+                    }
+
+                    const file = fileInput.files && fileInput.files[0];
+                    if (!file) {
+                        alert('Velg en fil for opplasting.');
+                        return;
+                    }
+
+                    button.disabled = true;
+                    button.textContent = 'Laster opp...';
+
+                    try {
+                        const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                        const uploadPath = `${pathPrefix}/${Date.now()}-${safeName}`;
+                        const url = await firebaseService.uploadImage(file, uploadPath);
+                        urlInput.value = url;
+                        this.updatePreview(previewId, url);
+                    } catch (err) {
+                        console.error('Upload error:', err);
+                        alert('Feil ved opplasting. Proev igjen.');
+                    } finally {
+                        button.disabled = false;
+                        button.textContent = idleText;
+                    }
+                };
+            };
+
+            wireUpload('site-logo-file', 'upload-logo-btn', 'site-logo-url', 'logo-preview-container', 'branding/logo', 'Last opp logo');
+            wireUpload('site-favicon-file', 'upload-favicon-btn', 'site-favicon-url', 'favicon-preview-container', 'branding/favicon', 'Last opp favicon');
         }
-    }
+
+        updatePreview(containerId, url) {
+            const container = document.getElementById(containerId);
+            if (url && url.startsWith('http')) {
+                container.innerHTML = `<img src="${url}" class="preview-img" style="margin-top: 10px; max-height: 100px; border-radius: 4px; border: 1px solid #ddd;">`;
+            } else {
+                container.innerHTML = '';
+            }
+        }
 
     async renderHeroManager() {
-        const section = document.getElementById('hero-section');
-        if (!section) return;
+            const section = document.getElementById('hero-section');
+            if (!section) return;
 
-        section.innerHTML = `
+            section.innerHTML = `
             <div class="section-header flex-between">
                 <div>
                     <h2 class="section-title">Hero Slider</h2>
@@ -1659,30 +1663,30 @@ class AdminManager {
                 <div class="loader">Laster slides...</div>
             </div>
         `;
-        section.setAttribute('data-rendered', 'true');
+            section.setAttribute('data-rendered', 'true');
 
-        document.getElementById('add-hero-slide').onclick = () => this.editHeroSlide();
-        this.loadHeroSlides();
-    }
+            document.getElementById('add-hero-slide').onclick = () => this.editHeroSlide();
+            this.loadHeroSlides();
+        }
 
     async loadHeroSlides() {
-        const container = document.getElementById('hero-slides-list');
-        if (!container) return;
+            const container = document.getElementById('hero-slides-list');
+            if (!container) return;
 
-        try {
-            const data = await firebaseService.getPageContent('hero_slides');
-            this.heroSlides = data ? data.slides || [] : [];
-            this.renderHeroSlides(this.heroSlides);
-        } catch (e) {
-            container.innerHTML = '<p>Kunne ikke laste slides.</p>';
+            try {
+                const data = await firebaseService.getPageContent('hero_slides');
+                this.heroSlides = data ? data.slides || [] : [];
+                this.renderHeroSlides(this.heroSlides);
+            } catch (e) {
+                container.innerHTML = '<p>Kunne ikke laste slides.</p>';
+            }
         }
-    }
 
     async renderProfileSection() {
-        const section = document.getElementById('profile-section');
-        if (!section) return;
+            const section = document.getElementById('profile-section');
+            if (!section) return;
 
-        section.innerHTML = `
+            section.innerHTML = `
             <div class="section-header">
                 <h2 class="section-title">Min Profil</h2>
                 <p class="section-subtitle">Administrer din kontoinformasjon og profilbilde.</p>
@@ -1740,87 +1744,87 @@ class AdminManager {
                 </div>
             </div>
         `;
-        section.setAttribute('data-rendered', 'true');
+            section.setAttribute('data-rendered', 'true');
 
-        // Load existing profile data
-        const profile = await firebaseService.getPageContent('settings_profile');
-        if (profile) {
-            document.getElementById('profile-name').value = profile.fullName || '';
-            document.getElementById('profile-dob').value = profile.birthDate || '';
-            document.getElementById('profile-address').value = profile.address || '';
-            document.getElementById('profile-phone').value = profile.phone || '';
-            document.getElementById('profile-bio').value = profile.bio || '';
-            document.getElementById('profile-photo-url').value = profile.photoUrl || '';
-            if (profile.photoUrl) {
-                document.getElementById('profile-img-preview').innerHTML = `<img src="${profile.photoUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            // Load existing profile data
+            const profile = await firebaseService.getPageContent('settings_profile');
+            if (profile) {
+                document.getElementById('profile-name').value = profile.fullName || '';
+                document.getElementById('profile-dob').value = profile.birthDate || '';
+                document.getElementById('profile-address').value = profile.address || '';
+                document.getElementById('profile-phone').value = profile.phone || '';
+                document.getElementById('profile-bio').value = profile.bio || '';
+                document.getElementById('profile-photo-url').value = profile.photoUrl || '';
+                if (profile.photoUrl) {
+                    document.getElementById('profile-img-preview').innerHTML = `<img src="${profile.photoUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                }
             }
-        }
 
-        // Handle Image Upload
-        const fileInput = document.getElementById('profile-file-input');
-        const uploadBtn = document.getElementById('upload-profile-btn');
-        const preview = document.getElementById('profile-img-preview');
-        const urlInput = document.getElementById('profile-photo-url');
+            // Handle Image Upload
+            const fileInput = document.getElementById('profile-file-input');
+            const uploadBtn = document.getElementById('upload-profile-btn');
+            const preview = document.getElementById('profile-img-preview');
+            const urlInput = document.getElementById('profile-photo-url');
 
-        uploadBtn.onclick = () => fileInput.click();
-        fileInput.onchange = async () => {
-            if (fileInput.files.length === 0) return;
-            uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Laster opp...';
-            try {
-                console.log("🚀 Starting upload to:", `profiles/${Date.now()}_${fileInput.files[0].name}`);
-                const url = await firebaseService.uploadImage(fileInput.files[0], `profiles/${Date.now()}_${fileInput.files[0].name}`);
-                console.log("✅ Upload success:", url);
-                urlInput.value = url;
-                preview.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            } catch (err) {
-                console.error("❌ Upload failed:", err);
-                alert('Opplasting feilet: ' + err.message + '\n\nSjekk at du har tilgang til å laste opp filer i Firebase Storage (Security Rules).');
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
-            }
-        };
-
-        // Handle Save
-        document.getElementById('save-profile-btn').onclick = async () => {
-            const btn = document.getElementById('save-profile-btn');
-            const data = {
-                fullName: document.getElementById('profile-name').value,
-                birthDate: document.getElementById('profile-dob').value,
-                address: document.getElementById('profile-address').value,
-                phone: document.getElementById('profile-phone').value,
-                bio: document.getElementById('profile-bio').value,
-                photoUrl: document.getElementById('profile-photo-url').value,
-                updatedAt: new Date().toISOString()
+            uploadBtn.onclick = () => fileInput.click();
+            fileInput.onchange = async () => {
+                if (fileInput.files.length === 0) return;
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Laster opp...';
+                try {
+                    console.log("🚀 Starting upload to:", `profiles/${Date.now()}_${fileInput.files[0].name}`);
+                    const url = await firebaseService.uploadImage(fileInput.files[0], `profiles/${Date.now()}_${fileInput.files[0].name}`);
+                    console.log("✅ Upload success:", url);
+                    urlInput.value = url;
+                    preview.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                } catch (err) {
+                    console.error("❌ Upload failed:", err);
+                    alert('Opplasting feilet: ' + err.message + '\n\nSjekk at du har tilgang til å laste opp filer i Firebase Storage (Security Rules).');
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
+                }
             };
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+            // Handle Save
+            document.getElementById('save-profile-btn').onclick = async () => {
+                const btn = document.getElementById('save-profile-btn');
+                const data = {
+                    fullName: document.getElementById('profile-name').value,
+                    birthDate: document.getElementById('profile-dob').value,
+                    address: document.getElementById('profile-address').value,
+                    phone: document.getElementById('profile-phone').value,
+                    bio: document.getElementById('profile-bio').value,
+                    photoUrl: document.getElementById('profile-photo-url').value,
+                    updatedAt: new Date().toISOString()
+                };
 
-            try {
-                await firebaseService.savePageContent('settings_profile', data);
-                alert('✅ Profilen er lagret!');
-                // Update header info immediately
-                const user = firebaseService.auth.currentUser;
-                if (user) this.updateUserInfo(user);
-            } catch (err) {
-                alert('❌ Feil ved lagring');
-            } finally {
-                btn.textContent = 'Lagre Profil';
-                btn.disabled = false;
-            }
-        };
-    }
+                btn.textContent = 'Lagrer...';
+                btn.disabled = true;
 
-    renderHeroSlides(slides) {
-        const container = document.getElementById('hero-slides-list');
-        if (slides.length === 0) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">Ingen slides ennå. Legg til din første!</p>';
-            return;
+                try {
+                    await firebaseService.savePageContent('settings_profile', data);
+                    alert('✅ Profilen er lagret!');
+                    // Update header info immediately
+                    const user = firebaseService.auth.currentUser;
+                    if (user) this.updateUserInfo(user);
+                } catch (err) {
+                    alert('❌ Feil ved lagring');
+                } finally {
+                    btn.textContent = 'Lagre Profil';
+                    btn.disabled = false;
+                }
+            };
         }
 
-        container.innerHTML = slides.map((slide, index) => `
+        renderHeroSlides(slides) {
+            const container = document.getElementById('hero-slides-list');
+            if (slides.length === 0) {
+                container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">Ingen slides ennå. Legg til din første!</p>';
+                return;
+            }
+
+            container.innerHTML = slides.map((slide, index) => `
             <div class="item-card">
                 <div class="item-thumb">
                     <img src="${slide.imageUrl || 'https://via.placeholder.com/400x225?text=Ingen+bilde'}" alt="Slide Thumb">
@@ -1839,15 +1843,15 @@ class AdminManager {
                 </div>
             </div>
         `).join('');
-    }
+        }
 
     async editHeroSlide(index = -1) {
-        const isNew = index === -1;
-        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', btnText: '', btnLink: '' } : this.heroSlides[index];
+            const isNew = index === -1;
+            const slide = isNew ? { title: '', subtitle: '', imageUrl: '', btnText: '', btnLink: '' } : this.heroSlides[index];
 
-        const modal = document.createElement('div');
-        modal.className = 'dashboard-modal';
-        modal.innerHTML = `
+            const modal = document.createElement('div');
+            modal.className = 'dashboard-modal';
+            modal.innerHTML = `
             <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
                 <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
                     <div class="card-header flex-between">
@@ -1886,80 +1890,80 @@ class AdminManager {
                 </div>
             </div>
         `;
-        document.body.appendChild(modal);
+            document.body.appendChild(modal);
 
-        const imgInput = document.getElementById('slide-img-url');
-        const fileInput = document.getElementById('slide-file-input');
-        const uploadBtn = document.getElementById('upload-slide-img');
+            const imgInput = document.getElementById('slide-img-url');
+            const fileInput = document.getElementById('slide-file-input');
+            const uploadBtn = document.getElementById('upload-slide-img');
 
-        uploadBtn.onclick = () => fileInput.click();
-        fileInput.onchange = async () => {
-            if (fileInput.files.length === 0) return;
-            uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
-            try {
-                const url = await firebaseService.uploadImage(fileInput.files[0], `hero/${Date.now()}_${fileInput.files[0].name}`);
-                imgInput.value = url;
-            } catch (err) {
-                alert('Upload failed: ' + err.message);
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
-            }
-        };
-
-        document.getElementById('close-modal').onclick = () => modal.remove();
-        document.getElementById('save-slide-btn').onclick = async () => {
-            const btn = document.getElementById('save-slide-btn');
-            const updatedSlide = {
-                imageUrl: document.getElementById('slide-img-url').value,
-                title: document.getElementById('slide-title').value,
-                subtitle: document.getElementById('slide-subtitle').value,
-                btnText: document.getElementById('slide-btn-text').value,
-                btnLink: document.getElementById('slide-btn-link').value
+            uploadBtn.onclick = () => fileInput.click();
+            fileInput.onchange = async () => {
+                if (fileInput.files.length === 0) return;
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
+                try {
+                    const url = await firebaseService.uploadImage(fileInput.files[0], `hero/${Date.now()}_${fileInput.files[0].name}`);
+                    imgInput.value = url;
+                } catch (err) {
+                    alert('Upload failed: ' + err.message);
+                } finally {
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
+                }
             };
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+            document.getElementById('close-modal').onclick = () => modal.remove();
+            document.getElementById('save-slide-btn').onclick = async () => {
+                const btn = document.getElementById('save-slide-btn');
+                const updatedSlide = {
+                    imageUrl: document.getElementById('slide-img-url').value,
+                    title: document.getElementById('slide-title').value,
+                    subtitle: document.getElementById('slide-subtitle').value,
+                    btnText: document.getElementById('slide-btn-text').value,
+                    btnLink: document.getElementById('slide-btn-link').value
+                };
 
-            if (isNew) {
-                this.heroSlides.push(updatedSlide);
-            } else {
-                this.heroSlides[index] = updatedSlide;
-            }
+                btn.textContent = 'Lagrer...';
+                btn.disabled = true;
 
-            try {
-                await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
-                modal.remove();
-                this.renderHeroSlides(this.heroSlides);
-            } catch (err) {
-                alert('Feil ved lagring');
-                btn.textContent = 'Lagre slide';
-                btn.disabled = false;
-            }
-        };
-    }
+                if (isNew) {
+                    this.heroSlides.push(updatedSlide);
+                } else {
+                    this.heroSlides[index] = updatedSlide;
+                }
+
+                try {
+                    await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
+                    modal.remove();
+                    this.renderHeroSlides(this.heroSlides);
+                } catch (err) {
+                    alert('Feil ved lagring');
+                    btn.textContent = 'Lagre slide';
+                    btn.disabled = false;
+                }
+            };
+        }
 
     async deleteHeroSlide(index) {
-        if (!confirm('Vil du slette denne sliden?')) return;
-        this.heroSlides.splice(index, 1);
-        try {
-            await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
-            this.renderHeroSlides(this.heroSlides);
-        } catch (err) {
-            alert('Feil ved sletting');
+            if (!confirm('Vil du slette denne sliden?')) return;
+            this.heroSlides.splice(index, 1);
+            try {
+                await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
+                this.renderHeroSlides(this.heroSlides);
+            } catch (err) {
+                alert('Feil ved sletting');
+            }
         }
-    }
 
     async renderTeachingManager() {
-        this.renderCollectionEditor('teaching', 'Undervisning');
-    }
+            this.renderCollectionEditor('teaching', 'Undervisning');
+        }
 
     async renderSEOSection() {
-        const section = document.getElementById('seo-section');
-        if (!section) return;
+            const section = document.getElementById('seo-section');
+            if (!section) return;
 
-        section.innerHTML = `
+            section.innerHTML = `
             <div class="section-header">
                 <h2 class="section-title">SEO & Synlighet</h2>
                 <p class="section-subtitle">Styr hvordan nettsiden din ser ut i søkemotorer og sosiale medier.</p>
@@ -2070,113 +2074,113 @@ class AdminManager {
                 </div>
             </div>
         `;
-        section.setAttribute('data-rendered', 'true');
+            section.setAttribute('data-rendered', 'true');
 
-        // Load Data
-        const seoData = await firebaseService.getPageContent('settings_seo') || {};
-        document.getElementById('seo-global-title').value = seoData.globalTitle || '';
-        document.getElementById('seo-global-desc').value = seoData.globalDescription || '';
-        document.getElementById('seo-global-keywords').value = seoData.globalKeywords || '';
-        document.getElementById('seo-og-image').value = seoData.ogImage || '';
-        document.getElementById('seo-global-geo-pos').value = seoData.geoPosition || '';
-        document.getElementById('seo-global-geo-region').value = seoData.geoRegion || '';
-        document.getElementById('seo-global-geo-place').value = seoData.geoPlacename || '';
+            // Load Data
+            const seoData = await firebaseService.getPageContent('settings_seo') || {};
+            document.getElementById('seo-global-title').value = seoData.globalTitle || '';
+            document.getElementById('seo-global-desc').value = seoData.globalDescription || '';
+            document.getElementById('seo-global-keywords').value = seoData.globalKeywords || '';
+            document.getElementById('seo-og-image').value = seoData.ogImage || '';
+            document.getElementById('seo-global-geo-pos').value = seoData.geoPosition || '';
+            document.getElementById('seo-global-geo-region').value = seoData.geoRegion || '';
+            document.getElementById('seo-global-geo-place').value = seoData.geoPlacename || '';
 
-        const updateOGPreview = () => {
-            const url = document.getElementById('seo-og-image').value;
-            const preview = document.getElementById('og-preview');
-            if (url) {
-                preview.innerHTML = `<img src="${url}" style="width: 100%; display: block;">`;
-                preview.style.display = 'block';
-            } else {
-                preview.style.display = 'none';
-            }
-        };
-        updateOGPreview();
+            const updateOGPreview = () => {
+                const url = document.getElementById('seo-og-image').value;
+                const preview = document.getElementById('og-preview');
+                if (url) {
+                    preview.innerHTML = `<img src="${url}" style="width: 100%; display: block;">`;
+                    preview.style.display = 'block';
+                } else {
+                    preview.style.display = 'none';
+                }
+            };
+            updateOGPreview();
 
-        // Page SEO Loading
-        const pageSelector = document.getElementById('seo-page-selector');
-        const loadPageSEO = () => {
-            const pageId = pageSelector.value;
-            const pageSEO = (seoData.pages && seoData.pages[pageId]) || {};
-            document.getElementById('seo-page-title').value = pageSEO.title || '';
-            document.getElementById('seo-page-desc').value = pageSEO.description || '';
-            document.getElementById('seo-page-geo-pos').value = pageSEO.geoPosition || '';
-            document.getElementById('seo-page-geo-place').value = pageSEO.geoPlacename || '';
-        };
-        pageSelector.onchange = loadPageSEO;
-        loadPageSEO();
+            // Page SEO Loading
+            const pageSelector = document.getElementById('seo-page-selector');
+            const loadPageSEO = () => {
+                const pageId = pageSelector.value;
+                const pageSEO = (seoData.pages && seoData.pages[pageId]) || {};
+                document.getElementById('seo-page-title').value = pageSEO.title || '';
+                document.getElementById('seo-page-desc').value = pageSEO.description || '';
+                document.getElementById('seo-page-geo-pos').value = pageSEO.geoPosition || '';
+                document.getElementById('seo-page-geo-place').value = pageSEO.geoPlacename || '';
+            };
+            pageSelector.onchange = loadPageSEO;
+            loadPageSEO();
 
-        // Image Upload
-        const ogFileInput = document.getElementById('og-file-input');
-        const uploadOGBtn = document.getElementById('upload-og-img');
-        uploadOGBtn.onclick = () => ogFileInput.click();
-        ogFileInput.onchange = async () => {
-            if (ogFileInput.files.length === 0) return;
-            uploadOGBtn.disabled = true;
-            uploadOGBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
-            try {
-                const url = await firebaseService.uploadImage(ogFileInput.files[0], `seo/og_image_${Date.now()}`);
-                document.getElementById('seo-og-image').value = url;
-                updateOGPreview();
-            } catch (err) { alert('Upload failed'); }
-            finally {
-                uploadOGBtn.disabled = false;
-                uploadOGBtn.innerHTML = '<span class="material-symbols-outlined">upload</span>';
-            }
-        };
-
-        // Save Global
-        document.getElementById('save-global-seo').onclick = async () => {
-            const btn = document.getElementById('save-global-seo');
-            seoData.globalTitle = document.getElementById('seo-global-title').value;
-            seoData.globalDescription = document.getElementById('seo-global-desc').value;
-            seoData.globalKeywords = document.getElementById('seo-global-keywords').value;
-            seoData.ogImage = document.getElementById('seo-og-image').value;
-            seoData.geoPosition = document.getElementById('seo-global-geo-pos').value;
-            seoData.geoRegion = document.getElementById('seo-global-geo-region').value;
-            seoData.geoPlacename = document.getElementById('seo-global-geo-place').value;
-
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
-            try {
-                await firebaseService.savePageContent('settings_seo', seoData);
-                alert('Globale SEO-innstillinger lagret!');
-            } catch (err) { alert('Feil ved lagring'); }
-            finally {
-                btn.textContent = 'Lagre Globale Innstillinger';
-                btn.disabled = false;
-            }
-        };
-
-        // Save Page SEO
-        document.getElementById('save-page-seo').onclick = async () => {
-            const btn = document.getElementById('save-page-seo');
-            const pageId = pageSelector.value;
-            if (!seoData.pages) seoData.pages = {};
-            seoData.pages[pageId] = {
-                title: document.getElementById('seo-page-title').value,
-                description: document.getElementById('seo-page-desc').value
+            // Image Upload
+            const ogFileInput = document.getElementById('og-file-input');
+            const uploadOGBtn = document.getElementById('upload-og-img');
+            uploadOGBtn.onclick = () => ogFileInput.click();
+            ogFileInput.onchange = async () => {
+                if (ogFileInput.files.length === 0) return;
+                uploadOGBtn.disabled = true;
+                uploadOGBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
+                try {
+                    const url = await firebaseService.uploadImage(ogFileInput.files[0], `seo/og_image_${Date.now()}`);
+                    document.getElementById('seo-og-image').value = url;
+                    updateOGPreview();
+                } catch (err) { alert('Upload failed'); }
+                finally {
+                    uploadOGBtn.disabled = false;
+                    uploadOGBtn.innerHTML = '<span class="material-symbols-outlined">upload</span>';
+                }
             };
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
-            try {
-                await firebaseService.savePageContent('settings_seo', seoData);
-                alert(`SEO for ${pageId} lagret!`);
-            } catch (err) { alert('Feil ved lagring'); }
-            finally {
-                btn.textContent = 'Lagre SEO for denne siden';
-                btn.disabled = false;
-            }
-        };
-    }
+            // Save Global
+            document.getElementById('save-global-seo').onclick = async () => {
+                const btn = document.getElementById('save-global-seo');
+                seoData.globalTitle = document.getElementById('seo-global-title').value;
+                seoData.globalDescription = document.getElementById('seo-global-desc').value;
+                seoData.globalKeywords = document.getElementById('seo-global-keywords').value;
+                seoData.ogImage = document.getElementById('seo-og-image').value;
+                seoData.geoPosition = document.getElementById('seo-global-geo-pos').value;
+                seoData.geoRegion = document.getElementById('seo-global-geo-region').value;
+                seoData.geoPlacename = document.getElementById('seo-global-geo-place').value;
+
+                btn.textContent = 'Lagrer...';
+                btn.disabled = true;
+                try {
+                    await firebaseService.savePageContent('settings_seo', seoData);
+                    alert('Globale SEO-innstillinger lagret!');
+                } catch (err) { alert('Feil ved lagring'); }
+                finally {
+                    btn.textContent = 'Lagre Globale Innstillinger';
+                    btn.disabled = false;
+                }
+            };
+
+            // Save Page SEO
+            document.getElementById('save-page-seo').onclick = async () => {
+                const btn = document.getElementById('save-page-seo');
+                const pageId = pageSelector.value;
+                if (!seoData.pages) seoData.pages = {};
+                seoData.pages[pageId] = {
+                    title: document.getElementById('seo-page-title').value,
+                    description: document.getElementById('seo-page-desc').value
+                };
+
+                btn.textContent = 'Lagrer...';
+                btn.disabled = true;
+                try {
+                    await firebaseService.savePageContent('settings_seo', seoData);
+                    alert(`SEO for ${pageId} lagret!`);
+                } catch (err) { alert('Feil ved lagring'); }
+                finally {
+                    btn.textContent = 'Lagre SEO for denne siden';
+                    btn.disabled = false;
+                }
+            };
+        }
 
     async renderIntegrationsSection() {
-        const section = document.getElementById('integrations-section');
-        if (!section) return;
+            const section = document.getElementById('integrations-section');
+            if (!section) return;
 
-        section.innerHTML = `
+            section.innerHTML = `
             <div class="section-header">
                 <h2 class="section-title">Integrasjoner</h2>
                 <p class="section-subtitle">Koble nettsiden din til eksterne tjenester som Google Calendar.</p>
@@ -2228,114 +2232,114 @@ class AdminManager {
             </div>
         `;
 
-        // Load existing settings
-        const settings = await firebaseService.getPageContent('settings_integrations') || {};
-        const gcal = settings.googleCalendar || {};
+            // Load existing settings
+            const settings = await firebaseService.getPageContent('settings_integrations') || {};
+            const gcal = settings.googleCalendar || {};
 
-        document.getElementById('gcal-api-key').value = gcal.apiKey || '';
+            document.getElementById('gcal-api-key').value = gcal.apiKey || '';
 
-        const listEl = document.getElementById('gcal-list');
-        const addBtn = document.getElementById('add-gcal');
-        const savedCalendars = Array.isArray(settings.googleCalendars)
-            ? settings.googleCalendars
-            : (gcal.calendarId ? [{ id: gcal.calendarId, label: gcal.label || '' }] : []);
+            const listEl = document.getElementById('gcal-list');
+            const addBtn = document.getElementById('add-gcal');
+            const savedCalendars = Array.isArray(settings.googleCalendars)
+                ? settings.googleCalendars
+                : (gcal.calendarId ? [{ id: gcal.calendarId, label: gcal.label || '' }] : []);
 
-        const renderCalendarRow = (value = {}) => {
-            const row = document.createElement('div');
-            row.className = 'gcal-row';
-            row.style.display = 'grid';
-            row.style.gridTemplateColumns = '1fr 2fr auto';
-            row.style.gap = '8px';
-            row.style.marginBottom = '8px';
+            const renderCalendarRow = (value = {}) => {
+                const row = document.createElement('div');
+                row.className = 'gcal-row';
+                row.style.display = 'grid';
+                row.style.gridTemplateColumns = '1fr 2fr auto';
+                row.style.gap = '8px';
+                row.style.marginBottom = '8px';
 
-            row.innerHTML = `
+                row.innerHTML = `
                 <input type="text" class="form-control gcal-label" placeholder="Navn (f.eks. Moter)" value="${this.escapeHtml(value.label || '')}">
                 <input type="text" class="form-control gcal-id" placeholder="Calendar ID" value="${this.escapeHtml(value.id || '')}">
                 <button type="button" class="btn btn-outline gcal-remove">Fjern</button>
             `;
 
-            row.querySelector('.gcal-remove').addEventListener('click', () => {
-                row.remove();
-            });
+                row.querySelector('.gcal-remove').addEventListener('click', () => {
+                    row.remove();
+                });
 
-            listEl.appendChild(row);
-        };
+                listEl.appendChild(row);
+            };
 
-        if (savedCalendars.length > 0) {
-            savedCalendars.forEach(renderCalendarRow);
-        } else {
-            renderCalendarRow();
-        }
-
-        if (addBtn) {
-            addBtn.addEventListener('click', () => renderCalendarRow());
-        }
-
-        if (gcal.apiKey && (savedCalendars.length > 0 || gcal.calendarId)) {
-            const statusBadge = document.getElementById('gcal-status');
-            statusBadge.textContent = 'Konfigurert';
-            statusBadge.style.background = '#dcfce7';
-            statusBadge.style.color = '#166534';
-        }
-
-        document.getElementById('save-gcal-settings').onclick = async (e) => {
-            const btn = e.target;
-            const apiKey = document.getElementById('gcal-api-key').value.trim();
-            const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
-            const calendars = rows.map(row => {
-                const label = row.querySelector('.gcal-label')?.value.trim();
-                const id = row.querySelector('.gcal-id')?.value.trim();
-                return { label, id };
-            }).filter(item => item.id);
-
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
-
-            try {
-                const newSettings = {
-                    ...settings,
-                    googleCalendar: {
-                        apiKey,
-                        calendarId: calendars[0]?.id || '',
-                        label: calendars[0]?.label || '',
-                        lastUpdated: new Date().toISOString()
-                    },
-                    googleCalendars: calendars
-                };
-
-                await firebaseService.savePageContent('settings_integrations', newSettings);
-
-                btn.textContent = 'Lagret!';
-                const statusBadge = document.getElementById('gcal-status');
-                if (apiKey && calendars.length > 0) {
-                    statusBadge.textContent = 'Konfigurert';
-                    statusBadge.style.background = '#dcfce7';
-                    statusBadge.style.color = '#166534';
-                }
-                setTimeout(() => { btn.textContent = 'Lagre Kalender-innstillinger'; btn.disabled = false; }, 2000);
-            } catch (err) {
-                console.error("Save Error:", err);
-                btn.textContent = 'Feil ved lagring';
-                btn.style.setProperty('background', '#ef4444', 'important');
-                setTimeout(() => {
-                    btn.textContent = 'Lagre Kalender-innstillinger';
-                    btn.disabled = false;
-                    btn.style.setProperty('background', '', '');
-                }, 2000);
+            if (savedCalendars.length > 0) {
+                savedCalendars.forEach(renderCalendarRow);
+            } else {
+                renderCalendarRow();
             }
-        };
 
-        section.setAttribute('data-rendered', 'true');
-    }
+            if (addBtn) {
+                addBtn.addEventListener('click', () => renderCalendarRow());
+            }
 
-    /**
-     * Settings, Placeholders and Helpers
-     */
-    renderSettingsSection() {
-        const section = document.getElementById('settings-section');
-        if (!section) return;
+            if (gcal.apiKey && (savedCalendars.length > 0 || gcal.calendarId)) {
+                const statusBadge = document.getElementById('gcal-status');
+                statusBadge.textContent = 'Konfigurert';
+                statusBadge.style.background = '#dcfce7';
+                statusBadge.style.color = '#166534';
+            }
 
-        section.innerHTML = `
+            document.getElementById('save-gcal-settings').onclick = async (e) => {
+                const btn = e.target;
+                const apiKey = document.getElementById('gcal-api-key').value.trim();
+                const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
+                const calendars = rows.map(row => {
+                    const label = row.querySelector('.gcal-label')?.value.trim();
+                    const id = row.querySelector('.gcal-id')?.value.trim();
+                    return { label, id };
+                }).filter(item => item.id);
+
+                btn.textContent = 'Lagrer...';
+                btn.disabled = true;
+
+                try {
+                    const newSettings = {
+                        ...settings,
+                        googleCalendar: {
+                            apiKey,
+                            calendarId: calendars[0]?.id || '',
+                            label: calendars[0]?.label || '',
+                            lastUpdated: new Date().toISOString()
+                        },
+                        googleCalendars: calendars
+                    };
+
+                    await firebaseService.savePageContent('settings_integrations', newSettings);
+
+                    btn.textContent = 'Lagret!';
+                    const statusBadge = document.getElementById('gcal-status');
+                    if (apiKey && calendars.length > 0) {
+                        statusBadge.textContent = 'Konfigurert';
+                        statusBadge.style.background = '#dcfce7';
+                        statusBadge.style.color = '#166534';
+                    }
+                    setTimeout(() => { btn.textContent = 'Lagre Kalender-innstillinger'; btn.disabled = false; }, 2000);
+                } catch (err) {
+                    console.error("Save Error:", err);
+                    btn.textContent = 'Feil ved lagring';
+                    btn.style.setProperty('background', '#ef4444', 'important');
+                    setTimeout(() => {
+                        btn.textContent = 'Lagre Kalender-innstillinger';
+                        btn.disabled = false;
+                        btn.style.setProperty('background', '', '');
+                    }, 2000);
+                }
+            };
+
+            section.setAttribute('data-rendered', 'true');
+        }
+
+        /**
+         * Settings, Placeholders and Helpers
+         */
+        renderSettingsSection() {
+            const section = document.getElementById('settings-section');
+            if (!section) return;
+
+            section.innerHTML = `
             <div class="section-header">
                 <h2 class="section-title">Innstillinger & Verktøy</h2>
                 <p class="section-subtitle">Administrer systeminnstillinger og datasync.</p>
@@ -2362,453 +2366,453 @@ class AdminManager {
                 </div>
             </div>
         `;
-        section.setAttribute('data-rendered', 'true');
+            section.setAttribute('data-rendered', 'true');
 
-        document.getElementById('save-fb').addEventListener('click', () => {
-            const val = document.getElementById('fb-config').value;
-            localStorage.setItem('hkm_firebase_config', val);
-            alert('Lagret! Laster på nytt...');
-            window.location.reload();
-        });
+            document.getElementById('save-fb').addEventListener('click', () => {
+                const val = document.getElementById('fb-config').value;
+                localStorage.setItem('hkm_firebase_config', val);
+                alert('Lagret! Laster på nytt...');
+                window.location.reload();
+            });
 
-        document.getElementById('sync-existing-content').addEventListener('click', () => this.seedExistingData());
-    }
+            document.getElementById('sync-existing-content').addEventListener('click', () => this.seedExistingData());
+        }
 
     async seedExistingData() {
-        const statusEl = document.getElementById('sync-status');
-        const btn = document.getElementById('sync-existing-content');
+            const statusEl = document.getElementById('sync-status');
+            const btn = document.getElementById('sync-existing-content');
 
-        if (!confirm('Dette vil overskrive eventuelle endringer du har gjort i dashboardet med innhold fra de statiske HTML-filene. Fortsette?')) return;
+            if (!confirm('Dette vil overskrive eventuelle endringer du har gjort i dashboardet med innhold fra de statiske HTML-filene. Fortsette?')) return;
 
-        btn.disabled = true;
-        statusEl.innerHTML = '<span style="color: #64748b;">Starter synkronisering...</span>';
+            btn.disabled = true;
+            statusEl.innerHTML = '<span style="color: #64748b;">Starter synkronisering...</span>';
 
-        try {
-            // 1. Hero Slides
-            statusEl.innerHTML += '<br>Syncing Hero Slides...';
-            const heroSlides = [
-                {
-                    imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop',
-                    title: 'Tenk & gi nestekjærlighet',
-                    subtitle: 'Vi er her for å støtte deg på din åndelige reise. Bli med i et trygt miljø der vi utforsker Guds ord, deler livet og styrker relasjonen til Jesus.',
-                    btnText: 'Utforsk mer',
-                    btnLink: 'om-oss.html'
-                },
-                {
-                    imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop',
-                    title: 'Vekst gjennom felleskap',
-                    subtitle: 'Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et felleskap som utforsker Guds ord og styrker troen.',
-                    btnText: 'Les mer',
-                    btnLink: 'om-oss.html'
-                },
-                {
-                    imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop',
-                    title: 'Støtt vårt arbeid',
-                    subtitle: 'Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet gjennom undervisning, reisevirksomhet og felleskap.',
-                    btnText: 'Gi gave nå',
-                    btnLink: 'donasjoner.html'
-                }
-            ];
-            await firebaseService.savePageContent('hero_slides', { slides: heroSlides });
-
-            // 2. Blog Posts
-            statusEl.innerHTML += '<br>Syncing Blog Posts...';
-            const blogPosts = [
-                {
-                    title: 'Hvordan bevare troen i en travel hverdag',
-                    date: '05 Feb, 2024',
-                    category: 'Undervisning',
-                    content: 'Vi utforsker praktiske tips og bibelske prinsipper for å opprettholde en nær relasjon med Gud til tross for en hektisk tidsplan...',
-                    imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-                },
-                {
-                    title: 'Rapport fra misjonsturen til Kenya',
-                    date: '28 Jan, 2024',
-                    category: 'Reise',
-                    content: 'Bli med på reisen gjennom våre opplevelser i Kenya. Vi så Guds godhet i aksjon gjennom helbredelse, omsorg og glede...',
-                    imageUrl: 'https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-                },
-                {
-                    title: 'Ny Podcast Episode: Tro, tvil og vekst',
-                    date: '15 Jan, 2024',
-                    category: 'Podcast',
-                    content: 'Lytt til vår nyeste episode hvor vi diskuterer de ærlige sidene ved troslivet og hvordan vi kan finne hvile i Guds løfter...',
-                    imageUrl: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-                },
-                {
-                    title: 'Viktigheten av å stå sammen',
-                    date: '10 Jan, 2024',
-                    category: 'Felleskap',
-                    content: 'Hvorfor felleskapet er essensielt for den kristne vandringen og hvordan vi kan støtte hverandre gjennom livets ulike sesonger...',
-                    imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-                },
-                {
-                    title: 'Min reise fra mørke til lys',
-                    date: '02 Jan, 2024',
-                    category: 'Vitnesbyrd',
-                    content: 'Et sterkt vitnesbyrd om hvordan Gud forandret et liv preget av håpløshet til et liv fylt med mening, fred og fremtidstro...',
-                    imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-                }
-            ];
-            await firebaseService.savePageContent('collection_blog', { items: blogPosts });
-
-            // 3. Teaching Series
-            statusEl.innerHTML += '<br>Syncing Teaching Series...';
-            const teachingSeries = [
-                {
-                    title: 'Tro og Tvil',
-                    content: 'Hvordan håndtere tvil og styrke din tro i utfordrende tider.',
-                    category: '5 episoder',
-                    author: 'His Kingdom',
-                    date: '02 Feb, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Guds Karakter',
-                    content: 'Utforsk Guds egenskaper og hva de betyr for våre liv.',
-                    category: '8 episoder',
-                    author: 'His Kingdom',
-                    date: '25 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Åndelige Gaver',
-                    content: 'Oppdag og bruk dine åndelige gaver til Guds ære.',
-                    category: '6 episoder',
-                    author: 'His Kingdom',
-                    date: '15 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Kristen Disippelskap',
-                    content: 'Lær hva det betyr å være en disippel av Jesus.',
-                    category: '10 episoder',
-                    author: 'His Kingdom',
-                    date: '10 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Bønneliv',
-                    content: 'Utvikle et kraftfullt og meningsfullt bønneliv.',
-                    category: '7 episoder',
-                    author: 'His Kingdom',
-                    date: '05 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Å Finne Guds Vilje',
-                    content: 'Hvordan søke og følge Guds plan for ditt liv.',
-                    category: '4 episoder',
-                    author: 'His Kingdom',
-                    date: '02 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Tilgivelse og Forsoning',
-                    content: 'Kraften i tilgivelse og hvordan leve i forsoning.',
-                    category: '5 episoder',
-                    author: 'His Kingdom',
-                    date: '28 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Åndelig Krigføring',
-                    content: 'Stå fast i kampen mot åndelige krefter.',
-                    category: '6 episoder',
-                    author: 'His Kingdom',
-                    date: '20 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Din Identitet i Kristus',
-                    content: 'Forstå hvem du er som Guds barn.',
-                    category: '5 episoder',
-                    author: 'His Kingdom',
-                    date: '15 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Kallet til Tjeneste',
-                    content: 'Hvordan tjene Gud og andre effektivt.',
-                    category: '8 episoder',
-                    author: 'His Kingdom',
-                    date: '10 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Helliggjørelse',
-                    content: 'Vokse i hellighet og likhet med Kristus.',
-                    category: '7 episoder',
-                    author: 'His Kingdom',
-                    date: '05 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=600&h=400&fit=crop'
-                },
-                {
-                    title: 'Endetidsprofetier',
-                    content: 'Forstå Bibelens profetier om endetiden.',
-                    category: '9 episoder',
-                    author: 'His Kingdom',
-                    date: '01 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop'
-                }
-            ];
-            await firebaseService.savePageContent('collection_teaching', { items: teachingSeries });
-
-            // 4. Page Content (index)
-            statusEl.innerHTML += '<br>Syncing Page Text...';
-            const indexContent = {
-                about: {
-                    label: 'Velkommen til Fellesskapet',
-                    title: 'Vi er en Non-Profit Organisasjon',
-                    description: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.',
-                    features: {
-                        mission: {
-                            title: 'Vårt Oppdrag',
-                            text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.'
-                        },
-                        story: {
-                            title: 'Vår Historie',
-                            text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.'
-                        }
+            try {
+                // 1. Hero Slides
+                statusEl.innerHTML += '<br>Syncing Hero Slides...';
+                const heroSlides = [
+                    {
+                        imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop',
+                        title: 'Tenk & gi nestekjærlighet',
+                        subtitle: 'Vi er her for å støtte deg på din åndelige reise. Bli med i et trygt miljø der vi utforsker Guds ord, deler livet og styrker relasjonen til Jesus.',
+                        btnText: 'Utforsk mer',
+                        btnLink: 'om-oss.html'
+                    },
+                    {
+                        imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop',
+                        title: 'Vekst gjennom felleskap',
+                        subtitle: 'Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et felleskap som utforsker Guds ord og styrker troen.',
+                        btnText: 'Les mer',
+                        btnLink: 'om-oss.html'
+                    },
+                    {
+                        imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop',
+                        title: 'Støtt vårt arbeid',
+                        subtitle: 'Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet gjennom undervisning, reisevirksomhet og felleskap.',
+                        btnText: 'Gi gave nå',
+                        btnLink: 'donasjoner.html'
                     }
-                },
-                features: {
-                    teaching: { title: 'Undervisning', text: 'Bibelskoler, seminarer og dyptgående undervisning.' },
-                    podcast: { title: 'Podcast', text: 'Lytt til våre samtaler om tro, liv og åndelig vekst.' },
-                    travel: { title: 'Reisevirksomhet', text: 'Forkynnelse og konferanser rundt om i verden.' }
-                },
-                stats: {
-                    events: { number: '150', label: 'Arrangementer' },
-                    podcast: { number: '85', label: 'Podcast Episoder' },
-                    reached: { number: '2500', label: 'Mennesker Nådd' },
-                    countries: { number: '12', label: 'Land Besøkt' }
-                }
-            };
-            await firebaseService.savePageContent('index', indexContent);
+                ];
+                await firebaseService.savePageContent('hero_slides', { slides: heroSlides });
 
-            // 5. om-oss content
-            statusEl.innerHTML += '<br>Syncing Om Oss...';
-            const omOssContent = {
-                hero: { title: 'Om Oss', subtitle: 'Lær mer om vår visjon, oppdrag og historie' },
-                intro: {
-                    label: 'Velkommen til Fellesskapet',
-                    title: 'Vi er en Non-Profit Organisasjon',
-                    text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.'
-                },
-                mission: { title: 'Vårt Oppdrag', text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.' },
-                history: { title: 'Vår Historie', text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.' },
-                values: {
-                    title: 'Hva Vi Står For',
-                    bible: { title: 'Bibeltro Undervisning', text: 'Vi forankrer alt vi gjør i Guds ord og søker å leve etter Bibelens prinsipper.' },
-                    prayer: { title: 'Bønn & Tilbedelse', text: 'Bønn er hjertet av alt vi gjør, og vi søker Guds nærvær i alt.' },
-                    community: { title: 'Fellesskap', text: 'Vi tror på kraften i felleskap og støtter hverandre i troen.' },
-                    love: { title: 'Kjærlighet & Omsorg', text: 'Vi møter alle med Kristi kjærlighet og omsorg.' }
-                }
-            };
-            await firebaseService.savePageContent('om-oss', omOssContent);
+                // 2. Blog Posts
+                statusEl.innerHTML += '<br>Syncing Blog Posts...';
+                const blogPosts = [
+                    {
+                        title: 'Hvordan bevare troen i en travel hverdag',
+                        date: '05 Feb, 2024',
+                        category: 'Undervisning',
+                        content: 'Vi utforsker praktiske tips og bibelske prinsipper for å opprettholde en nær relasjon med Gud til tross for en hektisk tidsplan...',
+                        imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    },
+                    {
+                        title: 'Rapport fra misjonsturen til Kenya',
+                        date: '28 Jan, 2024',
+                        category: 'Reise',
+                        content: 'Bli med på reisen gjennom våre opplevelser i Kenya. Vi så Guds godhet i aksjon gjennom helbredelse, omsorg og glede...',
+                        imageUrl: 'https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    },
+                    {
+                        title: 'Ny Podcast Episode: Tro, tvil og vekst',
+                        date: '15 Jan, 2024',
+                        category: 'Podcast',
+                        content: 'Lytt til vår nyeste episode hvor vi diskuterer de ærlige sidene ved troslivet og hvordan vi kan finne hvile i Guds løfter...',
+                        imageUrl: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    },
+                    {
+                        title: 'Viktigheten av å stå sammen',
+                        date: '10 Jan, 2024',
+                        category: 'Felleskap',
+                        content: 'Hvorfor felleskapet er essensielt for den kristne vandringen og hvordan vi kan støtte hverandre gjennom livets ulike sesonger...',
+                        imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    },
+                    {
+                        title: 'Min reise fra mørke til lys',
+                        date: '02 Jan, 2024',
+                        category: 'Vitnesbyrd',
+                        content: 'Et sterkt vitnesbyrd om hvordan Gud forandret et liv preget av håpløshet til et liv fylt med mening, fred og fremtidstro...',
+                        imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                    }
+                ];
+                await firebaseService.savePageContent('collection_blog', { items: blogPosts });
 
-            // 6. kontakt content
-            statusEl.innerHTML += '<br>Syncing Kontakt...';
-            const kontaktContent = {
-                hero: { title: 'Kontakt Oss', subtitle: 'Vi vil gjerne høre fra deg. Send oss en melding eller besøk oss.' },
-                info: {
-                    title: 'Ta Kontakt',
-                    text: 'Har du spørsmål, bønnebehov eller ønsker du å vite mer om vår tjeneste? Ikke nøl med å ta kontakt med oss.',
-                    email: 'post@hiskingdomministry.no',
-                    phone: '+47 930 94 615',
-                    address: 'Norge'
-                }
-            };
-            await firebaseService.savePageContent('kontakt', kontaktContent);
+                // 3. Teaching Series
+                statusEl.innerHTML += '<br>Syncing Teaching Series...';
+                const teachingSeries = [
+                    {
+                        title: 'Tro og Tvil',
+                        content: 'Hvordan håndtere tvil og styrke din tro i utfordrende tider.',
+                        category: '5 episoder',
+                        author: 'His Kingdom',
+                        date: '02 Feb, 2024',
+                        imageUrl: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Guds Karakter',
+                        content: 'Utforsk Guds egenskaper og hva de betyr for våre liv.',
+                        category: '8 episoder',
+                        author: 'His Kingdom',
+                        date: '25 Jan, 2024',
+                        imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Åndelige Gaver',
+                        content: 'Oppdag og bruk dine åndelige gaver til Guds ære.',
+                        category: '6 episoder',
+                        author: 'His Kingdom',
+                        date: '15 Jan, 2024',
+                        imageUrl: 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Kristen Disippelskap',
+                        content: 'Lær hva det betyr å være en disippel av Jesus.',
+                        category: '10 episoder',
+                        author: 'His Kingdom',
+                        date: '10 Jan, 2024',
+                        imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Bønneliv',
+                        content: 'Utvikle et kraftfullt og meningsfullt bønneliv.',
+                        category: '7 episoder',
+                        author: 'His Kingdom',
+                        date: '05 Jan, 2024',
+                        imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Å Finne Guds Vilje',
+                        content: 'Hvordan søke og følge Guds plan for ditt liv.',
+                        category: '4 episoder',
+                        author: 'His Kingdom',
+                        date: '02 Jan, 2024',
+                        imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Tilgivelse og Forsoning',
+                        content: 'Kraften i tilgivelse og hvordan leve i forsoning.',
+                        category: '5 episoder',
+                        author: 'His Kingdom',
+                        date: '28 Dec, 2023',
+                        imageUrl: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Åndelig Krigføring',
+                        content: 'Stå fast i kampen mot åndelige krefter.',
+                        category: '6 episoder',
+                        author: 'His Kingdom',
+                        date: '20 Dec, 2023',
+                        imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Din Identitet i Kristus',
+                        content: 'Forstå hvem du er som Guds barn.',
+                        category: '5 episoder',
+                        author: 'His Kingdom',
+                        date: '15 Dec, 2023',
+                        imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Kallet til Tjeneste',
+                        content: 'Hvordan tjene Gud og andre effektivt.',
+                        category: '8 episoder',
+                        author: 'His Kingdom',
+                        date: '10 Dec, 2023',
+                        imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Helliggjørelse',
+                        content: 'Vokse i hellighet og likhet med Kristus.',
+                        category: '7 episoder',
+                        author: 'His Kingdom',
+                        date: '05 Dec, 2023',
+                        imageUrl: 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=600&h=400&fit=crop'
+                    },
+                    {
+                        title: 'Endetidsprofetier',
+                        content: 'Forstå Bibelens profetier om endetiden.',
+                        category: '9 episoder',
+                        author: 'His Kingdom',
+                        date: '01 Dec, 2023',
+                        imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop'
+                    }
+                ];
+                await firebaseService.savePageContent('collection_teaching', { items: teachingSeries });
 
-            // 7. media content
-            statusEl.innerHTML += '<br>Syncing Media...';
-            const mediaContent = {
-                hero: { title: 'Media', subtitle: 'Utforsk våre videoer, podcaster og annet innhold' },
-                youtube: { title: 'Siste Videoer', description: 'Se våre nyeste videoer og undervisninger' },
-                podcast: { title: 'Siste Episoder', description: 'Lytt til våre podcaster om tro, liv og åndelig vekst' },
-                teaching: { title: 'Undervisningsressurser', description: 'Dyptgående bibelstudier og undervisningsserier' }
-            };
-            await firebaseService.savePageContent('media', mediaContent);
+                // 4. Page Content (index)
+                statusEl.innerHTML += '<br>Syncing Page Text...';
+                const indexContent = {
+                    about: {
+                        label: 'Velkommen til Fellesskapet',
+                        title: 'Vi er en Non-Profit Organisasjon',
+                        description: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.',
+                        features: {
+                            mission: {
+                                title: 'Vårt Oppdrag',
+                                text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.'
+                            },
+                            story: {
+                                title: 'Vår Historie',
+                                text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.'
+                            }
+                        }
+                    },
+                    features: {
+                        teaching: { title: 'Undervisning', text: 'Bibelskoler, seminarer og dyptgående undervisning.' },
+                        podcast: { title: 'Podcast', text: 'Lytt til våre samtaler om tro, liv og åndelig vekst.' },
+                        travel: { title: 'Reisevirksomhet', text: 'Forkynnelse og konferanser rundt om i verden.' }
+                    },
+                    stats: {
+                        events: { number: '150', label: 'Arrangementer' },
+                        podcast: { number: '85', label: 'Podcast Episoder' },
+                        reached: { number: '2500', label: 'Mennesker Nådd' },
+                        countries: { number: '12', label: 'Land Besøkt' }
+                    }
+                };
+                await firebaseService.savePageContent('index', indexContent);
 
-            // 8. donasjoner content
-            statusEl.innerHTML += '<br>Syncing Donasjoner...';
-            const donasjonerContent = {
-                hero: { title: 'Donasjoner' },
-                intro: {
-                    title: 'Våre aktive innsamlingsaksjoner',
-                    description: 'Din gave utgjør en forskjell. Velg et prosjekt du ønsker å støtte og bli med på å forandre liv.'
-                },
-                form: {
-                    title: 'Støtt vårt arbeid',
-                    description: 'Din gave gjør en reell forskjell. Velg beløp og betalingsmetode nedenfor.'
-                }
-            };
-            await firebaseService.savePageContent('donasjoner', donasjonerContent);
+                // 5. om-oss content
+                statusEl.innerHTML += '<br>Syncing Om Oss...';
+                const omOssContent = {
+                    hero: { title: 'Om Oss', subtitle: 'Lær mer om vår visjon, oppdrag og historie' },
+                    intro: {
+                        label: 'Velkommen til Fellesskapet',
+                        title: 'Vi er en Non-Profit Organisasjon',
+                        text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.'
+                    },
+                    mission: { title: 'Vårt Oppdrag', text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.' },
+                    history: { title: 'Vår Historie', text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.' },
+                    values: {
+                        title: 'Hva Vi Står For',
+                        bible: { title: 'Bibeltro Undervisning', text: 'Vi forankrer alt vi gjør i Guds ord og søker å leve etter Bibelens prinsipper.' },
+                        prayer: { title: 'Bønn & Tilbedelse', text: 'Bønn er hjertet av alt vi gjør, og vi søker Guds nærvær i alt.' },
+                        community: { title: 'Fellesskap', text: 'Vi tror på kraften i felleskap og støtter hverandre i troen.' },
+                        love: { title: 'Kjærlighet & Omsorg', text: 'Vi møter alle med Kristi kjærlighet og omsorg.' }
+                    }
+                };
+                await firebaseService.savePageContent('om-oss', omOssContent);
 
-            // 9. blogg content
-            statusEl.innerHTML += '<br>Syncing Blogg...';
-            const bloggContent = {
-                hero: { title: 'Nyheter / Blogg', subtitle: 'Les våre siste artikler og oppdateringer' },
-                section: { title: 'Siste Nytt', label: 'Nyheter & Blogg', description: 'Les våre siste artikler og oppdateringer.' }
-            };
-            await firebaseService.savePageContent('blogg', bloggContent);
+                // 6. kontakt content
+                statusEl.innerHTML += '<br>Syncing Kontakt...';
+                const kontaktContent = {
+                    hero: { title: 'Kontakt Oss', subtitle: 'Vi vil gjerne høre fra deg. Send oss en melding eller besøk oss.' },
+                    info: {
+                        title: 'Ta Kontakt',
+                        text: 'Har du spørsmål, bønnebehov eller ønsker du å vite mer om vår tjeneste? Ikke nøl med å ta kontakt med oss.',
+                        email: 'post@hiskingdomministry.no',
+                        phone: '+47 930 94 615',
+                        address: 'Norge'
+                    }
+                };
+                await firebaseService.savePageContent('kontakt', kontaktContent);
 
-            // 10. arrangementer content
-            statusEl.innerHTML += '<br>Syncing Arrangementer...';
-            const arrangementerContent = {
-                hero: { title: 'Arrangementer', subtitle: 'Bli med på våre kommende hendelser' },
-                section: { title: 'Kommende Arrangementer', description: 'Se våre kommende arrangementer og meld deg på.' }
-            };
-            await firebaseService.savePageContent('arrangementer', arrangementerContent);
+                // 7. media content
+                statusEl.innerHTML += '<br>Syncing Media...';
+                const mediaContent = {
+                    hero: { title: 'Media', subtitle: 'Utforsk våre videoer, podcaster og annet innhold' },
+                    youtube: { title: 'Siste Videoer', description: 'Se våre nyeste videoer og undervisninger' },
+                    podcast: { title: 'Siste Episoder', description: 'Lytt til våre podcaster om tro, liv og åndelig vekst' },
+                    teaching: { title: 'Undervisningsressurser', description: 'Dyptgående bibelstudier og undervisningsserier' }
+                };
+                await firebaseService.savePageContent('media', mediaContent);
 
-            // 11. undervisning content
-            statusEl.innerHTML += '<br>Syncing Undervisning...';
-            const undervisningContent = {
-                hero: { title: 'Undervisning', subtitle: 'Dyptgående bibelundervisning' }
-            };
-            await firebaseService.savePageContent('undervisning', undervisningContent);
+                // 8. donasjoner content
+                statusEl.innerHTML += '<br>Syncing Donasjoner...';
+                const donasjonerContent = {
+                    hero: { title: 'Donasjoner' },
+                    intro: {
+                        title: 'Våre aktive innsamlingsaksjoner',
+                        description: 'Din gave utgjør en forskjell. Velg et prosjekt du ønsker å støtte og bli med på å forandre liv.'
+                    },
+                    form: {
+                        title: 'Støtt vårt arbeid',
+                        description: 'Din gave gjør en reell forskjell. Velg beløp og betalingsmetode nedenfor.'
+                    }
+                };
+                await firebaseService.savePageContent('donasjoner', donasjonerContent);
 
-            // 12. bibelstudier content
-            statusEl.innerHTML += '<br>Syncing Bibelstudier...';
-            const bibelstudierContent = {
-                hero: { title: 'Bibelstudier', subtitle: 'Utforsk Guds ord sammen med oss' }
-            };
-            await firebaseService.savePageContent('bibelstudier', bibelstudierContent);
+                // 9. blogg content
+                statusEl.innerHTML += '<br>Syncing Blogg...';
+                const bloggContent = {
+                    hero: { title: 'Nyheter / Blogg', subtitle: 'Les våre siste artikler og oppdateringer' },
+                    section: { title: 'Siste Nytt', label: 'Nyheter & Blogg', description: 'Les våre siste artikler og oppdateringer.' }
+                };
+                await firebaseService.savePageContent('blogg', bloggContent);
 
-            // 13. seminarer content
-            statusEl.innerHTML += '<br>Syncing Seminarer...';
-            const seminarerContent = {
-                hero: { title: 'Seminarer', subtitle: 'Temabaserte undervisningsdager' }
-            };
-            await firebaseService.savePageContent('seminarer', seminarerContent);
+                // 10. arrangementer content
+                statusEl.innerHTML += '<br>Syncing Arrangementer...';
+                const arrangementerContent = {
+                    hero: { title: 'Arrangementer', subtitle: 'Bli med på våre kommende hendelser' },
+                    section: { title: 'Kommende Arrangementer', description: 'Se våre kommende arrangementer og meld deg på.' }
+                };
+                await firebaseService.savePageContent('arrangementer', arrangementerContent);
 
-            // 14. podcast content
-            statusEl.innerHTML += '<br>Syncing Podcast...';
-            const podcastContent = {
-                hero: { title: 'Podcast', subtitle: 'Lytt til våre samtaler' }
-            };
-            await firebaseService.savePageContent('podcast', podcastContent);
+                // 11. undervisning content
+                statusEl.innerHTML += '<br>Syncing Undervisning...';
+                const undervisningContent = {
+                    hero: { title: 'Undervisning', subtitle: 'Dyptgående bibelundervisning' }
+                };
+                await firebaseService.savePageContent('undervisning', undervisningContent);
 
-            // 15. default SEO settings
-            statusEl.innerHTML += '<br>Syncing SEO-innstillinger...';
-            const seoDefaults = {
-                globalTitle: 'His Kingdom Ministry',
-                globalDescription: 'His Kingdom Ministry driver med åndelig samlinger, undervisning og forkynnelse. Velkommen til vårt fellesskap.',
-                globalKeywords: 'tro, bibel, undervisning, bønn, fellesskap, jesus, kristendom',
-                ogImage: '',
-                pages: {
-                    index: { title: 'Forside | His Kingdom Ministry', description: 'Velkommen til His Kingdom Ministry.' },
-                    'om-oss': { title: 'Om Oss | His Kingdom Ministry', description: 'Les om vår visjon og historie.' },
-                    media: { title: 'Media & Undervisning', description: 'Se våre videoer og undervisning.' },
-                    blogg: { title: 'Siste Nytt & Blogg', description: 'Følg med på hva som skjer.' }
-                }
-            };
-            await firebaseService.savePageContent('settings_seo', seoDefaults);
+                // 12. bibelstudier content
+                statusEl.innerHTML += '<br>Syncing Bibelstudier...';
+                const bibelstudierContent = {
+                    hero: { title: 'Bibelstudier', subtitle: 'Utforsk Guds ord sammen med oss' }
+                };
+                await firebaseService.savePageContent('bibelstudier', bibelstudierContent);
 
-            statusEl.innerHTML = '<span style="color: #10b981; font-weight: 600;">✅ Datasynkronisering fullført!</span>';
-            alert('Synkronisering ferdig! Innholdet er nå tilgjengelig i dashboardet.');
-        } catch (err) {
-            console.error(err);
-            statusEl.innerHTML = '<span style="color: #ef4444;">❌ Synkronisering feilet: ' + err.message + '</span>';
-        } finally {
-            btn.disabled = false;
+                // 13. seminarer content
+                statusEl.innerHTML += '<br>Syncing Seminarer...';
+                const seminarerContent = {
+                    hero: { title: 'Seminarer', subtitle: 'Temabaserte undervisningsdager' }
+                };
+                await firebaseService.savePageContent('seminarer', seminarerContent);
+
+                // 14. podcast content
+                statusEl.innerHTML += '<br>Syncing Podcast...';
+                const podcastContent = {
+                    hero: { title: 'Podcast', subtitle: 'Lytt til våre samtaler' }
+                };
+                await firebaseService.savePageContent('podcast', podcastContent);
+
+                // 15. default SEO settings
+                statusEl.innerHTML += '<br>Syncing SEO-innstillinger...';
+                const seoDefaults = {
+                    globalTitle: 'His Kingdom Ministry',
+                    globalDescription: 'His Kingdom Ministry driver med åndelig samlinger, undervisning og forkynnelse. Velkommen til vårt fellesskap.',
+                    globalKeywords: 'tro, bibel, undervisning, bønn, fellesskap, jesus, kristendom',
+                    ogImage: '',
+                    pages: {
+                        index: { title: 'Forside | His Kingdom Ministry', description: 'Velkommen til His Kingdom Ministry.' },
+                        'om-oss': { title: 'Om Oss | His Kingdom Ministry', description: 'Les om vår visjon og historie.' },
+                        media: { title: 'Media & Undervisning', description: 'Se våre videoer og undervisning.' },
+                        blogg: { title: 'Siste Nytt & Blogg', description: 'Følg med på hva som skjer.' }
+                    }
+                };
+                await firebaseService.savePageContent('settings_seo', seoDefaults);
+
+                statusEl.innerHTML = '<span style="color: #10b981; font-weight: 600;">✅ Datasynkronisering fullført!</span>';
+                alert('Synkronisering ferdig! Innholdet er nå tilgjengelig i dashboardet.');
+            } catch (err) {
+                console.error(err);
+                statusEl.innerHTML = '<span style="color: #ef4444;">❌ Synkronisering feilet: ' + err.message + '</span>';
+            } finally {
+                btn.disabled = false;
+            }
         }
-    }
 
-    createPlaceholderSection(id) {
-        const contentArea = document.getElementById('content-area');
-        const section = document.createElement('div');
-        section.id = `${id}-section`;
-        section.className = 'section-content';
-        section.innerHTML = `<div class="card"><div class="card-body"><h2>${id}</h2><p>Kommer snart...</p></div></div>`;
-        contentArea.appendChild(section);
-    }
+        createPlaceholderSection(id) {
+            const contentArea = document.getElementById('content-area');
+            const section = document.createElement('div');
+            section.id = `${id}-section`;
+            section.className = 'section-content';
+            section.innerHTML = `<div class="card"><div class="card-body"><h2>${id}</h2><p>Kommer snart...</p></div></div>`;
+            contentArea.appendChild(section);
+        }
 
     async loadPageFields(pageId) {
-        const container = document.getElementById('editor-fields');
-        container.innerHTML = '<div class="loader">Laster...</div>';
+            const container = document.getElementById('editor-fields');
+            container.innerHTML = '<div class="loader">Laster...</div>';
 
-        try {
-            const data = await firebaseService.getPageContent(pageId);
-            this.renderFields(data || {});
-        } catch (e) {
-            container.innerHTML = '<p>Error.</p>';
-        }
-    }
-
-    renderFields(data) {
-        const container = document.getElementById('editor-fields');
-        container.innerHTML = '';
-        const flattenedData = this.flatten(data);
-
-        if (Object.keys(flattenedData).length === 0) {
-            container.innerHTML = '<p>Ingen redigerbare felt funnet for denne siden.</p>';
-            return;
-        }
-
-        Object.keys(flattenedData).forEach(key => {
-            const value = flattenedData[key];
-            const formGroup = document.createElement('div');
-            formGroup.className = 'form-group';
-
-            const label = document.createElement('label');
-            label.textContent = key.replace(/\./g, ' > ').toUpperCase();
-
-            let inputElement;
-            if (typeof value === 'string' && (value.length > 100 || key.includes('description') || key.includes('content'))) {
-                inputElement = document.createElement('textarea');
-                inputElement.style.height = '120px';
-            } else {
-                inputElement = document.createElement('input');
-                inputElement.type = 'text';
+            try {
+                const data = await firebaseService.getPageContent(pageId);
+                this.renderFields(data || {});
+            } catch (e) {
+                container.innerHTML = '<p>Error.</p>';
             }
-            inputElement.className = 'form-control';
-            inputElement.value = value || '';
-            inputElement.setAttribute('data-key', key);
+        }
 
-            formGroup.appendChild(label);
-            formGroup.appendChild(inputElement);
-            container.appendChild(formGroup);
-        });
-    }
+        renderFields(data) {
+            const container = document.getElementById('editor-fields');
+            container.innerHTML = '';
+            const flattenedData = this.flatten(data);
+
+            if (Object.keys(flattenedData).length === 0) {
+                container.innerHTML = '<p>Ingen redigerbare felt funnet for denne siden.</p>';
+                return;
+            }
+
+            Object.keys(flattenedData).forEach(key => {
+                const value = flattenedData[key];
+                const formGroup = document.createElement('div');
+                formGroup.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.textContent = key.replace(/\./g, ' > ').toUpperCase();
+
+                let inputElement;
+                if (typeof value === 'string' && (value.length > 100 || key.includes('description') || key.includes('content'))) {
+                    inputElement = document.createElement('textarea');
+                    inputElement.style.height = '120px';
+                } else {
+                    inputElement = document.createElement('input');
+                    inputElement.type = 'text';
+                }
+                inputElement.className = 'form-control';
+                inputElement.value = value || '';
+                inputElement.setAttribute('data-key', key);
+
+                formGroup.appendChild(label);
+                formGroup.appendChild(inputElement);
+                container.appendChild(formGroup);
+            });
+        }
 
     async savePageContent() {
-        const pageId = document.querySelector('.page-item.active').dataset.page;
-        const inputs = document.querySelectorAll('#editor-fields .form-control');
-        const dataToSave = {};
+            const pageId = document.querySelector('.page-item.active').dataset.page;
+            const inputs = document.querySelectorAll('#editor-fields .form-control');
+            const dataToSave = {};
 
-        inputs.forEach(input => {
-            const keys = input.dataset.key.split('.');
-            let curr = dataToSave;
-            keys.forEach((k, i) => {
-                if (i === keys.length - 1) {
-                    curr[k] = input.value;
-                } else {
-                    curr[k] = curr[k] || {};
-                    curr = curr[k];
-                }
+            inputs.forEach(input => {
+                const keys = input.dataset.key.split('.');
+                let curr = dataToSave;
+                keys.forEach((k, i) => {
+                    if (i === keys.length - 1) {
+                        curr[k] = input.value;
+                    } else {
+                        curr[k] = curr[k] || {};
+                        curr = curr[k];
+                    }
+                });
             });
-        });
 
-        try {
-            await firebaseService.savePageContent(pageId, dataToSave);
-            alert('✅ Innholdet er lagret!');
-        } catch (err) {
-            alert('❌ Feil ved lagring');
+            try {
+                await firebaseService.savePageContent(pageId, dataToSave);
+                alert('✅ Innholdet er lagret!');
+            } catch (err) {
+                alert('❌ Feil ved lagring');
+            }
+        }
+
+        flatten(obj, prefix = '') {
+            return Object.keys(obj).reduce((acc, k) => {
+                const pre = prefix.length ? prefix + '.' : '';
+                if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+                    Object.assign(acc, this.flatten(obj[k], pre + k));
+                } else { acc[pre + k] = obj[k]; }
+                return acc;
+            }, {});
         }
     }
-
-    flatten(obj, prefix = '') {
-        return Object.keys(obj).reduce((acc, k) => {
-            const pre = prefix.length ? prefix + '.' : '';
-            if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
-                Object.assign(acc, this.flatten(obj[k], pre + k));
-            } else { acc[pre + k] = obj[k]; }
-            return acc;
-        }, {});
-    }
-}
 
 // Start the manager
 window.adminManager = new AdminManager();
