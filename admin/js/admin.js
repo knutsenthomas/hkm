@@ -1106,35 +1106,45 @@ class AdminManager {
             const items = Array.isArray(rawData) ? rawData : (rawData && rawData.items ? rawData.items : []);
             const item = items[index] || {};
 
-            // Bruk kun ISO-format (YYYY-MM-DD) i dato-feltet. Hvis eksisterende dato
-            // ikke allerede er i dette formatet, lar vi feltet stå tomt slik at brukeren
-            // kan velge dato på nytt – dette hindrer at Date-parsing kaster feil.
             const safeDate = (typeof item.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.date))
                 ? item.date
                 : '';
+
+            // Handle existing tags (ensure array)
+            const existingTags = Array.isArray(item.tags) ? item.tags : [];
 
             const modal = document.createElement('div');
             modal.className = 'dashboard-modal';
             modal.innerHTML = `
                 <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                    <div class="card" style="width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto;">
+                    <div class="card" style="width: 100%; max-width: 900px; max-height: 90vh; overflow-y: auto;">
                         <div class="card-header flex-between">
                             <h3 class="card-title">Rediger innhold</h3>
                             <button class="icon-btn" id="close-col-modal"><span class="material-symbols-outlined">close</span></button>
                         </div>
                         <div class="card-body">
-                            <div class="grid-2-cols editor-layout">
+                            <div class="grid-2-cols editor-layout" style="grid-template-columns: 2fr 1fr; gap: 20px;">
                                 <div class="main-fields">
                                     <div class="form-group">
                                         <label>Tittel</label>
                                         <input type="text" id="col-item-title" class="form-control" value="${item.title || ''}">
                                     </div>
-                                    <div class="form-group">
+                                    <div class="form-group" style="display: flex; flex-direction: column; flex: 1;">
                                         <label>Innhold</label>
-                                        <div id="col-item-content" contenteditable="true" class="form-control" style="min-height: 300px; overflow-y: auto;">${item.content || ''}</div>
+                                        <!-- Quill Editor Container -->
+                                        <div id="quill-editor-container" style="height: 400px; background: white;">
+                                            ${item.content || ''}
+                                        </div>
                                     </div>
                                 </div>
                                 <div class="side-fields">
+                                    <div class="form-group">
+                                        <button class="btn-primary" style="width: 100%; margin-bottom: 20px;" id="save-col-item">
+                                            <span class="material-symbols-outlined">save</span> Lagre endringer
+                                        </button>
+                                        <div class="divider"></div>
+                                    </div>
+
                                     <div class="form-group">
                                         <label>Publiseringsdato</label>
                                         <input type="date" id="col-item-date" class="form-control" value="${safeDate}">
@@ -1145,14 +1155,28 @@ class AdminManager {
                                     </div>
                                     <div class="form-group">
                                         <label>Kategori</label>
-                                        <input type="text" id="col-item-cat" class="form-control" value="${item.category || ''}" placeholder="Eks: Undervisning, Nyheter">
+                                        <input type="text" id="col-item-cat" class="form-control" value="${item.category || ''}" placeholder="Eks: Undervisning">
                                     </div>
+                                    
+                                    <!-- Tag Management -->
+                                    <div class="form-group">
+                                        <label>Tagger</label>
+                                        <div class="tags-input-container">
+                                            <div id="active-tags" class="active-tags-list"></div>
+                                            <input type="text" id="tag-input" class="form-control" placeholder="Skriv tag og trykk Enter" style="margin-top: 8px;">
+                                        </div>
+                                    </div>
+
                                     <div class="form-group">
                                         <label>Bilde URL</label>
                                         <input type="text" id="col-item-img" class="form-control" value="${item.imageUrl || ''}">
+                                        <div id="img-preview-box" style="margin-top: 10px; height: 150px; background: #f8fafc; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                            ${item.imageUrl ? `<img src="${item.imageUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;">` : '<span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 48px;">image</span>'}
+                                        </div>
                                     </div>
+                                    
                                     <div class="divider" style="margin: 20px 0;"></div>
-                                    <h4 style="font-size: 14px; margin-bottom: 10px;">SEO & GEO</h4>
+                                    <h4 style="font-size: 14px; margin-bottom: 10px; color: #64748b;">Avansert (SEO)</h4>
                                     <div class="form-group">
                                         <label>SEO Tittel</label>
                                         <input type="text" id="col-item-seo-title" class="form-control" value="${item.seoTitle || ''}">
@@ -1161,14 +1185,7 @@ class AdminManager {
                                         <label>SEO Beskrivelse</label>
                                         <textarea id="col-item-seo-desc" class="form-control" style="height: 60px;">${item.seoDescription || ''}</textarea>
                                     </div>
-                                    <div class="form-group">
-                                        <label>GEO Posisjon</label>
-                                        <input type="text" id="col-item-geo" class="form-control" value="${item.geoPosition || ''}" placeholder="lat, long">
-                                    </div>
                                 </div>
-                            </div>
-                            <div style="margin-top: 24px; display: flex; gap: 10px;">
-                                <button class="btn-primary" style="flex: 1;" id="save-col-item">Lagre endringer</button>
                             </div>
                         </div>
                     </div>
@@ -1177,19 +1194,89 @@ class AdminManager {
 
             document.body.appendChild(modal);
 
+            // --- Initialize Quill ---
+            const quill = new Quill('#quill-editor-container', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['link', 'image', 'clean']
+                    ]
+                }
+            });
+
+            // --- Tag Management Logic ---
+            let currentTags = [...existingTags];
+            const tagsContainer = document.getElementById('active-tags');
+            const tagInput = document.getElementById('tag-input');
+
+            const renderTags = () => {
+                tagsContainer.innerHTML = currentTags.map(tag => `
+                    <span class="tag-badge">
+                        ${tag}
+                        <button type="button" class="remove-tag" data-tag="${tag}">&times;</button>
+                    </span>
+                `).join('');
+
+                // Add remove listeners
+                document.querySelectorAll('.remove-tag').forEach(btn => {
+                    btn.onclick = () => {
+                        const tagToRemove = btn.getAttribute('data-tag');
+                        currentTags = currentTags.filter(t => t !== tagToRemove);
+                        renderTags();
+                    };
+                });
+            };
+
+            // Render initial tags
+            renderTags();
+
+            // Add Tag Listener
+            tagInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ',') {
+                    e.preventDefault();
+                    const val = tagInput.value.trim().replace(',', '');
+                    if (val && !currentTags.includes(val)) {
+                        currentTags.push(val);
+                        renderTags();
+                        tagInput.value = '';
+                    }
+                }
+            });
+
+            // Image Preview Listener
+            document.getElementById('col-item-img').addEventListener('input', (e) => {
+                const url = e.target.value;
+                const box = document.getElementById('img-preview-box');
+                if (url && url.length > 10) {
+                    box.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+                } else {
+                    box.innerHTML = '<span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 48px;">image</span>';
+                }
+            });
+
             document.getElementById('close-col-modal').onclick = () => modal.remove();
+
             document.getElementById('save-col-item').onclick = async () => {
                 const btn = document.getElementById('save-col-item');
 
                 item.title = document.getElementById('col-item-title').value;
-                item.content = document.getElementById('col-item-content').innerHTML;
+
+                // Get HTML from Quill
+                item.content = quill.root.innerHTML;
+
                 item.date = document.getElementById('col-item-date').value;
                 item.imageUrl = document.getElementById('col-item-img').value;
                 item.author = document.getElementById('col-item-author').value;
                 item.category = document.getElementById('col-item-cat').value;
                 item.seoTitle = document.getElementById('col-item-seo-title').value;
                 item.seoDescription = document.getElementById('col-item-seo-desc').value;
-                item.geoPosition = document.getElementById('col-item-geo').value;
+
+                // Save Tags
+                item.tags = currentTags;
 
                 btn.textContent = 'Lagrer...';
                 btn.disabled = true;

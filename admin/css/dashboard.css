@@ -799,6 +799,74 @@ textarea.form-control {
     background-color: var(--accent-light);
 }
 
+/* Quill Editor Customization */
+.ql-toolbar.ql-snow {
+    border: 1px solid var(--border-color);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #f8fafc;
+}
+
+.ql-container.ql-snow {
+    border: 1px solid var(--border-color);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
+    background-color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+}
+
+.ql-editor {
+    min-height: 300px;
+}
+
+/* Tag Management Styling */
+.tags-input-container {
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 12px;
+    background-color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.active-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 32px;
+}
+
+.tag-badge {
+    background-color: var(--accent-light);
+    color: var(--accent-color);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.remove-tag {
+    background: none;
+    border: none;
+    color: var(--accent-color);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.7;
+}
+
+.remove-tag:hover {
+    opacity: 1;
+}
+
 .icon-btn.delete:hover {
     color: #ef4444;
     border-color: #ef4444;

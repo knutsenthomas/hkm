@@ -204,6 +204,13 @@ class ContentManager {
             heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${item.imageUrl}')`;
         }
 
+        const tagsEl = document.getElementById('single-post-tags');
+        if (tagsEl && item.tags && Array.isArray(item.tags)) {
+            tagsEl.innerHTML = item.tags.map(tag =>
+                `<span style="background: rgba(255,255,255,0.2); color: white; padding: 4px 12px; border-radius: 20px; font-size: 13px; backdrop-filter: blur(4px);">#${tag}</span>`
+            ).join('');
+        }
+
         container.innerHTML = item.content || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
     }
 
@@ -1220,10 +1227,15 @@ class ContentManager {
                         ${post.category ? `<span class="blog-category" style="position: absolute; top: 15px; left: 15px; background: var(--secondary-color, #ff6b2b); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${post.category}</span>` : ''}
                     </div>
                     <div class="blog-content" style="padding: 25px;">
-                        <div class="blog-meta" style="display: flex; gap: 15px; font-size: 13px; color: #6c757d; margin-bottom: 15px;">
+                        <div class="blog-meta" style="display: flex; gap: 15px; font-size: 13px; color: #6c757d; margin-bottom: 10px;">
                             ${post.date ? `<span><i class="fas fa-calendar-alt"></i> ${this.formatDate(post.date)}</span>` : ''}
                             ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : '<span><i class="fas fa-user"></i> Admin</span>'}
                         </div>
+                        ${post.tags && Array.isArray(post.tags) && post.tags.length > 0 ? `
+                        <div class="blog-tags" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
+                            ${post.tags.map(tag => `<span style="font-size: 11px; background: #fff0ea; color: #ff6b2b; padding: 2px 8px; border-radius: 12px; font-weight: 600;">#${tag}</span>`).join('')}
+                        </div>
+                        ` : ''}
                         <h3 class="blog-title" style="margin-bottom: 12px; font-size: 1.25rem;">${post.title}</h3>
                         <p class="blog-excerpt" style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">${this.stripHtml(post.content || '').substring(0, 120)}...</p>
                         <a href="blogg-post.html?id=${encodeURIComponent(post.title)}" class="blog-link" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">Les mer <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></a>
