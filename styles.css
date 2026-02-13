@@ -744,7 +744,8 @@ section {
     transition: var(--transition);
     border-radius: 50%;
     overflow: hidden;
-    background: transparent;
+    background: #cc712b;
+    /* Matches logo ring color */
     flex-shrink: 0;
 }
 
