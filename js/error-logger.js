@@ -55,6 +55,9 @@
         // Ignore common noise (e.g. browser extensions)
         if (errorMessage.includes('Script error.') && !error) return;
 
+        // Ignore benign ResizeObserver error
+        if (errorMessage.includes('ResizeObserver loop completed with undelivered notifications')) return;
+
         sendLog('ScriptError', `${errorMessage} at ${source}:${lineno}:${colno}`, 'WARNING', {
             stack: error ? error.stack : null
         });
