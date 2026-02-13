@@ -1931,10 +1931,62 @@ class AdminManager {
         const section = document.getElementById('causes-section');
         if (!section) return;
 
+        let totalDonations = 0;
+        let donationCount = 0;
+        let averageDonation = 0;
+
+        try {
+            if (firebaseService.db) {
+                const donationsSnapshot = await firebaseService.db.collection('donations').get();
+                donationCount = donationsSnapshot.size;
+                if (!donationsSnapshot.empty) {
+                    donationsSnapshot.forEach(doc => {
+                        const data = doc.data();
+                        if (data.amount) {
+                            totalDonations += (data.amount / 100);
+                        }
+                    });
+                }
+                if (donationCount > 0) {
+                    averageDonation = totalDonations / donationCount;
+                }
+            }
+        } catch (e) {
+            console.warn('Kunne ikke hente donasjoner for Gaver-siden:', e);
+        }
+
+        const formattedTotal = totalDonations.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
+        const formattedAverage = averageDonation.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
+
+
         section.innerHTML = `
             <div class="section-header">
-                <h2 class="section-title">Innsamlingsaksjoner</h2>
-                <p class="section-subtitle">Håndter innsamlingsaksjoner som vises på nettsiden.</p>
+                <h2 class="section-title">Gaver</h2>
+                <p class="section-subtitle">Oversikt over gaver og innsamlingsaksjoner.</p>
+            </div>
+
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <div class="stat-icon pink"><span class="material-symbols-outlined">payments</span></div>
+                    <div class="stat-info">
+                        <h3 class="stat-label">Totalt donert</h3>
+                        <p class="stat-value">${formattedTotal}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><span class="material-symbols-outlined">volunteer_activism</span></div>
+                    <div class="stat-info">
+                        <h3 class="stat-label">Antall gaver</h3>
+                        <p class="stat-value">${donationCount}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><span class="material-symbols-outlined">trending_up</span></div>
+                    <div class="stat-info">
+                        <h3 class="stat-label">Snittgave</h3>
+                        <p class="stat-value">${formattedAverage}</p>
+                    </div>
+                </div>
             </div>
 
             <div class="card">
