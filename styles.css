@@ -705,13 +705,16 @@ section {
 .header.scrolled {
     background: rgba(255, 255, 255, 0.98);
     box-shadow: var(--shadow);
+    /* Explicitly disable for mobile/tablet performance */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
 }
 
 /* Enable backdrop-filter only on desktop for performance */
 @media (min-width: 1025px) {
     .header.scrolled {
-        backdrop-filter: blur(10px);
-        -webkit-backdrop-filter: blur(10px);
+        backdrop-filter: blur(10px) !important;
+        -webkit-backdrop-filter: blur(10px) !important;
     }
 }
 
