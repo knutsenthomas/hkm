@@ -10,6 +10,30 @@ const nav = document.getElementById('nav');
 const navLinks = document.querySelectorAll('.nav-link');
 const headerActions = document.querySelector('.header-actions');
 
+// ===================================
+// Mobile Viewport Height Fix
+// ===================================
+function initMobileViewportHeight() {
+    // Only run on mobile
+    if (window.innerWidth > 1024) return;
+
+    // Set variable on load
+    const vh = window.innerHeight * 0.01;
+    document.documentElement.style.setProperty('--vh', `${vh}px`);
+
+    // Lock height for the hero slider specifically to prevent jumping
+    const heroSlider = document.querySelector('.hero-slider');
+    if (heroSlider) {
+        heroSlider.style.height = `${window.innerHeight}px`;
+    }
+}
+
+// Run immediately and on orientation change (but not generic resize to avoid jitter)
+initMobileViewportHeight();
+window.addEventListener('orientationchange', () => {
+    setTimeout(initMobileViewportHeight, 200);
+});
+
 // Header Scroll Effect
 let scrollTicking = false;
 window.addEventListener('scroll', () => {
