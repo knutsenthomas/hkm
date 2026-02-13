@@ -749,11 +749,10 @@ section {
 }
 
 .logo-icon img {
-    width: 110%;
-    height: 110%;
-    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
     display: block;
-    margin: -5%;
 }
 
 .nav {
