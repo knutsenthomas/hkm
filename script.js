@@ -28,10 +28,16 @@ function initMobileViewportHeight() {
     }
 }
 
-// Run immediately and on orientation change (but not generic resize to avoid jitter)
-initMobileViewportHeight();
+// Run on load and orientation change
+document.addEventListener('DOMContentLoaded', () => {
+    // Small delay to ensure browser chrome has settled
+    setTimeout(initMobileViewportHeight, 100);
+});
+
+window.addEventListener('load', initMobileViewportHeight);
+
 window.addEventListener('orientationchange', () => {
-    setTimeout(initMobileViewportHeight, 200);
+    setTimeout(initMobileViewportHeight, 300);
 });
 
 // Header Scroll Effect

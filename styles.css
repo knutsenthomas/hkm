@@ -710,13 +710,22 @@ section {
     -webkit-backdrop-filter: none !important;
 }
 
-/* Ensure no height shifts during header transitions */
-.header,
-.header.scrolled {
-    height: 80px;
-    /* Force consistent height */
+/* Standardize header content */
+.header-content {
     display: flex;
     align-items: center;
+    justify-content: space-between;
+    padding: 20px 40px;
+    /* Vertical padding defines the height */
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    transition: padding 0.3s ease;
+}
+
+.header.scrolled .header-content {
+    padding: 10px 40px;
+    /* Shrink on scroll */
 }
 
 /* Enable backdrop-filter only on desktop for performance */
@@ -2513,8 +2522,11 @@ body.hero-animate .slide-buttons {
     }
 
     .header-content {
-        justify-content: space-between;
-        padding: 0 20px;
+        padding: 15px 20px;
+    }
+
+    .header.scrolled .header-content {
+        padding: 10px 20px;
     }
 
     .logo {
@@ -2551,7 +2563,7 @@ body.hero-animate .slide-buttons {
     }
 
     .header-content {
-        padding: 0 20px;
+        padding: 15px 20px;
     }
 
     .slide-title {
