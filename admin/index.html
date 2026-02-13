@@ -23,12 +23,25 @@
 </head>
 
 <body class="admin-body">
+    <!-- Global Error UI (Hidden by default) -->
+    <div id="global-error-container"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <span class="material-symbols-outlined"
+            style="font-size: 64px; color: #ef4444; margin-bottom: 20px;">error</span>
+        <h2 style="font-size: 24px; color: #1e293b; margin-bottom: 10px;">Noe gikk galt</h2>
+        <p id="global-error-message" style="color: #64748b; max-width: 500px; margin-bottom: 30px;">En uventet feil har
+            oppstått.</p>
+        <button onclick="window.location.reload()"
+            style="padding: 12px 24px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Last
+            inn på nytt</button>
+    </div>
+
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <span class="material-symbols-outlined logo-icon">dashboard_customize</span>
-                <h1 class="logo-text">TK Studio</h1>
+                <img src="img/logo_circular.png" alt="HKM Logo" style="width: 40px; height: 40px; border-radius: 50%;">
+                <h1 class="logo-text">HKM Studio</h1>
             </div>
         </div>
 

@@ -1120,3 +1120,105 @@ input[type="range"] {
     margin-bottom: 0 !important;
     padding-bottom: 0 !important;
 }
+
+/* Mobile Responsiveness */
+@media (max-width: 900px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .mobile-nav-toggle {
+        display: block;
+        font-size: 24px;
+        cursor: pointer;
+        margin-right: 16px;
+    }
+
+    .grid-2-cols,
+    .grid-2-cols.editor-layout {
+        grid-template-columns: 1fr !important;
+        gap: 20px;
+    }
+
+    /* Reverse order for editor: Settings below content */
+    .grid-2-cols.editor-layout .side-fields {
+        order: 2;
+    }
+
+    .grid-2-cols.editor-layout .main-fields {
+        order: 1;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .section-container {
+        padding: 20px 16px;
+    }
+
+    .card-body {
+        padding: 16px;
+    }
+
+    /* Modal Mobile Adjustments */
+    .dashboard-modal .card {
+        height: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .dashboard-modal .modal-backdrop {
+        padding: 0;
+        align-items: flex-start;
+    }
+
+    .dashboard-modal .card-header {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        border-radius: 0;
+    }
+
+    /* Editor height on mobile */
+    #editorjs-container {
+        min-height: 300px !important;
+        padding: 50px 16px 20px 16px !important;
+        /* Increased top padding to avoid toolbar overlap */
+    }
+
+    /* Editor.js Specific Mobile Fixes */
+    .codex-editor__redactor {
+        padding-bottom: 50px !important;
+        margin-right: 0 !important;
+    }
+
+    /* Adjust toolbar position to not overlap content */
+    .ce-toolbar__content {
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .ce-toolbar__actions {
+        left: -30px !important;
+        /* Move actions slightly left but keep visible */
+        padding-right: 0 !important;
+    }
+
+    .ce-block__content {
+        max-width: 100% !important;
+        padding: 0 !important;
+    }
+}
