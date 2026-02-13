@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Min Side | His Kingdom Ministry</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Material Symbols -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <!-- Min Side CSS -->
+    <link rel="stylesheet" href="css/minside.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <!-- Using main site logo or text -->
+                    <span class="material-symbols-outlined logo-icon">account_circle</span>
+                    <h1 class="logo-text">Min Side</h1>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#overview" class="nav-link active" data-view="overview">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            <span>Oversikt</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#courses" class="nav-link" data-view="courses">
+                            <span class="material-symbols-outlined">school</span>
+                            <span>Mine Kurs</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#resources" class="nav-link" data-view="resources">
+                            <span class="material-symbols-outlined">folder_open</span>
+                            <span>Ressurser</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#profile" class="nav-link" data-view="profile">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>Min Profil</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="../index.html" class="nav-link">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                    <span>Tilbake til HKM</span>
+                </a>
+                <button id="logout-btn" class="nav-link logout">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span>Logg ut</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="top-header">
+                <button class="mobile-toggle" id="mobile-toggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="header-title">
+                    <h2 id="page-title">Oversikt</h2>
+                </div>
+                <div class="user-profile">
+                    <div class="user-info">
+                        <span class="user-name" id="user-name">Laster...</span>
+                        <span class="user-role badge">Medlem</span>
+                    </div>
+                    <div class="user-avatar" id="user-avatar">
+                        <span class="material-symbols-outlined">person</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Views -->
+            <div id="content-area" class="content-container">
+                <!-- Views will be injected here by JS -->
+                <div class="loader">Laster innhold...</div>
+            </div>
+        </main>
+
+        <!-- Overlay for mobile sidebar -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    </div>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- App Logic -->
+    <script src="js/minside.js"></script>
+</body>
+
+</html>

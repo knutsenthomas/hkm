@@ -2109,11 +2109,187 @@ body.hero-animate .slide-buttons {
     padding: 60px 0 20px;
 }
 
-.footer-grid {
+/* Footer V2 (Filadelfia Style) */
+.footer-layout-v2 {
+    display: flex;
+    gap: 60px;
+    margin-bottom: 60px;
+    align-items: flex-start;
+}
+
+.footer-left {
+    flex: 2;
+}
+
+.footer-brand {
+    margin-bottom: 50px;
+    max-width: 600px;
+}
+
+.footer-brand .logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    text-decoration: none;
+    margin-bottom: 15px;
+}
+
+.footer-brand .logo-text {
+    color: white;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.brand-description {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    line-height: 1.6;
+}
+
+.footer-nav-grid {
     display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1.5fr;
-    gap: 40px;
-    margin-bottom: 40px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+}
+
+.nav-col h4 {
+    color: white;
+    text-transform: uppercase;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    font-weight: 700;
+    opacity: 0.9;
+}
+
+.nav-col ul {
+    list-style: none;
+    padding: 0;
+}
+
+.nav-col li {
+    margin-bottom: 12px;
+}
+
+.nav-col a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease;
+    font-size: 0.95rem;
+}
+
+.nav-col a:hover {
+    color: white;
+}
+
+/* Right Side Cards */
+.footer-right {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 300px;
+}
+
+.footer-card {
+    background: rgba(255, 255, 255, 0.05);
+    /* Dark transparent background */
+    border-radius: 8px;
+    padding: 25px;
+    color: white;
+    /* White text for contrast */
+}
+
+.footer-card h3 {
+    margin: 0 0 20px;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: white;
+    /* White headers */
+}
+
+.footer-social-icons {
+    display: flex;
+    gap: 15px;
+}
+
+.footer-social-icons a {
+    width: 45px;
+    height: 45px;
+    background: white;
+    /* White icon background */
+    color: var(--text-dark);
+    /* Dark icon color */
+    border-radius: 8px;
+    /* Square with rounded corners match screenshot */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+.footer-social-icons a:hover {
+    background: var(--primary-orange);
+    color: white;
+}
+
+.contact-card .btn {
+    width: 100%;
+    margin-bottom: 25px;
+    background: #8B0000;
+    /* Dark Red to match example? Or stick to branding? User said "mer som dette". Let's use a dark red/orange. Existing primary-red might work if defined. If not, use primary-orange. */
+    background: var(--primary-orange);
+    border: none;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.contact-details {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.detail-item strong {
+    display: block;
+    font-size: 0.9rem;
+    margin-bottom: 2px;
+}
+
+.detail-item p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+    .footer-layout-v2 {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .footer-left {
+        width: 100%;
+    }
+
+    .footer-nav-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-right {
+        width: 100%;
+        flex-direction: column-reverse;
+        /* Put Contact above Follow on mobile? Or standard stack */
+    }
+}
+
+@media (max-width: 576px) {
+    .footer-nav-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 .footer-logo {
@@ -2456,6 +2632,73 @@ body {
     z-index: 1;
     max-width: 600px;
     margin: 0 auto;
+}
+
+/* Legal Page Specific Styles */
+.legal-page-body {
+    padding: 80px 0;
+    background: #fff;
+}
+
+.legal-text-container {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 1.05rem;
+    line-height: 1.8;
+    color: var(--text-dark);
+}
+
+.legal-text-container h2 {
+    color: var(--primary-orange);
+    margin-top: 50px;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+}
+
+.legal-text-container ul {
+    margin-bottom: 20px;
+    padding-left: 20px;
+    list-style-type: disc;
+}
+
+.legal-text-container li {
+    margin-bottom: 10px;
+}
+
+/* Scroll to Top Button */
+.scroll-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--primary-orange);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    z-index: 999;
+}
+
+.scroll-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.scroll-to-top:hover {
+    background: var(--primary-red);
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Vision & Values Section */

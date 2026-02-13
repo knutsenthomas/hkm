@@ -1,0 +1,190 @@
+/* Cookie Consent Banner Styling */
+#cookie-consent-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.05);
+    z-index: 9999;
+    font-family: 'Inter', sans-serif;
+    padding: 20px;
+    display: none;
+    /* Hidden by default, shown via JS */
+    border-top: 1px solid #e0e0e0;
+}
+
+#cookie-consent-banner.visible {
+    display: block;
+    animation: slideUp 0.4s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
+}
+
+.cookie-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.cookie-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.cookie-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 8px;
+}
+
+.cookie-text {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    max-width: 800px;
+}
+
+/* Toggles Section */
+.cookie-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding: 16px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #eee;
+}
+
+.cookie-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cookie-option label {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #333;
+    cursor: pointer;
+}
+
+.cookie-toggle {
+    appearance: none;
+    width: 40px;
+    height: 20px;
+    background: #ccc;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.cookie-toggle::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: white;
+    border-radius: 50%;
+    transition: transform 0.3s;
+}
+
+.cookie-toggle:checked {
+    background: #D17D39;
+    /* Primary Orange */
+}
+
+.cookie-toggle:checked::after {
+    transform: translateX(20px);
+}
+
+.cookie-toggle:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Buttons */
+.cookie-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.btn-cookie {
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+}
+
+.btn-cookie-accept {
+    background-color: #D17D39;
+    color: white;
+}
+
+.btn-cookie-accept:hover {
+    background-color: #B54D2B;
+}
+
+.btn-cookie-deny {
+    background-color: transparent;
+    border: 1px solid #ccc;
+    color: #666;
+}
+
+.btn-cookie-deny:hover {
+    border-color: #999;
+    color: #333;
+}
+
+.btn-cookie-selection {
+    background-color: transparent;
+    border: 1px solid #D17D39;
+    color: #D17D39;
+}
+
+.btn-cookie-selection:hover {
+    background-color: #fff5f0;
+}
+
+/* Details Toggle (Optional expansion) */
+.cookie-details-link {
+    font-size: 0.85rem;
+    color: #D17D39;
+    text-decoration: underline;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+@media (max-width: 768px) {
+    .cookie-options {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .cookie-buttons {
+        flex-direction: column;
+    }
+
+    .btn-cookie {
+        width: 100%;
+    }
+}

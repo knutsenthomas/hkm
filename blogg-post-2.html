@@ -5,9 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rapport fra misjonsturen til Kenya | His Kingdom Ministry</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -145,56 +145,113 @@
 
     <footer class="footer" id="kontakt">
         <div class="container">
-            <div class="footer-grid">
-                <div class="footer-col">
-                    <a href="index.html" class="logo" style="margin-bottom: 20px; display: inline-block;">
-                        <div class="logo-icon">
-                            <img src="img/Logo - sirkel.png" alt="His Kingdom Ministry Logo">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <!-- Brand / Intro -->
+                    <div class="footer-brand">
+                        <a href="index.html" class="logo">
+                            <div class="logo-icon">
+                                <img src="img/Logo - sirkel.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til
+                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                    </div>
+
+                    <!-- Links Grid -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>Om oss</h4>
+                            <ul>
+                                <li><a href="index.html#hjem">Hjem</a></li>
+                                <li><a href="om-oss.html">Hvem er vi?</a></li>
+                                <li><a href="om-oss.html#visjon">Vår visjon</a></li>
+                                <li><a href="kontakt.html">Kontakt oss</a></li>
+                            </ul>
                         </div>
-                        <span style="color: white;">His Kingdom Ministry</span>
-                    </a>
-                    <p class="footer-text">Et felleskap for vekst, bønn og undervisning. Vi ønsker å utruste mennesker
-                        til et dypere liv med Gud.</p>
-                    <div class="footer-social">
-                        <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f"></i></a>
-                        <a href="https://www.instagram.com/hiskingdomdesigns/" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram"></i></a>
-                        <a href="https://www.youtube.com/@HisKingdomMinistry" class="social-link" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+
+                        <div class="nav-col">
+                            <h4>Ressurser</h4>
+                            <ul>
+                                <li><a href="media.html#teaching-section">Undervisning</a></li>
+                                <li><a href="arrangementer.html">E-kurs</a></li>
+                                <li><a href="blogg.html">Bøker & Blogg</a></li>
+                                <li><a href="minside/index.html">Min Side</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="media.html#podcast-section">Podcast</a></li>
+                                <li><a href="media.html">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvering</h4>
+                            <ul>
+                                <li><a href="arrangementer.html">Kalender</a></li>
+                                <li><a href="donasjoner.html">Gi en gave</a></li>
+                                <li><a href="personvern.html">Personvern</a></li>
+                                <li><a href="tilgjengelighet.html">Tilgjengelighet</a></li>
+                                <li><a href="#"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
 
-                <div class="footer-col">
-                    <h4 class="footer-title">Sjekk ut</h4>
-                    <ul class="footer-links">
-                        <li><a href="index.html#hjem">Hjem</a></li>
-                        <li><a href="index.html#om-oss">Om oss</a></li>
-                        <li><a href="arrangementer.html">Arrangementer</a></li>
-                        <li><a href="blogg.html">Blogg</a></li>
-                        <li><a href="donasjoner.html">Donasjoner</a></li>
-                    </ul>
-                </div>
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <!-- Follow Us Card -->
+                    <div class="footer-card">
+                        <h3>Følg oss</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
 
-                <div class="footer-col">
-                    <h4 class="footer-title">Ressurser</h4>
-                    <ul class="footer-links">
-                        <li><a href="blogg.html">Bøker</a></li>
-                        <li><a href="media.html#teaching-section">Undervisning</a></li>
-                        <li><a href="media.html#podcast-section">Podcast</a></li>
-                        <li><a href="arrangementer.html">E-kurs</a></li>
-                    </ul>
-                </div>
+                    <!-- Contact Us Card -->
+                    <div class="footer-card contact-card">
+                        <h3>Kontakt oss</h3>
+                        <a href="kontakt.html" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
 
-                <div class="footer-col">
-                    <h4 class="footer-title">Kontakt</h4>
-                    <ul class="footer-contact">
-                        <li><i class="fas fa-envelope"></i> post@hiskingdomministry.no</li>
-                        <li><i class="fas fa-phone"></i> +47 930 94 615</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Norge</li>
-                    </ul>
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>E-post:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Telefon:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>806244</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Konto nr.:</strong>
+                                <p>1506.77.30948</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2024</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
+                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
+                <a href="admin/login.html" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>

@@ -577,6 +577,15 @@ class AdminManager {
                     </div>
                 </div>
 
+                <div class="stat-card" id="system-health-card">
+                    <div class="stat-icon green" id="system-health-icon"><span class="material-symbols-outlined">check_circle</span></div>
+                    <div class="stat-info">
+                        <h3 class="stat-label">Systemstatus</h3>
+                        <p class="stat-value" id="system-health-status">Normal</p>
+                        <small id="system-health-text" style="color: #64748b;">Ingen kritiske feil</small>
+                    </div>
+                </div>
+
                 <div class="stat-card">
                     <div class="stat-icon blue"><span class="material-symbols-outlined">edit_note</span></div>
                     <div class="stat-info">
@@ -697,6 +706,42 @@ class AdminManager {
             </div>
         `;
         section.setAttribute('data-rendered', 'true');
+
+        // Fetch System Health (Critical Errors)
+        this.checkSystemHealth();
+    }
+
+    async checkSystemHealth() {
+        if (!firebaseService.db) return;
+
+        try {
+            const snapshot = await firebaseService.db
+                .collection('system_logs')
+                .where('severity', '==', 'CRITICAL')
+                .where('read', '==', false)
+                .get();
+
+            const criticalCount = snapshot.size;
+            const healthCard = document.getElementById('system-health-card');
+            const healthIcon = document.getElementById('system-health-icon');
+            const healthStatus = document.getElementById('system-health-status');
+            const healthText = document.getElementById('system-health-text');
+
+            if (healthCard && criticalCount > 0) {
+                healthIcon.className = 'stat-icon red';
+                healthIcon.innerHTML = '<span class="material-symbols-outlined">warning</span>';
+                healthStatus.textContent = 'Kritisk';
+                healthStatus.style.color = '#ef4444';
+                healthText.textContent = `${criticalCount} ulest(e) kritisk feil`;
+                healthCard.style.border = '1px solid #ef4444';
+
+                // Make clickable to see logs (feature for later expansion: view logs section)
+                healthCard.style.cursor = 'pointer';
+                healthCard.onclick = () => alert(`Det er ${criticalCount} kritiske feil i loggen. Sjekk Firestore 'system_logs' eller e-postvarsler.`);
+            }
+        } catch (e) {
+            console.error('Failed to check system health:', e);
+        }
     }
 
     async fetchYouTubeStats() {

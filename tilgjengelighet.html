@@ -4,21 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YouTube Videoer | His Kingdom Ministry</title>
+    <title>Tilgjengelighetserklæring | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Tilgjengelighetserklæring for His Kingdom Ministry. Vårt arbeid for universell utforming.">
 
-    <!-- Google Fonts: Inter for hele siden -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="styles.css?v=2">
 
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
+    <!-- Header -->
     <!-- Header -->
     <header class="header" id="header">
         <div class="container">
@@ -34,7 +34,7 @@
                     <ul class="nav-list">
                         <li><a href="index.html#hjem" class="nav-link">Hjem</a></li>
                         <li><a href="om-oss.html" class="nav-link">Om oss</a></li>
-                        <li><a href="media.html" class="nav-link active">Media</a></li>
+                        <li><a href="media.html" class="nav-link">Media</a></li>
                         <li><a href="arrangementer.html" class="nav-link">Arrangementer</a></li>
                         <li><a href="blogg.html" class="nav-link">Blogg</a></li>
                         <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
@@ -43,7 +43,7 @@
                 </nav>
 
                 <div class="header-actions">
-                    <a href="donasjoner.html" class="btn btn-primary">Gi gave</a>
+                    <a href="donasjoner.html" class="btn btn-primary desktop-only">Gi gave</a>
                     <button class="mobile-toggle" id="mobile-toggle">
                         <span></span>
                         <span></span>
@@ -57,48 +57,75 @@
     <!-- Page Hero -->
     <section class="page-hero" style="padding-top: 160px;">
         <div class="container">
-            <h1 class="page-hero-title">YouTube Videoer</h1>
-            <p class="page-hero-subtitle">Se våre nyeste undervisninger og opptak</p>
-            <div style="margin-top: 20px;">
-                <a href="media.html" class="btn btn-outline btn-sm">
-                    <i class="fas fa-arrow-left"></i> Tilbake til Media
-                </a>
-            </div>
+            <h1 class="page-hero-title">Tilgjengelighetserklæring</h1>
+            <p class="page-hero-subtitle">Vårt engasjement for universell utforming</p>
         </div>
     </section>
 
-    <!-- YouTube Content -->
-    <section class="media-content-section">
+    <!-- Content -->
+    <section class="legal-page-body">
         <div class="container">
-            <div id="youtube-categories" class="youtube-categories"
-                style="margin-bottom: 32px; display: flex; flex-wrap: wrap; gap: 12px;"></div>
-            <div class="section-header">
-                <span class="section-label">Videoarkiv</span>
-                <h2 class="section-title">Alle videoer</h2>
-                <p class="section-description">Her finner du en oversikt over alt vårt videoinnhold direkte fra YouTube.
-                </p>
-            </div>
+            <div class="legal-text-container">
+                <p>His Kingdom Ministry ønsker at våre nettsider og vårt innhold skal være tilgjengelig for alle
+                    mennesker,
+                    uavhengig av funksjonsevne.</p>
 
-            <div class="media-grid" id="youtube-grid">
-                <!-- YouTube videos will be loaded here dynamically -->
-                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 50px;">
-                    <div class="loader"></div>
-                    <p style="margin-top: 15px; color: var(--text-muted);">Henter videoer fra YouTube...</p>
+                <h2>Vårt mål</h2>
+                <p>Vi arbeider kontinuerlig for å oppfylle kravene til universell utforming av IKT (WCAG 2.1). Vi tror
+                    at Guds
+                    ord og vårt fellesskap skal være åpent for alle, og digitale barrierer skal ikke stå i veien for
+                    dette.</p>
+
+                <h2>Status for samsvar</h2>
+                <div class="conformance-status"
+                    style="background-color: #f0fff4; border: 1px solid #c6f6d5; padding: 16px; border-radius: 8px; color: #276749; margin-bottom: 25px;">
+                    <p style="margin: 0;"><strong>Delvis samsvar:</strong> Vi er klar over at enkelte deler av
+                        nettstedet vårt kanskje ikke fullt
+                        ut tilfredsstiller alle krav i WCAG 2.1 nivå AA ennå, men vi jobber aktivt med forbedringer.</p>
                 </div>
-            </div>
-            <div style="text-align:center; margin-top:24px;">
-                <button id="youtube-show-more" class="btn btn-outline" style="display:none; min-width:160px;">Vis
-                    mer</button>
-            </div>
 
-            <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="https://youtube.com/@hiskingdomministry" target="_blank" class="btn btn-primary">
-                    <i class="fab fa-youtube"></i> Se kanalen vår på YouTube
-                </a>
+                <h2>Hva vi gjør for tilgjengelighet</h2>
+                <p>Vi har fokusert på følgende tiltak for å sikre god tilgjengelighet:</p>
+                <ul>
+                    <li><strong>Kontrast og lesbarhet:</strong> Vi bruker klare farger med god kontrast mellom tekst og
+                        bakgrunn
+                        for å sikre at teksten er lett å lese.</li>
+                    <li><strong>Tastaturnavigasjon:</strong> Nettstedet er bygget slik at det skal være mulig å navigere
+                        i
+                        menyene og innholdet ved hjelp av tastatur (Tab-tasten).</li>
+                    <li><strong>Bilder og media:</strong> Vi jobber med å inkludere tekstalternativer (alt-tekst) for
+                        bilder som
+                        bærer informasjon.</li>
+                    <li><strong>Video og undervisning:</strong> Vi har som mål å tekste våre undervisningsvideoer, slik
+                        at de er
+                        tilgjengelige for hørselshemmede og de som ser video uten lyd.</li>
+                </ul>
+
+                <h2>Kjente mangler</h2>
+                <p>Vi er oppmerksomme på følgende områder som vi jobber med å forbedre:</p>
+                <ul>
+                    <li>Eldre videoinnhold kan mangle teksting.</li>
+                    <li>Enkelte dokumenter (PDF) er kanskje ikke optimalisert for skjermlesere.</li>
+                </ul>
+
+                <h2>Gi oss tilbakemelding</h2>
+                <p>Opplever du problemer med å bruke nettsiden vår, eller har du forslag til forbedringer? Vi setter
+                    stor pris
+                    på din tilbakemelding.</p>
+                <p>Vennligst kontakt oss på:</p>
+                <p>
+                    <strong>E-post:</strong> post@hiskingdomministry.no<br>
+                    <strong>Telefon:</strong> +47 930 94 615
+                </p>
+
+                <p style="margin-top: 40px; font-size: 0.9rem; color: #718096;">Denne erklæringen ble sist oppdatert 13.
+                    februar
+                    2026.</p>
             </div>
         </div>
     </section>
 
+    <!-- Footer -->
     <!-- Footer -->
     <footer class="footer" id="kontakt">
         <div class="container">
@@ -213,19 +240,8 @@
         </div>
     </footer>
 
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-    <!-- Firebase Config & Service -->
-    <script src="js/firebase-config.js"></script>
-    <script src="js/firebase-service.js"></script>
-
-    <!-- JavaScript -->
     <script src="script.js"></script>
-    <script src="media.js"></script>
+
 </body>
 
 </html>

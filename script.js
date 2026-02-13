@@ -677,7 +677,38 @@ function initYouTubeStats() {
         });
 }
 
+// ===================================
+// Scroll to Top Button
+// ===================================
+function initScrollToTop() {
+    // Create button
+    const btn = document.createElement('button');
+    btn.className = 'scroll-to-top';
+    btn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    btn.setAttribute('aria-label', 'Til toppen');
+    document.body.appendChild(btn);
+
+    // Show/Hide on scroll
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    });
+
+    // Scroll to top on click
+    btn.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    initScrollToTop();
     initYouTubeStats();
     initPodcastStats();
 });
