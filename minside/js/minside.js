@@ -423,17 +423,17 @@ class MinSideManager {
                         </div>
                     </div>
 
-                    <form onsubmit="event.preventDefault(); alert('Lagret (Simulert)');">
+                    <form onsubmit="event.preventDefault(); window.minSideManager.handleProfileSave(this);">
                         <!-- Personal Info -->
                         <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personalia</h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">Navn</label>
-                                <input type="text" value="${this.currentUser.displayName || ''}" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <input type="text" name="displayName" value="${this.currentUser.displayName || ''}" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">Telefon</label>
-                                <input type="tel" placeholder="+47 000 00 000" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <input type="tel" name="phone" placeholder="+47 000 00 000" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
                             </div>
                             <div style="grid-column: span 2;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">E-post</label>
@@ -447,15 +447,15 @@ class MinSideManager {
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                             <div style="grid-column: span 2;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">Gateadresse</label>
-                                <input type="text" placeholder="Eksempelveien 12" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <input type="text" name="address" placeholder="Eksempelveien 12" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">Postnummer</label>
-                                <input type="text" placeholder="0000" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <input type="text" name="zip" placeholder="0000" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
                             </div>
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">Sted</label>
-                                <input type="text" placeholder="Oslo" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                <input type="text" name="city" placeholder="Oslo" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
                             </div>
                         </div>
 
@@ -463,9 +463,8 @@ class MinSideManager {
                         <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Kommunikasjon</h4>
                         <div style="margin-bottom: 30px;">
                             <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
-                                <input type="checkbox" checked style="width: 18px; height: 18px; accent-color: var(--primary-orange);">
+                                <input type="checkbox" name="newsletter" checked style="width: 18px; height: 18px; accent-color: var(--primary-orange);">
                                 <span>Motta nyhetsbrev på e-post</span>
-                            </label>
                             </label>
                         </div>
 
@@ -477,7 +476,7 @@ class MinSideManager {
 
                         <!-- Actions -->
                         <div style="display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border-color); padding-top: 24px;">
-                            <button class="btn btn-primary">Lagre endringer</button>
+                            <button type="submit" class="btn btn-primary">Lagre endringer</button>
                             <button type="button" class="btn" style="color: var(--text-muted); margin-left: auto;">Endre passord</button>
                         </div>
                     </form>
@@ -493,6 +492,26 @@ class MinSideManager {
 
         // Fetch and display consent status
         this.updateConsentStatusDisplay();
+        this.loadUserProfileData(container);
+    }
+
+    async loadUserProfileData(container) {
+        try {
+            const doc = await firebase.firestore().collection('users').doc(this.currentUser.uid).get();
+            if (doc.exists) {
+                const data = doc.data();
+                const form = container.querySelector('form');
+                if (!form) return;
+
+                if (data.phone) form.querySelector('[name="phone"]').value = data.phone;
+                if (data.address) form.querySelector('[name="address"]').value = data.address;
+                if (data.zip) form.querySelector('[name="zip"]').value = data.zip;
+                if (data.city) form.querySelector('[name="city"]').value = data.city;
+                form.querySelector('[name="newsletter"]').checked = data.newsletter !== false; // Default true
+            }
+        } catch (e) {
+            console.warn('Could not load user profile data:', e);
+        }
     }
 
     async updateConsentStatusDisplay() {
@@ -558,6 +577,45 @@ class MinSideManager {
             console.error("Opplasting feilet:", error);
             container.innerHTML = originalContent;
             alert('Kunne ikke laste opp bilde: ' + error.message);
+        }
+    }
+
+    async handleProfileSave(form) {
+        const btn = form.querySelector('button[type="submit"]');
+        const originalText = btn.textContent;
+        btn.disabled = true;
+        btn.textContent = 'Lagrer...';
+
+        try {
+            const formData = new FormData(form);
+            const updates = {
+                displayName: formData.get('displayName'),
+                phone: formData.get('phone'),
+                address: formData.get('address'),
+                zip: formData.get('zip'),
+                city: formData.get('city'),
+                newsletter: formData.get('newsletter') === 'on',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            // 1. Update Auth Profile (DisplayName)
+            if (updates.displayName && updates.displayName !== this.currentUser.displayName) {
+                await this.currentUser.updateProfile({
+                    displayName: updates.displayName
+                });
+                this.updateUserProfile(this.currentUser); // Update sidebar
+            }
+
+            // 2. Update Firestore Document
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
+
+            alert('Profilen er oppdatert!');
+        } catch (error) {
+            console.error('Save failed:', error);
+            alert('Kunne ikke lagre endringer: ' + error.message);
+        } finally {
+            btn.disabled = false;
+            btn.textContent = originalText;
         }
     }
 
