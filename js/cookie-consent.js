@@ -20,18 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
 function showCookieBanner() {
     // Inject HTML
     const bannerHTML = `
+    <div id="cookie-consent-backdrop"></div>
     <div id="cookie-consent-banner">
         <div class="cookie-content">
-            <div class="cookie-header">
-                <div>
-                    <h3 class="cookie-title">Vi bryr oss om ditt personvern</h3>
-                    <p class="cookie-text">
-                        Vi bruker informasjonskapsler (cookies) for at nettsiden skal fungere, for å analysere trafikken vår og for å tilby deg en bedre brukeropplevelse. 
-                        Du kan velge hvilke kategorier du vil tillate.
-                        <a href="personvern.html" class="cookie-details-link">Les vår personvernerklæring</a>
-                    </p>
-                </div>
-            </div>
+            <h3 class="cookie-title">Vi bryr oss om ditt personvern</h3>
+            <p class="cookie-text">
+                Vi bruker informasjonskapsler (cookies) for at nettsiden skal fungere, for å analysere trafikken vår og for å tilby deg en bedre brukeropplevelse. 
+                Du kan velge hvilke kategorier du vil tillate.
+                <a href="personvern.html" class="cookie-details-link">Les vår personvernerklæring</a>
+            </p>
             
             <div class="cookie-options">
                 <div class="cookie-option">
@@ -60,10 +57,12 @@ function showCookieBanner() {
     document.body.insertAdjacentHTML('beforeend', bannerHTML);
 
     const banner = document.getElementById('cookie-consent-banner');
+    const backdrop = document.getElementById('cookie-consent-backdrop');
 
     // Small delay to allow animation
     setTimeout(() => {
         banner.classList.add('visible');
+        backdrop.classList.add('visible');
     }, 100);
 
     // Event Listeners
@@ -87,10 +86,13 @@ function showCookieBanner() {
 
 function hideBanner() {
     const banner = document.getElementById('cookie-consent-banner');
+    const backdrop = document.getElementById('cookie-consent-backdrop');
     if (banner) {
         banner.classList.remove('visible');
+        if (backdrop) backdrop.classList.remove('visible');
         setTimeout(() => {
             banner.remove();
+            if (backdrop) backdrop.remove();
         }, 500);
     }
 }
