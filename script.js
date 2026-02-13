@@ -788,7 +788,8 @@ function initPodcastStats() {
     fetch(proxyUrl)
         .then(response => response.json())
         .then(data => {
-            const items = data && data.rss && data.rss.channel && data.rss.channel.item;
+            const channel = Array.isArray(data?.rss?.channel) ? data.rss.channel[0] : data?.rss?.channel;
+            const items = channel?.item;
             if (!items) return;
 
             const count = Array.isArray(items) ? items.length : 1;

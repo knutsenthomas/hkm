@@ -39,7 +39,7 @@
                         <li><a href="arrangementer.html" class="nav-link">Arrangementer</a></li>
                         <li><a href="blogg.html" class="nav-link">Blogg</a></li>
                         <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
-                        <li><a href="minside/index.html" class="nav-link">Min Side</a></li>
+                        <li><a href="minside/index.html" class="nav-link" target="_blank">Min Side</a></li>
                         <li class="mobile-only"><a href="donasjoner.html" class="btn btn-primary">Gi gave</a></li>
                     </ul>
                 </nav>
@@ -173,34 +173,34 @@
             </div>
 
             <div class="teaching-grid">
-                <div class="teaching-card" data-category="teaching">
+                <div class="teaching-card" data-category="Bibelstudier">
                     <div class="teaching-icon">
                         <i class="fas fa-book-bible"></i>
                     </div>
                     <h3 class="teaching-title">Bibelstudier</h3>
                     <p class="teaching-description">Systematiske studier gjennom Bibelens bøker med dyptgående
                         forklaringer.</p>
-                    <span class="teaching-count">12 serier tilgjengelig</span>
+                    <span class="teaching-count" data-count="bibelstudier">12 serier tilgjengelig</span>
                     <a href="bibelstudier.html" class="btn btn-outline btn-sm">Utforsk</a>
                 </div>
 
-                <div class="teaching-card" data-category="teaching">
+                <div class="teaching-card" data-category="Seminarer">
                     <div class="teaching-icon">
                         <i class="fas fa-graduation-cap"></i>
                     </div>
                     <h3 class="teaching-title">Seminarer</h3>
                     <p class="teaching-description">Opptak fra våre seminarer og konferanser om ulike temaer.</p>
-                    <span class="teaching-count">8 seminarer tilgjengelig</span>
+                    <span class="teaching-count" data-count="seminarer">8 seminarer tilgjengelig</span>
                     <a href="seminarer.html" class="btn btn-outline btn-sm">Utforsk</a>
                 </div>
 
-                <div class="teaching-card" data-category="teaching">
+                <div class="teaching-card" data-category="Undervisningsserier">
                     <div class="teaching-icon">
                         <i class="fas fa-chalkboard-teacher"></i>
                     </div>
                     <h3 class="teaching-title">Undervisningsserier</h3>
                     <p class="teaching-description">Tematiske undervisningsserier om viktige kristne emner.</p>
-                    <span class="teaching-count">15 serier tilgjengelig</span>
+                    <span class="teaching-count" data-count="undervisningsserier">15 serier tilgjengelig</span>
                     <a href="undervisningsserier.html" class="btn btn-outline btn-sm">Utforsk</a>
                 </div>
             </div>
@@ -319,11 +319,11 @@
                             </div>
                             <div class="detail-item">
                                 <strong>Vipps:</strong>
-                                <p>806244</p>
+                                <p>938361</p>
                             </div>
                             <div class="detail-item">
                                 <strong>Konto nr.:</strong>
-                                <p>1506.77.30948</p>
+                                <p>3000.66.08759</p>
                             </div>
                         </div>
                     </div>
@@ -346,12 +346,54 @@
     <!-- Firebase Config & Service -->
     <script src="js/firebase-config.js"></script>
     <script src="js/firebase-service.js"></script>
+    <script src="js/teaching-loader.js"></script>
 
     <!-- App Scripts -->
     <script src="script.js"></script>
     <script src="js/content-manager.js?v=author"></script>
     <script src="media.js"></script>
     <script src="js/cookie-consent.js"></script>
+
+    <script>
+        // Load teaching category counts on media.html
+        async function loadTeachingCounts() {
+            try {
+                const teachingData = await firebaseService.getPageContent('collection_teaching');
+                if (!teachingData || !teachingData.items) return;
+
+                const categories = {
+                    'bibelstudier': { name: 'Bibelstudier', label: 'serier' },
+                    'seminarer': { name: 'Seminarer', label: 'seminarer' },
+                    'undervisningsserier': { name: 'Undervisningsserier', label: 'serier' }
+                };
+
+                // Count items by category and update display
+                for (const [key, meta] of Object.entries(categories)) {
+                    const count = teachingData.items.filter(item =>
+                        item.category && item.category.trim().toLowerCase() === meta.name.trim().toLowerCase()
+                    ).length;
+
+                    const countSpan = document.querySelector(`[data-count="${key}"]`);
+                    if (countSpan) {
+                        if (count === 0) {
+                            countSpan.textContent = `Ingen ${meta.label} tilgjengelig`;
+                        } else if (count === 1) {
+                            countSpan.textContent = `1 ${meta.label} tilgjengelig`;
+                        } else {
+                            countSpan.textContent = `${count} ${meta.label} tilgjengelig`;
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading teaching counts:', error);
+            }
+        }
+
+        // Load counts on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadTeachingCounts();
+        });
+    </script>
 </body>
 
 </html>

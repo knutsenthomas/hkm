@@ -1231,11 +1231,16 @@ body.hero-animate .slide-buttons {
     color: white;
     cursor: pointer;
     transition: var(--transition);
+    display: none;
 }
 
 .slider-arrow:hover {
     background: var(--primary-orange);
     border-color: var(--primary-orange);
+}
+
+.slider-arrow {
+    display: none;
 }
 
 .slider-dots {
@@ -2662,6 +2667,18 @@ body {
     margin: 0 auto;
 }
 
+.page-hero .btn-outline {
+    background: white;
+    color: var(--primary-orange);
+    border-color: white;
+}
+
+.page-hero .btn-outline:hover {
+    background: transparent;
+    color: white;
+    border-color: white;
+}
+
 /* Legal Page Specific Styles */
 .legal-page-body {
     padding: 80px 0;
@@ -3433,6 +3450,30 @@ body {
     color: var(--primary-orange);
     font-weight: 600;
     margin-bottom: 20px;
+}
+
+.teaching-card .btn-outline {
+    background: var(--primary-orange);
+    color: white;
+    border-color: var(--primary-orange);
+}
+
+.teaching-card .btn-outline:hover {
+    background: var(--primary-red);
+    border-color: var(--primary-red);
+    color: white;
+}
+
+.teaching-section .section-header .btn-outline {
+    background: var(--primary-orange);
+    color: white;
+    border-color: var(--primary-orange);
+}
+
+.teaching-section .section-header .btn-outline:hover {
+    background: var(--primary-red);
+    border-color: var(--primary-red);
+    color: white;
 }
 
 /* Media Newsletter */

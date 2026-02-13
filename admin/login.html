@@ -186,6 +186,7 @@
     <!-- Firebase Config & Service -->
     <script src="../js/firebase-config.js"></script>
     <script src="../js/firebase-service.js"></script>
+    <script src="../js/user-roles.js"></script>
 
     <!-- Auth Logic -->
     <script>
@@ -195,6 +196,27 @@
             const errorBox = document.getElementById('error-box');
 
             if (!loginForm) return;
+
+            async function routeByRole() {
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+
+                let role = 'medlem';
+                try {
+                    role = await firebaseService.getUserRole(user.uid);
+                } catch (err) {
+                    console.warn('Kunne ikke hente rolle:', err);
+                }
+
+                const canAccessAdmin = window.HKM_PERMISSIONS
+                    && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                    && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+
+                window.location.href = canAccessAdmin ? 'index.html' : '../minside/index.html';
+            }
 
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -221,7 +243,7 @@
 
                 try {
                     await firebaseService.login(email, password);
-                    window.location.href = 'index.html';
+                    await routeByRole();
                 } catch (err) {
                     console.error("Login error:", err);
                     errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
@@ -241,7 +263,7 @@
 
                     try {
                         await firebaseService.loginWithGoogle();
-                        window.location.href = 'index.html';
+                        await routeByRole();
                     } catch (err) {
                         console.error("Google login error:", err);
                         errorBox.textContent = "Kunne ikke logge inn med Google.";

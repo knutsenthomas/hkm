@@ -1,41 +1,35 @@
-// Min Side Authentication Logic
-
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if initializing
-    if (!firebase.apps.length) {
-        console.error("Firebase not initialized! loading config...");
-    }
+    const firebaseService = window.firebaseService;
 
     // --- Mode Switching ---
-    const btnPass = document.getElementById('mode-password');
-    const btnMagic = document.getElementById('mode-magic');
-    const secPass = document.getElementById('section-password');
-    const secMagic = document.getElementById('section-magic');
+    const buttons = document.querySelectorAll('.btn-mode');
+    const sections = document.querySelectorAll('.auth-mode-section');
 
-    btnPass.addEventListener('click', () => {
-        setMode('password');
-    });
-
-    btnMagic.addEventListener('click', () => {
-        setMode('magic');
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const mode = btn.id.split('-')[1];
+            setMode(mode);
+        });
     });
 
     function setMode(mode) {
-        if (mode === 'password') {
-            secPass.classList.add('active');
-            secMagic.classList.remove('active');
-            btnPass.style.borderColor = 'var(--primary-orange)';
-            btnPass.style.color = 'var(--primary-orange)';
-            btnMagic.style.borderColor = 'var(--border-color)';
-            btnMagic.style.color = 'var(--text-main)';
-        } else {
-            secPass.classList.remove('active');
-            secMagic.classList.add('active');
-            btnMagic.style.borderColor = 'var(--primary-orange)';
-            btnMagic.style.color = 'var(--primary-orange)';
-            btnPass.style.borderColor = 'var(--border-color)';
-            btnPass.style.color = 'var(--text-main)';
-        }
+        buttons.forEach(b => {
+            if (b.id === `mode-${mode}`) {
+                b.style.borderColor = 'var(--primary-orange)';
+                b.style.color = 'var(--primary-orange)';
+            } else {
+                b.style.borderColor = 'var(--border-color)';
+                b.style.color = 'var(--text-main)';
+            }
+        });
+
+        sections.forEach(s => {
+            if (s.id === `section-${mode}`) {
+                s.classList.add('active');
+            } else {
+                s.classList.remove('active');
+            }
+        });
         hideMessage();
     }
 
@@ -51,10 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 1. Email/Password Login ---
-    document.getElementById('password-form').addEventListener('submit', async (e) => {
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('email-pass').value;
-        const password = document.getElementById('password').value;
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
         const btn = e.target.querySelector('button[type="submit"]');
 
         btn.disabled = true;
@@ -62,8 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
         hideMessage();
 
         try {
-            await firebase.auth().signInWithEmailAndPassword(email, password);
-            window.location.href = 'index.html';
+            await firebaseService.login(email, password);
+            await routeByRole();
         } catch (error) {
             console.error(error);
             showMessage(getErrorMessage(error), 'error');
@@ -72,7 +66,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 2. Magic Link Login (Send) ---
+    // --- 2. Registration ---
+    document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('register-email').value;
+        const name = document.getElementById('register-name').value;
+        const password = document.getElementById('register-password').value;
+        const confirm = document.getElementById('register-confirm').value;
+        const btn = e.target.querySelector('button[type="submit"]');
+
+        if (password !== confirm) {
+            return showMessage('Passordene er ikke like.', 'error');
+        }
+
+        btn.disabled = true;
+        btn.textContent = 'Oppretter profil...';
+        hideMessage();
+
+        try {
+            const userCredential = await firebaseService.register(email, password);
+            await userCredential.user.updateProfile({ displayName: name });
+            await routeByRole();
+        } catch (error) {
+            console.error(error);
+            showMessage(getErrorMessage(error), 'error');
+            btn.disabled = false;
+            btn.textContent = 'Opprett profil';
+        }
+    });
+
+    // --- 3. Magic Link Login (Send) ---
     document.getElementById('magic-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const email = document.getElementById('email-magic').value;
@@ -83,14 +106,14 @@ document.addEventListener('DOMContentLoaded', () => {
         hideMessage();
 
         const actionCodeSettings = {
-            url: window.location.href, // Redirect back here to finish login
+            url: window.location.href,
             handleCodeInApp: true
         };
 
         try {
             await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
             window.localStorage.setItem('emailForSignIn', email);
-            showMessage('Vi har sendt en magisk link til din e-post! Sjekk innboksen din (og spam-filteret).', 'success');
+            showMessage('Vi har sendt en magisk link til din e-post!', 'success');
             btn.textContent = 'Link sendt!';
         } catch (error) {
             console.error(error);
@@ -100,43 +123,74 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 3. Google Login ---
+    // --- 4. Google Login ---
     document.getElementById('google-login').addEventListener('click', async () => {
-        const provider = new firebase.auth.GoogleAuthProvider();
         try {
-            await firebase.auth().signInWithPopup(provider);
-            window.location.href = 'index.html';
+            const result = await firebaseService.loginWithGoogle();
+            const user = result.user;
+
+            // Check if user already has a doc, if not create one as 'medlem'
+            const role = await firebaseService.getUserRole(user.uid);
+            if (!role) {
+                await firebase.firestore().collection('users').doc(user.uid).set({
+                    email: user.email,
+                    role: 'medlem',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            }
+
+            await routeByRole();
         } catch (error) {
             console.error(error);
             showMessage(getErrorMessage(error), 'error');
         }
     });
 
-    // --- 4. Verify Magic Link on Load ---
+    // --- 5. Verify Magic Link on Load ---
     if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
         let email = window.localStorage.getItem('emailForSignIn');
         if (!email) {
-            email = window.prompt('Vennligst bekreft din e-postadresse for å logge inn:');
+            email = window.prompt('Bekreft din e-postadresse:');
         }
 
         firebase.auth().signInWithEmailLink(email, window.location.href)
-            .then((result) => {
+            .then(async () => {
                 window.localStorage.removeItem('emailForSignIn');
-                window.location.href = 'index.html';
+                await routeByRole();
             })
             .catch((error) => {
-                console.error(error);
                 showMessage(getErrorMessage(error), 'error');
             });
     }
 
+    async function routeByRole() {
+        const user = firebase.auth().currentUser;
+        if (!user) {
+            window.location.href = 'index.html';
+            return;
+        }
+
+        let role = 'medlem';
+        try {
+            role = await firebaseService.getUserRole(user.uid);
+        } catch (err) {
+            console.warn('Kunne ikke hente rolle:', err);
+        }
+
+        const canAccessAdmin = window.HKM_PERMISSIONS
+            && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+            && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+
+        window.location.href = canAccessAdmin ? '../admin/index.html' : 'index.html';
+    }
+
     function getErrorMessage(error) {
         switch (error.code) {
-            case 'auth/user-not-found': return 'Ingen bruker funnet med denne e-posten.';
+            case 'auth/user-not-found': return 'Ingen bruker funnet.';
             case 'auth/wrong-password': return 'Feil passord.';
-            case 'auth/invalid-email': return 'Ugyldig e-postadresse.';
-            case 'auth/too-many-requests': return 'For mange forsøk. Prøv igjen senere.';
-            default: return 'Noe gikk galt: ' + error.message;
+            case 'auth/email-already-in-use': return 'Denne e-posten er allerede i bruk.';
+            case 'auth/weak-password': return 'Passordet må ha minst 6 tegn.';
+            default: return error.message;
         }
     }
 });

@@ -59,7 +59,7 @@ class AdminManager {
     }
 
     /**
-     * Handle Admin Authentication
+     * Handle Admin Authentication & Roles
      */
     initAuth() {
         if (!firebaseService.isInitialized) {
@@ -67,13 +67,65 @@ class AdminManager {
             return;
         }
 
-        firebaseService.onAuthChange((user) => {
+        firebaseService.onAuthChange(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
-            } else {
+                return;
+            }
+
+            try {
+                // Fetch user role
+                const role = await firebaseService.getUserRole(user.uid);
+                this.userRole = role;
+
+                // RBAC Redirection: Members cannot access admin area
+                if (role === window.HKM_ROLES.MEDLEM) {
+                    console.warn("Access denied: User is a member, not an official/admin.");
+                    window.location.href = '../minside/index.html';
+                    return;
+                }
+
                 this.updateUserInfo(user);
+                this.applyRoleRestrictions(role);
+            } catch (error) {
+                console.error("Error verifying admin role:", error);
+                // On error, steer to safety (public area)
+                window.location.href = '../minside/index.html';
             }
         });
+    }
+
+    applyRoleRestrictions(role) {
+        console.log(`Applying restrictions for role: ${role}`);
+        const ROLES = window.HKM_ROLES;
+
+        // Editor Restrictions: Can only manage content
+        if (role === ROLES.EDITOR) {
+            // Hide admin-only sections
+            const adminOnlySections = ['settings', 'integrations', 'hero', 'design', 'seo'];
+            document.querySelectorAll('.nav-item').forEach(item => {
+                const section = item.querySelector('a')?.getAttribute('data-section');
+                if (adminOnlySections.includes(section)) {
+                    item.style.display = 'none';
+                }
+            });
+
+            // Note: More granular button restrictions can be added in specific render methods
+        }
+
+        // Non-Superadmin Restrictions: No Core Deletions
+        if (role !== ROLES.SUPERADMIN) {
+            // This is a placeholder for where we'd hide specific "Superadmin only" buttons
+            // For now, we'll implement this as logic in specific delete handlers if needed
+        }
+    }
+
+    hasPermission(permissionKey) {
+        const permissions = window.HKM_PERMISSIONS || {};
+        const role = this.userRole || (window.HKM_ROLES ? window.HKM_ROLES.MEDLEM : 'medlem');
+        const allowedRoles = permissions[permissionKey];
+        if (!Array.isArray(allowedRoles)) return false;
+        return allowedRoles.includes(role);
     }
 
     async updateUserInfo(user) {
@@ -233,6 +285,9 @@ class AdminManager {
                     break;
                 case 'media':
                     this.renderMediaManager();
+                    break;
+                case 'causes':
+                    this.renderCausesManager();
                     break;
                 case 'hero':
                     this.renderHeroManager();
@@ -773,7 +828,8 @@ class AdminManager {
         try {
             const response = await fetch(proxyUrl);
             const data = await response.json();
-            const items = data.rss?.channel?.item;
+            const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
+            const items = channel?.item;
             if (items) {
                 return Array.isArray(items) ? items.length : 1;
             }
@@ -1060,7 +1116,8 @@ class AdminManager {
             const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
             const response = await fetch(proxyUrl);
             const data = await response.json();
-            const items = data.rss?.channel?.item;
+            const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
+            const items = channel?.item;
 
             if (items) {
                 const episodes = Array.isArray(items) ? items : [items];
@@ -1593,6 +1650,12 @@ class AdminManager {
     }
 
     async deleteItem(collectionId, index) {
+        // Permission Check
+        if (!this.hasPermission('MANAGE_CONTENT')) {
+            alert('Du har ikke tilgang til å slette elementer.');
+            return;
+        }
+
         if (!confirm('Er du sikker på at du vil slette dette elementet?')) return;
 
         const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
@@ -1811,6 +1874,208 @@ class AdminManager {
             container.innerHTML = `<img src="${url}" class="preview-img" style="margin-top: 10px; max-height: 100px; border-radius: 4px; border: 1px solid #ddd;">`;
         } else {
             container.innerHTML = '';
+        }
+    }
+
+    async renderCausesManager() {
+        const section = document.getElementById('causes-section');
+        if (!section) return;
+
+        section.innerHTML = `
+            <div class="section-header">
+                <h2 class="section-title">Innsamlingsaksjoner</h2>
+                <p class="section-subtitle">Håndter innsamlingsaksjoner som vises på nettsiden.</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header flex-between">
+                    <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
+                    <button class="btn-primary btn-sm" id="add-cause-btn">Legg til innsamlingsaksjon</button>
+                </div>
+                <div class="card-body" id="causes-list">
+                    <p style="font-size:14px; color:#64748b;">Laster innsamlingsaksjoner...</p>
+                </div>
+            </div>
+
+            <div id="cause-form-modal" style="display: none;">
+                <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header">
+                        <h3 id="form-title">Ny innsamlingsaksjon</h3>
+                        <button class="modal-close" onclick="document.getElementById('cause-form-modal').style.display = 'none'">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Tittel</label>
+                            <input type="text" id="cause-title" class="form-control" placeholder="f.eks. Støtt vårt arbeid">
+                        </div>
+                        <div class="form-group">
+                            <label>Beskrivelse</label>
+                            <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Innsamlet beløp (kr)</label>
+                            <input type="number" id="cause-collected" class="form-control" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Målbeløp (kr)</label>
+                            <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
+                        </div>
+                        <div class="form-group">
+                            <label>Bildekilde (URL)</label>
+                            <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/...">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').style.display = 'none'">Avbryt</button>
+                        <button class="btn-primary" id="save-cause-btn">Lagre</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        section.setAttribute('data-rendered', 'true');
+
+        await this.loadCauses();
+
+        document.getElementById('add-cause-btn').addEventListener('click', () => {
+            document.getElementById('form-title').textContent = 'Ny innsamlingsaksjon';
+            document.getElementById('cause-title').value = '';
+            document.getElementById('cause-description').value = '';
+            document.getElementById('cause-collected').value = '0';
+            document.getElementById('cause-goal').value = '100000';
+            document.getElementById('cause-image').value = '';
+            document.getElementById('cause-form-modal').dataset.editId = '';
+            document.getElementById('cause-form-modal').style.display = 'flex';
+        });
+
+        document.getElementById('save-cause-btn').addEventListener('click', () => this.saveCause());
+    }
+
+    async loadCauses() {
+        const listEl = document.getElementById('causes-list');
+        if (!listEl) return;
+
+        try {
+            const causesData = await firebaseService.getPageContent('collection_causes');
+            const causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+
+            if (causes.length === 0) {
+                listEl.innerHTML = '<p style="font-size:14px; color:#64748b;">Ingen innsamlingsaksjoner ennå. Legg til din første!</p>';
+                return;
+            }
+
+            const itemsHtml = causes.map((cause, index) => {
+                const progress = cause.goal > 0 ? Math.round((cause.collected / cause.goal) * 100) : 0;
+                return `
+                    <div class="cause-item" style="padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
+                            <div style="flex: 1;">
+                                <h4 style="margin: 0 0 5px 0; font-size: 16px; font-weight: 600;">${cause.title || 'Uten tittel'}</h4>
+                                <p style="margin: 0; color: #64748b; font-size: 14px;">${cause.description || ''}</p>
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-secondary btn-sm edit-cause-btn" data-index="${index}">Rediger</button>
+                                <button class="btn-danger btn-sm delete-cause-btn" data-index="${index}">Slett</button>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 20px; font-size: 14px;">
+                            <div>
+                                <span style="color: #64748b;">Samlet inn:</span>
+                                <span style="font-weight: 600; color: #059669;">${cause.collected} kr</span>
+                            </div>
+                            <div>
+                                <span style="color: #64748b;">Mål:</span>
+                                <span style="font-weight: 600;">${cause.goal} kr</span>
+                            </div>
+                            <div>
+                                <span style="color: #64748b;">Progresjon:</span>
+                                <span style="font-weight: 600;">${progress}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            listEl.innerHTML = itemsHtml;
+
+            // Add event listeners
+            document.querySelectorAll('.edit-cause-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => this.editCause(parseInt(e.target.dataset.index)));
+            });
+
+            document.querySelectorAll('.delete-cause-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => this.deleteCause(parseInt(e.target.dataset.index)));
+            });
+        } catch (error) {
+            console.error('Error loading causes:', error);
+            listEl.innerHTML = '<p style="color:#ef4444;">Feil ved lasting av innsamlingsaksjoner.</p>';
+        }
+    }
+
+    async saveCause() {
+        const title = document.getElementById('cause-title').value.trim();
+        const description = document.getElementById('cause-description').value.trim();
+        const collected = parseInt(document.getElementById('cause-collected').value) || 0;
+        const goal = parseInt(document.getElementById('cause-goal').value) || 100000;
+        const image = document.getElementById('cause-image').value.trim();
+        const editId = document.getElementById('cause-form-modal').dataset.editId;
+
+        if (!title) {
+            alert('Tittel er påkrevd');
+            return;
+        }
+
+        try {
+            let causesData = await firebaseService.getPageContent('collection_causes');
+            let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+
+            const newCause = { title, description, collected, goal, image };
+
+            if (editId !== '') {
+                causes[parseInt(editId)] = newCause;
+            } else {
+                causes.push(newCause);
+            }
+
+            await firebaseService.savePageContent('collection_causes', { items: causes });
+            document.getElementById('cause-form-modal').style.display = 'none';
+            await this.loadCauses();
+        } catch (error) {
+            console.error('Error saving cause:', error);
+            alert('Feil ved lagring av innsamlingsaksjon');
+        }
+    }
+
+    editCause(index) {
+        const listEl = document.getElementById('causes-list');
+        const causesData = firebaseService.getPageContent('collection_causes').then(async (data) => {
+            const causes = data && Array.isArray(data.items) ? data.items : [];
+            if (causes[index]) {
+                const cause = causes[index];
+                document.getElementById('form-title').textContent = 'Rediger innsamlingsaksjon';
+                document.getElementById('cause-title').value = cause.title || '';
+                document.getElementById('cause-description').value = cause.description || '';
+                document.getElementById('cause-collected').value = cause.collected || 0;
+                document.getElementById('cause-goal').value = cause.goal || 100000;
+                document.getElementById('cause-image').value = cause.image || '';
+                document.getElementById('cause-form-modal').dataset.editId = index;
+                document.getElementById('cause-form-modal').style.display = 'flex';
+            }
+        });
+    }
+
+    async deleteCause(index) {
+        if (!confirm('Er du sikker på at du vil slette denne innsamlingsaksjon?')) return;
+
+        try {
+            let causesData = await firebaseService.getPageContent('collection_causes');
+            let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+            causes.splice(index, 1);
+            await firebaseService.savePageContent('collection_causes', { items: causes });
+            await this.loadCauses();
+        } catch (error) {
+            console.error('Error deleting cause:', error);
+            alert('Feil ved sletting av innsamlingsaksjon');
         }
     }
 

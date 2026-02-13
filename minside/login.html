@@ -225,26 +225,57 @@
 
         <!-- Mode Buttons -->
         <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
-            <button id="mode-password" class="btn btn-google"
-                style="font-size: 14px; padding: 8px 16px; width: auto; border-color: var(--primary-orange); color: var(--primary-orange);">Passord</button>
-            <button id="mode-magic" class="btn btn-google"
+            <button id="mode-login" class="btn btn-google btn-mode active"
+                style="font-size: 14px; padding: 8px 16px; width: auto; border-color: var(--primary-orange); color: var(--primary-orange);">Logg
+                inn</button>
+            <button id="mode-register" class="btn btn-google btn-mode"
+                style="font-size: 14px; padding: 8px 16px; width: auto;">Ny bruker</button>
+            <button id="mode-magic" class="btn btn-google btn-mode"
                 style="font-size: 14px; padding: 8px 16px; width: auto;">Magisk Link</button>
         </div>
 
         <!-- Password Login Form -->
-        <div id="section-password" class="auth-mode-section active">
-            <form id="password-form">
+        <div id="section-login" class="auth-mode-section active">
+            <form id="login-form">
                 <div class="form-group">
                     <label>E-post</label>
-                    <input type="email" id="email-pass" class="form-control" placeholder="din@epost.no" required>
+                    <input type="email" id="login-email" class="form-control" placeholder="din@epost.no" required>
                 </div>
                 <div class="form-group">
                     <label>Passord</label>
-                    <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                    <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
                 </div>
                 <button type="submit" class="btn btn-primary">Logg inn</button>
                 <button type="button" class="toggle-auth-mode"
                     onclick="alert('Glemt passord funksjon kommer snart!')">Glemt passord?</button>
+            </form>
+        </div>
+
+        <!-- Registration Form -->
+        <div id="section-register" class="auth-mode-section">
+            <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 16px;">
+                Opprett en profil for å få tilgang til kurs og ressurser.
+            </p>
+            <form id="register-form">
+                <div class="form-group">
+                    <label>E-post</label>
+                    <input type="email" id="register-email" class="form-control" placeholder="din@epost.no" required>
+                </div>
+                <div class="form-group">
+                    <label>Fullt navn</label>
+                    <input type="text" id="register-name" class="form-control" placeholder="Ola Nordmann" required>
+                </div>
+                <div class="form-group">
+                    <label>Passord</label>
+                    <input type="password" id="register-password" class="form-control" placeholder="Minst 6 tegn"
+                        required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Bekreft Passord</label>
+                    <input type="password" id="register-confirm" class="form-control" placeholder="••••••••" required
+                        minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary">Opprett profil</button>
             </form>
         </div>
 
@@ -278,6 +309,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script src="../js/firebase-config.js"></script>
+    <script src="../js/user-roles.js"></script>
     <script src="../js/firebase-service.js"></script>
     <script src="js/minside-auth.js"></script>
 </body>

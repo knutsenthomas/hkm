@@ -41,7 +41,7 @@
                         <li><a href="arrangementer.html" class="nav-link">Arrangementer</a></li>
                         <li><a href="blogg.html" class="nav-link">Blogg</a></li>
                         <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
-                        <li><a href="minside/index.html" class="nav-link">Min Side</a></li>
+                        <li><a href="minside/index.html" class="nav-link" target="_blank">Min Side</a></li>
                         <li class="mobile-only"><a href="donasjoner.html" class="btn btn-primary">Gi gave</a></li>
                     </ul>
                 </nav>
@@ -544,7 +544,7 @@
                                 <li><a href="media.html#teaching-section">Undervisning</a></li>
                                 <li><a href="arrangementer.html">E-kurs</a></li>
                                 <li><a href="blogg.html">Bøker & Blogg</a></li>
-                                <li><a href="minside/index.html">Min Side</a></li>
+                                <li><a href="minside/index.html" target="_blank">Min Side</a></li>
                             </ul>
                         </div>
 
@@ -604,11 +604,11 @@
                             </div>
                             <div class="detail-item">
                                 <strong>Vipps:</strong>
-                                <p>806244</p>
+                                <p>938361</p>
                             </div>
                             <div class="detail-item">
                                 <strong>Konto nr.:</strong>
-                                <p>1506.77.30948</p>
+                                <p>3000.66.08759</p>
                             </div>
                         </div>
                     </div>
@@ -617,7 +617,7 @@
 
             <div class="footer-bottom">
                 <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
-                <a href="admin/login.html" class="admin-link">Admin</a>
+                <a href="admin/login.html" class="admin-link" id="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -631,11 +631,109 @@
     <!-- Firebase Config & Service -->
     <script src="js/firebase-config.js"></script>
     <script src="js/firebase-service.js"></script>
+    <script src="js/user-roles.js"></script>
 
     <!-- App Scripts -->
     <script src="script.js"></script>
     <script src="js/content-manager.js?v=author"></script>
     <script src="js/cookie-consent.js"></script>
+    <script>
+        (function () {
+            const adminLink = document.getElementById('admin-link');
+            const firebaseService = window.firebaseService;
+
+            if (!adminLink || !firebaseService || !firebaseService.isInitialized) return;
+
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) return;
+
+                let role = 'medlem';
+                try {
+                    role = await firebaseService.getUserRole(user.uid);
+                } catch (err) {
+                    console.warn('Kunne ikke hente rolle for admin-lenke:', err);
+                }
+
+                const canAccessAdmin = window.HKM_PERMISSIONS
+                    && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                    && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+
+                adminLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
+            });
+        })();
+    </script>
+
+    <script>
+        // Load and manage Causes section
+        (function() {
+            const firebaseService = window.firebaseService;
+            if (!firebaseService || !firebaseService.isInitialized) return;
+
+            async function loadCausesSection() {
+                try {
+                    const causesData = await firebaseService.getPageContent('collection_causes');
+                    const causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+                    const innsamlingSection = document.getElementById('innsamling');
+
+                    if (!innsamlingSection) return;
+
+                    if (causes.length === 0) {
+                        // Hide section if no causes
+                        innsamlingSection.style.display = 'none';
+                        return;
+                    }
+
+                    // Show section
+                    innsamlingSection.style.display = 'block';
+
+                    // Update causes grid
+                    const causesGrid = innsamlingSection.querySelector('.causes-grid');
+                    if (!causesGrid) return;
+
+                    causesGrid.innerHTML = causes.map(cause => {
+                        const progress = cause.goal > 0 ? Math.round((cause.collected / cause.goal) * 100) : 0;
+                        return `
+                            <div class="cause-card">
+                                <div class="cause-image">
+                                    <img src="${cause.image || 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop'}" alt="${cause.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                                </div>
+                                <div class="cause-content">
+                                    <h3 class="cause-title">${cause.title || 'Innsamlingsaksjon'}</h3>
+                                    <p class="cause-text">${cause.description || ''}</p>
+
+                                    <div class="cause-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" data-progress="${progress}" style="width: ${progress}%;"></div>
+                                        </div>
+                                        <div class="progress-stats">
+                                            <span><strong>${(cause.collected || 0).toLocaleString('no-NO')} kr</strong> samlet inn</span>
+                                            <span><strong>${(cause.goal || 0).toLocaleString('no-NO')} kr</strong> mål</span>
+                                        </div>
+                                    </div>
+
+                                    <a href="donasjoner.html" class="btn btn-primary btn-block">Donér nå</a>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                } catch (error) {
+                    console.error('Error loading causes:', error);
+                    const innsamlingSection = document.getElementById('innsamling');
+                    if (innsamlingSection) {
+                        innsamlingSection.style.display = 'none';
+                    }
+                }
+            }
+
+            // Load on page load
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', loadCausesSection);
+            } else {
+                loadCausesSection();
+            }
+        })();
+    </script>
 </body>
 
 </html>

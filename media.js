@@ -374,15 +374,57 @@ const PODCAST_KEYWORDS = {
     undervisning: ["undervisning", "lære", "serie", "studie", "disippel", "lærling"]
 };
 
+function asText(value) {
+    if (Array.isArray(value)) {
+        return value[0] || '';
+    }
+    if (value && typeof value === 'object') {
+        return value._ || '';
+    }
+    return value || '';
+}
+
+function getChannelImage(channel) {
+    const image = channel?.image;
+    if (Array.isArray(image)) {
+        return image[0]?.url || image[0]?.href || '';
+    }
+    if (image && typeof image === 'object') {
+        return image.url || image.href || '';
+    }
+    return '';
+}
+
+function getItunesImage(episode) {
+    const img = episode["itunes:image"];
+    if (Array.isArray(img)) {
+        return img[0]?.$?.href || img[0]?.href || '';
+    }
+    if (img && typeof img === 'object') {
+        return img.$?.href || img.href || '';
+    }
+    return '';
+}
+
+function getEpisodeId(episode) {
+    const guid = Array.isArray(episode.guid) ? episode.guid[0] : episode.guid;
+    if (guid && typeof guid === 'object') {
+        return guid._ || asText(episode.link) || asText(episode.title);
+    }
+    return guid || asText(episode.link) || asText(episode.title);
+}
+
 function getEpisodeCategory(episode) {
     // 1. Sjekk manuell overstyring først
-    const id = episode.guid?._ || episode.guid || episode.link;
+    const id = getEpisodeId(episode);
     if (podcastOverrides && podcastOverrides[id]) {
         return podcastOverrides[id];
     }
 
     // 2. Bruk nøkkelord hvis ingen overstyring finnes
-    const text = (episode.title + " " + (episode.description || "")).toLowerCase();
+    const title = asText(episode.title);
+    const description = asText(episode.description) || asText(episode["itunes:summary"]);
+    const text = (title + " " + description).toLowerCase();
 
     for (const [category, keywords] of Object.entries(PODCAST_KEYWORDS)) {
         if (keywords.some(keyword => text.includes(keyword))) {
@@ -413,23 +455,26 @@ async function initPodcastRSS() {
         const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
         const response = await fetch(proxyUrl);
         const data = await response.json();
-
-        const items = data.rss?.channel?.item;
+        const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
+        const items = channel?.item;
 
         if (items) {
             const episodes = Array.isArray(items) ? items : [items];
 
-            allPodcastEpisodes = episodes.map((episode, index) => ({
-                title: episode.title,
-                pubDate: episode.pubDate,
-                dateObj: new Date(episode.pubDate),
-                link: episode.link,
-                description: typeof episode.description === 'string' ? episode.description : (episode.description?._ || ""),
-                thumbnail: data.rss.channel.image?.url || episode["itunes:image"]?.$?.href || episode["itunes:image"]?.href,
-                audioUrl: episode.enclosure?.$?.url || episode.enclosure?.url,
-                episodeNumber: episodes.length - index,
-                category: getEpisodeCategory(episode)
-            }));
+            allPodcastEpisodes = episodes.map((episode, index) => {
+                const pubDateText = asText(episode.pubDate);
+                return {
+                    title: asText(episode.title),
+                    pubDate: pubDateText,
+                    dateObj: new Date(pubDateText),
+                    link: asText(episode.link),
+                    description: asText(episode.description) || asText(episode["itunes:summary"]),
+                    thumbnail: getChannelImage(channel) || getItunesImage(episode),
+                    audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
+                    episodeNumber: episodes.length - index,
+                    category: getEpisodeCategory(episode)
+                };
+            });
 
             initPodcastControls();
             renderPodcastEpisodes();
@@ -482,7 +527,6 @@ function renderPodcastEpisodes() {
     });
 
     grid.innerHTML = '';
-
     // Husk nåværende rekkefølge for spillerkøen
     currentEpisodeOrder = filtered;
 

@@ -23,6 +23,7 @@ class MinSideManager {
             if (user) {
                 this.currentUser = user;
                 this.updateUserProfile(user);
+                this.updateRoleLinks(user);
                 this.loadView(this.getCurrentViewFromHash() || 'overview');
             } else {
                 // Redirect to login if not authenticated
@@ -93,6 +94,37 @@ class MinSideManager {
         } else {
             const initials = (user.displayName || user.email || '?').charAt(0).toUpperCase();
             avatarEl.textContent = initials;
+        }
+    }
+
+    async updateRoleLinks(user) {
+        const firebaseService = window.firebaseService;
+        if (!firebaseService || !window.HKM_PERMISSIONS) return;
+
+        let role = 'medlem';
+        try {
+            role = await firebaseService.getUserRole(user.uid);
+        } catch (err) {
+            console.warn('Kunne ikke hente rolle for menylenke:', err);
+        }
+
+        const canAccessAdmin = Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+            && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+        const footer = document.querySelector('.sidebar-footer');
+        if (!footer) return;
+
+        const existing = document.getElementById('admin-link');
+        if (canAccessAdmin) {
+            if (!existing) {
+                const link = document.createElement('a');
+                link.id = 'admin-link';
+                link.href = '../admin/index.html';
+                link.className = 'nav-link';
+                link.innerHTML = '<span class="material-symbols-outlined">admin_panel_settings</span><span>Admin</span>';
+                footer.insertBefore(link, footer.firstChild);
+            }
+        } else if (existing) {
+            existing.remove();
         }
     }
 

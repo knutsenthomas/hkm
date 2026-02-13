@@ -138,6 +138,64 @@ class FirebaseService {
     }
 
     /**
+     * User Roles & Profile
+     */
+    async register(email, password) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+
+        // Initialize user document with 'medlem' role
+        await this.db.collection('users').doc(user.uid).set({
+            email: user.email,
+            role: 'medlem',
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        return userCredential;
+    }
+
+    async getUserRole(uid) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const fallbackSuperadmins = ['thomas@hiskingdomministry.no'];
+        const currentUser = this.auth && this.auth.currentUser ? this.auth.currentUser : null;
+        if (currentUser && fallbackSuperadmins.includes((currentUser.email || '').toLowerCase())) {
+            return 'superadmin';
+        }
+        const doc = await this.db.collection('users').doc(uid).get();
+        if (doc.exists) {
+            const rawRole = doc.data().role;
+            if (typeof rawRole === 'string' && rawRole.trim()) {
+                return rawRole.trim().toLowerCase();
+            }
+            return 'medlem';
+        }
+        return 'medlem'; // Default fallback
+    }
+
+    async sendEmailVerification() {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const user = this.auth.currentUser;
+        if (user) {
+            return user.sendEmailVerification();
+        }
+        throw new Error("Ingen bruker er logget inn");
+    }
+
+    async updatePhoneNumber(phone) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const user = this.auth.currentUser;
+        if (!user) throw new Error("Ingen bruker er logget inn");
+
+        // Note: For actual phone auth, we need Recaptcha and verifyPhoneNumber
+        // This method updates the phone number field in the users collection
+        return this.db.collection('users').doc(user.uid).update({
+            phone: phone,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    }
+
+    /**
      * Storage Methods
      */
     async uploadImage(file, path, options = {}) {
