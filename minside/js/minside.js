@@ -136,12 +136,34 @@ class MinSideManager {
 
             <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
                 <div class="card">
-                    <h3 style="font-size: 1rem; color: var(--text-muted);">Aktive Kurs</h3>
-                    <p style="font-size: 2rem; font-weight: 700; color: var(--primary-orange);">2</p>
+                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">school</span>
+                        Aktive Kurs
+                    </h3>
+                    <p style="font-size: 2rem; font-weight: 700; color: var(--primary-orange); margin-top: 8px;">2</p>
                 </div>
                 <div class="card">
-                    <h3 style="font-size: 1rem; color: var(--text-muted);">Fullførte Leksjoner</h3>
-                    <p style="font-size: 2rem; font-weight: 700; color: var(--accent-blue);">12</p>
+                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">task_alt</span>
+                        Fullførte Leksjoner
+                    </h3>
+                    <p style="font-size: 2rem; font-weight: 700; color: var(--accent-blue); margin-top: 8px;">12</p>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">favorite</span>
+                        Gaver denne måneden
+                    </h3>
+                    <p style="font-size: 2rem; font-weight: 700; color: #e91e63; margin-top: 8px;">kr 500,-</p>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Takk for ditt bidrag!</div>
+                </div>
+                <div class="card">
+                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">military_tech</span>
+                        Total gitt i 2024
+                    </h3>
+                    <p style="font-size: 2rem; font-weight: 700; color: #10b981; margin-top: 8px;">kr 4 500,-</p>
+                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Din støtte utgjør en forskjell</div>
                 </div>
             </div>
 

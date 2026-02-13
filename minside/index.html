@@ -81,12 +81,13 @@
                 <div class="header-title">
                     <h2 id="page-title">Oversikt</h2>
                 </div>
-                <div class="user-profile" onclick="window.minSideManager.navigateTo('profile')">
+                <div class="user-profile">
                     <div class="user-info">
                         <span class="user-name" id="user-name">Laster...</span>
                         <span class="user-role badge">Medlem</span>
                     </div>
-                    <div class="user-avatar" id="user-avatar">
+                    <div class="user-avatar" id="user-avatar" onclick="window.minSideManager.navigateTo('profile')"
+                        style="cursor: pointer;">
                         <span class="material-symbols-outlined">person</span>
                     </div>
                 </div>
