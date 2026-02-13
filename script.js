@@ -932,17 +932,18 @@ const fadeInObserver = new IntersectionObserver((entries) => {
 // Apply fade-in animation to cards (Cleaned up for mobile stability)
 document.querySelectorAll('.feature-box, .cause-card, .event-card, .blog-card').forEach(el => {
     const isMobileLayout = window.innerWidth <= 768;
-    el.style.opacity = '0';
 
     if (isMobileLayout) {
-        // No vertical offset on mobile to ensure zero jitter/jumping
+        // No vertical offset or hidden state on mobile to ensure zero jitter/jumping
+        el.style.opacity = '1';
         el.style.transform = 'none';
-        el.style.transition = 'opacity 0.8s ease';
+        el.style.transition = 'none';
     } else {
+        el.style.opacity = '0';
         el.style.transform = 'translateY(30px)';
         el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        fadeInObserver.observe(el);
     }
-    fadeInObserver.observe(el);
 });
 
 // ===================================
