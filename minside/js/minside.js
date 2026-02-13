@@ -5,6 +5,7 @@ class MinSideManager {
             overview: this.renderOverview,
             courses: this.renderCourses,
             resources: this.renderResources,
+            giving: this.renderGiving,
             profile: this.renderProfile
         };
 
@@ -105,6 +106,7 @@ class MinSideManager {
             overview: 'Oversikt',
             courses: 'Mine Kurs',
             resources: 'Ressurser',
+            giving: 'Gaver & Betalinger',
             profile: 'Min Profil'
         };
         document.getElementById('page-title').textContent = names[viewId] || 'Min Side';
@@ -207,6 +209,132 @@ class MinSideManager {
                 </div>
             </div>
         `;
+    }
+
+    async renderGiving(container) {
+        container.innerHTML = `
+            <div class="giving-container">
+                <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px;">
+                    <div class="card summary-card orange">
+                        <h4>Gitt i år</h4>
+                        <p class="amount" id="this-year-total">kr 0,00</p>
+                    </div>
+                    <div class="card summary-card blue">
+                        <h4>Siste gave</h4>
+                        <p class="amount" id="last-gift-amount">—</p>
+                        <p class="sub-text" id="last-gift-date"></p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3>Gavehistorikk</h3>
+                        <div class="filter-controls">
+                            <select id="year-filter" class="select-field" style="padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="data-table" id="donations-table">
+                            <thead>
+                                <tr>
+                                    <th>Dato</th>
+                                    <th>Kategori</th>
+                                    <th>Metode</th>
+                                    <th class="text-right">Beløp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="4" class="text-center">Henter data...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="card" style="background: #f8fafc; border: 1px dashed var(--border-color);">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <span class="material-symbols-outlined" style="font-size: 32px; color: var(--primary-orange);">info</span>
+                        <div>
+                            <h4>Skattefradrag</h4>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">Dine gaver til His Kingdom Ministry gir rett til skattefradrag. Sørg for at ditt fødselsnummer er registrert på profilen.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // Fetch Donations
+        try {
+            const userId = this.currentUser.uid;
+            const userEmail = this.currentUser.email;
+
+            // Simple query for now: donations matching UID or Email
+            // Note: In a real app, you might need composite indices if filtering/sorting complexly
+            const donationsQuery = firebase.firestore().collection("donations")
+                .where("status", "==", "succeeded")
+                .orderBy("timestamp", "desc");
+
+            const snapshot = await donationsQuery.get();
+
+            // Client-side filtering as fallback if Firestore security rules or indices are tight
+            const donations = snapshot.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(d => d.uid === userId || d.email === userEmail);
+
+            this.updateDonationsUI(donations);
+        } catch (error) {
+            console.error("Failed to load donations:", error);
+            document.getElementById('donations-table').querySelector('tbody').innerHTML = `
+                <tr><td colspan="4" class="text-center">Kunne ikke laste historikk.</td></tr>
+            `;
+        }
+    }
+
+    updateDonationsUI(donations) {
+        const tbody = document.querySelector('#donations-table tbody');
+        const totalYearEl = document.getElementById('this-year-total');
+        const lastGiftAmountEl = document.getElementById('last-gift-amount');
+        const lastGiftDateEl = document.getElementById('last-gift-date');
+
+        if (!donations || donations.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Ingen gaver funnet.</td></tr>';
+            return;
+        }
+
+        let yearTotal = 0;
+        const currentYear = new Date().getFullYear();
+        let html = '';
+
+        donations.forEach((d, index) => {
+            const date = d.timestamp ? d.timestamp.toDate() : new Date();
+            const formattedDate = date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' });
+            const amount = d.amount / 100; // Convert from cents
+
+            if (date.getFullYear() === currentYear) {
+                yearTotal += amount;
+            }
+
+            if (index === 0) {
+                lastGiftAmountEl.textContent = `kr ${amount.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`;
+                lastGiftDateEl.textContent = formattedDate;
+            }
+
+            html += `
+                <tr>
+                    <td>${formattedDate}</td>
+                    <td>${d.type || 'Gave'}</td>
+                    <td><span class="method-badge">${d.method || 'Kort'}</span></td>
+                    <td class="text-right"><strong>kr ${amount.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
+                </tr>
+            `;
+        });
+
+        totalYearEl.textContent = `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`;
+        tbody.innerHTML = html;
     }
 
     renderProfile(container) {

@@ -275,3 +275,88 @@ body {
         display: block;
     }
 }
+
+/* Giving View Styles */
+.summary-card {
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.summary-card .amount {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.summary-card.orange .amount {
+    color: var(--primary-orange);
+}
+
+.summary-card.blue .amount {
+    color: var(--accent-blue);
+}
+
+.summary-card .sub-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+/* Data Table */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.data-table th {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.data-table tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f8fafc;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.method-badge {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #f1f5f9;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: #475569;
+}

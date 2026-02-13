@@ -127,6 +127,8 @@ async function checkStatus() {
     switch (paymentIntent.status) {
         case "succeeded":
             showMessage("Betalingen var vellykket! Takk for din gave.");
+            // Record to Firestore
+            await recordDonation(paymentIntent);
             break;
         case "processing":
             showMessage("Betalingen behandles.");
@@ -137,6 +139,40 @@ async function checkStatus() {
         default:
             showMessage("Noe gikk galt.");
             break;
+    }
+}
+
+async function recordDonation(paymentIntent) {
+    try {
+        // Only record if we are on a page where firebase is initialized
+        if (typeof firebase === 'undefined') return;
+
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+        const user = auth.currentUser;
+
+        // Use paymentIntent ID as document ID to prevent duplicates
+        const donationRef = db.collection("donations").doc(paymentIntent.id);
+
+        // Check if already recorded
+        const doc = await donationRef.get();
+        if (doc.exists) return;
+
+        await donationRef.set({
+            paymentIntentId: paymentIntent.id,
+            amount: paymentIntent.amount,
+            currency: paymentIntent.currency,
+            status: paymentIntent.status,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            uid: user ? user.uid : null,
+            email: user ? user.email : (paymentIntent.receipt_email || null),
+            type: "Donation",
+            method: paymentIntent.payment_method_types[0] || "card"
+        });
+
+        console.log("Donation recorded successfully");
+    } catch (error) {
+        console.error("Error recording donation:", error);
     }
 }
 
