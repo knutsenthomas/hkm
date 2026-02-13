@@ -160,9 +160,9 @@ class MinSideManager {
                 <div class="card">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">military_tech</span>
-                        Total gitt i 2024
+                        Total gitt i 2026
                     </h3>
-                    <p style="font-size: 2rem; font-weight: 700; color: #10b981; margin-top: 8px;">kr 4 500,-</p>
+                    <p style="font-size: 2rem; font-weight: 700; color: #10b981; margin-top: 8px;">kr 5 500,-</p>
                     <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Din støtte utgjør en forskjell</div>
                 </div>
             </div>

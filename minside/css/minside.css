@@ -136,14 +136,19 @@ body {
 }
 
 .top-header {
-    height: var(--header-height);
+    min-height: var(--header-height);
+    height: auto;
     background-color: var(--bg-white);
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 32px;
+    padding: 12px 32px;
     flex-shrink: 0;
+    gap: 32px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
 .mobile-toggle {
