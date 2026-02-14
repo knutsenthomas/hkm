@@ -3970,3 +3970,161 @@ ol.block-list {
     color: var(--text-light);
     font-style: italic;
 }
+
+/* ===================================
+   Ingen Utelatt Style Hero Slider
+   =================================== */
+
+.hero-slider {
+    position: relative;
+    width: 100%;
+    height: 100vh;
+    /* Full viewport height */
+    overflow: hidden;
+    background: #000;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    z-index: 1;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+/* Background Image */
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    /* Subtle zoom effect on active */
+    transform: scale(1);
+    transition: transform 6s ease-out;
+}
+
+.hero-slide.active .hero-bg {
+    transform: scale(1.05);
+}
+
+/* Gradient Overlay */
+.hero-slide::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Dark gradient at bottom to make text pop */
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.2) 50%, rgba(0, 0, 0, 0.85) 90%);
+    pointer-events: none;
+}
+
+/* Content Layout */
+.hero-container {
+    position: relative;
+    height: 100%;
+    display: flex;
+    align-items: flex-end;
+    /* Text at bottom */
+    padding-bottom: 80px;
+    /* Space from bottom */
+    z-index: 10;
+}
+
+.hero-content {
+    max-width: 900px;
+    color: white;
+    padding: 0 20px;
+}
+
+.hero-title {
+    font-size: clamp(3.5rem, 6vw, 6rem);
+    /* Huge text */
+    font-weight: 800;
+    line-height: 0.95;
+    /* Tight line height */
+    margin-bottom: 24px;
+    letter-spacing: -0.02em;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+
+    /* Animation */
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 1s ease, transform 1s ease;
+    transition-delay: 0.5s;
+    /* Wait for slide fade */
+}
+
+.hero-subtitle {
+    font-size: clamp(1.2rem, 2vw, 1.8rem);
+    font-weight: 300;
+    /* Light weight */
+    margin-bottom: 0;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease, transform 1s ease;
+    transition-delay: 0.8s;
+}
+
+.hero-slide.active .hero-title,
+.hero-slide.active .hero-subtitle {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Custom Navigation Arrows */
+.hero-nav {
+    position: absolute;
+    bottom: 40px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: all 0.3s ease;
+}
+
+.hero-nav:hover {
+    background: white;
+    color: black;
+    border-color: white;
+}
+
+.hero-nav.prev {
+    right: 100px;
+}
+
+.hero-nav.next {
+    right: 40px;
+}
+
+@media (max-width: 768px) {
+    .hero-container {
+        padding-bottom: 120px;
+        /* More space for mobile controls */
+        justify-content: center;
+        text-align: center;
+    }
+
+    .hero-nav {
+        bottom: 30px;
+    }
+
+    .hero-nav.prev {
+        right: auto;
+        left: 20px;
+    }
+
+    .hero-nav.next {
+        right: 20px;
+    }
+}
