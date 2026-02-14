@@ -4283,16 +4283,22 @@ ol.block-list {
 /* Menu Grid */
 .mega-menu-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
+    /* 3 Columns */
     gap: 40px;
     margin-bottom: auto;
     /* Push footer down */
+    text-align: left;
 }
 
 .menu-section-title {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     margin-bottom: 24px;
-    color: var(--text-dark);
+    color: var(--text-light);
+    /* Lighter color for headers */
+    font-weight: 600;
 }
 
 .mega-nav-list {
@@ -4301,32 +4307,41 @@ ol.block-list {
 }
 
 .mega-nav-list li {
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 }
 
 .mega-nav-list a {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    /* Large text for links */
+    font-weight: 500;
     color: var(--text-dark);
     text-decoration: none;
     transition: color 0.2s;
+    display: inline-block;
 }
 
 .mega-nav-list a:hover {
     color: var(--primary-orange);
+    transform: translateX(5px);
+    /* Subtle nudge */
 }
 
 /* Menu Footer */
 .mega-menu-footer {
-    border-top: 1px solid #eee;
+    border-top: 1px solid #f0f0f0;
     padding-top: 40px;
-    text-align: center;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
 .mega-menu-footer .btn-large {
-    padding: 16px 48px;
-    font-size: 1.2rem;
-    margin-bottom: 20px;
+    padding: 16px 50px;
+    font-size: 1.1rem;
     border-radius: 50px;
+    min-width: 300px;
 }
 
 .menu-footer-links {
@@ -4349,7 +4364,6 @@ ol.block-list {
 
     .mega-menu-header {
         flex-direction: column-reverse;
-        /* Search on top/bottom? */
         align-items: flex-start;
         gap: 20px;
         position: relative;
@@ -4369,6 +4383,7 @@ ol.block-list {
 
     .mega-menu-grid {
         grid-template-columns: 1fr;
+        /* Stack on mobile */
         gap: 40px;
     }
 }
