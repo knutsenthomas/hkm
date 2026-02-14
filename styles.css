@@ -692,22 +692,23 @@ section {
 /* Header */
 .header {
     position: fixed;
-    top: 30px;
-    /* Moved down for "luft" */
+    top: 0;
     left: 0;
     width: 100%;
     background: transparent;
     box-shadow: none;
     z-index: 1000;
-    transition: top 0.3s ease, background-color 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
-    will-change: top, background-color, padding, box-shadow;
+    padding-top: 50px;
+    /* Move content down using padding */
+    transition: padding 0.3s ease, background-color 0.3s ease, box-shadow 0.3s ease;
+    will-change: padding, background-color, box-shadow;
     backface-visibility: hidden;
     transform: translateZ(0);
 }
 
 .header.scrolled {
-    top: 0;
-    /* Stick to top */
+    padding-top: 0;
+    /* Standardize on scroll */
     background: rgba(255, 255, 255, 0.98);
     box-shadow: var(--shadow);
     /* Explicitly disable for mobile/tablet performance */
