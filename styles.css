@@ -4157,9 +4157,10 @@ ol.block-list {
 
 /* Hamburger Button */
 .menu-toggle {
-    background: var(--primary-green);
-    /* Green background like reference */
-    border: none;
+    background: transparent;
+    /* Removed green background */
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    /* Subtle border instead */
     width: 50px;
     height: 50px;
     border-radius: 50%;
@@ -4167,7 +4168,7 @@ ol.block-list {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease;
+    transition: all 0.3s ease;
     z-index: 10001;
     /* Above menu */
 }
