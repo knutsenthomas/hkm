@@ -58,66 +58,59 @@
         </div>
     </header>
 
-    <!-- Hero Slider -->
+    <!-- Hero Slider (New Design) -->
     <section class="hero-slider" id="hjem">
-        <div class="slider-container">
-            <div class="slide active">
-                <div class="slide-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop')">
-                </div>
-                <div class="slide-content">
-                    <div class="container">
-                        <h1 class="slide-title" data-content-key="hero.title">Tenk & gi nestekjærlighet</h1>
-                        <p class="slide-text" data-content-key="hero.subtitle">Vi er her for å støtte deg på din
-                            åndelige reise. Bli med i et trygt miljø
-                            der vi utforsker Guds ord, deler livet og styrker relasjonen til Jesus.</p>
-                        <div class="slide-buttons">
-                            <a href="om-oss.html" class="btn btn-primary">Utforsk mer</a>
-                            <a href="donasjoner.html" class="btn btn-outline">Gi gave</a>
-                        </div>
-                    </div>
-                </div>
+        <!-- Background Layer -->
+        <div class="hero-bg-layer" id="hero-bg"></div>
+        <div class="hero-overlay"></div>
+
+        <!-- Content Layer -->
+        <div class="container hero-container">
+            <div class="hero-content" id="hero-content">
+                <!-- Dynamic Content Injected Here -->
             </div>
 
-            <div class="slide">
-                <div class="slide-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop')">
-                </div>
-                <div class="slide-content">
-                    <div class="container">
-                        <h1 class="slide-title">Vekst gjennom felleskap</h1>
-                        <p class="slide-text">Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med
-                            i et felleskap som utforsker Guds ord og styrker troen.</p>
-                        <div class="slide-buttons">
-                            <a href="om-oss.html" class="btn btn-primary">Les mer</a>
-                            <a href="kontakt.html" class="btn btn-outline">Kontakt oss</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="slide">
-                <div class="slide-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop')">
-                </div>
-                <div class="slide-content">
-                    <div class="container">
-                        <h1 class="slide-title">Støtt vårt arbeid</h1>
-                        <p class="slide-text">Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet
-                            gjennom undervisning, reisevirksomhet og felleskap.</p>
-                        <div class="slide-buttons">
-                            <a href="donasjoner.html" class="btn btn-primary">Gi gave nå</a>
-                            <a href="#innsamling" class="btn btn-outline">Se prosjekter</a>
-                        </div>
-                    </div>
-                </div>
+            <!-- Thumbnail Navigation -->
+            <div class="hero-thumbs" id="hero-thumbs">
+                <!-- Dynamic Thumbs Injected Here -->
             </div>
         </div>
 
-        <div class="slider-nav">
-            <button class="slider-arrow slider-prev"><i class="fas fa-chevron-left"></i></button>
-            <div class="slider-dots"></div>
-            <button class="slider-arrow slider-next"><i class="fas fa-chevron-right"></i></button>
+        <!-- Navigation Controls -->
+        <div class="hero-controls">
+            <button class="hero-prev"><i class="fas fa-arrow-left"></i></button>
+            <button class="hero-next"><i class="fas fa-arrow-right"></i></button>
+        </div>
+
+        <!-- Hidden Source Data (CMS Editable) -->
+        <div id="hero-data" style="display: none;">
+            <div class="slide-data"
+                data-image="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop"
+                data-title="Tenk & gi nestekjærlighet" data-subtitle="Vi er her for å støtte deg på din åndelige reise."
+                data-location="Felleskap">
+                <div class="buttons">
+                    <a href="om-oss.html" class="btn btn-primary">Utforsk mer</a>
+                    <a href="donasjoner.html" class="btn btn-outline">Gi gave</a>
+                </div>
+            </div>
+            <div class="slide-data"
+                data-image="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop"
+                data-title="Vekst gjennom felleskap" data-subtitle="Bli med i et felleskap som utforsker Guds ord."
+                data-location="Samhold">
+                <div class="buttons">
+                    <a href="om-oss.html" class="btn btn-primary">Les mer</a>
+                    <a href="kontakt.html" class="btn btn-outline">Kontakt oss</a>
+                </div>
+            </div>
+            <div class="slide-data"
+                data-image="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop"
+                data-title="Støtt vårt arbeid" data-subtitle="Din gave gjør en forskjell. Hjelp oss å nå flere."
+                data-location="Misjon">
+                <div class="buttons">
+                    <a href="donasjoner.html" class="btn btn-primary">Gi gave nå</a>
+                    <a href="#innsamling" class="btn btn-outline">Se prosjekter</a>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -665,7 +658,7 @@
 
     <script>
         // Load and manage Causes section
-        (function() {
+        (function () {
             const firebaseService = window.firebaseService;
             if (!firebaseService || !firebaseService.isInitialized) return;
 
