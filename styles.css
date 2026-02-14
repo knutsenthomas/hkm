@@ -4164,8 +4164,10 @@ ol.block-list {
 }
 
 /* Donate Button in Header */
-.header-donate-btn {
-    background-color: var(--accent-green);
+/* Donate Button in Header */
+.header-actions .header-donate-btn {
+    background-color: var(--accent-green) !important;
+    /* Force override of btn-primary */
     color: white;
     border: none;
     border-radius: 50px;
@@ -4180,8 +4182,8 @@ ol.block-list {
     /* Flat design */
 }
 
-.header-donate-btn:hover {
-    background-color: #009444;
+.header-actions .header-donate-btn:hover {
+    background-color: #009444 !important;
     /* Slightly darker on hover */
     transform: scale(1.05);
     color: white;
