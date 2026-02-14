@@ -4296,9 +4296,14 @@ ol.block-list {
 }
 
 .menu-search {
-    flex-grow: 1;
+    flex-grow: 0;
+    /* Don't grow to fill space */
+    width: 100%;
     max-width: 400px;
-    margin: 0 40px;
+    margin-left: auto;
+    /* Push to the right */
+    margin-right: 100px;
+    /* Space for close button + extra gap to align with column */
     position: relative;
     background: #f8f8f8;
     border-radius: 50px;
@@ -4318,8 +4323,8 @@ ol.block-list {
 
 .menu-close {
     position: absolute;
-    top: 15px;
-    /* (Header height 80px - Button height 50px) / 2 */
+    top: 25px;
+    /* Centered in 100px header: (100 - 50) / 2 */
     right: 40px;
     /* Matching header padding */
     background: transparent;
