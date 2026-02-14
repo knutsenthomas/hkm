@@ -4273,11 +4273,39 @@ ol.block-list {
 }
 
 .menu-close {
-    background: none;
+    position: absolute;
+    top: 15px;
+    /* (Header height 80px - Button height 50px) / 2 */
+    right: 40px;
+    /* Matching header padding */
+    background: var(--primary-green);
+    /* Match hamburger style */
     border: none;
-    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    /* Circle */
+    font-size: 1.5rem;
     cursor: pointer;
-    color: var(--text-dark);
+    color: white;
+    /* White icon */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    z-index: 10002;
+}
+
+.menu-close:hover {
+    transform: scale(1.1) rotate(90deg);
+}
+
+/* Mobile Adjustments for Close Button */
+@media (max-width: 768px) {
+    .menu-close {
+        right: 20px;
+        /* Matching mobile header padding */
+    }
 }
 
 /* Menu Grid */
