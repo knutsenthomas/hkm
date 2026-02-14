@@ -23,40 +23,88 @@
 
 <body class="cms-loading">
     <!-- Header -->
+    <!-- Header (Mega Menu Style) -->
     <header class="header" id="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="index.html" class="logo">
-                    <div class="logo-icon">
-                        <img src="img/Logo sirkel - orange og hvit.png" alt="His Kingdom Ministry Logo">
-                    </div>
-                    <span>His Kingdom Ministry</span>
-                </a>
-
-                <nav class="nav" id="nav">
-                    <ul class="nav-list">
-                        <li><a href="index.html#hjem" class="nav-link active">Hjem</a></li>
-                        <li><a href="om-oss.html" class="nav-link">Om oss</a></li>
-                        <li><a href="media.html" class="nav-link">Media</a></li>
-                        <li><a href="arrangementer.html" class="nav-link">Arrangementer</a></li>
-                        <li><a href="blogg.html" class="nav-link">Blogg</a></li>
-                        <li><a href="kontakt.html" class="nav-link">Kontakt</a></li>
-                        <li><a href="minside/index.html" class="nav-link" target="_blank">Min Side</a></li>
-                        <li class="mobile-only"><a href="donasjoner.html" class="btn btn-primary">Gi gave</a></li>
-                    </ul>
-                </nav>
-
-                <div class="header-actions">
-                    <a href="donasjoner.html" class="btn btn-primary desktop-only">Gi gave</a>
-                    <button class="mobile-toggle" id="mobile-toggle">
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                    </button>
+        <div class="container-fluid header-container">
+            <!-- Logo -->
+            <a href="index.html" class="logo">
+                <div class="logo-icon">
+                    <img src="img/Logo sirkel - orange og hvit.png" alt="His Kingdom Ministry Logo">
                 </div>
+                <span>His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Hamburger -->
+            <div class="header-actions">
+                <a href="donasjoner.html" class="btn btn-primary header-donate-btn">Gi gave <i
+                        class="fas fa-heart"></i></a>
+                <button class="menu-toggle" id="menu-toggle" aria-label="Åpne meny">
+                    <span class="hamburger-box">
+                        <span class="hamburger-inner"></span>
+                    </span>
+                </button>
             </div>
         </div>
     </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="mega-menu" id="mega-menu">
+        <div class="mega-menu-container">
+            <!-- Menu Header (Close & Search) -->
+            <div class="mega-menu-header">
+                <a href="minside/index.html" class="menu-login-link"><i class="fas fa-user-circle"></i> Min side</a>
+
+                <div class="menu-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Hva leter du etter?">
+                </div>
+
+                <button class="menu-close" id="menu-close" aria-label="Lukk meny">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Menu Content Grid -->
+            <div class="mega-menu-grid">
+                <!-- Column 1 -->
+                <div class="menu-col">
+                    <h3 class="menu-section-title">Engasjer deg</h3>
+                    <ul class="mega-nav-list">
+                        <li><a href="donasjoner.html">Støtt arbeidet</a></li>
+                        <li><a href="donasjoner.html#faste-givere">Bli fast giver</a></li>
+                        <li><a href="for-menigheter.html">For menigheter</a></li>
+                        <li><a href="for-bedrifter.html">For bedrifter</a></li>
+                        <li><a href="bnn.html">Business Network</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 2 -->
+                <div class="menu-col">
+                    <h3 class="menu-section-title">Bli kjent med oss</h3>
+                    <ul class="mega-nav-list">
+                        <li><a href="om-oss.html">Om stiftelsen</a></li>
+                        <li><a href="om-oss.html#historie">Vår historie</a></li>
+                        <li><a href="kontakt.html">Her arbeider vi</a></li>
+                        <li><a href="arrangementer.html">Arrangementer</a></li>
+                        <li><a href="media.html">Media & Podcast</a></li>
+                        <li><a href="blogg.html">Nyheter & Blogg</a></li>
+                        <li><a href="kontakt.html">Kontakt oss</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Menu Footer -->
+            <div class="mega-menu-footer">
+                <a href="donasjoner.html" class="btn btn-primary btn-large btn-block">Støtt nå <i
+                        class="fas fa-heart"></i></a>
+                <div class="menu-footer-links">
+                    <a href="donasjoner.html#skattefradrag">Skattefradrag</a>
+                    <a href="om-oss.html">Om oss</a>
+                    <a href="personvern.html">Personvern</a>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- Hero Slider (Ingen Utelatt Style) -->
     <section class="hero-slider" id="hjem">

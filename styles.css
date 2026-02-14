@@ -4133,3 +4133,242 @@ ol.block-list {
         right: 20px;
     }
 }
+
+/* ===================================
+   Full-screen Mega Menu
+   =================================== */
+
+/* Header Adjustments */
+.header .container-fluid {
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 80px;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Hamburger Button */
+.menu-toggle {
+    background: var(--primary-green);
+    /* Green background like reference */
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s ease;
+    z-index: 10001;
+    /* Above menu */
+}
+
+.menu-toggle:hover {
+    transform: scale(1.1);
+}
+
+.hamburger-box {
+    width: 24px;
+    height: 24px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+}
+
+.hamburger-inner,
+.hamburger-inner::before,
+.hamburger-inner::after {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 2px;
+    background-color: white;
+    border-radius: 2px;
+}
+
+.hamburger-inner::before {
+    transform: translateY(-8px);
+}
+
+.hamburger-inner::after {
+    transform: translateY(8px);
+}
+
+
+/* Mega Menu Overlay */
+.mega-menu {
+    position: fixed;
+    inset: 0;
+    background: white;
+    z-index: 10000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.mega-menu.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.mega-menu-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+/* Menu Header */
+.mega-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 60px;
+}
+
+.menu-login-link {
+    font-size: 1.1rem;
+    color: var(--text-dark);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.menu-search {
+    flex-grow: 1;
+    max-width: 400px;
+    margin: 0 40px;
+    position: relative;
+    background: #f8f8f8;
+    border-radius: 50px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+}
+
+.menu-search input {
+    border: none;
+    background: transparent;
+    width: 100%;
+    margin-left: 10px;
+    font-size: 1rem;
+    outline: none;
+}
+
+.menu-close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-dark);
+}
+
+/* Menu Grid */
+.mega-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    margin-bottom: auto;
+    /* Push footer down */
+}
+
+.menu-section-title {
+    font-size: 1.5rem;
+    margin-bottom: 24px;
+    color: var(--text-dark);
+}
+
+.mega-nav-list {
+    list-style: none;
+    padding: 0;
+}
+
+.mega-nav-list li {
+    margin-bottom: 16px;
+}
+
+.mega-nav-list a {
+    font-size: 1.25rem;
+    color: var(--text-dark);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.mega-nav-list a:hover {
+    color: var(--primary-orange);
+}
+
+/* Menu Footer */
+.mega-menu-footer {
+    border-top: 1px solid #eee;
+    padding-top: 40px;
+    text-align: center;
+}
+
+.mega-menu-footer .btn-large {
+    padding: 16px 48px;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+    border-radius: 50px;
+}
+
+.menu-footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+}
+
+.menu-footer-links a {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .header .container-fluid {
+        padding: 0 20px;
+    }
+
+    .mega-menu-header {
+        flex-direction: column-reverse;
+        /* Search on top/bottom? */
+        align-items: flex-start;
+        gap: 20px;
+        position: relative;
+    }
+
+    .menu-close {
+        position: absolute;
+        top: -10px;
+        right: 0;
+    }
+
+    .menu-search {
+        margin: 0;
+        width: 100%;
+        max-width: none;
+    }
+
+    .mega-menu-grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+}
