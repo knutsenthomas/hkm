@@ -4280,26 +4280,28 @@ ol.block-list {
     /* (Header height 80px - Button height 50px) / 2 */
     right: 40px;
     /* Matching header padding */
-    background: var(--primary-green);
-    /* Match hamburger style */
+    background: transparent;
+    /* Blend with page */
     border: none;
     width: 50px;
     height: 50px;
     border-radius: 50%;
     /* Circle */
-    font-size: 1.5rem;
+    font-size: 2rem;
+    /* Larger X */
     cursor: pointer;
-    color: white;
-    /* White icon */
+    color: var(--text-dark);
+    /* Dark icon */
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, color 0.3s ease;
     z-index: 10002;
 }
 
 .menu-close:hover {
     transform: scale(1.1) rotate(90deg);
+    color: var(--primary-orange);
 }
 
 /* Mobile Adjustments for Close Button */
