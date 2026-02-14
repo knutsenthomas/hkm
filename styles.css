@@ -4206,7 +4206,10 @@ ol.block-list {
 }
 
 .menu-toggle:hover {
-    transform: scale(1.1);
+    background-color: #009444;
+    /* Match donate button hover */
+    transform: scale(1.05);
+    /* Match donate button scale */
 }
 
 .hamburger-box {
