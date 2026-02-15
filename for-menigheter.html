@@ -165,52 +165,33 @@
     <main>
         <!-- Page Hero -->
         <section class="page-hero" data-content-key="hero.bg"
-            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
-            <div class="container">
-                <h1 class="page-hero-title" data-content-key="hero.title">For Menigheter</h1>
-                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Vi ønsker å stå sammen med lokale
-                    menigheter for å utruste troende og spre
-                    evangeliet.</p>
+            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); display: flex; align-items: center; min-height: 350px;">
+            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">For Menigheter</h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Vi ønsker å stå sammen med lokale menigheter for å utruste troende og spre evangeliet.</p>
             </div>
         </section>
 
         <!-- Content Sections -->
         <section class="section" style="background: white;">
             <div class="container">
-                <div class="about-grid"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
-                    <div class="about-content">
+                <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+                    <div class="about-content flex-1">
                         <span class="section-label" data-content-key="intro.label">Samarbeid</span>
                         <h2 class="section-title" data-content-key="intro.title">Et felles oppdrag</h2>
-                        <p class="section-text" data-content-key="intro.text">His Kingdom Ministry brenner for å se den
-                            lokale kirken blomstre. Vi
-                            tilbyr
-                            ressurser, seminarer og undervisning som kan komplementere deres eksisterende arbeid og
-                            inspirere til dypere etterfølgelse av Jesus.</p>
-
-                        <ul style="margin: 30px 0; display: grid; gap: 15px;">
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Seminarer om bønn og
-                                disippelskap</li>
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Ressurser for
-                                smågrupper
-                            </li>
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Besøk av våre
-                                undervisere
-                            </li>
-                            <li><i class="fas fa-check-circle"
-                                    style="color: var(--primary-orange); margin-right: 10px;"></i> Felles bønneinitiativ
-                            </li>
+                        <p class="section-text" data-content-key="intro.text">His Kingdom Ministry brenner for å se den lokale kirken blomstre. Vi tilbyr ressurser, seminarer og undervisning som kan komplementere deres eksisterende arbeid og inspirere til dypere etterfølgelse av Jesus.</p>
+                        <ul class="my-8 grid gap-3">
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Seminarer om bønn og disippelskap</li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Ressurser for smågrupper</li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Besøk av våre undervisere</li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Felles bønneinitiativ</li>
                         </ul>
-
                         <a href="kontakt.html" class="btn btn-primary">Ta kontakt for samarbeid</a>
                     </div>
-                    <div class="about-image">
+                    <div class="about-image flex-1 flex justify-center">
                         <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                             data-content-key="intro.image" alt="Menighetssamarbeid"
-                            style="border-radius: 20px; box-shadow: var(--shadow);">
+                            class="rounded-2xl shadow-lg object-cover w-full max-w-md h-72 lg:h-96">
                     </div>
                 </div>
             </div>
@@ -219,15 +200,10 @@
         <!-- CTA Section -->
         <section class="cta-section"
             style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
-            <div class="container text-center">
-                <h2 style="color: white; margin-bottom: 20px;">Vil dere høre mer?</h2>
-                <p style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">Vi sender gjerne mer informasjon om
-                    hvordan
-                    vi kan støtte deres menighet.</p>
-                <a href="kontakt.html" class="btn btn-outline"
-                    style="color: #c8682a !important; font-weight: bold; background-color: white; border-color: white;">Kontakt
-                    oss i
-                    dag</a>
+            <div class="container flex flex-col items-center justify-center text-center py-16 md:py-20">
+                <h2 class="mb-5" style="color: white;">Vil dere høre mer?</h2>
+                <p class="mb-8 text-lg opacity-90">Vi sender gjerne mer informasjon om hvordan vi kan støtte deres menighet.</p>
+                <a href="kontakt.html" class="btn btn-outline mx-auto" style="color: #c8682a !important; font-weight: bold; background-color: white; border-color: white;">Kontakt oss i dag</a>
             </div>
         </section>
 

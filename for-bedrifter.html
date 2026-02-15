@@ -165,53 +165,42 @@
     <main>
         <!-- Page Hero -->
         <section class="page-hero" data-content-key="hero.bg"
-            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
-            <div class="container">
-                <h1 class="page-hero-title" data-content-key="hero.title">For Bedrifter</h1>
-                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Bli en samarbeidspartner og vær med på å
-                    finansiere viktig arbeid som forandrer liv.</p>
+            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); display: flex; align-items: center; min-height: 350px;">
+            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">For Bedrifter</h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Bli en samarbeidspartner og vær med på å finansiere viktig arbeid som forandrer liv.</p>
             </div>
         </section>
 
         <!-- Content Sections -->
         <section class="section" style="background: white;">
             <div class="container">
-                <div class="about-grid"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
-                    <div class="about-image">
+                <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+                    <div class="about-image flex-1 flex justify-center">
                         <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                             data-content-key="intro.image" alt="Bedriftssamarbeid"
-                            style="border-radius: 20px; box-shadow: var(--shadow);">
+                            class="rounded-2xl shadow-lg object-cover w-full max-w-md h-72 lg:h-96">
                     </div>
-                    <div class="about-content">
+                    <div class="about-content flex-1">
                         <span class="section-label" data-content-key="intro.label">Samarbeidspartner</span>
                         <h2 class="section-title" data-content-key="intro.title">Bedrifter med et hjerte for misjon</h2>
-                        <p class="section-text" data-content-key="intro.text">Vi inviterer bedrifter til å stå sammen
-                            med oss i vårt oppdrag. Gjennom
-                            bedriftsgaver bidrar dere direkte til åndelig vekst og hjelp til mennesker som trenger det.
-                        </p>
-
-                        <div style="margin: 30px 0; display: grid; gap: 20px;">
-                            <div style="display: flex; gap: 15px;">
-                                <div style="flex-shrink: 0; color: var(--primary-orange);"><i
-                                        class="fas fa-chart-line fa-2x"></i></div>
+                        <p class="section-text" data-content-key="intro.text">Vi inviterer bedrifter til å stå sammen med oss i vårt oppdrag. Gjennom bedriftsgaver bidrar dere direkte til åndelig vekst og hjelp til mennesker som trenger det.</p>
+                        <div class="my-8 grid gap-5">
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 text-primary-orange"><i class="fas fa-chart-line fa-2x"></i></div>
                                 <div>
-                                    <h4 style="margin-bottom: 5px;">Målbare resultater</h4>
-                                    <p style="font-size: 0.95rem; color: var(--text-light);">Vi sender regelmessige
-                                        oppdateringer på hvordan deres støtte blir brukt.</p>
+                                    <h4 class="mb-1">Målbare resultater</h4>
+                                    <p class="text-sm text-gray-500">Vi sender regelmessige oppdateringer på hvordan deres støtte blir brukt.</p>
                                 </div>
                             </div>
-                            <div style="display: flex; gap: 15px;">
-                                <div style="flex-shrink: 0; color: var(--primary-orange);"><i
-                                        class="fas fa-handshake fa-2x"></i></div>
+                            <div class="flex gap-4 items-start">
+                                <div class="flex-shrink-0 text-primary-orange"><i class="fas fa-handshake fa-2x"></i></div>
                                 <div>
-                                    <h4 style="margin-bottom: 5px;">Verdibasert samarbeid</h4>
-                                    <p style="font-size: 0.95rem; color: var(--text-light);">Vi deler verdier som
-                                        integritet, omsorg og nestekjærlighet.</p>
+                                    <h4 class="mb-1">Verdibasert samarbeid</h4>
+                                    <p class="text-sm text-gray-500">Vi deler verdier som integritet, omsorg og nestekjærlighet.</p>
                                 </div>
                             </div>
                         </div>
-
                         <a href="kontakt.html" class="btn btn-primary">Ta kontakt for en samtale</a>
                     </div>
                 </div>
@@ -220,14 +209,11 @@
 
         <!-- CTA Section -->
         <section class="cta-section"
-            style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white; padding: 100px 0;">
-            <div class="container text-center">
-                <h2 style="color: white; margin-bottom: 20px;">Ønsker dere et bedriftssamarbeid?</h2>
-                <p style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">Vi tar gjerne en uforpliktende prat om
-                    hvordan
-                    din bedrift kan bidra.</p>
-                <a href="kontakt.html" class="btn btn-outline" style="border-color: white; color: white;">Kontakt oss i
-                    dag</a>
+            style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
+            <div class="container flex flex-col items-center justify-center text-center py-16 md:py-20">
+                <h2 class="mb-5" style="color: white;">Ønsker dere et bedriftssamarbeid?</h2>
+                <p class="mb-8 text-lg opacity-90">Vi tar gjerne en uforpliktende prat om hvordan din bedrift kan bidra.</p>
+                <a href="kontakt.html" class="btn btn-outline mx-auto" style="border-color: white; color: white;">Kontakt oss i dag</a>
             </div>
         </section>
 
