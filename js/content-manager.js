@@ -1337,12 +1337,22 @@ class ContentManager {
                 return;
             }
 
-
-            // HERO IMAGE & TEXT SYNC (for-menigheter, for-bedrifter, bnn, om-oss)
+            // HERO IMAGE & TEXT SYNC (for-menigheter, for-bedrifter, bnn, om-oss, blogg)
             const isHeroSection = el.classList.contains('page-hero') || el.classList.contains('hero-section');
             const isBgKey = key === "hero.backgroundImage" || key === "hero.bg" || key.endsWith(".backgroundImage") || key.endsWith(".bg");
             const isHeroTitle = el.classList.contains('page-hero-title') || el.classList.contains('hero-title');
             const isHeroSubtitle = el.classList.contains('page-hero-subtitle') || el.classList.contains('hero-subtitle');
+
+            // --- Blogg/nyheter hero fix ---
+            if (this.pageId === 'blogg' && isHeroTitle) {
+                // Only set textContent, never image URL
+                if (typeof value === 'string' && value.startsWith('http')) {
+                    el.textContent = 'Blogg & nyheter'; // fallback
+                } else {
+                    el.textContent = value || 'Blogg & nyheter';
+                }
+                return;
+            }
 
             // --- Business Network (bnn) hero fix ---
             if (this.pageId === 'bnn' && isHeroSection && isBgKey) {
