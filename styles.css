@@ -2498,6 +2498,12 @@ body.hero-animate .slide-buttons {
 }
 
 .footer-nav-grid {
+        @media (max-width: 900px) {
+            .footer-nav-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 28px !important;
+            }
+        }
         display: grid !important;
         grid-template-columns: repeat(4, 1fr) !important;
         gap: 40px !important;
