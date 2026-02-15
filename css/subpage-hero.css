@@ -1,0 +1,40 @@
+/* Shared hero style for all subpages (not index) */
+.subpage-hero {
+  min-height: 400px;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 100px 0;
+  position: relative;
+}
+
+.page-hero-title {
+  overflow-wrap: break-word;
+  word-break: break-word;
+  hyphens: auto;
+}
+
+@media (max-width: 768px) {
+  .page-hero-title {
+    font-size: clamp(1.8rem, 8vw, 2.5rem) !important;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .subpage-hero > div,
+  .page-hero > div {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .subpage-hero {
+    padding-top: 60px;
+    padding-bottom: 60px;
+  }
+}
+}
+
+.subpage-hero .page-hero-title,
+.subpage-hero .page-hero-subtitle {
+  margin-bottom: 1rem;
+}

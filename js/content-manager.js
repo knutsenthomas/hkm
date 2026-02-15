@@ -1337,13 +1337,59 @@ class ContentManager {
                 return;
             }
 
-            // HERO IMAGE & TEXT SYNC (for-menigheter, for-bedrifter)
+
+            // HERO IMAGE & TEXT SYNC (for-menigheter, for-bedrifter, bnn, om-oss)
             const isHeroSection = el.classList.contains('page-hero') || el.classList.contains('hero-section');
             const isBgKey = key === "hero.backgroundImage" || key === "hero.bg" || key.endsWith(".backgroundImage") || key.endsWith(".bg");
             const isHeroTitle = el.classList.contains('page-hero-title') || el.classList.contains('hero-title');
             const isHeroSubtitle = el.classList.contains('page-hero-subtitle') || el.classList.contains('hero-subtitle');
 
-            // Fade-in for hero image and text
+            // --- Business Network (bnn) hero fix ---
+            if (this.pageId === 'bnn' && isHeroSection && isBgKey) {
+                const defaultBg = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
+                const bgUrl = value || defaultBg;
+                const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
+                if (heroEl) {
+                    heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
+                    heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
+                }
+                return;
+            }
+            if (this.pageId === 'bnn' && isHeroTitle) {
+                // Only set textContent, never image URL
+                if (typeof value === 'string' && value.startsWith('http')) {
+                    el.textContent = 'Business Network'; // fallback
+                } else {
+                    el.textContent = value || 'Business Network';
+                }
+                return;
+            }
+            if (this.pageId === 'bnn' && isHeroSubtitle) {
+                el.textContent = value || 'Et nettverk for kristne ledere og næringsdrivende som ønsker å bruke sine ressurser for Guds rike.';
+                return;
+            }
+
+            // --- Om oss (om-oss) hero fix ---
+            if (this.pageId === 'om-oss' && isHeroSection && isBgKey) {
+                const defaultBg = "https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
+                const bgUrl = value || defaultBg;
+                const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
+                if (heroEl) {
+                    heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
+                    heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
+                }
+                return;
+            }
+            if (this.pageId === 'om-oss' && isHeroTitle) {
+                el.textContent = value || 'Om Oss';
+                return;
+            }
+            if (this.pageId === 'om-oss' && isHeroSubtitle) {
+                el.textContent = value || 'Lær mer om vår visjon, oppdrag og historie';
+                return;
+            }
+
+            // --- for-menigheter & for-bedrifter (existing logic) ---
             if ((this.pageId === 'for-menigheter' || this.pageId === 'for-bedrifter') && isHeroSection && isBgKey) {
                 const defaultBg = "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080";
                 const bgUrl = value || defaultBg;
