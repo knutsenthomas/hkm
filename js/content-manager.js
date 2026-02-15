@@ -1327,7 +1327,6 @@ class ContentManager {
         elements.forEach(el => {
             const key = el.getAttribute("data-content-key");
             const value = this.getValueByPath(data, key);
-
             if (value === undefined) return;
 
             // Images kan trygt oppdateres direkte
@@ -1338,28 +1337,45 @@ class ContentManager {
                 return;
             }
 
-            // Background images application with fallback
+            // HERO IMAGE & TEXT SYNC (for-menigheter, for-bedrifter)
             const isHeroSection = el.classList.contains('page-hero') || el.classList.contains('hero-section');
             const isBgKey = key === "hero.backgroundImage" || key === "hero.bg" || key.endsWith(".backgroundImage") || key.endsWith(".bg");
+            const isHeroTitle = el.classList.contains('page-hero-title') || el.classList.contains('hero-title');
+            const isHeroSubtitle = el.classList.contains('page-hero-subtitle') || el.classList.contains('hero-subtitle');
 
-            if (this.pageId !== 'index' && isHeroSection && isBgKey) {
-                // High-quality fallback image
+            // Fade-in for hero image and text
+            if ((this.pageId === 'for-menigheter' || this.pageId === 'for-bedrifter') && isHeroSection && isBgKey) {
                 const defaultBg = "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080";
                 const bgUrl = value || defaultBg;
-                // Debug log for hero image
-                console.log('[ContentManager] Hero image URL for page:', this.pageId, '->', bgUrl);
-                // Force hero-section background image style
-                const heroEl = document.querySelector('.hero-section') || el;
+                const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
                 if (heroEl) {
-                    heroEl.style.backgroundImage = `url('${bgUrl}')`;
+                    heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
+                    heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
                 }
-                el.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
+                return;
+            }
+            if ((this.pageId === 'for-menigheter' || this.pageId === 'for-bedrifter') && isHeroTitle) {
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.textContent = value;
+                    el.style.transition = 'opacity 0.5s';
+                    el.style.opacity = '1';
+                }, 50);
+                return;
+            }
+            if ((this.pageId === 'for-menigheter' || this.pageId === 'for-bedrifter') && isHeroSubtitle) {
+                el.style.opacity = '0';
+                setTimeout(() => {
+                    el.textContent = value;
+                    el.style.transition = 'opacity 0.5s';
+                    el.style.opacity = '1';
+                }, 50);
                 return;
             }
 
+            // Default text update
             const newText = String(value).trim();
             const currentText = (el.textContent || "").trim();
-
             if (currentText !== newText) {
                 el.textContent = value;
             }
