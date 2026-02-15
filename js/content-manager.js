@@ -1340,18 +1340,29 @@ class ContentManager {
             // HERO IMAGE & TEXT SYNC (for-menigheter, for-bedrifter, bnn, om-oss, blogg)
             const isHeroSection = el.classList.contains('page-hero') || el.classList.contains('hero-section');
             const isBgKey = key === "hero.backgroundImage" || key === "hero.bg" || key.endsWith(".backgroundImage") || key.endsWith(".bg");
-            const isHeroTitle = el.classList.contains('page-hero-title') || el.classList.contains('hero-title');
+            const isHeroTitle = el.classList.contains('page-hero-title') || el.classList.contains('hero-title') || el.classList.contains('page-title');
             const isHeroSubtitle = el.classList.contains('page-hero-subtitle') || el.classList.contains('hero-subtitle');
 
             // --- Blogg/nyheter hero fix ---
-            if (this.pageId === 'blogg' && isHeroTitle) {
-                // Only set textContent, never image URL
-                if (typeof value === 'string' && value.startsWith('http')) {
-                    el.textContent = 'Blogg & nyheter'; // fallback
-                } else {
-                    el.textContent = value || 'Blogg & nyheter';
+            if (this.pageId === 'blogg') {
+                if (isHeroSection && isBgKey) {
+                    // Only set background image
+                    const defaultBg = "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
+                    const bgUrl = value || defaultBg;
+                    const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
+                    if (heroEl) {
+                        heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
+                        heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
+                    }
+                    return;
                 }
-                return;
+                if (isHeroTitle) {
+                    // Only set textContent from hero.title
+                    const titleValue = value || 'Blogg & nyheter';
+                    el.textContent = titleValue;
+                    console.log('Hero Title found:', titleValue);
+                    return;
+                }
             }
 
             // --- Business Network (bnn) hero fix ---
@@ -1391,7 +1402,9 @@ class ContentManager {
                 return;
             }
             if (this.pageId === 'om-oss' && isHeroTitle) {
-                el.textContent = value || 'Om Oss';
+                const titleValue = value || 'Om Oss';
+                el.textContent = titleValue;
+                console.log('Hero Title found:', titleValue);
                 return;
             }
             if (this.pageId === 'om-oss' && isHeroSubtitle) {
@@ -1476,8 +1489,21 @@ class ContentManager {
                 document.head.appendChild(link);
             }
         }
+        // Font size variables for global CSS
         if (data.fontSizeBase) {
-            document.documentElement.style.fontSize = `${data.fontSizeBase}px`;
+            document.documentElement.style.setProperty('--fs-body', `${data.fontSizeBase}px`);
+        }
+        if (data.fontSizeH1Desktop) {
+            document.documentElement.style.setProperty('--fs-h1-desktop', `${data.fontSizeH1Desktop}px`);
+        }
+        if (data.fontSizeH1Mobile) {
+            document.documentElement.style.setProperty('--fs-h1-mobile', `${data.fontSizeH1Mobile}px`);
+        }
+        if (data.fontSizeH2Desktop) {
+            document.documentElement.style.setProperty('--fs-h2-desktop', `${data.fontSizeH2Desktop}px`);
+        }
+        if (data.fontSizeH2Mobile) {
+            document.documentElement.style.setProperty('--fs-h2-mobile', `${data.fontSizeH2Mobile}px`);
         }
         if (data.primaryColor) {
             document.documentElement.style.setProperty('--primary-color', data.primaryColor);

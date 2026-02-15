@@ -1790,9 +1790,8 @@ class AdminManager {
         section.innerHTML = `
             <div class="section-header">
                 <h2 class="section-title">Design & Identitet</h2>
-                <p class="section-subtitle">Administrer logo, favicon, fonter og globale farger.</p>
+                <p class="section-subtitle">Administrer logo, favicon, fonter, globale farger og tekststørrelser.</p>
             </div>
-            
             <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
                 <!-- Site Identity Card -->
                 <div class="card">
@@ -1846,7 +1845,35 @@ class AdminManager {
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Grunnstørrelse (Body Text)</label>
+                            <label>H1 Størrelse (Desktop)</label>
+                            <div class="range-group">
+                                <input type="range" id="font-size-h1-desktop" min="24" max="80" value="48">
+                                <span class="range-val" id="font-size-h1-desktop-val">48px</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>H1 Størrelse (Mobil)</label>
+                            <div class="range-group">
+                                <input type="range" id="font-size-h1-mobile" min="18" max="48" value="32">
+                                <span class="range-val" id="font-size-h1-mobile-val">32px</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>H2/H3 Størrelse (Desktop)</label>
+                            <div class="range-group">
+                                <input type="range" id="font-size-h2-desktop" min="18" max="48" value="28">
+                                <span class="range-val" id="font-size-h2-desktop-val">28px</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>H2/H3 Størrelse (Mobil)</label>
+                            <div class="range-group">
+                                <input type="range" id="font-size-h2-mobile" min="14" max="32" value="20">
+                                <span class="range-val" id="font-size-h2-mobile-val">20px</span>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Brødtekst (Body Text)</label>
                             <div class="range-group">
                                 <input type="range" id="font-size-base" min="12" max="24" value="16">
                                 <span class="range-val" id="font-size-base-val">16px</span>
@@ -1862,7 +1889,6 @@ class AdminManager {
                     </div>
                 </div>
             </div>
-
             <div style="margin-top: 24px;">
                 <button class="btn-primary" id="save-design-settings">Lagre design-innstillinger</button>
             </div>
@@ -1876,6 +1902,10 @@ class AdminManager {
             el.oninput = () => valEl.textContent = `${el.value}px`;
         };
         syncRange('font-size-base');
+        syncRange('font-size-h1-desktop');
+        syncRange('font-size-h1-mobile');
+        syncRange('font-size-h2-desktop');
+        syncRange('font-size-h2-mobile');
 
         const syncColor = (pickerId, hexId) => {
             const picker = document.getElementById(pickerId);
@@ -1904,6 +1934,22 @@ class AdminManager {
                     document.getElementById('font-size-base').value = data.fontSizeBase;
                     document.getElementById('font-size-base-val').textContent = `${data.fontSizeBase}px`;
                 }
+                if (data.fontSizeH1Desktop) {
+                    document.getElementById('font-size-h1-desktop').value = data.fontSizeH1Desktop;
+                    document.getElementById('font-size-h1-desktop-val').textContent = `${data.fontSizeH1Desktop}px`;
+                }
+                if (data.fontSizeH1Mobile) {
+                    document.getElementById('font-size-h1-mobile').value = data.fontSizeH1Mobile;
+                    document.getElementById('font-size-h1-mobile-val').textContent = `${data.fontSizeH1Mobile}px`;
+                }
+                if (data.fontSizeH2Desktop) {
+                    document.getElementById('font-size-h2-desktop').value = data.fontSizeH2Desktop;
+                    document.getElementById('font-size-h2-desktop-val').textContent = `${data.fontSizeH2Desktop}px`;
+                }
+                if (data.fontSizeH2Mobile) {
+                    document.getElementById('font-size-h2-mobile').value = data.fontSizeH2Mobile;
+                    document.getElementById('font-size-h2-mobile-val').textContent = `${data.fontSizeH2Mobile}px`;
+                }
                 if (data.primaryColor) {
                     document.getElementById('primary-color-picker').value = data.primaryColor;
                     document.getElementById('primary-color-hex').value = data.primaryColor;
@@ -1922,6 +1968,10 @@ class AdminManager {
                 siteTitle: document.getElementById('site-title-seo').value,
                 mainFont: document.getElementById('main-font-select').value,
                 fontSizeBase: document.getElementById('font-size-base').value,
+                fontSizeH1Desktop: document.getElementById('font-size-h1-desktop').value,
+                fontSizeH1Mobile: document.getElementById('font-size-h1-mobile').value,
+                fontSizeH2Desktop: document.getElementById('font-size-h2-desktop').value,
+                fontSizeH2Mobile: document.getElementById('font-size-h2-mobile').value,
                 primaryColor: document.getElementById('primary-color-hex').value,
                 updatedAt: new Date().toISOString()
             };
