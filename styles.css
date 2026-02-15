@@ -2465,9 +2465,34 @@ body.hero-animate .slide-buttons {
 }
 
 .footer-nav-grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 40px;
+        display: grid !important;
+        grid-template-columns: repeat(4, 1fr) !important;
+        gap: 40px !important;
+        width: 100%;
+}
+
+.footer-nav-grid .nav-col {
+        width: 100% !important;
+        text-align: left !important;
+        margin: 0 !important;
+        padding: 0 !important;
+}
+
+@media (max-width: 768px) {
+    .footer-nav-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 24px !important;
+    }
+}
+@media (max-width: 480px) {
+    .footer-nav-grid {
+        grid-template-columns: 1fr !important;
+        gap: 16px !important;
+    }
+    .footer-nav-grid .nav-col {
+        text-align: left !important;
+        align-items: flex-start !important;
+    }
 }
 
 .nav-col h4 {
