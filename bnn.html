@@ -165,11 +165,10 @@
     <main>
         <!-- Page Hero -->
         <section class="page-hero" data-content-key="hero.bg"
-            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
-            <div class="container">
-                <h1 class="page-hero-title" data-content-key="hero.title">Business Network (BNN)</h1>
-                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Et nettverk for kristne ledere og
-                    næringsdrivende som ønsker å bruke sine ressurser for Guds rike.</p>
+            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); display: flex; align-items: center; min-height: 350px;">
+            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">Business Network</h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Et nettverk for kristne ledere og næringsdrivende som ønsker å bruke sine ressurser for Guds rike.</p>
             </div>
         </section>
 
@@ -178,33 +177,27 @@
             <div class="container text-center">
                 <span class="section-label" data-content-key="intro.label">Nettverk</span>
                 <h2 class="section-title" data-content-key="intro.title">Mer enn bare business</h2>
-                <p class="section-description" data-content-key="intro.text"
-                    style="max-width: 800px; margin: 0 auto 50px;">BNN er et fellesskap der
-                    vi
-                    kombinerer faglig kompetanse med åndelig fokus. Vi tror på at næringslivet spiller en nøkkelrolle i
-                    å
-                    finansiere og drive misjon fremover.</p>
+                <p class="section-description" data-content-key="intro.text" style="max-width: 800px; margin: 0 auto 50px;">BNN er et fellesskap der vi kombinerer faglig kompetanse med åndelig fokus. Vi tror på at næringslivet spiller en nøkkelrolle i å finansiere og drive misjon fremover.</p>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px;">
-                    <div style="padding: 30px; background: #f8f9fa; border-radius: 15px;">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                    <div class="p-8 bg-[#f8f9fa] rounded-2xl flex flex-col items-center">
                         <i class="fas fa-users fa-3x" style="color: var(--primary-orange); margin-bottom: 20px;"></i>
-                        <h4>Nettverkssamlinger</h4>
+                        <h4 class="font-semibold mb-2">Nettverkssamlinger</h4>
                         <p>Møt likesinnede ledere for inspirasjon og erfaringsutveksling.</p>
                     </div>
-                    <div style="padding: 30px; background: #f8f9fa; border-radius: 15px;">
-                        <i class="fas fa-lightbulb fa-3x"
-                            style="color: var(--primary-orange); margin-bottom: 20px;"></i>
-                        <h4>Inspirasjon</h4>
+                    <div class="p-8 bg-[#f8f9fa] rounded-2xl flex flex-col items-center">
+                        <i class="fas fa-lightbulb fa-3x" style="color: var(--primary-orange); margin-bottom: 20px;"></i>
+                        <h4 class="font-semibold mb-2">Inspirasjon</h4>
                         <p>Få undervisning spesielt rettet mot kristent lederskap i arbeidslivet.</p>
                     </div>
-                    <div style="padding: 30px; background: #f8f9fa; border-radius: 15px;">
+                    <div class="p-8 bg-[#f8f9fa] rounded-2xl flex flex-col items-center">
                         <i class="fas fa-seedling fa-3x" style="color: var(--primary-orange); margin-bottom: 20px;"></i>
-                        <h4>Vekst</h4>
+                        <h4 class="font-semibold mb-2">Vekst</h4>
                         <p>Se hvordan din bedrift kan være en plattform for Guds rike.</p>
                     </div>
                 </div>
 
-                <div style="margin-top: 80px;">
+                <div class="mt-16">
                     <a href="kontakt.html" class="btn btn-primary">Bli en del av nettverket</a>
                 </div>
             </div>
