@@ -1337,37 +1337,21 @@ class ContentManager {
                 return;
             }
 
-            // HERO IMAGE & TEXT SYNC (for-menigheter, for-bedrifter, bnn, om-oss, blogg)
+            // HERO IMAGE & TEXT SYNC (unified, strict separation)
             const isHeroSection = el.classList.contains('page-hero') || el.classList.contains('hero-section');
             const isBgKey = key === "hero.backgroundImage" || key === "hero.bg" || key.endsWith(".backgroundImage") || key.endsWith(".bg");
             const isHeroTitle = el.classList.contains('page-hero-title') || el.classList.contains('hero-title') || el.classList.contains('page-title');
             const isHeroSubtitle = el.classList.contains('page-hero-subtitle') || el.classList.contains('hero-subtitle');
 
-            // --- Blogg/nyheter hero fix ---
-            if (this.pageId === 'blogg') {
-                if (isHeroSection && isBgKey) {
-                    // Only set background image
-                    const defaultBg = "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
-                    const bgUrl = value || defaultBg;
-                    const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
-                    if (heroEl) {
-                        heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
-                        heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
-                    }
-                    return;
-                }
-                if (isHeroTitle) {
-                    // Only set textContent from hero.title
-                    const titleValue = value || 'Blogg & nyheter';
-                    el.textContent = titleValue;
-                    console.log('Hero Title found:', titleValue);
-                    return;
-                }
-            }
-
-            // --- Business Network (bnn) hero fix ---
-            if (this.pageId === 'bnn' && isHeroSection && isBgKey) {
-                const defaultBg = "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
+            // Strict: Only set background image for hero section, never as text
+            if (isHeroSection && isBgKey) {
+                const defaultBg = {
+                    'blogg': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'bnn': "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'om-oss': "https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'for-menigheter': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080",
+                    'for-bedrifter': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080"
+                }[this.pageId] || "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
                 const bgUrl = value || defaultBg;
                 const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
                 if (heroEl) {
@@ -1376,73 +1360,40 @@ class ContentManager {
                 }
                 return;
             }
-            if (this.pageId === 'bnn' && isHeroTitle) {
-                // Only set textContent, never image URL
+            // Strict: Only set hero title as text, never an image URL
+            if (isHeroTitle) {
                 if (typeof value === 'string' && value.startsWith('http')) {
-                    el.textContent = 'Business Network'; // fallback
+                    // If value is a URL, fallback to default title
+                    const fallbackTitle = {
+                        'blogg': 'Blogg & nyheter',
+                        'bnn': 'Business Network',
+                        'om-oss': 'Om Oss',
+                        'for-menigheter': 'For menigheter',
+                        'for-bedrifter': 'For bedrifter'
+                    }[this.pageId] || 'Tittel';
+                    el.textContent = fallbackTitle;
                 } else {
-                    el.textContent = value || 'Business Network';
+                    el.textContent = value || {
+                        'blogg': 'Blogg & nyheter',
+                        'bnn': 'Business Network',
+                        'om-oss': 'Om Oss',
+                        'for-menigheter': 'For menigheter',
+                        'for-bedrifter': 'For bedrifter'
+                    }[this.pageId] || 'Tittel';
                 }
                 return;
             }
-            if (this.pageId === 'bnn' && isHeroSubtitle) {
-                el.textContent = value || 'Et nettverk for kristne ledere og næringsdrivende som ønsker å bruke sine ressurser for Guds rike.';
+            // Strict: Only set hero subtitle as text
+            if (isHeroSubtitle) {
+                el.textContent = value || {
+                    'bnn': 'Et nettverk for kristne ledere og næringsdrivende som ønsker å bruke sine ressurser for Guds rike.',
+                    'om-oss': 'Lær mer om vår visjon, oppdrag og historie'
+                }[this.pageId] || '';
                 return;
             }
 
-            // --- Om oss (om-oss) hero fix ---
-            if (this.pageId === 'om-oss' && isHeroSection && isBgKey) {
-                const defaultBg = "https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
-                const bgUrl = value || defaultBg;
-                const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
-                if (heroEl) {
-                    heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
-                    heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
-                }
-                return;
-            }
-            if (this.pageId === 'om-oss' && isHeroTitle) {
-                const titleValue = value || 'Om Oss';
-                el.textContent = titleValue;
-                console.log('Hero Title found:', titleValue);
-                return;
-            }
-            if (this.pageId === 'om-oss' && isHeroSubtitle) {
-                el.textContent = value || 'Lær mer om vår visjon, oppdrag og historie';
-                return;
-            }
-
-            // --- for-menigheter & for-bedrifter (existing logic) ---
-            if ((this.pageId === 'for-menigheter' || this.pageId === 'for-bedrifter') && isHeroSection && isBgKey) {
-                const defaultBg = "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080";
-                const bgUrl = value || defaultBg;
-                const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
-                if (heroEl) {
-                    heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
-                    heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
-                }
-                return;
-            }
-            if ((this.pageId === 'for-menigheter' || this.pageId === 'for-bedrifter') && isHeroTitle) {
-                el.style.opacity = '0';
-                setTimeout(() => {
-                    el.textContent = value;
-                    el.style.transition = 'opacity 0.5s';
-                    el.style.opacity = '1';
-                }, 50);
-                return;
-            }
-            if ((this.pageId === 'for-menigheter' || this.pageId === 'for-bedrifter') && isHeroSubtitle) {
-                el.style.opacity = '0';
-                setTimeout(() => {
-                    el.textContent = value;
-                    el.style.transition = 'opacity 0.5s';
-                    el.style.opacity = '1';
-                }, 50);
-                return;
-            }
-
-            // Default text update
+            // Default text update (never allow image URL as text)
+            if (typeof value === 'string' && value.startsWith('http')) return;
             const newText = String(value).trim();
             const currentText = (el.textContent || "").trim();
             if (currentText !== newText) {

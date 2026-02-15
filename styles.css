@@ -4,7 +4,7 @@
     position: relative;
     opacity: 1 !important;
     visibility: visible !important;
-    display: block !important;
+    /* display: block !important;  Removed to fix button layout bug */
 }
 /* === Global Font Size Variables === */
 :root {
@@ -293,15 +293,23 @@ ul {
 }
 
 
+
 .page-hero-title {
-        font-size: var(--fs-h1-desktop, 48px);
-        font-weight: 800;
-        margin-bottom: 1rem;
+    font-size: var(--fs-h1-desktop, 48px);
+    font-weight: 800;
+    margin-bottom: 1rem;
 }
 
 @media (max-width: 700px) {
     .page-hero-title {
-        font-size: var(--fs-h1-mobile, 32px);
+        font-size: var(--fs-h1-mobile, 8vw) !important;
+        max-width: 90vw !important;
+        word-break: break-word !important;
+        overflow-wrap: break-word !important;
+        white-space: normal !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        display: block !important;
     }
 }
 
@@ -324,20 +332,66 @@ p, li, td, th {
 }
 }
 
-.btn {
+
+/* --- Professional Button Reset & Brand Style --- */
+.btn, .button, a.btn, a.button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    min-height: 44px;
-    padding: 14px 32px;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: 16px;
+    padding: 12px 28px !important;
+    border-radius: 50px !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
     cursor: pointer;
     border: 2px solid transparent;
-    transition: var(--transition);
     text-align: center;
+    transition: all 0.3s ease;
+    box-shadow: none;
+    outline: none;
+    /* Remove background: none and text-decoration reset to allow .btn-primary styles to apply */
+}
+
+/* Primary Button: Brand Orange */
+.btn-primary, .button-primary, a.btn-primary, a.button-primary {
+    background: #c8682a !important;
+    color: #fff !important;
+    border-color: #c8682a !important;
+    padding: 12px 28px !important;
+    border-radius: 50px !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+}
+
+/* Secondary Button: White with Orange Border */
+.btn-secondary, .button-secondary, a.btn-secondary, a.button-secondary {
+    background: #fff !important;
+    color: #c8682a !important;
+    border-color: #c8682a !important;
+    padding: 12px 28px !important;
+    border-radius: 50px !important;
+    font-weight: bold !important;
+    font-size: 16px !important;
+    text-align: center !important;
+    box-shadow: none !important;
+}
+
+/* Hover Effects */
+.btn:hover, .button:hover, a.btn:hover, a.button:hover,
+.btn-primary:hover, .button-primary:hover, a.btn-primary:hover, a.button-primary:hover,
+.btn-secondary:hover, .button-secondary:hover, a.btn-secondary:hover, a.button-secondary:hover {
+    filter: brightness(1.08) saturate(1.1);
+    transform: scale(1.04);
+    transition: all 0.3s ease;
+    text-decoration: none !important;
+}
+
+/* Remove flat/unstyled link look for buttons */
+.btn, .button, a.btn, a.button {
+    box-shadow: none !important;
+    background-image: none !important;
+    border-style: solid !important;
 }
 
 .btn-primary {
@@ -4524,8 +4578,15 @@ ol.block-list {
     color: var(--text-dark) !important;
 }
 
+
+/* Logo text is black only when mega menu is open */
 .header.menu-open .logo {
-    color: #ffffff !important;
+    color: var(--text-dark) !important;
+}
+
+/* Logo text is white otherwise (default) */
+.logo {
+    color: #fff !important;
 }
 
 .header.scrolled .lang-btn,
