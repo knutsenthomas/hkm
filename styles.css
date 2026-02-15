@@ -334,6 +334,34 @@ p, li, td, th {
 
 
 /* --- Professional Button Reset & Brand Style --- */
+/* --- Heart Icon Spacing & Color --- */
+.footer-donate-btn .heart,
+.footer-donate-btn span.heart,
+.footer-donate-btn i.heart {
+    margin-left: 12px !important;
+    transition: color 0.3s;
+}
+.footer-donate-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px !important;
+}
+.footer-donate-btn:hover .heart,
+.footer-donate-btn:hover span.heart,
+.footer-donate-btn:hover i.heart {
+    color: inherit !important;
+}
+.header-donate-btn .heart,
+.header-donate-btn span.heart,
+.header-donate-btn i.heart {
+    margin-left: 10px !important;
+    transition: color 0.3s;
+}
+.header-donate-btn:hover .heart,
+.header-donate-btn:hover span.heart,
+.header-donate-btn:hover i.heart {
+    color: inherit !important;
+}
 .btn, .button, a.btn, a.button {
     display: inline-flex;
     align-items: center;
