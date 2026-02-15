@@ -1,23 +1,3 @@
-/* === CTA Button: Kontakt oss i dag (for-menigheter, for-bedrifter) === */
-.cta-kontakt-btn {
-    display: inline-block;
-    background: #fff;
-    color: #c46b2d;
-    font-weight: 700;
-    font-size: 2rem;
-    padding: 0.3em 0.8em;
-    border-radius: 4px;
-    border: none;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-    text-decoration: none;
-    margin: 0.5em 0;
-}
-.cta-kontakt-btn:hover, .cta-kontakt-btn:focus {
-    background: #c46b2d;
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(196,107,45,0.15);
-}
 .page-hero-title, .hero-title {
     color: #fff !important;
     z-index: 10 !important;
