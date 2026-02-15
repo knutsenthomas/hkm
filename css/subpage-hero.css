@@ -10,20 +10,26 @@
   position: relative;
 }
 
-.page-hero-title {
+.page-hero-title, .hero-title {
+  font-size: clamp(2rem, 10vw, 4rem);
+  line-height: 1.2;
   overflow-wrap: break-word;
   word-break: break-word;
   hyphens: auto;
 }
 
 @media (max-width: 768px) {
-  .page-hero-title {
-    font-size: clamp(1.8rem, 8vw, 2.5rem) !important;
+  .page-hero-title, .hero-title {
     padding-left: 20px;
     padding-right: 20px;
     max-width: 100vw;
     width: 100%;
     box-sizing: border-box;
+    line-height: 1.2;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    white-space: normal;
   }
   .subpage-hero > div,
   .page-hero > div {
@@ -33,12 +39,6 @@
   .subpage-hero {
     padding-top: 60px;
     padding-bottom: 60px;
-  }
-  .page-hero-title {
-    overflow-wrap: break-word;
-    word-break: break-word;
-    hyphens: auto;
-    white-space: normal;
   }
 }
 }
