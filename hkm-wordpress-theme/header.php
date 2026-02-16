@@ -32,16 +32,19 @@
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                        <i class="fas fa-globe text-lg"></i>
+                        <span><?php echo strtoupper(pll_current_language()); ?></span>
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no">🇳🇴 Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en">🇺🇸 English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es">🇪🇸 Español</a>
+                        <?php
+                        $languages = pll_the_languages(array('raw' => 1));
+                        if ($languages) {
+                            foreach ($languages as $lang) {
+                                echo '<a href="' . esc_url($lang['url']) . '" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="' . esc_attr($lang['slug']) . '">' . $lang['flag'] . ' ' . esc_html($lang['name']) . '</a>';
+                            }
+                        }
+                        ?>
                     </div>
                 </div>
                 <a href="<?php echo site_url('/donasjoner'); ?>"
@@ -81,11 +84,18 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="#" class="text-sm font-bold text-primary-orange">NO</a>
-                            <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="#" class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
-                            <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="#" class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                            <?php 
+                            $languages = pll_the_languages(array('raw' => 1));
+                            if($languages) {
+                                $i = 0;
+                                foreach($languages as $lang) {
+                                    if($i > 0) echo '<div class="w-px h-3 bg-gray-300"></div>';
+                                    $active_class = $lang['current_lang'] ? 'font-bold text-primary-orange' : 'font-semibold text-gray-500 hover:text-primary-orange';
+                                    echo '<a href="' . esc_url($lang['url']) . '" class="text-sm ' . $active_class . '">' . strtoupper(esc_html($lang['slug'])) . '</a>';
+                                    $i++;
+                                }
+                            }
+                            ?>
                         </div>
                     </div>
                 </div>

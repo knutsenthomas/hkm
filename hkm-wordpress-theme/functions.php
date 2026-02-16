@@ -91,9 +91,21 @@ function hkm_theme_scripts()
     wp_enqueue_script('cookie-consent', get_template_directory_uri() . '/js/cookie-consent.js', array(), '1.0.0', true);
 
     // Page Specific Scripts
-    if (is_page_template('page-media.php')) {
+    if (is_page_template('page-media.php') || is_page_template('page-podcast.php') || is_page_template('page-youtube.php')) {
         wp_enqueue_script('teaching-loader', get_template_directory_uri() . '/js/teaching-loader.js', array(), '1.0.0', true);
-        wp_enqueue_script('media-js', get_template_directory_uri() . '/js/media.js', array(), '1.0.0', true); // Assuming media.js moved to js folder or needs copy
+        wp_enqueue_script('media-js', get_template_directory_uri() . '/js/media.js', array(), '1.0.0', true);
+    }
+
+    if (is_page_template('page-undervisningsserier.php') || is_page_template('page-seminarer.php') || is_page_template('page-bibelstudier.php')) {
+        wp_enqueue_script('teaching-loader', get_template_directory_uri() . '/js/teaching-loader.js', array(), '1.0.0', true);
+    }
+
+    if (is_page_template('page-arrangementer.php') || is_page_template('page-kalender.php') || is_singular('arrangement')) {
+        wp_enqueue_script('google-calendar', 'https://apis.google.com/js/api.js', array(), null, true);
+    }
+
+    if (is_page_template('page-admin.php') || is_page_template('page-minside.php')) {
+        // These will need more specific enqueues later, but adding the templates here for now
     }
 
     if (is_page_template('page-donasjoner.php')) {
@@ -109,3 +121,79 @@ function cc_mime_types($mimes)
     return $mimes;
 }
 add_filter('upload_mimes', 'cc_mime_types');
+
+// Register Custom Post Type: Events (Arrangementer)
+function hkm_register_events_cpt()
+{
+    $labels = array(
+        'name' => _x('Arrangementer', 'Post Type General Name', 'hkm-theme'),
+        'singular_name' => _x('Arrangement', 'Post Type Singular Name', 'hkm-theme'),
+        'menu_name' => __('Arrangementer', 'hkm-theme'),
+        'name_admin_bar' => __('Arrangement', 'hkm-theme'),
+        'archives' => __('Arrangement Arkiv', 'hkm-theme'),
+        'attributes' => __('Arrangement Attributter', 'hkm-theme'),
+        'parent_item_colon' => __('Foreldre Arrangement:', 'hkm-theme'),
+        'all_items' => __('Alle Arrangementer', 'hkm-theme'),
+        'add_new_item' => __('Legg til nytt arrangement', 'hkm-theme'),
+        'add_new' => __('Legg til nytt', 'hkm-theme'),
+        'new_item' => __('Nytt arrangement', 'hkm-theme'),
+        'edit_item' => __('Rediger arrangement', 'hkm-theme'),
+        'update_item' => __('Oppdater arrangement', 'hkm-theme'),
+        'view_item' => __('Se arrangement', 'hkm-theme'),
+        'view_items' => __('Se arrangementer', 'hkm-theme'),
+        'search_items' => __('Søk arrangement', 'hkm-theme'),
+        'not_found' => __('Ikke funnet', 'hkm-theme'),
+        'not_found_in_trash' => __('Ikke funnet i papirkurven', 'hkm-theme'),
+        'featured_image' => __('Bilde', 'hkm-theme'),
+        'set_featured_image' => __('Sett bilde', 'hkm-theme'),
+        'remove_featured_image' => __('Fjern bilde', 'hkm-theme'),
+        'use_featured_image' => __('Bruk som bilde', 'hkm-theme'),
+        'insert_into_item' => __('Sett inn i arrangement', 'hkm-theme'),
+        'uploaded_to_this_item' => __('Last opp til dette arrangementet', 'hkm-theme'),
+        'items_list' => __('Arrangementliste', 'hkm-theme'),
+        'items_list_navigation' => __('Arrangementliste navigasjon', 'hkm-theme'),
+        'filter_items_list' => __('Filtrer arrangementliste', 'hkm-theme'),
+    );
+    $args = array(
+        'label' => __('Arrangement', 'hkm-theme'),
+        'description' => __('Kommende arrangementer', 'hkm-theme'),
+        'labels' => $labels,
+        'supports' => array('title', 'editor', 'thumbnail', 'excerpt'),
+        'hierarchical' => false,
+        'public' => true,
+        'show_ui' => true,
+        'show_in_menu' => true,
+        'menu_position' => 5,
+        'menu_icon' => 'dashicons-calendar-alt',
+        'show_in_admin_bar' => true,
+        'show_in_nav_menus' => true,
+        'can_export' => true,
+        'has_archive' => true,
+        'exclude_from_search' => false,
+        'publicly_queryable' => true,
+        'capability_type' => 'post',
+        'show_in_rest' => true,
+    );
+    register_post_type('arrangement', $args);
+}
+add_action('init', 'hkm_register_events_cpt', 0);
+
+// Polylang Shims to prevent fatal errors if plugin is deactivated
+if (!function_exists('pll_current_language')) {
+    function pll_current_language()
+    {
+        return 'no';
+    }
+}
+if (!function_exists('pll_the_languages')) {
+    function pll_the_languages($args)
+    {
+        return false;
+    }
+}
+if (!function_exists('pll_home_url')) {
+    function pll_home_url($lang)
+    {
+        return home_url();
+    }
+}

@@ -236,7 +236,39 @@
         </div>
 
         <div class="events-grid">
-            <!-- Static Fallback / JS Generated -->
+            <?php
+            $args = array(
+                'post_type' => 'arrangement',
+                'posts_per_page' => 3
+            );
+            $query = new WP_Query($args);
+
+            if ($query->have_posts()):
+                while ($query->have_posts()):
+                    $query->the_post();
+                    ?>
+                    <div class="event-card">
+                        <div class="event-image">
+                            <?php if (has_post_thumbnail()): ?>
+                                <?php the_post_thumbnail('medium'); ?>
+                            <?php else: ?>
+                                <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&h=400&fit=crop"
+                                    alt="<?php the_title(); ?>">
+                            <?php endif; ?>
+                        </div>
+                        <div class="event-content">
+                            <h3 class="event-title"><?php the_title(); ?></h3>
+                            <div class="event-excerpt"><?php echo wp_trim_words(get_the_excerpt(), 15); ?></div>
+                            <a href="<?php the_permalink(); ?>" class="btn btn-outline btn-sm">Les mer</a>
+                        </div>
+                    </div>
+                    <?php
+                endwhile;
+                wp_reset_postdata();
+            else:
+                ?>
+                <p style="grid-column: 1/-1; text-align: center;">Ingen kommende arrangementer funnet.</p>
+            <?php endif; ?>
         </div>
 
         <div class="section-footer" style="text-align: center; margin-top: 50px;">
