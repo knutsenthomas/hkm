@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Become a Regular Donor | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Become a regular donor and support our work at His Kingdom Ministry to create lasting change.">
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../css/cookie-consent.css">
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#f39c12',
+                        'primary-red': '#e74c3c',
+                        'text-dark': '#333333',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="../img/Logo sirkel - orange og hvit.png" alt="His Kingdom Ministry Logo"
+                        class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="flex items-center gap-5 header-actions">
+                <div class="lang-switcher relative group">
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>EN</span>
+                    </button>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="../bli-fast-giver.html"
+                            class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴
+                            Norsk</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en">🇺🇸 English</a>
+                        <a href="../es/donantes-regulares.html"
+                            class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸
+                            Español</a>
+                    </div>
+                </div>
+                <a href="donations.html"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Give gift <i class="fas fa-heart text-sm"></i>
+                </a>
+
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle menu">
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Search..."
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-100">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="../bli-fast-giver.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="regular-donors.html" class="text-sm font-bold text-primary-orange">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="../es/donantes-regulares.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Get Involved -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Get Involved</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donations.html">Support our work</a></li>
+                            <li><a href="regular-donors.html">Become a regular donor</a></li>
+                            <li><a href="for-churches.html">For churches</a></li>
+                            <li><a href="for-businesses.html">For businesses</a></li>
+                            <li><a href="bnn.html">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Get to Know Us -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Get to Know Us</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="about.html">About the foundation</a></li>
+                            <li><a href="contact.html">Contact us</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Resources & Media -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Resources</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="events.html">Events</a></li>
+                            <li><a href="media.html">Media & Podcast</a></li>
+                            <li><a href="blog.html">News & Blog</a></li>
+                            <li><a href="../minside/index.html">My Page</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="donations.html" class="btn btn-primary btn-large btn-block">Support now <i
+                            class="fas fa-heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="donations.html#tax-deduction">Tax Deduction</a>
+                        <a href="about.html">About us</a>
+                        <a href="privacy.html">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <main>
+        <!-- Page Hero -->
+        <section class="page-hero" data-content-key="hero.backgroundImage"
+            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
+            <div class="container">
+                <div class="page-hero-content">
+                    <h1 class="page-title">Become a Regular Donor</h1>
+                    <div class="breadcrumbs">
+                        <a href="index.html">Home</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="donations.html">Donations</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Regular Donors</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Regular Donor Section -->
+        <section class="regular-donor section" id="regular-donors" style="background: white;">
+            <div class="container">
+                <div class="section-header">
+                    <span class="section-label">Become a Regular Donor</span>
+                    <h2 class="section-title">Help Create Lasting Change</h2>
+                    <p class="section-description">As a regular donor, you help ensure predictability in our work, so
+                        that we can plan and carry out more projects for God's kingdom.</p>
+                </div>
+
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; margin-top: 50px;">
+                    <!-- Option 1: Vipps -->
+                    <div
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
+                        <div
+                            style="width: 70px; height: 70px; background: #FF5B24; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3 style="margin-bottom: 15px;">Regular Gift via Vipps</h3>
+                        <p style="color: var(--text-light); margin-bottom: 25px;">The easiest way to become a regular
+                            donor. You create a regular agreement directly in the Vipps app.</p>
+                        <a href="https://vipps.no" target="_blank" class="btn btn-outline"
+                            style="color: #FF5B24; border-color: #FF5B24;">Create in Vipps</a>
+                    </div>
+
+                    <!-- Option 2: Bank Transfer -->
+                    <div
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
+                        <div
+                            style="width: 70px; height: 70px; background: #2196F3; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h3 style="margin-bottom: 15px;">Bank Transfer</h3>
+                        <p style="color: var(--text-light); margin-bottom: 25px;">Set up a regular transfer in your
+                            online bank to our account. This gives us the lowest fees.</p>
+                        <div
+                            style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange);">
+                            Account: 3000.66.08759
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 60px; text-align: center; background: var(--bg-light); padding: 30px; border-radius: 15px;"
+                    id="tax-deduction">
+                    <h4 style="margin-bottom: 10px;"><i class="fas fa-info-circle"
+                            style="margin-right: 10px; color: var(--primary-orange);"></i>Did you know you get a tax
+                        deduction?</h4>
+                    <p style="max-width: 800px; margin: 0 auto;">Gifts to His Kingdom Ministry are eligible for a tax
+                        deduction if the total gifts during a calendar year are at least 500 NOK. To receive a
+                        deduction, we must have your social security number (11 digits, for Norwegian residents).</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter -->
+        <section class="newsletter">
+            <div class="container">
+                <div class="newsletter-content">
+                    <h2 class="newsletter-title">Stay Updated</h2>
+                    <p class="newsletter-text">Sign up for our newsletter to get the latest news directly in your inbox.
+                    </p>
+
+                    <form class="newsletter-form">
+                        <input type="email" class="newsletter-input" placeholder="Your email address" required>
+                        <button type="submit" class="btn btn-primary">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <div class="footer-brand">
+                        <a href="index.html" class="logo">
+                            <div class="logo-icon">
+                                <img src="../img/Logo sirkel - orange og hvit.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
+                            spiritual growth through teaching, podcast, and missionary travel.</p>
+                    </div>
+
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>About us</h4>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="about.html">Who are we?</a></li>
+                                <li><a href="about.html#vision">Our vision</a></li>
+                                <li><a href="contact.html">Contact us</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="media.html#teaching-section">Teaching</a></li>
+                                <li><a href="events.html">E-courses</a></li>
+                                <li><a href="blog.html">Books & Blog</a></li>
+                                <li><a href="../minside/index.html">My Page</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="media.html#podcast-section">Podcast</a></li>
+                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvement</h4>
+                            <ul>
+                                <li><a href="events.html">Calendar</a></li>
+                                <li><a href="donations.html">Give a gift</a></li>
+                                <li><a href="privacy.html">Privacy Policy</a></li>
+                                <li><a href="accessibility.html">Accessibility</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <div class="footer-card">
+                        <h3>Follow Us</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-card contact-card">
+                        <h3>Contact Us</h3>
+                        <a href="contact.html" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Account nr.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+                <a href="../admin/login.html" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/firebase-service.js"></script>
+
+    <!-- App Scripts -->
+    <script src="../js/i18n.js"></script>
+    <script src="../script.js"></script>
+    <script src="../js/content-manager.js?v=author"></script>
+    <script src="../js/cookie-consent.js"></script>
+</body>
+
+</html>
