@@ -482,14 +482,7 @@ class ContentManager {
             if (gcalEvents.length > 0) {
                 // Use GCal as base, but override with Firebase if ID or Title/Date matches
                 finalEvents = gcalEvents.map(gEvent => {
-                    const override = taggedFirebase.find(fEvent =>
-                        (fEvent.gcalId && fEvent.gcalId === gEvent.id) ||
-                        (fEvent.title === gEvent.title && this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start)))
-                    );
-                    if (override) {
-                        return { ...gEvent, ...override, sourceId: gEvent.sourceId }; // Preserve GCal source
-                    }
-                    return gEvent;
+                    return this._mergeEventWithFirestore(gEvent, taggedFirebase);
                 });
 
                 // Add Firebase events that DON'T match GCal
@@ -1688,7 +1681,10 @@ class ContentManager {
                 if (!eventKey.includes('|')) {
                     const freshEvent = await this.fetchSingleGoogleCalendarEvent(apiKey, calendar.id, eventKey);
                     if (freshEvent) {
-                        event = freshEvent;
+                        // Load Firestore items to ensure overrides (images and text from dashboard) are applied
+                        const eventData = await firebaseService.getPageContent('collection_events');
+                        const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
+                        event = this._mergeEventWithFirestore(freshEvent, firebaseItems);
                         this.populateEventDetailsDOM(event);
                         break;
                     }
@@ -2099,6 +2095,29 @@ class ContentManager {
     _getEventImage(event) {
         if (!event) return this.generateEventImage('default');
         return event.dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+    }
+
+    _mergeEventWithFirestore(gEvent, firebaseItems) {
+        if (!firebaseItems || !Array.isArray(firebaseItems)) return gEvent;
+
+        const override = firebaseItems.find(fEvent =>
+            (fEvent.gcalId && fEvent.gcalId === gEvent.id) ||
+            (fEvent.title === gEvent.title && this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start)))
+        );
+
+        if (override) {
+            // Apply overrides while preserving GCal source identity where needed
+            return {
+                ...gEvent,
+                ...override,
+                // Specifically ensure these fields from Firestore are used if they exist
+                title: override.title || gEvent.title,
+                description: override.content || override.description || gEvent.description,
+                imageUrl: override.dashboardImage || override.imageUrl || gEvent.imageUrl,
+                sourceId: gEvent.sourceId || override.sourceId
+            };
+        }
+        return gEvent;
     }
 
     formatDate(dateStr) {
