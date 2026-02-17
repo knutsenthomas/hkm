@@ -759,6 +759,30 @@
                     adminLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
                 });
             })();
+                // Dynamisk profil-lenke i header
+                (async function () {
+                    let count = 0;
+                    while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                        await new Promise(r => setTimeout(r, 50));
+                        count++;
+                    }
+                    const profileLink = document.getElementById('header-profile-link');
+                    const firebaseService = window.firebaseService;
+                    if (!profileLink || !firebaseService || !firebaseService.isInitialized) return;
+                    firebase.auth().onAuthStateChanged(async (user) => {
+                        if (!user) return;
+                        let role = 'medlem';
+                        try {
+                            role = await firebaseService.getUserRole(user.uid);
+                        } catch (err) {
+                            console.warn('Kunne ikke hente rolle for profil-lenke:', err);
+                        }
+                        const canAccessAdmin = window.HKM_PERMISSIONS
+                            && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                            && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+                        profileLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
+                    });
+                })();
     </script>
 
     <script type="module">
