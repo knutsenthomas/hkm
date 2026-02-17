@@ -453,7 +453,7 @@ th {
 .footer-donate-btn .heart,
 .footer-donate-btn span.heart,
 .footer-donate-btn i.heart {
-    margin-left: 4px !important;
+    margin-left: 10px !important;
     transition: color 0.3s;
 }
 
@@ -471,7 +471,7 @@ th {
 .header-donate-btn .heart,
 .header-donate-btn span.heart,
 .header-donate-btn i.heart {
-    margin-left: 4px !important;
+    margin-left: 10px !important;
     transition: color 0.3s;
 }
 
