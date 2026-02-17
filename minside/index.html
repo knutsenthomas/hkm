@@ -25,7 +25,7 @@
         <aside class="sidebar">
             <div class="sidebar-header">
                 <div class="logo">
-                    <img src="../img/Logo%20sirkel%20-%20orange%20og%20hvit.png" alt="HKM Logo" class="sidebar-logo">
+                    <img src="../img/Logo%20sirkel%20-%20orange%20og%20hvit.png" alt="HKM Logo" class="sidebar-logo" onerror="this.onerror=null;this.src='https://upload.wikimedia.org/wikipedia/commons/a/ac/No_image_available.svg';">
                     <h1 class="logo-text">Min Side</h1>
                 </div>
             </div>
@@ -56,6 +56,12 @@
                             <span>Gaver og Betalinger</span>
                         </a>
                     </li>
+                    <li class="nav-item">
+                        <a href="#profile" class="nav-link" data-view="profile">
+                            <span class="material-symbols-outlined">person</span>
+                            <span>Min Profil</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
 
@@ -82,8 +88,26 @@
                     <h2 id="page-title">Oversikt</h2>
                 </div>
                 <div class="user-profile">
-                    <span id="user-name" class="user-name">Laster...</span>
-                    <div id="user-avatar" class="user-avatar">?</div>
+                                        <span id="user-name" class="user-name">Laster...</span>
+                                        <div id="user-avatar" class="user-avatar">?</div>
+                                        <div class="user-profile-link" id="minside-profile-trigger" style="display: inline-block; width: 40px; height: 40px; cursor: pointer; background: transparent; position: relative;"></div>
+                                </div>
+                                <!-- Profile Modal -->
+                                <div id="profile-modal" class="profile-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
+                                    <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:320px; max-width:90vw; position:relative; display:flex; flex-direction:column; align-items:flex-start;">
+                                        <button id="close-profile-modal" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
+                                        <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+                                            <div id="modal-user-avatar" class="user-avatar" style="width:64px; height:64px; font-size:28px;"></div>
+                                            <div>
+                                                <div id="modal-user-name" class="user-name" style="font-size:20px; font-weight:700;">Navn</div>
+                                                <div id="modal-user-role" class="user-role">Bruker</div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom:16px;">
+                                            <strong>E-post:</strong> <span id="modal-user-email">epost@eksempel.no</span>
+                                        </div>
+                                    </div>
+                                </div>
                 </div>
             </header>
 
@@ -113,6 +137,15 @@
 
     <!-- App Logic -->
     <script type="module" src="js/minside.js"></script>
+
+<script>
+// Fallback: Hvis MinSideManager ikke starter, prøv å initialisere på nytt etter 1 sekund
+setTimeout(function() {
+    if (!window.minSideManager) {
+        try { window.minSideManager = new MinSideManager(); } catch(e) { console.error(e); }
+    }
+}, 1000);
+</script>
 </body>
 
 </html>

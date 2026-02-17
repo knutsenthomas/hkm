@@ -129,6 +129,12 @@
                         <span>Integrasjoner</span>
                     </a>
                 </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="profile">
+                        <span class="material-symbols-outlined">person</span>
+                        <span>Profil</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -151,8 +157,47 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Header -->
-
-
+        <header class="main-header">
+            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                <span class="material-symbols-outlined">menu</span>
+            </button>
+            <div class="header-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Søk i innhold..." aria-label="Søk">
+            </div>
+            <div class="header-actions">
+                <button id="messages-bell" class="notification-btn">
+                    <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                    <span id="notification-dot" class="notification-dot"></span>
+                </button>
+                <div class="user-profile">
+                                        <div class="user-profile-link" id="admin-profile-trigger" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; cursor: pointer;">
+                                                <div class="user-info">
+                                                        <span id="admin-name" class="user-name">Laster...</span>
+                                                        <span class="user-role">Administrator</span>
+                                                </div>
+                                                <div id="admin-avatar" class="user-avatar">?</div>
+                                        </div>
+                </div>
+                                <!-- Profile Modal -->
+                                <div id="profile-modal" class="profile-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
+                                    <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:320px; max-width:90vw; position:relative;">
+                                        <button id="close-profile-modal" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
+                                        <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+                                            <div id="modal-admin-avatar" class="user-avatar" style="width:64px; height:64px; font-size:28px;"></div>
+                                            <div>
+                                                <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">Navn</div>
+                                                <div id="modal-admin-role" class="user-role">Administrator</div>
+                                            </div>
+                                        </div>
+                                        <div style="margin-bottom:16px;">
+                                            <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
+                                        </div>
+                                        <button class="btn-primary" style="margin-top:12px;" onclick="window.location.href='/minside'">Gå til Min Side</button>
+                                    </div>
+                                </div>
+            </div>
+        </header>
 
         <!-- Dynamic Section Content -->
         <section id="content-area" class="section-container">

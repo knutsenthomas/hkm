@@ -29,7 +29,7 @@ get_header(); ?>
                     <div class="card p-6 bg-white shadow-sm rounded-xl">
                         <h3 class="text-xl font-bold mb-4">Innstillinger</h3>
                         <p class="text-gray-600">Endre dine personopplysninger og preferanser.</p>
-                        <button id="edit-profile-btn" class="btn btn-outline btn-sm mt-4">Rediger profil</button>
+                        <a href="/minside/profil" class="btn btn-outline btn-sm mt-4">Rediger profil</a>
                     </div>
                 </div>
             </div>

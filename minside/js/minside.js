@@ -61,6 +61,37 @@ class MinSideManager {
                 window.location.href = '../index.html';
             });
         });
+
+        // Header Profile Click (åpner modal)
+        const profileTrigger = document.getElementById('minside-profile-trigger');
+        const profileModal = document.getElementById('profile-modal');
+        const closeProfileModal = document.getElementById('close-profile-modal');
+        if (profileTrigger && profileModal && closeProfileModal) {
+            profileTrigger.onclick = (e) => {
+                e.stopPropagation();
+                // Fyll modal med profilinfo
+                const user = this.currentUser;
+                document.getElementById('modal-user-name').textContent = user.displayName || user.email;
+                document.getElementById('modal-user-role').textContent = 'Bruker';
+                document.getElementById('modal-user-email').textContent = user.email || '';
+                const modalAvatar = document.getElementById('modal-user-avatar');
+                if (user.photoURL) {
+                    modalAvatar.innerHTML = `<img src="${user.photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                } else {
+                    const initials = (user.displayName || user.email || '?').split(' ').map(n => n[0]).join('').toUpperCase();
+                    modalAvatar.textContent = initials.substring(0, 2);
+                }
+                profileModal.style.display = 'flex';
+            };
+            closeProfileModal.onclick = (e) => {
+                e.stopPropagation();
+                profileModal.style.display = 'none';
+            };
+            // Lukk modal ved klikk utenfor innhold
+            profileModal.addEventListener('mousedown', (e) => {
+                if (e.target === profileModal) profileModal.style.display = 'none';
+            });
+        }
     }
 
     toggleSidebar(show) {

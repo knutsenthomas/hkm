@@ -329,23 +329,31 @@ class AdminManager {
         }
 
         // Add click listener to profile (header)
-        const userProfile = document.querySelector('.user-profile');
-        if (userProfile) {
-            userProfile.style.cursor = 'pointer';
-            userProfile.onclick = () => {
-                // Åpne profil-seksjonen direkte, uten å være avhengig av et meny-element
-                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
-                    window.adminManager.onSectionSwitch('profile');
+        const profileTrigger = document.getElementById('admin-profile-trigger');
+        const profileModal = document.getElementById('profile-modal');
+        const closeProfileModal = document.getElementById('close-profile-modal');
+        if (profileTrigger && profileModal && closeProfileModal) {
+            profileTrigger.onclick = () => {
+                // Fyll modal med profilinfo
+                document.getElementById('modal-admin-name').textContent = displayName;
+                document.getElementById('modal-admin-role').textContent = 'Administrator';
+                document.getElementById('modal-admin-email').textContent = user.email || '';
+                const modalAvatar = document.getElementById('modal-admin-avatar');
+                if (photoURL) {
+                    modalAvatar.innerHTML = `<img src="${photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+                } else {
+                    const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
+                    modalAvatar.textContent = initials.substring(0, 2);
                 }
-
-                const sections = document.querySelectorAll('.section-content');
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === 'profile-section') {
-                        section.classList.add('active');
-                    }
-                });
+                profileModal.style.display = 'flex';
             };
+            closeProfileModal.onclick = () => {
+                profileModal.style.display = 'none';
+            };
+            // Lukk modal ved klikk utenfor innhold
+            profileModal.addEventListener('click', (e) => {
+                if (e.target === profileModal) profileModal.style.display = 'none';
+            });
         }
     }
 

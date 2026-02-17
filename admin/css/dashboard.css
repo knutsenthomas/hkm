@@ -214,6 +214,19 @@ body.admin-body {
     gap: 12px;
 }
 
+.user-profile-link {
+    transition: background 0.15s, box-shadow 0.15s;
+    border-radius: 12px;
+    padding: 4px 8px;
+}
+.user-profile-link:hover {
+    background: var(--accent-light);
+    box-shadow: 0 2px 8px rgba(255,107,43,0.08);
+    text-decoration: none;
+    color: var(--accent-color);
+}
+}
+
 .user-info {
     text-align: right;
 }
