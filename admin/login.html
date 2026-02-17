@@ -206,29 +206,19 @@
     <!-- Auth Logic -->
     <script type="module">
             (async function () {
-                // Wait for firebaseService to be available and initialized
-                let count = 0;
-                while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
-                    await new Promise(r => setTimeout(r, 50));
-                    count++;
-                }
-
-                const firebaseService = window.firebaseService;
-                const loginForm = document.getElementById('login-form');
-                const errorBox = document.getElementById('error-box');
-
-                if (!loginForm) return;
+                console.log("[HKM] Admin Auth Script loaded");
 
                 async function routeByRole() {
+                    const service = window.firebaseService;
                     const user = firebase.auth().currentUser;
-                    if (!user) {
+                    if (!user || !service) {
                         window.location.href = 'index.html';
                         return;
                     }
 
                     let role = 'medlem';
                     try {
-                        role = await firebaseService.getUserRole(user.uid);
+                        role = await service.getUserRole(user.uid);
                     } catch (err) {
                         console.warn('Kunne ikke hente rolle:', err);
                     }
@@ -240,52 +230,63 @@
                     window.location.href = canAccessAdmin ? 'index.html' : '../minside/index.html';
                 }
 
-                loginForm.addEventListener('submit', async (e) => {
-                    e.preventDefault();
+                const loginForm = document.getElementById('login-form');
+                if (loginForm) {
+                    loginForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        console.log("[HKM] Login attempt started");
 
-                    const email = document.getElementById('email').value;
-                    const password = document.getElementById('password').value;
-                    const btn = loginForm.querySelector('button');
+                        const service = window.firebaseService;
+                        const email = document.getElementById('email').value;
+                        const password = document.getElementById('password').value;
+                        const btn = loginForm.querySelector('button');
+                        const errorBox = document.getElementById('error-box');
 
-                    const originalText = btn.textContent;
-                    btn.textContent = 'Logger inn...';
-                    btn.disabled = true;
-                    errorBox.style.display = 'none';
+                        if (!btn) return;
+                        const originalText = btn.textContent;
+                        btn.textContent = 'Logger inn...';
+                        btn.disabled = true;
+                        if (errorBox) errorBox.style.display = 'none';
 
-                    if (!firebaseService || !firebaseService.isInitialized) {
-                        alert("⚠️ Firebase er ikke konfigurert!");
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                        return;
-                    }
-
-                    try {
-                        await firebaseService.login(email, password);
-                        await routeByRole();
-                    } catch (err) {
-                        console.error("Login error:", err);
-                        errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
-                        errorBox.style.display = 'block';
-                        btn.textContent = originalText;
-                        btn.disabled = false;
-                    }
-                });
-
-                const googleBtn = document.getElementById('google-login');
-                if (googleBtn) {
-                    googleBtn.addEventListener('click', async () => {
-                        if (!firebaseService || !firebaseService.isInitialized) {
-                            alert("⚠️ Firebase er ikke konfigurert!");
+                        if (!service || !service.isInitialized) {
+                            console.error("[HKM] Firebase service not ready", { service: !!service, initialized: service?.isInitialized });
+                            alert("⚠️ Tjenesten er ikke helt klar. Vennligst prøv igjen om et sekund.");
+                            btn.textContent = originalText;
+                            btn.disabled = false;
                             return;
                         }
 
                         try {
-                            await firebaseService.loginWithGoogle();
+                            console.log("[HKM] Logging in...");
+                            await service.login(email, password);
+                            console.log("[HKM] Login success, routing...");
                             await routeByRole();
                         } catch (err) {
-                            console.error("Google login error:", err);
-                            errorBox.textContent = "Kunne ikke logge inn med Google.";
-                            errorBox.style.display = 'block';
+                            console.error("[HKM] Login error:", err);
+                            if (errorBox) {
+                                errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
+                                errorBox.style.display = 'block';
+                            }
+                            btn.textContent = originalText;
+                            btn.disabled = false;
+                        }
+                    });
+                }
+
+                const googleBtn = document.getElementById('google-login');
+                if (googleBtn) {
+                    googleBtn.addEventListener('click', async () => {
+                        const service = window.firebaseService;
+                        if (!service || !service.isInitialized) {
+                            alert("⚠️ Tjenesten er ikke klar!");
+                            return;
+                        }
+
+                        try {
+                            await service.loginWithGoogle();
+                            await routeByRole();
+                        } catch (err) {
+                            console.error("[HKM] Google login error:", err);
                         }
                     });
                 }

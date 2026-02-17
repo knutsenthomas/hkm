@@ -5,12 +5,21 @@
 
 // --- Global Error Handling ---
 window.onerror = function (msg, url, lineNo, columnNo, error) {
+    // Ignore benign ResizeObserver error
+    if (msg && msg.toString().includes('ResizeObserver loop completed with undelivered notifications')) {
+        return false;
+    }
     console.error('Global Error Caught:', msg, url, lineNo, columnNo, error);
     showErrorUI('En uventet feil oppstod: ' + msg);
     return false;
 };
 
 window.onunhandledrejection = function (event) {
+    const reason = event.reason ? event.reason.toString() : '';
+    // Ignore benign ResizeObserver error in promises too
+    if (reason.includes('ResizeObserver loop completed with undelivered notifications')) {
+        return false;
+    }
     console.error('Unhandled Promise Rejection:', event.reason);
     showErrorUI('En asynkron feil oppstod: ' + (event.reason ? event.reason.message : 'Ukjent feil'));
 };
