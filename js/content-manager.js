@@ -1784,6 +1784,12 @@ class ContentManager {
                 imgEl.style.visibility = 'visible';
                 imgEl.style.opacity = '1';
                 imgEl.classList.add('fade-in');
+
+                // Also update Hero Background when image is ready
+                const pageHero = document.querySelector('.page-hero');
+                if (pageHero) {
+                    pageHero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${imageUrl}')`;
+                }
             };
             tempImg.onerror = function () {
                 imgEl.src = '../img/placeholder-event.jpg';
@@ -1792,12 +1798,6 @@ class ContentManager {
                 imgEl.classList.add('fade-in');
             };
             tempImg.src = imageUrl;
-
-            // Also update Hero Background
-            const pageHero = document.querySelector('.page-hero');
-            if (pageHero) {
-                pageHero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${imageUrl}')`;
-            }
         }
 
         // Description
@@ -1856,7 +1856,7 @@ class ContentManager {
 
         sidebarContainer.innerHTML = others.map(event => {
             const key = this.getEventKey(event);
-            const img = event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+            const img = this._getEventImage(event);
             const date = this.parseEventDate(event.start || event.date);
             const dateStr = date ? date.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
 
