@@ -146,6 +146,96 @@ class AdminManager {
     }
 
     /**
+     * Helper to update or delete an event in Google Calendar via API.
+     * @param {object} eventItem - The event data
+     * @param {'PATCH' | 'DELETE'} method 
+     */
+    async updateGoogleCalendarEvent(eventItem, method = 'PATCH') {
+        if (!this.googleAccessToken) {
+            console.log('[AdminManager] Google Access Token missing. Skipping GCal sync.');
+            return;
+        }
+
+        if (!eventItem.gcalId) {
+            console.log('[AdminManager] Item has no gcalId. Skipping GCal sync.');
+            return;
+        }
+
+        // Get the current calendar ID from settings
+        const settings = await firebaseService.getPageContent('settings_integrations') || {};
+        const calendarId = settings.googleCalendar?.calendarId;
+
+        if (!calendarId) {
+            this.showToast('Kalender-ID mangler i innstillinger. Kan ikke synkronisere.', 'error');
+            return;
+        }
+
+        const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${eventItem.gcalId}`;
+
+        let fetchOptions = {
+            method,
+            headers: {
+                'Authorization': `Bearer ${this.googleAccessToken}`,
+                'Content-Type': 'application/json'
+            }
+        };
+
+        if (method === 'PATCH') {
+            const description = typeof eventItem.content === 'object' && eventItem.content.blocks
+                ? this.blocksToHtml(eventItem.content)
+                : (eventItem.description || eventItem.content || '');
+
+            fetchOptions.body = JSON.stringify({
+                summary: eventItem.title,
+                description: description
+            });
+        }
+
+        try {
+            const response = await fetch(url, fetchOptions);
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                // Handle 404 (Event deleted manually in GCal) or 401 (Expired token)
+                if (response.status === 404) {
+                    console.warn('[AdminManager] GCal event not found. It might have been deleted manually.');
+                    return;
+                }
+                throw new Error(errorData.error?.message || `API Status ${response.status}`);
+            }
+
+            console.log(`[AdminManager] GCal sync (${method}) successful.`);
+            this.showToast(`✅ Google Calendar: ${method === 'DELETE' ? 'Slettet' : 'Oppdatert'}`, 'success', 3000);
+        } catch (error) {
+            console.error('[AdminManager] Google Calendar sync failed:', error);
+            if (error.message.includes('401') || error.message.includes('token') || error.message.includes('expired')) {
+                this.googleAccessToken = null;
+                this.showToast('Google-tilkoblingen er utløpt. Vennligst koble til på nytt.', 'error');
+            } else {
+                this.showToast('GCal Sync feilet: ' + error.message, 'error');
+            }
+        }
+    }
+
+    /**
+     * Minimal EditorJS to HTML converter for GCal description
+     */
+    blocksToHtml(content) {
+        if (!content || !content.blocks) return '';
+        return content.blocks.map(block => {
+            switch (block.type) {
+                case 'header': return `<h${block.data.level}>${block.data.text}</h${block.data.level}>`;
+                case 'paragraph': return `<p>${block.data.text}</p>`;
+                case 'list':
+                    const tag = block.data.style === 'ordered' ? 'ol' : 'ul';
+                    const items = block.data.items.map(i => `<li>${i}</li>`).join('');
+                    return `<${tag}>${items}</${tag}>`;
+                default: return block.data.text || '';
+            }
+        }).join('\n');
+    }
+
+    /**
      * Handle Admin Authentication & Roles
      */
     initAuth() {
@@ -1831,6 +1921,11 @@ class AdminManager {
                         // Force clear the public visitor cache if we modified events
                         if (collectionId === 'events') {
                             this.clearPublicEventCache();
+
+                            // If connected to Google, sync back
+                            if (this.googleAccessToken && item.gcalId) {
+                                await this.updateGoogleCalendarEvent(item, 'PATCH');
+                            }
                         }
 
                         modal.remove();
@@ -1917,6 +2012,11 @@ class AdminManager {
             // Force clear public cache
             if (collectionId === 'events') {
                 this.clearPublicEventCache();
+
+                // If connected to Google, delete from there too
+                if (this.googleAccessToken && itemToDelete.gcalId) {
+                    await this.updateGoogleCalendarEvent(itemToDelete, 'DELETE');
+                }
             }
         } else {
             // If it's not in Firestore, we can't delete it (it's a pure GCal item)
@@ -3014,14 +3114,28 @@ class AdminManager {
                         </div>
 
                         <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-                            <h4 style="margin-bottom: 12px; font-size: 14px;">Visningsinnstillinger</h4>
-                            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                <input type="checkbox" id="gcal-show-month" style="width: 18px; height: 18px;">
-                                <label for="gcal-show-month" style="margin-bottom: 0; cursor: pointer;">Vis Månedskalender</label>
-                            </div>
-                            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                                <input type="checkbox" id="gcal-show-agenda" style="width: 18px; height: 18px;">
-                                <label for="gcal-show-agenda" style="margin-bottom: 0; cursor: pointer;">Vis Agendaoversikt (Kommende arrangementer)</label>
+                            <h4 style="margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; color: #f39c12;">sync</span>
+                                Synkronisering (To-veis)
+                            </h4>
+                            <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Aktiver to-veis synkronisering for å sende endringer fra dashbordet tilbake til Google Calendar.</p>
+                            
+                            <div id="google-auth-status" style="margin-bottom: 15px;">
+                                ${this.googleAccessToken ? `
+                                    <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+                                        <span class="material-symbols-outlined" style="color: #16a34a;">check_circle</span>
+                                        <div style="flex: 1;">
+                                            <p style="font-size: 12px; font-weight: 600; color: #166534; margin: 0;">Tilkoblet Google</p>
+                                            <p style="font-size: 10px; color: #15803d; margin: 0;">Skrivetilgang er aktivert</p>
+                                        </div>
+                                        <button id="disconnect-google" class="btn-text" style="color: #dc2626; font-size: 11px;">Koble fra</button>
+                                    </div>
+                                ` : `
+                                    <button class="btn-outline" id="connect-google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                        <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="Google">
+                                        Koble til Google for skrivetilgang
+                                    </button>
+                                `}
                             </div>
                         </div>
 
@@ -3047,6 +3161,31 @@ class AdminManager {
                 </div>
             </div>
         `;
+
+        // Bind Google Auth listeners
+        const connectBtn = document.getElementById('connect-google-btn');
+        if (connectBtn) {
+            connectBtn.onclick = async () => {
+                try {
+                    const result = await firebaseService.connectToGoogle();
+                    this.googleAccessToken = result.accessToken;
+                    this.showToast('Tilkoblet Google! Du har nå skrivetilgang.', 'success');
+                    this.renderIntegrationsSection(); // Refresh UI to show connected state
+                } catch (error) {
+                    console.error('Google connection failed:', error);
+                    this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
+                }
+            };
+        }
+
+        const disconnectBtn = document.getElementById('disconnect-google');
+        if (disconnectBtn) {
+            disconnectBtn.onclick = () => {
+                this.googleAccessToken = null;
+                this.showToast('Koblet fra Google. Skrivetilgang deaktivert.');
+                this.renderIntegrationsSection();
+            };
+        }
 
         // Load existing settings
         const settings = await firebaseService.getPageContent('settings_integrations') || {};

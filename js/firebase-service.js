@@ -153,6 +153,25 @@ class FirebaseService {
         return userCredential;
     }
 
+    async connectToGoogle() {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+
+        const provider = new firebase.auth.GoogleAuthProvider();
+        // Request write access to calendar events
+        provider.addScope('https://www.googleapis.com/auth/calendar.events');
+
+        try {
+            const result = await this.auth.signInWithPopup(provider);
+            return {
+                user: result.user,
+                accessToken: result.credential.accessToken
+            };
+        } catch (error) {
+            console.error("❌ Google Connection Failed:", error);
+            throw error;
+        }
+    }
+
     async getUserRole(uid) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
         const fallbackSuperadmins = ['thomas@hiskingdomministry.no'];
