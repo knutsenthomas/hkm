@@ -4758,12 +4758,12 @@ ol.block-list {
 
 /* Give mega-menu content a little more top breathing room under the fixed header */
 #mega-menu>div {
-    padding-top: 132px !important;
+    padding-top: 148px !important;
 }
 
 @media (max-width: 768px) {
     #mega-menu>div {
-        padding-top: 120px !important;
+        padding-top: 132px !important;
     }
 }
 
