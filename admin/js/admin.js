@@ -1413,7 +1413,53 @@ class AdminManager {
 
         try {
             const data = await firebaseService.getPageContent(`collection_${collectionId}`);
-            const items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
+            let items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
+
+            // Specialized merge for events to show synced GCal events
+            if (collectionId === 'events') {
+                try {
+                    const integrations = await firebaseService.getPageContent('settings_integrations');
+                    const gcal = integrations?.googleCalendar || {};
+                    const apiKey = gcal.apiKey;
+                    const calendarId = gcal.calendarId;
+
+                    if (apiKey && calendarId) {
+                        // Fetch next 3 months of GCal events
+                        const now = new Date();
+                        const end = new Date();
+                        end.setMonth(now.getMonth() + 3);
+
+                        const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?key=${apiKey}&timeMin=${now.toISOString()}&timeMax=${end.toISOString()}&orderBy=startTime&singleEvents=true`;
+                        const res = await fetch(url);
+                        const gData = await res.json();
+
+                        if (gData.items) {
+                            const gItems = gData.items.map(gi => ({
+                                title: gi.summary,
+                                date: gi.start.dateTime || gi.start.date,
+                                isSynced: true,
+                                id: gi.id
+                            }));
+
+                            // Merge: Add GCal items if they don't exist in Firestore
+                            gItems.forEach(gi => {
+                                const exists = items.some(fi => fi.title === gi.title && fi.date?.split('T')[0] === gi.date?.split('T')[0]);
+                                if (!exists) {
+                                    items.push(gi);
+                                } else {
+                                    // Mark existing as synced so we know it's an override
+                                    const fi = items.find(fi => fi.title === gi.title && fi.date?.split('T')[0] === gi.date?.split('T')[0]);
+                                    if (fi) fi.isSynced = true;
+                                }
+                            });
+                        }
+                    }
+                } catch (gErr) {
+                    console.error("GCal fetch failed in admin:", gErr);
+                }
+            }
+
+            this.currentItems = items;
             this.renderItems(collectionId, items);
         } catch (e) {
             listContainer.innerHTML = '<p>Kunne ikke laste data.</p>';
@@ -1428,18 +1474,23 @@ class AdminManager {
         }
 
         container.innerHTML = `<div class="collection-grid">${items.map((item, index) => `
-            <div class="item-card">
+            <div class="item-card ${item.isSynced ? 'synced-item' : ''}">
                 ${item.imageUrl ? `<div class="item-thumb"><img src="${item.imageUrl}" alt="Thumb"></div>` : ''}
                 <div class="item-content">
-                    <h4 style="margin: 0;">${item.title || 'Uten tittel'}</h4>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <h4 style="margin: 0;">${item.title || 'Uten tittel'}</h4>
+                        ${item.isSynced ? '<span class="badge" style="background: #e0f2fe; color: #0369a1; font-size: 10px; padding: 2px 6px; border-radius: 4px;">Synkronisert</span>' : ''}
+                    </div>
                     <p style="margin: 5px 0 12px; font-size: 13px; color: #64748b;">${item.date || ''}</p>
                     <div class="item-actions">
                         <button class="icon-btn" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
+                        ${!item.isSynced ? `
                         <button class="icon-btn delete" onclick="window.adminManager.deleteItem('${collectionId}', ${index})">
                             <span class="material-symbols-outlined">delete</span>
                         </button>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -1448,9 +1499,8 @@ class AdminManager {
 
     async editCollectionItem(collectionId, index) {
         try {
-            const rawData = await firebaseService.getPageContent(`collection_${collectionId}`);
-            const items = Array.isArray(rawData) ? rawData : (rawData && rawData.items ? rawData.items : []);
-            const item = items[index] || {};
+            // Use the already merged item from currentItems
+            const item = (this.currentItems && this.currentItems[index]) ? { ...this.currentItems[index] } : {};
 
             const safeDate = (typeof item.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.date))
                 ? item.date
@@ -1718,11 +1768,27 @@ class AdminManager {
                     try {
                         const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                         const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
-                        if (typeof index === 'number' && index >= 0) {
-                            list[index] = item;
+
+                        // Specialized matching for events to avoid index mismatch with GCal items
+                        if (collectionId === 'events') {
+                            const existingIdx = list.findIndex(fi =>
+                                fi.title === item.title &&
+                                fi.date?.split('T')[0] === item.date?.split('T')[0]
+                            );
+                            if (existingIdx >= 0) {
+                                list[existingIdx] = item;
+                            } else {
+                                list.push(item);
+                            }
                         } else {
-                            list.push(item);
+                            // Standard index-based handling for other collections
+                            if (typeof index === 'number' && index >= 0 && !item.isSynced) {
+                                list[index] = item;
+                            } else {
+                                list.push(item);
+                            }
                         }
+
                         await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
                         modal.remove();
                         this.loadCollection(collectionId);

@@ -469,24 +469,39 @@ class ContentManager {
                 gcalEvents = results.flat();
             }
 
-            if (gcalEvents.length > 0) {
-                finalEvents = [...gcalEvents, ...monthHolidays];
-            } else {
-                // 3. Fallback to cached events from Firestore (if any)
-                const eventData = await firebaseService.getPageContent('collection_events');
-                const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
+            // 3. Fetch Firestore events (always, to allow overrides or manual events)
+            const eventData = await firebaseService.getPageContent('collection_events');
+            const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
+            const taggedFirebase = firebaseItems.map(event => ({
+                ...event,
+                sourceId: 'manual',
+                sourceLabel: 'Interne arrangementer'
+            }));
 
-                if (firebaseItems.length > 0) {
-                    const tagged = firebaseItems.map(event => ({
-                        ...event,
-                        sourceId: 'manual',
-                        sourceLabel: 'Arrangementer'
-                    }));
-                    finalEvents = [...tagged, ...monthHolidays];
-                } else {
-                    // 4. Only holidays if nothing else finnes
-                    finalEvents = monthHolidays;
-                }
+            // 4. Merge Logic
+            if (gcalEvents.length > 0) {
+                // Use GCal as base, but override with Firebase if Title matches
+                finalEvents = gcalEvents.map(gEvent => {
+                    const override = taggedFirebase.find(fEvent =>
+                        fEvent.title === gEvent.title &&
+                        this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start))
+                    );
+                    if (override) {
+                        return { ...gEvent, ...override, sourceId: gEvent.sourceId }; // Preserve GCal source
+                    }
+                    return gEvent;
+                });
+
+                // Add Firebase events that DON'T match GCal
+                const uniqueFirebase = taggedFirebase.filter(fEvent =>
+                    !gcalEvents.some(gEvent =>
+                        gEvent.title === fEvent.title &&
+                        this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start))
+                    )
+                );
+                finalEvents = [...finalEvents, ...uniqueFirebase, ...monthHolidays];
+            } else {
+                finalEvents = [...taggedFirebase, ...monthHolidays];
             }
 
             // Save to Cache
@@ -1767,13 +1782,13 @@ class ContentManager {
             imgEl.classList.remove('fade-in');
             // Preload image
             const tempImg = new window.Image();
-            tempImg.onload = function() {
+            tempImg.onload = function () {
                 imgEl.src = imageUrl;
                 imgEl.style.visibility = 'visible';
                 imgEl.style.opacity = '1';
                 imgEl.classList.add('fade-in');
             };
-            tempImg.onerror = function() {
+            tempImg.onerror = function () {
                 imgEl.src = '../img/placeholder-event.jpg';
                 imgEl.style.visibility = 'visible';
                 imgEl.style.opacity = '1';
@@ -2086,6 +2101,13 @@ class ContentManager {
         } catch (e) {
             return dateStr;
         }
+    }
+
+    isSameDay(d1, d2) {
+        if (!d1 || !d2) return false;
+        return d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate();
     }
 
     /**
