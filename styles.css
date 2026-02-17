@@ -434,7 +434,7 @@ th {
 .footer-donate-btn .heart,
 .footer-donate-btn span.heart,
 .footer-donate-btn i.heart {
-    margin-left: 6px !important;
+    margin-left: 4px !important;
     transition: color 0.3s;
 }
 
@@ -452,7 +452,7 @@ th {
 .header-donate-btn .heart,
 .header-donate-btn span.heart,
 .header-donate-btn i.heart {
-    margin-left: 6px !important;
+    margin-left: 4px !important;
     transition: color 0.3s;
 }
 
@@ -4631,7 +4631,7 @@ ol.block-list {
     font-size: 1rem;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0 !important;
     transition: transform 0.2s ease, background-color 0.2s ease;
     box-shadow: none;
     /* Flat design */
