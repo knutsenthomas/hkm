@@ -3139,6 +3139,18 @@ class AdminManager {
                             </div>
                         </div>
 
+                        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+                            <h4 style="margin-bottom: 12px; font-size: 14px;">Visningsinnstillinger</h4>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                <input type="checkbox" id="gcal-show-month" style="width: 18px; height: 18px;">
+                                <label for="gcal-show-month" style="margin-bottom: 0; cursor: pointer;">Vis Månedskalender</label>
+                            </div>
+                            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                                <input type="checkbox" id="gcal-show-agenda" style="width: 18px; height: 18px;">
+                                <label for="gcal-show-agenda" style="margin-bottom: 0; cursor: pointer;">Vis Agendaoversikt (Kommende arrangementer)</label>
+                            </div>
+                        </div>
+
                         <div style="margin-top: 10px;">
                             <button class="btn-primary" id="save-gcal-settings" style="width: 100%;">Lagre Kalender-innstillinger</button>
                         </div>
