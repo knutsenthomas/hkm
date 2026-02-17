@@ -434,13 +434,13 @@ th {
 .footer-donate-btn .heart,
 .footer-donate-btn span.heart,
 .footer-donate-btn i.heart {
+    margin-left: 6px !important;
     transition: color 0.3s;
 }
 
 .footer-donate-btn {
     display: flex;
     align-items: center;
-    gap: 8px !important;
 }
 
 .footer-donate-btn:hover .heart,
@@ -452,6 +452,7 @@ th {
 .header-donate-btn .heart,
 .header-donate-btn span.heart,
 .header-donate-btn i.heart {
+    margin-left: 6px !important;
     transition: color 0.3s;
 }
 
