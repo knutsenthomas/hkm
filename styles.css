@@ -9,14 +9,16 @@
     background: linear-gradient(135deg, #f39c12 0%, #e74c3c 100%);
     color: #fff;
     font-size: 1.25rem;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
 }
+
 .profile-btn:hover {
     background: #fff;
     color: #e74c3c;
-    box-shadow: 0 4px 16px rgba(243,156,18,0.15);
+    box-shadow: 0 4px 16px rgba(243, 156, 18, 0.15);
 }
+
 /* --- Landscape Phone Fixes for Hero Section --- */
 @media (max-height: 500px) and (orientation: landscape) {
 
@@ -448,13 +450,15 @@ th {
 
 
 
-/* --- Professional Button Reset & Brand Style --- */
-/* --- Heart Icon Spacing & Color --- */
-.footer-donate-btn .heart,
-.footer-donate-btn span.heart,
-.footer-donate-btn i.heart {
+/* Global heart icon spacing for buttons and links site-wide */
+.btn i.fa-heart,
+.button i.fa-heart,
+a i.fa-heart,
+.header-donate-btn i.fa-heart,
+.footer-donate-btn i.fa-heart,
+.heart {
     margin-left: 10px !important;
-    transition: color 0.3s;
+    vertical-align: middle;
 }
 
 .footer-donate-btn {
@@ -462,22 +466,11 @@ th {
     align-items: center;
 }
 
-.footer-donate-btn:hover .heart,
-.footer-donate-btn:hover span.heart,
-.footer-donate-btn:hover i.heart {
+.footer-donate-btn:hover i.fa-heart {
     color: inherit !important;
 }
 
-.header-donate-btn .heart,
-.header-donate-btn span.heart,
-.header-donate-btn i.heart {
-    margin-left: 10px !important;
-    transition: color 0.3s;
-}
-
-.header-donate-btn:hover .heart,
-.header-donate-btn:hover span.heart,
-.header-donate-btn:hover i.heart {
+.header-donate-btn:hover i.fa-heart {
     color: inherit !important;
 }
 
