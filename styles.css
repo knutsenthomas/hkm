@@ -1,37 +1,50 @@
 /* --- Landscape Phone Fixes for Hero Section --- */
 @media (max-height: 500px) and (orientation: landscape) {
+
     .hero-slider,
     .hero-slide,
     .hero-container {
         padding-top: 60px !important;
         padding-bottom: 40px !important;
     }
-    .hero-title, .page-hero-title {
+
+    .hero-title,
+    .page-hero-title {
         font-size: 6vw !important;
         line-height: 1.1 !important;
         margin-bottom: 10px !important;
     }
-    .hero-subtitle, .page-hero-subtitle {
+
+    .hero-subtitle,
+    .page-hero-subtitle {
         font-size: 3.5vw !important;
         line-height: 1.2 !important;
         margin-bottom: 0 !important;
     }
-    .header, .header.scrolled {
+
+    .header,
+    .header.scrolled {
         height: 60px !important;
         min-height: 0 !important;
         max-height: 60px !important;
     }
-    .header .logo, .header .logo-icon {
+
+    .header .logo,
+    .header .logo-icon {
         height: 36px !important;
         min-height: 0 !important;
         max-height: 36px !important;
     }
+
     /* Optionally hide subtitle if space is too tight */
-    .hero-subtitle, .page-hero-subtitle {
+    .hero-subtitle,
+    .page-hero-subtitle {
         display: none !important;
     }
 }
-.page-hero-title, .hero-title {
+
+.page-hero-title,
+.hero-title {
     color: #fff !important;
     z-index: 10 !important;
     position: relative;
@@ -39,6 +52,7 @@
     visibility: visible !important;
     /* display: block !important;  Removed to fix button layout bug */
 }
+
 /* === Global Font Size Variables === */
 :root {
     --fs-h1-desktop: 48px !important;
@@ -49,11 +63,37 @@
 }
 
 /* === Global Text Wrapping === */
-h1, h2, h3, h4, h5, h6, p, .page-hero-title, .page-hero-subtitle, .section-title, .section-label, .section-description, .blog-card-title, .blog-card-desc, .cause-title, .cause-description, .event-title, .event-description, .agenda-title, .agenda-meta, .btn, a, span, li, td, th {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+.page-hero-title,
+.page-hero-subtitle,
+.section-title,
+.section-label,
+.section-description,
+.blog-card-title,
+.blog-card-desc,
+.cause-title,
+.cause-description,
+.event-title,
+.event-description,
+.agenda-title,
+.agenda-meta,
+.btn,
+a,
+span,
+li,
+td,
+th {
     overflow-wrap: break-word;
     word-break: break-word;
     hyphens: auto;
 }
+
 /* YouTube kategori-knapper */
 .youtube-categories {
     display: flex;
@@ -349,21 +389,30 @@ ul {
 h1 {
     font-size: var(--fs-h1-desktop, 48px);
 }
-h2, h3 {
+
+h2,
+h3 {
     font-size: var(--fs-h2-desktop, 28px);
 }
-p, li, td, th {
+
+p,
+li,
+td,
+th {
     font-size: var(--fs-body, 16px);
 }
+
 @media (max-width: 700px) {
     h1 {
         font-size: var(--fs-h1-mobile, 32px);
     }
-    h2, h3 {
+
+    h2,
+    h3 {
         font-size: var(--fs-h2-mobile, 20px);
     }
 }
-}
+
 
 
 /* --- Professional Button Reset & Brand Style --- */
@@ -374,28 +423,36 @@ p, li, td, th {
     margin-left: 12px !important;
     transition: color 0.3s;
 }
+
 .footer-donate-btn {
     display: flex;
     align-items: center;
     gap: 12px !important;
 }
+
 .footer-donate-btn:hover .heart,
 .footer-donate-btn:hover span.heart,
 .footer-donate-btn:hover i.heart {
     color: inherit !important;
 }
+
 .header-donate-btn .heart,
 .header-donate-btn span.heart,
 .header-donate-btn i.heart {
     margin-left: 10px !important;
     transition: color 0.3s;
 }
+
 .header-donate-btn:hover .heart,
 .header-donate-btn:hover span.heart,
 .header-donate-btn:hover i.heart {
     color: inherit !important;
 }
-.btn, .button, a.btn, a.button {
+
+.btn,
+.button,
+a.btn,
+a.button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -413,7 +470,10 @@ p, li, td, th {
 }
 
 /* Primary Button: Brand Orange */
-.btn-primary, .button-primary, a.btn-primary, a.button-primary {
+.btn-primary,
+.button-primary,
+a.btn-primary,
+a.button-primary {
     background: #c8682a !important;
     color: #fff !important;
     border-color: #c8682a !important;
@@ -426,7 +486,10 @@ p, li, td, th {
 }
 
 /* Secondary Button: White with Orange Border */
-.btn-secondary, .button-secondary, a.btn-secondary, a.button-secondary {
+.btn-secondary,
+.button-secondary,
+a.btn-secondary,
+a.button-secondary {
     background: #fff !important;
     color: #c8682a !important;
     border-color: #c8682a !important;
@@ -439,9 +502,18 @@ p, li, td, th {
 }
 
 /* Hover Effects */
-.btn:hover, .button:hover, a.btn:hover, a.button:hover,
-.btn-primary:hover, .button-primary:hover, a.btn-primary:hover, a.button-primary:hover,
-.btn-secondary:hover, .button-secondary:hover, a.btn-secondary:hover, a.button-secondary:hover {
+.btn:hover,
+.button:hover,
+a.btn:hover,
+a.button:hover,
+.btn-primary:hover,
+.button-primary:hover,
+a.btn-primary:hover,
+a.button-primary:hover,
+.btn-secondary:hover,
+.button-secondary:hover,
+a.btn-secondary:hover,
+a.button-secondary:hover {
     filter: brightness(1.08) saturate(1.1);
     transform: scale(1.04);
     transition: all 0.3s ease;
@@ -449,7 +521,10 @@ p, li, td, th {
 }
 
 /* Remove flat/unstyled link look for buttons */
-.btn, .button, a.btn, a.button {
+.btn,
+.button,
+a.btn,
+a.button {
     box-shadow: none !important;
     background-image: none !important;
     border-style: solid !important;
@@ -2498,23 +2573,24 @@ body.hero-animate .slide-buttons {
 }
 
 .footer-nav-grid {
-        @media (max-width: 900px) {
-            .footer-nav-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 28px !important;
-            }
+    @media (max-width: 900px) {
+        .footer-nav-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 28px !important;
         }
-        display: grid !important;
-        grid-template-columns: repeat(4, 1fr) !important;
-        gap: 40px !important;
-        width: 100%;
+    }
+
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 40px !important;
+    width: 100%;
 }
 
 .footer-nav-grid .nav-col {
-        width: 100% !important;
-        text-align: left !important;
-        margin: 0 !important;
-        padding: 0 !important;
+    width: 100% !important;
+    text-align: left !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 @media (max-width: 768px) {
@@ -2523,11 +2599,13 @@ body.hero-animate .slide-buttons {
         gap: 24px !important;
     }
 }
+
 @media (max-width: 480px) {
     .footer-nav-grid {
         grid-template-columns: 1fr !important;
         gap: 16px !important;
     }
+
     .footer-nav-grid .nav-col {
         text-align: left !important;
         align-items: flex-start !important;
