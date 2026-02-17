@@ -8,7 +8,7 @@
                 <div class="footer-brand">
                     <a href="<?php echo home_url(); ?>" class="logo">
                         <div class="logo-icon">
-                            <img src="<?php echo get_template_directory_uri(); ?>/img/Logo sirkel - orange og hvit.png"
+                            <img src="<?php echo get_template_directory_uri(); ?>/img/logo-hkm.png"
                                 alt="His Kingdom Ministry Logo">
                         </div>
                         <span class="logo-text">His Kingdom Ministry</span>

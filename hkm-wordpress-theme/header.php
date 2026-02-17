@@ -21,7 +21,7 @@
                 class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="<?php echo get_template_directory_uri(); ?>/img/Logo sirkel - orange og hvit.png"
+                    <img src="<?php echo get_template_directory_uri(); ?>/img/logo-hkm.png"
                         alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
