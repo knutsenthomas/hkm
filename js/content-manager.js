@@ -1534,12 +1534,12 @@ class ContentManager {
         if (slides.length > 0) {
             document.body.classList.remove('hero-animate');
             sliderContainer.innerHTML = slides.map((slide, index) => `
-                <div class="slide ${index === 0 ? 'active' : ''}">
-                    <div class="slide-bg" style="background-image: url('${slide.imageUrl}')"></div>
-                    <div class="slide-content">
-                        <div class="container">
-                            <h1 class="slide-title">${slide.title}</h1>
-                            <p class="slide-text">${slide.subtitle}</p>
+                <div class="hero-slide ${index === 0 ? 'active' : ''}">
+                    <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                    <div class="container hero-container">
+                        <div class="hero-content">
+                            <h1 class="hero-title">${slide.title}</h1>
+                            <p class="hero-subtitle">${slide.subtitle}</p>
                             ${slide.btnText ? `
                                 <div class="slide-buttons">
                                     <a href="${slide.btnLink}" class="btn btn-primary">${slide.btnText}</a>
@@ -1552,9 +1552,10 @@ class ContentManager {
 
             // Re-init HeroSlider from script.js
             if (window.heroSlider) {
-                window.heroSlider.slides = document.querySelectorAll('.slide');
-                window.heroSlider.currentSlide = 0;
-                window.heroSlider.init();
+                window.heroSlider.stopAutoPlay();
+                window.heroSlider.slides = document.querySelectorAll('.hero-slide');
+                window.heroSlider.currentIndex = 0;
+                window.heroSlider.startAutoPlay();
             }
 
             this.enableHeroAnimations();
