@@ -142,7 +142,7 @@
             display: none;
         }
     </style>
-<!-- Tailwind CSS Play CDN -->
+    <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -204,89 +204,92 @@
     <script type="module" src="../js/user-roles.js"></script>
 
     <!-- Auth Logic -->
-    <script>
-        (function () {
-            const firebaseService = window.firebaseService;
-            const loginForm = document.getElementById('login-form');
-            const errorBox = document.getElementById('error-box');
-
-            if (!loginForm) return;
-
-            async function routeByRole() {
-                const user = firebase.auth().currentUser;
-                if (!user) {
-                    window.location.href = 'index.html';
-                    return;
+    <script type="module">
+            (async function () {
+                // Wait for firebaseService to be available and initialized
+                let count = 0;
+                while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                    await new Promise(r => setTimeout(r, 50));
+                    count++;
                 }
 
-                let role = 'medlem';
-                try {
-                    role = await firebaseService.getUserRole(user.uid);
-                } catch (err) {
-                    console.warn('Kunne ikke hente rolle:', err);
-                }
+                const firebaseService = window.firebaseService;
+                const loginForm = document.getElementById('login-form');
+                const errorBox = document.getElementById('error-box');
 
-                const canAccessAdmin = window.HKM_PERMISSIONS
-                    && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-                    && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+                if (!loginForm) return;
 
-                window.location.href = canAccessAdmin ? 'index.html' : '../minside/index.html';
-            }
-
-            loginForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
-                const btn = loginForm.querySelector('button');
-
-                const originalText = btn.textContent;
-                btn.textContent = 'Logger inn...';
-                btn.disabled = true;
-                errorBox.style.display = 'none';
-
-                if (!firebaseService.isInitialized) {
-                    alert("⚠️ Firebase er ikke konfigurert! Vennligst gå til 'admin/index.html' og bruk Innstiling-siden for å koble til først (eller bruk admin/admin123 for lokal testing).");
-                    // Fallback for development if not configured
-                    if (email === 'thomas@hiskingdomministry.no' && password === 'Thomas2026!') {
+                async function routeByRole() {
+                    const user = firebase.auth().currentUser;
+                    if (!user) {
                         window.location.href = 'index.html';
+                        return;
                     }
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                    return;
+
+                    let role = 'medlem';
+                    try {
+                        role = await firebaseService.getUserRole(user.uid);
+                    } catch (err) {
+                        console.warn('Kunne ikke hente rolle:', err);
+                    }
+
+                    const canAccessAdmin = window.HKM_PERMISSIONS
+                        && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                        && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+
+                    window.location.href = canAccessAdmin ? 'index.html' : '../minside/index.html';
                 }
 
-                try {
-                    await firebaseService.login(email, password);
-                    await routeByRole();
-                } catch (err) {
-                    console.error("Login error:", err);
-                    errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
-                    errorBox.style.display = 'block';
-                    btn.textContent = originalText;
-                    btn.disabled = false;
-                }
-            });
+                loginForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
 
-            const googleBtn = document.getElementById('google-login');
-            if (googleBtn) {
-                googleBtn.addEventListener('click', async () => {
-                    if (!firebaseService.isInitialized) {
+                    const email = document.getElementById('email').value;
+                    const password = document.getElementById('password').value;
+                    const btn = loginForm.querySelector('button');
+
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Logger inn...';
+                    btn.disabled = true;
+                    errorBox.style.display = 'none';
+
+                    if (!firebaseService || !firebaseService.isInitialized) {
                         alert("⚠️ Firebase er ikke konfigurert!");
+                        btn.textContent = originalText;
+                        btn.disabled = false;
                         return;
                     }
 
                     try {
-                        await firebaseService.loginWithGoogle();
+                        await firebaseService.login(email, password);
                         await routeByRole();
                     } catch (err) {
-                        console.error("Google login error:", err);
-                        errorBox.textContent = "Kunne ikke logge inn med Google.";
+                        console.error("Login error:", err);
+                        errorBox.textContent = "Feil e-post eller passord. Vennligst prøv igjen.";
                         errorBox.style.display = 'block';
+                        btn.textContent = originalText;
+                        btn.disabled = false;
                     }
                 });
-            }
-        })();
+
+                const googleBtn = document.getElementById('google-login');
+                if (googleBtn) {
+                    googleBtn.addEventListener('click', async () => {
+                        if (!firebaseService || !firebaseService.isInitialized) {
+                            alert("⚠️ Firebase er ikke konfigurert!");
+                            return;
+                        }
+
+                        try {
+                            await firebaseService.loginWithGoogle();
+                            await routeByRole();
+                        } catch (err) {
+                            console.error("Google login error:", err);
+                            errorBox.textContent = "Kunne ikke logge inn med Google.";
+                            errorBox.style.display = 'block';
+                        }
+                    });
+                }
+            })();
     </script>
 </body>
 

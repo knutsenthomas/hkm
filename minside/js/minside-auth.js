@@ -1,4 +1,10 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // Wait for firebaseService to be available and initialized
+    let count = 0;
+    while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+        await new Promise(r => setTimeout(r, 50));
+        count++;
+    }
     const firebaseService = window.firebaseService;
 
     // --- Mode Switching ---
