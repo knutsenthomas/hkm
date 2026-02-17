@@ -1063,13 +1063,22 @@ class ContentManager {
             : this.getTranslation('location_not_set');
 
         titleEl.textContent = event.title || 'Arrangement';
-        dateEl.innerHTML = `< i class="far fa-calendar-alt" ></i > ${dateLabel} `;
-        timeEl.innerHTML = `< i class="far fa-clock" ></i > ${timeLabel} `;
-        locationEl.innerHTML = `< i class="fas fa-map-marker-alt" ></i > ${event.location || 'Sted ikke satt'} `;
-        const rawDescription = event.description || '';
-        const safeHtml = this.sanitizeEventHtml(rawDescription);
-        if (safeHtml) {
-            descEl.innerHTML = safeHtml;
+        dateEl.innerHTML = `<i class="far fa-calendar-alt"></i> ${dateLabel}`;
+        timeEl.innerHTML = `<i class="far fa-clock"></i> ${timeLabel}`;
+        locationEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${event.location || 'Sted ikke satt'}`;
+
+        // Handle both Google Calendar 'description' and Firebase 'content'
+        const contentData = event.content || event.description || '';
+        let finalHtml = '';
+
+        if (typeof contentData === 'object' && contentData.blocks) {
+            finalHtml = this.parseBlocks(contentData);
+        } else {
+            finalHtml = this.sanitizeEventHtml(contentData);
+        }
+
+        if (finalHtml) {
+            descEl.innerHTML = finalHtml;
         } else {
             descEl.textContent = 'Beskrivelse kommer.';
         }

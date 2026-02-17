@@ -128,6 +128,24 @@ class AdminManager {
     }
 
     /**
+     * Clear the public site's event cache in localStorage.
+     * This ensures visitors see changes immediately after an admin saves them.
+     */
+    clearPublicEventCache() {
+        try {
+            // Public site uses 'hkm_events_{startIso}_{endIso}' cache keys
+            Object.keys(localStorage).forEach(key => {
+                if (key.startsWith('hkm_events_')) {
+                    localStorage.removeItem(key);
+                    console.log(`[AdminManager] Cleared cache key: ${key}`);
+                }
+            });
+        } catch (e) {
+            console.warn('[AdminManager] Failed to clear public cache', e);
+        }
+    }
+
+    /**
      * Handle Admin Authentication & Roles
      */
     initAuth() {
@@ -1809,6 +1827,12 @@ class AdminManager {
                         }
 
                         await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+
+                        // Force clear the public visitor cache if we modified events
+                        if (collectionId === 'events') {
+                            this.clearPublicEventCache();
+                        }
+
                         modal.remove();
                         this.loadCollection(collectionId);
                         this.showToast('✅ Lagret!', 'success');
@@ -1889,6 +1913,11 @@ class AdminManager {
         if (matchIdx >= 0) {
             list.splice(matchIdx, 1);
             await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+
+            // Force clear public cache
+            if (collectionId === 'events') {
+                this.clearPublicEventCache();
+            }
         } else {
             // If it's not in Firestore, we can't delete it (it's a pure GCal item)
             this.showToast('Dette elementet kan ikke slettes da det hentes direkte fra Google Calendar.', 'error');
