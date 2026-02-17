@@ -480,11 +480,11 @@ class ContentManager {
 
             // 4. Merge Logic
             if (gcalEvents.length > 0) {
-                // Use GCal as base, but override with Firebase if Title matches
+                // Use GCal as base, but override with Firebase if ID or Title/Date matches
                 finalEvents = gcalEvents.map(gEvent => {
                     const override = taggedFirebase.find(fEvent =>
-                        fEvent.title === gEvent.title &&
-                        this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start))
+                        (fEvent.gcalId && fEvent.gcalId === gEvent.id) ||
+                        (fEvent.title === gEvent.title && this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start)))
                     );
                     if (override) {
                         return { ...gEvent, ...override, sourceId: gEvent.sourceId }; // Preserve GCal source
@@ -495,8 +495,8 @@ class ContentManager {
                 // Add Firebase events that DON'T match GCal
                 const uniqueFirebase = taggedFirebase.filter(fEvent =>
                     !gcalEvents.some(gEvent =>
-                        gEvent.title === fEvent.title &&
-                        this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start))
+                        (fEvent.gcalId && fEvent.gcalId === gEvent.id) ||
+                        (gEvent.title === fEvent.title && this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start)))
                     )
                 );
                 finalEvents = [...finalEvents, ...uniqueFirebase, ...monthHolidays];

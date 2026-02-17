@@ -1443,13 +1443,23 @@ class AdminManager {
 
                             // Merge: Add GCal items if they don't exist in Firestore
                             gItems.forEach(gi => {
-                                const exists = items.some(fi => fi.title === gi.title && fi.date?.split('T')[0] === gi.date?.split('T')[0]);
+                                const exists = items.some(fi =>
+                                    (fi.gcalId && fi.gcalId === gi.id) ||
+                                    (fi.title === gi.title && fi.date?.split('T')[0] === gi.date?.split('T')[0])
+                                );
+
                                 if (!exists) {
                                     items.push(gi);
                                 } else {
                                     // Mark existing as synced so we know it's an override
-                                    const fi = items.find(fi => fi.title === gi.title && fi.date?.split('T')[0] === gi.date?.split('T')[0]);
-                                    if (fi) fi.isSynced = true;
+                                    const fi = items.find(fi =>
+                                        (fi.gcalId && fi.gcalId === gi.id) ||
+                                        (fi.title === gi.title && fi.date?.split('T')[0] === gi.date?.split('T')[0])
+                                    );
+                                    if (fi) {
+                                        fi.isSynced = true;
+                                        if (!fi.gcalId) fi.gcalId = gi.id; // Link it if not already linked
+                                    }
                                 }
                             });
                         }
@@ -1762,6 +1772,11 @@ class AdminManager {
                     item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
                     item.tags = currentTags;
 
+                    // Ensure gcalId is preserved if this was a synced item
+                    if (item.isSynced && item.id && !item.gcalId) {
+                        item.gcalId = item.id;
+                    }
+
                     btn.textContent = 'Lagrer...';
                     btn.disabled = true;
 
@@ -1769,11 +1784,11 @@ class AdminManager {
                         const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                         const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
-                        // Specialized matching for events to avoid index mismatch with GCal items
+                        // Specialized matching for events to avoid duplicate Firestore entries
                         if (collectionId === 'events') {
                             const existingIdx = list.findIndex(fi =>
-                                fi.title === item.title &&
-                                fi.date?.split('T')[0] === item.date?.split('T')[0]
+                                (item.gcalId && fi.gcalId === item.gcalId) ||
+                                (fi.title === item.title && fi.date?.split('T')[0] === item.date?.split('T')[0])
                             );
                             if (existingIdx >= 0) {
                                 list[existingIdx] = item;
