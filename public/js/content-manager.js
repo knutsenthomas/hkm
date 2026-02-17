@@ -1518,18 +1518,23 @@ class ContentManager {
      * Dynamically render Hero Slides
      */
     renderHeroSlides(slides) {
+        console.log('[ContentManager] renderHeroSlides called with:', slides);
         const sliderContainer = document.querySelector('.slider-container');
-        if (!sliderContainer) return;
+        if (!sliderContainer) {
+            console.warn('[ContentManager] slider-container NOT found!');
+            return;
+        }
 
-        if (slides.length > 0) {
+        if (slides && slides.length > 0) {
+            console.log(`[ContentManager] Rendering ${slides.length} dynamic slides.`);
             document.body.classList.remove('hero-animate');
             sliderContainer.innerHTML = slides.map((slide, index) => `
-                <div class="slide ${index === 0 ? 'active' : ''}">
-                    <div class="slide-bg" style="background-image: url('${slide.imageUrl}')"></div>
-                    <div class="slide-content">
-                        <div class="container">
-                            <h1 class="slide-title">${slide.title}</h1>
-                            <p class="slide-text">${slide.subtitle}</p>
+                <div class="hero-slide ${index === 0 ? 'active' : ''}">
+                    <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                    <div class="container hero-container">
+                        <div class="hero-content">
+                            <h1 class="hero-title">${slide.title}</h1>
+                            <p class="hero-subtitle">${slide.subtitle}</p>
                             ${slide.btnText ? `
                                 <div class="slide-buttons">
                                     <a href="${slide.btnLink}" class="btn btn-primary">${slide.btnText}</a>
@@ -1542,9 +1547,10 @@ class ContentManager {
 
             // Re-init HeroSlider from script.js
             if (window.heroSlider) {
-                window.heroSlider.slides = document.querySelectorAll('.slide');
-                window.heroSlider.currentSlide = 0;
-                window.heroSlider.init();
+                window.heroSlider.stopAutoPlay();
+                window.heroSlider.slides = document.querySelectorAll('.hero-slide');
+                window.heroSlider.currentIndex = 0;
+                window.heroSlider.startAutoPlay();
             }
 
             this.enableHeroAnimations();
@@ -1767,13 +1773,13 @@ class ContentManager {
             imgEl.classList.remove('fade-in');
             // Preload image
             const tempImg = new window.Image();
-            tempImg.onload = function() {
+            tempImg.onload = function () {
                 imgEl.src = imageUrl;
                 imgEl.style.visibility = 'visible';
                 imgEl.style.opacity = '1';
                 imgEl.classList.add('fade-in');
             };
-            tempImg.onerror = function() {
+            tempImg.onerror = function () {
                 imgEl.src = '../img/placeholder-event.jpg';
                 imgEl.style.visibility = 'visible';
                 imgEl.style.opacity = '1';
