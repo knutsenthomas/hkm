@@ -1512,9 +1512,10 @@ class AdminManager {
             // Use the already merged item from currentItems
             const item = (this.currentItems && this.currentItems[index]) ? { ...this.currentItems[index] } : {};
 
-            const safeDate = (typeof item.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(item.date))
-                ? item.date
-                : new Date().toISOString().split('T')[0];
+            let safeDate = new Date().toISOString().split('T')[0];
+            if (item.date && typeof item.date === 'string') {
+                safeDate = item.date.split('T')[0];
+            }
 
             // Handle existing tags (ensure array)
             const existingTags = Array.isArray(item.tags) ? item.tags : [];
