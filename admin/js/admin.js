@@ -1415,6 +1415,9 @@ class AdminManager {
             const data = await firebaseService.getPageContent(`collection_${collectionId}`);
             let items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
 
+            // Mark items that exist in Firestore so we can delete them
+            items.forEach(it => it.isFirestore = true);
+
             // Specialized merge for events to show synced GCal events
             if (collectionId === 'events') {
                 try {
@@ -1496,7 +1499,7 @@ class AdminManager {
                         <button class="icon-btn" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
-                        ${!item.isSynced ? `
+                        ${item.isFirestore ? `
                         <button class="icon-btn delete" onclick="window.adminManager.deleteItem('${collectionId}', ${index})">
                             <span class="material-symbols-outlined">delete</span>
                         </button>
@@ -1867,9 +1870,30 @@ class AdminManager {
         if (!confirm('Er du sikker på at du vil slette dette elementet?')) return;
 
         const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-        const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
-        items.splice(index, 1);
-        await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
+        const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+
+        // Get the actual item we want to delete from the displayed list
+        const itemToDelete = (this.currentItems && this.currentItems[index]) ? this.currentItems[index] : null;
+
+        if (!itemToDelete) {
+            this.showToast('Kunne ikke finne elementet som skal slettes.', 'error');
+            return;
+        }
+
+        // Find match in Firestore
+        const matchIdx = list.findIndex(fi =>
+            (itemToDelete.gcalId && fi.gcalId === itemToDelete.gcalId) ||
+            (fi.title === itemToDelete.title && fi.date?.split('T')[0] === itemToDelete.date?.split('T')[0])
+        );
+
+        if (matchIdx >= 0) {
+            list.splice(matchIdx, 1);
+            await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+        } else {
+            // If it's not in Firestore, we can't delete it (it's a pure GCal item)
+            this.showToast('Dette elementet kan ikke slettes da det hentes direkte fra Google Calendar.', 'error');
+            return;
+        }
         this.loadCollection(collectionId);
         this.showToast('✅ Element slettet!', 'success');
     }
