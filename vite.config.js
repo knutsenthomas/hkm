@@ -8,7 +8,7 @@ function getHtmlEntries(dir, entries = {}) {
         const filePath = resolve(dir, file);
         const stats = fs.statSync(filePath);
         if (stats.isDirectory()) {
-            if (!['node_modules', '.git', 'public', 'dist', 'functions', 'hkm-wordpress-theme'].includes(file)) {
+            if (!['node_modules', '.git', 'public', 'dist', 'functions', 'hkm-wordpress-theme', 'wishon', 'stitch'].includes(file)) {
                 getHtmlEntries(filePath, entries);
             }
         } else if (file.endsWith('.html')) {
