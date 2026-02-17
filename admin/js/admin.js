@@ -262,7 +262,8 @@ class AdminManager {
                     return;
                 }
 
-                this.updateUserInfo(user);
+                await this.syncProfileFromGoogleProvider(user);
+                await this.updateUserInfo(user);
                 this.applyRoleRestrictions(role);
             } catch (error) {
                 console.error("Error verifying admin role:", error);
@@ -305,18 +306,52 @@ class AdminManager {
         return allowedRoles.includes(role);
     }
 
+    async syncProfileFromGoogleProvider(user) {
+        if (!user) return;
+        const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com');
+        if (!googleProvider) return;
+
+        try {
+            const authUpdates = {};
+            if (!user.displayName && googleProvider.displayName) authUpdates.displayName = googleProvider.displayName;
+            if (!user.photoURL && googleProvider.photoURL) authUpdates.photoURL = googleProvider.photoURL;
+            if (Object.keys(authUpdates).length > 0) {
+                await user.updateProfile(authUpdates);
+            }
+
+            await firebase.firestore().collection('users').doc(user.uid).set({
+                displayName: user.displayName || googleProvider.displayName || user.email || '',
+                photoURL: user.photoURL || googleProvider.photoURL || '',
+                email: user.email || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        } catch (e) {
+            console.warn('Kunne ikke synkronisere Google-profil i admin:', e);
+        }
+    }
+
     async updateUserInfo(user) {
         const adminName = document.getElementById('admin-name');
         const adminAvatar = document.getElementById('admin-avatar');
 
         // Try load custom profile data
         let profile = null;
+        let userProfile = null;
         try {
             profile = await firebaseService.getPageContent('settings_profile');
         } catch (e) { }
+        try {
+            const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+            if (userDoc.exists) userProfile = userDoc.data();
+        } catch (e) { }
 
-        const displayName = (profile && profile.fullName) || user.displayName || user.email;
-        const photoURL = (profile && profile.photoUrl) || user.photoURL;
+        const displayName = (userProfile && userProfile.displayName)
+            || user.displayName
+            || (profile && profile.fullName)
+            || user.email;
+        const photoURL = (userProfile && userProfile.photoURL)
+            || user.photoURL
+            || (profile && profile.photoUrl);
 
         if (adminName) adminName.textContent = displayName;
         if (adminAvatar) {
@@ -332,20 +367,24 @@ class AdminManager {
         const profileTrigger = document.getElementById('admin-profile-trigger');
         const profileModal = document.getElementById('profile-modal');
         const closeProfileModal = document.getElementById('close-profile-modal');
+        const profileForm = document.getElementById('admin-modal-profile-form');
         if (profileTrigger && profileModal && closeProfileModal) {
             profileTrigger.onclick = () => {
-                // Fyll modal med profilinfo
-                document.getElementById('modal-admin-name').textContent = displayName;
-                document.getElementById('modal-admin-role').textContent = 'Administrator';
-                document.getElementById('modal-admin-email').textContent = user.email || '';
-                const modalAvatar = document.getElementById('modal-admin-avatar');
-                if (photoURL) {
-                    modalAvatar.innerHTML = `<img src="${photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                } else {
-                    const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
-                    modalAvatar.textContent = initials.substring(0, 2);
-                }
-                profileModal.style.display = 'flex';
+                profileModal.style.display = 'none';
+                this.onSectionSwitch('profile');
+
+                const navLinks = document.querySelectorAll('.nav-link[data-section]');
+                navLinks.forEach(l => {
+                    l.classList.toggle('active', l.getAttribute('data-section') === 'profile');
+                });
+
+                const sections = document.querySelectorAll('.section-content');
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === 'profile-section') {
+                        section.classList.add('active');
+                    }
+                });
             };
             closeProfileModal.onclick = () => {
                 profileModal.style.display = 'none';
@@ -354,6 +393,93 @@ class AdminManager {
             profileModal.addEventListener('click', (e) => {
                 if (e.target === profileModal) profileModal.style.display = 'none';
             });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && profileModal.style.display === 'flex') {
+                    profileModal.style.display = 'none';
+                }
+            });
+        }
+
+        if (profileForm && !profileForm.dataset.bound) {
+            profileForm.dataset.bound = '1';
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.saveAdminProfileModal(user);
+            });
+        }
+    }
+
+    openAdminProfileModal(user, profile) {
+        const profileModal = document.getElementById('profile-modal');
+        if (!profileModal) return;
+
+        const displayName = profile.displayName || user.displayName || user.email || 'Bruker';
+        document.getElementById('modal-admin-name').textContent = displayName;
+        document.getElementById('modal-admin-role').textContent = 'Administrator';
+        document.getElementById('modal-admin-email').textContent = user.email || '';
+
+        const modalAvatar = document.getElementById('modal-admin-avatar');
+        if (profile.photoURL) {
+            modalAvatar.innerHTML = `<img src="${profile.photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        } else {
+            const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
+            modalAvatar.textContent = initials.substring(0, 2);
+        }
+
+        document.getElementById('admin-modal-display-name').value = displayName;
+        document.getElementById('admin-modal-phone').value = profile.phone || '';
+        document.getElementById('admin-modal-address').value = profile.address || '';
+        document.getElementById('admin-modal-bio').value = profile.bio || '';
+
+        profileModal.style.display = 'flex';
+    }
+
+    async saveAdminProfileModal(user) {
+        const btn = document.getElementById('admin-modal-save-btn');
+        const originalText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Lagrer...';
+        }
+
+        try {
+            const displayName = (document.getElementById('admin-modal-display-name').value || '').trim();
+            const phone = (document.getElementById('admin-modal-phone').value || '').trim();
+            const address = (document.getElementById('admin-modal-address').value || '').trim();
+            const bio = (document.getElementById('admin-modal-bio').value || '').trim();
+
+            if (displayName && displayName !== user.displayName) {
+                await user.updateProfile({ displayName });
+            }
+
+            await firebase.firestore().collection('users').doc(user.uid).set({
+                displayName,
+                phone,
+                address,
+                bio,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+
+            await firebaseService.savePageContent('settings_profile', {
+                fullName: displayName,
+                phone,
+                address,
+                bio,
+                updatedAt: new Date().toISOString()
+            });
+
+            const profileModal = document.getElementById('profile-modal');
+            if (profileModal) profileModal.style.display = 'none';
+            await this.updateUserInfo(user);
+            this.showToast('Profil oppdatert.', 'success', 4000);
+        } catch (error) {
+            console.error('Kunne ikke lagre admin-profil:', error);
+            this.showToast('Kunne ikke lagre profil.', 'error', 5000);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         }
     }
 
@@ -2595,133 +2721,271 @@ class AdminManager {
         const section = document.getElementById('profile-section');
         if (!section) return;
 
-        section.innerHTML = `
-            <div class="section-header">
-                <h2 class="section-title">Min Profil</h2>
-                <p class="section-subtitle">Administrer din kontoinformasjon og profilbilde.</p>
-            </div>
-            
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: 280px 1fr; gap: 24px;">
-                <!-- Profile Picture Card -->
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Profilbilde</h3></div>
-                    <div class="card-body" style="text-align: center;">
-                        <div id="profile-img-preview" style="width: 150px; height: 150px; border-radius: 50%; background: #f1f5f9; margin: 0 auto 20px; border: 4px solid #fff; box-shadow: 0 4px 12px rgba(0,0,0,0.1); overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined" style="font-size: 64px; color: #cbd5e1;">person</span>
-                        </div>
-                        <input type="file" id="profile-file-input" style="display: none;" accept="image/*">
-                        <input type="hidden" id="profile-photo-url">
-                        <button class="btn-primary" id="upload-profile-btn" style="width: 100%; margin-top: 10px;">
-                            <span class="material-symbols-outlined">upload</span> Last opp nytt bilde
-                        </button>
-                    </div>
-                </div>
+        const authUser = firebaseService.auth && firebaseService.auth.currentUser ? firebaseService.auth.currentUser : null;
+        if (!authUser) return;
 
-                <!-- Profile Info Card -->
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Personalia & Kontakt</h3></div>
-                    <div class="card-body">
-                        <div class="grid-2-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                            <div class="form-group">
-                                <label>Fullt Navn</label>
-                                <input type="text" id="profile-name" class="form-control" placeholder="Navn Navnesen">
+        section.innerHTML = `
+            <div style="max-width: 900px; margin: 0 auto; padding: 0 16px;">
+                <div class="card" style="padding: 24px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3>Min Profil</h3>
+                        <span class="badge" style="font-size: 0.9rem; padding: 6px 12px;">Medlem siden 2024</span>
+                    </div>
+                    
+                    <div style="background: white; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; margin-bottom: 30px; display: flex; align-items: center; gap: 24px;">
+                        <div id="profile-picture-container-admin" style="position: relative; width: 100px; height: 100px; border-radius: 50%; background: #D17D39; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700; overflow: hidden; border: 4px solid white; box-shadow: var(--shadow);">
+                            ${(authUser.photoURL ? `<img src="${authUser.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : (authUser.displayName || authUser.email || '?').charAt(0).toUpperCase())}
+                            <label for="profile-upload-admin" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;">
+                                <span class="material-symbols-outlined">photo_camera</span>
+                            </label>
+                            <input type="file" id="profile-upload-admin" style="display: none;" accept="image/*">
+                        </div>
+                        <div>
+                            <h4 style="margin-bottom: 4px;">Profilbilde</h4>
+                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
+                            <div style="display: flex; gap: 10px;">
+                                <button type="button" id="upload-profile-btn-admin" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white; border-radius: 8px; cursor: pointer;">Last opp nytt</button>
+                                ${Array.isArray(authUser.providerData) && authUser.providerData.some(p => p && p.providerId === 'google.com')
+                ? `<button type="button" id="google-photo-btn-admin" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white; border-radius: 8px; cursor: pointer;">Hent fra Google</button>`
+                : ''}
                             </div>
-                            <div class="form-group">
-                                <label>Fødselsdato</label>
-                                <input type="date" id="profile-dob" class="form-control">
+                        </div>
+                    </div>
+
+                    <form id="admin-profile-full-form">
+                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personalia</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Navn</label>
+                                <input type="text" name="displayName" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Telefon</label>
+                                <input type="tel" name="phone" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            </div>
+                            <div style="grid-column: span 2;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">E-post</label>
+                                <input type="email" name="email" disabled style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: #f8fafc; color: #64748b;">
                             </div>
                         </div>
-                        <div class="form-group" style="margin-top: 16px;">
-                            <label>Adresse</label>
-                            <input type="text" id="profile-address" class="form-control" placeholder="Norge">
+
+                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Adresse</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div style="grid-column: span 2;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Gateadresse</label>
+                                <input type="text" name="address" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Postnummer</label>
+                                <input type="text" name="zip" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Sted</label>
+                                <input type="text" name="city" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                            </div>
                         </div>
-                        <div class="form-group" style="margin-top: 16px;">
-                            <label>Telefon</label>
-                            <input type="tel" id="profile-phone" class="form-control" placeholder="+47 930 94 615">
+
+                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Kommunikasjon</h4>
+                        <div style="margin-bottom: 30px;">
+                            <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
+                                <input type="checkbox" name="newsletter" style="width: 18px; height: 18px; accent-color: #D17D39;">
+                                <span>Motta nyhetsbrev på e-post</span>
+                            </label>
                         </div>
-                        <div class="form-group" style="margin-top: 16px;">
-                            <label>Om meg / Bio</label>
-                            <textarea id="profile-bio" class="form-control" style="height: 100px;" placeholder="Skriv litt om deg selv..."></textarea>
+
+                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personvern & Samtykke</h4>
+                        <div id="admin-consent-status-display" style="padding: 15px; background: #f1f5f9; border-radius: 8px; margin-bottom: 30px;">
+                            <div class="loader">Henter samtykkestatus...</div>
                         </div>
-                        
-                        <div style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
-                            <button class="btn-secondary" id="save-profile-btn" style="width: 100%;">
-                                <span class="material-symbols-outlined">save</span> Lagre Profil
+
+                        <div style="display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                            <button type="submit" id="save-profile-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; border:none; border-radius:10px; padding:12px 16px; color:#fff; font-weight:600; cursor:pointer; background: linear-gradient(135deg, #D17D39, #B54D2B);">
+                                <span class="material-symbols-outlined">save</span> Lagre endringer
                             </button>
                         </div>
-                    </div>
+                    </form>
                 </div>
             </div>
         `;
         section.setAttribute('data-rendered', 'true');
 
-        // Load existing profile data
+        // Load existing profile data from the same source as Min Side
         const profile = await firebaseService.getPageContent('settings_profile');
-        if (profile) {
-            document.getElementById('profile-name').value = profile.fullName || '';
-            document.getElementById('profile-dob').value = profile.birthDate || '';
-            document.getElementById('profile-address').value = profile.address || '';
-            document.getElementById('profile-phone').value = profile.phone || '';
-            document.getElementById('profile-bio').value = profile.bio || '';
-            document.getElementById('profile-photo-url').value = profile.photoUrl || '';
-            if (profile.photoUrl) {
-                document.getElementById('profile-img-preview').innerHTML = `<img src="${profile.photoUrl}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            }
+        let userProfile = null;
+        try {
+            const userDoc = await firebase.firestore().collection('users').doc(authUser.uid).get();
+            if (userDoc.exists) userProfile = userDoc.data();
+        } catch (e) {
+            console.warn('Kunne ikke hente users-profil i admin:', e);
         }
 
-        // Handle Image Upload
-        const fileInput = document.getElementById('profile-file-input');
-        const uploadBtn = document.getElementById('upload-profile-btn');
-        const preview = document.getElementById('profile-img-preview');
-        const urlInput = document.getElementById('profile-photo-url');
+        const mergedName = (userProfile && userProfile.displayName) || (authUser && authUser.displayName) || (profile && profile.fullName) || '';
+        const mergedPhoto = (userProfile && userProfile.photoURL) || authUser.photoURL || (profile && profile.photoUrl) || '';
+        const mergedAddress = (userProfile && userProfile.address) || (profile && profile.address) || '';
+        const mergedZip = (userProfile && userProfile.zip) || (profile && profile.zip) || '';
+        const mergedCity = (userProfile && userProfile.city) || (profile && profile.city) || '';
+        const mergedPhone = (userProfile && userProfile.phone) || (profile && profile.phone) || '';
+        const mergedBio = (userProfile && userProfile.bio) || (profile && profile.bio) || '';
+        const mergedNewsletter = userProfile && typeof userProfile.newsletter === 'boolean' ? userProfile.newsletter : true;
 
-        uploadBtn.onclick = () => fileInput.click();
+        const form = document.getElementById('admin-profile-full-form');
+        if (!form) return;
+
+        form.querySelector('[name="displayName"]').value = mergedName;
+        form.querySelector('[name="email"]').value = authUser.email || '';
+        form.querySelector('[name="address"]').value = mergedAddress;
+        form.querySelector('[name="zip"]').value = mergedZip;
+        form.querySelector('[name="city"]').value = mergedCity;
+        form.querySelector('[name="phone"]').value = mergedPhone;
+        form.querySelector('[name="newsletter"]').checked = mergedNewsletter;
+
+        const pictureContainer = document.getElementById('profile-picture-container-admin');
+        if (mergedPhoto) {
+            const overlay = pictureContainer.querySelector('label[for="profile-upload-admin"]');
+            const input = pictureContainer.querySelector('#profile-upload-admin');
+            pictureContainer.innerHTML = `<img src="${mergedPhoto}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            if (overlay) pictureContainer.appendChild(overlay);
+            if (input) pictureContainer.appendChild(input);
+        }
+
+        // Consent status
+        try {
+            const consentDiv = document.getElementById('admin-consent-status-display');
+            const userDoc = await firebase.firestore().collection("users").doc(authUser.uid).get();
+            if (consentDiv) {
+                if (userDoc.exists && userDoc.data().privacySettings) {
+                    const choices = userDoc.data().privacySettings.choices || {};
+                    consentDiv.innerHTML = `
+                        <p style="font-size: 0.95rem; line-height: 1.5;">
+                            <strong>Aktivt samtykke:</strong><br>
+                            Nødvendige: <span style="color: green;">Ja</span><br>
+                            Statistikk: ${choices.analytics ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}<br>
+                            Markedsføring: ${choices.marketing ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}
+                        </p>
+                    `;
+                } else {
+                    consentDiv.innerHTML = '<p style="font-size: 0.95rem;">Ingen lagret samtykkestatus funnet.</p>';
+                }
+            }
+        } catch (e) {
+            const consentDiv = document.getElementById('admin-consent-status-display');
+            if (consentDiv) consentDiv.textContent = 'Kunne ikke hente samtykkestatus.';
+        }
+
+        // Image upload
+        const fileInput = document.getElementById('profile-upload-admin');
+        const uploadBtn = document.getElementById('upload-profile-btn-admin');
+        if (uploadBtn && fileInput) uploadBtn.onclick = () => fileInput.click();
         fileInput.onchange = async () => {
             if (fileInput.files.length === 0) return;
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Laster opp...';
+            uploadBtn.textContent = 'Laster opp...';
             try {
-                console.log("🚀 Starting upload to:", `profiles/${Date.now()}_${fileInput.files[0].name}`);
-                const url = await firebaseService.uploadImage(fileInput.files[0], `profiles/${Date.now()}_${fileInput.files[0].name}`);
-                console.log("✅ Upload success:", url);
-                urlInput.value = url;
-                preview.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                const url = await firebaseService.uploadImage(fileInput.files[0], `profiles/${authUser.uid}/avatar.jpg`);
+                await authUser.updateProfile({ photoURL: url });
+                await firebase.firestore().collection('users').doc(authUser.uid).set({
+                    photoURL: url,
+                    displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
+                    email: authUser.email || '',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                await firebaseService.savePageContent('settings_profile', {
+                    fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
+                    photoUrl: url,
+                    updatedAt: new Date().toISOString()
+                });
+
+                const overlay = pictureContainer.querySelector('label[for="profile-upload-admin"]');
+                const input = pictureContainer.querySelector('#profile-upload-admin');
+                pictureContainer.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                if (overlay) pictureContainer.appendChild(overlay);
+                if (input) pictureContainer.appendChild(input);
+                await this.updateUserInfo(authUser);
+                this.showToast('Profilbilde oppdatert.', 'success', 4000);
             } catch (err) {
-                console.error("❌ Upload failed:", err);
-                this.showToast('Opplasting feilet: ' + err.message + '. Sjekk at du har tilgang til å laste opp filer i Firebase Storage (Security Rules).', 'error', 7000);
+                this.showToast('Opplasting feilet: ' + err.message, 'error', 6000);
             } finally {
                 uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
+                uploadBtn.textContent = 'Last opp nytt';
             }
         };
 
-        // Handle Save
-        document.getElementById('save-profile-btn').onclick = async () => {
+        // Google photo sync
+        const googlePhotoBtn = document.getElementById('google-photo-btn-admin');
+        if (googlePhotoBtn) {
+            googlePhotoBtn.onclick = async () => {
+                const provider = (authUser.providerData || []).find(p => p && p.providerId === 'google.com');
+                if (!provider || !provider.photoURL) return;
+                try {
+                    await authUser.updateProfile({ photoURL: provider.photoURL });
+                    await firebase.firestore().collection('users').doc(authUser.uid).set({
+                        photoURL: provider.photoURL,
+                        displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
+                        email: authUser.email || '',
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    await firebaseService.savePageContent('settings_profile', {
+                        fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
+                        photoUrl: provider.photoURL,
+                        updatedAt: new Date().toISOString()
+                    });
+                    await this.renderProfileSection();
+                    await this.updateUserInfo(authUser);
+                    this.showToast('Profilbilde hentet fra Google.', 'success', 4000);
+                } catch (err) {
+                    this.showToast('Kunne ikke hente bilde fra Google.', 'error', 5000);
+                }
+            };
+        }
+
+        // Save full profile
+        form.onsubmit = async (event) => {
+            event.preventDefault();
             const btn = document.getElementById('save-profile-btn');
             const data = {
-                fullName: document.getElementById('profile-name').value,
-                birthDate: document.getElementById('profile-dob').value,
-                address: document.getElementById('profile-address').value,
-                phone: document.getElementById('profile-phone').value,
-                bio: document.getElementById('profile-bio').value,
-                photoUrl: document.getElementById('profile-photo-url').value,
+                fullName: form.querySelector('[name="displayName"]').value || '',
+                address: form.querySelector('[name="address"]').value || '',
+                zip: form.querySelector('[name="zip"]').value || '',
+                city: form.querySelector('[name="city"]').value || '',
+                phone: form.querySelector('[name="phone"]').value || '',
+                bio: mergedBio || '',
+                newsletter: form.querySelector('[name="newsletter"]').checked,
+                photoUrl: authUser.photoURL || mergedPhoto || '',
                 updatedAt: new Date().toISOString()
             };
 
+            const original = btn.textContent;
             btn.textContent = 'Lagrer...';
             btn.disabled = true;
 
             try {
+                const authUpdates = {};
+                if (data.fullName && data.fullName !== authUser.displayName) authUpdates.displayName = data.fullName;
+                if (Object.keys(authUpdates).length > 0) {
+                    await authUser.updateProfile(authUpdates);
+                }
+
+                await firebase.firestore().collection('users').doc(authUser.uid).set({
+                    displayName: data.fullName,
+                    address: data.address,
+                    zip: data.zip,
+                    city: data.city,
+                    phone: data.phone,
+                    bio: data.bio,
+                    newsletter: data.newsletter,
+                    photoURL: data.photoUrl,
+                    email: authUser.email || '',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
                 await firebaseService.savePageContent('settings_profile', data);
                 this.showToast('✅ Profilen er lagret!', 'success', 5000);
-                // Update header info immediately
-                const user = firebaseService.auth.currentUser;
-                if (user) this.updateUserInfo(user);
+                await this.updateUserInfo(authUser);
             } catch (err) {
                 console.error(err);
                 this.showToast('❌ Feil ved lagring', 'error', 5000);
             } finally {
-                btn.textContent = 'Lagre Profil';
+                btn.textContent = original;
                 btn.disabled = false;
             }
         };

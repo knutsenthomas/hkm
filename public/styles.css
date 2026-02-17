@@ -4646,6 +4646,17 @@ ol.block-list {
     visibility: visible;
 }
 
+/* Give mega-menu content a little more top breathing room under the fixed header */
+#mega-menu>div {
+    padding-top: 132px !important;
+}
+
+@media (max-width: 768px) {
+    #mega-menu>div {
+        padding-top: 120px !important;
+    }
+}
+
 
 .mega-menu-container {
     max-width: 1440px;

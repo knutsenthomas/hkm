@@ -19,10 +19,11 @@ class MinSideManager {
         this.setupNavigation();
 
         // 2. Setup Auth Listener
-        firebase.auth().onAuthStateChanged(user => {
+        firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 this.currentUser = user;
-                this.updateUserProfile(user);
+                await this.syncProfileFromGoogleProvider();
+                await this.updateUserProfile(user);
                 this.updateRoleLinks(user);
                 this.loadView(this.getCurrentViewFromHash() || 'overview');
             } else {
@@ -61,6 +62,39 @@ class MinSideManager {
                 window.location.href = '../index.html';
             });
         });
+
+        // Header Profile Click: åpne full profilside, ikke popup
+        const profileTrigger = document.getElementById('minside-profile-trigger');
+        const profileModal = document.getElementById('profile-modal');
+        const closeProfileModal = document.getElementById('close-profile-modal');
+        const profileForm = document.getElementById('modal-profile-form');
+        if (profileTrigger && profileModal && closeProfileModal) {
+            profileTrigger.onclick = (e) => {
+                e.stopPropagation();
+                this.closeProfileModal();
+                this.navigateTo('profile');
+            };
+            closeProfileModal.onclick = (e) => {
+                e.stopPropagation();
+                this.closeProfileModal();
+            };
+            // Lukk modal ved klikk utenfor innhold
+            profileModal.addEventListener('mousedown', (e) => {
+                if (e.target === profileModal) this.closeProfileModal();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && profileModal.style.display === 'flex') {
+                    this.closeProfileModal();
+                }
+            });
+        }
+
+        if (profileForm) {
+            profileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                await this.saveProfileFromModal(profileForm);
+            });
+        }
     }
 
     toggleSidebar(show) {
@@ -86,14 +120,169 @@ class MinSideManager {
         return window.location.hash.replace('#', '');
     }
 
-    updateUserProfile(user) {
-        document.getElementById('user-name').textContent = user.displayName || user.email;
+    async getMergedProfile(user = this.currentUser) {
+        if (!user) return null;
+
+        let userData = {};
+        try {
+            const doc = await firebase.firestore().collection('users').doc(user.uid).get();
+            if (doc.exists) userData = doc.data() || {};
+        } catch (e) {
+            console.warn('Kunne ikke lese brukerprofil:', e);
+        }
+
+        const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com') || {};
+        const displayName = userData.displayName || user.displayName || googleProvider.displayName || user.email || '';
+        const photoURL = userData.photoURL || user.photoURL || googleProvider.photoURL || '';
+
+        return {
+            ...userData,
+            displayName,
+            photoURL
+        };
+    }
+
+    async syncProfileFromGoogleProvider() {
+        if (!this.currentUser) return;
+        const user = this.currentUser;
+        const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com');
+        if (!googleProvider) return;
+
+        try {
+            const updates = {};
+            if (!user.displayName && googleProvider.displayName) updates.displayName = googleProvider.displayName;
+            if (!user.photoURL && googleProvider.photoURL) updates.photoURL = googleProvider.photoURL;
+            if (Object.keys(updates).length > 0) {
+                await user.updateProfile(updates);
+            }
+
+            await firebase.firestore().collection('users').doc(user.uid).set({
+                displayName: user.displayName || googleProvider.displayName || user.email || '',
+                photoURL: user.photoURL || googleProvider.photoURL || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        } catch (e) {
+            console.warn('Kunne ikke synkronisere Google-profil:', e);
+        }
+    }
+
+    async updateUserProfile(user) {
+        const merged = await this.getMergedProfile(user);
+        document.getElementById('user-name').textContent = merged?.displayName || user.displayName || user.email;
         const avatarEl = document.getElementById('user-avatar');
-        if (user.photoURL) {
-            avatarEl.innerHTML = `<img src="${user.photoURL}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+        const avatarUrl = merged?.photoURL || '';
+        if (avatarUrl) {
+            avatarEl.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
         } else {
-            const initials = (user.displayName || user.email || '?').charAt(0).toUpperCase();
+            const initials = (merged?.displayName || user.displayName || user.email || '?').charAt(0).toUpperCase();
             avatarEl.textContent = initials;
+        }
+    }
+
+    async openProfileModal() {
+        const profileModal = document.getElementById('profile-modal');
+        if (!profileModal || !this.currentUser) return;
+
+        const user = this.currentUser;
+        const merged = await this.getMergedProfile(user);
+        document.getElementById('modal-user-name').textContent = merged?.displayName || user.displayName || user.email;
+        document.getElementById('modal-user-role').textContent = 'Bruker';
+        document.getElementById('modal-user-email').textContent = user.email || '';
+
+        const modalAvatar = document.getElementById('modal-user-avatar');
+        const avatarUrl = merged?.photoURL || user.photoURL || '';
+        if (avatarUrl) {
+            modalAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
+        } else {
+            const initials = (merged?.displayName || user.displayName || user.email || '?').split(' ').map(n => n[0]).join('').toUpperCase();
+            modalAvatar.textContent = initials.substring(0, 2);
+        }
+
+        await this.populateProfileModalForm();
+        profileModal.style.display = 'flex';
+    }
+
+    closeProfileModal() {
+        const profileModal = document.getElementById('profile-modal');
+        if (profileModal) profileModal.style.display = 'none';
+    }
+
+    async populateProfileModalForm() {
+        const form = document.getElementById('modal-profile-form');
+        if (!form || !this.currentUser) return;
+
+        const merged = await this.getMergedProfile(this.currentUser);
+        form.querySelector('[name="displayName"]').value = merged?.displayName || this.currentUser.displayName || '';
+        form.querySelector('[name="phone"]').value = '';
+        form.querySelector('[name="address"]').value = '';
+        form.querySelector('[name="zip"]').value = '';
+        form.querySelector('[name="city"]').value = '';
+
+        try {
+            const doc = await firebase.firestore().collection('users').doc(this.currentUser.uid).get();
+            if (!doc.exists) return;
+            const data = doc.data() || {};
+            form.querySelector('[name="phone"]').value = data.phone || '';
+            form.querySelector('[name="address"]').value = data.address || '';
+            form.querySelector('[name="zip"]').value = data.zip || '';
+            form.querySelector('[name="city"]').value = data.city || '';
+            if (!form.querySelector('[name="displayName"]').value) {
+                form.querySelector('[name="displayName"]').value = data.displayName || '';
+            }
+        } catch (err) {
+            console.warn('Kunne ikke hente profildata for popup:', err);
+        }
+    }
+
+    async saveProfileFromModal(form) {
+        if (!this.currentUser) return;
+        const btn = document.getElementById('save-modal-profile-btn');
+        const originalText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Lagrer...';
+        }
+
+        try {
+            const formData = new FormData(form);
+            const updates = {
+                displayName: formData.get('displayName') || '',
+                phone: formData.get('phone') || '',
+                address: formData.get('address') || '',
+                zip: formData.get('zip') || '',
+                city: formData.get('city') || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (updates.displayName && updates.displayName !== this.currentUser.displayName) {
+                await this.currentUser.updateProfile({ displayName: updates.displayName });
+            }
+
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+                ...updates,
+                photoURL: this.currentUser.photoURL || '',
+                email: this.currentUser.email || ''
+            }, { merge: true });
+            if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
+                await window.firebaseService.savePageContent('settings_profile', {
+                    fullName: updates.displayName || '',
+                    phone: updates.phone || '',
+                    address: updates.address || '',
+                    updatedAt: new Date().toISOString()
+                });
+            }
+            await this.updateUserProfile(this.currentUser);
+            document.getElementById('modal-user-name').textContent = updates.displayName || this.currentUser.email;
+            alert('Profil oppdatert.');
+            this.closeProfileModal();
+        } catch (error) {
+            console.error('Kunne ikke lagre profil fra popup:', error);
+            alert('Kunne ikke lagre profil: ' + error.message);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.textContent = originalText;
+            }
         }
     }
 
@@ -149,8 +338,13 @@ class MinSideManager {
 
         if (renderer) {
             container.innerHTML = '<div class="loader">Laster...</div>';
-            setTimeout(() => { // Simulate delay
-                renderer.call(this, container);
+            setTimeout(async () => { // Simulate delay
+                try {
+                    await renderer.call(this, container);
+                } catch (error) {
+                    console.error(`Feil ved rendering av view "${viewId}":`, error);
+                    container.innerHTML = '<div class="card"><p>Kunne ikke laste innholdet. Oppdater siden og prøv igjen.</p></div>';
+                }
             }, 300);
         } else {
             container.innerHTML = '<p>Visning ikke funnet.</p>';
@@ -396,6 +590,9 @@ class MinSideManager {
     }
 
     renderProfile(container) {
+        const hasGoogleProvider = Array.isArray(this.currentUser?.providerData)
+            && this.currentUser.providerData.some(p => p && p.providerId === 'google.com');
+
         container.innerHTML = `
             <div style="max-width: 800px; margin: 0 auto;">
                 <div class="card">
@@ -417,7 +614,7 @@ class MinSideManager {
                             <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
                             <div style="display: flex; gap: 10px;">
                                 <button type="button" class="btn" onclick="document.getElementById('profile-upload').click()" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white;">Last opp nytt</button>
-                                ${this.currentUser.providerData.some(p => p.providerId === 'google.com') ?
+                                ${hasGoogleProvider ?
                 `<button type="button" class="btn" onclick="window.minSideManager.syncGooglePhoto()" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white;">Hent fra Google</button>` : ''}
                             </div>
                         </div>
@@ -497,12 +694,23 @@ class MinSideManager {
 
     async loadUserProfileData(container) {
         try {
+            const merged = await this.getMergedProfile(this.currentUser);
+            const pictureContainer = container.querySelector('#profile-picture-container');
+            if (pictureContainer && merged && merged.photoURL) {
+                const existingOverlay = pictureContainer.querySelector('label[for="profile-upload"]');
+                const existingInput = pictureContainer.querySelector('#profile-upload');
+                pictureContainer.innerHTML = `<img src="${merged.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                if (existingOverlay) pictureContainer.appendChild(existingOverlay);
+                if (existingInput) pictureContainer.appendChild(existingInput);
+            }
+
             const doc = await firebase.firestore().collection('users').doc(this.currentUser.uid).get();
             if (doc.exists) {
                 const data = doc.data();
                 const form = container.querySelector('form');
                 if (!form) return;
 
+                if (merged && merged.displayName) form.querySelector('[name="displayName"]').value = merged.displayName;
                 if (data.phone) form.querySelector('[name="phone"]').value = data.phone;
                 if (data.address) form.querySelector('[name="address"]').value = data.address;
                 if (data.zip) form.querySelector('[name="zip"]').value = data.zip;
@@ -570,8 +778,22 @@ class MinSideManager {
             });
 
             // Update UI
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+                photoURL: url,
+                displayName: this.currentUser.displayName || '',
+                email: this.currentUser.email || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
+                await window.firebaseService.savePageContent('settings_profile', {
+                    fullName: this.currentUser.displayName || '',
+                    photoUrl: url,
+                    updatedAt: new Date().toISOString()
+                });
+            }
+
             container.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
-            this.updateUserProfile(this.currentUser);
+            await this.updateUserProfile(this.currentUser);
             alert('Profilbilde er oppdatert!');
         } catch (error) {
             console.error("Opplasting feilet:", error);
@@ -603,11 +825,23 @@ class MinSideManager {
                 await this.currentUser.updateProfile({
                     displayName: updates.displayName
                 });
-                this.updateUserProfile(this.currentUser); // Update sidebar
+                await this.updateUserProfile(this.currentUser); // Update sidebar
             }
 
             // 2. Update Firestore Document
-            await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+                ...updates,
+                photoURL: this.currentUser.photoURL || '',
+                email: this.currentUser.email || ''
+            }, { merge: true });
+            if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
+                await window.firebaseService.savePageContent('settings_profile', {
+                    fullName: updates.displayName || '',
+                    phone: updates.phone || '',
+                    address: updates.address || '',
+                    updatedAt: new Date().toISOString()
+                });
+            }
 
             alert('Profilen er oppdatert!');
         } catch (error) {
@@ -626,8 +860,21 @@ class MinSideManager {
                 await this.currentUser.updateProfile({
                     photoURL: googleProvider.photoURL
                 });
+                await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+                    photoURL: googleProvider.photoURL,
+                    displayName: this.currentUser.displayName || googleProvider.displayName || this.currentUser.email || '',
+                    email: this.currentUser.email || '',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
+                    await window.firebaseService.savePageContent('settings_profile', {
+                        fullName: this.currentUser.displayName || googleProvider.displayName || '',
+                        photoUrl: googleProvider.photoURL,
+                        updatedAt: new Date().toISOString()
+                    });
+                }
                 this.loadView('profile'); // Refresh view
-                this.updateUserProfile(this.currentUser);
+                await this.updateUserProfile(this.currentUser);
                 alert('Profilbilde hentet fra Google!');
             } catch (error) {
                 console.error("Google sync feilet:", error);

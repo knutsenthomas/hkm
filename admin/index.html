@@ -193,7 +193,25 @@
                                         <div style="margin-bottom:16px;">
                                             <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
                                         </div>
-                                        <button class="btn-primary" style="margin-top:12px;" onclick="window.location.href='/minside'">Gå til Min Side</button>
+                                        <form id="admin-modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
+                                            <div>
+                                                <label for="admin-modal-display-name" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
+                                                <input id="admin-modal-display-name" name="displayName" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                                            </div>
+                                            <div>
+                                                <label for="admin-modal-phone" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
+                                                <input id="admin-modal-phone" name="phone" type="tel" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                                            </div>
+                                            <div>
+                                                <label for="admin-modal-address" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
+                                                <input id="admin-modal-address" name="address" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                                            </div>
+                                            <div>
+                                                <label for="admin-modal-bio" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Bio</label>
+                                                <textarea id="admin-modal-bio" name="bio" style="width:100%; min-height:78px; padding:10px; border:1px solid #e2e8f0; border-radius:8px;"></textarea>
+                                            </div>
+                                            <button id="admin-modal-save-btn" type="submit" class="btn-primary" style="margin-top:4px;">Lagre profil</button>
+                                        </form>
                                     </div>
                                 </div>
             </div>
