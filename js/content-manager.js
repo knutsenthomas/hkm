@@ -869,8 +869,7 @@ class ContentManager {
                         ? startDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
                         : '';
 
-                    const imageUrl = event.imageUrl || event.image || event.imageLink;
-                    const imageSrc = imageUrl || this.generateEventImage(event.title);
+                    const imageSrc = this._getEventImage(event);
                     const imageAlt = event.title || 'Arrangement';
 
                     const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
@@ -1083,16 +1082,10 @@ class ContentManager {
             descEl.textContent = 'Beskrivelse kommer.';
         }
 
-        const imageUrl = event.imageUrl || event.image || event.imageLink;
-        if (imageUrl) {
-            imageEl.src = imageUrl;
-            imageEl.alt = event.title || 'Arrangement';
-            imageWrap.style.display = 'block';
-        } else {
-            imageEl.src = this.generateEventImage(event.title);
-            imageEl.alt = event.title || 'Arrangement';
-            imageWrap.style.display = 'block';
-        }
+        const imageSrc = this._getEventImage(event);
+        imageEl.src = imageSrc;
+        imageEl.alt = event.title || 'Arrangement';
+        imageWrap.style.display = 'block';
 
         const videoLink = this.extractVideoLink(event);
         const videoLinkEl = modal.querySelector('.event-modal-video-link');
@@ -1778,12 +1771,7 @@ class ContentManager {
         if (titleEl) titleEl.textContent = event.title;
         if (breadcrumbEl) breadcrumbEl.textContent = event.title;
 
-        // Preload logic: If dashboard image is set, use it immediately
-        let dashboardImage = '';
-        if (event.dashboardImage) {
-            dashboardImage = event.dashboardImage;
-        }
-        const imageUrl = dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+        const imageUrl = this._getEventImage(event);
         if (imgEl && imageUrl) {
             // Hide image until loaded
             imgEl.style.opacity = '0';
@@ -1804,6 +1792,12 @@ class ContentManager {
                 imgEl.classList.add('fade-in');
             };
             tempImg.src = imageUrl;
+
+            // Also update Hero Background
+            const pageHero = document.querySelector('.page-hero');
+            if (pageHero) {
+                pageHero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${imageUrl}')`;
+            }
         }
 
         // Description
@@ -2100,6 +2094,11 @@ class ContentManager {
         }
 
         return imageLibrary.default;
+    }
+
+    _getEventImage(event) {
+        if (!event) return this.generateEventImage('default');
+        return event.dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
     }
 
     formatDate(dateStr) {
