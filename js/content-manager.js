@@ -1528,10 +1528,15 @@ class ContentManager {
      * Dynamically render Hero Slides
      */
     renderHeroSlides(slides) {
+        console.log('[ContentManager] renderHeroSlides called with:', slides);
         const sliderContainer = document.querySelector('.slider-container');
-        if (!sliderContainer) return;
+        if (!sliderContainer) {
+            console.warn('[ContentManager] slider-container NOT found!');
+            return;
+        }
 
-        if (slides.length > 0) {
+        if (slides && slides.length > 0) {
+            console.log(`[ContentManager] Rendering ${slides.length} dynamic slides.`);
             document.body.classList.remove('hero-animate');
             sliderContainer.innerHTML = slides.map((slide, index) => `
                 <div class="hero-slide ${index === 0 ? 'active' : ''}">
