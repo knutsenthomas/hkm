@@ -1994,3 +1994,48 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     background: #b91c1c;
     box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
 }
+
+/* Top Navigation Tabs */
+.top-nav-tabs {
+    display: flex;
+    gap: 8px;
+    padding: 0 32px;
+    border-bottom: 1px solid var(--border-color);
+    background-color: #ffffff;
+}
+
+.top-nav-tab {
+    padding: 16px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.top-nav-tab:hover {
+    color: var(--text-main);
+}
+
+.top-nav-tab.active {
+    color: var(--accent-color);
+}
+
+.top-nav-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: var(--accent-color);
+    border-radius: 3px 3px 0 0;
+}
+
+/* Hide sidebar items by default */
+.nav-item[data-category] {
+    display: none;
+}

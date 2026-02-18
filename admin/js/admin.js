@@ -498,6 +498,15 @@ class AdminManager {
             });
         }
 
+        // Top nav tabs
+        const topNavTabs = document.querySelectorAll('.top-nav-tab');
+        topNavTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const category = tab.dataset.category;
+                this.filterSidebar(category);
+            });
+        });
+
         // Render initial overview
         this.renderOverview();
         console.log("Dashboard initialized.");
@@ -507,6 +516,26 @@ class AdminManager {
 
         // Søke-funksjon i toppfeltet
         this.initSearch();
+
+        // Set initial sidebar filter
+        this.filterSidebar('nettsted');
+    }
+
+    filterSidebar(category) {
+        const topNavTabs = document.querySelectorAll('.top-nav-tab');
+        topNavTabs.forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.category === category);
+        });
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            const itemCategory = item.dataset.category;
+            if (!itemCategory) { // Always show items without a category (like Oversikt)
+                item.style.display = 'block';
+            } else {
+                item.style.display = itemCategory === category ? 'block' : 'none';
+            }
+        });
     }
 
     async logout() {
