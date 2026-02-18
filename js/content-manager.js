@@ -1537,6 +1537,7 @@ class ContentManager {
      * Dynamically render Hero Slides
      */
     renderHeroSlides(slides) {
+        console.log("[ContentManager] Received hero slides:", slides);
         const sliderContainer = document.querySelector('.slider-container');
         if (!sliderContainer) return;
 

@@ -4551,7 +4551,8 @@ ol.block-list {
 }
 
 .hero-content {
-    width: min(100%, 850px);
+    width: min(100%, 1200px);
+    /* Increased from 850px to fit long titles on one line */
     color: white;
     padding: 0 clamp(16px, 3vw, 32px);
     margin-top: 0;
