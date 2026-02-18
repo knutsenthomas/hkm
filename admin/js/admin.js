@@ -4576,7 +4576,7 @@ class AdminManager {
             <div style="max-width: 900px;">
                 <div class="card" style="margin-bottom: 24px;">
                     <div class="card-body" style="display: flex; align-items: center; gap: 32px; padding: 32px;">
-                        <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; position: relative; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover; background-position: center;` : ''}">
+                        <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover; background-position: center;` : 'background-color: var(--accent-color);'}">
                             ${!userData.photoURL ? initials : ''}
                             ${this.userEditMode ? `
                                 <div id="change-photo-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; border-radius: inherit; cursor: pointer; color: white;">
@@ -4830,6 +4830,7 @@ class AdminManager {
             // Update local state and UI immediately
             if (avatar) {
                 avatar.style.backgroundImage = `url('${url}')`;
+                avatar.style.backgroundColor = 'transparent';
                 avatar.innerHTML = `
                     <div id="change-photo-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; border-radius: inherit; cursor: pointer; color: white;">
                         <span class="material-symbols-outlined">photo_camera</span>
