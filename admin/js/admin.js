@@ -2215,11 +2215,15 @@ class AdminManager {
                 <h2 class="section-title">Design & Identitet</h2>
                 <p class="section-subtitle">Administrer logo, favicon, fonter, globale farger og tekststørrelser.</p>
             </div>
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+            
+            <div class="settings-grid">
                 <!-- Site Identity Card -->
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Nettstedsidentitet</h3></div>
-                    <div class="card-body">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="material-symbols-outlined">fingerprint</span>
+                        <h3>Nettstedsidentitet</h3>
+                    </div>
+                    <div class="settings-card-body">
                         <div class="form-group">
                             <label>Logo URL</label>
                             <input type="text" id="site-logo-url" class="form-control" placeholder="https://...">
@@ -2227,13 +2231,11 @@ class AdminManager {
                                 <input type="file" id="site-logo-file" class="form-control file-input" accept="image/*">
                                 <button class="btn-secondary" id="upload-logo-btn" type="button">Last opp logo</button>
                             </div>
-                            <small class="helper-text">Anbefalt: PNG/SVG, maks 1 MB.</small>
-                            <div class="preview-container" id="logo-preview-container"></div>
+                            <div class="preview-container" id="logo-preview-container" style="margin-top: 15px;"></div>
                         </div>
                         <div class="form-group">
                             <label>Tekst ved siden av logo</label>
                             <input type="text" id="site-logo-text" class="form-control" placeholder="His Kingdom Ministry">
-                            <small class="helper-text">Brukes hvis logoen er et ikon uten tekst.</small>
                         </div>
                         <div class="form-group">
                             <label>Favicon URL</label>
@@ -2242,8 +2244,7 @@ class AdminManager {
                                 <input type="file" id="site-favicon-file" class="form-control file-input" accept="image/png,image/x-icon,image/svg+xml">
                                 <button class="btn-secondary" id="upload-favicon-btn" type="button">Last opp favicon</button>
                             </div>
-                            <small class="helper-text">Anbefalt: 512x512 PNG eller ICO, maks 200 KB.</small>
-                            <div class="preview-container" id="favicon-preview-container"></div>
+                            <div class="preview-container" id="favicon-preview-container" style="margin-top: 15px;"></div>
                         </div>
                         <div class="form-group">
                             <label>Sidetittel (SEO)</label>
@@ -2253,9 +2254,12 @@ class AdminManager {
                 </div>
 
                 <!-- Typography Card -->
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Typografi & Styling</h3></div>
-                    <div class="card-body">
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <span class="material-symbols-outlined">palette</span>
+                        <h3>Typografi & Styling</h3>
+                    </div>
+                    <div class="settings-card-body">
                         <div class="form-group">
                             <label>Hovedfont (Google Fonts)</label>
                             <select id="main-font-select" class="form-control">
@@ -2265,76 +2269,98 @@ class AdminManager {
                                 <option value="Roboto">Roboto</option>
                                 <option value="Open Sans">Open Sans</option>
                                 <option value="Montserrat">Montserrat</option>
+                                <option value="Outfit">Outfit</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>H1 Størrelse (Desktop)</label>
-                            <div class="range-group">
-                                <input type="range" id="font-size-h1-desktop" min="24" max="80" value="48">
-                                <span class="range-val" id="font-size-h1-desktop-val">48px</span>
+
+                        <div class="premium-range-group">
+                            <div class="premium-range-header">
+                                <label>H1 Størrelse (Desktop)</label>
+                                <span class="premium-range-val" id="font-size-h1-desktop-val">48px</span>
                             </div>
+                            <input type="range" id="font-size-h1-desktop" class="premium-slider" min="24" max="80" value="48">
                         </div>
-                        <div class="form-group">
-                            <label>H1 Størrelse (Mobil)</label>
-                            <div class="range-group">
-                                <input type="range" id="font-size-h1-mobile" min="18" max="48" value="32">
-                                <span class="range-val" id="font-size-h1-mobile-val">32px</span>
+
+                        <div class="premium-range-group">
+                            <div class="premium-range-header">
+                                <label>Brødtekst (Body Text)</label>
+                                <span class="premium-range-val" id="font-size-base-val">16px</span>
                             </div>
+                            <input type="range" id="font-size-base" class="premium-slider" min="12" max="24" value="16">
                         </div>
-                        <div class="form-group">
-                            <label>H2/H3 Størrelse (Desktop)</label>
-                            <div class="range-group">
-                                <input type="range" id="font-size-h2-desktop" min="18" max="48" value="28">
-                                <span class="range-val" id="font-size-h2-desktop-val">28px</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>H2/H3 Størrelse (Mobil)</label>
-                            <div class="range-group">
-                                <input type="range" id="font-size-h2-mobile" min="14" max="32" value="20">
-                                <span class="range-val" id="font-size-h2-mobile-val">20px</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Brødtekst (Body Text)</label>
-                            <div class="range-group">
-                                <input type="range" id="font-size-base" min="12" max="24" value="16">
-                                <span class="range-val" id="font-size-base-val">16px</span>
-                            </div>
-                        </div>
+
                         <div class="form-group">
                             <label>Primærfarge</label>
-                            <div class="color-input-group">
-                                <input type="color" id="primary-color-picker" value="#1a1a1a">
-                                <input type="text" id="primary-color-hex" class="form-control" value="#1a1a1a" style="width: 100px;">
+                            <div class="premium-color-wrapper">
+                                <input type="color" id="primary-color-picker" class="premium-color-picker-input" value="#1a1a1a">
+                                <input type="text" id="primary-color-hex" class="premium-color-hex" value="#1a1a1a">
                             </div>
+                        </div>
+
+                        <!-- Live Preview Area -->
+                        <div class="live-preview-box" id="live-preview-area">
+                            <span class="preview-label">Live Forhåndsvisning</span>
+                            <h2 id="typography-preview-text">Slik ser teksten ut</h2>
+                            <p style="margin-top: 10px; opacity: 0.7;">Dette er et eksempel på brødtekst-størrelsen din.</p>
                         </div>
                     </div>
                 </div>
             </div>
-            <div style="margin-top: 24px;">
-                <button class="btn-primary" id="save-design-settings">Lagre design-innstillinger</button>
+
+            <div style="margin-top: 32px; display: flex; justify-content: flex-end;">
+                <button class="btn-primary" id="save-design-settings" style="padding: 14px 32px; font-size: 16px;">
+                    <span class="material-symbols-outlined">auto_awesome</span> Lagre alle endringer
+                </button>
             </div>
         `;
         section.setAttribute('data-rendered', 'true');
+
+        // Logic for Dynamic Preview
+        const updateLivePreview = () => {
+            const font = document.getElementById('main-font-select').value;
+            const h1Size = document.getElementById('font-size-h1-desktop').value;
+            const bodySize = document.getElementById('font-size-base').value;
+            const color = document.getElementById('primary-color-hex').value;
+            const previewText = document.getElementById('typography-preview-text');
+            const previewBox = document.getElementById('live-preview-area');
+
+            if (previewText) {
+                previewText.style.fontFamily = `'${font}', sans-serif`;
+                previewText.style.fontSize = `${h1Size}px`;
+                previewText.style.color = color;
+            }
+            if (previewBox) {
+                previewBox.style.fontFamily = `'${font}', sans-serif`;
+                previewBox.querySelector('p').style.fontSize = `${bodySize}px`;
+            }
+        };
 
         // Add Listeners
         const syncRange = (id) => {
             const el = document.getElementById(id);
             const valEl = document.getElementById(`${id}-val`);
-            el.oninput = () => valEl.textContent = `${el.value}px`;
+            el.oninput = () => {
+                valEl.textContent = `${el.value}px`;
+                updateLivePreview();
+            };
         };
         syncRange('font-size-base');
         syncRange('font-size-h1-desktop');
-        syncRange('font-size-h1-mobile');
-        syncRange('font-size-h2-desktop');
-        syncRange('font-size-h2-mobile');
+
+        const fontSelect = document.getElementById('main-font-select');
+        fontSelect.onchange = updateLivePreview;
 
         const syncColor = (pickerId, hexId) => {
             const picker = document.getElementById(pickerId);
             const hex = document.getElementById(hexId);
-            picker.oninput = () => hex.value = picker.value.toUpperCase();
-            hex.oninput = () => picker.value = hex.value;
+            picker.oninput = () => {
+                hex.value = picker.value.toUpperCase();
+                updateLivePreview();
+            };
+            hex.oninput = () => {
+                picker.value = hex.value;
+                updateLivePreview();
+            };
         };
         syncColor('primary-color-picker', 'primary-color-hex');
 
@@ -2361,22 +2387,11 @@ class AdminManager {
                     document.getElementById('font-size-h1-desktop').value = data.fontSizeH1Desktop;
                     document.getElementById('font-size-h1-desktop-val').textContent = `${data.fontSizeH1Desktop}px`;
                 }
-                if (data.fontSizeH1Mobile) {
-                    document.getElementById('font-size-h1-mobile').value = data.fontSizeH1Mobile;
-                    document.getElementById('font-size-h1-mobile-val').textContent = `${data.fontSizeH1Mobile}px`;
-                }
-                if (data.fontSizeH2Desktop) {
-                    document.getElementById('font-size-h2-desktop').value = data.fontSizeH2Desktop;
-                    document.getElementById('font-size-h2-desktop-val').textContent = `${data.fontSizeH2Desktop}px`;
-                }
-                if (data.fontSizeH2Mobile) {
-                    document.getElementById('font-size-h2-mobile').value = data.fontSizeH2Mobile;
-                    document.getElementById('font-size-h2-mobile-val').textContent = `${data.fontSizeH2Mobile}px`;
-                }
                 if (data.primaryColor) {
                     document.getElementById('primary-color-picker').value = data.primaryColor;
                     document.getElementById('primary-color-hex').value = data.primaryColor;
                 }
+                updateLivePreview();
             }
         } catch (e) {
             console.error("Load design error:", e);
@@ -2392,9 +2407,6 @@ class AdminManager {
                 mainFont: document.getElementById('main-font-select').value,
                 fontSizeBase: document.getElementById('font-size-base').value,
                 fontSizeH1Desktop: document.getElementById('font-size-h1-desktop').value,
-                fontSizeH1Mobile: document.getElementById('font-size-h1-mobile').value,
-                fontSizeH2Desktop: document.getElementById('font-size-h2-desktop').value,
-                fontSizeH2Mobile: document.getElementById('font-size-h2-mobile').value,
                 primaryColor: document.getElementById('primary-color-hex').value,
                 updatedAt: new Date().toISOString()
             };
@@ -2408,7 +2420,7 @@ class AdminManager {
             } catch (err) {
                 this.showToast('❌ Feil ved lagring', 'error', 5000);
             } finally {
-                btn.textContent = 'Lagre design-innstillinger';
+                btn.textContent = 'Lagre alle endringer';
                 btn.disabled = false;
             }
         };
