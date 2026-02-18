@@ -682,7 +682,7 @@ class MinSideManager {
                 <div class="card" style="background-color: #fef2f2; border: 1px solid #fee2e2;">
                     <h4 style="color: #991b1b; margin-bottom: 8px;">Slett konto</h4>
                     <p style="font-size: 0.9rem; color: #7f1d1d; margin-bottom: 16px;">Ønsker du å slette kontoen din og alle data? Dette kan ikke angres.</p>
-                    <button class="btn" style="color: #dc2626; border: 1px solid #dc2626; background: white;">Slett min konto</button>
+                    <button id="delete-account-btn" class="btn" onclick="window.minSideManager.handleAccountDeletion()" style="color: #dc2626; border: 1px solid #dc2626; background: white;">Slett min konto</button>
                 </div>
             </div>
         `;
@@ -879,6 +879,50 @@ class MinSideManager {
             } catch (error) {
                 console.error("Google sync feilet:", error);
                 alert('Kunne ikke hente bilde fra Google.');
+            }
+        }
+    }
+
+    async handleAccountDeletion() {
+        if (!this.currentUser) return;
+
+        const warningMsg = "⚠️ ADVARSEL: Er du helt sikker?\n\nDette vil slette kontoen din, alle dine kurshistorikk, profilinformasjon og dine lagrede data permanent.\n\nDette kan ikke angres. Vil du fortsette?";
+
+        if (!confirm(warningMsg)) return;
+
+        const btn = document.getElementById('delete-account-btn');
+        const originalText = btn ? btn.textContent : '';
+        if (btn) {
+            btn.disabled = true;
+            btn.textContent = 'Sletter konto...';
+        }
+
+        try {
+            const uid = this.currentUser.uid;
+
+            // 1. Delete user data from Firestore first
+            console.log(`[HKM] Deleting Firestore data for user: ${uid}`);
+            await firebase.firestore().collection('users').doc(uid).delete();
+
+            // 2. Delete the user account from Firebase Auth
+            console.log(`[HKM] Deleting Auth account for user: ${uid}`);
+            await this.currentUser.delete();
+
+            alert('Din konto er nå slettet. Takk for tiden din hos oss.');
+            window.location.href = '../index.html';
+        } catch (error) {
+            console.error('Account deletion failed:', error);
+
+            if (error.code === 'auth/requires-recent-login') {
+                alert('For din sikkerhet må du logge ut og inn igjen for å bekrefte at du eier kontoen før du kan slette den.');
+                await firebase.auth().signOut();
+                window.location.href = 'login.html';
+            } else {
+                alert('Kunne ikke slette konto: ' + error.message);
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = originalText;
+                }
             }
         }
     }
