@@ -94,13 +94,18 @@
             </header>
 
             <!-- Profile Modal -->
-            <div id="profile-modal" class="profile-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
-                <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:320px; max-width:90vw; position:relative; display:flex; flex-direction:column; align-items:flex-start;">
-                    <button id="close-profile-modal" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
+            <div id="profile-modal" class="profile-modal"
+                style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
+                <div class="profile-modal-content"
+                    style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:320px; max-width:90vw; position:relative; display:flex; flex-direction:column; align-items:flex-start;">
+                    <button id="close-profile-modal"
+                        style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
                     <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
-                        <div id="modal-user-avatar" class="user-avatar" style="width:64px; height:64px; font-size:28px;"></div>
+                        <div id="modal-user-avatar" class="user-avatar"
+                            style="width:64px; height:64px; font-size:28px;"></div>
                         <div>
-                            <div id="modal-user-name" class="user-name" style="font-size:20px; font-weight:700;">Navn</div>
+                            <div id="modal-user-name" class="user-name" style="font-size:20px; font-weight:700;">Navn
+                            </div>
                             <div id="modal-user-role" class="user-role">Bruker</div>
                         </div>
                     </div>
@@ -109,28 +114,39 @@
                     </div>
                     <form id="modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
                         <div>
-                            <label for="modal-display-name" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
-                            <input id="modal-display-name" name="displayName" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                            <label for="modal-display-name"
+                                style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
+                            <input id="modal-display-name" name="displayName" type="text"
+                                style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                         <div>
-                            <label for="modal-phone" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
-                            <input id="modal-phone" name="phone" type="tel" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                            <label for="modal-phone"
+                                style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
+                            <input id="modal-phone" name="phone" type="tel"
+                                style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                         <div>
-                            <label for="modal-address" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
-                            <input id="modal-address" name="address" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                            <label for="modal-address"
+                                style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
+                            <input id="modal-address" name="address" type="text"
+                                style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                         </div>
                         <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
                             <div>
-                                <label for="modal-zip" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Postnummer</label>
-                                <input id="modal-zip" name="zip" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                                <label for="modal-zip"
+                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Postnummer</label>
+                                <input id="modal-zip" name="zip" type="text"
+                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                             </div>
                             <div>
-                                <label for="modal-city" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Sted</label>
-                                <input id="modal-city" name="city" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                                <label for="modal-city"
+                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Sted</label>
+                                <input id="modal-city" name="city" type="text"
+                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
                             </div>
                         </div>
-                        <button id="save-modal-profile-btn" type="submit" class="btn btn-primary" style="margin-top:4px; width:100%; justify-content:center;">Lagre profil</button>
+                        <button id="save-modal-profile-btn" type="submit" class="btn btn-primary"
+                            style="margin-top:4px; width:100%; justify-content:center;">Lagre profil</button>
                     </form>
                 </div>
             </div>
@@ -159,7 +175,7 @@
     <script src="../js/firebase-service.js"></script>
 
     <!-- App Logic -->
-    <script src="js/minside.js"></script>
+    <script src="js/minside.js?v=auth_v2"></script>
 </body>
 
 </html>
