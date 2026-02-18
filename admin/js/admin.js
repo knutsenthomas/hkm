@@ -4430,6 +4430,38 @@ class AdminManager {
                         <input type="tel" name="phone" class="form-control" value="${userData ? (userData.phone || '') : ''}">
                     </div>
 
+                    <div class="form-group">
+                        <label>Adresse</label>
+                        <input type="text" name="address" class="form-control" value="${userData ? (userData.address || '') : ''}">
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 2fr; gap:16px;">
+                        <div class="form-group">
+                            <label>Postnummer</label>
+                            <input type="text" name="zip" class="form-control" value="${userData ? (userData.zip || '') : ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Poststed</label>
+                            <input type="text" name="city" class="form-control" value="${userData ? (userData.city || '') : ''}">
+                        </div>
+                    </div>
+
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                        <div class="form-group">
+                            <label>Fødselsdato</label>
+                            <input type="date" name="birthdate" class="form-control" value="${userData ? (userData.birthdate || '') : ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Medlemsnummer</label>
+                            <input type="text" name="membershipNumber" class="form-control" value="${userData ? (userData.membershipNumber || '') : ''}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Interne notater</label>
+                        <textarea name="adminNotes" class="form-control" style="min-height:80px; resize:vertical;">${userData ? (userData.adminNotes || '') : ''}</textarea>
+                    </div>
+
                     <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
                         <button type="button" class="btn-cancel" style="padding:10px 20px; border-radius:8px; border:1px solid #e2e8f0; background:none; cursor:pointer;">Avbryt</button>
                         <button type="submit" class="btn-primary">Lagre endringer</button>
@@ -4456,7 +4488,13 @@ class AdminManager {
                 displayName: formData.get('displayName'),
                 email: formData.get('email'),
                 role: formData.get('role'),
-                phone: formData.get('phone')
+                phone: formData.get('phone'),
+                address: formData.get('address'),
+                zip: formData.get('zip'),
+                city: formData.get('city'),
+                birthdate: formData.get('birthdate'),
+                membershipNumber: formData.get('membershipNumber'),
+                adminNotes: formData.get('adminNotes')
             };
             const userId = formData.get('id');
             await this.saveUser(userId, data);
