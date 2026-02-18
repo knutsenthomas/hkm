@@ -1450,7 +1450,7 @@ class ContentManager {
 
         // Apply Typography
         if (data.mainFont) {
-            document.body.style.fontFamily = `'${data.mainFont}', sans - serif`;
+            document.body.style.fontFamily = `'${data.mainFont}', sans-serif`;
             if (!document.getElementById('google-font-injection')) {
                 const link = document.createElement('link');
                 link.id = 'google-font-injection';
@@ -1541,8 +1541,7 @@ class ContentManager {
         if (!sliderContainer) return;
 
         if (slides && slides.length > 0) {
-            document.body.classList.remove('hero-animate');
-            sliderContainer.innerHTML = slides.map((slide, index) => `
+            const newHTML = slides.map((slide, index) => `
                 <div class="hero-slide ${index === 0 ? 'active' : ''}">
                     <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
                     <div class="container hero-container">
@@ -1557,17 +1556,27 @@ class ContentManager {
                         </div>
                     </div>
                 </div>
-            `).join('');
+            `).join('').trim();
 
-            // Re-init HeroSlider from script.js
-            if (window.heroSlider) {
-                window.heroSlider.stopAutoPlay();
-                window.heroSlider.slides = document.querySelectorAll('.hero-slide');
-                window.heroSlider.currentIndex = 0;
-                window.heroSlider.startAutoPlay();
+            const currentHTML = sliderContainer.innerHTML.trim();
+            // Simplified check: only update if HTML significantly changed (ignoring minor whitespace if needed, but we trimmed)
+            if (currentHTML !== newHTML) {
+                document.body.classList.remove('hero-animate');
+                sliderContainer.innerHTML = newHTML;
+
+                // Re-init HeroSlider from script.js
+                if (window.heroSlider) {
+                    window.heroSlider.stopAutoPlay();
+                    window.heroSlider.slides = document.querySelectorAll('.hero-slide');
+                    window.heroSlider.currentIndex = 0;
+                    window.heroSlider.startAutoPlay();
+                }
+
+                // Only re-animate if we actually changed something
+                this.enableHeroAnimations();
+            } else {
+                console.log("[ContentManager] Hero content unchanged, skipping re-render.");
             }
-
-            this.enableHeroAnimations();
         }
     }
 
