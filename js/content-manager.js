@@ -1159,6 +1159,15 @@ class ContentManager {
 
     sanitizeEventHtml(value) {
         if (!value) return '';
+
+        // Handle potential object values to prevent [object Object] rendering
+        if (typeof value === 'object') {
+            if (value.html) return this.sanitizeEventHtml(value.html);
+            if (value.text) return this.sanitizeEventHtml(value.text);
+            if (value.content && typeof value.content === 'string') return this.sanitizeEventHtml(value.content);
+            return ''; // Hide objects that aren't strings or handled formats
+        }
+
         let safe = String(value);
         safe = safe.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '');
         safe = safe.replace(/\son\w+="[^"]*"/gi, '');
