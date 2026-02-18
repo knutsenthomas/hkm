@@ -852,7 +852,9 @@ class ContentManager {
                 } catch (e) { }
             }
 
-            const displayEvents = this.pageId === 'index' ? events.slice(0, 3) : events;
+            // Filter out holidays from the "boxes" (cards) view
+            const filteredEvents = (events || []).filter(e => !e.isHoliday);
+            const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
             const html = displayEvents.map(event => {
                 try {
                     const eventKey = this.getEventKey(event);
