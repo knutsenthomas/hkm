@@ -2030,24 +2030,31 @@ class AdminManager {
                         const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                         const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
-                        // Specialized matching for events to avoid duplicate Firestore entries
-                        if (collectionId === 'events') {
-                            const existingIdx = list.findIndex(fi =>
-                                (item.gcalId && fi.gcalId === item.gcalId) ||
-                                (fi.title === item.title && fi.date?.split('T')[0] === item.date?.split('T')[0])
-                            );
-                            if (existingIdx >= 0) {
-                                list[existingIdx] = item;
+                        // Use ID-based matching if available (most reliable)
+                        let existingIdx = -1;
+                        if (item.id) {
+                            existingIdx = list.findIndex(fi => fi.id === item.id);
+                        }
+
+                        // Fallback to "Smart Matching" for legacy items or events without ID
+                        if (existingIdx === -1) {
+                            if (collectionId === 'events') {
+                                existingIdx = list.findIndex(fi =>
+                                    (item.gcalId && fi.gcalId === item.gcalId) ||
+                                    (fi.title === item.title && fi.date?.split('T')[0] === item.date?.split('T')[0])
+                                );
                             } else {
-                                list.push(item);
+                                // Standard index-based handling if no ID match (fallback for old items)
+                                if (typeof index === 'number' && index >= 0 && !item.isSynced) {
+                                    existingIdx = index;
+                                }
                             }
+                        }
+
+                        if (existingIdx >= 0) {
+                            list[existingIdx] = item;
                         } else {
-                            // Standard index-based handling for other collections
-                            if (typeof index === 'number' && index >= 0 && !item.isSynced) {
-                                list[index] = item;
-                            } else {
-                                list.push(item);
-                            }
+                            list.unshift(item); // Push to top if truly new
                         }
 
                         await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
@@ -2084,8 +2091,15 @@ class AdminManager {
     }
 
     async addNewItem(collectionId) {
-        // Create new item with empty title (no prompt)
+        const btn = document.getElementById(`add-new-${collectionId}`);
+        if (btn) {
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Oppretter...';
+        }
+
+        // Create new item with empty title and a unique ID to prevent duplicates
         const newItem = {
+            id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
             title: '',
             date: new Date().toISOString().split('T')[0],
             content: ''
@@ -2110,6 +2124,11 @@ class AdminManager {
         } catch (error) {
             console.error('Error creating new item:', error);
             this.showToast('Kunne ikke opprette nytt element. Sjekk konsollen.', 'error', 5000);
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">add</span> Legg til ny';
+            }
         }
     }
 
