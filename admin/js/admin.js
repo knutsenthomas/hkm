@@ -4702,6 +4702,28 @@ class AdminManager {
                             </div>
                         </div>
                     </div>
+
+                    <div class="card" style="margin-top: 24px;">
+                        <div class="card-header">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined" style="color: var(--accent-color);">mail</span>
+                                <h4 class="card-title">Kommunikasjon</h4>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Send e-post til bruker</label>
+                                <input type="text" id="manual-email-subject" class="form-control" placeholder="Emne..." style="margin-bottom:12px;">
+                                <textarea id="manual-email-message" class="form-control" style="min-height:150px;" placeholder="Skriv meldingen her..."></textarea>
+                            </div>
+                            <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                                <button type="button" id="send-manual-email-btn" class="btn-primary">
+                                    <span class="material-symbols-outlined">send</span>
+                                    Send e-post
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </form>
             </div>
         `;
@@ -4767,6 +4789,32 @@ class AdminManager {
                 } catch (e) {
                     saveBtn.disabled = false;
                     saveBtn.textContent = 'Lagre endringer';
+                }
+            };
+        }
+
+        const sendMailBtn = document.getElementById('send-manual-email-btn');
+        if (sendMailBtn) {
+            sendMailBtn.onclick = async () => {
+                const subject = document.getElementById('manual-email-subject').value;
+                const message = document.getElementById('manual-email-message').value;
+
+                if (!subject || !message) {
+                    this.showToast('Vennligst fyll ut både emne og melding.', 'warning');
+                    return;
+                }
+
+                sendMailBtn.disabled = true;
+                const originalText = sendMailBtn.innerHTML;
+                sendMailBtn.innerHTML = '<span class="material-symbols-outlined">sync</span> Sender...';
+
+                try {
+                    await this.sendEmailToUser(userData.email, subject, message);
+                    document.getElementById('manual-email-subject').value = '';
+                    document.getElementById('manual-email-message').value = '';
+                } finally {
+                    sendMailBtn.disabled = false;
+                    sendMailBtn.innerHTML = originalText;
                 }
             };
         }
@@ -4858,6 +4906,36 @@ class AdminManager {
             this.showToast('Kunne ikke laste opp bilde: ' + error.message, 'error');
         } finally {
             if (progressContainer) progressContainer.style.display = 'none';
+        }
+    }
+
+    async sendEmailToUser(email, subject, message) {
+        if (!email) {
+            this.showToast('Brukeren mangler e-postadresse.', 'error');
+            return;
+        }
+
+        try {
+            const response = await fetch('https://sendmanualemail-7fskzic55a-uc.a.run.app', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    to: email,
+                    subject: subject,
+                    message: message,
+                    fromName: 'His Kingdom Ministry'
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                this.showToast('E-post er sendt!', 'success');
+            } else {
+                throw new Error(result.error || 'Kunne ikke sende e-post.');
+            }
+        } catch (error) {
+            console.error('Feil ved sending av e-post:', error);
+            this.showToast('Feil ved sending: ' + error.message, 'error');
         }
     }
 
