@@ -1768,76 +1768,72 @@ class AdminManager {
             const modal = document.createElement('div');
             modal.className = 'dashboard-modal';
             modal.innerHTML = `
-                <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                    <div class="card" style="width: 100%; max-width: 1100px; max-height: 95vh; overflow-y: auto;">
-                        <div class="card-header flex-between">
-                            <h3 class="card-title">Rediger innhold (Blokk-editor)</h3>
-                            <button class="icon-btn" id="close-col-modal"><span class="material-symbols-outlined">close</span></button>
+                <div class="editor-layout-v2">
+                    <header class="editor-header-v2">
+                        <div class="editor-header-left">
+                             <button class="btn-ghost" id="close-col-modal">
+                                <span class="material-symbols-outlined">arrow_back</span> Tilbake
+                             </button>
+                             <span style="color: #94a3b8; margin: 0 8px;">|</span>
+                             <span style="font-weight: 600; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">
+                                ${collectionId === 'blog' ? 'Blogginnlegg' : (collectionId === 'events' ? 'Arrangement' : (collectionId === 'teaching' ? 'Undervisning' : 'Rediger innhold'))}
+                             </span>
                         </div>
-                        <div class="card-body">
-                            <div class="grid-2-cols editor-layout">
-                                <div class="main-fields">
-                                    <div class="form-group">
-                                        <label>Tittel</label>
-                                        <input type="text" id="col-item-title" class="form-control" value="${item.title || ''}" style="font-size: 1.2rem; font-weight: 600;">
-                                    </div>
-                                    <div class="form-group" style="display: flex; flex-direction: column; flex: 1;">
-                                        <label>Innhold</label>
-                                        <!-- Editor.js Container -->
-                                        <div id="editorjs-container" class="form-control" style="min-height: 500px; background: white; padding: 40px; border: 1px solid #e2e8f0; border-radius: 8px;"></div>
-                                    </div>
-                                </div>
-                                <div class="side-fields" style="background: #f8fafc; padding: 20px; border-radius: 12px; height: fit-content;">
-                                    <div class="form-group">
-                                        <button class="btn-primary" style="width: 100%; margin-bottom: 20px;" id="save-col-item">
-                                            <span class="material-symbols-outlined">save</span> Lagre endringer
-                                        </button>
-                                        <div class="divider"></div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Publiseringsdato</label>
-                                        <input type="date" id="col-item-date" class="form-control" value="${safeDate}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Forfatter</label>
-                                        <input type="text" id="col-item-author" class="form-control" value="${item.author || ''}" placeholder="Navn">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Kategori</label>
-                                        <input type="text" id="col-item-cat" class="form-control" value="${item.category || ''}" placeholder="Eks: Undervisning">
-                                    </div>
-                                    
-                                    <!-- Tag Management -->
-                                    <div class="form-group">
-                                        <label>Tagger</label>
-                                        <div class="tags-input-container">
-                                            <div id="active-tags" class="active-tags-list"></div>
-                                            <input type="text" id="tag-input" class="form-control" placeholder="Tag + Enter" style="margin-top: 8px;">
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label>Omslagsbilde URL</label>
-                                        <input type="text" id="col-item-img" class="form-control" value="${item.imageUrl || ''}">
-                                        <div id="img-preview-box" style="margin-top: 10px; height: 150px; background: white; border-radius: 6px; overflow: hidden; display: flex; align-items: center; justify-content: center; border: 1px solid #e2e8f0;">
-                                            ${item.imageUrl ? `<img src="${item.imageUrl}" style="max-width: 100%; max-height: 100%; object-fit: contain;">` : '<span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 48px;">image</span>'}
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="divider" style="margin: 20px 0;"></div>
-                                    <h4 style="font-size: 14px; margin-bottom: 15px; color: #64748b;">SEO</h4>
-                                    <div class="form-group">
-                                        <label>SEO Tittel</label>
-                                        <input type="text" id="col-item-seo-title" class="form-control" value="${item.seoTitle || ''}">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>SEO Beskrivelse</label>
-                                        <textarea id="col-item-seo-desc" class="form-control" style="height: 80px;">${item.seoDescription || ''}</textarea>
-                                    </div>
-                                </div>
+                        <div class="editor-header-right">
+                             <button class="btn-primary" id="save-col-item">
+                                <span class="material-symbols-outlined">publish</span> Lagre og publiser
+                             </button>
+                        </div>
+                    </header>
+                    <div class="editor-content-wrapper">
+                        <div class="editor-main-canvas">
+                            <div class="editor-paper">
+                                <input type="text" id="col-item-title-v2" placeholder="Skriv din tittel her..." value="${item.title || ''}">
+                                <div id="editorjs-container-v2"></div>
                             </div>
                         </div>
+                        <aside class="editor-sidebar-v2">
+                             <h4 class="sidebar-section-title">DETALJER</h4>
+                             <div class="sidebar-group">
+                                 <label>Publiseringsdato</label>
+                                 <input type="date" id="col-item-date" class="sidebar-control" value="${safeDate}">
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Forfatter</label>
+                                 <input type="text" id="col-item-author" class="sidebar-control" value="${item.author || ''}" placeholder="Navn">
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Kategori</label>
+                                 <input type="text" id="col-item-cat" class="sidebar-control" value="${item.category || ''}" placeholder="Eks: Undervisning">
+                             </div>
+                             
+                             <h4 class="sidebar-section-title">OMSLAGSBILDE</h4>
+                             <div class="sidebar-group">
+                                 <div class="sidebar-img-preview" id="sidebar-img-trigger">
+                                     ${item.imageUrl ? `<img src="${item.imageUrl}">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
+                                 </div>
+                                 <input type="text" id="col-item-img" class="sidebar-control" style="margin-top:8px;" placeholder="Lim inn bilde-URL" value="${item.imageUrl || ''}">
+                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Tips: Klikk på boksen over for å lime inn URL raskt.</p>
+                             </div>
+
+                             <h4 class="sidebar-section-title">TAGGER</h4>
+                             <div class="sidebar-group">
+                                 <div class="tags-input-container">
+                                     <div id="active-tags" class="active-tags-list"></div>
+                                     <input type="text" id="tag-input" class="sidebar-control" placeholder="Legg til tag + Enter">
+                                 </div>
+                             </div>
+
+                             <h4 class="sidebar-section-title">SEO & SYNLIGHET</h4>
+                             <div class="sidebar-group">
+                                 <label>Meta-tittel (SEO)</label>
+                                 <input type="text" id="col-item-seo-title" class="sidebar-control" value="${item.seoTitle || ''}" placeholder="Tittel for søkemotorer">
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Meta-beskrivelse</label>
+                                 <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
+                             </div>
+                        </aside>
                     </div>
                 </div>
             `;
@@ -1942,7 +1938,7 @@ class AdminManager {
             console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
 
             const editor = new EditorJS({
-                holder: 'editorjs-container',
+                holder: 'editorjs-container-v2',
                 data: editorData,
                 placeholder: 'Trykk "/" for å velge blokker...',
                 tools: toolsConfig,
@@ -1999,15 +1995,27 @@ class AdminManager {
             if (imgInput) {
                 imgInput.addEventListener('input', (e) => {
                     const url = e.target.value;
-                    const box = document.getElementById('img-preview-box');
+                    const box = document.getElementById('sidebar-img-trigger');
                     if (box) {
                         if (url && url.length > 10) {
-                            box.innerHTML = `<img src="${url}" style="max-width: 100%; max-height: 100%; object-fit: contain;">`;
+                            box.innerHTML = `<img src="${url}">`;
                         } else {
-                            box.innerHTML = '<span class="material-symbols-outlined" style="color: #cbd5e1; font-size: 48px;">image</span>';
+                            box.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
                         }
                     }
                 });
+            }
+
+            const imgTrigger = document.getElementById('sidebar-img-trigger');
+            if (imgTrigger) {
+                imgTrigger.onclick = () => {
+                    const url = prompt("Lim inn bilde-URL her:");
+                    if (url) {
+                        imgInput.value = url;
+                        // Trigger input event manually to update preview
+                        imgInput.dispatchEvent(new Event('input'));
+                    }
+                };
             }
 
             const closeBtn = document.getElementById('close-col-modal');
@@ -2029,7 +2037,7 @@ class AdminManager {
                         return;
                     }
 
-                    item.title = document.getElementById('col-item-title')?.value || '';
+                    item.title = document.getElementById('col-item-title-v2')?.value || '';
                     item.content = savedData; // Store as JSON object
 
                     item.date = document.getElementById('col-item-date')?.value || '';

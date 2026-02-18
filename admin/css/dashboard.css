@@ -219,12 +219,12 @@ body.admin-body {
     border-radius: 12px;
     padding: 4px 8px;
 }
+
 .user-profile-link:hover {
     background: var(--accent-light);
-    box-shadow: 0 2px 8px rgba(255,107,43,0.08);
+    box-shadow: 0 2px 8px rgba(255, 107, 43, 0.08);
     text-decoration: none;
     color: var(--accent-color);
-}
 }
 
 .user-info {
@@ -1364,4 +1364,227 @@ input[type="range"] {
     to {
         width: 0%;
     }
+}
+
+/* ==========================================================================
+   Wix-style Full-screen Editor
+   ========================================================================== */
+
+.dashboard-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    overflow: hidden;
+    background-color: var(--main-bg);
+    animation: editorFadeIn 0.3s ease-out;
+}
+
+@keyframes editorFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(1.02);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.editor-layout-v2 {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.editor-header-v2 {
+    height: 64px;
+    background: white;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    z-index: 10;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.editor-header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.editor-header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.editor-content-wrapper {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    background-color: #f6f7f9;
+}
+
+.editor-main-canvas {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 20px;
+    display: flex;
+    justify-content: center;
+    scroll-behavior: smooth;
+}
+
+.editor-paper {
+    width: 100%;
+    max-width: 850px;
+    background: white;
+    min-height: 1000px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+    padding: 80px 100px;
+    margin-bottom: 100px;
+}
+
+.editor-sidebar-v2 {
+    width: 320px;
+    background: white;
+    border-left: 1px solid var(--border-color);
+    overflow-y: auto;
+    padding: 24px;
+}
+
+/* Premium Typography for Editor */
+#col-item-title-v2 {
+    width: 100%;
+    border: none !important;
+    outline: none !important;
+    font-size: 42px !important;
+    font-weight: 800 !important;
+    color: #0f172a;
+    margin-bottom: 32px;
+    padding: 0 !important;
+    font-family: 'Inter', sans-serif;
+    letter-spacing: -0.02em;
+    background: transparent;
+}
+
+#col-item-title-v2::placeholder {
+    color: #cbd5e1;
+}
+
+/* EditorJS Overrides for Clean Look */
+#editorjs-container-v2 {
+    min-height: 400px;
+}
+
+.ce-block__content {
+    max-width: 100% !important;
+}
+
+.ce-toolbar__content {
+    max-width: 100% !important;
+}
+
+/* Sidebar Section Headers */
+.sidebar-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    margin-bottom: 16px;
+    margin-top: 24px;
+}
+
+.sidebar-section-title:first-child {
+    margin-top: 0;
+}
+
+/* Sidebar Field Styling */
+.sidebar-group {
+    margin-bottom: 20px;
+}
+
+.sidebar-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 6px;
+}
+
+.sidebar-control {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #f8fafc;
+}
+
+.sidebar-control:focus {
+    background: white;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(255, 107, 43, 0.1);
+}
+
+.sidebar-upload-area {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.sidebar-img-preview {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: 8px;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    margin-top: 8px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sidebar-img-preview:hover {
+    border-color: var(--accent-color);
+    background: var(--accent-light);
+}
+
+.sidebar-img-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Transition for buttons in header */
+.editor-header-right .btn-primary {
+    padding: 10px 20px;
+    font-size: 14px;
+    box-shadow: none;
+}
+
+.btn-ghost {
+    background: transparent;
+    color: var(--text-muted);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-ghost:hover {
+    background: #f1f5f9;
+    color: var(--text-main);
 }
