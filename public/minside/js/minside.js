@@ -885,11 +885,63 @@ class MinSideManager {
 
     async handleAccountDeletion() {
         if (!this.currentUser) return;
+        this.showDeleteConfirmationModal();
+    }
 
-        const warningMsg = "⚠️ ADVARSEL: Er du helt sikker?\n\nDette vil slette kontoen din, alle dine kurshistorikk, profilinformasjon og dine lagrede data permanent.\n\nDette kan ikke angres. Vil du fortsette?";
+    showDeleteConfirmationModal() {
+        // Remove existing if any
+        const existing = document.getElementById('hkm-delete-modal-overlay');
+        if (existing) existing.remove();
 
-        if (!confirm(warningMsg)) return;
+        const warningMsg = "Dette vil slette kontoen din, alle dine kurshistorikk, profilinformasjon og dine lagrede data permanent. Dette kan ikke angres. Vil du fortsette?";
 
+        const modalHtml = `
+            <div id="hkm-delete-modal-overlay" class="hkm-modal-overlay">
+                <div class="hkm-modal-container">
+                    <div class="hkm-modal-icon">
+                        <span class="material-symbols-outlined">warning</span>
+                    </div>
+                    <h3 class="hkm-modal-title">\u26A0\uFE0F Slett konto?</h3>
+                    <p class="hkm-modal-message">${warningMsg}</p>
+                    <div class="hkm-modal-actions">
+                        <button id="hkm-modal-cancel" class="hkm-modal-btn hkm-modal-btn-cancel">Avbryt</button>
+                        <button id="hkm-modal-confirm" class="hkm-modal-btn hkm-modal-btn-delete">Slett konto</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        const overlay = document.getElementById('hkm-delete-modal-overlay');
+        const cancelBtn = document.getElementById('hkm-modal-cancel');
+        const confirmBtn = document.getElementById('hkm-modal-confirm');
+
+        // Close on cancel or overlay click
+        const closeModal = () => {
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.remove(), 200);
+        };
+
+        cancelBtn.onclick = closeModal;
+        overlay.onclick = (e) => {
+            if (e.target === overlay) closeModal();
+        };
+
+        // Confirm deletion
+        confirmBtn.onclick = async () => {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Sletter...';
+            await this.performAccountDeletion();
+        };
+
+        // Show with animation
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+        });
+    }
+
+    async performAccountDeletion() {
         const btn = document.getElementById('delete-account-btn');
         const originalText = btn ? btn.textContent : '';
         if (btn) {
@@ -912,6 +964,10 @@ class MinSideManager {
             window.location.href = '../index.html';
         } catch (error) {
             console.error('Account deletion failed:', error);
+
+            // Close modal so alert is visible
+            const overlay = document.getElementById('hkm-delete-modal-overlay');
+            if (overlay) overlay.remove();
 
             if (error.code === 'auth/requires-recent-login') {
                 alert('For din sikkerhet må du logge ut og inn igjen for å bekrefte at du eier kontoen før du kan slette den.');
