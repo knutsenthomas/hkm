@@ -1257,7 +1257,7 @@ class ContentManager {
             const year = dateValue.getFullYear();
             const month = String(dateValue.getMonth() + 1).padStart(2, '0');
             const day = String(dateValue.getDate()).padStart(2, '0');
-            return `${year} -${month} -${day} `;
+            return `${year}-${month}-${day}`;
         };
 
         const addHoliday = (date, title) => {
@@ -1554,7 +1554,7 @@ class ContentManager {
             const currentSlides = Array.from(sliderContainer.querySelectorAll('.hero-slide')).map(s => ({
                 title: s.querySelector('.hero-title')?.textContent?.trim() || '',
                 subtitle: s.querySelector('.hero-subtitle')?.textContent?.trim() || '',
-                imageUrl: s.querySelector('.hero-bg')?.style.backgroundImage.replace(/url\(["']?(.*?)["']?\)/, '$1') || '',
+                imageUrl: (s.querySelector('.hero-bg')?.style.backgroundImage || '').replace(/url\(["']?(.*?)["']?\)/, '$1') || '',
                 btnText: s.querySelector('.btn')?.textContent?.trim() || '',
                 btnLink: s.querySelector('.btn')?.getAttribute('href') || ''
             }));
