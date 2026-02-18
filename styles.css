@@ -5123,3 +5123,49 @@ ol.block-list {
         display: none !important;
     }
 }
+
+/* Responsive Blog Styles */
+@media (max-width: 992px) {
+    .blog-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .blog-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+
+    .blog-image {
+        flex: 1;
+        height: auto;
+        min-width: 150px;
+        max-width: 200px;
+    }
+
+    .blog-content {
+        flex: 2;
+        padding: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-card {
+        flex-direction: column;
+    }
+
+    .blog-image {
+        max-width: 100%;
+    }
+}
+
+/* iPad specific styles for mega menu */
+@media (max-width: 1024px) and (min-width: 768px) {
+    .mega-menu-grid {
+        gap: 20px;
+    }
+    .mega-nav-list a {
+        font-size: 1.2rem;
+    }
+}
