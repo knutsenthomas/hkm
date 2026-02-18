@@ -1541,28 +1541,46 @@ class ContentManager {
         if (!sliderContainer) return;
 
         if (slides && slides.length > 0) {
-            const newHTML = slides.map((slide, index) => `
-                <div class="hero-slide ${index === 0 ? 'active' : ''}">
-                    <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
-                    <div class="container hero-container">
-                        <div class="hero-content">
-                            <h1 class="hero-title">${slide.title}</h1>
-                            <p class="hero-subtitle">${slide.subtitle}</p>
-                            ${slide.btnText ? `
-                                <div class="slide-buttons">
-                                    <a href="${slide.btnLink}" class="btn btn-primary">${slide.btnText}</a>
-                                </div>
-                            ` : ''}
+            // Extract current data from DOM for comparison to avoid flicker if same
+            const currentSlides = Array.from(sliderContainer.querySelectorAll('.hero-slide')).map(s => ({
+                title: s.querySelector('.hero-title')?.textContent?.trim() || '',
+                subtitle: s.querySelector('.hero-subtitle')?.textContent?.trim() || '',
+                imageUrl: s.querySelector('.hero-bg')?.style.backgroundImage.replace(/url\(["']?(.*?)["']?\)/, '$1') || '',
+                btnText: s.querySelector('.btn')?.textContent?.trim() || '',
+                btnLink: s.querySelector('.btn')?.getAttribute('href') || ''
+            }));
+
+            // Compare incoming slides data with what is currently in the DOM
+            const isDifferent = slides.length !== currentSlides.length || slides.some((slide, i) => {
+                const current = currentSlides[i];
+                if (!current) return true;
+                return (slide.title || '').trim() !== current.title ||
+                    (slide.subtitle || '').trim() !== current.subtitle ||
+                    (slide.imageUrl || '').trim() !== current.imageUrl ||
+                    (slide.btnText || '').trim() !== current.btnText ||
+                    (slide.btnLink || '').trim() !== current.btnLink;
+            });
+
+            if (isDifferent) {
+                console.log("[ContentManager] Hero content changed or updated from dashboard, re-rendering...");
+                document.body.classList.remove('hero-animate');
+
+                sliderContainer.innerHTML = slides.map((slide, index) => `
+                    <div class="hero-slide ${index === 0 ? 'active' : ''}">
+                        <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                        <div class="container hero-container">
+                            <div class="hero-content">
+                                <h1 class="hero-title">${slide.title}</h1>
+                                <p class="hero-subtitle">${slide.subtitle}</p>
+                                ${slide.btnText ? `
+                                    <div class="slide-buttons">
+                                        <a href="${slide.btnLink}" class="btn btn-primary">${slide.btnText}</a>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('').trim();
-
-            const currentHTML = sliderContainer.innerHTML.trim();
-            // Simplified check: only update if HTML significantly changed (ignoring minor whitespace if needed, but we trimmed)
-            if (currentHTML !== newHTML) {
-                document.body.classList.remove('hero-animate');
-                sliderContainer.innerHTML = newHTML;
+                `).join('');
 
                 // Re-init HeroSlider from script.js
                 if (window.heroSlider) {
@@ -1572,10 +1590,9 @@ class ContentManager {
                     window.heroSlider.startAutoPlay();
                 }
 
-                // Only re-animate if we actually changed something
                 this.enableHeroAnimations();
             } else {
-                console.log("[ContentManager] Hero content unchanged, skipping re-render.");
+                console.log("[ContentManager] Hero content matches DOM, skipping re-render to prevent flicker.");
             }
         }
     }
