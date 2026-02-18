@@ -4309,12 +4309,66 @@ class AdminManager {
         });
 
         container.querySelectorAll('.delete-user-btn').forEach(btn => {
-            btn.onclick = async () => {
+            btn.onclick = () => {
                 const userId = btn.getAttribute('data-id');
-                if (confirm('Er du sikker på at du vil slette denne brukeren fra oversikten? (Dette sletter kun profildata i Firestore)')) {
-                    await this.deleteUser(userId);
-                }
+                const userData = this.allUsersData.find(u => u.id === userId);
+                const userName = userData ? (userData.displayName || userData.fullName || 'Ukjent') : 'Ukjent';
+                this.showDeleteUserConfirmationModal(userId, userName);
             };
+        });
+    }
+
+    showDeleteUserConfirmationModal(userId, userName) {
+        // Remove existing if any
+        const existing = document.getElementById('hkm-delete-modal-overlay');
+        if (existing) existing.remove();
+
+        const warningMsg = `Er du sikker på at du vil slette brukeren "${userName}" fra oversikten? Dette sletter kun profildata i Firestore og kan ikke angres.`;
+
+        const modalHtml = `
+            <div id="hkm-delete-modal-overlay" class="hkm-modal-overlay">
+                <div class="hkm-modal-container">
+                    <div class="hkm-modal-icon">
+                        <span class="material-symbols-outlined">warning</span>
+                    </div>
+                    <h3 class="hkm-modal-title">\u26A0\uFE0F Slett bruker?</h3>
+                    <p class="hkm-modal-message">${warningMsg}</p>
+                    <div class="hkm-modal-actions">
+                        <button id="hkm-modal-cancel" class="hkm-modal-btn hkm-modal-btn-cancel">Avbryt</button>
+                        <button id="hkm-modal-confirm" class="hkm-modal-btn hkm-modal-btn-delete">Slett bruker</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        const overlay = document.getElementById('hkm-delete-modal-overlay');
+        const cancelBtn = document.getElementById('hkm-modal-cancel');
+        const confirmBtn = document.getElementById('hkm-modal-confirm');
+
+        // Close on cancel or overlay click
+        const closeModal = () => {
+            overlay.classList.remove('active');
+            setTimeout(() => overlay.remove(), 200);
+        };
+
+        cancelBtn.onclick = closeModal;
+        overlay.onclick = (e) => {
+            if (e.target === overlay) closeModal();
+        };
+
+        // Confirm deletion
+        confirmBtn.onclick = async () => {
+            confirmBtn.disabled = true;
+            confirmBtn.textContent = 'Sletter...';
+            await this.deleteUser(userId);
+            closeModal();
+        };
+
+        // Show with animation
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
         });
     }
 
