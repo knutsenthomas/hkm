@@ -200,6 +200,9 @@ class ContentManager {
             const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
             if (blogItems.length > 0) this.renderBlogPosts(blogItems, '#blogg .blog-grid');
 
+            const causes = await this.loadCauses();
+            this.renderCauses(causes);
+
             this.enableHeroAnimations();
         }
 
@@ -302,7 +305,7 @@ class ContentManager {
 
     renderCauses(causes) {
         const container = document.querySelector('.causes-grid');
-        const section = document.querySelector('.donations-page.section');
+        const section = document.querySelector('.donations-page.section') || document.querySelector('.causes');
 
         if (!container || !section) return;
 
