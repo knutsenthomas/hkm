@@ -64,6 +64,11 @@
 }
 
 .subpage-hero .page-hero-title,
-.subpage-hero .page-hero-subtitle {
-  margin-bottom: 1rem;
+.subpage-hero .hero-title {
+  margin-bottom: 20px !important;
+}
+
+.subpage-hero .page-hero-subtitle,
+.subpage-hero .hero-breadcrumbs {
+  margin-bottom: 0 !important;
 }

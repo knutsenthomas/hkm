@@ -2074,6 +2074,15 @@ body.hero-animate .slide-buttons {
 }
 
 /* Events */
+/* --- Hero for Arrangement Detaljer --- */
+.page-hero.event-details-hero {
+    text-align: center !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 .events-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -3501,6 +3510,14 @@ body {
 
     .page-hero-subtitle {
         font-size: 1.1rem;
+    }
+
+    /* Standardize Scroll Spacing (40px gap under 100px header) */
+    .subpage-hero+.section,
+    .subpage-hero+.calendar-section,
+    .subpage-hero+#registration-form,
+    #events-list-section {
+        padding-top: 140px !important;
     }
 
     .values-grid {
