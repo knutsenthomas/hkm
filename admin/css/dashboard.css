@@ -1117,11 +1117,8 @@ input[type="range"] {
 }
 
 .ce-paragraph {
-    line-height: 1.4 !important;
-    padding-top: 0 !important;
-    padding-bottom: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
+    line-height: 1.8 !important;
+    /* Matches earlier reinforcement */
 }
 
 .ce-header {
