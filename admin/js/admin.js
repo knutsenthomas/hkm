@@ -2094,36 +2094,32 @@ class AdminManager {
         const btn = document.getElementById(`add-new-${collectionId}`);
         if (btn) {
             btn.disabled = true;
-            btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Oppretter...';
+            btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Forbereder...';
         }
 
-        // Create new item with empty title and a unique ID to prevent duplicates
-        const newItem = {
-            id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-            title: '',
-            date: new Date().toISOString().split('T')[0],
-            content: ''
-        };
-
         try {
-            const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-            const items = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
-
-            // Add to beginning of list
-            items.unshift(newItem);
-
-            // Save to Firebase
-            await firebaseService.savePageContent(`collection_${collectionId}`, { items: items });
-
-            // Refresh the list in the background
+            // First, ensure we have the latest data locally
             await this.loadCollection(collectionId);
 
+            // Create new item with empty title and a unique ID
+            const newItem = {
+                id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                title: '',
+                date: new Date().toISOString().split('T')[0],
+                content: ''
+            };
+
+            // Add to the beginning of the local list only (don't save to Firebase yet)
+            if (!this.currentItems) this.currentItems = [];
+            this.currentItems.unshift(newItem);
+
             // Immediately open the editor for this new item (index 0)
+            // It will save for the first time when the user clicks "Lagre"
             this.editCollectionItem(collectionId, 0);
 
         } catch (error) {
-            console.error('Error creating new item:', error);
-            this.showToast('Kunne ikke opprette nytt element. Sjekk konsollen.', 'error', 5000);
+            console.error('Error preparing new item:', error);
+            this.showToast('Kunne ikke forberede nytt element.', 'error', 5000);
         } finally {
             if (btn) {
                 btn.disabled = false;
