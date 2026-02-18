@@ -4744,11 +4744,13 @@ class AdminManager {
     }
 
     async saveUser(userId, data) {
-        // Remove undefined fields to prevent Firestore errors
-        const cleanData = Object.keys(data).reduce((acc, key) => {
-            if (data[key] !== undefined) acc[key] = data[key];
-            return acc;
-        }, {});
+        // Remove undefined/null fields to prevent Firestore errors and clean up data
+        const cleanData = {};
+        Object.keys(data).forEach(key => {
+            if (data[key] !== undefined && data[key] !== null) {
+                cleanData[key] = data[key];
+            }
+        });
 
         try {
             if (userId) {
