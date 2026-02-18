@@ -4576,8 +4576,14 @@ class AdminManager {
             <div style="max-width: 900px;">
                 <div class="card" style="margin-bottom: 24px;">
                     <div class="card-body" style="display: flex; align-items: center; gap: 32px; padding: 32px;">
-                        <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover;` : ''}">
+                        <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; position: relative; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover; background-position: center;` : ''}">
                             ${!userData.photoURL ? initials : ''}
+                            ${this.userEditMode ? `
+                                <div id="change-photo-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; border-radius: inherit; cursor: pointer; color: white;">
+                                    <span class="material-symbols-outlined">photo_camera</span>
+                                </div>
+                                <input type="file" id="user-photo-input" style="display: none;" accept="image/*">
+                            ` : ''}
                         </div>
                         <div style="flex:1;">
                             <div style="display:flex; justify-content:space-between; align-items:flex-start;">
@@ -4608,6 +4614,15 @@ class AdminManager {
                         </div>
                     </div>
                 </div>
+
+                ${this.userEditMode ? `
+                    <div id="upload-progress-container" style="display: none; margin-bottom: 24px;">
+                        <div style="height: 4px; background: #eee; border-radius: 2px; overflow: hidden;">
+                            <div id="upload-progress-bar" style="height: 100%; background: var(--accent-color); width: 0%; transition: width 0.3s ease;"></div>
+                        </div>
+                        <p style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">Laster opp bilde...</p>
+                    </div>
+                ` : ''}
 
                 <form id="user-detail-form" class="${!this.userEditMode ? 'readonly-form' : ''}">
                     <input type="hidden" name="id" value="${userData.id}">
@@ -4692,6 +4707,20 @@ class AdminManager {
         `;
 
         // Event Listeners
+        if (this.userEditMode) {
+            const overlay = document.getElementById('change-photo-overlay');
+            const fileInput = document.getElementById('user-photo-input');
+            if (overlay && fileInput) {
+                overlay.onclick = () => fileInput.click();
+                fileInput.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (file) {
+                        await this.handleUserPhotoUpload(userData.id, file);
+                    }
+                };
+            }
+        }
+
         const activateEditBtn = document.getElementById('activate-edit-btn');
         if (activateEditBtn) {
             activateEditBtn.onclick = () => {
@@ -4782,6 +4811,52 @@ class AdminManager {
         } catch (error) {
             console.error('Error saving user:', error);
             this.showToast('Kunne ikke lagre bruker: ' + error.message, 'error');
+        }
+    }
+
+    async handleUserPhotoUpload(userId, file) {
+        const progressBar = document.getElementById('upload-progress-bar');
+        const progressContainer = document.getElementById('upload-progress-container');
+        const avatar = document.querySelector('.user-avatar-lg');
+
+        if (progressContainer) progressContainer.style.display = 'block';
+
+        try {
+            const path = `profiles/${userId}/avatar_${Date.now()}.jpg`;
+            const url = await firebaseService.uploadImage(file, path, (progress) => {
+                if (progressBar) progressBar.style.value = progress;
+            });
+
+            // Update local state and UI immediately
+            if (avatar) {
+                avatar.style.backgroundImage = `url('${url}')`;
+                avatar.innerHTML = `
+                    <div id="change-photo-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; border-radius: inherit; cursor: pointer; color: white;">
+                        <span class="material-symbols-outlined">photo_camera</span>
+                    </div>
+                    <input type="file" id="user-photo-input" style="display: none;" accept="image/*">
+                `;
+                // Re-bind listeners as internalHTML was reset
+                const overlay = document.getElementById('change-photo-overlay');
+                const fileInput = document.getElementById('user-photo-input');
+                if (overlay && fileInput) {
+                    overlay.onclick = () => fileInput.click();
+                    fileInput.onchange = (e) => this.handleUserPhotoUpload(userId, e.target.files[0]);
+                }
+            }
+
+            // Update in Firestore
+            await firebaseService.db.collection('users').doc(userId).update({
+                photoURL: url,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            this.showToast('Profilbilde er oppdatert.', 'success');
+        } catch (error) {
+            console.error('Error uploading photo:', error);
+            this.showToast('Kunne ikke laste opp bilde: ' + error.message, 'error');
+        } finally {
+            if (progressContainer) progressContainer.style.display = 'none';
         }
     }
 
