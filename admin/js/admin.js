@@ -1901,32 +1901,32 @@ class AdminManager {
                 toolsConfig.delimiter = Delimiter;
             }
 
-            if (typeof window.Embed !== 'undefined' || typeof Embed !== 'undefined') {
-                const EmbedClass = window.Embed || (typeof Embed !== 'undefined' ? Embed : null);
-                if (EmbedClass) {
-                    console.log("Registering Video / Embed tool...");
-                    toolsConfig.video = {
-                        class: EmbedClass,
-                        inlineToolbar: true,
-                        config: {
-                            services: {
-                                youtube: true,
-                                vimeo: true,
-                                facebook: true,
-                                instagram: true,
-                                twitter: true
-                            }
-                        },
-                        toolbox: {
-                            title: 'Video / Embed'
+            // Video / Embed tool
+            const EmbedClass = window.Embed || (typeof Embed !== 'undefined' ? Embed : null);
+            if (EmbedClass) {
+                console.log("Registering Embed tool with class:", EmbedClass.name);
+                toolsConfig.embed = {
+                    class: EmbedClass,
+                    inlineToolbar: true,
+                    config: {
+                        services: {
+                            youtube: true,
+                            vimeo: true,
+                            facebook: true,
+                            instagram: true,
+                            twitter: true
                         }
-                    };
-                }
+                    },
+                    toolbox: {
+                        title: 'Video',
+                        icon: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M17 4H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 9V7l5 3-5 3z"/></svg>'
+                    }
+                };
             } else {
-                console.warn("Embed tool class not found in window or global scope.");
+                console.warn("Embed tool class NOT found in window or local scope.");
             }
 
-            console.log("Final EditorJS Tools Config:", Object.keys(toolsConfig));
+            console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
 
             const editor = new EditorJS({
                 holder: 'editorjs-container',

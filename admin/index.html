@@ -171,49 +171,64 @@
                     <span id="notification-dot" class="notification-dot"></span>
                 </button>
                 <div class="user-profile">
-                                        <div class="user-profile-link" id="admin-profile-trigger" style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; cursor: pointer;">
-                                                <div class="user-info">
-                                                        <span id="admin-name" class="user-name">Laster...</span>
-                                                        <span class="user-role">Administrator</span>
-                                                </div>
-                                                <div id="admin-avatar" class="user-avatar">?</div>
-                                        </div>
+                    <div class="user-profile-link" id="admin-profile-trigger"
+                        style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; cursor: pointer;">
+                        <div class="user-info">
+                            <span id="admin-name" class="user-name">Laster...</span>
+                            <span class="user-role">Administrator</span>
+                        </div>
+                        <div id="admin-avatar" class="user-avatar">?</div>
+                    </div>
                 </div>
-                                <!-- Profile Modal -->
-                                <div id="profile-modal" class="profile-modal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
-                                    <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:320px; max-width:90vw; position:relative;">
-                                        <button id="close-profile-modal" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
-                                        <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
-                                            <div id="modal-admin-avatar" class="user-avatar" style="width:64px; height:64px; font-size:28px;"></div>
-                                            <div>
-                                                <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">Navn</div>
-                                                <div id="modal-admin-role" class="user-role">Administrator</div>
-                                            </div>
-                                        </div>
-                                        <div style="margin-bottom:16px;">
-                                            <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
-                                        </div>
-                                        <form id="admin-modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
-                                            <div>
-                                                <label for="admin-modal-display-name" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
-                                                <input id="admin-modal-display-name" name="displayName" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                                            </div>
-                                            <div>
-                                                <label for="admin-modal-phone" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
-                                                <input id="admin-modal-phone" name="phone" type="tel" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                                            </div>
-                                            <div>
-                                                <label for="admin-modal-address" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
-                                                <input id="admin-modal-address" name="address" type="text" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                                            </div>
-                                            <div>
-                                                <label for="admin-modal-bio" style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Bio</label>
-                                                <textarea id="admin-modal-bio" name="bio" style="width:100%; min-height:78px; padding:10px; border:1px solid #e2e8f0; border-radius:8px;"></textarea>
-                                            </div>
-                                            <button id="admin-modal-save-btn" type="submit" class="btn-primary" style="margin-top:4px;">Lagre profil</button>
-                                        </form>
-                                    </div>
-                                </div>
+                <!-- Profile Modal -->
+                <div id="profile-modal" class="profile-modal"
+                    style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
+                    <div class="profile-modal-content"
+                        style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:320px; max-width:90vw; position:relative;">
+                        <button id="close-profile-modal"
+                            style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
+                        <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+                            <div id="modal-admin-avatar" class="user-avatar"
+                                style="width:64px; height:64px; font-size:28px;"></div>
+                            <div>
+                                <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">
+                                    Navn</div>
+                                <div id="modal-admin-role" class="user-role">Administrator</div>
+                            </div>
+                        </div>
+                        <div style="margin-bottom:16px;">
+                            <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
+                        </div>
+                        <form id="admin-modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
+                            <div>
+                                <label for="admin-modal-display-name"
+                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
+                                <input id="admin-modal-display-name" name="displayName" type="text"
+                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                            </div>
+                            <div>
+                                <label for="admin-modal-phone"
+                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
+                                <input id="admin-modal-phone" name="phone" type="tel"
+                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                            </div>
+                            <div>
+                                <label for="admin-modal-address"
+                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
+                                <input id="admin-modal-address" name="address" type="text"
+                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                            </div>
+                            <div>
+                                <label for="admin-modal-bio"
+                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Bio</label>
+                                <textarea id="admin-modal-bio" name="bio"
+                                    style="width:100%; min-height:78px; padding:10px; border:1px solid #e2e8f0; border-radius:8px;"></textarea>
+                            </div>
+                            <button id="admin-modal-save-btn" type="submit" class="btn-primary"
+                                style="margin-top:4px;">Lagre profil</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </header>
 
@@ -474,7 +489,7 @@
             margin-top: 10px !important;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@latest"
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.7.2"
         onerror="alert('FEIL: Videoverktøyet ble blokkert! Har du en ad-blocker på?');"></script>
 
     <!-- Admin Logic -->
