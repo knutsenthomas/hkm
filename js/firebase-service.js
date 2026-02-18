@@ -251,6 +251,43 @@ class FirebaseService {
         });
     }
 
+    async requestNotificationPermission() {
+        if (!this.isInitialized || typeof firebase.messaging !== 'function' || !firebase.messaging.isSupported()) {
+            console.warn("Firebase Messaging is not initialized or supported in this browser.");
+            return null;
+        }
+        const messaging = firebase.messaging();
+        try {
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                console.log('Notification permission granted.');
+                // TODO: Replace 'YOUR_VAPID_KEY' with your actual VAPID key from Firebase project settings.
+                const token = await messaging.getToken({ vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA' });
+                if (token) {
+                    console.log('FCM Token:', token);
+                    const user = this.auth.currentUser;
+                    if (user) {
+                        const userDocRef = this.db.collection('users').doc(user.uid);
+                        await userDocRef.update({
+                            fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+                        });
+                        console.log('FCM token saved to user profile.');
+                    }
+                    return token;
+                } else {
+                    console.log('No registration token available. Request permission to generate one.');
+                    return null;
+                }
+            } else {
+                console.log('Unable to get permission to notify.');
+                return null;
+            }
+        } catch (error) {
+            console.error('An error occurred while requesting permission or getting token:', error);
+            return null;
+        }
+    }
+
     onAuthChange(callback) {
         if (!this.isInitialized) return;
         this.auth.onAuthStateChanged(callback);

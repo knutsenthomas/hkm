@@ -695,13 +695,21 @@ class MinSideManager {
                             </div>
                         </div>
 
-                        <!-- Notifications -->
+                        <!-- Communication -->
                         <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Kommunikasjon</h4>
                         <div style="margin-bottom: 30px;">
                             <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
                                 <input type="checkbox" name="newsletter" checked style="width: 18px; height: 18px; accent-color: var(--primary-orange);">
                                 <span>Motta nyhetsbrev på e-post</span>
                             </label>
+                        </div>
+
+                        <!-- Notifications -->
+                        <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Varslinger</h4>
+                        <div style="margin-bottom: 30px;">
+                            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">Få varslinger på denne enheten om nye arrangementer og viktige oppdateringer.</p>
+                            <button type="button" id="enable-notifications-btn" class="btn btn-primary">Aktiver push-varslinger</button>
+                            <div id="notification-status" style="margin-top: 10px; font-size: 0.85rem;"></div>
                         </div>
 
                         <!-- Privacy Settings (Consent) -->
@@ -725,6 +733,39 @@ class MinSideManager {
                 </div>
             </div>
         `;
+
+        // Notifications
+        const enableNotificationsBtn = container.querySelector('#enable-notifications-btn');
+        const notificationStatusEl = container.querySelector('#notification-status');
+
+        if (enableNotificationsBtn && notificationStatusEl) {
+            // Check initial permission status
+            if ('Notification' in window) {
+                notificationStatusEl.textContent = `Status: ${Notification.permission}`;
+            }
+
+            enableNotificationsBtn.addEventListener('click', async () => {
+                enableNotificationsBtn.disabled = true;
+                enableNotificationsBtn.textContent = 'Behandler...';
+                try {
+                    const token = await window.firebaseService.requestNotificationPermission();
+                    if (token) {
+                        notificationStatusEl.textContent = 'Status: Varslinger er aktivert på denne enheten.';
+                        notificationStatusEl.style.color = 'green';
+                        enableNotificationsBtn.textContent = 'Varslinger er Aktivert';
+                    } else {
+                        notificationStatusEl.textContent = 'Status: Kunne ikke aktivere varslinger. Sjekk nettleserinnstillingene.';
+                        notificationStatusEl.style.color = 'red';
+                        enableNotificationsBtn.textContent = 'Aktiver push-varslinger';
+                    }
+                } catch (error) {
+                    notificationStatusEl.textContent = `Feil: ${error.message}`;
+                    notificationStatusEl.style.color = 'red';
+                } finally {
+                    enableNotificationsBtn.disabled = Notification.permission === 'granted';
+                }
+            });
+        }
 
         // Fetch and display consent status
         this.updateConsentStatusDisplay();

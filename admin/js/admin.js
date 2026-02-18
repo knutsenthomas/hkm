@@ -633,7 +633,133 @@ class AdminManager {
                     this.userEditMode = false;
                     this.renderUsersSection();
                     break;
+                case 'kommunikasjon':
+                    this.renderKommunikasjonSection();
+                    break;
             }
+        }
+    }
+
+    renderKommunikasjonSection() {
+        const section = document.getElementById('kommunikasjon-section');
+        if (!section) return;
+        section.setAttribute('data-rendered', 'true');
+
+        const form = document.getElementById('bulk-email-form');
+        const statusEl = document.getElementById('email-status');
+
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = form.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.textContent = 'Sender...';
+                statusEl.textContent = 'Forbereder utsendelse...';
+                statusEl.className = 'status-message info';
+
+                try {
+                    const user = firebase.auth().currentUser;
+                    if (!user) {
+                        throw new Error('Du er ikke logget inn.');
+                    }
+
+                    const idToken = await user.getIdToken();
+                    const targetRole = document.getElementById('target-role').value;
+                    const subject = document.getElementById('email-subject').value;
+                    const message = document.getElementById('email-message').value;
+
+                    const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendBulkEmail', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${idToken}`
+                        },
+                        body: JSON.stringify({
+                            targetRole,
+                            subject,
+                            message,
+                            fromName: "His Kingdom Ministry"
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || `Server responded with ${response.status}`);
+                    }
+
+                    statusEl.textContent = result.message || 'E-poster er sendt!';
+                    statusEl.className = 'status-message success';
+                    form.reset();
+
+                } catch (error) {
+                    console.error('Feil ved masseutsendelse:', error);
+                    statusEl.textContent = `Feil: ${error.message}`;
+                    statusEl.className = 'status-message error';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Send E-poster';
+                }
+            });
+        }
+
+        const pushForm = document.getElementById('push-notification-form');
+        const pushStatusEl = document.getElementById('push-status');
+
+        if (pushForm) {
+            pushForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = pushForm.querySelector('button[type="submit"]');
+                btn.disabled = true;
+                btn.textContent = 'Sender...';
+                pushStatusEl.textContent = 'Forbereder utsendelse...';
+                pushStatusEl.className = 'status-message info';
+
+                try {
+                    const user = firebase.auth().currentUser;
+                    if (!user) {
+                        throw new Error('Du er ikke logget inn.');
+                    }
+
+                    const idToken = await user.getIdToken();
+                    const targetRole = document.getElementById('push-target-role').value;
+                    const title = document.getElementById('push-title').value;
+                    const body = document.getElementById('push-body').value;
+                    const click_action = document.getElementById('push-click-action').value;
+
+                    const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendPushNotification', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${idToken}`
+                        },
+                        body: JSON.stringify({
+                            targetRole,
+                            title,
+                            body,
+                            click_action
+                        })
+                    });
+
+                    const result = await response.json();
+
+                    if (!response.ok) {
+                        throw new Error(result.error || `Server responded with ${response.status}`);
+                    }
+
+                    pushStatusEl.textContent = result.message || 'Push-varsling er sendt!';
+                    pushStatusEl.className = 'status-message success';
+                    pushForm.reset();
+
+                } catch (error) {
+                    console.error('Feil ved utsendelse av push-varsling:', error);
+                    pushStatusEl.textContent = `Feil: ${error.message}`;
+                    pushStatusEl.className = 'status-message error';
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Send Push-varsling';
+                }
+            });
         }
     }
 

@@ -136,6 +136,12 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a href="#" class="nav-link" data-section="kommunikasjon">
+                        <span class="material-symbols-outlined">campaign</span>
+                        <span>Kommunikasjon</span>
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a href="#" class="nav-link" data-section="profile">
                         <span class="material-symbols-outlined">person</span>
                         <span>Profil</span>
@@ -376,7 +382,67 @@
                 </div>
                 <div class="loader"></div>
             </div>
-        </section>
+
+            <div id="kommunikasjon-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Kommunikasjon</h2>
+                    <p class="section-subtitle">Send e-poster og push-varslinger til brukergrupper.</p>
+                </div>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">Masseutsendelse av E-post</h3>
+                        <form id="bulk-email-form">
+                            <div class="form-group">
+                                <label for="target-role">Målgruppe</label>
+                                <select id="target-role" name="targetRole" class="form-control">
+                                    <option value="all">Alle Brukere</option>
+                                    <option value="medlem">Bare Medlemmer</option>
+                                    <!-- Add other roles as needed -->
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-subject">Emne</label>
+                                <input type="text" id="email-subject" name="subject" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-message">Melding</label>
+                                <textarea id="email-message" name="message" class="form-control" rows="6" required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">Send E-poster</button>
+                                            <div id="email-status" class="status-message" style="margin-top: 15px;"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                                <div class="card" style="margin-top: 30px;">
+                                    <div class="card-body">
+                                        <h3 class="card-title">Utsendelse av Push-varsling</h3>
+                                        <form id="push-notification-form">
+                                            <div class="form-group">
+                                                <label for="push-target-role">Målgruppe</label>
+                                                <select id="push-target-role" name="targetRole" class="form-control">
+                                                    <option value="all">Alle Brukere</option>
+                                                    <option value="medlem">Bare Medlemmer</option>
+                                                    <!-- Add other roles as needed -->
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="push-title">Tittel</label>
+                                                <input type="text" id="push-title" name="title" class="form-control" required>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="push-body">Melding</label>
+                                                <textarea id="push-body" name="body" class="form-control" rows="3" required></textarea>
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="push-click-action">Link (valgfri)</label>
+                                                <input type="text" id="push-click-action" name="click_action" class="form-control" placeholder="https://his-kingdom-ministry.web.app/arrangementer">
+                                            </div>
+                                            <button type="submit" class="btn-primary">Send Push-varsling</button>
+                                            <div id="push-status" class="status-message" style="margin-top: 15px;"></div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>        </section>
     </main>
 
     <!-- Core Dashboard Logic (Non-Module for compatibility) -->
