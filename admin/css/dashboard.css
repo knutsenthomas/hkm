@@ -847,10 +847,11 @@ h3.ce-header {
     font-size: 1.05rem;
     /* Slightly larger text */
     color: #334155;
+    margin-bottom: 20px !important;
 }
 
 .ce-block {
-    padding-bottom: 20px;
+    padding-bottom: 24px !important;
     /* More space between blocks */
 }
 
