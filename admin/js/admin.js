@@ -1901,25 +1901,32 @@ class AdminManager {
                 toolsConfig.delimiter = Delimiter;
             }
 
-            if (typeof Embed !== 'undefined' || window.Embed) {
-                const EmbedClass = window.Embed || Embed;
-                toolsConfig.embed = {
-                    class: EmbedClass,
-                    inlineToolbar: true,
-                    config: {
-                        services: {
-                            youtube: true,
-                            vimeo: true,
-                            facebook: true,
-                            instagram: true,
-                            twitter: true
+            if (typeof window.Embed !== 'undefined' || typeof Embed !== 'undefined') {
+                const EmbedClass = window.Embed || (typeof Embed !== 'undefined' ? Embed : null);
+                if (EmbedClass) {
+                    console.log("Registering Video / Embed tool...");
+                    toolsConfig.video = {
+                        class: EmbedClass,
+                        inlineToolbar: true,
+                        config: {
+                            services: {
+                                youtube: true,
+                                vimeo: true,
+                                facebook: true,
+                                instagram: true,
+                                twitter: true
+                            }
+                        },
+                        toolbox: {
+                            title: 'Video / Embed'
                         }
-                    },
-                    toolbox: {
-                        title: 'Video / Embed'
-                    }
-                };
+                    };
+                }
+            } else {
+                console.warn("Embed tool class not found in window or global scope.");
             }
+
+            console.log("Final EditorJS Tools Config:", Object.keys(toolsConfig));
 
             const editor = new EditorJS({
                 holder: 'editorjs-container',
