@@ -852,7 +852,8 @@ class ContentManager {
                 } catch (e) { }
             }
 
-            const html = events.slice(0, 3).map(event => {
+            const displayEvents = this.pageId === 'index' ? events.slice(0, 3) : events;
+            const html = displayEvents.map(event => {
                 try {
                     const eventKey = this.getEventKey(event);
                     const startValue = event.start || event.date;

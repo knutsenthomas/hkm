@@ -50,9 +50,10 @@ class FirebaseService {
             console.log("✅ Firebase initialized (Compat)");
 
             // Enable offline persistence for faster subsequent loads
-            this.db.enablePersistence().catch((err) => {
+            // Use synchronizeTabs: true to allow multiple tabs to share the same persistence layer
+            this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
                 if (err.code === 'failed-precondition') {
-                    console.warn("[FirebaseService] Persistence failed (multiple tabs open)");
+                    console.warn("[FirebaseService] Persistence failed (multiple tabs open without sync)");
                 } else if (err.code === 'unimplemented') {
                     console.warn("[FirebaseService] Persistence not supported by browser");
                 }
