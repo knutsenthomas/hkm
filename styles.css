@@ -4452,13 +4452,16 @@ ol.block-list {
 }
 
 /* Responsive Video Embeds */
+.block-embed-wrapper {
+    margin: 30px 0;
+}
+
 .block-embed {
     position: relative;
     padding-bottom: 56.25%;
     /* 16:9 Aspect Ratio */
     height: 0;
     overflow: hidden;
-    margin: 30px 0;
     border-radius: 8px;
     background: #f1f5f9;
 }
@@ -4473,12 +4476,10 @@ ol.block-list {
 }
 
 .block-embed-caption {
-    position: absolute;
-    bottom: -25px;
-    width: 100%;
+    margin-top: 10px;
     text-align: center;
     font-size: 0.9rem;
-    color: var(--text-light);
+    color: #64748b;
     font-style: italic;
 }
 

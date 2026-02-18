@@ -1910,7 +1910,9 @@ class AdminManager {
                         services: {
                             youtube: true,
                             vimeo: true,
-                            facebook: true
+                            facebook: true,
+                            instagram: true,
+                            twitter: true
                         }
                     },
                     toolbox: {

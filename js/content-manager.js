@@ -2078,8 +2078,10 @@ class ContentManager {
                     case 'embed': // Keep for backward compatibility
                     case 'video': // New key
                         return `
-                            <div class="block-embed">
-                                <iframe src="${block.data.embed}" width="${block.data.width}" height="${block.data.height}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            <div class="block-embed-wrapper">
+                                <div class="block-embed">
+                                    <iframe src="${block.data.embed}" width="${block.data.width}" height="${block.data.height}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                                </div>
                                 ${block.data.caption ? `<div class="block-embed-caption">${block.data.caption}</div>` : ''}
                             </div>
                         `;
