@@ -640,62 +640,100 @@ class AdminManager {
         }
     }
 
-    renderKommunikasjonSection() {
+    async loadAllUsers() {
+        if (this.allUsersData) return; // Use cache if available
+        try {
+            const snapshot = await firebaseService.db.collection('users').orderBy('createdAt', 'desc').get();
+            const users = [];
+            snapshot.forEach(doc => {
+                users.push({ id: doc.id, ...doc.data() });
+            });
+            this.allUsersData = users; // Cache for filtering
+        } catch (error) {
+            console.error('Error fetching users:', error);
+        }
+    }
+
+    async renderKommunikasjonSection() {
         const section = document.getElementById('kommunikasjon-section');
         if (!section) return;
         section.setAttribute('data-rendered', 'true');
 
-        const form = document.getElementById('bulk-email-form');
-        const statusEl = document.getElementById('email-status');
+        await this.loadAllUsers();
 
-        if (form) {
-            form.addEventListener('submit', async (e) => {
+        const renderUserSelection = (containerId) => {
+            const container = document.getElementById(containerId);
+            if (!container || !this.allUsersData) return;
+            const userCheckboxes = this.allUsersData.map(user => `
+                <label class="user-checkbox-label">
+                    <input type="checkbox" class="user-select-checkbox" value="${user.id}">
+                    ${user.displayName || user.email}
+                </label>
+            `).join('');
+            container.innerHTML = `<div class="user-list-scroll">${userCheckboxes}</div>`;
+        };
+
+        // Email form
+        const emailForm = document.getElementById('bulk-email-form');
+        const emailStatusEl = document.getElementById('email-status');
+        const emailTargetRole = document.getElementById('target-role');
+        const emailUserSelection = document.getElementById('email-user-selection');
+
+        emailTargetRole.addEventListener('change', (e) => {
+            if (e.target.value === 'selected') {
+                renderUserSelection('email-user-selection');
+                emailUserSelection.style.display = 'block';
+            } else {
+                emailUserSelection.style.display = 'none';
+            }
+        });
+
+        if (emailForm) {
+            emailForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const btn = form.querySelector('button[type="submit"]');
+                const btn = emailForm.querySelector('button[type="submit"]');
                 btn.disabled = true;
                 btn.textContent = 'Sender...';
-                statusEl.textContent = 'Forbereder utsendelse...';
-                statusEl.className = 'status-message info';
+                emailStatusEl.textContent = 'Forbereder utsendelse...';
+                emailStatusEl.className = 'status-message info';
 
                 try {
                     const user = firebase.auth().currentUser;
-                    if (!user) {
-                        throw new Error('Du er ikke logget inn.');
-                    }
+                    if (!user) throw new Error('Du er ikke logget inn.');
 
                     const idToken = await user.getIdToken();
-                    const targetRole = document.getElementById('target-role').value;
+                    const targetRole = emailTargetRole.value;
                     const subject = document.getElementById('email-subject').value;
                     const message = document.getElementById('email-message').value;
 
+                    let payload = { targetRole, subject, message, fromName: "His Kingdom Ministry" };
+
+                    if (targetRole === 'selected') {
+                        const selectedUserIds = Array.from(emailUserSelection.querySelectorAll('.user-select-checkbox:checked')).map(cb => cb.value);
+                        if (selectedUserIds.length === 0) {
+                            throw new Error("Ingen brukere er valgt.");
+                        }
+                        payload.selectedUserIds = selectedUserIds;
+                    }
+
                     const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendBulkEmail', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${idToken}`
-                        },
-                        body: JSON.stringify({
-                            targetRole,
-                            subject,
-                            message,
-                            fromName: "His Kingdom Ministry"
-                        })
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                        body: JSON.stringify(payload)
                     });
 
                     const result = await response.json();
+                    if (!response.ok) throw new Error(result.error || `Server responded with ${response.status}`);
 
-                    if (!response.ok) {
-                        throw new Error(result.error || `Server responded with ${response.status}`);
-                    }
-
-                    statusEl.textContent = result.message || 'E-poster er sendt!';
-                    statusEl.className = 'status-message success';
-                    form.reset();
+                    emailStatusEl.textContent = result.message || 'E-poster er sendt!';
+                    emailStatusEl.className = 'status-message success';
+                    emailForm.reset();
+                    emailUserSelection.style.display = 'none';
 
                 } catch (error) {
                     console.error('Feil ved masseutsendelse:', error);
-                    statusEl.textContent = `Feil: ${error.message}`;
-                    statusEl.className = 'status-message error';
+                    emailStatusEl.textContent = `Feil: ${error.message}`;
+                    emailStatusEl.className = 'status-message error';
                 } finally {
                     btn.disabled = false;
                     btn.textContent = 'Send E-poster';
@@ -703,8 +741,20 @@ class AdminManager {
             });
         }
 
+        // Push form
         const pushForm = document.getElementById('push-notification-form');
         const pushStatusEl = document.getElementById('push-status');
+        const pushTargetRole = document.getElementById('push-target-role');
+        const pushUserSelection = document.getElementById('push-user-selection');
+
+        pushTargetRole.addEventListener('change', (e) => {
+            if (e.target.value === 'selected') {
+                renderUserSelection('push-user-selection');
+                pushUserSelection.style.display = 'block';
+            } else {
+                pushUserSelection.style.display = 'none';
+            }
+        });
 
         if (pushForm) {
             pushForm.addEventListener('submit', async (e) => {
@@ -717,39 +767,37 @@ class AdminManager {
 
                 try {
                     const user = firebase.auth().currentUser;
-                    if (!user) {
-                        throw new Error('Du er ikke logget inn.');
-                    }
+                    if (!user) throw new Error('Du er ikke logget inn.');
 
                     const idToken = await user.getIdToken();
-                    const targetRole = document.getElementById('push-target-role').value;
+                    const targetRole = pushTargetRole.value;
                     const title = document.getElementById('push-title').value;
                     const body = document.getElementById('push-body').value;
                     const click_action = document.getElementById('push-click-action').value;
 
+                    let payload = { targetRole, title, body, click_action };
+
+                     if (targetRole === 'selected') {
+                        const selectedUserIds = Array.from(pushUserSelection.querySelectorAll('.user-select-checkbox:checked')).map(cb => cb.value);
+                        if (selectedUserIds.length === 0) {
+                            throw new Error("Ingen brukere er valgt.");
+                        }
+                        payload.selectedUserIds = selectedUserIds;
+                    }
+
                     const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendPushNotification', {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${idToken}`
-                        },
-                        body: JSON.stringify({
-                            targetRole,
-                            title,
-                            body,
-                            click_action
-                        })
+                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                        body: JSON.stringify(payload)
                     });
 
                     const result = await response.json();
-
-                    if (!response.ok) {
-                        throw new Error(result.error || `Server responded with ${response.status}`);
-                    }
+                    if (!response.ok) throw new Error(result.error || `Server responded with ${response.status}`);
 
                     pushStatusEl.textContent = result.message || 'Push-varsling er sendt!';
                     pushStatusEl.className = 'status-message success';
                     pushForm.reset();
+                    pushUserSelection.style.display = 'none';
 
                 } catch (error) {
                     console.error('Feil ved utsendelse av push-varsling:', error);

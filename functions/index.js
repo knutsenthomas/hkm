@@ -265,19 +265,26 @@ exports.sendBulkEmail = onRequest({ cors: true }, async (req, res) => {
         }
 
         try {
-            const { targetRole, subject, message, fromName } = req.body;
+            const { targetRole, subject, message, fromName, selectedUserIds } = req.body;
 
-            if (!targetRole || !subject || !message) {
-                res.status(400).send({ error: "Mangler targetRole, subject eller message." });
+            if ((!targetRole && !selectedUserIds) || !subject || !message) {
+                res.status(400).send({ error: "Mangler målgruppe, emne eller melding." });
                 return;
             }
 
-            console.log(`Starter masseutsendelse for rolle: ${targetRole}`);
-
-            const users = await getAllUsers(targetRole);
+            let users = [];
+            if (targetRole === 'selected' && selectedUserIds && selectedUserIds.length > 0) {
+                console.log(`Henter ${selectedUserIds.length} utvalgte brukere.`);
+                const userPromises = selectedUserIds.map(uid => db.collection('users').doc(uid).get());
+                const userDocs = await Promise.all(userPromises);
+                users = userDocs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } else {
+                console.log(`Starter masseutsendelse for rolle: ${targetRole}`);
+                users = await getAllUsers(targetRole);
+            }
             
             if (users.length === 0) {
-                res.status(404).send({ error: "Ingen brukere funnet for den valgte rollen." });
+                res.status(404).send({ error: "Ingen brukere funnet for den valgte målgruppen." });
                 return;
             }
             
@@ -326,19 +333,26 @@ exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
         }
 
         try {
-            const { targetRole, title, body, icon, click_action } = req.body;
+            const { targetRole, title, body, icon, click_action, selectedUserIds } = req.body;
 
-            if (!targetRole || !title || !body) {
-                res.status(400).send({ error: "Mangler targetRole, title eller body." });
+            if ((!targetRole && !selectedUserIds) || !title || !body) {
+                res.status(400).send({ error: "Mangler målgruppe, tittel eller melding." });
                 return;
             }
 
-            console.log(`Starter utsendelse av push-varsling for rolle: ${targetRole}`);
-
-            const users = await getAllUsers(targetRole);
+            let users = [];
+            if (targetRole === 'selected' && selectedUserIds && selectedUserIds.length > 0) {
+                console.log(`Henter ${selectedUserIds.length} utvalgte brukere for push-varsling.`);
+                const userPromises = selectedUserIds.map(uid => db.collection('users').doc(uid).get());
+                const userDocs = await Promise.all(userPromises);
+                users = userDocs.map(doc => ({ id: doc.id, ...doc.data() }));
+            } else {
+                console.log(`Starter utsendelse av push-varsling for rolle: ${targetRole}`);
+                users = await getAllUsers(targetRole);
+            }
             
             if (users.length === 0) {
-                res.status(404).send({ error: "Ingen brukere funnet for den valgte rollen." });
+                res.status(404).send({ error: "Ingen brukere funnet for den valgte målgruppen." });
                 return;
             }
 
