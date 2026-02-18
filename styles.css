@@ -1641,23 +1641,8 @@ section {
     margin: 0 auto 30px;
 }
 
-.slide-buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: flex-start;
-    align-items: center;
-}
-
-body.hero-animate .slide-title {
-    animation: fadeInUp 1s ease;
-}
-
-body.hero-animate .slide-text {
-    animation: fadeInUp 1s ease 0.2s both;
-}
-
-body.hero-animate .slide-buttons {
-    animation: fadeInUp 1s ease 0.4s both;
+gap: 30px;
+z-index: 10;
 }
 
 .slider-nav {
@@ -4553,10 +4538,10 @@ ol.block-list {
 
     /* Animation */
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 1s ease, transform 1s ease;
-    transition-delay: 0.5s;
-    /* Wait for slide fade */
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition-delay: 0.1s;
+    /* Reduced delay for snappier load */
 }
 
 .hero-subtitle {
@@ -4565,9 +4550,9 @@ ol.block-list {
     line-height: 1.45;
     margin-bottom: 32px;
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 1s ease, transform 1s ease;
-    transition-delay: 0.8s;
+    transform: translateY(15px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+    transition-delay: 0.2s;
     max-width: 650px;
 }
 
