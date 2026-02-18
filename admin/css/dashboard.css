@@ -1051,7 +1051,17 @@ input[type="range"] {
     }
 
     .user-info {
-        display: none;
+        display: none !important;
+    }
+
+    .user-profile {
+        gap: 8px;
+    }
+
+    .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
     }
 
     .section-container {
@@ -1084,6 +1094,26 @@ input[type="range"] {
 
     .collection-grid {
         grid-template-columns: 1fr;
+    }
+
+    .top-nav-tabs {
+        padding: 0 16px;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .top-nav-tabs::-webkit-scrollbar {
+        display: none;
+        /* Safari and Chrome */
+    }
+
+    .top-nav-tab {
+        padding: 12px 12px;
+        font-size: 13px;
+        flex: 0 0 auto;
     }
 }
 
@@ -1145,8 +1175,28 @@ input[type="range"] {
     }
 
     .main-content {
-        margin-left: 0;
+        margin-left: 0 !important;
         width: 100%;
+    }
+
+    .top-nav-tabs {
+        padding: 0 16px;
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        position: relative;
+        z-index: 5;
+        /* Keep below overlay (1001) */
+    }
+
+    .top-nav-tabs::-webkit-scrollbar {
+        display: none;
+    }
+
+    .top-nav-tab {
+        padding: 14px 16px;
+        flex: 0 0 auto;
     }
 
     .mobile-nav-toggle {
@@ -1154,6 +1204,22 @@ input[type="range"] {
         font-size: 24px;
         cursor: pointer;
         margin-right: 16px;
+    }
+
+    .sidebar {
+        z-index: 1002;
+        /* Ensure it's above overlay on iPad */
+        width: 260px;
+    }
+
+    .header-search {
+        display: none !important;
+        /* Hide search on iPad as it gets cramped with sidebar toggle */
+    }
+
+    .user-info {
+        display: none;
+        /* Hide text on iPad to save space */
     }
 
     .grid-2-cols,
@@ -1231,6 +1297,47 @@ input[type="range"] {
     .ce-block__content {
         max-width: 100% !important;
         padding: 0 !important;
+    }
+
+    /* Full-screen Editor Mobile Adjustments */
+    .editor-paper {
+        padding: 40px 20px !important;
+        min-height: auto !important;
+        margin-bottom: 40px !important;
+        border-radius: 0 !important;
+    }
+
+    .editor-content-wrapper {
+        flex-direction: column !important;
+        overflow-y: auto !important;
+    }
+
+    .editor-sidebar-v2 {
+        width: 100% !important;
+        border-left: none !important;
+        border-top: 1px solid var(--border-color);
+        padding: 24px !important;
+        overflow-y: visible !important;
+    }
+
+    .editor-main-canvas {
+        padding: 0 !important;
+        overflow-y: visible !important;
+    }
+
+    #col-item-title-v2 {
+        font-size: 28px !important;
+        line-height: 1.2 !important;
+        margin-bottom: 20px !important;
+    }
+
+    .editor-header-v2 {
+        padding: 0 16px !important;
+    }
+
+    .editor-header-right .btn-primary {
+        padding: 8px 12px !important;
+        font-size: 13px !important;
     }
 }
 
