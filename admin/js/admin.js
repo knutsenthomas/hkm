@@ -1902,9 +1902,26 @@ class AdminManager {
             }
 
             // Video / Embed tool
-            const EmbedClass = window.Embed || (typeof Embed !== 'undefined' ? Embed : null);
+            let EmbedClass = window.Embed || (typeof Embed !== 'undefined' ? Embed : null);
             if (EmbedClass) {
-                console.log("Registering Embed tool with class:", EmbedClass.name);
+                console.log("Registering Embed tool. Class found:", EmbedClass.name || 'Anonymous');
+
+                // Manually inject toolbox if missing (crucial for EditorJS to show it)
+                if (!EmbedClass.toolbox) {
+                    try {
+                        Object.defineProperty(EmbedClass, 'toolbox', {
+                            get: () => ({
+                                title: 'Video',
+                                icon: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M17 4H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 9V7l5 3-5 3z"/></svg>'
+                            }),
+                            configurable: true
+                        });
+                        console.log("Injected toolbox property into EmbedClass.");
+                    } catch (e) {
+                        console.error("Failed to inject toolbox:", e);
+                    }
+                }
+
                 toolsConfig.embed = {
                     class: EmbedClass,
                     inlineToolbar: true,
@@ -1916,10 +1933,6 @@ class AdminManager {
                             instagram: true,
                             twitter: true
                         }
-                    },
-                    toolbox: {
-                        title: 'Video',
-                        icon: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M17 4H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 9V7l5 3-5 3z"/></svg>'
                     }
                 };
             } else {
