@@ -1,5 +1,5 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const firebaseService = window.firebaseService;
+document.addEventListener('DOMContentLoaded', async () => {
+    console.log("[HKM] MinSide Auth Script loaded");
 
     // --- Mode Switching ---
     const buttons = document.querySelectorAll('.btn-mode');
@@ -56,7 +56,9 @@ document.addEventListener('DOMContentLoaded', () => {
         hideMessage();
 
         try {
-            await firebaseService.login(email, password);
+            const service = window.firebaseService;
+            if (!service || !service.isInitialized) throw new Error("Firebase mismatch");
+            await service.login(email, password);
             await routeByRole();
         } catch (error) {
             console.error(error);
@@ -126,11 +128,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 4. Google Login ---
     document.getElementById('google-login').addEventListener('click', async () => {
         try {
-            const result = await firebaseService.loginWithGoogle();
+            const service = window.firebaseService;
+            if (!service || !service.isInitialized) throw new Error("Firebase mismatch");
+            const result = await service.loginWithGoogle();
             const user = result.user;
 
             // Check if user already has a doc, if not create one as 'medlem'
-            const role = await firebaseService.getUserRole(user.uid);
+            const role = await service.getUserRole(user.uid);
             if (!role) {
                 await firebase.firestore().collection('users').doc(user.uid).set({
                     email: user.email,
@@ -164,15 +168,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function routeByRole() {
+        const service = window.firebaseService;
         const user = firebase.auth().currentUser;
-        if (!user) {
+        if (!user || !service) {
             window.location.href = 'index.html';
             return;
         }
 
         let role = 'medlem';
         try {
-            role = await firebaseService.getUserRole(user.uid);
+            role = await service.getUserRole(user.uid);
         } catch (err) {
             console.warn('Kunne ikke hente rolle:', err);
         }

@@ -22,6 +22,7 @@ class MinSideManager {
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 this.currentUser = user;
+                await this.syncUserProfile(user);
                 await this.syncProfileFromGoogleProvider();
                 await this.updateUserProfile(user);
                 this.updateRoleLinks(user);
@@ -142,6 +143,38 @@ class MinSideManager {
         };
     }
 
+    async syncUserProfile(user) {
+        if (!user) return;
+        try {
+            const docRef = firebase.firestore().collection('users').doc(user.uid);
+            const doc = await docRef.get();
+            const isNewUser = !doc.exists;
+
+            if (isNewUser) {
+                // Initial creation
+                await docRef.set({
+                    email: user.email || '',
+                    displayName: user.displayName || user.email || '',
+                    photoURL: user.photoURL || '',
+                    role: 'medlem',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Admin Notification
+                await this.createAdminNotification({
+                    type: 'NEW_USER_REGISTRATION',
+                    userId: user.uid,
+                    userEmail: user.email,
+                    userName: user.displayName || user.email,
+                    message: `Ny bruker registrert: ${user.displayName || user.email}`
+                });
+            }
+        } catch (e) {
+            console.warn('Kunne ikke synkronisere bruker:', e);
+        }
+    }
+
     async syncProfileFromGoogleProvider() {
         if (!this.currentUser) return;
         const user = this.currentUser;
@@ -156,11 +189,15 @@ class MinSideManager {
                 await user.updateProfile(updates);
             }
 
-            await firebase.firestore().collection('users').doc(user.uid).set({
+            const docRef = firebase.firestore().collection('users').doc(user.uid);
+            // No need to check exists here as syncUserProfile handled it or will merge
+            await docRef.set({
                 displayName: user.displayName || googleProvider.displayName || user.email || '',
                 photoURL: user.photoURL || googleProvider.photoURL || '',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             }, { merge: true });
+
+            // Note: Registration notification is handled in syncUserProfile
         } catch (e) {
             console.warn('Kunne ikke synkronisere Google-profil:', e);
         }
@@ -226,6 +263,7 @@ class MinSideManager {
             form.querySelector('[name="address"]').value = data.address || '';
             form.querySelector('[name="zip"]').value = data.zip || '';
             form.querySelector('[name="city"]').value = data.city || '';
+            form.querySelector('[name="ssn"]').value = data.ssn || '';
             if (!form.querySelector('[name="displayName"]').value) {
                 form.querySelector('[name="displayName"]').value = data.displayName || '';
             }
@@ -251,6 +289,7 @@ class MinSideManager {
                 address: formData.get('address') || '',
                 zip: formData.get('zip') || '',
                 city: formData.get('city') || '',
+                ssn: formData.get('ssn') || '',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
@@ -939,6 +978,19 @@ class MinSideManager {
         requestAnimationFrame(() => {
             overlay.classList.add('active');
         });
+    }
+
+    async createAdminNotification(notifData) {
+        try {
+            await firebase.firestore().collection('admin_notifications').add({
+                ...notifData,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                read: false
+            });
+            console.log("Admin notification created:", notifData);
+        } catch (err) {
+            console.warn("Failed to create admin notification:", err);
+        }
     }
 
     async performAccountDeletion() {
