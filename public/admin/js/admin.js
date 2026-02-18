@@ -4462,6 +4462,12 @@ class AdminManager {
                         <textarea name="adminNotes" class="form-control" style="min-height:80px; resize:vertical;">${userData ? (userData.adminNotes || '') : ''}</textarea>
                     </div>
 
+                    <div class="form-group">
+                        <label>Fødselsnummer (11 siffer - for skattefradrag)</label>
+                        <input type="password" name="ssn" class="form-control" value="${userData ? (userData.ssn || '') : ''}" placeholder="00000000000" maxlength="11" autocomplete="off">
+                        <p class="helper-text">Lagres kryptert/sikkert i Firestore for rapportering til Skatteetaten.</p>
+                    </div>
+
                     <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
                         <button type="button" class="btn-cancel" style="padding:10px 20px; border-radius:8px; border:1px solid #e2e8f0; background:none; cursor:pointer;">Avbryt</button>
                         <button type="submit" class="btn-primary">Lagre endringer</button>
@@ -4494,7 +4500,8 @@ class AdminManager {
                 city: formData.get('city'),
                 birthdate: formData.get('birthdate'),
                 membershipNumber: formData.get('membershipNumber'),
-                adminNotes: formData.get('adminNotes')
+                adminNotes: formData.get('adminNotes'),
+                ssn: formData.get('ssn')
             };
             const userId = formData.get('id');
             await this.saveUser(userId, data);
@@ -4517,7 +4524,17 @@ class AdminManager {
                     ...data,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                this.showToast('Brukerrettigheter opprettet.', 'success');
+
+                // Admin Notification
+                await this.createAdminNotification({
+                    type: 'NEW_USER',
+                    userId: newDoc.id,
+                    userEmail: data.email,
+                    userName: data.displayName,
+                    message: `Ny bruker registrert: ${data.displayName || data.email}`
+                });
+
+                this.showToast('Brukerrettigheter opprettet og admin varslet.', 'success');
             }
             await this.loadUsersList();
         } catch (error) {
@@ -4534,6 +4551,19 @@ class AdminManager {
         } catch (error) {
             console.error('Error deleting user:', error);
             this.showToast('Kunne ikke slette bruker: ' + error.message, 'error');
+        }
+    }
+
+    async createAdminNotification(notifData) {
+        try {
+            await firebaseService.db.collection('admin_notifications').add({
+                ...notifData,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                read: false
+            });
+            console.log("Admin notification created:", notifData);
+        } catch (err) {
+            console.warn("Failed to create admin notification:", err);
         }
     }
 }
