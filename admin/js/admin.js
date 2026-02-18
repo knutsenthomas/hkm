@@ -4716,7 +4716,7 @@ class AdminManager {
                 const updates = {
                     displayName: formData.get('displayName'),
                     phone: formData.get('phone'),
-                    gender: userData.gender, // preserve
+                    gender: userData.gender || null, // preserve or null
                     birthdate: formData.get('birthdate'),
                     address: formData.get('address'),
                     zip: formData.get('zip'),
@@ -4744,18 +4744,24 @@ class AdminManager {
     }
 
     async saveUser(userId, data) {
+        // Remove undefined fields to prevent Firestore errors
+        const cleanData = Object.keys(data).reduce((acc, key) => {
+            if (data[key] !== undefined) acc[key] = data[key];
+            return acc;
+        }, {});
+
         try {
             if (userId) {
                 // Update
                 await firebaseService.db.collection('users').doc(userId).set({
-                    ...data,
+                    ...cleanData,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 this.showToast('Bruker oppdatert.', 'success');
             } else {
                 // Create (Placeholder for Firestore metadata - User still needs Auth account)
                 const newDoc = await firebaseService.db.collection('users').add({
-                    ...data,
+                    ...cleanData,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -4763,9 +4769,9 @@ class AdminManager {
                 await this.createAdminNotification({
                     type: 'NEW_USER',
                     userId: newDoc.id,
-                    userEmail: data.email,
-                    userName: data.displayName,
-                    message: `Ny bruker registrert: ${data.displayName || data.email}`
+                    userEmail: cleanData.email,
+                    userName: cleanData.displayName,
+                    message: `Ny bruker registrert: ${cleanData.displayName || cleanData.email}`
                 });
 
                 this.showToast('Brukerrettigheter opprettet og admin varslet.', 'success');
