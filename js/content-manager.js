@@ -107,6 +107,12 @@ class ContentManager {
             if (cachedPage) {
                 this.updateDOM(JSON.parse(cachedPage));
             }
+
+            const cachedHero = localStorage.getItem('hkm_cache_hero_slides');
+            if (cachedHero) {
+                const heroData = JSON.parse(cachedHero);
+                if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
+            }
         } catch (e) {
             console.warn("[ContentManager] Early cache read failed", e);
         }
@@ -182,7 +188,10 @@ class ContentManager {
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
             const heroData = await firebaseService.getPageContent('hero_slides');
-            if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
+            if (heroData && heroData.slides) {
+                localStorage.setItem('hkm_cache_hero_slides', JSON.stringify(heroData));
+                this.renderHeroSlides(heroData.slides);
+            }
 
             const events = await this.loadEvents();
             this.renderEvents(events || []);
@@ -1554,11 +1563,22 @@ class ContentManager {
             const isDifferent = slides.length !== currentSlides.length || slides.some((slide, i) => {
                 const current = currentSlides[i];
                 if (!current) return true;
-                return (slide.title || '').trim() !== current.title ||
-                    (slide.subtitle || '').trim() !== current.subtitle ||
-                    (slide.imageUrl || '').trim() !== current.imageUrl ||
-                    (slide.btnText || '').trim() !== current.btnText ||
-                    (slide.btnLink || '').trim() !== current.btnLink;
+
+                const title = (slide.title || '').trim();
+                const subtitle = (slide.subtitle || '').trim();
+                const btnText = (slide.btnText || '').trim();
+                const btnLink = (slide.btnLink || '').trim();
+
+                // Advanced URL comparison: strip quotes and normalize protocol
+                const clean = (url) => (url || '').replace(/['"]/g, '').replace(/^https?:/, '').trim();
+                const currentImg = clean(current.imageUrl);
+                const incomingImg = clean(slide.imageUrl);
+
+                return title !== current.title ||
+                    subtitle !== current.subtitle ||
+                    currentImg !== incomingImg ||
+                    btnText !== current.btnText ||
+                    btnLink !== current.btnLink;
             });
 
             if (isDifferent) {
