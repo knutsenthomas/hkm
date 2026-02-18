@@ -396,7 +396,7 @@
     </style>
     <link rel="stylesheet" href="css/cookie-consent.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
-<!-- Tailwind CSS Play CDN -->
+    <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -422,8 +422,7 @@
             <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
-                        class="w-full h-full object-cover">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
             </a>
@@ -462,48 +461,38 @@
     </header>
 
     <!-- Full-screen Mega Menu Overlay -->
-    <div class="mega-menu" id="mega-menu">
-        <div class="mega-menu-container">
-
-
-            <!-- Menu Header (Close & Search) -->
-            <div class="mega-menu-header">
-                <!-- Mirrored Header Structure for Precision Alignment -->
-                <div class="header-container-mirror">
-                    <!-- Brand Logo in Menu -->
-                    <a href="index.html" class="logo">
-                        <div class="logo-icon">
-                            <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo">
-                        </div>
-                        <span>His Kingdom Ministry</span>
-                    </a>
-
-                    <!-- Right Controls Wrapper -->
-                    <div class="header-actions-mirror">
-                        <!-- Independent Close Button -->
-                        <button class="menu-close" id="menu-close" aria-label="Lukk meny">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..."
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <!-- Search & Lang Row (Below Header) -->
-                <div class="menu-controls-row">
-                    <div class="menu-search">
-                        <i class="fas fa-search"></i>
-                        <input type="text" placeholder="Søk...">
-                    </div>
-
-                    <div class="mega-menu-lang in-header mobile-only">
-                        <a href="arrangementer.html" class="active"><i class="fas fa-globe"></i> NO</a>
-                        <a href="en/events.html"><i class="fas fa-globe"></i> EN</a>
-                        <a href="es/eventos.html"><i class="fas fa-globe"></i> ES</a>
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="index.html" class="text-sm font-bold text-primary-orange">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="en/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="es/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
                     <div class="menu-col">
                         <h3 class="menu-section-title">Engasjer deg</h3>
                         <ul class="mega-nav-list">
@@ -515,6 +504,7 @@
                         </ul>
                     </div>
 
+                    <!-- Column 2: Bli kjent med oss -->
                     <div class="menu-col">
                         <h3 class="menu-section-title">Bli kjent med oss</h3>
                         <ul class="mega-nav-list">
@@ -523,19 +513,22 @@
                         </ul>
                     </div>
 
+                    <!-- Column 3: Ressurser & Media -->
                     <div class="menu-col">
                         <h3 class="menu-section-title">Ressurser</h3>
                         <ul class="mega-nav-list">
                             <li><a href="arrangementer.html">Arrangementer</a></li>
                             <li><a href="media.html">Media & Podcast</a></li>
                             <li><a href="blogg.html">Nyheter & Blogg</a></li>
+                            <li><a href="minside/index.html">Min Side</a></li>
                         </ul>
                     </div>
                 </div>
 
+                <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block">Støtt nå <i
-                            class="fas fa-heart"></i></a>
+                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block footer-donate-btn">Støtt nå<i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
                         <a href="donasjoner.html#skattefradrag">Skattefradrag</a>
                         <a href="om-oss.html">Om oss</a>

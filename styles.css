@@ -1638,7 +1638,7 @@ section {
 .slide-buttons {
     display: flex;
     gap: 20px;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
 }
 
@@ -3025,9 +3025,10 @@ body.hero-animate .slide-buttons {
     }
 
     .slide-buttons {
-        flex-direction: column;
+        flex-direction: row;
         gap: 12px;
-        align-items: center;
+        align-items: flex-start;
+        justify-content: flex-start;
     }
 
 
@@ -4505,24 +4506,25 @@ ol.block-list {
     height: 100%;
     display: flex;
     align-items: center;
-    /* Center vertically instead of bottom */
-    padding-bottom: 0;
+    justify-content: flex-start;
+    padding-top: clamp(96px, 14vh, 160px);
+    padding-bottom: clamp(110px, 12vh, 150px);
     z-index: 10;
 }
 
 .hero-content {
-    max-width: 800px;
+    width: min(100%, 850px);
     color: white;
-    padding: 0 20px;
-    margin-top: 10vh;
-    /* Push slightly down from absolute center */
+    padding: 0 clamp(16px, 3vw, 32px);
+    margin-top: 0;
+    text-align: left;
 }
 
 .hero-title {
-    font-size: clamp(3.5rem, 5.5vw, 5.5rem);
+    font-size: clamp(2.3rem, 6vw, 5.5rem);
     font-weight: 800;
     line-height: 1.05;
-    margin-bottom: 32px;
+    margin-bottom: clamp(16px, 2.4vw, 32px);
     letter-spacing: -0.02em;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 
@@ -4535,10 +4537,10 @@ ol.block-list {
 }
 
 .hero-subtitle {
-    font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+    font-size: clamp(1rem, 2.4vw, 1.35rem);
     font-weight: 400;
-    line-height: 1.6;
-    margin-bottom: 0;
+    line-height: 1.45;
+    margin-bottom: 32px;
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 1s ease, transform 1s ease;
@@ -4586,23 +4588,51 @@ ol.block-list {
 
 @media (max-width: 768px) {
     .hero-container {
-        padding-bottom: 120px;
-        /* More space for mobile controls */
-        justify-content: center;
-        text-align: center;
+        align-items: flex-end;
+        justify-content: flex-start;
+        padding-top: 96px;
+        padding-bottom: 130px;
+    }
+
+    .hero-content {
+        width: 100%;
+        padding: 0 20px;
+        text-align: left;
+    }
+
+    .hero-title {
+        font-size: clamp(2rem, 9vw, 3.2rem);
+        line-height: 1.08;
+    }
+
+    .hero-subtitle {
+        max-width: 36ch;
     }
 
     .hero-nav {
-        bottom: 30px;
+        bottom: 24px;
+        width: 44px;
+        height: 44px;
     }
 
     .hero-nav.prev {
-        right: auto;
-        left: 20px;
+        right: 74px;
+        left: auto;
     }
 
     .hero-nav.next {
         right: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-container {
+        padding-top: 88px;
+        padding-bottom: 120px;
+    }
+
+    .hero-content {
+        padding: 0 16px;
     }
 }
 
@@ -4957,23 +4987,16 @@ ol.block-list {
         /* Removed top padding to eliminate gap below language pill */
     }
 
-    .mega-menu-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        width: 100vw;
-        height: auto;
-        min-height: 100px;
-        background: #ffffff;
-        margin: 0;
-        padding: 0 0 20px 0;
-        z-index: 10001;
-        pointer-events: none;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    /* Mega Menu Grid Fix */
+    .mega-menu-grid {
+        grid-template-columns: 1fr !important;
+        gap: 32px !important;
+        margin-top: 20px !important;
+    }
 
-        display: flex;
-        flex-direction: column;
+    .mega-menu-header {
+        display: none !important;
+        /* Hide old header mirror if present */
     }
 
     /* Robust avoidance of stacking in mirror header */
@@ -4987,85 +5010,7 @@ ol.block-list {
         /* Match mobile padding */
     }
 
-    .mega-menu-header * {
-        pointer-events: auto;
-        /* Re-enable clicks for children */
-    }
-
-    .mega-menu-header .logo {
-        font-size: 20px;
-        order: unset;
-        /* Remove flex order */
-        margin: 0 !important;
-        /* Prevent auto margins centering */
-        align-self: flex-start !important;
-        flex-grow: 0 !important;
-        flex-shrink: 1 !important;
-        /* Allow logo to shrink if needed */
-        text-align: left !important;
-        width: auto !important;
-        white-space: nowrap !important;
-        /* Keep text on one line */
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
-        /* Ellipsis if it gets too small */
-        max-width: calc(100% - 70px) !important;
-        /* Ensure space for button (50px + 20px buffer) */
-    }
-
-    .menu-close {
-        /* FIXED POSITIONING: Bypasses all container flow on mobile */
-        position: relative !important;
-        top: auto !important;
-        right: auto !important;
-        /* Matches header top alignment */
-        left: auto !important;
-        bottom: auto !important;
-
-        /* EXACT SIZE: Matches menu-toggle */
-        width: 50px !important;
-        height: 50px !important;
-        min-width: 50px !important;
-        min-height: 50px !important;
-        flex: 0 0 50px !important;
-        box-sizing: border-box !important;
-        margin: 0 !important;
-        padding: 0 !important;
-
-        /* VISUALS */
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-        appearance: none;
-        border: none;
-        background: transparent;
-        color: var(--text-dark);
-        font-size: 24px !important;
-        cursor: pointer;
-        z-index: 2147483647 !important;
-        /* Max Z-Index */
-
-        /* STABILITY */
-        transform: none !important;
-        transition: none !important;
-        /* Prevent transition artifacts */
-    }
-
-    .menu-close:hover {
-        color: var(--primary-orange);
-        transform: none !important;
-    }
-
-    .menu-close i {
-        font-size: 24px !important;
-        /* Standard icon size */
-        width: 24px !important;
-        height: 24px !important;
-        line-height: 1 !important;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-    }
+    /* Old Header Mirror Styles Removed */
 
     /* PREVENT PARENT INTERFERENCE */
     .mega-menu,
@@ -5075,35 +5020,9 @@ ol.block-list {
         perspective: none !important;
     }
 
-    /* Move search row down to avoid overlap */
-    .menu-controls-row {
-        margin-top: 100px;
-        /* Push below header mirror */
-        padding: 0;
-        /* Remove padding to allow full width children */
-    }
-
-    .menu-controls-row {
-        order: 3;
-        display: flex;
-        flex-direction: column;
-        /* Stack search and lang */
-        align-items: flex-start;
-        /* Left align children */
-        gap: 15px;
-        /* Increase gap between search and lang */
-        width: 100%;
-        margin-top: 20px;
-    }
-
-    .menu-search {
-        margin: 0;
-        width: 100%;
-        /* Full width search */
-        max-width: 100%;
-        padding: 10px 20px;
-        /* Matches header side padding */
-        box-sizing: border-box;
+    /* Push content below the fixed header toggle */
+    .mega-menu>div {
+        padding-top: 100px !important;
     }
 
     .menu-search input {
