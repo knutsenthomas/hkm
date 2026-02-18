@@ -43,6 +43,10 @@ class AdminManager {
         this.unreadMessageCount = 0;
         this.messagesUnsub = null;
 
+        // User Detail View State
+        this.currentUserDetailId = null;
+        this.userEditMode = false;
+
         try {
             this.init();
         } catch (e) {
@@ -625,6 +629,8 @@ class AdminManager {
                     this.renderIntegrationsSection();
                     break;
                 case 'users':
+                    this.currentUserDetailId = null;
+                    this.userEditMode = false;
                     this.renderUsersSection();
                     break;
             }
@@ -4167,6 +4173,12 @@ class AdminManager {
         const section = document.getElementById('users-section');
         if (!section) return;
 
+        // If a user is selected, render the detail view instead of the list
+        if (this.currentUserDetailId) {
+            await this.renderUserDetailView(this.currentUserDetailId);
+            return;
+        }
+
         section.innerHTML = `
             <div class="section-header flex-between">
                 <div>
@@ -4303,8 +4315,9 @@ class AdminManager {
         container.querySelectorAll('.edit-user-btn').forEach(btn => {
             btn.onclick = () => {
                 const userId = btn.getAttribute('data-id');
-                const userData = this.allUsersData.find(u => u.id === userId);
-                this.openUserModal(userData);
+                this.currentUserDetailId = userId;
+                this.userEditMode = false; // Start in read-only mode as requested
+                this.renderUsersSection();
             };
         });
 
@@ -4507,6 +4520,227 @@ class AdminManager {
             await this.saveUser(userId, data);
             closeModal();
         };
+    }
+
+    async renderUserDetailView(userId) {
+        const section = document.getElementById('users-section');
+        if (!section) return;
+
+        section.innerHTML = `
+            <div class="section-header">
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                    <button id="back-to-users-btn" class="icon-btn" title="Tilbake til oversikt">
+                        <span class="material-symbols-outlined">arrow_back</span>
+                    </button>
+                    <h2 class="section-title">Brukerprofil</h2>
+                </div>
+                <p class="section-subtitle">Detaljert informasjon og rettigheter for valgt bruker.</p>
+            </div>
+
+            <div id="user-detail-container" class="loader"></div>
+        `;
+
+        const backBtn = document.getElementById('back-to-users-btn');
+        if (backBtn) {
+            backBtn.onclick = () => {
+                this.currentUserDetailId = null;
+                this.userEditMode = false;
+                this.renderUsersSection();
+            };
+        }
+
+        const container = document.getElementById('user-detail-container');
+        try {
+            const doc = await firebaseService.db.collection('users').doc(userId).get();
+            if (!doc.exists) {
+                container.innerHTML = '<p class="error-text">Bruker ble ikke funnet.</p>';
+                return;
+            }
+            const userData = { id: doc.id, ...doc.data() };
+            this.renderUserDetailLayout(container, userData);
+        } catch (err) {
+            console.error('Error loading user details:', err);
+            container.innerHTML = `<p class="error-text">Feil ved lasting av brukerdetaljer: ${err.message}</p>`;
+        }
+    }
+
+    renderUserDetailLayout(container, userData) {
+        const name = userData.displayName || userData.fullName || 'Ukjent Navn';
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        const ROLES = window.HKM_ROLES;
+        const rolesOptions = Object.values(ROLES).map(role =>
+            `<option value="${role}" ${userData.role === role ? 'selected' : ''}>${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
+        ).join('');
+
+        container.innerHTML = `
+            <div style="max-width: 900px;">
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-body" style="display: flex; align-items: center; gap: 32px; padding: 32px;">
+                        <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover;` : ''}">
+                            ${!userData.photoURL ? initials : ''}
+                        </div>
+                        <div style="flex:1;">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                <div>
+                                    <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${this.escapeHtml(name)}</h3>
+                                    <p style="color: var(--text-muted); font-size: 15px;">${this.escapeHtml(userData.email || 'Ingen e-post')}</p>
+                                </div>
+                                <div style="display:flex; gap:12px;">
+                                    ${!this.userEditMode ? `
+                                        <button id="activate-edit-btn" class="btn-secondary">
+                                            <span class="material-symbols-outlined">edit</span>
+                                            Aktiver redigering
+                                        </button>
+                                    ` : `
+                                        <button id="cancel-edit-btn" class="action-btn">
+                                            Avbryt
+                                        </button>
+                                        <button id="save-user-detail-btn" class="btn-primary">
+                                            Lagre endringer
+                                        </button>
+                                    `}
+                                </div>
+                            </div>
+                            <div style="margin-top:16px; display:flex; gap:16px;">
+                                <span class="role-badge role-badge-${userData.role || 'medlem'}">${(userData.role || 'medlem').toUpperCase()}</span>
+                                <span style="font-size:13px; color:var(--text-muted);">Opprettet: ${userData.createdAt ? (userData.createdAt.toDate ? userData.createdAt.toDate().toLocaleDateString('no-NO') : new Date(userData.createdAt).toLocaleDateString('no-NO')) : 'Ukjent'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form id="user-detail-form" class="${!this.userEditMode ? 'readonly-form' : ''}">
+                    <input type="hidden" name="id" value="${userData.id}">
+                    
+                    <div class="grid-2-cols equal" style="margin-bottom: 24px; gap: 24px;">
+                        <div class="card">
+                            <div class="card-header"><h4 class="card-title">Personalia</h4></div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Fullt navn</label>
+                                    <input type="text" name="displayName" class="form-control" value="${this.escapeHtml(name)}" ${!this.userEditMode ? 'disabled' : ''} required>
+                                </div>
+                                <div class="form-group">
+                                    <label>E-post (kun lesetilgang)</label>
+                                    <input type="email" class="form-control" value="${this.escapeHtml(userData.email || '')}" disabled>
+                                </div>
+                                <div class="form-group">
+                                    <label>Telefon</label>
+                                    <input type="tel" name="phone" class="form-control" value="${this.escapeHtml(userData.phone || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                </div>
+                                <div class="form-group">
+                                    <label>Fødselsdato</label>
+                                    <input type="date" name="birthdate" class="form-control" value="${userData.birthdate || ''}" ${!this.userEditMode ? 'disabled' : ''}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header"><h4 class="card-title">Adresse</h4></div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Gateadresse</label>
+                                    <input type="text" name="address" class="form-control" value="${this.escapeHtml(userData.address || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                </div>
+                                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:16px;">
+                                    <div class="form-group">
+                                        <label>Postnr</label>
+                                        <input type="text" name="zip" class="form-control" value="${this.escapeHtml(userData.zip || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Sted</label>
+                                        <input type="text" name="city" class="form-control" value="${this.escapeHtml(userData.city || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Fødselsnummer (kun for skattefradrag)</label>
+                                    <input type="password" name="ssn" class="form-control" value="${userData.ssn || ''}" placeholder="11 siffer" maxlength="11" autocomplete="off" ${!this.userEditMode ? 'disabled' : ''}>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2-cols equal" style="gap: 24px;">
+                        <div class="card">
+                            <div class="card-header"><h4 class="card-title">Medlemskap & Tilgang</h4></div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Rolle / Tilgangsnivå</label>
+                                    <select name="role" class="form-control" ${!this.userEditMode ? 'disabled' : ''}>
+                                        ${rolesOptions}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Medlemsnummer</label>
+                                    <input type="text" name="membershipNumber" class="form-control" value="${this.escapeHtml(userData.membershipNumber || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header"><h4 class="card-title">Interne notater</h4></div>
+                            <div class="card-body">
+                                <div class="form-group">
+                                    <label>Notater (kun synlig for admin)</label>
+                                    <textarea name="adminNotes" class="form-control" style="min-height:120px;" ${!this.userEditMode ? 'disabled' : ''}>${this.escapeHtml(userData.adminNotes || '')}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        `;
+
+        // Event Listeners
+        const activateEditBtn = document.getElementById('activate-edit-btn');
+        if (activateEditBtn) {
+            activateEditBtn.onclick = () => {
+                this.userEditMode = true;
+                this.renderUserDetailLayout(container, userData);
+            };
+        }
+
+        const cancelEditBtn = document.getElementById('cancel-edit-btn');
+        if (cancelEditBtn) {
+            cancelEditBtn.onclick = () => {
+                this.userEditMode = false;
+                this.renderUserDetailLayout(container, userData);
+            };
+        }
+
+        const saveBtn = document.getElementById('save-user-detail-btn');
+        if (saveBtn) {
+            saveBtn.onclick = async () => {
+                const form = document.getElementById('user-detail-form');
+                const formData = new FormData(form);
+                const updates = {
+                    displayName: formData.get('displayName'),
+                    phone: formData.get('phone'),
+                    gender: userData.gender, // preserve
+                    birthdate: formData.get('birthdate'),
+                    address: formData.get('address'),
+                    zip: formData.get('zip'),
+                    city: formData.get('city'),
+                    ssn: formData.get('ssn'),
+                    membershipNumber: formData.get('membershipNumber'),
+                    role: formData.get('role'),
+                    adminNotes: formData.get('adminNotes')
+                };
+
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Lagrer...';
+
+                try {
+                    await this.saveUser(userData.id, updates);
+                    this.userEditMode = false;
+                    // reload details to reflect fresh data
+                    await this.renderUserDetailView(userData.id);
+                } catch (e) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Lagre endringer';
+                }
+            };
+        }
     }
 
     async saveUser(userId, data) {
