@@ -1,4 +1,5 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 const admin = require("firebase-admin");
@@ -98,38 +99,16 @@ exports.createPaymentIntent = onRequest({ cors: true, invoker: "public" }, async
 /**
  * Helper-funksjon for å sende e-post.
  */
-async function sendEmail({ to, subject, text, html, fromName = "His Kingdom Ministry" }) {
-  const emailUser = process.env.EMAIL_USER;
-  const emailPass = process.env.EMAIL_PASS;
-
-  if (!emailUser || !emailPass) {
-    console.warn("Mangler e-postkonfigurasjon (EMAIL_USER, EMAIL_PASS).");
-    return false;
-  }
-
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: emailUser,
-      pass: emailPass,
-    },
-  });
-
-  await transporter.sendMail({
-    from: `"${fromName}" <${emailUser}>`,
-    to,
-    subject,
-    text,
-    html,
-  });
-
-  return true;
-}
 
 /**
  * Trigger som sender velkomst-e-post til nye brukere.
  */
-exports.onUserCreate = admin.firestore().collection("users").onCreate(async (snapshot, context) => {
+exports.onUserCreate = onDocumentCreated("users/{userId}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) {
+    console.log("No data associated with the event");
+    return;
+  }
   const userData = snapshot.data();
   const email = userData.email;
   const name = userData.displayName || userData.fullName || "venn";
@@ -174,46 +153,272 @@ exports.onUserCreate = admin.firestore().collection("users").onCreate(async (sna
  * Manuel utsendelse av e-post fra admin-panelet.
  */
 exports.sendManualEmail = onRequest({ cors: true }, async (req, res) => {
-  if (req.method === 'OPTIONS') {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-    res.status(204).send('');
-    return;
-  }
-
-  try {
-    const { to, subject, message, fromName } = req.body;
-
-    if (!to || !subject || !message) {
-      res.status(400).send({ error: "Mangler mottaker, emne eller melding." });
+  await verifyAdmin(req, res, async () => {
+    if (req.method === 'OPTIONS') {
+      res.set('Access-Control-Allow-Origin', '*');
+      res.set('Access-Control-Allow-Methods', 'POST');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.status(204).send('');
       return;
     }
 
-    const html = `
-      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-        <div style="margin-bottom: 20px;">
-          ${message.replace(/\n/g, '<br>')}
-        </div>
-        <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-          Vennlig hilsen,<br>
-          His Kingdom Ministry
-        </div>
-      </div>
-    `;
+    try {
+      const { to, subject, message, fromName } = req.body;
 
-    const success = await sendEmail({ to, subject, html, text: message, fromName });
+      if (!to || !subject || !message) {
+        res.status(400).send({ error: "Mangler mottaker, emne eller melding." });
+        return;
+      }
 
-    if (success) {
-      res.status(200).send({ success: true });
-    } else {
-      res.status(500).send({ error: "E-postkonfigurasjon mangler på serveren." });
+      const html = `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+          <div style="margin-bottom: 20px;">
+            ${message.replace(/\n/g, '<br>')}
+          </div>
+          <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+            Vennlig hilsen,<br>
+            His Kingdom Ministry
+          </div>
+        </div>
+      `;
+
+      const success = await sendEmail({ to, subject, html, text: message, fromName });
+
+      if (success) {
+        res.status(200).send({ success: true });
+      } else {
+        res.status(500).send({ error: "E-postkonfigurasjon mangler på serveren." });
+      }
+
+    } catch (error) {
+      console.error("Feil ved manuell e-postsending:", error);
+      res.status(500).send({ error: error.message });
+    }
+  });
+});
+
+/**
+ * Paginert henting av alle brukere fra Firestore.
+ * @param {string} [role] - Filtrer brukere etter rolle.
+ */
+async function getAllUsers(role) {
+  const users = [];
+  let usersQuery = db.collection('users');
+
+  if (role && role !== 'all') {
+    usersQuery = usersQuery.where('role', '==', role);
+  }
+
+  const querySnapshot = await usersQuery.get();
+  querySnapshot.forEach(doc => {
+    users.push({ id: doc.id, ...doc.data() });
+  });
+
+  return users;
+}
+
+/**
+ * Verifies that the user is an admin.
+ * Express-style middleware for use in onRequest functions.
+ */
+const verifyAdmin = async (req, res, next) => {
+    const idToken = req.headers.authorization?.split('Bearer ')[1];
+
+    if (!idToken) {
+        res.status(401).send({ error: 'Unauthorized: Missing authorization token.' });
+        return;
     }
 
-  } catch (error) {
-    console.error("Feil ved manuell e-postsending:", error);
-    res.status(500).send({ error: error.message });
-  }
+    try {
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+
+        if (userDoc.exists) {
+            const userRole = userDoc.data().role;
+            // Allow 'admin' or 'superadmin'
+            if (userRole === 'admin' || userRole === 'superadmin') {
+                req.user = decodedToken; // Pass user info to the handler
+                return next();
+            }
+        }
+
+        res.status(403).send({ error: 'Forbidden: You do not have permission to perform this action.' });
+    } catch (error) {
+        console.error('Error verifying admin token:', error);
+        res.status(401).send({ error: 'Unauthorized: Invalid token.' });
+    }
+};
+
+/**
+ * Utsendelse av e-post til en gruppe brukere.
+ * Krever admin-autentisering.
+ */
+exports.sendBulkEmail = onRequest({ cors: true }, async (req, res) => {
+    // Wrap the core logic in the verifyAdmin middleware
+    await verifyAdmin(req, res, async () => {
+        if (req.method === 'OPTIONS') {
+            res.set('Access-Control-Allow-Origin', '*');
+            res.set('Access-Control-Allow-Methods', 'POST');
+            res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            res.status(204).send('');
+            return;
+        }
+
+        try {
+            const { targetRole, subject, message, fromName } = req.body;
+
+            if (!targetRole || !subject || !message) {
+                res.status(400).send({ error: "Mangler targetRole, subject eller message." });
+                return;
+            }
+
+            console.log(`Starter masseutsendelse for rolle: ${targetRole}`);
+
+            const users = await getAllUsers(targetRole);
+            
+            if (users.length === 0) {
+                res.status(404).send({ error: "Ingen brukere funnet for den valgte rollen." });
+                return;
+            }
+            
+            const emails = users.map(u => u.email).filter(Boolean);
+            console.log(`Fant ${emails.length} e-postadresser å sende til.`);
+
+            // For now, lets send in parallel. If there are many users, a batching queue would be better.
+            const emailPromises = emails.map(email => {
+                const html = `
+                  <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+                    <div style="margin-bottom: 20px;">
+                      ${message.replace(/\n/g, '<br>')}
+                    </div>
+                    <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+                      Vennlig hilsen,<br>
+                      His Kingdom Ministry
+                    </div>
+                  </div>
+                `;
+                return sendEmail({ to: email, subject, html, text: message, fromName });
+            });
+
+            await Promise.all(emailPromises);
+
+            res.status(200).send({ success: true, message: `E-poster er sendt til ${emails.length} brukere.` });
+
+        } catch (error) {
+            console.error("Feil ved masseutsendelse av e-post:", error);
+            res.status(500).send({ error: error.message });
+        }
+    });
+});
+
+/**
+ * Utsendelse av push-varslinger til en gruppe brukere.
+ * Krever admin-autentisering.
+ */
+exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
+    await verifyAdmin(req, res, async () => {
+        if (req.method === 'OPTIONS') {
+            res.set('Access-Control-Allow-Origin', '*');
+            res.set('Access-Control-Allow-Methods', 'POST');
+            res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+            res.status(204).send('');
+            return;
+        }
+
+        try {
+            const { targetRole, title, body, icon, click_action } = req.body;
+
+            if (!targetRole || !title || !body) {
+                res.status(400).send({ error: "Mangler targetRole, title eller body." });
+                return;
+            }
+
+            console.log(`Starter utsendelse av push-varsling for rolle: ${targetRole}`);
+
+            const users = await getAllUsers(targetRole);
+            
+            if (users.length === 0) {
+                res.status(404).send({ error: "Ingen brukere funnet for den valgte rollen." });
+                return;
+            }
+
+            // Create a map of token to user ID
+            const tokenUserMap = new Map();
+            users.forEach(user => {
+                if (user.fcmTokens && Array.isArray(user.fcmTokens)) {
+                    user.fcmTokens.forEach(token => {
+                        tokenUserMap.set(token, user.id);
+                    });
+                }
+            });
+
+            const tokens = Array.from(tokenUserMap.keys());
+
+            if (tokens.length === 0) {
+                res.status(404).send({ error: "Ingen brukere med varslingstokens funnet." });
+                return;
+            }
+
+            console.log(`Fant ${tokens.length} tokens å sende til.`);
+
+            const message = {
+                notification: {
+                    title,
+                    body,
+                    icon: icon || '/img/logo-hkm.png',
+                },
+                webpush: {
+                    fcm_options: {
+                        link: click_action || 'https://his-kingdom-ministry.web.app/'
+                    }
+                }
+            };
+
+            const response = await admin.messaging().sendToDevice(tokens, message);
+            let failureCount = 0;
+            let successCount = 0;
+
+            const tokensToClean = [];
+
+            response.results.forEach((result, index) => {
+                const error = result.error;
+                if (error) {
+                    failureCount++;
+                    console.error('Failure sending notification to', tokens[index], error);
+                    // Cleanup the tokens that are not registered anymore.
+                    if (error.code === 'messaging/registration-token-not-registered' ||
+                        error.code === 'messaging/invalid-registration-token') {
+                        const token = tokens[index];
+                        tokensToClean.push(token);
+                    }
+                } else {
+                    successCount++;
+                }
+            });
+            
+            if (tokensToClean.length > 0) {
+                console.log(`Cleaning ${tokensToClean.length} invalid tokens.`);
+                const cleanupPromises = tokensToClean.map(async (token) => {
+                    const userId = tokenUserMap.get(token);
+                    if (userId) {
+                        const userRef = db.collection('users').doc(userId);
+                        return userRef.update({
+                            fcmTokens: admin.firestore.FieldValue.arrayRemove(token)
+                        });
+                    }
+                });
+                await Promise.all(cleanupPromises);
+                console.log("Token cleanup complete.");
+            }
+
+            console.log(`Successfully sent message to ${successCount} devices. Failed for ${failureCount} devices.`);
+            res.status(200).send({ success: true, message: `Varsling sendt til ${successCount} enheter. ${failureCount} feilet.` });
+
+        } catch (error) {
+            console.error("Feil ved utsendelse av push-varsling:", error);
+            res.status(500).send({ error: error.message });
+        }
+    });
 });
 
 /**
