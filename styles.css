@@ -1,3 +1,9 @@
+/* CMS Loading protections */
+body.cms-loading .hero-content {
+    visibility: hidden;
+    opacity: 0 !important;
+}
+
 /* Profil-ikon i header */
 .profile-btn {
     display: flex;
