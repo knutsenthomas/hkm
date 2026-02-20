@@ -18,9 +18,9 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
-    <!-- Dashboard CSS -->
-    <!-- Dashboard CSS -->
-    <link rel="stylesheet" href="css/dashboard.css?v=admin_users_v5">
+    <link rel="stylesheet" href="css/dashboard.css?v=admin_users_v8_collection_mobile">
+    <link rel="stylesheet" href="../css/notifications.css">
+    <link rel="stylesheet" href="css/admin-unified.css?v=3">
 
     <!-- Error Logger -->
     <script type="module" src="../js/error-logger.js"></script>
@@ -42,233 +42,389 @@
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <img src="img/logo_circular.png" alt="HKM Logo" style="width: 40px; height: 40px; border-radius: 50%;">
+        <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="logo" style="margin-bottom: 0;">
+                <img src="img/logo_circular.png" alt="HKM Logo">
                 <h1 class="logo-text">HKM Studio</h1>
             </div>
+            <button id="mobile-sidebar-close"
+                style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;"
+                class="mobile-sidebar-close-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
         </div>
 
         <nav class="sidebar-nav">
-            <ul class="nav-list">
-                <li class="nav-item">
-                    <a href="#" class="nav-link active" data-section="overview">
-                        <span class="material-symbols-outlined">home</span>
-                        <span>Oversikt</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="nettsted">
-                    <a href="#" class="nav-link" data-section="content">
-                        <span class="material-symbols-outlined">article</span>
-                        <span>Sideinnhold</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="nettsted">
-                    <a href="#" class="nav-link" data-section="blog">
-                        <span class="material-symbols-outlined">edit_note</span>
-                        <span>Blogg</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="kommunikasjon">
-                    <a href="#" class="nav-link" data-section="events">
-                        <span class="material-symbols-outlined">calendar_today</span>
-                        <span>Arrangementer</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="kommunikasjon">
-                    <a href="#" class="nav-link" data-section="messages">
-                        <span class="material-symbols-outlined">mail</span>
-                        <span>Meldinger</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="nettsted">
-                    <a href="#" class="nav-link" data-section="media">
-                        <span class="material-symbols-outlined">video_library</span>
-                        <span>Media</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="administrasjon">
-                    <a href="#" class="nav-link" data-section="causes">
-                        <span class="material-symbols-outlined">volunteer_activism</span>
-                        <span>Gaver</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="nettsted">
-                    <a href="#" class="nav-link" data-section="hero">
-                        <span class="material-symbols-outlined">view_carousel</span>
-                        <span>Hero Slider</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="nettsted">
-                    <a href="#" class="nav-link" data-section="teaching">
-                        <span class="material-symbols-outlined">school</span>
-                        <span>Undervisning</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="nettsted">
-                    <a href="#" class="nav-link" data-section="design">
-                        <span class="material-symbols-outlined">palette</span>
-                        <span>Design & Logo</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="administrasjon">
-                    <a href="#" class="nav-link" data-section="settings">
-                        <span class="material-symbols-outlined">settings</span>
-                        <span>Innstillinger</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="nettsted">
-                    <a href="#" class="nav-link" data-section="seo">
-                        <span class="material-symbols-outlined">search_check</span>
-                        <span>SEO & Meta</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="administrasjon">
-                    <a href="#" class="nav-link" data-section="integrations">
-                        <span class="material-symbols-outlined">api</span>
-                        <span>Integrasjoner</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="administrasjon">
-                    <a href="#" class="nav-link" data-section="users">
-                        <span class="material-symbols-outlined">group</span>
-                        <span>Brukere</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="kommunikasjon">
-                    <a href="#" class="nav-link" data-section="kommunikasjon">
-                        <span class="material-symbols-outlined">campaign</span>
-                        <span>Kommunikasjon</span>
-                    </a>
-                </li>
-                <li class="nav-item" data-category="administrasjon">
-                    <a href="#" class="nav-link" data-section="profile">
-                        <span class="material-symbols-outlined">person</span>
-                        <span>Profil</span>
-                    </a>
-                </li>
-            </ul>
-        </nav>
+            <div class="nav-group">
+                <ul class="nav-list">
+                    <li class="nav-item visible" data-nav-category="all">
+                        <a href="#" class="nav-link active" data-section="overview">
+                            <span class="material-symbols-outlined">home</span>
+                            <span>Oversikt</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="content">
+                            <span class="material-symbols-outlined">description</span>
+                            <span>Sideinnhold</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="blog">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            <span>Blogg</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="media">
+                            <span class="material-symbols-outlined">image</span>
+                            <span>Media</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="hero">
+                            <span class="material-symbols-outlined">view_carousel</span>
+                            <span>Hero Slider</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="teaching">
+                            <span class="material-symbols-outlined">school</span>
+                            <span>Undervisning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="design">
+                            <span class="material-symbols-outlined">palette</span>
+                            <span>Design & Logo</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="#" class="nav-link" data-section="events">
+                            <span class="material-symbols-outlined">event</span>
+                            <span>Arrangementer</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-kommunikasjon.html" class="nav-link">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Kontakter</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-nyhetsbrev.html" class="nav-link">
+                            <span class="material-symbols-outlined">mail_outline</span>
+                            <span>Nyhetsbrev</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="causes">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                            <span>Gaver</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="users">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Brukere</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="seo">
+                            <span class="material-symbols-outlined">search_check</span>
+                            <span>SEO & Meta</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="settings">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>Innstillinger</span>
+                        </a>
+                    </li>
+                    <li class="nav-item visible" data-nav-category="administrasjon">
+                        <a href="admin-logger.html" class="nav-link">
+                            <span class="material-symbols-outlined">assignment</span>
+                            <span>Systemlogger</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
 
-        <div class="sidebar-footer">
-            <a href="../minside/index.html" class="nav-link">
-                <span class="material-symbols-outlined">account_circle</span>
-                <span>Min Side</span>
-            </a>
-            <a href="../index.html" class="nav-link" target="_blank" rel="noopener noreferrer">
-                <span class="material-symbols-outlined">visibility</span>
-                <span>Se nettside</span>
-            </a>
-            <button id="logout-btn" class="nav-link logout">
-                <span class="material-symbols-outlined">logout</span>
-                <span>Logg ut</span>
-            </button>
-        </div>
+            <div class="nav-group bottom">
+                <ul class="nav-list">
+                    <li class="nav-item" data-nav-category="all">
+                        <a href="../minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <span>Min Side</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="all">
+                        <a href="/" target="_blank" class="nav-link">
+                            <span class="material-symbols-outlined">visibility</span>
+                            <span>Se nettside</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="all">
+                        <button id="logout-btn" class="nav-link logout">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logg ut</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </aside>
 
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Header -->
         <header class="main-header">
-            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                <span class="material-symbols-outlined">menu</span>
-            </button>
-            <div class="header-search">
-                <span class="material-symbols-outlined">search</span>
-                <input type="text" placeholder="Søk i innhold..." aria-label="Søk">
+            <div class="header-left">
+                <div class="welcome-banner">
+                    <h1 class="welcome-title">Velkommen tilbake!</h1>
+                    <p class="welcome-subtitle">Oversikt over nettstedets aktivitet.</p>
+                </div>
             </div>
-            <div class="header-actions">
+
+            <div class="header-right">
+                <img src="img/logo_circular.png" alt="HKM" class="mobile-logo-header" style="display: none;">
+
                 <button id="messages-bell" class="notification-btn">
                     <span id="notification-icon" class="material-symbols-outlined">notifications</span>
                     <span id="notification-dot" class="notification-dot"></span>
                 </button>
-                <div class="user-profile">
-                    <div class="user-profile-link" id="admin-profile-trigger"
-                        style="display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit; cursor: pointer;">
-                        <div class="user-info">
-                            <span id="admin-name" class="user-name">Laster...</span>
-                            <span class="user-role">Administrator</span>
-                        </div>
-                        <div id="admin-avatar" class="user-avatar">?</div>
+
+                <a href="../minside/index.html" class="user-profile-link" id="admin-profile-trigger">
+                    <div class="user-info-text">
+                        <span id="admin-name" class="user-name">Laster...</span>
+                        <span class="user-role">Administrator</span>
                     </div>
-                </div>
-                <!-- Profile Modal -->
-                <div id="profile-modal" class="profile-modal"
-                    style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;">
-                    <div class="profile-modal-content"
-                        style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:320px; max-width:90vw; position:relative;">
-                        <button id="close-profile-modal"
-                            style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
-                        <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
-                            <div id="modal-admin-avatar" class="user-avatar"
-                                style="width:64px; height:64px; font-size:28px;"></div>
-                            <div>
-                                <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">
-                                    Navn</div>
-                                <div id="modal-admin-role" class="user-role">Administrator</div>
-                            </div>
-                        </div>
-                        <div style="margin-bottom:16px;">
-                            <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
-                        </div>
-                        <form id="admin-modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
-                            <div>
-                                <label for="admin-modal-display-name"
-                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
-                                <input id="admin-modal-display-name" name="displayName" type="text"
-                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                            </div>
-                            <div>
-                                <label for="admin-modal-phone"
-                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
-                                <input id="admin-modal-phone" name="phone" type="tel"
-                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                            </div>
-                            <div>
-                                <label for="admin-modal-address"
-                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
-                                <input id="admin-modal-address" name="address" type="text"
-                                    style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
-                            </div>
-                            <div>
-                                <label for="admin-modal-bio"
-                                    style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Bio</label>
-                                <textarea id="admin-modal-bio" name="bio"
-                                    style="width:100%; min-height:78px; padding:10px; border:1px solid #e2e8f0; border-radius:8px;"></textarea>
-                            </div>
-                            <button id="admin-modal-save-btn" type="submit" class="btn-primary"
-                                style="margin-top:4px;">Lagre profil</button>
-                        </form>
-                    </div>
-                </div>
+                    <div id="admin-avatar" class="user-avatar">?</div>
+                </a>
+
+                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
             </div>
         </header>
 
-        <div class="top-nav-tabs">
-            <button class="top-nav-tab active" data-category="nettsted">Nettsted</button>
-            <button class="top-nav-tab" data-category="kommunikasjon">Kommunikasjon</button>
-            <button class="top-nav-tab" data-category="administrasjon">Administrasjon</button>
+        <div class="content-header">
+            <div class="tabs-container">
+                <div class="top-nav-tabs">
+                    <button class="top-nav-tab active" data-category="nettsted">Nettsted</button>
+                    <button class="top-nav-tab" data-category="kommunikasjon">Kommunikasjon</button>
+                    <button class="top-nav-tab" data-category="administrasjon">Administrasjon</button>
+                </div>
+
+                <div class="header-search">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" placeholder="Søk i innhold..." aria-label="Søk">
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div id="profile-modal" class="profile-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+            <div class="profile-modal-content"
+                style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
+                <button id="close-profile-modal"
+                    style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
+                <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+                    <div id="modal-admin-avatar" class="user-avatar" style="width:64px; height:64px; font-size:28px;">
+                    </div>
+                    <div>
+                        <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">
+                            Navn</div>
+                        <div id="modal-admin-role" class="user-role">Administrator</div>
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
+                </div>
+                <form id="admin-modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
+                    <div>
+                        <label for="admin-modal-display-name"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
+                        <input id="admin-modal-display-name" name="displayName" type="text"
+                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label for="admin-modal-phone"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
+                        <input id="admin-modal-phone" name="phone" type="tel"
+                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label for="admin-modal-address"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
+                        <input id="admin-modal-address" name="address" type="text"
+                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label for="admin-modal-bio"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Bio</label>
+                        <textarea id="admin-modal-bio" name="bio"
+                            style="width:100%; min-height:78px; padding:10px; border:1px solid #e2e8f0; border-radius:8px;"></textarea>
+                    </div>
+                    <button id="admin-modal-save-btn" type="submit" class="btn-primary" style="margin-top:4px;">Lagre
+                        profil</button>
+                </form>
+            </div>
         </div>
 
         <!-- Dynamic Section Content -->
         <section id="content-area" class="section-container">
             <!-- Default Overview Section -->
             <div id="overview-section" class="section-content active">
-                <div class="section-header">
-                    <h2 class="section-title">Velkommen tilbake!</h2>
-                    <p class="section-subtitle">Her er hva som har skjedd på nettsiden din i det siste.</p>
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap purple">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Sidevisninger (30 dager)</h3>
+                            <p class="stat-value" id="stats-visitors">12,450</p>
+                            <div class="stat-trend positive">
+                                <span class="material-symbols-outlined">trending_up</span>
+                                12.5%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap green">
+                            <span class="material-symbols-outlined">check_circle</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Systemstatus</h3>
+                            <p class="stat-value text-green">Normal</p>
+                            <span class="stat-meta">Ingen kritiske feil</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue">
+                            <span class="material-symbols-outlined">edit_note</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Blogginnlegg</h3>
+                            <p class="stat-value" id="stats-blog-count">4</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap mint">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Undervisningsserier</h3>
+                            <p class="stat-value" id="stats-teaching-count">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap donation">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Donasjoner</h3>
+                            <p class="stat-value">0</p>
+                            <span class="stat-meta">Totalt: 0 kr</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap megaphone">
+                            <span class="material-symbols-outlined">campaign</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Innsamlingsaksjoner</h3>
+                            <p class="stat-value">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap youtube">
+                            <span class="material-symbols-outlined">video_library</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">YouTube Totalt</h3>
+                            <p class="stat-value" id="stats-youtube-views">56 699</p>
+                            <span class="stat-meta" id="stats-youtube-subs">446 abonnenter • 449 videoer</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap podcast">
+                            <span class="material-symbols-outlined">podcasts</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Podcast Episoder</h3>
+                            <p class="stat-value" id="stats-podcast-count">45</p>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Stats Cards (Static for now) -->
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon purple">
-                            <span class="material-symbols-outlined">group</span>
+                <!-- Chart Section -->
+                <div class="dashboard-main-grid">
+                    <div class="chart-container card">
+                        <div class="card-header-simple">
+                            <div>
+                                <h3 class="card-title">Trafikkovervåking (Google Analytics)</h3>
+                                <div class="live-indicator">
+                                    <span class="dot"></span>
+                                    Sanntid: 24 aktive akkurat nå
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined muted">more_vert</span>
                         </div>
-                        <div class="stat-info">
-                            <h3 class="stat-label">Besøkende</h3>
-                            <p class="stat-value">Laster...</p>
+                        <div class="chart-placeholder">
+                            <div class="bar-chart">
+                                <div class="bar" style="height: 40%;"><span>08:00</span></div>
+                                <div class="bar" style="height: 65%;"></div>
+                                <div class="bar" style="height: 85%;"><span>12:00</span></div>
+                                <div class="bar" style="height: 55%;"></div>
+                                <div class="bar" style="height: 75%;"><span>16:00</span></div>
+                                <div class="bar" style="height: 45%;"></div>
+                                <div class="bar" style="height: 80%;"><span>20:00</span></div>
+                                <div class="bar" style="height: 60%;"></div>
+                            </div>
                         </div>
+                    </div>
+
+                    <div class="top-pages-widget card">
+                        <h3 class="card-title">Topp Sider</h3>
+                        <ul class="page-rank-list">
+                            <li>
+                                <div class="page-info">
+                                    <span class="page-url">/index.html</span>
+                                    <span class="page-count">4,230</span>
+                                </div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar" style="width: 85%;"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="page-info">
+                                    <span class="page-url">/blogg.html</span>
+                                    <span class="page-count">2,150</span>
+                                </div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar" style="width: 45%;"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="page-info">
+                                    <span class="page-url">/media.html</span>
+                                    <span class="page-count">1,890</span>
+                                </div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar" style="width: 35%;"></div>
+                                </div>
+                            </li>
+                        </ul>
                     </div>
                 </div>
             </div>
@@ -327,7 +483,7 @@
 
             <div id="causes-section" class="section-content">
                 <div class="section-header">
-                    <h2 class="section-title">Innsamlingsaksjoner</h2>
+                    <h2 class="section-title">Gaver & Donasjoner</h2>
                 </div>
                 <div class="loader"></div>
             </div>
@@ -389,22 +545,41 @@
                 <div class="loader"></div>
             </div>
 
-            <div id="kommunikasjon-section" class="section-content">
+            <div id="newsletter-section" class="section-content">
                 <div class="section-header">
-                    <h2 class="section-title">Kommunikasjon</h2>
-                    <p class="section-subtitle">Send e-poster og push-varslinger til brukergrupper.</p>
+                    <h2 class="section-title">E-post & Nyhetsbrev</h2>
+                    <p class="section-subtitle">Skap og send profesjonelle nyhetsbrev og viktige meldinger.</p>
                 </div>
-                <div class="card">
+
+                <div class="card modern newsletter-promo">
                     <div class="card-body">
-                        <h3 class="card-title">Masseutsendelse av E-post</h3>
+                        <div class="newsletter-content">
+                            <div class="promo-icon purple">
+                                <span class="material-symbols-outlined">auto_awesome</span>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Nyhetsbrev Builder</h3>
+                                <p>Bruk vårt nye blokk-baserte verktøy for å designe vakre e-poster som ser bra ut på
+                                    alle enheter.</p>
+                            </div>
+                        </div>
+                        <div class="newsletter-action">
+                            <a href="admin-nyhetsbrev.html" class="btn-primary">Åpne Email Builder</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Hurtigmelding (Tekst)</h3>
                         <form id="bulk-email-form">
+                            <p class="section-subtitle mb-4">For raske beskjeder uten design.</p>
                             <div class="form-group">
                                 <label for="target-role">Målgruppe</label>
                                 <select id="target-role" name="targetRole" class="form-control">
                                     <option value="all">Alle Brukere</option>
                                     <option value="medlem">Bare Medlemmer</option>
                                     <option value="selected">Valgte brukere</option>
-                                    <!-- Add other roles as needed -->
                                 </select>
                             </div>
                             <div id="email-user-selection" class="user-selection-container" style="display: none;">
@@ -416,78 +591,148 @@
                             </div>
                             <div class="form-group">
                                 <label for="email-message">Melding</label>
-                                <textarea id="email-message" name="message" class="form-control" rows="6" required></textarea>
+                                <textarea id="email-message" name="message" class="form-control" rows="6"
+                                    required></textarea>
                             </div>
                             <button type="submit" class="btn-primary">Send E-poster</button>
-                                            <div id="email-status" class="status-message" style="margin-top: 15px;"></div>
-                                        </form>
-                                    </div>
-                                </div>
-                                <div class="card" style="margin-top: 30px;">
-                                    <div class="card-body">
-                                        <h3 class="card-title">Utsendelse av Push-varsling</h3>
-                                        <form id="push-notification-form">
-                                            <div class="form-group">
-                                                <label for="push-target-role">Målgruppe</label>
-                                                <select id="push-target-role" name="targetRole" class="form-control">
-                                                    <option value="all">Alle Brukere</option>
-                                                    <option value="medlem">Bare Medlemmer</option>
-                                                    <option value="selected">Valgte brukere</option>
-                                                    <!-- Add other roles as needed -->
-                                                </select>
-                                            </div>
-                                            <div id="push-user-selection" class="user-selection-container" style="display: none;">
-                                                <!-- User list will be injected here -->
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="push-title">Tittel</label>
-                                                <input type="text" id="push-title" name="title" class="form-control" required>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="push-body">Melding</label>
-                                                <textarea id="push-body" name="body" class="form-control" rows="3" required></textarea>
-                                            </div>
-                                            <div class="form-group">
-                                                <label for="push-click-action">Link (valgfri)</label>
-                                                <input type="text" id="push-click-action" name="click_action" class="form-control" placeholder="https://his-kingdom-ministry.web.app/arrangementer">
-                                            </div>
-                                            <button type="submit" class="btn-primary">Send Push-varsling</button>
-                                            <div id="push-status" class="status-message" style="margin-top: 15px;"></div>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>        </section>
+                            <div id="email-status" class="status-message" style="margin-top: 15px;"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="kommunikasjon-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Kommunikasjon & Varslinger</h2>
+                    <p class="section-subtitle">Send push-varslinger direkte til app-brukere.</p>
+                </div>
+
+                <div class="card modern mb-4">
+                    <div class="card-body">
+                        <div class="promo-icon purple">
+                            <span class="material-symbols-outlined">person_search</span>
+                        </div>
+                        <h3 class="card-title">CRM & Kontakter</h3>
+                        <p>Få full oversikt over medlemmer, frivillige og givere. Segmenter listen din for mer målrettet
+                            kommunikasjon.</p>
+                        <a href="admin-kommunikasjon.html" class="btn-primary mt-3">Åpne CRM</a>
+                    </div>
+                </div>
+
+                <div class="card modern">
+                    <div class="card-body">
+                        <div class="promo-icon blue">
+                            <span class="material-symbols-outlined">smartphone</span>
+                        </div>
+                        <h3 class="card-title">Push-varslinger</h3>
+                        <p>Send korte varsler direkte til brukernes telefoner via mobil-appen.</p>
+                        <form id="push-notification-form" class="mt-4">
+                            <div class="form-group">
+                                <label for="push-target-role">Målgruppe</label>
+                                <select id="push-target-role" name="targetRole" class="form-control">
+                                    <option value="all">Alle Brukere</option>
+                                    <option value="medlem">Bare Medlemmer</option>
+                                    <option value="selected">Valgte brukere</option>
+                                </select>
+                            </div>
+                            <div id="push-user-selection" class="user-selection-container" style="display: none;">
+                                <!-- User list will be injected here -->
+                            </div>
+                            <div class="form-group">
+                                <label for="push-title">Tittel</label>
+                                <input type="text" id="push-title" name="title" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="push-body">Melding</label>
+                                <textarea id="push-body" name="body" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="push-click-action">Link (valgfri)</label>
+                                <input type="text" id="push-click-action" name="click_action" class="form-control"
+                                    placeholder="https://his-kingdom-ministry.web.app/arrangementer">
+                            </div>
+                            <button type="submit" class="btn-primary">Send Push-varsling</button>
+                            <div id="push-status" class="status-message" style="margin-top: 15px;"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </section>
     </main>
 
+    <nav class="mobile-bottom-nav">
+        <a href="index.html#overview" class="mobile-nav-item active" data-section="overview">
+            <span class="material-symbols-outlined">grid_view</span>
+            <span>Oversikt</span>
+        </a>
+        <a href="admin-kommunikasjon.html" class="mobile-nav-item">
+            <span class="material-symbols-outlined">group</span>
+            <span>Kontakter</span>
+        </a>
+        <a href="../minside/index.html" class="mobile-nav-item">
+            <span class="material-symbols-outlined">account_circle</span>
+            <span>Min Side</span>
+        </a>
+        <a href="index.html#settings" class="mobile-nav-item" data-section="settings">
+            <span class="material-symbols-outlined">settings</span>
+            <span>Innstillinger</span>
+        </a>
+    </nav>
+
+    <div class="fab-menu-container">
+        <div class="fab-menu" id="fab-menu">
+            <button class="fab-item" onclick="triggerFabAction('blog', 'add-new-blog')">
+                <span class="fab-label">Ny blogg</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">edit_document</span></div>
+            </button>
+            <button class="fab-item" onclick="window.location.href='admin-nyhetsbrev.html'">
+                <span class="fab-label">Nytt nyhetsbrev</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">mark_email_unread</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('teaching', 'add-new-teaching')">
+                <span class="fab-label">Ny undervisning</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">school</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('events', 'add-new-events')">
+                <span class="fab-label">Nytt arrangement</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">event</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('users', 'add-user-btn')">
+                <span class="fab-label">Ny bruker</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
+            </button>
+        </div>
+        <button class="mobile-fab" id="main-fab">
+            <span class="material-symbols-outlined">add</span>
+        </button>
+    </div>
+
+    <!-- App Scripts -->
+    <script src="js/admin-header.js"></script>
     <!-- Core Dashboard Logic (Non-Module for compatibility) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.querySelector('.sidebar');
             const mobileToggle = document.getElementById('mobile-nav-toggle');
 
-            // Create overlay if it doesn't exist
-            let overlay = document.querySelector('.sidebar-overlay');
-            if (!overlay) {
-                overlay = document.createElement('div');
-                overlay.className = 'sidebar-overlay';
-                document.body.appendChild(overlay);
-            }
+            // All hamburger/overlay logic is now handled by admin-header.js
 
-            if (mobileToggle) {
-                mobileToggle.addEventListener('click', () => {
-                    sidebar.classList.toggle('active');
-                    overlay.classList.toggle('active');
+            const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+            if (mobileSidebarClose) {
+                mobileSidebarClose.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    const overlay = document.querySelector('.sidebar-overlay');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                        overlay.style.removeProperty('display');
+                        overlay.style.removeProperty('opacity');
+                        overlay.style.removeProperty('pointer-events');
+                    }
                 });
             }
 
-            overlay.addEventListener('click', () => {
-                sidebar.classList.remove('active');
-                overlay.classList.remove('active');
-            });
-
-            const navLinks = document.querySelectorAll('.nav-link[data-section]');
-            const messagesNavLink = document.querySelector('.nav-link[data-section="messages"]');
-            const notificationBtn = document.getElementById('notification-btn');
+            const navLinks = document.querySelectorAll('.nav-link[data-section], .mobile-nav-item[data-section]');
 
             navLinks.forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -496,22 +741,30 @@
 
                     e.preventDefault();
 
-                    // Close sidebar on mobile after selecting a section
-                    if (window.innerWidth <= 768) {
-                        sidebar.classList.remove('active');
+                    // Close sidebar on mobile
+                    sidebar.classList.remove('active');
+                    const overlay = document.querySelector('.sidebar-overlay');
+                    if (overlay) {
                         overlay.classList.remove('active');
+                        overlay.style.removeProperty('display');
+                        overlay.style.removeProperty('opacity');
+                        overlay.style.removeProperty('pointer-events');
                     }
 
                     // Update Active Link UI
-                    navLinks.forEach(l => l.classList.remove('active'));
+                    document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => l.classList.remove('active'));
                     link.classList.add('active');
+
+                    // Sync desktop/mobile active states
+                    const sameSectionLinks = document.querySelectorAll(`[data-section="${targetSectionId}"]`);
+                    sameSectionLinks.forEach(l => l.classList.add('active'));
 
                     // Trigger module-based rendering if available
                     if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
                         window.adminManager.onSectionSwitch(targetSectionId);
                     }
 
-                    // Update Visible Section (Re-query to find dynamically added ones)
+                    // Update Visible Section
                     const sections = document.querySelectorAll('.section-content');
                     sections.forEach(section => {
                         section.classList.remove('active');
@@ -522,28 +775,52 @@
                 });
             });
 
-            if (notificationBtn && messagesNavLink) {
-                notificationBtn.addEventListener('click', (e) => {
-                    e.preventDefault();
+            // Handle Deep Linking via Hash
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const targetLink = document.querySelector(`.nav-link[data-section="${hash}"]`);
+                if (targetLink) {
+                    setTimeout(() => targetLink.click(), 100); // Small delay to ensure render
+                }
+            } else {
+                const overviewLink = document.querySelector('.nav-link[data-section="overview"]');
+                if (overviewLink) overviewLink.classList.add('active');
+            }
 
-                    // Marker meldingsmenyen som aktiv
-                    navLinks.forEach(l => l.classList.remove('active'));
-                    messagesNavLink.classList.add('active');
-
-                    // Bytt til meldingsseksjonen
-                    if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
-                        window.adminManager.onSectionSwitch('messages');
+            // FAB Menu Logic
+            const mainFab = document.getElementById('main-fab');
+            const fabMenu = document.getElementById('fab-menu');
+            if (mainFab && fabMenu) {
+                mainFab.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    mainFab.classList.toggle('active');
+                    fabMenu.classList.toggle('active');
+                });
+                document.addEventListener('click', (e) => {
+                    if (fabMenu.classList.contains('active') && !fabMenu.contains(e.target) && e.target !== mainFab) {
+                        mainFab.classList.remove('active');
+                        fabMenu.classList.remove('active');
                     }
-
-                    const sections = document.querySelectorAll('.section-content');
-                    sections.forEach(section => {
-                        section.classList.remove('active');
-                        if (section.id === 'messages-section') {
-                            section.classList.add('active');
-                        }
-                    });
                 });
             }
+
+            // Global function to trigger specific add buttons
+            window.triggerFabAction = function (sectionId, btnId) {
+                // Navigate to section
+                const link = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
+                if (link) {
+                    link.click();
+                }
+                // Close FAB
+                if (mainFab) mainFab.classList.remove('active');
+                if (fabMenu) fabMenu.classList.remove('active');
+
+                // Wait for render, then click add button
+                setTimeout(() => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) btn.click();
+                }, 300);
+            };
         });
     </script>
 
@@ -570,10 +847,9 @@
         onerror="alert('FEIL: Videoverktøyet ble blokkert! Har du en ad-blocker på?');"></script>
 
     <!-- Admin Logic -->
-    <!-- Admin Logic -->
-    <script type="module" src="js/admin.js?v=admin_users_v5"></script>
+    <script src="../js/notifications.js"></script>
+    <script type="module" src="js/admin.js?v=admin_users_v7"></script>
     <script>
-        // Initialize Admin Manager after scripts load
         window.addEventListener('load', () => {
             if (!window.adminManager) {
                 window.adminManager = new AdminManager();

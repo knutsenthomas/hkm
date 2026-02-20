@@ -147,7 +147,8 @@
                     <i class="fab fa-youtube"></i>
                 </div>
                 <div class="funfact-content">
-                    <span class="funfact-number" id="yt-video-count" data-target="0">0</span>
+                    <span class="funfact-number" id="yt-video-count" data-target="0"
+                        data-content-key="stats.youtube_videos">0</span>
                     <span class="funfact-label">YouTube-videoer</span>
                 </div>
             </div>
@@ -157,7 +158,8 @@
                     <i class="fas fa-chart-line"></i>
                 </div>
                 <div class="funfact-content">
-                    <span class="funfact-number" id="yt-view-count" data-target="0">0</span>
+                    <span class="funfact-number" id="yt-view-count" data-target="0"
+                        data-content-key="stats.youtube_views">0</span>
                     <span class="funfact-label">YouTube-visninger</span>
                 </div>
             </div>
@@ -167,7 +169,8 @@
                     <i class="fas fa-microphone"></i>
                 </div>
                 <div class="funfact-content">
-                    <span class="funfact-number" id="podcast-episode-count" data-target="45">0</span>
+                    <span class="funfact-number" id="podcast-episode-count" data-target="45"
+                        data-content-key="stats.podcast_episodes">0</span>
                     <span class="funfact-label">Podcast-episoder</span>
                 </div>
             </div>
@@ -177,7 +180,7 @@
                     <i class="fas fa-globe"></i>
                 </div>
                 <div class="funfact-content">
-                    <span class="funfact-number" data-target="8">0</span>
+                    <span class="funfact-number" data-target="9" data-content-key="stats.countries_visited">0</span>
                     <span class="funfact-label">Land besøkt</span>
                 </div>
             </div>

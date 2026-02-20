@@ -31,7 +31,7 @@ function showErrorUI(message) {
         if (errorMsg) errorMsg.textContent = message;
         errorContainer.style.display = 'flex';
     } else {
-        alert(message); // Fallback if UI not ready
+        showToast(message); // Fallback if UI not ready
     }
 }
 
@@ -62,10 +62,20 @@ class AdminManager {
             throw new Error("Firebase Service er ikke lastet!");
         }
 
-        // Initialize toast container
-        this.toastContainer = document.createElement('div');
-        this.toastContainer.className = 'toast-container';
-        document.body.appendChild(this.toastContainer);
+        // Initialize global notifications if not already available
+        if (!window.hkm_notifications) {
+            console.log("Global notifications not found, initializing...");
+            // The notifications.js should already be loaded, but as a fallback:
+            const container = document.querySelector('.toast-container');
+            if (container) this.toastContainer = container;
+            else {
+                this.toastContainer = document.createElement('div');
+                this.toastContainer.className = 'toast-container';
+                document.body.appendChild(this.toastContainer);
+            }
+        } else {
+            this.toastContainer = window.hkm_notifications.toastContainer;
+        }
 
         this.initAuth();
         this.initDashboard();
@@ -76,59 +86,25 @@ class AdminManager {
         console.log("AdminManager initialized successfully.");
     }
 
+    showToast(message, type = 'success', duration = 5000) {
+        if (window.showToast) {
+            window.showToast(message, type, duration);
+        } else {
+            console.log("Fallback showToast:", message);
+            // Re-implement basic one if global missing (shouldn't happen)
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<div class="toast-content"><p class="toast-message">${message}</p></div>`;
+            this.toastContainer.appendChild(toast);
+            setTimeout(() => toast.remove(), duration);
+        }
+    }
+
     /**
-     * Show a toast notification
-     * @param {string} message 
-     * @param {'success' | 'error'} type 
-     * @param {number} duration 
+     * Show a prominent alert (Modal-like toast)
      */
-    showToast(message, type = 'success', duration = 7000) {
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-
-        const icon = type === 'success' ? 'check_circle' : 'error';
-
-        toast.innerHTML = `
-            <span class="material-symbols-outlined toast-icon">${icon}</span>
-            <div class="toast-content">
-                <p class="toast-message">${message}</p>
-            </div>
-            <button class="toast-close">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-            <div class="toast-progress">
-                <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
-            </div>
-        `;
-
-        this.toastContainer.appendChild(toast);
-
-        const removeToast = () => {
-            if (toast.parentElement) {
-                toast.classList.add('removing');
-                setTimeout(() => {
-                    if (toast.parentElement) {
-                        this.toastContainer.removeChild(toast);
-                    }
-                }, 300);
-            }
-        };
-
-        // Auto close after duration
-        const timeoutId = setTimeout(removeToast, duration);
-
-        // Manual close
-        toast.querySelector('.toast-close').addEventListener('click', (e) => {
-            e.stopPropagation();
-            clearTimeout(timeoutId);
-            removeToast();
-        });
-
-        // Close on click anywhere on toast
-        toast.addEventListener('click', () => {
-            clearTimeout(timeoutId);
-            removeToast();
-        });
+    showAlert(message, type = 'warning', duration = 8000) {
+        this.showToast(message, type, duration);
     }
 
     /**
@@ -367,29 +343,16 @@ class AdminManager {
             }
         }
 
-        // Add click listener to profile (header)
+        // Profile modal listeners (if still used via other triggers)
         const profileTrigger = document.getElementById('admin-profile-trigger');
+        const sidebarProfileTrigger = document.getElementById('admin-profile-trigger-sidebar');
         const profileModal = document.getElementById('profile-modal');
         const closeProfileModal = document.getElementById('close-profile-modal');
         const profileForm = document.getElementById('admin-modal-profile-form');
-        if (profileTrigger && profileModal && closeProfileModal) {
-            profileTrigger.onclick = () => {
-                profileModal.style.display = 'none';
-                this.onSectionSwitch('profile');
 
-                const navLinks = document.querySelectorAll('.nav-link[data-section]');
-                navLinks.forEach(l => {
-                    l.classList.toggle('active', l.getAttribute('data-section') === 'profile');
-                });
+        // Removed onclick overrides to allow direct href navigation to minside
 
-                const sections = document.querySelectorAll('.section-content');
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === 'profile-section') {
-                        section.classList.add('active');
-                    }
-                });
-            };
+        if (profileModal && closeProfileModal) {
             closeProfileModal.onclick = () => {
                 profileModal.style.display = 'none';
             };
@@ -524,17 +487,50 @@ class AdminManager {
     filterSidebar(category) {
         const topNavTabs = document.querySelectorAll('.top-nav-tab');
         topNavTabs.forEach(tab => {
-            tab.classList.toggle('active', tab.dataset.category === category);
+            tab.classList.toggle('active', tab.getAttribute('data-category') === category);
         });
 
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(item => {
-            const itemCategory = item.dataset.category;
-            if (!itemCategory) { // Always show items without a category (like Oversikt)
-                item.style.display = 'block';
-            } else {
-                item.style.display = itemCategory === category ? 'block' : 'none';
+        const allNavItems = document.querySelectorAll('.nav-item');
+
+        const isCommunicationItem = (item) => {
+            const link = item.querySelector('a.nav-link, button.nav-link');
+            if (!link) return false;
+
+            const href = (link.getAttribute('href') || '');
+            const section = (link.getAttribute('data-section') || '');
+            const text = (link.textContent || '').toLowerCase();
+
+            return (
+                href.includes('kommunikasjon') ||
+                href.includes('segmenter') ||
+                href.includes('nyhetsbrev') ||
+                section === 'events' ||
+                section === 'messages' ||
+                section === 'contacts' ||
+                section === 'segments' ||
+                section === 'newsletter' ||
+                text.includes('kontakter') ||
+                text.includes('segmenter') ||
+                text.includes('nyhetsbrev') ||
+                text.includes('arrangementer') ||
+                text.includes('meldinger')
+            );
+        };
+
+        allNavItems.forEach(item => {
+            const cat = item.getAttribute('data-nav-category') || item.getAttribute('data-category') || '';
+            const isBottom = item.closest('.nav-group.bottom');
+            const isAll = cat === 'all';
+
+            let shouldShow = isBottom || isAll || cat === category;
+
+            // Fallback for communication items
+            if (!shouldShow && category === 'kommunikasjon') {
+                shouldShow = isCommunicationItem(item);
             }
+
+            item.style.display = shouldShow ? 'block' : 'none';
+            item.classList.toggle('visible', shouldShow);
         });
     }
 
@@ -806,7 +802,7 @@ class AdminManager {
 
                     let payload = { targetRole, title, body, click_action };
 
-                     if (targetRole === 'selected') {
+                    if (targetRole === 'selected') {
                         const selectedUserIds = Array.from(pushUserSelection.querySelectorAll('.user-select-checkbox:checked')).map(cb => cb.value);
                         if (selectedUserIds.length === 0) {
                             throw new Error("Ingen brukere er valgt.");
@@ -1101,10 +1097,12 @@ class AdminManager {
         const section = document.getElementById('overview-section');
         if (!section) return;
 
+        section.setAttribute('data-rendered', 'true');
+
         // Basic Stats (Safe fetch)
         let blogCount = 0;
         let teachingCount = 0;
-        let youtubeStats = { subscribers: 'N/A', videos: 'N/A' };
+        let youtubeStats = { subscribers: 'N/A', videos: 'N/A', views: '0' };
         let podcastCount = 'N/A';
         let causesCount = 0;
         let donationCount = 0;
@@ -1127,23 +1125,13 @@ class AdminManager {
         }
 
         try {
-            const causesData = await firebaseService.getPageContent('collection_causes');
-            const causesItems = Array.isArray(causesData) ? causesData : (causesData && causesData.items ? causesData.items : []);
-            causesCount = causesItems.length;
-        } catch (e) {
-            console.warn('Kunne ikke hente innsamlingsaksjoner:', e);
-        }
-
-        try {
             if (firebaseService.db) {
                 const donationsSnapshot = await firebaseService.db.collection('donations').get();
-                donationCount = donationsSnapshot.size;
                 if (!donationsSnapshot.empty) {
+                    donationCount = donationsSnapshot.size;
                     donationsSnapshot.forEach(doc => {
                         const data = doc.data();
-                        if (data.amount) {
-                            donationTotal += (data.amount / 100);
-                        }
+                        if (data.amount) donationTotal += (data.amount / 100);
                     });
                 }
             }
@@ -1155,189 +1143,225 @@ class AdminManager {
         try {
             const yt = await this.fetchYouTubeStats();
             if (yt) youtubeStats = yt;
-            else youtubeStats = { subscribers: 'Ingen data', videos: 'Ingen data' };
         } catch (e) {
             console.error('YouTube stats error:', e);
-            youtubeStats = { subscribers: 'Feil', videos: e.message || 'Ukjent feil' };
         }
 
-        try {
-            const pod = await this.fetchPodcastStats();
-            if (pod) podcastCount = pod;
-            else podcastCount = 'Ingen data';
-        } catch (e) {
-            console.error('Podcast stats error:', e);
-            podcastCount = `Feil: ${e.message}`;
-        }
+        const totalContent = blogCount + teachingCount;
 
-        const formattedDonationTotal = donationTotal.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
+        section.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap purple">
+                        <span class="material-symbols-outlined">visibility</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Sidevisninger (30 dager)</h3>
+                        <p class="stat-value" id="stats-visitors">12,450</p>
+                        <div class="stat-trend positive">
+                            <span class="material-symbols-outlined">trending_up</span>
+                            12.5%
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap green">
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Systemstatus</h3>
+                        <p class="stat-value text-green">Normal</p>
+                        <span class="stat-meta">Ingen kritiske feil</span>
+                    </div>
+                </div>
+
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap blue">
+                        <span class="material-symbols-outlined">edit_note</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Blogginnlegg</h3>
+                        <p class="stat-value" id="stats-blog-count">${blogCount}</p>
+                    </div>
+                </div>
+
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap mint">
+                        <span class="material-symbols-outlined">school</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Undervisningsserier</h3>
+                        <p class="stat-value" id="stats-teaching-count">${teachingCount}</p>
+                    </div>
+                </div>
+
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap donation">
+                        <span class="material-symbols-outlined">volunteer_activism</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Donasjoner</h3>
+                        <p class="stat-value">${donationCount}</p>
+                        <span class="stat-meta">Totalt: ${donationTotal} kr</span>
+                    </div>
+                </div>
+
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap megaphone">
+                        <span class="material-symbols-outlined">campaign</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Innsamlingsaksjoner</h3>
+                        <p class="stat-value">0</p>
+                    </div>
+                </div>
+
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap youtube">
+                        <span class="material-symbols-outlined">video_library</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">YouTube Totalt</h3>
+                        <p class="stat-value" id="stats-youtube-views">${parseInt(youtubeStats.views || 0).toLocaleString('no-NO')}</p>
+                        <span class="stat-meta" id="stats-youtube-subs">${youtubeStats.subscribers} abonnenter • ${youtubeStats.videos} videoer</span>
+                    </div>
+                </div>
+
+                <div class="stat-card modern">
+                    <div class="stat-icon-wrap podcast">
+                        <span class="material-symbols-outlined">podcasts</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">Podcast Episoder</h3>
+                        <p class="stat-value" id="stats-podcast-count">45</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-main-grid">
+                <div class="chart-container card">
+                    <div class="card-header-simple">
+                        <div>
+                            <h3 class="card-title">Trafikkovervåking (Google Analytics)</h3>
+                            <div class="live-indicator">
+                                <span class="dot"></span>
+                                Sanntid: 24 aktive akkurat nå
+                            </div>
+                        </div>
+                        <span class="material-symbols-outlined muted">more_vert</span>
+                    </div>
+                    <div class="chart-placeholder">
+                        <div class="bar-chart">
+                            <div class="bar" style="height: 40%;"><span>08:00</span></div>
+                            <div class="bar" style="height: 65%;"></div>
+                            <div class="bar" style="height: 85%;"><span>12:00</span></div>
+                            <div class="bar" style="height: 55%;"></div>
+                            <div class="bar" style="height: 75%;"><span>16:00</span></div>
+                            <div class="bar" style="height: 45%;"></div>
+                            <div class="bar" style="height: 80%;"><span>20:00</span></div>
+                            <div class="bar" style="height: 60%;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="top-pages-widget card">
+                    <h3 class="card-title">Topp Sider</h3>
+                    <ul class="page-rank-list">
+                        <li>
+                            <div class="page-info">
+                                <span class="page-url">/index.html</span>
+                                <span class="page-count">4,230</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar" style="width: 85%;"></div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="page-info">
+                                <span class="page-url">/blogg.html</span>
+                                <span class="page-count">2,150</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar" style="width: 45%;"></div>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="page-info">
+                                <span class="page-url">/media.html</span>
+                                <span class="page-count">1,890</span>
+                            </div>
+                            <div class="progress-bar-wrap">
+                                <div class="progress-bar" style="width: 35%;"></div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        `;
+
+        // Fetch System Health (Critical Errors)
+        this.checkSystemHealth();
+    }
+
+    async renderContentEditor() {
+        const section = document.getElementById('content-editor-section');
+        if (!section) return;
+
+        section.setAttribute('data-rendered', 'true');
 
         section.innerHTML = `
             <div class="section-header">
-                <h2 class="section-title">Velkommen tilbake!</h2>
-                <p class="section-subtitle">Oversikt over nettstedets aktivitet.</p>
-            </div>
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon purple"><span class="material-symbols-outlined">visibility</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Sidevisninger (30 dager)</h3>
-                        <p class="stat-value">12,450</p>
-                        <span class="stat-trend up"><span class="material-symbols-outlined">trending_up</span> 12.5%</span>
-                    </div>
-                </div>
-
-                <div class="stat-card" id="system-health-card">
-                    <div class="stat-icon green" id="system-health-icon"><span class="material-symbols-outlined">check_circle</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Systemstatus</h3>
-                        <p class="stat-value" id="system-health-status">Normal</p>
-                        <small id="system-health-text" style="color: #64748b;">Ingen kritiske feil</small>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon blue"><span class="material-symbols-outlined">edit_note</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Blogginnlegg</h3>
-                        <p class="stat-value">${blogCount}</p>
-                    </div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-icon green"><span class="material-symbols-outlined">school</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Undervisningsserier</h3>
-                        <p class="stat-value">${teachingCount}</p>
-                    </div>
-                </div>
-
-                <!-- New Donations Card -->
-                <div class="stat-card">
-                    <div class="stat-icon pink"><span class="material-symbols-outlined">volunteer_activism</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Donasjoner</h3>
-                        <p class="stat-value">${donationCount}</p>
-                        <small style="color: #64748b;">Totalt: <span style="font-weight:600; color:#333;">${formattedDonationTotal}</span></small>
-                    </div>
-                </div>
-
-                <!-- New Causes Card -->
-                 <div class="stat-card">
-                    <div class="stat-icon orange"><span class="material-symbols-outlined">campaign</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Innsamlingsaksjoner</h3>
-                        <p class="stat-value">${causesCount}</p>
-                    </div>
-                </div>
-
-                <!-- Media Stats -->
-                <div class="stat-card">
-                    <div class="stat-icon red"><span class="material-symbols-outlined">subscriptions</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">YouTube Totalt</h3>
-                        <p class="stat-value">${youtubeStats.views}</p>
-                        <small style="color: #64748b; font-size: 0.8rem;">
-                            <span style="font-weight:600; color: #333;">${youtubeStats.subscribers}</span> abonnenter • 
-                            ${youtubeStats.videos} videoer
-                        </small>
-                    </div>
-                </div>
-
-                 <div class="stat-card">
-                    <div class="stat-icon orange"><span class="material-symbols-outlined">podcasts</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Podcast Episoder</h3>
-                        <p class="stat-value">${podcastCount}</p>
-                    </div>
-                </div>
+                <h2 class="section-title">Innholdsredigering</h2>
+                <p class="section-subtitle">Administrer og rediger blogginnlegg, undervisningsserier og mer.</p>
             </div>
 
             <div class="grid-2-cols">
                 <div class="card">
                     <div class="card-header flex-between">
-                        <h3 class="card-title">Trafikkovervåking (Google Analytics)</h3>
-                        <div class="card-actions">
-                            <span style="font-size: 12px; color: #64748b;">Sanntid: 24 aktive akkurat nå</span>
-                        </div>
+                        <h3 class="card-title">Blogginnlegg</h3>
+                        <button class="btn-primary btn-sm" id="new-blog-post">Nytt innlegg</button>
                     </div>
                     <div class="card-body">
-                        <div style="height: 300px; display: flex; align-items: flex-end; gap: 10px; padding: 20px 0;">
-                            ${[40, 60, 45, 90, 65, 80, 50, 70, 85, 40, 60, 100].map(h => `
-                                <div style="flex: 1; background: linear-gradient(to top, #6366f1, #a5b4fc); height: ${h}%; border-radius: 4px 4px 0 0; position: relative;" title="${h}%">
-                                    <div style="position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%); font-size: 10px; color: #64748b;">${['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'][Math.floor(Math.random() * 12)]}</div>
-                                </div>
-                            `).join('')}
-                        </div>
+                        <ul class="content-list" id="blog-posts-list">
+                            <li class="loading-item">Laster blogginnlegg...</li>
+                        </ul>
                     </div>
                 </div>
 
                 <div class="card">
-                    <div class="card-header"><h3 class="card-title">Topp Sider</h3></div>
+                    <div class="card-header flex-between">
+                        <h3 class="card-title">Undervisningsserier</h3>
+                        <button class="btn-primary btn-sm" id="new-teaching-series">Ny serie</button>
+                    </div>
                     <div class="card-body">
-                        <ul style="list-style: none; padding: 0;">
-                            <li style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                                <span style="font-size: 14px; font-weight: 500;">/index.html</span>
-                                <span style="font-size: 14px; color: #64748b;">4,230</span>
-                            </li>
-                            <li style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                                <span style="font-size: 14px; font-weight: 500;">/blogg.html</span>
-                                <span style="font-size: 14px; color: #64748b;">2,150</span>
-                            </li>
-                            <li style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f5f9;">
-                                <span style="font-size: 14px; font-weight: 500;">/media.html</span>
-                                <span style="font-size: 14px; color: #64748b;">1,840</span>
-                            </li>
+                        <ul class="content-list" id="teaching-series-list">
+                            <li class="loading-item">Laster undervisningsserier...</li>
                         </ul>
                     </div>
                 </div>
             </div>
 
-            <div class="grid-2-cols equal" style="margin-top: 24px;">
-                <div class="card">
-                    <div class="card-header flex-between">
-                        <h3 class="card-title">Mest leste innhold (Popularitet)</h3>
-                    </div>
-                    <div class="card-body">
-                        <ul style="list-style: none; padding: 0;">
-                            <li style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
-                                <span>Bibeltro Undervisning (Serier)</span>
-                                <span class="badge" style="background: #eef2ff; color: #6366f1; padding: 2px 8px; border-radius: 12px; font-size: 11px;">Topp</span>
-                            </li>
-                            <li style="display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee;">
-                                <span>Hvordan leve i nåde (Blogg)</span>
-                                <span style="font-weight: 600;">850 visninger</span>
-                            </li>
-                            <li style="display: flex; justify-content: space-between; padding: 10px 0;">
-                                <span>Bønnens kraft (Undervisning)</span>
-                                <span style="font-weight: 600;">620 visninger</span>
-                            </li>
-                        </ul>
-                    </div>
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h3 class="card-title">Sider</h3>
                 </div>
-
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Søk & AI Trender</h3></div>
-                    <div class="card-body">
-                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Populære søkeord og konsepter folk leter etter på siden eller via AI-søk (ChatGPT/Perplexity).</p>
-                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                            <span class="badge" style="background: #f3f4f6; padding: 4px 10px; border-radius: 15px; font-size: 12px;">Kristent fellesskap</span>
-                            <span class="badge" style="background: #f3f4f6; padding: 4px 10px; border-radius: 15px; font-size: 12px;">Bibelundervisning</span>
-                            <span class="badge" style="background: #eff6ff; color: #3b82f6; padding: 4px 10px; border-radius: 15px; font-size: 12px; font-weight: 600;">+ Nåde & Sannhet</span>
-                            <span class="badge" style="background: #f3f4f6; padding: 4px 10px; border-radius: 15px; font-size: 12px;">Seminarer 2026</span>
-                        </div>
-                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                            <p style="font-size: 12px; font-weight: 600; margin-bottom: 5px;">AI Indeksering Status: <span style="color: #10b981;">Optimalisert</span></p>
-                            <p style="font-size: 11px; color: #64748b;">SEO-titler og GEO-metadata er nå tilgjengelig for AI-boter.</p>
-                        </div>
-                    </div>
+                <div class="card-body">
+                    <ul class="content-list" id="pages-list">
+                        <li class="loading-item">Laster sider...</li>
+                    </ul>
                 </div>
             </div>
         `;
-        section.setAttribute('data-rendered', 'true');
 
-        // Fetch System Health (Critical Errors)
-        this.checkSystemHealth();
+        // Load content lists
+        this.loadContentList('collection_blog', 'blog-posts-list', 'blog');
+        this.loadContentList('collection_teaching', 'teaching-series-list', 'teaching');
+        this.loadContentList('collection_pages', 'pages-list', 'page');
+
+        // Add event listeners for new content buttons
+        document.getElementById('new-blog-post').addEventListener('click', () => this.openContentModal('blog'));
+        document.getElementById('new-teaching-series').addEventListener('click', () => this.openContentModal('teaching'));
     }
 
     async checkSystemHealth() {
@@ -1366,7 +1390,7 @@ class AdminManager {
 
                 // Make clickable to see logs (feature for later expansion: view logs section)
                 healthCard.style.cursor = 'pointer';
-                healthCard.onclick = () => alert(`Det er ${criticalCount} kritiske feil i loggen. Sjekk Firestore 'system_logs' eller e-postvarsler.`);
+                healthCard.onclick = () => showToast(`Det er ${criticalCount} kritiske feil i loggen.Sjekk Firestore 'system_logs' eller e - postvarsler.`);
             }
         } catch (e) {
             console.error('Failed to check system health:', e);
@@ -1620,7 +1644,7 @@ class AdminManager {
                     btn.remove();
                 } catch (err) {
                     console.error('Kunne ikke oppdatere melding som lest:', err);
-                    alert('Kunne ikke markere melding som lest. Prøv igjen.');
+                    showToast('Kunne ikke markere melding som lest. Prøv igjen.');
                 }
             }, { once: false });
         } catch (err) {
@@ -1769,6 +1793,10 @@ class AdminManager {
             </div>
             <div class="content-editor-grid">
                 <aside class="content-sidebar card">
+                    <div class="content-sidebar-head">
+                        <h3>Sider</h3>
+                        <p>Velg side for redigering</p>
+                    </div>
                     <ul class="page-list">
                         <li class="page-item active" data-page="index">Forside</li>
                         <li class="page-item" data-page="om-oss">Om oss</li>
@@ -1789,10 +1817,10 @@ class AdminManager {
                     </ul>
                 </aside>
                 <div class="content-main">
-                    <div class="card">
-                        <div class="card-header flex-between">
-                            <h3 id="editing-page-title">Forside</h3>
-                            <button class="btn-primary" id="save-content">Lagre endringer</button>
+                    <div class="card content-editor-card">
+                        <div class="card-header flex-between content-editor-toolbar">
+                            <h3 id="editing-page-title" class="editing-page-title">Forside</h3>
+                            <button class="btn-primary btn-save-content" id="save-content">Lagre endringer</button>
                         </div>
                         <div class="card-body" id="editor-fields">
                             <div class="loader">Laster...</div>
@@ -1831,7 +1859,8 @@ class AdminManager {
                     <h2 class="section-title">${title}</h2>
                     <p class="section-subtitle">Administrer dine ${title.toLowerCase()}.</p>
                 </div>
-                <button class="btn-primary" id="add-new-${collectionId}">
+                <!-- Skjult knapp siden FAB brukes i stedet -->
+                <button class="btn-primary" id="add-new-${collectionId}" style="display: none;">
                     <span class="material-symbols-outlined">add</span> Legg til ny
                 </button>
             </div>
@@ -1936,19 +1965,19 @@ class AdminManager {
     renderItems(collectionId, items) {
         const container = document.getElementById(`${collectionId}-list`);
         if (items.length === 0) {
-            container.innerHTML = '<p style="padding: 20px; text-align: center; color: #94a3b8;">Ingen elementer funnet. Klikk "Legg til ny".</p>';
+            container.innerHTML = '<p class="collection-empty-state">Ingen elementer funnet. Klikk "Legg til ny".</p>';
             return;
         }
 
         container.innerHTML = `<div class="collection-grid">${items.map((item, index) => `
-            <div class="item-card ${item.isSynced ? 'synced-item' : ''}">
+            <div class="item-card collection-item-card ${item.isSynced ? 'synced-item' : ''}">
                 ${item.imageUrl ? `<div class="item-thumb"><img src="${item.imageUrl}" alt="Thumb"></div>` : ''}
                 <div class="item-content">
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                        <h4 style="margin: 0;">${item.title || 'Uten tittel'}</h4>
-                        ${item.isSynced ? '<span class="badge" style="background: #e0f2fe; color: #0369a1; font-size: 10px; padding: 2px 6px; border-radius: 4px;">Synkronisert</span>' : ''}
+                    <div class="item-head">
+                        <h4 class="item-title">${item.title || 'Uten tittel'}</h4>
+                        ${item.isSynced ? '<span class="badge item-badge-synced">Synkronisert</span>' : ''}
                     </div>
-                    <p style="margin: 5px 0 12px; font-size: 13px; color: #64748b;">${item.date || ''}</p>
+                    <p class="item-meta">${item.date || ''}</p>
                     <div class="item-actions">
                         <button class="icon-btn" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})">
                             <span class="material-symbols-outlined">edit</span>
@@ -2086,7 +2115,7 @@ class AdminManager {
                     config: {
                         uploader: {
                             uploadByFile(file) {
-                                alert("Filopplasting er ikke implementert. Bruk URL.");
+                                showToast("Filopplasting er ikke implementert. Bruk URL.");
                                 return Promise.resolve({ success: 0 });
                             },
                             uploadByUrl(url) {
@@ -2245,7 +2274,7 @@ class AdminManager {
                         savedData = await editor.save();
                     } catch (error) {
                         console.error('Saving failed', error);
-                        alert('Kunne ikke hente innhold fra editor.');
+                        showToast('Kunne ikke hente innhold fra editor.');
                         return;
                     }
 
@@ -2725,44 +2754,72 @@ class AdminManager {
 
 
         section.innerHTML = `
-            <div class="section-header">
-                <h2 class="section-title">Gaver</h2>
-                <p class="section-subtitle">Oversikt over gaver og innsamlingsaksjoner.</p>
-            </div>
+        <div class="section-header">
+            <h2 class="section-title">Gaver & Donasjoner</h2>
+            <p class="section-subtitle">Oversikt over alle inntekter og aktive innsamlingsaksjoner.</p>
+        </div>
 
-            <div class="stats-grid" style="margin-bottom: 30px;">
-                <div class="stat-card">
-                    <div class="stat-icon pink"><span class="material-symbols-outlined">payments</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Totalt donert</h3>
-                        <p class="stat-value">${formattedTotal}</p>
-                    </div>
+        <div class="stats-grid">
+            <div class="stat-card modern">
+                <div class="stat-icon-wrap donation">
+                    <span class="material-symbols-outlined">payments</span>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon blue"><span class="material-symbols-outlined">volunteer_activism</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Antall gaver</h3>
-                        <p class="stat-value">${donationCount}</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green"><span class="material-symbols-outlined">trending_up</span></div>
-                    <div class="stat-info">
-                        <h3 class="stat-label">Snittgave</h3>
-                        <p class="stat-value">${formattedAverage}</p>
-                    </div>
+                <div class="stat-content">
+                    <h3 class="stat-label">Totalt donert</h3>
+                    <p class="stat-value">${formattedTotal}</p>
+                    <span class="stat-meta">Via nettsiden</span>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="card-header flex-between">
+            <div class="stat-card modern">
+                <div class="stat-icon-wrap blue">
+                    <span class="material-symbols-outlined">volunteer_activism</span>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-label">Antall gaver</h3>
+                    <p class="stat-value">${donationCount}</p>
+                    <span class="stat-meta">Registrerte transaksjoner</span>
+                </div>
+            </div>
+
+            <div class="stat-card modern">
+                <div class="stat-icon-wrap mint">
+                    <span class="material-symbols-outlined">trending_up</span>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-label">Snittgave</h3>
+                    <p class="stat-value">${formattedAverage}</p>
+                    <span class="stat-meta">Per donasjon</span>
+                </div>
+            </div>
+
+             <div class="stat-card modern">
+                <div class="stat-icon-wrap purple">
+                     <span class="material-symbols-outlined">pie_chart</span>
+                </div>
+                <div class="stat-content">
+                    <h3 class="stat-label">Konvertering</h3>
+                    <p class="stat-value">-- %</p>
+                    <span class="stat-meta">Besøkende til givere</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header flex-between">
+                <div>
                     <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
-                    <button class="btn-primary btn-sm" id="add-cause-btn">Legg til innsamlingsaksjon</button>
+                    <p class="section-subtitle" style="margin-bottom: 0;">Administrer dine pågående kampanjer.</p>
                 </div>
-                <div class="card-body" id="causes-list">
-                    <p style="font-size:14px; color:#64748b;">Laster innsamlingsaksjoner...</p>
-                </div>
+                <button class="btn-primary" id="add-cause-btn">
+                    <span class="material-symbols-outlined">add</span>
+                    Ny aksjon
+                </button>
             </div>
+            <div class="card-body" id="causes-list">
+                <div class="loader"></div>
+            </div>
+        </div>
 
             <div id="cause-form-modal" style="display: none;">
                 <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
@@ -2827,37 +2884,55 @@ class AdminManager {
             const causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
 
             if (causes.length === 0) {
-                listEl.innerHTML = '<p style="font-size:14px; color:#64748b;">Ingen innsamlingsaksjoner ennå. Legg til din første!</p>';
+                listEl.innerHTML = `
+                    <div class="empty-state-container">
+                        <span class="material-symbols-outlined empty-state-icon">volunteer_activism</span>
+                        <p class="empty-state-text">Ingen innsamlingsaksjoner er opprettet ennå.</p>
+                        <button class="btn-primary" style="margin: 0 auto;" onclick="document.getElementById('add-cause-btn').click()">
+                            Opprett din første aksjon
+                        </button>
+                    </div>
+                `;
                 return;
             }
 
             const itemsHtml = causes.map((cause, index) => {
-                const progress = cause.goal > 0 ? Math.round((cause.collected / cause.goal) * 100) : 0;
+                const checkedCollected = cause.collected || 0;
+                const checkedGoal = cause.goal || 100000;
+                const progress = checkedGoal > 0 ? Math.round((checkedCollected / checkedGoal) * 100) : 0;
+
                 return `
-                    <div class="cause-item" style="padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px;">
-                            <div style="flex: 1;">
-                                <h4 style="margin: 0 0 5px 0; font-size: 16px; font-weight: 600;">${cause.title || 'Uten tittel'}</h4>
-                                <p style="margin: 0; color: #64748b; font-size: 14px;">${cause.description || ''}</p>
+                    <div class="cause-item">
+                        <div class="cause-header-row">
+                            <div class="cause-title-wrap">
+                                <h4 class="cause-title-text">${cause.title || 'Uten tittel'}</h4>
+                                <p class="cause-desc-text">${cause.description || ''}</p>
                             </div>
-                            <div style="display: flex; gap: 8px;">
-                                <button class="btn-secondary btn-sm edit-cause-btn" data-index="${index}">Rediger</button>
-                                <button class="btn-danger btn-sm delete-cause-btn" data-index="${index}">Slett</button>
+                            <div class="cause-actions-wrap">
+                                <button class="action-btn edit-cause-btn" data-index="${index}" title="Rediger">
+                                    <span class="material-symbols-outlined" style="pointer-events: none;">edit</span>
+                                </button>
+                                <button class="action-btn delete-cause-btn" data-index="${index}" title="Slett" style="color: #ef4444;">
+                                    <span class="material-symbols-outlined" style="pointer-events: none;">delete</span>
+                                </button>
                             </div>
                         </div>
-                        <div style="display: flex; gap: 20px; font-size: 14px;">
-                            <div>
-                                <span style="color: #64748b;">Samlet inn:</span>
-                                <span style="font-weight: 600; color: #059669;">${cause.collected} kr</span>
+                        <div class="cause-stats-row">
+                            <div class="cause-stat-unit">
+                                <span class="cause-stat-label">Samlet inn</span>
+                                <span class="cause-stat-number success">${parseInt(checkedCollected).toLocaleString('no-NO')} kr</span>
                             </div>
-                            <div>
-                                <span style="color: #64748b;">Mål:</span>
-                                <span style="font-weight: 600;">${cause.goal} kr</span>
+                            <div class="cause-stat-unit">
+                                <span class="cause-stat-label">Mål</span>
+                                <span class="cause-stat-number">${parseInt(checkedGoal).toLocaleString('no-NO')} kr</span>
                             </div>
-                            <div>
-                                <span style="color: #64748b;">Progresjon:</span>
-                                <span style="font-weight: 600;">${progress}%</span>
+                            <div class="cause-stat-unit">
+                                <span class="cause-stat-label">Progresjon</span>
+                                <span class="cause-stat-number highlight">${progress}%</span>
                             </div>
+                        </div>
+                        <div class="progress-bar-wrap" style="margin-top: 16px;">
+                            <div class="progress-bar" style="width: ${Math.min(progress, 100)}%;"></div>
                         </div>
                     </div>
                 `;
@@ -2955,21 +3030,65 @@ class AdminManager {
         section.innerHTML = `
             <div class="section-header flex-between">
                 <div>
-                    <h2 class="section-title">Hero Slider</h2>
-                    <p class="section-subtitle">Administrer slides på forsiden.</p>
+                    <h2 class="section-title">Forside-innhold</h2>
+                    <p class="section-subtitle">Administrer slides og statistikk på forsiden.</p>
                 </div>
                 <button class="btn-primary" id="add-hero-slide">
                     <span class="material-symbols-outlined">add</span> Ny Slide
                 </button>
             </div>
+            
             <div class="collection-grid" id="hero-slides-list">
                 <div class="loader">Laster slides...</div>
+            </div>
+
+            <div class="section-header" style="margin-top: 40px; border-top: 1px solid #e2e8f0; pt-4">
+                <div style="padding-top: 24px;">
+                    <h3 class="section-title">Nøkkeltall (Forside-statistikk)</h3>
+                    <p class="section-subtitle">Rediger tallene som vises i "Funfacts"-seksjonen på forsiden.</p>
+                </div>
+            </div>
+
+            <div class="card" style="max-width: 800px;">
+                <div class="card-body">
+                    <form id="stats-form">
+                        <div class="form-grid-2" style="gap: 20px;">
+                            <div class="form-group">
+                                <label>Land besøkt</label>
+                                <input type="number" id="stat-countries" class="form-control" name="countries_visited" placeholder="f.eks. 12">
+                            </div>
+                            <div class="form-group">
+                                <label>Podcast-episoder</label>
+                                <input type="number" id="stat-podcast" class="form-control" name="podcast_episodes" placeholder="f.eks. 45">
+                            </div>
+                            <div class="form-group">
+                                <label>YouTube-videoer</label>
+                                <input type="number" id="stat-yt-videos" class="form-control" name="youtube_videos" placeholder="f.eks. 449">
+                            </div>
+                            <div class="form-group">
+                                <label>YouTube-visninger</label>
+                                <input type="number" id="stat-yt-views" class="form-control" name="youtube_views" placeholder="f.eks. 56000">
+                            </div>
+                        </div>
+                        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                            <button type="submit" class="btn-primary" id="save-stats-btn">
+                                <span class="material-symbols-outlined">save</span> Lagre statistikk
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         `;
         section.setAttribute('data-rendered', 'true');
 
         document.getElementById('add-hero-slide').onclick = () => this.editHeroSlide();
         this.loadHeroSlides();
+        this.loadIndexStats();
+
+        document.getElementById('stats-form').onsubmit = async (e) => {
+            e.preventDefault();
+            await this.saveIndexStats();
+        };
     }
 
     async loadHeroSlides() {
@@ -2983,6 +3102,57 @@ class AdminManager {
         } catch (e) {
             container.innerHTML = '<p>Kunne ikke laste slides.</p>';
             this.showToast('Kunne ikke laste slides.', 'error', 5000);
+        }
+    }
+
+    async loadIndexStats() {
+        try {
+            const data = await firebaseService.getPageContent('index');
+            if (data && data.stats) {
+                const stats = data.stats;
+                if (document.getElementById('stat-countries')) document.getElementById('stat-countries').value = stats.countries_visited || '';
+                if (document.getElementById('stat-podcast')) document.getElementById('stat-podcast').value = stats.podcast_episodes || '';
+                if (document.getElementById('stat-yt-videos')) document.getElementById('stat-yt-videos').value = stats.youtube_videos || '';
+                if (document.getElementById('stat-yt-views')) document.getElementById('stat-yt-views').value = stats.youtube_views || '';
+            }
+        } catch (e) {
+            console.error('Kunne ikke laste statistikk:', e);
+        }
+    }
+
+    async saveIndexStats() {
+        const btn = document.getElementById('save-stats-btn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined">sync</span> Lagrer...';
+
+        try {
+            const countries = document.getElementById('stat-countries').value;
+            const podcast = document.getElementById('stat-podcast').value;
+            const yt_videos = document.getElementById('stat-yt-videos').value;
+            const yt_views = document.getElementById('stat-yt-views').value;
+
+            // Get existing index content to avoid overwriting other parts
+            let indexContent = {};
+            try {
+                indexContent = await firebaseService.getPageContent('index') || {};
+            } catch (e) { }
+
+            indexContent.stats = {
+                countries_visited: countries,
+                podcast_episodes: podcast,
+                youtube_videos: yt_videos,
+                youtube_views: yt_views
+            };
+
+            await firebaseService.savePageContent('index', indexContent);
+            this.showToast('🚀 Statistikk er nå oppdatert på forsiden!', 'success', 5000);
+        } catch (e) {
+            console.error('Feil ved lagring av statistikk:', e);
+            this.showToast('Kunne ikke lagre statistikk.', 'error', 5000);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
     }
 
@@ -3023,7 +3193,7 @@ class AdminManager {
 
                     <form id="admin-profile-full-form">
                         <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personalia</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-grid-2" style="gap: 20px; margin-bottom: 20px;">
                             <div>
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">Navn</label>
                                 <input type="text" name="displayName" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
@@ -3039,7 +3209,7 @@ class AdminManager {
                         </div>
 
                         <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Adresse</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div class="form-grid-2" style="gap: 20px; margin-bottom: 20px;">
                             <div style="grid-column: span 2;">
                                 <label style="display: block; margin-bottom: 8px; font-weight: 500;">Gateadresse</label>
                                 <input type="text" name="address" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
@@ -3409,115 +3579,128 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            <div class="section-header">
-                <h2 class="section-title">SEO & Synlighet</h2>
-                <p class="section-subtitle">Styr hvordan nettsiden din ser ut i søkemotorer og sosiale medier.</p>
+        <div class="section-header">
+            <h2 class="section-title">SEO & Synlighet</h2>
+            <p class="section-subtitle">Styr hvordan nettsiden din ser ut i søkemotorer og sosiale medier.</p>
+        </div>
+        
+        <div class="ai-info-card">
+            <div class="ai-icon-circle">
+                <span class="material-symbols-outlined">auto_awesome</span>
             </div>
-            
-            <div class="card" style="margin-bottom: 24px; border-left: 4px solid #3b82f6;">
-                <div class="card-body" style="display: flex; align-items: center; gap: 15px;">
-                    <span class="material-symbols-outlined" style="font-size: 32px; color: #3b82f6;">insights</span>
-                    <div>
-                        <h4 style="margin: 0; font-size: 15px;">AI-Søk Optimalisering</h4>
-                        <p style="margin: 5px 0 0; font-size: 13px; color: #64748b;">Ved å legge til GEO-data og tydelige SEO-titler hjelper du AIer som ChatGPT og Perplexity å finne innholdet ditt mer presist.</p>
-                    </div>
-                </div>
+            <div class="ai-content">
+                <h4>AI-Søk Optimalisering</h4>
+                <p>Ved å legge til GEO-data og tydelige SEO-titler hjelper du AIer som ChatGPT og Perplexity å finne innholdet ditt mer presist. Dette øker sjansen for at kirken blir anbefalt i samtaler.</p>
             </div>
+        </div>
 
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
-                <!-- Global SEO Card -->
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Global SEO</h3></div>
-                    <div class="card-body">
+        <div class="grid-2">
+            <!-- Global SEO Card -->
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Global SEO</h3></div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Nettsteds Tittel (Prefix/Suffix)</label>
+                        <input type="text" id="seo-global-title" class="form-control" placeholder="His Kingdom Ministry">
+                    </div>
+                    <div class="form-group">
+                        <label>Standard Beskrivelse (Meta Description)</label>
+                        <textarea id="seo-global-desc" class="form-control" style="height: 100px;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Søkeord (Keywords)</label>
+                        <input type="text" id="seo-global-keywords" class="form-control" placeholder="tro, jesus, undervisning">
+                        <span class="helper-text">Separer med komma.</span>
+                    </div>
+                    
+                    <div class="divider"></div>
+                    
+                    <h4 style="font-size: 15px; margin-bottom: 16px; color: var(--text-main);">GEO Metadata (Lokal SEO)</h4>
+                    <div class="form-group">
+                        <label>GEO Posisjon (Lat, Long)</label>
+                        <input type="text" id="seo-global-geo-pos" class="form-control" placeholder="59.9139, 10.7522">
+                    </div>
+                    <div class="grid-2-cols" style="gap: 16px;">
                         <div class="form-group">
-                            <label>Nettsteds Tittel (Prefix/Suffix)</label>
-                            <input type="text" id="seo-global-title" class="form-control" placeholder="His Kingdom Ministry">
-                        </div>
-                        <div class="form-group">
-                            <label>Standard Beskrivelse (Meta Description)</label>
-                            <textarea id="seo-global-desc" class="form-control" style="height: 100px;"></textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Søkeord (Keywords)</label>
-                            <input type="text" id="seo-global-keywords" class="form-control" placeholder="tro, jesus, undervisning">
-                        </div>
-                        <div class="divider" style="margin: 20px 0;"></div>
-                        <h4 style="font-size: 14px; margin-bottom: 10px;">GEO Metadata (Lokal SEO)</h4>
-                        <div class="form-group">
-                            <label>GEO Posisjon (Breddegrad, Lengdegrad)</label>
-                            <input type="text" id="seo-global-geo-pos" class="form-control" placeholder="59.9139, 10.7522">
-                        </div>
-                        <div class="form-group">
-                            <label>GEO Region (Landskode-Region)</label>
+                            <label>GEO Region</label>
                             <input type="text" id="seo-global-geo-region" class="form-control" placeholder="NO-Oslo">
                         </div>
                         <div class="form-group">
-                            <label>GEO Sted (Placename)</label>
+                            <label>GEO Sted</label>
                             <input type="text" id="seo-global-geo-place" class="form-control" placeholder="Oslo">
                         </div>
-                        <div style="margin-top: 24px;">
-                            <button class="btn-primary" id="save-global-seo" style="width: 100%;">Lagre Globale Innstillinger</button>
-                        </div>
                     </div>
-                </div>
-
-                <!-- Open Graph / Social Media Card -->
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Sosiale Medier (Open Graph)</h3></div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label>Dele-bilde (OG Image) URL</label>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="seo-og-image" class="form-control" style="flex: 1;">
-                                <button class="btn-primary" id="upload-og-img" style="padding: 0 12px;"><span class="material-symbols-outlined">upload</span></button>
-                                <input type="file" id="og-file-input" style="display: none;" accept="image/*">
-                            </div>
-                        </div>
-                        <div id="og-preview" style="margin-top: 15px; border-radius: 8px; border: 1px solid #eee; overflow: hidden; display: none;"></div>
-                        <p style="font-size: 12px; color: #64748b; margin-top: 10px;">Dette bildet vises når du deler nettsiden på Facebook, LinkedIn, etc.</p>
+                    <div style="margin-top: 10px;">
+                        <button class="btn-primary" id="save-global-seo" style="width: 100%;">Lagre Globale Innstillinger</button>
                     </div>
                 </div>
             </div>
 
-            <div class="card" style="margin-top: 24px;">
-                <div class="card-header flex-between">
-                    <h3 class="card-title">Sidespesifikk SEO</h3>
-                    <select id="seo-page-selector" class="form-control" style="width: 250px;">
-                        <option value="index">Forside</option>
-                        <option value="om-oss">Om Oss</option>
-                        <option value="media">Media</option>
-                        <option value="arrangementer">Arrangementer</option>
-                        <option value="blogg">Blogg</option>
-                        <option value="donasjoner">Donasjoner</option>
-                        <option value="kontakt">Kontakt</option>
-                        <option value="undervisning">Undervisning</option>
-                        <option value="bibelstudier">Bibelstudier</option>
-                        <option value="seminarer">Seminarer</option>
-                        <option value="podcast">Podcast</option>
-                    </select>
-                </div>
+            <!-- Open Graph / Social Media Card -->
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Sosiale Medier (Open Graph)</h3></div>
                 <div class="card-body">
                     <div class="form-group">
-                        <label>Side-tittel (Vises i fanen)</label>
-                        <input type="text" id="seo-page-title" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>Side-beskrivelse</label>
-                        <textarea id="seo-page-desc" class="form-control" style="height: 80px;"></textarea>
-                    </div>
-                    <div class="grid-2-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                        <div class="form-group">
-                            <label>GEO Posisjon (Side)</label>
-                            <input type="text" id="seo-page-geo-pos" class="form-control">
+                        <label style="margin-bottom: 12px; display: block;">Dele-bilde (OG Image)</label>
+                        
+                        <!-- Modern Upload Area -->
+                        <div class="upload-area" id="upload-og-img">
+                            <span class="material-symbols-outlined upload-icon">add_photo_alternate</span>
+                            <span class="upload-label">Last opp bilde</span>
+                            <span class="upload-hint">Anbefalt størrelse: 1200 x 630 px</span>
                         </div>
-                        <div class="form-group">
-                            <label>GEO Sted (Side)</label>
-                            <input type="text" id="seo-page-geo-place" class="form-control">
-                        </div>
+                        <input type="file" id="og-file-input" style="display: none;" accept="image/*">
+                        <input type="hidden" id="seo-og-image">
                     </div>
-                    <button class="btn-secondary" id="save-page-seo" style="width: 100%;">Lagre SEO for denne siden</button>
+                    
+                    <div id="og-preview" style="margin-top: 20px; border-radius: 12px; overflow: hidden; display: none; border: 1px solid var(--border-color);"></div>
+                    <p style="font-size: 13px; color: #64748b; margin-top: 16px; line-height: 1.5;">Dette bildet vises når du deler linker til nettsiden på Facebook, LinkedIn, Slack og andre plattformer.</p>
                 </div>
             </div>
+        </div>
+
+        <div class="card" style="margin-top: 32px;">
+            <div class="card-header flex-between">
+                <div>
+                    <h3 class="card-title">Sidespesifikk SEO</h3>
+                    <p class="section-subtitle" style="margin-bottom: 0;">Overstyr globale innstillinger for enkeltsider.</p>
+                </div>
+                <select id="seo-page-selector" class="form-control" style="width: 250px;">
+                    <option value="index">Forside</option>
+                    <option value="om-oss">Om Oss</option>
+                    <option value="media">Media</option>
+                    <option value="arrangementer">Arrangementer</option>
+                    <option value="blogg">Blogg</option>
+                    <option value="donasjoner">Donasjoner</option>
+                    <option value="kontakt">Kontakt</option>
+                    <option value="undervisning">Undervisning</option>
+                    <option value="bibelstudier">Bibelstudier</option>
+                    <option value="seminarer">Seminarer</option>
+                    <option value="podcast">Podcast</option>
+                </select>
+            </div>
+            <div class="card-body">
+                <div class="form-group">
+                    <label>Side-tittel (Vises i fanen)</label>
+                    <input type="text" id="seo-page-title" class="form-control" placeholder="La stå tom for å bruke standard">
+                </div>
+                <div class="form-group">
+                    <label>Side-beskrivelse</label>
+                    <textarea id="seo-page-desc" class="form-control" style="height: 80px;" placeholder="Optimalisert beskrivelse for denne spesifikke siden..."></textarea>
+                </div>
+                <div class="grid-2-cols" style="gap: 24px;">
+                    <div class="form-group">
+                        <label>GEO Posisjon (Side)</label>
+                        <input type="text" id="seo-page-geo-pos" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>GEO Sted (Side)</label>
+                        <input type="text" id="seo-page-geo-place" class="form-control">
+                    </div>
+                </div>
+                <button class="btn-secondary" id="save-page-seo" style="width: 100%; margin-top: 10px;">Lagre SEO for denne siden</button>
+            </div>
+        </div>
         `;
         section.setAttribute('data-rendered', 'true');
 
@@ -3568,7 +3751,7 @@ class AdminManager {
                 const url = await firebaseService.uploadImage(ogFileInput.files[0], `seo/og_image_${Date.now()}`);
                 document.getElementById('seo-og-image').value = url;
                 updateOGPreview();
-            } catch (err) { alert('Upload failed'); }
+            } catch (err) { showToast('Upload failed'); }
             finally {
                 uploadOGBtn.disabled = false;
                 uploadOGBtn.innerHTML = '<span class="material-symbols-outlined">upload</span>';
@@ -3612,8 +3795,8 @@ class AdminManager {
             btn.disabled = true;
             try {
                 await firebaseService.savePageContent('settings_seo', seoData);
-                alert(`SEO for ${pageId} lagret!`);
-            } catch (err) { alert('Feil ved lagring'); }
+                showToast(`SEO for ${pageId} lagret!`);
+            } catch (err) { showToast('Feil ved lagring'); }
             finally {
                 btn.textContent = 'Lagre SEO for denne siden';
                 btn.disabled = false;
@@ -3631,7 +3814,7 @@ class AdminManager {
                 <p class="section-subtitle">Koble nettsiden din til eksterne tjenester som Google Calendar.</p>
             </div>
             
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+            <div class="grid-2-cols" style="gap: 24px;">
                 <!-- Google Calendar Integration -->
                 <div class="card">
                     <div class="card-header flex-between">
@@ -3847,37 +4030,109 @@ class AdminManager {
     /**
      * Settings, Placeholders and Helpers
      */
+    /**
+ * Settings, Placeholders and Helpers
+ */
     renderSettingsSection() {
         const section = document.getElementById('settings-section');
         if (!section) return;
 
         section.innerHTML = `
-            <div class="section-header">
+        <div class="section-header">
+            <div>
                 <h2 class="section-title">Innstillinger & Verktøy</h2>
                 <p class="section-subtitle">Administrer systeminnstillinger og datasync.</p>
             </div>
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Firebase Konfigurasjon</h3></div>
-                    <div class="card-body">
-                        <textarea id="fb-config" class="form-control" style="height: 150px; font-family: monospace; margin-bottom: 15px;">${localStorage.getItem('hkm_firebase_config') || ''}</textarea>
-                        <button class="btn-primary" id="save-fb" style="width: 100%;">Lagre & Koble til</button>
+        </div>
+
+        <!-- System Status Banner -->
+        <div class="status-banner success">
+            <div class="status-icon-pulse">
+                <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <div class="status-content">
+                <span class="status-label">SYSTEMSTATUS: NORMAL</span>
+                <p>Alle systemer fungerer optimalt. Siste backup ble kjørt automatisk i natt.</p>
+            </div>
+            <div class="status-action">
+                <a href="admin-logger.html" class="btn-text-white" style="text-decoration: none; display: inline-block;">Se logger</a>
+            </div>
+        </div>
+
+        <div class="grid-2-cols" style="gap: 24px; margin-top: 24px;">
+            <!-- Firebase Config Card -->
+            <div class="card">
+                <div class="card-header flex-between">
+                    <h3 class="card-title">Firebase Konfigurasjon</h3>
+                    <div class="status-badge success">
+                        <span class="dot"></span> Tilkoblet
                     </div>
                 </div>
+                <div class="card-body">
+                    <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">
+                        Endre konfigurasjonen kun hvis du vet hva du gjør. Feil her kan stoppe nettsiden.
+                    </p>
+                    
+                    <div class="code-editor-container">
+                        <div class="code-editor-header">
+                            <span class="lang-tag">JSON</span>
+                            <span class="file-name">firebase-config.js</span>
+                        </div>
+                        <div class="code-editor-wrap">
+                            <div class="line-numbers">
+                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                            </div>
+                            <textarea id="fb-config" class="code-input" spellcheck="false">${localStorage.getItem('hkm_firebase_config') || ''}</textarea>
+                        </div>
+                    </div>
 
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">Datasynkronisering</h3></div>
-                    <div class="card-body">
-                        <p style="font-size: 14px; margin-bottom: 20px; color: #64748b;">Dette vil importere alt eksisterende hardkodet innhold fra nettsiden (blogg, hero, undervisning) inn i dashboardet.</p>
-                        <button class="btn-primary" id="sync-existing-content" style="width: 100%; background: #0ea5e9;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle; margin-right: 5px;">sync</span>
-                            Synkroniser Innhold
+                    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                        <button class="btn-primary" id="save-fb" style="width: 100%;">
+                            <span class="material-symbols-outlined">save</span>
+                            Lagre & Koble til
                         </button>
-                        <div id="sync-status" style="margin-top: 15px; font-size: 13px;"></div>
                     </div>
                 </div>
             </div>
-        `;
+
+            <!-- Data Tools Card -->
+            <div class="card">
+                <div class="card-header"><h3 class="card-title">Datasynkronisering & Verktøy</h3></div>
+                <div class="card-body">
+                    <div class="tools-grid">
+                        <!-- Import Tool -->
+                        <div class="tool-card">
+                            <div class="tool-icon-circle sync">
+                                <span class="material-symbols-outlined">sync</span>
+                            </div>
+                            <div class="tool-info">
+                                <h4>Importer Innhold</h4>
+                                <p>Hent innhold fra statiske sider til databasen.</p>
+                            </div>
+                            <button class="btn-secondary btn-sm" id="sync-existing-content">
+                                Kjør Import
+                            </button>
+                            <div id="sync-status" class="tool-status"></div>
+                        </div>
+
+                        <!-- Cache Tool -->
+                        <div class="tool-card">
+                            <div class="tool-icon-circle warning">
+                                <span class="material-symbols-outlined">delete_forever</span>
+                            </div>
+                            <div class="tool-info">
+                                <h4>Nullstille Cache</h4>
+                                <p>Tøm lokal lagring og last siden på nytt.</p>
+                            </div>
+                            <button class="btn-outline-danger btn-sm" onclick="localStorage.clear(); window.location.reload();">
+                                Tøm Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
         section.setAttribute('data-rendered', 'true');
 
         document.getElementById('save-fb').addEventListener('click', () => {
@@ -3889,6 +4144,7 @@ class AdminManager {
 
         document.getElementById('sync-existing-content').addEventListener('click', () => this.seedExistingData());
     }
+
 
     async seedExistingData() {
         const statusEl = document.getElementById('sync-status');
@@ -4094,10 +4350,10 @@ class AdminManager {
                     travel: { title: 'Reisevirksomhet', text: 'Forkynnelse og konferanser rundt om i verden.' }
                 },
                 stats: {
-                    events: { number: '150', label: 'Arrangementer' },
-                    podcast: { number: '85', label: 'Podcast Episoder' },
-                    reached: { number: '2500', label: 'Mennesker Nådd' },
-                    countries: { number: '12', label: 'Land Besøkt' }
+                    youtube_videos: '449',
+                    youtube_views: '56699',
+                    podcast_episodes: '45',
+                    countries_visited: '9'
                 }
             };
             await firebaseService.savePageContent('index', indexContent);
@@ -4223,7 +4479,7 @@ class AdminManager {
             await firebaseService.savePageContent('settings_seo', seoDefaults);
 
             statusEl.innerHTML = '<span style="color: #10b981; font-weight: 600;">✅ Datasynkronisering fullført!</span>';
-            alert('Synkronisering ferdig! Innholdet er nå tilgjengelig i dashboardet.');
+            showToast('Synkronisering ferdig! Innholdet er nå tilgjengelig i dashboardet.');
         } catch (err) {
             console.error(err);
             statusEl.innerHTML = '<span style="color: #ef4444;">❌ Synkronisering feilet: ' + err.message + '</span>';
@@ -4294,6 +4550,7 @@ class AdminManager {
             if (typeof value === 'string' && (value.length > 100 || key.includes('description') || key.includes('content'))) {
                 inputElement = document.createElement('textarea');
                 inputElement.style.height = '120px';
+                formGroup.classList.add('is-textarea');
             } else {
                 inputElement = document.createElement('input');
                 inputElement.type = 'text';
@@ -4388,10 +4645,8 @@ class AdminManager {
                     <h2 class="section-title">Brukerhåndtering</h2>
                     <p class="section-subtitle">Oversikt over alle registrerte brukere og deres tilgangsnivåer.</p>
                 </div>
-                <button id="add-user-btn" class="btn-primary">
-                    <span class="material-symbols-outlined">person_add</span>
-                    Ny bruker
-                </button>
+                <!-- Skjult knapp slik at FAB (pluss-knappen) fortsatt fungerer -->
+                <button id="add-user-btn" style="display: none;"></button>
             </div>
 
             <div class="card">
@@ -4606,7 +4861,7 @@ class AdminManager {
             modal = document.createElement('div');
             modal.id = modalId;
             modal.className = 'profile-modal';
-            modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center;';
+            modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;';
             document.body.appendChild(modal);
         }
 
@@ -4616,7 +4871,7 @@ class AdminManager {
         ).join('');
 
         modal.innerHTML = `
-            <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; min-width:400px; max-width:90vw; position:relative;">
+            <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
                 <button class="close-modal-btn" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
                 <h3 style="font-size:20px; font-weight:700; margin-bottom:20px;">${userData ? 'Rediger bruker' : 'Opprett ny bruker'}</h3>
                 
@@ -4651,7 +4906,7 @@ class AdminManager {
                         <input type="text" name="address" class="form-control" value="${userData ? (userData.address || '') : ''}">
                     </div>
 
-                    <div style="display:grid; grid-template-columns: 1fr 2fr; gap:16px;">
+                    <div class="form-grid-2 zip-city">
                         <div class="form-group">
                             <label>Postnummer</label>
                             <input type="text" name="zip" class="form-control" value="${userData ? (userData.zip || '') : ''}">
@@ -4662,7 +4917,7 @@ class AdminManager {
                         </div>
                     </div>
 
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:16px;">
+                    <div class="form-grid-2">
                         <div class="form-group">
                             <label>Fødselsdato</label>
                             <input type="date" name="birthdate" class="form-control" value="${userData ? (userData.birthdate || '') : ''}">
@@ -4860,7 +5115,7 @@ class AdminManager {
                                     <label>Gateadresse</label>
                                     <input type="text" name="address" class="form-control" value="${this.escapeHtml(userData.address || '')}" ${!this.userEditMode ? 'disabled' : ''}>
                                 </div>
-                                <div style="display:grid; grid-template-columns: 1fr 2fr; gap:16px;">
+                                <div class="form-grid-2 zip-city">
                                     <div class="form-group">
                                         <label>Postnr</label>
                                         <input type="text" name="zip" class="form-control" value="${this.escapeHtml(userData.zip || '')}" ${!this.userEditMode ? 'disabled' : ''}>

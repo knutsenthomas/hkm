@@ -14,6 +14,7 @@
     <!-- Material Symbols -->
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+    <link rel="stylesheet" href="../css/notifications.css">
 
     <style>
         :root {
@@ -192,6 +193,7 @@
         <a href="../index.html" class="back-link">Tilbake til nettsiden</a>
     </div>
 
+    <script src="../js/notifications.js"></script>
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -250,7 +252,7 @@
 
                         if (!service || !service.isInitialized) {
                             console.error("[HKM] Firebase service not ready", { service: !!service, initialized: service?.isInitialized });
-                            alert("⚠️ Tjenesten er ikke helt klar. Vennligst prøv igjen om et sekund.");
+                            showToast("⚠️ Tjenesten er ikke helt klar. Vennligst prøv igjen om et sekund.", "warning");
                             btn.textContent = originalText;
                             btn.disabled = false;
                             return;
@@ -278,7 +280,7 @@
                     googleBtn.addEventListener('click', async () => {
                         const service = window.firebaseService;
                         if (!service || !service.isInitialized) {
-                            alert("⚠️ Tjenesten er ikke klar!");
+                            showToast("⚠️ Tjenesten er ikke klar!", "error");
                             return;
                         }
 

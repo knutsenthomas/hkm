@@ -1428,8 +1428,20 @@ class ContentManager {
 
             // Default text update (never allow image URL as text)
             if (typeof value === 'string' && value.startsWith('http')) return;
+
             const newText = String(value).trim();
             const currentText = (el.textContent || "").trim();
+
+            // Specific handling for funfact counters
+            if (el.classList.contains('funfact-number')) {
+                el.setAttribute('data-target', newText);
+                // If animation already happened, update text too
+                if (el.getAttribute('data-animated') === 'true' || currentText === '0') {
+                    el.textContent = newText;
+                }
+                return;
+            }
+
             if (currentText !== newText) {
                 el.textContent = value;
             }
