@@ -834,3 +834,47 @@ body.admin-body .welcome-subtitle {
         grid-template-columns: 1fr !important;
     }
 }
+
+/* --- Global Mobile Optimization for Fixed UI --- */
+@media (max-width: 1024px) {
+    html {
+        height: 100% !important;
+    }
+
+    body.admin-body,
+    body.crm-body,
+    body.builder-active {
+        height: 100vh !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .main-content,
+    .builder-layout,
+    .logs-container {
+        flex: 1 !important;
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        display: block !important;
+        padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+        width: 100% !important;
+        min-height: 0 !important;
+        /* Allow flex shrinking */
+    }
+
+    /* Keep UI elements strictly above the scrollable areas */
+    .mobile-bottom-nav {
+        z-index: 9999 !important;
+    }
+
+    .fab-menu-container,
+    .builder-tools-fab {
+        z-index: 9998 !important;
+        bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+    }
+}
