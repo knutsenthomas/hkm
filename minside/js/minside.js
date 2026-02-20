@@ -633,7 +633,7 @@ class MinSideManager {
             && this.currentUser.providerData.some(p => p && p.providerId === 'google.com');
 
         container.innerHTML = `
-            <div style="max-width: 800px; margin: 0 auto;">
+            <div style="width: 100%; margin: 0 auto;">
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h3>Min Profil</h3>

@@ -3164,7 +3164,7 @@ class AdminManager {
         if (!authUser) return;
 
         section.innerHTML = `
-            <div style="max-width: 900px; margin: 0 auto; padding: 0 16px;">
+            <div style="width: 100%; margin: 0 auto; padding: 0 16px;">
                 <div class="card" style="padding: 24px;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h3>Min Profil</h3>
