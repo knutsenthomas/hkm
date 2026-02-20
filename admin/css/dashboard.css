@@ -2457,13 +2457,19 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     bottom: 0;
     left: 0;
     right: 0;
-    height: 70px;
-    background: white;
-    border-top: 1px solid var(--border-color);
-    z-index: 1000;
-    padding: 0 20px;
+    height: calc(75px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    z-index: 5000;
+    /* Ensure it's above most things but below modals */
+    padding: 0 10px 10px 10px;
+    /* Reduced side padding, added bottom safe area buffer */
+    padding-bottom: env(safe-area-inset-bottom, 10px);
     align-items: center;
-    justify-content: space-between;
+    justify-content: space-around;
+    /* Use space-around for better distribution */
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .mobile-nav-item {
