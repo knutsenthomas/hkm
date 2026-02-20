@@ -702,6 +702,10 @@
                 <span class="fab-label">Ny bruker</span>
                 <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
             </button>
+            <button class="fab-item" onclick="triggerFabAction('kommunikasjon', 'push-title')">
+                <span class="fab-label">Ny push-varsling</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">send_to_mobile</span></div>
+            </button>
         </div>
         <button class="mobile-fab" id="main-fab">
             <span class="material-symbols-outlined">add</span>
@@ -818,7 +822,13 @@
                 // Wait for render, then click add button
                 setTimeout(() => {
                     const btn = document.getElementById(btnId);
-                    if (btn) btn.click();
+                    if (btn) {
+                        if (btn.tagName === 'INPUT' || btn.tagName === 'TEXTAREA') {
+                            btn.focus();
+                        } else {
+                            btn.click();
+                        }
+                    }
                 }, 300);
             };
         });
