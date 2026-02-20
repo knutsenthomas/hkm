@@ -171,7 +171,6 @@ class NewsletterBuilder {
 
         fabBtn.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent accidental closures
-            if (!this.isMobileViewport()) return;
 
             if (document.body.classList.contains('builder-tools-panel-open')) {
                 this.closeToolsUi();
