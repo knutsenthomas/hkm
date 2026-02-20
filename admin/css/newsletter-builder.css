@@ -1413,22 +1413,23 @@ input:checked+.slider:before {
     .builder-tools-fab {
         display: block;
         position: fixed;
-        right: 16px;
+        right: 20px;
         bottom: 100px;
-        z-index: 2400;
+        z-index: 9999;
+        /* Higher z-index to be above everything */
     }
 
     .builder-tools-fab-btn {
-        width: 60px;
-        height: 60px;
+        width: 64px;
+        height: 64px;
         border: none;
         border-radius: 50%;
-        background: linear-gradient(135deg, #ff7a1a 0%, #f97316 100%);
+        background: var(--accent-orange, #f97316);
         color: white;
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 20px rgba(249, 115, 22, 0.4);
+        box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
         cursor: pointer;
         transition: transform 0.2s ease;
     }
@@ -1446,18 +1447,18 @@ input:checked+.slider:before {
     .builder-tools-menu {
         position: absolute;
         right: 0;
-        bottom: 70px;
+        bottom: 80px;
         display: flex;
         flex-direction: column;
-        gap: 8px;
+        gap: 10px;
         opacity: 0;
-        transform: translateY(8px) scale(0.97);
+        transform: translateY(10px) scale(0.95);
         transform-origin: bottom right;
         pointer-events: none;
-        transition: opacity 0.18s ease, transform 0.18s ease;
-        max-height: 58vh;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        max-height: 60vh;
         overflow-y: auto;
-        padding-right: 2px;
+        padding: 4px;
     }
 
     body.builder-tools-menu-open .builder-tools-menu {
