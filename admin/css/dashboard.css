@@ -33,6 +33,7 @@ body.admin-body {
     color: var(--text-main);
     display: flex;
     min-height: 100vh;
+    min-height: 100dvh;
 }
 
 /* Sidebar Navigation */
@@ -2622,7 +2623,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 
     .main-content {
         margin-left: 0;
-        padding-bottom: 80px;
+        padding-bottom: calc(85px + env(safe-area-inset-bottom, 20px));
     }
 
     .main-header {

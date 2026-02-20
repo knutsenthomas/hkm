@@ -28,6 +28,7 @@ body {
     color: var(--text-dark);
     background-color: var(--bg-light);
     height: 100vh;
+    height: 100dvh;
     overflow: hidden;
     /* App-like feel */
 }
@@ -335,6 +336,7 @@ body {
 
     .content-container {
         padding: 16px;
+        padding-bottom: calc(40px + env(safe-area-inset-bottom, 20px));
     }
 
     .sidebar-overlay {
