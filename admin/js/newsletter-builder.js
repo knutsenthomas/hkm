@@ -169,7 +169,8 @@ class NewsletterBuilder {
 
         if (!fabBtn || !menu || !backdrop) return;
 
-        fabBtn.addEventListener('click', () => {
+        fabBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent accidental closures
             if (!this.isMobileViewport()) return;
 
             if (document.body.classList.contains('builder-tools-panel-open')) {
@@ -177,8 +178,9 @@ class NewsletterBuilder {
                 return;
             }
 
-            fabBtn.classList.toggle('active');
-            document.body.classList.toggle('builder-tools-menu-open');
+            const isOpen = document.body.classList.toggle('builder-tools-menu-open');
+            fabBtn.classList.toggle('active', isOpen);
+            console.log("Newsletter FAB Toggle:", isOpen);
         });
 
         menu.querySelectorAll('[data-tool-type]').forEach(btn => {
@@ -963,7 +965,9 @@ class NewsletterBuilder {
     }
 }
 
-window.builder = new NewsletterBuilder();
+if (!window.builder) {
+    window.builder = new NewsletterBuilder();
+}
 
 // Recipient flow listeners
 document.addEventListener('DOMContentLoaded', () => {
