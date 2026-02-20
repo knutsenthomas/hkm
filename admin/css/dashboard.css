@@ -3761,10 +3761,10 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     }
 }
 
-/* Ensure global FAB doesn't overlap editor save button area on mobile */
+/* Ensure global FAB and bottom nav don't overlap editor save button area on mobile */
 @media (max-width: 768px) {
-    .dashboard-modal .mobile-bottom-nav {
-        z-index: 10001;
-        /* Keep bottom nav on top of editor modal */
+    .mobile-bottom-nav {
+        z-index: 10001 !important;
+        /* Keep bottom nav on top of editor modal (which is 10000) */
     }
 }
