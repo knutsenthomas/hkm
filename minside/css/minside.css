@@ -175,11 +175,15 @@ body {
     display: flex;
     align-items: center;
     gap: 16px;
+    min-width: 0;
 }
 
 .user-avatar {
     width: 40px;
     height: 40px;
+    min-width: 40px;
+    min-height: 40px;
+    flex-shrink: 0;
     border-radius: 50%;
     background-color: var(--primary-orange);
     color: white;
@@ -189,6 +193,7 @@ body {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
+    overflow: hidden;
 }
 
 .user-avatar:hover {
@@ -208,6 +213,9 @@ body {
     display: block;
     font-weight: 600;
     font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .badge {
@@ -290,7 +298,39 @@ body {
     }
 
     .top-header {
-        padding: 0 16px;
+        padding: 10px 12px;
+        gap: 10px;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+    }
+
+    .header-title {
+        min-width: 0;
+    }
+
+    .header-title h2 {
+        font-size: 1.2rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .user-profile {
+        justify-self: end;
+        gap: 10px;
+    }
+
+    .user-name {
+        max-width: 110px;
+        font-size: 0.82rem;
+    }
+
+    .user-avatar {
+        width: 42px;
+        height: 42px;
+        min-width: 42px;
+        min-height: 42px;
     }
 
     .content-container {
@@ -307,6 +347,12 @@ body {
 
     .sidebar-overlay.active {
         display: block;
+    }
+}
+
+@media (max-width: 480px) {
+    .user-name {
+        display: none;
     }
 }
 
