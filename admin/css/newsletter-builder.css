@@ -1410,16 +1410,15 @@ input:checked+.slider:before {
         pointer-events: auto;
     }
 
-    .builder-tools-fab {
+    .fab-menu-container {
         display: block;
         position: fixed;
         right: 20px;
-        bottom: 100px;
+        bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
         z-index: 9999;
-        /* Higher z-index to be above everything */
     }
 
-    .builder-tools-fab-btn {
+    .mobile-fab {
         width: 64px;
         height: 64px;
         border: none;
@@ -1434,24 +1433,26 @@ input:checked+.slider:before {
         transition: transform 0.2s ease;
     }
 
-    .builder-tools-fab-btn span {
+    .mobile-fab span {
         font-size: 32px;
         transition: transform 0.2s ease;
     }
 
-    body.builder-tools-menu-open .builder-tools-fab-btn span,
-    body.builder-tools-panel-open .builder-tools-fab-btn span {
+    body.builder-tools-menu-open .mobile-fab span,
+    body.builder-tools-panel-open .mobile-fab span {
         transform: rotate(45deg);
     }
 
-    .builder-tools-menu {
+    .fab-menu {
         position: absolute;
         right: 0;
         bottom: 80px;
         display: flex;
         flex-direction: column;
+        align-items: flex-end;
         gap: 10px;
         opacity: 0;
+        visibility: hidden;
         transform: translateY(10px) scale(0.95);
         transform-origin: bottom right;
         pointer-events: none;
@@ -1461,35 +1462,47 @@ input:checked+.slider:before {
         padding: 4px;
     }
 
-    body.builder-tools-menu-open .builder-tools-menu {
+    body.builder-tools-menu-open .fab-menu {
         opacity: 1;
+        visibility: visible;
         transform: translateY(0) scale(1);
         pointer-events: auto;
     }
 
-    .builder-tools-menu-btn {
+    .fab-item {
         border: 1px solid #e2e8f0;
         background: white;
         border-radius: 12px;
-        min-height: 42px;
-        padding: 8px 12px;
-        display: inline-flex;
+        min-height: 48px;
+        padding: 10px 18px;
+        display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 12px;
         color: #0f172a;
-        font-size: 13px;
+        font-size: 15px;
         font-weight: 700;
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.12);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         cursor: pointer;
         white-space: nowrap;
+        width: auto;
     }
 
-    .builder-tools-menu-btn .material-symbols-outlined {
-        font-size: 18px;
+    .fab-item .fab-icon {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff7ed;
+        border-radius: 50%;
+    }
+
+    .fab-item .fab-icon span {
+        font-size: 20px;
         color: #f97316;
     }
 
-    body.builder-recipients-open .builder-tools-fab {
+    body.builder-recipients-open .fab-menu-container {
         display: none;
     }
 

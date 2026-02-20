@@ -158,6 +158,8 @@ class NewsletterBuilder {
     closeToolsUi() {
         document.body.classList.remove('builder-tools-menu-open');
         document.body.classList.remove('builder-tools-panel-open');
+        const fabBtn = document.getElementById('builder-tools-fab');
+        if (fabBtn) fabBtn.classList.remove('active');
     }
 
     setupToolsFab() {
@@ -175,6 +177,7 @@ class NewsletterBuilder {
                 return;
             }
 
+            fabBtn.classList.toggle('active');
             document.body.classList.toggle('builder-tools-menu-open');
         });
 

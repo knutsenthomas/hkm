@@ -562,46 +562,46 @@
     </div>
 
     <div id="builder-tools-backdrop" class="builder-tools-backdrop"></div>
-    <div class="builder-tools-fab" id="builder-tools-fab-container">
-        <div class="builder-tools-menu" id="builder-tools-menu">
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="header">
-                <span class="material-symbols-outlined">title</span>
-                <span>Overskrift</span>
+    <div class="fab-menu-container" id="builder-tools-fab-container">
+        <div class="fab-menu" id="builder-tools-menu">
+            <button class="fab-item" type="button" data-tool-type="header">
+                <span class="fab-label">Overskrift</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">title</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="text">
-                <span class="material-symbols-outlined">notes</span>
-                <span>Tekst</span>
+            <button class="fab-item" type="button" data-tool-type="text">
+                <span class="fab-label">Tekst</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">notes</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="image">
-                <span class="material-symbols-outlined">image</span>
-                <span>Bilde</span>
+            <button class="fab-item" type="button" data-tool-type="image">
+                <span class="fab-label">Bilde</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">image</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="button">
-                <span class="material-symbols-outlined">smart_button</span>
-                <span>Knapp</span>
+            <button class="fab-item" type="button" data-tool-type="button">
+                <span class="fab-label">Knapp</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">smart_button</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="video">
-                <span class="material-symbols-outlined">smart_display</span>
-                <span>Video</span>
+            <button class="fab-item" type="button" data-tool-type="video">
+                <span class="fab-label">Video</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">smart_display</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="columns">
-                <span class="material-symbols-outlined">view_column</span>
-                <span>Kolonner</span>
+            <button class="fab-item" type="button" data-tool-type="columns">
+                <span class="fab-label">Kolonner</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">view_column</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="social">
-                <span class="material-symbols-outlined">public</span>
-                <span>Sosiale medier</span>
+            <button class="fab-item" type="button" data-tool-type="social">
+                <span class="fab-label">Sosiale medier</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">public</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="divider">
-                <span class="material-symbols-outlined">horizontal_rule</span>
-                <span>Skillelinje</span>
+            <button class="fab-item" type="button" data-tool-type="divider">
+                <span class="fab-label">Skillelinje</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">horizontal_rule</span></div>
             </button>
-            <button class="builder-tools-menu-btn" type="button" data-tool-type="spacer">
-                <span class="material-symbols-outlined">space_bar</span>
-                <span>Avstand</span>
+            <button class="fab-item" type="button" data-tool-type="spacer">
+                <span class="fab-label">Avstand</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">space_bar</span></div>
             </button>
         </div>
-        <button id="builder-tools-fab" class="builder-tools-fab-btn" type="button" aria-label="Åpne verktøy">
+        <button id="builder-tools-fab" class="mobile-fab" type="button" aria-label="Åpne verktøy">
             <span class="material-symbols-outlined">add</span>
         </button>
     </div>
@@ -617,7 +617,7 @@
     </div>
 
     <nav class="mobile-bottom-nav">
-        <a href="index.html#overview" class="mobile-nav-item" data-section="overview">
+        <a href="index.html#overview" class="mobile-nav-item active" data-section="overview">
             <span class="material-symbols-outlined">grid_view</span>
             <span>Oversikt</span>
         </a>
