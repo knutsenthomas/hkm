@@ -856,7 +856,8 @@ body.admin-body .welcome-subtitle {
 
     .main-content,
     .builder-layout,
-    .logs-container {
+    .logs-container,
+    main {
         flex: 1 !important;
         overflow-y: auto !important;
         -webkit-overflow-scrolling: touch !important;
