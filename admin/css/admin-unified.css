@@ -868,14 +868,14 @@ body.admin-body .welcome-subtitle {
         /* Allow flex shrinking */
     }
 
-    /* Keep UI elements strictly above the scrollable areas */
+    /* Keep UI elements strictly above the scrollable areas and drawers */
     .mobile-bottom-nav {
-        z-index: 9999 !important;
+        z-index: 12000 !important;
     }
 
     .fab-menu-container,
     .builder-tools-fab {
-        z-index: 9998 !important;
-        bottom: calc(90px + env(safe-area-inset-bottom, 0px)) !important;
+        z-index: 11500 !important;
+        bottom: calc(95px + env(safe-area-inset-bottom, 0px)) !important;
     }
 }

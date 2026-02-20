@@ -1354,26 +1354,46 @@ input:checked+.slider:before {
         display: flex;
     }
 
+    .builder-layout {
+        display: block !important;
+        width: 100% !important;
+        height: 100dvh !important;
+        overflow: hidden !important;
+        padding-bottom: 0 !important;
+    }
+
+    .builder-workspace {
+        width: 100% !important;
+        height: 100% !important;
+        padding-bottom: 120px !important;
+        /* Space for FAB and Nav */
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .recipients-drawer {
-        position: fixed;
-        top: 0;
-        right: 0;
-        height: 100vh;
-        width: 100%;
-        transform: translateX(100%);
-        transition: transform 0.3s ease;
-        overflow-y: auto;
-        z-index: 2600;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100vw !important;
+        height: 100dvh !important;
+        transform: translateX(100%) !important;
+        z-index: 10000 !important;
+        /* Above everything including nav and fab */
+        background: white !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     .recipients-drawer.open {
-        width: 100%;
-        transform: translateX(0);
-        border-left: none;
+        transform: translateX(0) !important;
     }
 
     .drawer-inner-content {
-        padding: 20px 16px 110px;
+        flex: 1 !important;
+        overflow-y: auto !important;
+        padding: 20px 16px 150px !important;
     }
 
     .recipient-page-header {
