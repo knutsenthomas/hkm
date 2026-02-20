@@ -786,6 +786,21 @@
                 if (targetLink) {
                     setTimeout(() => targetLink.click(), 100); // Small delay to ensure render
                 }
+
+                const pendingBtnId = sessionStorage.getItem('pendingFabAction');
+                if (pendingBtnId) {
+                    sessionStorage.removeItem('pendingFabAction');
+                    setTimeout(() => {
+                        const btn = document.getElementById(pendingBtnId);
+                        if (btn) {
+                            if (btn.tagName === 'INPUT' || btn.tagName === 'TEXTAREA') {
+                                btn.focus();
+                            } else {
+                                btn.click();
+                            }
+                        }
+                    }, 600);
+                }
             } else {
                 const overviewLink = document.querySelector('.nav-link[data-section="overview"]');
                 if (overviewLink) overviewLink.classList.add('active');

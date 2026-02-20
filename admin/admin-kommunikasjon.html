@@ -382,12 +382,66 @@
                 </div>
             </form>
         </div>
-    </div>
+        <!-- FAB Menu -->
+        <div class="fab-menu-container">
+            <div class="fab-menu" id="fab-menu">
+                <button class="fab-item" onclick="triggerFabAction('blog', 'add-new-blog')">
+                    <span class="fab-label">Ny blogg</span>
+                    <div class="fab-icon"><span class="material-symbols-outlined">edit_document</span></div>
+                </button>
+                <button class="fab-item" onclick="window.location.href='admin-nyhetsbrev.html'">
+                    <span class="fab-label">Nytt nyhetsbrev</span>
+                    <div class="fab-icon"><span class="material-symbols-outlined">mark_email_unread</span></div>
+                </button>
+                <button class="fab-item" onclick="triggerFabAction('teaching', 'add-new-teaching')">
+                    <span class="fab-label">Ny undervisning</span>
+                    <div class="fab-icon"><span class="material-symbols-outlined">school</span></div>
+                </button>
+                <button class="fab-item" onclick="triggerFabAction('events', 'add-new-events')">
+                    <span class="fab-label">Nytt arrangement</span>
+                    <div class="fab-icon"><span class="material-symbols-outlined">event</span></div>
+                </button>
+                <button class="fab-item" onclick="triggerFabAction('users', 'add-user-btn')">
+                    <span class="fab-label">Ny bruker</span>
+                    <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
+                </button>
+                <button class="fab-item" onclick="triggerFabAction('kommunikasjon', 'push-title')">
+                    <span class="fab-label">Ny push-varsling</span>
+                    <div class="fab-icon"><span class="material-symbols-outlined">send_to_mobile</span></div>
+                </button>
+            </div>
+            <button class="mobile-fab" id="main-fab">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+        </div>
 
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const mainFab = document.getElementById('main-fab');
+                const fabMenu = document.getElementById('fab-menu');
+                if (mainFab && fabMenu) {
+                    mainFab.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        mainFab.classList.toggle('active');
+                        fabMenu.classList.toggle('active');
+                    });
+                    document.addEventListener('click', (e) => {
+                        if (fabMenu.classList.contains('active') && !fabMenu.contains(e.target) && e.target !== mainFab) {
+                            mainFab.classList.remove('active');
+                            fabMenu.classList.remove('active');
+                        }
+                    });
+                }
 
+                window.triggerFabAction = function (sectionId, btnId) {
+                    sessionStorage.setItem('pendingFabAction', btnId);
+                    window.location.href = 'index.html#' + sectionId;
+                };
+            });
+        </script>
 
-    <script type="module" src="js/admin-header.js"></script>
-    <script defer src="js/crm.js"></script>
+        <script type="module" src="js/admin-header.js"></script>
+        <script defer src="js/crm.js"></script>
 </body>
 
 </html>
