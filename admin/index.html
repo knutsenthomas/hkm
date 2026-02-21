@@ -942,43 +942,17 @@
             // ── Collapsible Nav Categories ──────────────────────────────────
             const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
 
-            function setCategory(category, expanded, animate = false) {
+            function setCategory(category, expanded) {
                 const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
                 const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
                 if (!header) return;
 
                 if (expanded) {
                     header.classList.remove('collapsed');
-                    items.forEach(item => {
-                        item.style.display = 'block';
-                        if (animate) {
-                            item.style.overflow = 'hidden';
-                            item.style.maxHeight = '0';
-                            item.style.opacity = '0';
-                            item.style.transition = 'max-height 0.3s ease, opacity 0.25s ease';
-                            requestAnimationFrame(() => {
-                                item.style.maxHeight = '60px';
-                                item.style.opacity = '1';
-                            });
-                        }
-                    });
+                    items.forEach(item => item.classList.remove('nav-cat-hidden'));
                 } else {
                     header.classList.add('collapsed');
-                    items.forEach(item => {
-                        if (animate) {
-                            item.style.overflow = 'hidden';
-                            item.style.maxHeight = '60px';
-                            item.style.opacity = '1';
-                            item.style.transition = 'max-height 0.3s ease, opacity 0.25s ease';
-                            requestAnimationFrame(() => {
-                                item.style.maxHeight = '0';
-                                item.style.opacity = '0';
-                            });
-                            setTimeout(() => { item.style.display = 'none'; }, 300);
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
+                    items.forEach(item => item.classList.add('nav-cat-hidden'));
                 }
 
                 sessionStorage.setItem(`nav_cat_${category}`, expanded ? 'open' : 'closed');
@@ -988,18 +962,18 @@
             categoryHeaders.forEach(header => {
                 const cat = header.getAttribute('data-target-category');
                 const saved = sessionStorage.getItem(`nav_cat_${cat}`);
-                // Default: nettsted = open, everything else = closed
-                const defaultOpen = cat === 'nettsted';
-                const shouldBeOpen = saved ? saved === 'open' : defaultOpen;
-                setCategory(cat, shouldBeOpen, false);
+                const defaultOpen = (cat === 'nettsted');
+                const shouldBeOpen = saved ? (saved === 'open') : defaultOpen;
+                setCategory(cat, shouldBeOpen);
             });
 
-            // Click handler: toggle
+            // Click handler: toggle on every click
             categoryHeaders.forEach(header => {
-                header.addEventListener('click', () => {
+                header.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const cat = header.getAttribute('data-target-category');
-                    const isCollapsed = header.classList.contains('collapsed');
-                    setCategory(cat, isCollapsed, true);
+                    const isNowCollapsed = header.classList.contains('collapsed');
+                    setCategory(cat, isNowCollapsed); // if collapsed -> expand; if expanded -> collapse
                 });
             });
 
