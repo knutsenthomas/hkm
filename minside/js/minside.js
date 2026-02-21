@@ -835,7 +835,7 @@ class MinSideManager {
     async renderNotifications(container) {
         const uid = this.currentUser?.uid;
         container.innerHTML = `
-        <div style="max-width:700px">
+        <div style="width:100%">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
                 <h2 style="font-size:1.05rem; font-weight:700;">Varslinger</h2>
                 <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">Merk alle lest</button>
@@ -975,7 +975,7 @@ class MinSideManager {
             </div>
 
             ${yearTotal >= 500 ? `
-            <div class="info-card" style="margin-top:16px; max-width:760px">
+            <div class="info-card" style="margin-top:16px">
                 <div class="info-card-header">
                     <h3>Skattefradrag</h3>
                 </div>
