@@ -1,1315 +1,676 @@
+/* ═══════════════════════════════════════════════════════
+   MIN SIDE — PCO-inspired Member Profile
+   ═══════════════════════════════════════════════════════ */
+
 class MinSideManager {
     constructor() {
         this.currentUser = null;
+        this.profileData = {};
+
         this.views = {
-            overview: this.renderOverview,
-            courses: this.renderCourses,
-            resources: this.renderResources,
-            giving: this.renderGiving,
             profile: this.renderProfile,
-            notifications: this.renderNotifications
+            activity: this.renderActivity,
+            notifications: this.renderNotifications,
+            giving: this.renderGiving,
+            courses: this.renderCourses,
+            notes: this.renderNotes,
         };
 
         this.init();
     }
 
+    // ──────────────────────────────────────────────────────────
+    // INIT
+    // ──────────────────────────────────────────────────────────
     async init() {
-        console.log("Min Side Manager Initializing...");
-
-        // 1. Setup Navigation
         this.setupNavigation();
 
-        // 2. Setup Auth Listener
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user) {
                 this.currentUser = user;
                 await this.syncUserProfile(user);
                 await this.syncProfileFromGoogleProvider();
-                await this.updateUserProfile(user);
-                this.updateRoleLinks(user);
+                this.profileData = await this.getMergedProfile(user);
+                this.updateHeader();
                 this.initNotificationBadge();
-                this.loadView(this.getCurrentViewFromHash() || 'overview');
+                const startView = window.location.hash.replace('#', '') || 'profile';
+                this.loadView(startView);
             } else {
-                // Redirect to login if not authenticated
-                console.log("No user logged in. Redirecting to login...");
                 window.location.href = 'login.html';
             }
         });
     }
 
+    // ──────────────────────────────────────────────────────────
+    // NAVIGATION
+    // ──────────────────────────────────────────────────────────
     setupNavigation() {
-        // Sidebar Links
         document.querySelectorAll('.nav-link[data-view]').forEach(link => {
-            link.addEventListener('click', (e) => {
+            link.addEventListener('click', e => {
                 e.preventDefault();
-                const view = link.getAttribute('data-view');
-                this.navigateTo(view);
-
-                // Mobile: Close sidebar
-                if (window.innerWidth <= 768) {
-                    this.toggleSidebar(false);
-                }
+                this.loadView(link.dataset.view);
+                if (window.innerWidth <= 768) this.toggleSidebar(false);
             });
         });
 
-        // Mobile Toggle
-        const toggleBtn = document.getElementById('mobile-toggle');
-        const overlay = document.getElementById('sidebar-overlay');
+        document.getElementById('mobile-toggle')?.addEventListener('click', () => this.toggleSidebar(true));
+        document.getElementById('sidebar-overlay')?.addEventListener('click', () => this.toggleSidebar(false));
 
-        toggleBtn.addEventListener('click', () => this.toggleSidebar(true));
-        overlay.addEventListener('click', () => this.toggleSidebar(false));
-
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', () => {
-            firebase.auth().signOut().then(() => {
-                window.location.href = '../index.html';
-            });
+        document.getElementById('logout-btn')?.addEventListener('click', () => {
+            firebase.auth().signOut().then(() => window.location.href = '../index.html');
         });
 
-        // Header Profile Click: åpne full profilside, ikke popup
-        const profileTrigger = document.getElementById('minside-profile-trigger');
-        const profileModal = document.getElementById('profile-modal');
-        const closeProfileModal = document.getElementById('close-profile-modal');
-        const profileForm = document.getElementById('modal-profile-form');
-        if (profileTrigger && profileModal && closeProfileModal) {
-            profileTrigger.onclick = (e) => {
-                e.stopPropagation();
-                this.closeProfileModal();
-                this.navigateTo('profile');
-            };
-            closeProfileModal.onclick = (e) => {
-                e.stopPropagation();
-                this.closeProfileModal();
-            };
-            // Lukk modal ved klikk utenfor innhold
-            profileModal.addEventListener('mousedown', (e) => {
-                if (e.target === profileModal) this.closeProfileModal();
-            });
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape' && profileModal.style.display === 'flex') {
-                    this.closeProfileModal();
-                }
-            });
-        }
+        // Actions dropdown
+        const actionsBtn = document.getElementById('actions-btn');
+        const actionsMenu = document.getElementById('actions-menu');
+        actionsBtn?.addEventListener('click', e => {
+            e.stopPropagation();
+            actionsMenu.classList.toggle('open');
+        });
+        document.addEventListener('click', () => actionsMenu?.classList.remove('open'));
 
-        if (profileForm) {
-            profileForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                await this.saveProfileFromModal(profileForm);
-            });
-        }
+        // Profile photo upload
+        document.getElementById('ph-upload')?.addEventListener('change', e => this.handlePhotoUpload(e));
     }
 
     toggleSidebar(show) {
-        const sidebar = document.querySelector('.sidebar');
-        const overlay = document.getElementById('sidebar-overlay');
+        document.getElementById('sidebar')?.classList.toggle('active', show);
+        document.getElementById('sidebar-overlay')?.classList.toggle('active', show);
+    }
 
-        if (show) {
-            sidebar.classList.add('active');
-            overlay.classList.add('active');
+    loadView(viewId) {
+        if (!this.views[viewId]) viewId = 'profile';
+        window.location.hash = viewId;
+
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active');
+
+        const container = document.getElementById('content-area');
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Laster...</p></div>`;
+
+        setTimeout(async () => {
+            try {
+                await this.views[viewId].call(this, container);
+            } catch (err) {
+                console.error(`View "${viewId}" error:`, err);
+                container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Noe gikk galt</h3><p>${err.message}</p></div>`;
+            }
+        }, 80);
+    }
+
+    // ──────────────────────────────────────────────────────────
+    // HEADER
+    // ──────────────────────────────────────────────────────────
+    updateHeader() {
+        const p = this.profileData;
+        const name = p.displayName || this.currentUser?.email || 'Bruker';
+
+        // Name
+        const nameEl = document.getElementById('ph-name');
+        if (nameEl) nameEl.textContent = name;
+
+        // Avatar
+        this._setAvatarEl(document.getElementById('ph-avatar'), p.photoURL, name);
+
+        // Email
+        const emailText = document.getElementById('ph-email-text');
+        if (emailText) emailText.textContent = this.currentUser?.email || '—';
+
+        // Phone
+        const phoneText = document.getElementById('ph-phone-text');
+        const phoneEl = document.getElementById('ph-phone');
+        if (p.phone) {
+            if (phoneText) phoneText.textContent = p.phone;
         } else {
-            sidebar.classList.remove('active');
-            overlay.classList.remove('active');
+            if (phoneEl) phoneEl.style.display = 'none';
+        }
+
+        // Role
+        const roleEl = document.getElementById('ph-role');
+        if (roleEl) roleEl.textContent = this._roleLabel(p.role);
+    }
+
+    _setAvatarEl(el, photoURL, name) {
+        if (!el) return;
+        if (photoURL) {
+            el.innerHTML = `<img src="${photoURL}" alt="${name}">`;
+        } else {
+            el.textContent = (name || '?').charAt(0).toUpperCase();
         }
     }
 
-    navigateTo(viewId) {
-        // Update URL hash
-        window.location.hash = viewId;
-        this.loadView(viewId);
+    _roleLabel(role) {
+        const map = { admin: 'Administrator', pastor: 'Pastor', leder: 'Leder', frivillig: 'Frivillig', giver: 'Fast Giver' };
+        return map[role] || 'Medlem';
     }
 
-    getCurrentViewFromHash() {
-        return window.location.hash.replace('#', '');
-    }
-
-    async getMergedProfile(user = this.currentUser) {
-        if (!user) return null;
-
-        let userData = {};
+    // ──────────────────────────────────────────────────────────
+    // FIREBASE SYNC
+    // ──────────────────────────────────────────────────────────
+    async getMergedProfile(user) {
+        if (!user) return {};
+        let data = {};
         try {
             const doc = await firebase.firestore().collection('users').doc(user.uid).get();
-            if (doc.exists) userData = doc.data() || {};
-        } catch (e) {
-            console.warn('Kunne ikke lese brukerprofil:', e);
-        }
+            if (doc.exists) data = doc.data() || {};
+        } catch (e) { console.warn('getMergedProfile:', e); }
 
-        const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com') || {};
-        const displayName = userData.displayName || user.displayName || googleProvider.displayName || user.email || '';
-        const photoURL = userData.photoURL || user.photoURL || googleProvider.photoURL || '';
-
+        const google = (user.providerData || []).find(p => p.providerId === 'google.com') || {};
         return {
-            ...userData,
-            displayName,
-            photoURL
+            ...data,
+            displayName: data.displayName || user.displayName || google.displayName || user.email || '',
+            photoURL: data.photoURL || user.photoURL || google.photoURL || '',
         };
     }
 
     async syncUserProfile(user) {
         if (!user) return;
         try {
-            const docRef = firebase.firestore().collection('users').doc(user.uid);
-            const doc = await docRef.get();
-            const isNewUser = !doc.exists;
-
-            if (isNewUser) {
-                // Initial creation
-                await docRef.set({
+            const ref = firebase.firestore().collection('users').doc(user.uid);
+            const doc = await ref.get();
+            if (!doc.exists) {
+                await ref.set({
                     email: user.email || '',
-                    displayName: user.displayName || user.email || '',
+                    displayName: user.displayName || '',
                     photoURL: user.photoURL || '',
                     role: 'medlem',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 });
-
-                // Admin Notification
                 await this.createAdminNotification({
                     type: 'NEW_USER_REGISTRATION',
                     userId: user.uid,
                     userEmail: user.email,
                     userName: user.displayName || user.email,
-                    message: `Ny bruker registrert: ${user.displayName || user.email}`
+                    message: `Ny bruker: ${user.displayName || user.email}`,
                 });
             }
-        } catch (e) {
-            console.warn('Kunne ikke synkronisere bruker:', e);
-        }
+        } catch (e) { console.warn('syncUserProfile:', e); }
     }
 
     async syncProfileFromGoogleProvider() {
-        if (!this.currentUser) return;
         const user = this.currentUser;
-        const googleProvider = (user.providerData || []).find(p => p.providerId === 'google.com');
-        if (!googleProvider) return;
-
+        if (!user) return;
+        const google = (user.providerData || []).find(p => p.providerId === 'google.com');
+        if (!google) return;
         try {
             const updates = {};
-            if (!user.displayName && googleProvider.displayName) updates.displayName = googleProvider.displayName;
-            if (!user.photoURL && googleProvider.photoURL) updates.photoURL = googleProvider.photoURL;
-            if (Object.keys(updates).length > 0) {
-                await user.updateProfile(updates);
-            }
-
-            const docRef = firebase.firestore().collection('users').doc(user.uid);
-            // No need to check exists here as syncUserProfile handled it or will merge
-            await docRef.set({
-                displayName: user.displayName || googleProvider.displayName || user.email || '',
-                photoURL: user.photoURL || googleProvider.photoURL || '',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            if (!user.displayName && google.displayName) updates.displayName = google.displayName;
+            if (!user.photoURL && google.photoURL) updates.photoURL = google.photoURL;
+            if (Object.keys(updates).length) await user.updateProfile(updates);
+            await firebase.firestore().collection('users').doc(user.uid).set({
+                displayName: user.displayName || google.displayName || '',
+                photoURL: user.photoURL || google.photoURL || '',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
             }, { merge: true });
-
-            // Note: Registration notification is handled in syncUserProfile
-        } catch (e) {
-            console.warn('Kunne ikke synkronisere Google-profil:', e);
-        }
+        } catch (e) { console.warn('syncGoogleProvider:', e); }
     }
 
-    async updateUserProfile(user) {
-        const merged = await this.getMergedProfile(user);
-        document.getElementById('user-name').textContent = merged?.displayName || user.displayName || user.email;
-        const avatarEl = document.getElementById('user-avatar');
-        const avatarUrl = merged?.photoURL || '';
-        if (avatarUrl) {
-            avatarEl.innerHTML = `<img src="${avatarUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
-        } else {
-            const initials = (merged?.displayName || user.displayName || user.email || '?').charAt(0).toUpperCase();
-            avatarEl.textContent = initials;
-        }
-    }
-
-    async openProfileModal() {
-        const profileModal = document.getElementById('profile-modal');
-        if (!profileModal || !this.currentUser) return;
-
-        const user = this.currentUser;
-        const merged = await this.getMergedProfile(user);
-        document.getElementById('modal-user-name').textContent = merged?.displayName || user.displayName || user.email;
-        document.getElementById('modal-user-role').textContent = 'Bruker';
-        document.getElementById('modal-user-email').textContent = user.email || '';
-
-        const modalAvatar = document.getElementById('modal-user-avatar');
-        const avatarUrl = merged?.photoURL || user.photoURL || '';
-        if (avatarUrl) {
-            modalAvatar.innerHTML = `<img src="${avatarUrl}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        } else {
-            const initials = (merged?.displayName || user.displayName || user.email || '?').split(' ').map(n => n[0]).join('').toUpperCase();
-            modalAvatar.textContent = initials.substring(0, 2);
-        }
-
-        await this.populateProfileModalForm();
-        profileModal.style.display = 'flex';
-    }
-
-    closeProfileModal() {
-        const profileModal = document.getElementById('profile-modal');
-        if (profileModal) profileModal.style.display = 'none';
-    }
-
-    async populateProfileModalForm() {
-        const form = document.getElementById('modal-profile-form');
-        if (!form || !this.currentUser) return;
-
-        const merged = await this.getMergedProfile(this.currentUser);
-        form.querySelector('[name="displayName"]').value = merged?.displayName || this.currentUser.displayName || '';
-        form.querySelector('[name="phone"]').value = '';
-        form.querySelector('[name="address"]').value = '';
-        form.querySelector('[name="zip"]').value = '';
-        form.querySelector('[name="city"]').value = '';
-
-        try {
-            const doc = await firebase.firestore().collection('users').doc(this.currentUser.uid).get();
-            if (!doc.exists) return;
-            const data = doc.data() || {};
-            form.querySelector('[name="phone"]').value = data.phone || '';
-            form.querySelector('[name="address"]').value = data.address || '';
-            form.querySelector('[name="zip"]').value = data.zip || '';
-            form.querySelector('[name="city"]').value = data.city || '';
-            form.querySelector('[name="ssn"]').value = data.ssn || '';
-            if (!form.querySelector('[name="displayName"]').value) {
-                form.querySelector('[name="displayName"]').value = data.displayName || '';
-            }
-        } catch (err) {
-            console.warn('Kunne ikke hente profildata for popup:', err);
-        }
-    }
-
-    async saveProfileFromModal(form) {
-        if (!this.currentUser) return;
-        const btn = document.getElementById('save-modal-profile-btn');
-        const originalText = btn ? btn.textContent : '';
-        if (btn) {
-            btn.disabled = true;
-            btn.textContent = 'Lagrer...';
-        }
-
-        try {
-            const formData = new FormData(form);
-            const updates = {
-                displayName: formData.get('displayName') || '',
-                phone: formData.get('phone') || '',
-                address: formData.get('address') || '',
-                zip: formData.get('zip') || '',
-                city: formData.get('city') || '',
-                ssn: formData.get('ssn') || '',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            if (updates.displayName && updates.displayName !== this.currentUser.displayName) {
-                await this.currentUser.updateProfile({ displayName: updates.displayName });
-            }
-
-            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
-                ...updates,
-                photoURL: this.currentUser.photoURL || '',
-                email: this.currentUser.email || ''
-            }, { merge: true });
-            if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
-                await window.firebaseService.savePageContent('settings_profile', {
-                    fullName: updates.displayName || '',
-                    phone: updates.phone || '',
-                    address: updates.address || '',
-                    updatedAt: new Date().toISOString()
-                });
-            }
-            await this.updateUserProfile(this.currentUser);
-            document.getElementById('modal-user-name').textContent = updates.displayName || this.currentUser.email;
-            alert('Profil oppdatert.');
-            this.closeProfileModal();
-        } catch (error) {
-            console.error('Kunne ikke lagre profil fra popup:', error);
-            alert('Kunne ikke lagre profil: ' + error.message);
-        } finally {
-            if (btn) {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            }
-        }
-    }
-
-    async updateRoleLinks(user) {
-        const firebaseService = window.firebaseService;
-        if (!firebaseService || !window.HKM_PERMISSIONS) return;
-
-        let role = 'medlem';
-        try {
-            role = await firebaseService.getUserRole(user.uid);
-        } catch (err) {
-            console.warn('Kunne ikke hente rolle for menylenke:', err);
-        }
-
-        const canAccessAdmin = Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-            && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
-        const footer = document.querySelector('.sidebar-footer');
-        if (!footer) return;
-
-        const existing = document.getElementById('admin-link');
-        if (canAccessAdmin) {
-            if (!existing) {
-                const link = document.createElement('a');
-                link.id = 'admin-link';
-                link.href = '../admin/index.html';
-                link.className = 'nav-link';
-                link.innerHTML = '<span class="material-symbols-outlined">admin_panel_settings</span><span>Admin</span>';
-                footer.insertBefore(link, footer.firstChild);
-            }
-        } else if (existing) {
-            existing.remove();
-        }
-    }
-
-    loadView(viewId) {
-        const container = document.getElementById('content-area');
-        const renderer = this.views[viewId];
-
-        // Update Active Link
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        const activeLink = document.querySelector(`.nav-link[data-view="${viewId}"]`);
-        if (activeLink) activeLink.classList.add('active');
-
-        // Update Header Title
-        const names = {
-            overview: 'Oversikt',
-            courses: 'Mine Kurs',
-            resources: 'Ressurser',
-            giving: 'Gaver & Betalinger',
-            profile: 'Min Profil',
-            notifications: 'Varslinger'
-        };
-        document.getElementById('page-title').textContent = names[viewId] || 'Min Side';
-
-        if (renderer) {
-            container.innerHTML = '<div class="loader">Laster...</div>';
-            setTimeout(async () => { // Simulate delay
-                try {
-                    await renderer.call(this, container);
-                } catch (error) {
-                    console.error(`Feil ved rendering av view "${viewId}":`, error);
-                    container.innerHTML = '<div class="card"><p>Kunne ikke laste innholdet. Oppdater siden og prøv igjen.</p></div>';
-                }
-            }, 300);
-        } else {
-            container.innerHTML = '<p>Visning ikke funnet.</p>';
-        }
-    }
-
-    // --- Render Methods ---
-
-    renderOverview(container) {
-        container.innerHTML = `
-            <div class="welcome-banner card" style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
-                <h2>Hei, ${this.currentUser.displayName || 'Venn'}! 👋</h2>
-                <p style="opacity: 0.9; margin-top: 5px;">"For jeg vet hvilke tanker jeg har med dere, sier Herren..." - Jeremia 29:11</p>
-            </div>
-
-            <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                <div class="card stat-box">
-                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">school</span>
-                        Aktive Kurs
-                    </h3>
-                    <p id="stat-active-courses" style="font-size: 2rem; font-weight: 700; color: var(--primary-orange); margin-top: 8px;">—</p>
-                </div>
-                <div class="card stat-box">
-                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">task_alt</span>
-                        Fullførte Leksjoner
-                    </h3>
-                    <p id="stat-completed-lessons" style="font-size: 2rem; font-weight: 700; color: var(--accent-blue); margin-top: 8px;">—</p>
-                </div>
-                <div class="card stat-box">
-                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">favorite</span>
-                        Gaver denne måneden
-                    </h3>
-                    <p id="stat-month-giving" style="font-size: 2rem; font-weight: 700; color: #e91e63; margin-top: 8px;">—</p>
-                    <div id="stat-month-giving-sub" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;"></div>
-                </div>
-                <div class="card stat-box">
-                    <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 1.2rem;">military_tech</span>
-                        Total gitt i ${new Date().getFullYear()}
-                    </h3>
-                    <p id="stat-year-giving" style="font-size: 2rem; font-weight: 700; color: #10b981; margin-top: 8px;">—</p>
-                    <div id="stat-year-giving-sub" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Din støtte utgjør en forskjell</div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-                    <h3>Nyheter fra HKM</h3>
-                    <a href="#resources" onclick="window.minSideManager.navigateTo('resources')" style="color:var(--primary-orange); font-size:0.85rem; font-weight:600; text-decoration:none;">Se alle</a>
-                </div>
-                <div id="news-feed-overview">
-                    <div class="loader-placeholder" style="height:100px; background:#f8fafc; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#94a3b8;">Laster nyheter...</div>
-                </div>
-            </div>
-        `;
-
-        // Fetch dynamic stats asynchronously
-        this._loadOverviewStats();
-        this._loadOverviewNews();
-    }
-
-    async _loadOverviewNews() {
-        try {
-            const feed = document.getElementById('news-feed-overview');
-            if (!feed) return;
-
-            const blogSnap = await firebase.firestore().collection('content').doc('collection_blog').get();
-            const items = (blogSnap.exists ? blogSnap.data()?.items : []) || [];
-
-            // Get 2 latest
-            const latest = [...items].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 2);
-
-            if (latest.length === 0) {
-                feed.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Ingen nyheter publisert ennå.</p>';
-                return;
-            }
-
-            feed.innerHTML = `
-                <ul style="list-style: none;">
-                    ${latest.map(item => `
-                        <li style="padding: 12px 0; border-bottom: 1px solid var(--border-color); display:flex; gap:12px; align-items:center;">
-                            <div style="width:40px; height:40px; border-radius:8px; background:#fff8f0; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                                <span class="material-symbols-outlined" style="color:var(--primary-orange); font-size:1.2rem;">article</span>
-                            </div>
-                            <div style="flex:1;">
-                                <div style="display:flex; align-items:center; gap:8px;">
-                                    <strong style="font-size:0.95rem;">${item.title || 'Uten tittel'}</strong>
-                                    ${item.category ? `<span class="badge" style="font-size:10px;">${item.category}</span>` : ''}
-                                </div>
-                                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">${new Date(item.date).toLocaleDateString('no-NO')}</p>
-                            </div>
-                            <a href="../blogg-post.html?id=${encodeURIComponent(item.id || item.title)}" style="color:var(--text-muted);"><span class="material-symbols-outlined">chevron_right</span></a>
-                        </li>
-                    `).join('')}
-                </ul>
-            `;
-        } catch (e) {
-            console.warn('Overview news failed:', e);
-        }
-    }
-
-    async _loadOverviewStats() {
-        const uid = this.currentUser?.uid;
-        const email = this.currentUser?.email;
-        const currentYear = new Date().getFullYear();
-        const currentMonth = new Date().getMonth();
-
-        const fmt = (n) => n === 0
-            ? 'kr 0,-'
-            : `kr ${n.toLocaleString('no-NO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })},-`;
-
-        const animateCount = (el, target) => {
-            if (!el) return;
-            if (typeof target !== 'number') { el.textContent = target; return; }
-            const duration = 1000;
-            const start = performance.now();
-            const startVal = parseFloat(el.textContent.replace(/[^\d]/g, '')) || 0;
-
-            const step = (now) => {
-                const t = Math.min((now - start) / duration, 1);
-                const eased = 1 - Math.pow(1 - t, 4); // Quartic ease-out
-                const current = Math.floor(startVal + (target - startVal) * eased);
-                el.textContent = current.toLocaleString('no-NO');
-                if (t < 1) requestAnimationFrame(step);
-            };
-            requestAnimationFrame(step);
-        };
-
-        // --- 1. Course Stats (Teaching + Courses) ---
-        try {
-            let totalActiveCourses = 0;
-
-            // Check siteContent/collection_courses (New system)
-            const coursesSnap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
-            if (coursesSnap.exists) {
-                totalActiveCourses += (coursesSnap.data()?.items || []).length;
-            }
-
-            // Check content/collection_teaching (Old system)
-            const teachingSnap = await firebase.firestore().collection('content').doc('collection_teaching').get();
-            if (teachingSnap.exists) {
-                totalActiveCourses += (teachingSnap.data()?.items || []).length;
-            }
-
-            animateCount(document.getElementById('stat-active-courses'), totalActiveCourses);
-
-            // Fetch progress
-            let completedCount = 0;
-            try {
-                const progDoc = await firebase.firestore().collection('users').doc(uid).collection('progress').get();
-                // This counts sub-documents or items in progress. In our Udemy-style system, 
-                // we'll eventually track per lesson. For now, let's count completed sessions if any.
-                completedCount = progDoc.size || 0;
-            } catch (e) { }
-            animateCount(document.getElementById('stat-completed-lessons'), completedCount);
-
-        } catch (err) {
-            console.warn('Course stats sync failed:', err);
-        }
-
-        // --- 2. Giving Stats (Optimized Query) ---
-        try {
-            // Fetch donations. We skip orderBy if indices are missing.
-            const query = firebase.firestore().collection('donations').where('status', '==', 'succeeded');
-            const snap = await query.get();
-
-            const donations = snap.docs
-                .map(d => d.data())
-                .filter(d => (d.uid === uid || d.email === email) && d.timestamp);
-
-            let monthTotal = 0;
-            let yearTotal = 0;
-
-            donations.forEach(d => {
-                const dDate = d.timestamp.toDate ? d.timestamp.toDate() : new Date(d.timestamp);
-                const amount = (d.amount || 0) / 100;
-
-                if (dDate.getFullYear() === currentYear) {
-                    yearTotal += amount;
-                    if (dDate.getMonth() === currentMonth) {
-                        monthTotal += amount;
-                    }
-                }
-            });
-
-            const mEl = document.getElementById('stat-month-giving');
-            const yEl = document.getElementById('stat-year-giving');
-            const mSub = document.getElementById('stat-month-giving-sub');
-
-            if (mEl) mEl.textContent = fmt(monthTotal);
-            if (yEl) yEl.textContent = fmt(yearTotal);
-            if (mSub) mSub.textContent = monthTotal > 0 ? 'Takk for ditt bidrag! 🙌' : 'Ingen gaver denne måneden';
-
-        } catch (err) {
-            console.warn('Giving stats sync failed:', err);
-        }
-    }
-
-    async renderCourses(container) {
-        container.innerHTML = `
-            <div id="courses-view-container">
-                <div class="view-header" style="margin-bottom: 24px;">
-                    <p style="color: var(--text-muted);">Her finner du alle kursene du har tilgang til.</p>
-                </div>
-                <div id="courses-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
-                    <div class="loader">Laster dine kurs...</div>
-                </div>
-            </div>
-        `;
-
-        try {
-            // Fetch both Teaching (original) and Courses (new management system)
-            const [teachSnap, cursSnap] = await Promise.all([
-                firebase.firestore().collection('content').doc('collection_teaching').get(),
-                firebase.firestore().collection('siteContent').doc('collection_courses').get()
-            ]);
-
-            const teachItems = (teachSnap.exists ? teachSnap.data()?.items : []) || [];
-            const cursItems = (cursSnap.exists ? cursSnap.data()?.items : []) || [];
-
-            // Merge all items
-            const allItems = [
-                ...teachItems.map(i => ({ ...i, source: 'teaching' })),
-                ...cursItems.map(i => ({ ...i, source: 'course' }))
-            ];
-
-            const grid = document.getElementById('courses-grid');
-            if (allItems.length === 0) {
-                grid.innerHTML = `
-                    <div class="card" style="grid-column: 1/-1; text-align: center; padding: 48px;">
-                        <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">school</span>
-                        <h4>Ingen kurs tilgjengelig</h4>
-                        <p style="color: var(--text-muted); margin-top: 8px;">Du har ikke meldt deg på noen kurs ennå. Utforsk katalogen på forsiden!</p>
-                        <a href="../kurs.html" class="btn btn-primary" style="margin-top: 24px; text-decoration:none;">Se kurskatalog</a>
-                    </div>
-                `;
-                return;
-            }
-
-            grid.innerHTML = allItems.map(item => {
-                const img = item.imageUrl || '../img/course-placeholder.jpg';
-                const id = item.id || item.title;
-                const link = item.source === 'course' ? `../kurs-detaljer.html?id=${id}` : `../blogg-post.html?id=${id}`;
-
-                return `
-                    <div class="card" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
-                        <div style="height:160px; position:relative;">
-                            <img src="${img}" style="width:100%; height:100%; object-fit:cover;">
-                            <div style="position:absolute; top:12px; left:12px; padding:4px 10px; background:rgba(0,0,0,0.6); color:white; border-radius:20px; font-size:10px; font-weight:700; backdrop-filter:blur(4px);">
-                                ${item.category || (item.source === 'course' ? 'KURS' : 'UNDERVISNING')}
-                            </div>
-                        </div>
-                        <div style="padding:20px; flex:1; display:flex; flex-direction:column;">
-                            <h4 style="margin-bottom:8px;">${item.title}</h4>
-                            <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; flex:1; margin-bottom:16px;">
-                                ${item.description ? item.description.substring(0, 80) + '...' : 'Utforsk dette dypdykket i Guds ord.'}
-                            </p>
-                            <a href="${link}" class="btn btn-outline" style="width:100%; justify-content:center; text-decoration:none;">Gå til kurs</a>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-        } catch (err) {
-            console.error('Course render failed:', err);
-            document.getElementById('courses-grid').innerHTML = '<p>Kunne ikke laste kursene dine.</p>';
-        }
-    }
-
-    async renderResources(container) {
-        container.innerHTML = `
-            <div class="card">
-                <h3 style="margin-bottom:6px;">Ressurser</h3>
-                <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:20px;">Artikler og innlegg fra His Kingdom Ministry</p>
-                <div id="resources-list" style="display:flex;flex-direction:column;gap:12px;">
-                    ${[1, 2, 3].map(() => `
-                    <div style="display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border-color);border-radius:8px;animation:skeletonPulse 1.5s ease-in-out infinite;">
-                        <div style="width:44px;height:44px;background:#e2e8f0;border-radius:8px;flex-shrink:0;"></div>
-                        <div style="flex:1;">
-                            <div style="height:14px;background:#e2e8f0;border-radius:6px;margin-bottom:6px;width:60%;"></div>
-                            <div style="height:12px;background:#e2e8f0;border-radius:6px;width:40%;"></div>
-                        </div>
-                    </div>`).join('')}
-                </div>
-            </div>
-        `;
-
-        try {
-            const data = await firebase.firestore().collection('siteContent').doc('collection_blog').get();
-            const items = (data.exists ? data.data()?.items : null) || [];
-
-            const list = document.getElementById('resources-list');
-            if (!list) return;
-
-            if (items.length === 0) {
-                list.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:20px 0;">Ingen ressurser tilgjengelig ennå.</p>`;
-                return;
-            }
-
-            // Show up to 10 latest
-            const sorted = [...items].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 10);
-
-            list.innerHTML = sorted.map(item => {
-                const excerpt = (typeof item.content === 'string'
-                    ? item.content
-                    : (item.content?.blocks?.filter(b => b.type === 'paragraph').map(b => b.data?.text || '').join(' ') || '')
-                ).replace(/<[^>]+>/g, '').substring(0, 80);
-
-                const url = `../blogg-post.html?id=${encodeURIComponent(item.id || item.title)}`;
-                const dateStr = item.date ? new Date(item.date).toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
-
-                const categoryColors = {
-                    'Undervisning': '#e0f2fe:#0284c7',
-                    'Nyhet': '#dcfce7:#16a34a',
-                    'Vitnesbyrd': '#fef3c7:#d97706',
-                };
-                const [bg, fg] = (categoryColors[item.category] || '#f1f5f9:#475569').split(':');
-
-                return `
-                <a href="${url}" style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--border-color);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .2s,box-shadow .2s;"
-                   onmouseover="this.style.borderColor='var(--primary-orange)';this.style.boxShadow='0 2px 12px rgba(209,125,57,.1)'"
-                   onmouseout="this.style.borderColor='';this.style.boxShadow=''">
-                    <div style="width:44px;height:44px;border-radius:8px;background:#fff8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #ffe4cc;">
-                        <span class="material-symbols-outlined" style="color:var(--primary-orange);font-size:1.3rem;">article</span>
-                    </div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap;">
-                            <strong style="font-size:0.95rem;">${item.title || 'Uten tittel'}</strong>
-                            ${item.category ? `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:${bg};color:${fg};">${item.category}</span>` : ''}
-                        </div>
-                        <p style="font-size:0.8rem;color:var(--text-muted);margin:0;">${excerpt}${excerpt.length === 80 ? '...' : ''}</p>
-                        <p style="font-size:0.75rem;color:#94a3b8;margin:4px 0 0;">${item.author ? item.author + ' · ' : ''}${dateStr}</p>
-                    </div>
-                    <span class="material-symbols-outlined" style="color:#94a3b8;flex-shrink:0;">chevron_right</span>
-                </a>`;
-            }).join('');
-
-        } catch (err) {
-            console.error('Kunne ikke laste ressurser:', err);
-            const list = document.getElementById('resources-list');
-            if (list) list.innerHTML = `<p style="color:var(--text-muted);text-align:center;">Kunne ikke laste ressurser. Prøv igjen.</p>`;
-        }
-    }
-
-    async renderGiving(container) {
-        container.innerHTML = `
-            <div class="giving-container">
-                <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                    <div class="card summary-card orange">
-                        <h4>Gitt i år</h4>
-                        <p class="amount" id="this-year-total">kr 0,00</p>
-                    </div>
-                    <div class="card summary-card blue">
-                        <h4>Siste gave</h4>
-                        <p class="amount" id="last-gift-amount">—</p>
-                        <p class="sub-text" id="last-gift-date"></p>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3>Gavehistorikk</h3>
-                        <div class="filter-controls">
-                            <select id="year-filter" class="select-field" style="padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                <option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>
-                                <option value="${new Date().getFullYear() - 1}">${new Date().getFullYear() - 1}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="data-table" id="donations-table">
-                            <thead>
-                                <tr>
-                                    <th>Dato</th>
-                                    <th>Kategori</th>
-                                    <th>Metode</th>
-                                    <th class="text-right">Beløp</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td colspan="4" class="text-center">Henter data...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="card" style="background: #f8fafc; border: 1px dashed var(--border-color);">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <span class="material-symbols-outlined" style="font-size: 32px; color: var(--primary-orange);">info</span>
-                        <div>
-                            <h4>Skattefradrag</h4>
-                            <p style="font-size: 0.9rem; color: var(--text-muted);">Dine gaver til His Kingdom Ministry gir rett til skattefradrag. Sørg for at ditt fødselsnummer er registrert på profilen.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Fetch Donations
-        try {
-            const userId = this.currentUser.uid;
-            const userEmail = this.currentUser.email;
-
-            // Simple query for now: donations matching UID or Email
-            // Note: In a real app, you might need composite indices if filtering/sorting complexly
-            const donationsQuery = firebase.firestore().collection("donations")
-                .where("status", "==", "succeeded")
-                .orderBy("timestamp", "desc");
-
-            const snapshot = await donationsQuery.get();
-
-            // Client-side filtering as fallback if Firestore security rules or indices are tight
-            const donations = snapshot.docs
-                .map(doc => ({ id: doc.id, ...doc.data() }))
-                .filter(d => d.uid === userId || d.email === userEmail);
-
-            this.updateDonationsUI(donations);
-        } catch (error) {
-            console.error("Failed to load donations:", error);
-            document.getElementById('donations-table').querySelector('tbody').innerHTML = `
-                <tr><td colspan="4" class="text-center">Kunne ikke laste historikk.</td></tr>
-            `;
-        }
-    }
-
-    updateDonationsUI(donations) {
-        const tbody = document.querySelector('#donations-table tbody');
-        const totalYearEl = document.getElementById('this-year-total');
-        const lastGiftAmountEl = document.getElementById('last-gift-amount');
-        const lastGiftDateEl = document.getElementById('last-gift-date');
-        const taxCard = document.querySelector('.giving-container > .card:last-child');
-
-        if (!donations || donations.length === 0) {
-            // Hide summary cards and tax info for users with no donations
-            if (totalYearEl) totalYearEl.textContent = '—';
-            if (lastGiftAmountEl) lastGiftAmountEl.textContent = '—';
-            if (lastGiftDateEl) lastGiftDateEl.textContent = '';
-            if (taxCard) taxCard.style.display = 'none';
-            if (tbody) tbody.innerHTML = `
-                <tr>
-                    <td colspan="4" style="text-align: center; padding: 40px 16px; color: #94a3b8;">
-                        <span class="material-symbols-outlined" style="font-size: 40px; display: block; margin-bottom: 12px;">volunteer_activism</span>
-                        <span>Ingen registrerte gaver ennå.</span>
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        // Show tax card if hidden
-        if (taxCard) taxCard.style.display = '';
-
-        let yearTotal = 0;
-        const currentYear = new Date().getFullYear();
-        let html = '';
-
-        donations.forEach((d, index) => {
-            const date = d.timestamp ? d.timestamp.toDate() : new Date();
-            const formattedDate = date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' });
-            const amount = d.amount / 100; // Convert from cents
-
-            if (date.getFullYear() === currentYear) {
-                yearTotal += amount;
-            }
-
-            if (index === 0) {
-                lastGiftAmountEl.textContent = `kr ${amount.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`;
-                lastGiftDateEl.textContent = formattedDate;
-            }
-
-            html += `
-                <tr>
-                    <td>${formattedDate}</td>
-                    <td>${d.type || 'Gave'}</td>
-                    <td><span class="method-badge">${d.method || 'Kort'}</span></td>
-                    <td class="text-right"><strong>kr ${amount.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
-                </tr>
-            `;
-        });
-
-        totalYearEl.textContent = `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`;
-        tbody.innerHTML = html;
-    }
-
-    renderProfile(container) {
-        const hasGoogleProvider = Array.isArray(this.currentUser?.providerData)
-            && this.currentUser.providerData.some(p => p && p.providerId === 'google.com');
-
-        container.innerHTML = `
-            <div style="width: 100%;">
-                <div class="card" style="width: 100%; max-width: 100%;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h3>Min Profil</h3>
-                        <span id="member-since-badge" class="badge" style="font-size: 0.9rem; padding: 6px 12px;">Laster...</span>
-                    </div>
-                    
-                    <div style="background: white; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; margin-bottom: 30px; display: flex; align-items: center; gap: 24px;">
-                        <div id="profile-picture-container" style="position: relative; width: 100px; height: 100px; border-radius: 50%; background: var(--primary-orange); display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700; overflow: hidden; border: 4px solid white; box-shadow: var(--shadow);">
-                            ${this.currentUser.photoURL ? `<img src="${this.currentUser.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : (this.currentUser.displayName || this.currentUser.email || '?').charAt(0).toUpperCase()}
-                            <label for="profile-upload" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;">
-                                <span class="material-symbols-outlined">photo_camera</span>
-                            </label>
-                            <input type="file" id="profile-upload" style="display: none;" accept="image/*" onchange="window.minSideManager.handleProfilePictureUpload(this)">
-                        </div>
-                        <div>
-                            <h4 style="margin-bottom: 4px;">Profilbilde</h4>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
-                            <div style="display: flex; gap: 10px;">
-                                <button type="button" class="btn" onclick="document.getElementById('profile-upload').click()" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white;">Last opp nytt</button>
-                                ${hasGoogleProvider ?
-                `<button type="button" class="btn" onclick="window.minSideManager.syncGooglePhoto()" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white;">Hent fra Google</button>` : ''}
-                            </div>
-                        </div>
-                    </div>
-
-                    <form onsubmit="event.preventDefault(); window.minSideManager.handleProfileSave(this);">
-                        <!-- Personal Info -->
-                        <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personalia</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Navn</label>
-                                <input type="text" name="displayName" value="${this.currentUser.displayName || ''}" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Telefon</label>
-                                <input type="tel" name="phone" placeholder="+47 000 00 000" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div style="grid-column: span 2;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">E-post</label>
-                                <input type="email" value="${this.currentUser.email || ''}" disabled style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: #f8fafc; color: #64748b;">
-                                <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">E-post kan ikke endres direkte. Kontakt support.</div>
-                            </div>
-                        </div>
-
-                        <!-- Address -->
-                        <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Adresse</h4>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                            <div style="grid-column: span 2;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Gateadresse</label>
-                                <input type="text" name="address" placeholder="Eksempelveien 12" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Postnummer</label>
-                                <input type="text" name="zip" placeholder="0000" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Sted</label>
-                                <input type="text" name="city" placeholder="Oslo" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                        </div>
-
-                        <!-- Communication -->
-                        <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Kommunikasjon</h4>
-                        <div style="margin-bottom: 30px;">
-                            <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
-                                <input type="checkbox" name="newsletter" checked style="width: 18px; height: 18px; accent-color: var(--primary-orange);">
-                                <span>Motta nyhetsbrev på e-post</span>
-                            </label>
-                        </div>
-
-                        <!-- Notifications -->
-                        <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Varslinger</h4>
-                        <div style="margin-bottom: 30px;">
-                            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 12px;">Få varslinger på denne enheten om nye arrangementer og viktige oppdateringer.</p>
-                            <button type="button" id="enable-notifications-btn" class="btn btn-primary">Aktiver push-varslinger</button>
-                            <div id="notification-status" style="margin-top: 10px; font-size: 0.85rem;"></div>
-                        </div>
-
-                        <!-- Privacy Settings (Consent) -->
-                        <h4 style="margin-bottom: 16px; color: var(--primary-orange); border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personvern & Samtykke</h4>
-                        <div id="consent-status-display" style="padding: 15px; background: #f1f5f9; border-radius: 8px; margin-bottom: 30px;">
-                            <div class="loader">Henter samtykkestatus...</div>
-                        </div>
-
-                        <!-- Actions -->
-                        <div style="display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border-color); padding-top: 24px;">
-                            <button type="submit" class="btn btn-primary">Lagre endringer</button>
-                            <button type="button" class="btn" style="color: var(--text-muted); margin-left: auto;">Endre passord</button>
-                        </div>
-                    </form>
-                </div>
-
-                <div class="card" style="background-color: #fef2f2; border: 1px solid #fee2e2;">
-                    <h4 style="color: #991b1b; margin-bottom: 8px;">Slett konto</h4>
-                    <p style="font-size: 0.9rem; color: #7f1d1d; margin-bottom: 16px;">Ønsker du å slette kontoen din og alle data? Dette kan ikke angres.</p>
-                    <button id="delete-account-btn" class="btn" onclick="window.minSideManager.handleAccountDeletion()" style="color: #dc2626; border: 1px solid #dc2626; background: white;">Slett min konto</button>
-                </div>
-            </div>
-        `;
-
-        // Notifications
-        const enableNotificationsBtn = container.querySelector('#enable-notifications-btn');
-        const notificationStatusEl = container.querySelector('#notification-status');
-
-        if (enableNotificationsBtn && notificationStatusEl) {
-            // Check initial permission status
-            if ('Notification' in window) {
-                notificationStatusEl.textContent = `Status: ${Notification.permission}`;
-            }
-
-            enableNotificationsBtn.addEventListener('click', async () => {
-                enableNotificationsBtn.disabled = true;
-                enableNotificationsBtn.textContent = 'Behandler...';
-                try {
-                    const token = await window.firebaseService.requestNotificationPermission();
-                    if (token) {
-                        notificationStatusEl.textContent = 'Status: Varslinger er aktivert på denne enheten.';
-                        notificationStatusEl.style.color = 'green';
-                        enableNotificationsBtn.textContent = 'Varslinger er Aktivert';
-                    } else {
-                        notificationStatusEl.textContent = 'Status: Kunne ikke aktivere varslinger. Sjekk nettleserinnstillingene.';
-                        notificationStatusEl.style.color = 'red';
-                        enableNotificationsBtn.textContent = 'Aktiver push-varslinger';
-                    }
-                } catch (error) {
-                    notificationStatusEl.textContent = `Feil: ${error.message}`;
-                    notificationStatusEl.style.color = 'red';
-                } finally {
-                    enableNotificationsBtn.disabled = Notification.permission === 'granted';
-                }
-            });
-        }
-
-        // Fetch and display consent status
-        this.updateConsentStatusDisplay();
-        this.loadUserProfileData(container);
-    }
-
-    async loadUserProfileData(container) {
-        try {
-            const merged = await this.getMergedProfile(this.currentUser);
-            const pictureContainer = container.querySelector('#profile-picture-container');
-            if (pictureContainer && merged && merged.photoURL) {
-                const existingOverlay = pictureContainer.querySelector('label[for="profile-upload"]');
-                const existingInput = pictureContainer.querySelector('#profile-upload');
-                pictureContainer.innerHTML = `<img src="${merged.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                if (existingOverlay) pictureContainer.appendChild(existingOverlay);
-                if (existingInput) pictureContainer.appendChild(existingInput);
-            }
-
-            const doc = await firebase.firestore().collection('users').doc(this.currentUser.uid).get();
-            if (doc.exists) {
-                const data = doc.data();
-                const form = container.querySelector('form');
-                if (!form) return;
-
-                if (merged && merged.displayName) form.querySelector('[name="displayName"]').value = merged.displayName;
-                if (data.phone) form.querySelector('[name="phone"]').value = data.phone;
-                if (data.address) form.querySelector('[name="address"]').value = data.address;
-                if (data.zip) form.querySelector('[name="zip"]').value = data.zip;
-                if (data.city) form.querySelector('[name="city"]').value = data.city;
-                form.querySelector('[name="newsletter"]').checked = data.newsletter !== false; // Default true
-
-                // Update "Medlem siden" badge dynamically
-                const badge = document.getElementById('member-since-badge');
-                if (badge) {
-                    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-                    const joinYear = createdAt ? createdAt.getFullYear() : new Date().getFullYear();
-                    badge.textContent = `Medlem siden ${joinYear}`;
-                }
-            }
-        } catch (e) {
-            console.warn('Could not load user profile data:', e);
-        }
-    }
-
-    async updateConsentStatusDisplay() {
-        const statusDiv = document.getElementById('consent-status-display');
-        if (!statusDiv || !this.currentUser) return;
-
-        try {
-            const userDoc = await firebase.firestore().collection("users").doc(this.currentUser.uid).get();
-            if (userDoc.exists && userDoc.data().privacySettings) {
-                const settings = userDoc.data().privacySettings;
-                const choices = settings.choices;
-
-                let statusText = "<strong>Aktivt samtykke:</strong><br>";
-                statusText += `Nødvendige: <span style="color: green;">Ja</span><br>`;
-                statusText += `Statistikk: ${choices.analytics ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}<br>`;
-                statusText += `Markedsføring: ${choices.marketing ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}`;
-
-                statusDiv.innerHTML = `
-                    <p style="font-size: 0.95rem; line-height: 1.5;">${statusText}</p>
-                    <button type="button" class="btn btn-outline" style="margin-top: 12px; font-size: 0.85rem; padding: 6px 12px;" 
-                            onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload();">
-                        Endre innstillinger
-                    </button>
-                `;
-            } else {
-                statusDiv.innerHTML = `
-                    <p style="font-size: 0.95rem;">Ingen lagret status funnet på profil.</p>
-                    <button type="button" class="btn btn-outline" style="margin-top: 12px; font-size: 0.85rem; padding: 6px 12px;" 
-                            onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload();">
-                        Sett innstillinger nå
-                    </button>
-                `;
-            }
-        } catch (error) {
-            console.error("Feil ved henting av samtykke:", error);
-            statusDiv.innerHTML = "Kunne ikke hente samtykkestatus.";
-        }
-    }
-
-    async handleProfilePictureUpload(input) {
-        const file = input.files[0];
-        if (!file) return;
-
-        // Show loading state
-        const container = document.getElementById('profile-picture-container');
-        const originalContent = container.innerHTML;
-        container.innerHTML = `<div class="loader" style="transform: scale(0.5);"></div>`;
-
-        try {
-            const path = `profiles/${this.currentUser.uid}/avatar.jpg`;
-            const url = await window.firebaseService.uploadImage(file, path);
-
-            // Update User Profile in Firebase Auth
-            await this.currentUser.updateProfile({
-                photoURL: url
-            });
-
-            // Update UI
-            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
-                photoURL: url,
-                displayName: this.currentUser.displayName || '',
-                email: this.currentUser.email || '',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }, { merge: true });
-            if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
-                await window.firebaseService.savePageContent('settings_profile', {
-                    fullName: this.currentUser.displayName || '',
-                    photoUrl: url,
-                    updatedAt: new Date().toISOString()
-                });
-            }
-
-            container.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
-            await this.updateUserProfile(this.currentUser);
-            alert('Profilbilde er oppdatert!');
-        } catch (error) {
-            console.error("Opplasting feilet:", error);
-            container.innerHTML = originalContent;
-            alert('Kunne ikke laste opp bilde: ' + error.message);
-        }
-    }
-
-    async handleProfileSave(form) {
-        const btn = form.querySelector('button[type="submit"]');
-        const originalText = btn.textContent;
-        btn.disabled = true;
-        btn.textContent = 'Lagrer...';
-
-        try {
-            const formData = new FormData(form);
-            const updates = {
-                displayName: formData.get('displayName'),
-                phone: formData.get('phone'),
-                address: formData.get('address'),
-                zip: formData.get('zip'),
-                city: formData.get('city'),
-                newsletter: formData.get('newsletter') === 'on',
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
-            // 1. Update Auth Profile (DisplayName)
-            if (updates.displayName && updates.displayName !== this.currentUser.displayName) {
-                await this.currentUser.updateProfile({
-                    displayName: updates.displayName
-                });
-                await this.updateUserProfile(this.currentUser); // Update sidebar
-            }
-
-            // 2. Update Firestore Document
-            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
-                ...updates,
-                photoURL: this.currentUser.photoURL || '',
-                email: this.currentUser.email || ''
-            }, { merge: true });
-            if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
-                await window.firebaseService.savePageContent('settings_profile', {
-                    fullName: updates.displayName || '',
-                    phone: updates.phone || '',
-                    address: updates.address || '',
-                    updatedAt: new Date().toISOString()
-                });
-            }
-
-            alert('Profilen er oppdatert!');
-        } catch (error) {
-            console.error('Save failed:', error);
-            alert('Kunne ikke lagre endringer: ' + error.message);
-        } finally {
-            btn.disabled = false;
-            btn.textContent = originalText;
-        }
-    }
-
-    async syncGooglePhoto() {
-        const googleProvider = this.currentUser.providerData.find(p => p.providerId === 'google.com');
-        if (googleProvider && googleProvider.photoURL) {
-            try {
-                await this.currentUser.updateProfile({
-                    photoURL: googleProvider.photoURL
-                });
-                await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
-                    photoURL: googleProvider.photoURL,
-                    displayName: this.currentUser.displayName || googleProvider.displayName || this.currentUser.email || '',
-                    email: this.currentUser.email || '',
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                if (window.firebaseService && typeof window.firebaseService.savePageContent === 'function') {
-                    await window.firebaseService.savePageContent('settings_profile', {
-                        fullName: this.currentUser.displayName || googleProvider.displayName || '',
-                        photoUrl: googleProvider.photoURL,
-                        updatedAt: new Date().toISOString()
-                    });
-                }
-                this.loadView('profile'); // Refresh view
-                await this.updateUserProfile(this.currentUser);
-                alert('Profilbilde hentet fra Google!');
-            } catch (error) {
-                console.error("Google sync feilet:", error);
-                alert('Kunne ikke hente bilde fra Google.');
-            }
-        }
-    }
-
-    async handleAccountDeletion() {
-        if (!this.currentUser) return;
-        this.showDeleteConfirmationModal();
-    }
-
-    showDeleteConfirmationModal() {
-        // Remove existing if any
-        const existing = document.getElementById('hkm-delete-modal-overlay');
-        if (existing) existing.remove();
-
-        const warningMsg = "Dette vil slette kontoen din, alle dine kurshistorikk, profilinformasjon og dine lagrede data permanent. Dette kan ikke angres. Vil du fortsette?";
-
-        const modalHtml = `
-            <div id="hkm-delete-modal-overlay" class="hkm-modal-overlay">
-                <div class="hkm-modal-container">
-                    <div class="hkm-modal-icon">
-                        <span class="material-symbols-outlined">warning</span>
-                    </div>
-                    <h3 class="hkm-modal-title">\u26A0\uFE0F Slett konto?</h3>
-                    <p class="hkm-modal-message">${warningMsg}</p>
-                    <div class="hkm-modal-actions">
-                        <button id="hkm-modal-cancel" class="hkm-modal-btn hkm-modal-btn-cancel">Avbryt</button>
-                        <button id="hkm-modal-confirm" class="hkm-modal-btn hkm-modal-btn-delete">Slett konto</button>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-        const overlay = document.getElementById('hkm-delete-modal-overlay');
-        const cancelBtn = document.getElementById('hkm-modal-cancel');
-        const confirmBtn = document.getElementById('hkm-modal-confirm');
-
-        // Close on cancel or overlay click
-        const closeModal = () => {
-            overlay.classList.remove('active');
-            setTimeout(() => overlay.remove(), 200);
-        };
-
-        cancelBtn.onclick = closeModal;
-        overlay.onclick = (e) => {
-            if (e.target === overlay) closeModal();
-        };
-
-        // Confirm deletion
-        confirmBtn.onclick = async () => {
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Sletter...';
-            await this.performAccountDeletion();
-        };
-
-        // Show with animation
-        requestAnimationFrame(() => {
-            overlay.classList.add('active');
-        });
-    }
-
-    async createAdminNotification(notifData) {
+    async createAdminNotification(data) {
         try {
             await firebase.firestore().collection('admin_notifications').add({
-                ...notifData,
+                ...data,
                 timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                read: false
+                read: false,
             });
-            console.log("Admin notification created:", notifData);
-        } catch (err) {
-            console.warn("Failed to create admin notification:", err);
-        }
+        } catch (e) { console.warn('createAdminNotification:', e); }
     }
 
-    // ── Notifications View ──────────────────────────────────────────────────────
+    // ──────────────────────────────────────────────────────────
+    // NOTIFICATION BADGE
+    // ──────────────────────────────────────────────────────────
+    initNotificationBadge() {
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+        try {
+            firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .where('read', '==', false)
+                .onSnapshot(snap => this._setBadge(snap.size));
+        } catch (e) { console.warn('badge listener:', e); }
+    }
 
-    async renderNotifications(container) {
-        container.innerHTML = `
-            <div class="card" style="padding: 0; overflow: hidden;">
-                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
-                    <h3 style="margin:0;">Varslinger</h3>
-                    <button id="mark-all-read-btn" style="background:none; border:none; color:var(--primary-orange); font-weight:600; font-size:0.85rem; cursor:pointer;">Merk alle som lest</button>
-                </div>
-                <div id="notifications-list" style="min-height: 120px;">
-                    <div class="loader" style="padding: 40px; text-align:center; color:#94a3b8;">Laster varslinger...</div>
-                </div>
-            </div>
-        `;
+    _setBadge(count) {
+        const el = document.getElementById('notif-badge');
+        if (!el) return;
+        el.textContent = count > 9 ? '9+' : count;
+        el.style.display = count > 0 ? 'inline-block' : 'none';
+    }
 
-        const list = container.querySelector('#notifications-list');
-        const markAllBtn = container.querySelector('#mark-all-read-btn');
+    _timeAgo(date) {
+        const s = Math.floor((Date.now() - date) / 1000);
+        if (s < 60) return 'Akkurat nå';
+        if (s < 3600) return `${Math.floor(s / 60)} min siden`;
+        if (s < 86400) return `${Math.floor(s / 3600)} t siden`;
+        if (s < 604800) return `${Math.floor(s / 86400)} d siden`;
+        return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: PROFIL (PCO style)
+    // ══════════════════════════════════════════════════════════
+    async renderProfile(container) {
         const uid = this.currentUser?.uid;
         if (!uid) return;
 
+        // Fresh fetch
+        let data = {};
+        try {
+            const doc = await firebase.firestore().collection('users').doc(uid).get();
+            if (doc.exists) data = doc.data() || {};
+        } catch (e) { }
+
+        const p = { ...this.profileData, ...data };
+        const val = v => v ? `<span class="info-row-value">${v}</span>` : `<span class="info-row-value empty">—</span>`;
+
+        const joinYear = p.createdAt?.toDate
+            ? p.createdAt.toDate().getFullYear()
+            : new Date().getFullYear();
+
+        container.innerHTML = `
+        <div class="profile-grid">
+            <!-- ── LEFT COLUMN ── -->
+            <div class="profile-left">
+
+                <!-- Contact information -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>Kontaktinformasjon</h3>
+                        <button class="edit-icon-btn" id="toggle-contact-edit" title="Rediger">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
+                    <div class="info-rows" id="contact-display">
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">mail</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">E-post</div>
+                                ${val(this.currentUser.email)}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">phone</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">Telefon</div>
+                                ${val(p.phone)}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">location_on</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">Adresse</div>
+                                ${p.address || p.zip || p.city
+                ? `<span class="info-row-value">${[p.address, [p.zip, p.city].filter(Boolean).join(' ')].filter(Boolean).join('<br>')}</span>`
+                : `<span class="info-row-value empty">—</span>`}
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Inline edit form -->
+                    <div class="edit-form" id="contact-edit-form" style="display:none">
+                        <div class="form-group">
+                            <label>Fullt navn</label>
+                            <input name="displayName" value="${p.displayName || ''}" autocomplete="name">
+                        </div>
+                        <div class="form-group">
+                            <label>Telefon</label>
+                            <input name="phone" type="tel" value="${p.phone || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Gateadresse</label>
+                            <input name="address" value="${p.address || ''}">
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Postnr</label>
+                                <input name="zip" value="${p.zip || ''}">
+                            </div>
+                            <div class="form-group">
+                                <label>By</label>
+                                <input name="city" value="${p.city || ''}">
+                            </div>
+                        </div>
+                        <div class="edit-form-actions">
+                            <button class="btn btn-ghost btn-sm" id="cancel-contact-edit">Avbryt</button>
+                            <button class="btn btn-primary btn-sm" id="save-contact-btn">
+                                <span class="material-symbols-outlined">save</span> Lagre
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal information -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>Personlig informasjon</h3>
+                        <button class="edit-icon-btn" id="toggle-personal-edit">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </div>
+                    <div class="info-rows" id="personal-display">
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">person</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">Kjønn</div>
+                                ${val(p.gender)}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">cake</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">Fødselsdato</div>
+                                ${val(p.birthday ? new Date(p.birthday).toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">favorite</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">Sivilstatus</div>
+                                ${val(p.maritalStatus)}
+                            </div>
+                        </div>
+                        <div class="info-row">
+                            <span class="material-symbols-outlined info-row-icon">calendar_today</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">Medlem siden</div>
+                                <span class="info-row-value">${joinYear}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="edit-form" id="personal-edit-form" style="display:none">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Kjønn</label>
+                                <select name="gender">
+                                    <option value="">Velg...</option>
+                                    <option value="Mann" ${p.gender === 'Mann' ? 'selected' : ''}>Mann</option>
+                                    <option value="Kvinne" ${p.gender === 'Kvinne' ? 'selected' : ''}>Kvinne</option>
+                                    <option value="Annet" ${p.gender === 'Annet' ? 'selected' : ''}>Annet</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Sivilstatus</label>
+                                <select name="maritalStatus">
+                                    <option value="">Velg...</option>
+                                    <option value="Ugift"     ${p.maritalStatus === 'Ugift' ? 'selected' : ''}>Ugift</option>
+                                    <option value="Gift"      ${p.maritalStatus === 'Gift' ? 'selected' : ''}>Gift</option>
+                                    <option value="Samboer"   ${p.maritalStatus === 'Samboer' ? 'selected' : ''}>Samboer</option>
+                                    <option value="Skilt"     ${p.maritalStatus === 'Skilt' ? 'selected' : ''}>Skilt</option>
+                                    <option value="Enke/Enkemann" ${p.maritalStatus === 'Enke/Enkemann' ? 'selected' : ''}>Enke/Enkemann</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Fødselsdato</label>
+                            <input type="date" name="birthday" value="${p.birthday || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Personnummer (kryptert)</label>
+                            <input type="password" name="ssn" placeholder="Bare for skattefradrag" value="${p.ssn || ''}">
+                        </div>
+                        <div class="edit-form-actions">
+                            <button class="btn btn-ghost btn-sm" id="cancel-personal-edit">Avbryt</button>
+                            <button class="btn btn-primary btn-sm" id="save-personal-btn">
+                                <span class="material-symbols-outlined">save</span> Lagre
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Danger Zone -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>Kontoadministrasjon</h3>
+                    </div>
+                    <div style="padding: 16px 20px;">
+                        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+                            Sletting av konto er permanent og kan ikke angres.
+                        </p>
+                        <button class="btn btn-danger" id="delete-account-btn">
+                            <span class="material-symbols-outlined">delete_forever</span>
+                            Slett konto
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── RIGHT COLUMN ── -->
+            <div class="profile-right">
+
+                <!-- Household -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>Familie</h3>
+                    </div>
+                    <div id="household-content">
+                        ${p.familyMembers?.length ? `
+                            <p class="household-name">${p.displayName?.split(' ').pop() || ''} Husstand</p>
+                            <div class="household-members">
+                                ${p.familyMembers.map(m => `
+                                    <div class="member-row">
+                                        <div class="member-avatar">${(m.name || '?').charAt(0).toUpperCase()}</div>
+                                        <div class="member-info">
+                                            <div class="member-info-name">${m.name}</div>
+                                            <div class="member-info-sub">${m.role || ''}</div>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        ` : `
+                            <div class="empty-state" style="padding:32px 20px;">
+                                <span class="material-symbols-outlined" style="font-size:36px;">group_off</span>
+                                <p style="font-size:0.82rem;">Ingen familiemedlemmer registrert.</p>
+                            </div>
+                        `}
+                    </div>
+                </div>
+
+                <!-- Push Notifications Toggle -->
+                <div class="info-card">
+                    <div class="info-card-header">
+                        <h3>Varslingspreferanser</h3>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-row-label">Push-varslinger</div>
+                            <div class="setting-row-sub">Mottar varslinger når HKM sender meldinger</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="push-toggle" ${p.pushEnabled ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div>
+                            <div class="setting-row-label">E-postvarslinger</div>
+                            <div class="setting-row-sub">Mottar nyhetsbrev og oppdateringer</div>
+                        </div>
+                        <label class="toggle">
+                            <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    <div style="padding:12px 20px;">
+                        <button class="btn btn-primary btn-sm" id="save-prefs-btn" style="width:100%">Lagre preferanser</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>`;
+
+        // ── Wire up events ──
+        // Contact edit toggle
+        const toggleContact = document.getElementById('toggle-contact-edit');
+        const contactForm = document.getElementById('contact-edit-form');
+        const contactDisp = document.getElementById('contact-display');
+        toggleContact?.addEventListener('click', () => {
+            const open = contactForm.style.display === 'none';
+            contactForm.style.display = open ? 'grid' : 'none';
+        });
+        document.getElementById('cancel-contact-edit')?.addEventListener('click', () => {
+            contactForm.style.display = 'none';
+        });
+        document.getElementById('save-contact-btn')?.addEventListener('click', async () => {
+            await this._saveProfileFields(contactForm, ['displayName', 'phone', 'address', 'zip', 'city']);
+            this.profileData = await this.getMergedProfile(this.currentUser);
+            this.updateHeader();
+            this.loadView('profile');
+        });
+
+        // Personal edit toggle
+        const togglePersonal = document.getElementById('toggle-personal-edit');
+        const personalForm = document.getElementById('personal-edit-form');
+        togglePersonal?.addEventListener('click', () => {
+            personalForm.style.display = personalForm.style.display === 'none' ? 'grid' : 'none';
+        });
+        document.getElementById('cancel-personal-edit')?.addEventListener('click', () => {
+            personalForm.style.display = 'none';
+        });
+        document.getElementById('save-personal-btn')?.addEventListener('click', async () => {
+            await this._saveProfileFields(personalForm, ['gender', 'maritalStatus', 'birthday', 'ssn']);
+            this.loadView('profile');
+        });
+
+        // Push toggle
+        document.getElementById('save-prefs-btn')?.addEventListener('click', async () => {
+            const pushEnabled = document.getElementById('push-toggle')?.checked;
+            const emailConsent = document.getElementById('email-toggle')?.checked;
+            try {
+                await firebase.firestore().collection('users').doc(this.currentUser.uid).set(
+                    { pushEnabled, emailConsent, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+                    { merge: true }
+                );
+                if (pushEnabled) await this._requestPushPermission();
+            } catch (e) { console.warn('save prefs:', e); }
+        });
+
+        // Delete account
+        document.getElementById('delete-account-btn')?.addEventListener('click', () => this.showDeleteConfirmModal());
+    }
+
+    async _saveProfileFields(formEl, fields) {
+        if (!this.currentUser) return;
+        const btn = formEl.querySelector('button[id^="save-"]');
+        if (btn) { btn.disabled = true; btn.textContent = 'Lagrer...'; }
+        try {
+            const updates = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
+            fields.forEach(f => {
+                const input = formEl.querySelector(`[name="${f}"]`);
+                if (input) updates[f] = input.value;
+            });
+            if (updates.displayName && updates.displayName !== this.currentUser.displayName) {
+                await this.currentUser.updateProfile({ displayName: updates.displayName });
+            }
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
+        } catch (e) {
+            console.error('saveProfileFields:', e);
+            alert('Feil ved lagring: ' + e.message);
+        } finally {
+            if (btn) { btn.disabled = false; btn.textContent = 'Lagret ✓'; }
+        }
+    }
+
+    async _requestPushPermission() {
+        try {
+            if (!firebase.messaging || !firebase.messaging.isSupported()) return;
+            const perm = await Notification.requestPermission();
+            if (perm !== 'granted') return;
+            const msg = firebase.messaging();
+            const token = await msg.getToken({ vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA' });
+            if (token) {
+                await firebase.firestore().collection('users').doc(this.currentUser.uid).update({
+                    fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+                });
+            }
+        } catch (e) { console.warn('push permission:', e); }
+    }
+
+    async handlePhotoUpload(e) {
+        const file = e.target.files?.[0];
+        if (!file || !this.currentUser) return;
+        try {
+            const ref = firebase.storage().ref(`profilePictures/${this.currentUser.uid}`);
+            await ref.put(file);
+            const url = await ref.getDownloadURL();
+            await this.currentUser.updateProfile({ photoURL: url });
+            await firebase.firestore().collection('users').doc(this.currentUser.uid).set({ photoURL: url }, { merge: true });
+            this.profileData.photoURL = url;
+            this._setAvatarEl(document.getElementById('ph-avatar'), url, this.profileData.displayName);
+        } catch (err) {
+            console.error('Photo upload failed:', err);
+            alert('Feil ved opplasting: ' + err.message);
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: AKTIVITET
+    // ══════════════════════════════════════════════════════════
+    async renderActivity(container) {
+        const uid = this.currentUser?.uid;
+        container.innerHTML = `<div class="activity-list" id="activity-inner"><div class="loading-state" style="min-height:120px"><div class="spinner"></div></div></div>`;
+        const list = container.querySelector('#activity-inner');
+
+        try {
+            const snap = await firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .orderBy('createdAt', 'desc')
+                .limit(50)
+                .get();
+
+            if (snap.empty) {
+                list.innerHTML = `<div class="empty-state">
+                    <span class="material-symbols-outlined">history</span>
+                    <h3>Ingen aktivitet ennå</h3>
+                    <p>Aktivitet som push-varslinger og meldinger du mottar vil vises her.</p>
+                </div>`;
+                return;
+            }
+
+            const iconMap = {
+                push: { icon: 'campaign', bg: '#1e3a5f', color: '#60a5fa' },
+                message: { icon: 'mail', bg: '#14352a', color: '#34d399' },
+                default: { icon: 'notifications', bg: '#2d1f4e', color: '#a78bfa' },
+            };
+
+            list.innerHTML = snap.docs.map(doc => {
+                const d = doc.data();
+                const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
+                const m = iconMap[d.type] || iconMap.default;
+                return `
+                <div class="activity-item ${!d.read ? 'unread' : ''}">
+                    <div class="activity-icon" style="background:${m.bg}">
+                        <span class="material-symbols-outlined" style="color:${m.color}">${m.icon}</span>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${d.title || 'Varsling'}</div>
+                        ${d.body ? `<div class="activity-body">${d.body}</div>` : ''}
+                        ${d.link ? `<a href="${d.link}" target="_blank" style="font-size:0.78rem; color:var(--accent);">Åpne lenke →</a>` : ''}
+                        <div class="activity-time">${this._timeAgo(date)}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+        } catch (err) {
+            list.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><p>Kunne ikke laste aktivitet.</p></div>`;
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: VARSLINGER (unread + mark-read)
+    // ══════════════════════════════════════════════════════════
+    async renderNotifications(container) {
+        const uid = this.currentUser?.uid;
+        container.innerHTML = `
+        <div style="max-width:700px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                <h2 style="font-size:1.05rem; font-weight:700;">Varslinger</h2>
+                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">Merk alle lest</button>
+            </div>
+            <div id="notifs-inner"><div class="loading-state" style="min-height:80px"><div class="spinner"></div></div></div>
+        </div>`;
+
+        const inner = container.querySelector('#notifs-inner');
         try {
             const snap = await firebase.firestore()
                 .collection('user_notifications')
@@ -1319,176 +680,284 @@ class MinSideManager {
                 .get();
 
             if (snap.empty) {
-                list.innerHTML = `
-                    <div style="padding: 48px 24px; text-align: center; color: #94a3b8;">
-                        <span class="material-symbols-outlined" style="font-size: 48px; display:block; margin-bottom:12px;">notifications_off</span>
-                        <p>Ingen varslinger ennå.</p>
-                    </div>`;
+                inner.innerHTML = `<div class="empty-state">
+                    <span class="material-symbols-outlined">notifications_off</span>
+                    <h3>Ingen varslinger</h3>
+                    <p>Du har ingen varslinger ennå.</p>
+                </div>`;
                 return;
             }
 
             const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-            list.innerHTML = items.map(n => {
-                const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date();
-                const timeAgo = this._timeAgo(date);
-                const isUnread = !n.read;
-                return `
-                    <div data-notif-id="${n.id}" style="display:flex; align-items:flex-start; gap:14px; padding:16px 24px;
-                        border-bottom:1px solid var(--border-color); background:${isUnread ? '#fff8f0' : 'white'};
-                        transition: background 0.3s;">
-                        <div style="width:40px; height:40px; border-radius:50%; background:${isUnread ? 'var(--primary-orange)' : '#e2e8f0'};
-                            display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-                            <span class="material-symbols-outlined" style="font-size:20px; color:${isUnread ? 'white' : '#64748b'};">
-                                ${n.type === 'push' ? 'campaign' : 'notifications'}
-                            </span>
-                        </div>
-                        <div style="flex:1; min-width:0;">
-                            <div style="font-weight:${isUnread ? '700' : '500'}; font-size:0.95rem; margin-bottom:3px;">${n.title || 'Varsling'}</div>
-                            <div style="font-size:0.85rem; color:#64748b; margin-bottom:4px;">${n.body || ''}</div>
-                            <div style="font-size:0.75rem; color:#94a3b8;">${timeAgo}</div>
-                        </div>
-                        ${isUnread ? `<div style="width:8px; height:8px; border-radius:50%; background:var(--primary-orange); flex-shrink:0; margin-top:6px;"></div>` : ''}
-                    </div>`;
+            inner.innerHTML = items.map(n => {
+                const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
+                return `<div class="activity-item ${!n.read ? 'unread' : ''}">
+                    <div class="activity-icon" style="background:${!n.read ? '#1e3a5f' : '#1c2030'}">
+                        <span class="material-symbols-outlined" style="color:${!n.read ? '#60a5fa' : '#475569'}">campaign</span>
+                    </div>
+                    <div class="activity-content">
+                        <div class="activity-title">${n.title || 'Varsling'}</div>
+                        ${n.body ? `<div class="activity-body">${n.body}</div>` : ''}
+                        <div class="activity-time">${this._timeAgo(date)}</div>
+                    </div>
+                    ${!n.read ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></div>` : ''}
+                </div>`;
             }).join('');
 
-            // Mark all as read when viewed
-            const unreadIds = items.filter(n => !n.read).map(n => n.id);
-            if (unreadIds.length > 0) {
+            // Mark all read
+            const unread = items.filter(n => !n.read);
+            if (unread.length) {
                 const batch = firebase.firestore().batch();
-                unreadIds.forEach(id => {
-                    batch.update(firebase.firestore().collection('user_notifications').doc(id), { read: true });
-                });
+                unread.forEach(n => batch.update(firebase.firestore().collection('user_notifications').doc(n.id), { read: true }));
                 await batch.commit();
-                this._updateNotifBadge(0);
+                this._setBadge(0);
             }
 
-            markAllBtn.addEventListener('click', async () => {
-                const allIds = items.filter(n => !n.read).map(n => n.id);
-                if (allIds.length === 0) return;
-                const batch = firebase.firestore().batch();
-                allIds.forEach(id => batch.update(firebase.firestore().collection('user_notifications').doc(id), { read: true }));
-                await batch.commit();
-                // Refresh
-                container.querySelectorAll('[data-notif-id]').forEach(el => {
-                    el.style.background = 'white';
-                    const dot = el.querySelector('div[style*="border-radius:50%; background:var"]');
-                    if (dot) dot.remove();
-                });
-                this._updateNotifBadge(0);
+            document.getElementById('mark-all-read-btn')?.addEventListener('click', async () => {
+                const b = firebase.firestore().batch();
+                items.forEach(n => b.update(firebase.firestore().collection('user_notifications').doc(n.id), { read: true }));
+                await b.commit();
+                this._setBadge(0);
+                this.renderNotifications(container);
             });
 
         } catch (err) {
-            console.error('Feil ved henting av varslinger:', err);
-            list.innerHTML = `<div style="padding: 24px; color:#94a3b8; text-align:center;">Kunne ikke laste varslinger.</div>`;
+            inner.innerHTML = `<div class="empty-state"><p>Kunne ikke laste varslinger.</p></div>`;
         }
     }
 
-    _timeAgo(date) {
-        const now = new Date();
-        const diff = Math.floor((now - date) / 1000);
-        if (diff < 60) return 'Akkurat nå';
-        if (diff < 3600) return `${Math.floor(diff / 60)} min siden`;
-        if (diff < 86400) return `${Math.floor(diff / 3600)} t siden`;
-        if (diff < 604800) return `${Math.floor(diff / 86400)} dager siden`;
-        return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
-    }
-
-    _updateNotifBadge(count) {
-        const badge = document.getElementById('notif-badge');
-        if (!badge) return;
-        if (count > 0) {
-            badge.textContent = count > 9 ? '9+' : count;
-            badge.style.display = 'inline-block';
-        } else {
-            badge.style.display = 'none';
-        }
-    }
-
-    async initNotificationBadge() {
+    // ══════════════════════════════════════════════════════════
+    // VIEW: GAVER
+    // ══════════════════════════════════════════════════════════
+    async renderGiving(container) {
         const uid = this.currentUser?.uid;
-        if (!uid || !firebase.firestore) return;
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
+
+        let donations = [];
         try {
-            firebase.firestore()
-                .collection('user_notifications')
+            const snap = await firebase.firestore()
+                .collection('donations')
                 .where('userId', '==', uid)
-                .where('read', '==', false)
-                .onSnapshot(snap => {
-                    this._updateNotifBadge(snap.size);
-                });
-        } catch (err) {
-            console.warn('Notification badge failed:', err);
+                .orderBy('timestamp', 'desc')
+                .get();
+            snap.forEach(d => donations.push({ id: d.id, ...d.data() }));
+        } catch (e) { }
+
+        const currentYear = new Date().getFullYear();
+        const yearTotal = donations.filter(d => d.timestamp?.toDate?.()?.getFullYear?.() === currentYear)
+            .reduce((s, d) => s + (d.amount || 0) / 100, 0);
+        const lastGift = donations[0];
+
+        container.innerHTML = `
+        <div>
+            <div class="giving-stats">
+                <div class="stat-chip">
+                    <div class="stat-chip-label">Gitt i ${currentYear}</div>
+                    <div class="stat-chip-value">${yearTotal > 0 ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}` : '—'}</div>
+                </div>
+                <div class="stat-chip">
+                    <div class="stat-chip-label">Siste gave</div>
+                    <div class="stat-chip-value">${lastGift ? `kr ${(lastGift.amount / 100).toLocaleString('no-NO')}` : '—'}</div>
+                    <div class="stat-chip-sub">${lastGift?.timestamp?.toDate ? lastGift.timestamp.toDate().toLocaleDateString('no-NO') : ''}</div>
+                </div>
+                <div class="stat-chip">
+                    <div class="stat-chip-label">Totalt antall gaver</div>
+                    <div class="stat-chip-value">${donations.length || '—'}</div>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-card-header">
+                    <h3>Gavehistorikk</h3>
+                </div>
+                ${donations.length === 0 ? `
+                    <div class="empty-state" style="padding:48px 24px">
+                        <span class="material-symbols-outlined">volunteer_activism</span>
+                        <h3>Ingen gaver ennå</h3>
+                        <p>Dine donasjoner til HKM vises her.</p>
+                    </div>
+                ` : `
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Dato</th>
+                                <th>Type</th>
+                                <th>Metode</th>
+                                <th class="text-right">Beløp</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${donations.map(d => {
+            const date = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
+            return `<tr>
+                                    <td>${date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                    <td>${d.type || 'Gave'}</td>
+                                    <td><span class="method-tag">${d.method || 'Kort'}</span></td>
+                                    <td class="text-right"><strong>kr ${(d.amount / 100).toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
+                                </tr>`;
+        }).join('')}
+                        </tbody>
+                    </table>
+                `}
+            </div>
+
+            ${yearTotal >= 500 ? `
+            <div class="info-card" style="margin-top:16px; max-width:760px">
+                <div class="info-card-header">
+                    <h3>Skattefradrag</h3>
+                </div>
+                <div class="info-row">
+                    <span class="material-symbols-outlined info-row-icon">receipt_long</span>
+                    <div class="info-row-content">
+                        <div class="info-row-label">Fradragsberettiget ${currentYear}</div>
+                        <span class="info-row-value">kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</span>
+                    </div>
+                </div>
+                <div style="padding:12px 20px; font-size:0.8rem; color:var(--text-muted);">
+                    Gaver over kr 500 er skattefradragsberettiget. Kontakt HKM for bekreftelse.
+                </div>
+            </div>` : ''}
+        </div>`;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: KURS
+    // ══════════════════════════════════════════════════════════
+    async renderCourses(container) {
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
+        let courses = [];
+        try {
+            const snap = await firebase.firestore().collection('teaching').orderBy('createdAt', 'desc').get();
+            snap.forEach(d => courses.push({ id: d.id, ...d.data() }));
+        } catch (e) { }
+
+        if (courses.length === 0) {
+            container.innerHTML = `<div class="empty-state">
+                <span class="material-symbols-outlined">school</span>
+                <h3>Ingen kurs ennå</h3>
+                <p>Undervisnings- og kursinnhold fra HKM vil vises her.</p>
+            </div>`;
+            return;
         }
+
+        container.innerHTML = `<div class="courses-grid">
+            ${courses.map(c => `
+            <div class="course-card">
+                <div class="course-thumb">
+                    ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" loading="lazy">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:40px;color:var(--border-light)">school</span></div>`}
+                    ${c.category ? `<span class="course-badge">${c.category}</span>` : ''}
+                </div>
+                <div class="course-body">
+                    <div class="course-title">${c.title || 'Uten tittel'}</div>
+                    <div class="course-desc">${c.excerpt || c.intro || ''}</div>
+                    ${c.videoUrl ? `<a href="${c.videoUrl}" target="_blank" class="btn btn-primary btn-sm">
+                        <span class="material-symbols-outlined">play_circle</span> Se video
+                    </a>` : ''}
+                </div>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: NOTATER
+    // ══════════════════════════════════════════════════════════
+    async renderNotes(container) {
+        const uid = this.currentUser?.uid;
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
+
+        let notes = [];
+        try {
+            const snap = await firebase.firestore()
+                .collection('user_notes')
+                .where('userId', '==', uid)
+                .orderBy('createdAt', 'desc')
+                .get();
+            snap.forEach(d => notes.push({ id: d.id, ...d.data() }));
+        } catch (e) { }
+
+        if (notes.length === 0) {
+            container.innerHTML = `<div class="empty-state">
+                <span class="material-symbols-outlined">notes</span>
+                <h3>Ingen notater ennå</h3>
+                <p>Notater fra HKM-teamet vil vises her.</p>
+            </div>`;
+            return;
+        }
+
+        container.innerHTML = `<div class="notes-list">
+            ${notes.map(n => `
+            <div class="note-card">
+                <div class="note-author">${n.authorName || 'HKM-teamet'} · ${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
+                <div class="note-text">${n.text || ''}</div>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // DELETE ACCOUNT MODAL
+    // ══════════════════════════════════════════════════════════
+    showDeleteConfirmModal() {
+        const existing = document.getElementById('confirm-delete-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'confirm-delete-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.innerHTML = `
+        <div class="hkm-modal-container">
+            <div class="hkm-modal-icon">
+                <span class="material-symbols-outlined">warning</span>
+            </div>
+            <div class="hkm-modal-title">Slett konto?</div>
+            <p class="hkm-modal-message">
+                Dette vil permanent slette kontoen din og all tilknyttet data. 
+                Handlingen kan ikke angres. Du vil bli bedt om å bekrefte identiteten din.
+            </p>
+            <div class="hkm-modal-actions">
+                <button class="btn btn-ghost hkm-modal-btn" id="cancel-delete-btn">Avbryt</button>
+                <button class="btn btn-danger hkm-modal-btn" id="confirm-delete-btn">Slett konto</button>
+            </div>
+        </div>`;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('active'));
+
+        modal.querySelector('#cancel-delete-btn').addEventListener('click', () => {
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 300);
+        });
+
+        modal.querySelector('#confirm-delete-btn').addEventListener('click', async () => {
+            await this.performAccountDeletion();
+            modal.remove();
+        });
+
+        modal.addEventListener('click', e => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                setTimeout(() => modal.remove(), 300);
+            }
+        });
     }
 
     async performAccountDeletion() {
-        const btn = document.getElementById('delete-account-btn');
-        const originalText = btn ? btn.textContent : '';
-        if (btn) {
-            btn.disabled = true;
-            btn.textContent = 'Sletter konto...';
-        }
-
+        const user = firebase.auth().currentUser;
+        if (!user) return;
         try {
-            const uid = this.currentUser.uid;
-
-            // 1. Delete user data from Firestore first
-            console.log(`[HKM] Deleting Firestore data for user: ${uid}`);
-            await firebase.firestore().collection('users').doc(uid).delete();
-
-            // 2. Delete the user account from Firebase Auth
-            console.log(`[HKM] Deleting Auth account for user: ${uid}`);
-            await this.currentUser.delete();
-
-            alert('Din konto er nå slettet. Takk for tiden din hos oss.');
+            await firebase.firestore().collection('users').doc(user.uid).delete();
+            await user.delete();
             window.location.href = '../index.html';
         } catch (error) {
-            console.error('Account deletion failed:', error);
-
-            // Close modal so alert is visible
-            const overlay = document.getElementById('hkm-delete-modal-overlay');
-            if (overlay) overlay.remove();
-
             if (error.code === 'auth/requires-recent-login') {
-                alert('For din sikkerhet må du logge ut og inn igjen for å bekrefte at du eier kontoen før du kan slette den.');
+                alert('Vennligst logg inn på nytt for å bekrefte sletting.');
                 await firebase.auth().signOut();
                 window.location.href = 'login.html';
             } else {
-                alert('Kunne ikke slette konto: ' + error.message);
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = originalText;
-                }
+                alert('Feil: ' + error.message);
             }
         }
     }
 }
 
-// Initialize on Load (simulated user data for dev if no auth)
-window.addEventListener('load', () => {
-    // Check for Firebase Config
-    if (typeof firebaseConfig !== 'undefined' && !firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-
-    // Config needs to be loaded from somewhere, or we inject it here.
-    // Assuming firebase-service.js or inline config exists in index.html, 
-    // but index.html currently only loads the SDKs.
-    // Let's inject a basic config here for safety if separate file isn't loaded:
-    if (!firebase.apps.length) {
-        const _k1 = "AIza" + "Sy";
-        const _k2 = "AelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE";
-
-        const config = {
-            apiKey: _k1 + _k2,
-            authDomain: "his-kingdom-ministry.firebaseapp.com",
-            projectId: "his-kingdom-ministry",
-            storageBucket: "his-kingdom-ministry.appspot.com",
-            messagingSenderId: "791237361706",
-            appId: "1:791237361706:web:63516ba3d74436f23ac353"
-        };
-        firebase.initializeApp(config);
-    }
-
-    window.minSideManager = new MinSideManager();
-});
+// Boot
+window.minSideManager = new MinSideManager();
