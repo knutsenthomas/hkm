@@ -612,6 +612,9 @@ class AdminManager {
                 case 'teaching':
                     this.renderTeachingManager();
                     break;
+                case 'courses':
+                    this.renderCoursesManager();
+                    break;
                 case 'design':
                     this.renderDesignSection();
                     break;
@@ -4015,6 +4018,283 @@ class AdminManager {
 
     async renderTeachingManager() {
         this.renderCollectionEditor('teaching', 'Undervisning');
+    }
+
+    async renderCoursesManager() {
+        const section = document.getElementById('courses-section');
+        if (!section) return;
+
+        section.innerHTML = `
+            <div class="section-header" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                <div>
+                    <h2 class="section-title">Kursadministrasjon</h2>
+                    <p class="section-subtitle">Opprett og administrer kurs med leksjoner – Udemy-stil.</p>
+                </div>
+                <button class="btn-primary" id="new-course-btn" style="display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;">
+                    <span class="material-symbols-outlined" style="font-size:1.1rem;">add</span> Nytt kurs
+                </button>
+            </div>
+
+            <div id="courses-list" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px;margin-bottom:32px;">
+                <div class="loader" style="grid-column:1/-1;text-align:center;padding:40px;color:#94a3b8;">Laster kurs...</div>
+            </div>
+
+            <!-- Course Modal -->
+            <div id="course-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:1000;overflow-y:auto;padding:20px;">
+                <div style="background:white;border-radius:16px;max-width:780px;margin:20px auto;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,0.2);">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+                        <h3 id="course-modal-title" style="font-size:1.4rem;font-weight:700;">Nytt kurs</h3>
+                        <button id="close-course-modal" style="background:none;border:none;cursor:pointer;color:#94a3b8;font-size:1.5rem;">✕</button>
+                    </div>
+
+                    <form id="course-form">
+                        <input type="hidden" id="course-id">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-weight:600;margin-bottom:6px;">Kurstitel *</label>
+                                <input id="course-title" type="text" placeholder="Eks: Identitet i Kristus" required
+                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-weight:600;margin-bottom:6px;">Beskrivelse</label>
+                                <textarea id="course-description" rows="3" placeholder="Hva lærer studentene?"
+                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-family:inherit;font-size:1rem;resize:vertical;"></textarea>
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:600;margin-bottom:6px;">Kategori</label>
+                                <select id="course-category" style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;background:white;">
+                                    <option value="Bibelstudium">Bibelstudium</option>
+                                    <option value="Bønn">Bønn</option>
+                                    <option value="Lederskap">Lederskap</option>
+                                    <option value="Helbredelse">Helbredelse</option>
+                                    <option value="Evangelisering">Evangelisering</option>
+                                    <option value="Identitet">Identitet</option>
+                                    <option value="Annet">Annet</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label style="display:block;font-weight:600;margin-bottom:6px;">Pris (NOK) – 0 = gratis</label>
+                                <input id="course-price" type="number" min="0" placeholder="0" value="0"
+                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                            </div>
+                            <div style="grid-column:span 2;">
+                                <label style="display:block;font-weight:600;margin-bottom:6px;">Forsidebilde URL</label>
+                                <input id="course-image" type="url" placeholder="https://..."
+                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                            </div>
+                        </div>
+
+                        <!-- Lessons -->
+                        <div style="border-top:1px solid #e2e8f0;padding-top:20px;margin-top:4px;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+                                <h4 style="font-size:1rem;font-weight:700;">Leksjoner</h4>
+                                <button type="button" id="add-lesson-btn" style="background:#fff8f0;color:#e07b39;border:1.5px solid #ffd5b0;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                                    <span class="material-symbols-outlined" style="font-size:1rem;">add</span> Legg til leksjon
+                                </button>
+                            </div>
+                            <div id="lessons-container" style="display:flex;flex-direction:column;gap:12px;"></div>
+                        </div>
+
+                        <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:1px solid #e2e8f0;">
+                            <button type="submit" id="save-course-btn" class="btn-primary" style="padding:12px 28px;border-radius:10px;font-weight:600;display:flex;align-items:center;gap:8px;">
+                                <span class="material-symbols-outlined" style="font-size:1rem;">save</span> Lagre kurs
+                            </button>
+                            <button type="button" id="delete-course-btn" style="display:none;padding:12px 20px;border-radius:10px;background:white;color:#ef4444;border:1.5px solid #fee2e2;font-weight:600;cursor:pointer;">
+                                Slett kurs
+                            </button>
+                        </div>
+                        <p id="course-save-status" style="margin-top:12px;font-size:0.85rem;"></p>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        // Load courses
+        await this._loadCoursesList();
+
+        // New course
+        document.getElementById('new-course-btn').addEventListener('click', () => this._openCourseModal());
+        document.getElementById('close-course-modal').addEventListener('click', () => this._closeCourseModal());
+        document.getElementById('course-modal').addEventListener('click', e => { if (e.target === document.getElementById('course-modal')) this._closeCourseModal(); });
+        document.getElementById('add-lesson-btn').addEventListener('click', () => this._addLessonRow());
+        document.getElementById('course-form').addEventListener('submit', e => { e.preventDefault(); this._saveCourse(); });
+        document.getElementById('delete-course-btn').addEventListener('click', () => this._deleteCourse());
+    }
+
+    async _loadCoursesList() {
+        const list = document.getElementById('courses-list');
+        if (!list) return;
+        try {
+            const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+            const items = (snap.exists ? snap.data()?.items : null) || [];
+
+            if (items.length === 0) {
+                list.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;background:#f8fafc;border-radius:16px;border:2px dashed #e2e8f0;">
+                    <span class="material-symbols-outlined" style="font-size:48px;color:#94a3b8;display:block;margin-bottom:12px;">menu_book</span>
+                    <p style="color:#64748b;font-size:1rem;">Ingen kurs opprettet ennå. Klikk "Nytt kurs" for å komme i gang.</p>
+                </div>`;
+                return;
+            }
+
+            list.innerHTML = items.map((course, i) => `
+                <div style="background:white;border-radius:14px;box-shadow:0 2px 12px rgba(0,0,0,0.07);overflow:hidden;transition:box-shadow .2s;"
+                     onmouseover="this.style.boxShadow='0 8px 30px rgba(0,0,0,0.12)'" onmouseout="this.style.boxShadow='0 2px 12px rgba(0,0,0,0.07)'">
+                    <div style="height:150px;background:${course.imageUrl ? `url('${course.imageUrl}') center/cover` : 'linear-gradient(135deg,#f39c12,#e74c3c)'};position:relative;">
+                        ${course.price > 0
+                    ? `<span style="position:absolute;top:10px;right:10px;background:#f39c12;color:white;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;">kr ${course.price},-</span>`
+                    : `<span style="position:absolute;top:10px;right:10px;background:#10b981;color:white;font-size:12px;font-weight:700;padding:4px 12px;border-radius:20px;">Gratis</span>`}
+                        ${course.category ? `<span style="position:absolute;top:10px;left:10px;background:rgba(0,0,0,0.5);color:white;font-size:11px;padding:3px 10px;border-radius:20px;">${course.category}</span>` : ''}
+                    </div>
+                    <div style="padding:18px;">
+                        <h4 style="margin-bottom:6px;font-size:1rem;">${course.title || 'Uten tittel'}</h4>
+                        <p style="color:#64748b;font-size:0.85rem;margin-bottom:12px;line-height:1.4;">${(course.description || '').substring(0, 80)}${(course.description || '').length > 80 ? '...' : ''}</p>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span style="font-size:0.8rem;color:#94a3b8;">${(course.lessons || []).length} leksjoner</span>
+                            <button onclick="window.adminApp._openCourseModal(${i})" style="background:#f1f5f9;color:#334155;border:none;padding:7px 14px;border-radius:8px;font-weight:600;cursor:pointer;font-size:0.85rem;">Rediger</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        } catch (err) {
+            console.error('Kurs-feil:', err);
+            if (list) list.innerHTML = `<p style="color:#ef4444;">Kunne ikke laste kurs.</p>`;
+        }
+    }
+
+    async _openCourseModal(index = null) {
+        const modal = document.getElementById('course-modal');
+        const title = document.getElementById('course-modal-title');
+        const deleteBtn = document.getElementById('delete-course-btn');
+        const lessonsContainer = document.getElementById('lessons-container');
+        const status = document.getElementById('course-save-status');
+
+        // Reset form
+        document.getElementById('course-form').reset();
+        document.getElementById('course-id').value = '';
+        document.getElementById('course-price').value = '0';
+        lessonsContainer.innerHTML = '';
+        if (status) status.textContent = '';
+
+        if (index !== null) {
+            // Edit existing
+            title.textContent = 'Rediger kurs';
+            deleteBtn.style.display = 'inline-flex';
+            try {
+                const snap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+                const items = (snap.exists ? snap.data()?.items : null) || [];
+                const course = items[index];
+                if (!course) return;
+
+                document.getElementById('course-id').value = index;
+                document.getElementById('course-title').value = course.title || '';
+                document.getElementById('course-description').value = course.description || '';
+                document.getElementById('course-category').value = course.category || 'Bibelstudium';
+                document.getElementById('course-price').value = course.price || 0;
+                document.getElementById('course-image').value = course.imageUrl || '';
+
+                (course.lessons || []).forEach(l => this._addLessonRow(l.title, l.videoUrl));
+            } catch (err) { console.error(err); }
+        } else {
+            title.textContent = 'Nytt kurs';
+            deleteBtn.style.display = 'none';
+            this._addLessonRow(); // Start with one empty lesson
+        }
+
+        modal.style.display = 'block';
+    }
+
+    _closeCourseModal() {
+        const modal = document.getElementById('course-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    _addLessonRow(lessonTitle = '', videoUrl = '') {
+        const container = document.getElementById('lessons-container');
+        if (!container) return;
+        const index = container.children.length + 1;
+        const row = document.createElement('div');
+        row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:center;background:#f8fafc;padding:12px;border-radius:10px;border:1px solid #e2e8f0;';
+        row.innerHTML = `
+            <input type="text" placeholder="Leksjon ${index}: Tittel" value="${lessonTitle}"
+                style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;" class="lesson-title">
+            <input type="url" placeholder="YouTube/Vimeo URL" value="${videoUrl}"
+                style="padding:10px 14px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:0.9rem;" class="lesson-video">
+            <button type="button" style="background:#fee2e2;color:#ef4444;border:none;width:36px;height:36px;border-radius:8px;cursor:pointer;font-size:1.1rem;flex-shrink:0;"
+                onclick="this.closest('div').remove()">✕</button>
+        `;
+        container.appendChild(row);
+    }
+
+    async _saveCourse() {
+        const btn = document.getElementById('save-course-btn');
+        const status = document.getElementById('course-save-status');
+        const editIndex = document.getElementById('course-id').value;
+
+        const lessons = [];
+        document.querySelectorAll('#lessons-container > div').forEach(row => {
+            const t = row.querySelector('.lesson-title')?.value?.trim();
+            const v = row.querySelector('.lesson-video')?.value?.trim();
+            if (t || v) lessons.push({ title: t || '', videoUrl: v || '' });
+        });
+
+        const course = {
+            id: `course_${Date.now()}`,
+            title: document.getElementById('course-title').value.trim(),
+            description: document.getElementById('course-description').value.trim(),
+            category: document.getElementById('course-category').value,
+            price: parseInt(document.getElementById('course-price').value) || 0,
+            imageUrl: document.getElementById('course-image').value.trim(),
+            lessons,
+            updatedAt: new Date().toISOString()
+        };
+
+        if (!course.title) {
+            if (status) { status.style.color = '#ef4444'; status.textContent = 'Kurstitel er påkrevd.'; }
+            return;
+        }
+
+        if (btn) { btn.disabled = true; btn.textContent = 'Lagrer...'; }
+        try {
+            const ref = firebase.firestore().collection('siteContent').doc('collection_courses');
+            const snap = await ref.get();
+            let items = (snap.exists ? snap.data()?.items : null) || [];
+
+            if (editIndex !== '') {
+                items[parseInt(editIndex)] = { ...items[parseInt(editIndex)], ...course };
+            } else {
+                items.push(course);
+            }
+
+            await ref.set({ items, updatedAt: new Date().toISOString() }, { merge: true });
+
+            if (status) { status.style.color = '#16a34a'; status.textContent = '✅ Kurs lagret!'; }
+            setTimeout(() => {
+                this._closeCourseModal();
+                this._loadCoursesList();
+            }, 800);
+        } catch (err) {
+            console.error(err);
+            if (status) { status.style.color = '#ef4444'; status.textContent = 'Feil: ' + err.message; }
+        } finally {
+            if (btn) { btn.disabled = false; btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:1rem;">save</span> Lagre kurs'; }
+        }
+    }
+
+    async _deleteCourse() {
+        const editIndex = document.getElementById('course-id').value;
+        if (editIndex === '' || !confirm('Er du sikker på at du vil slette dette kurset?')) return;
+
+        try {
+            const ref = firebase.firestore().collection('siteContent').doc('collection_courses');
+            const snap = await ref.get();
+            let items = (snap.exists ? snap.data()?.items : null) || [];
+            items.splice(parseInt(editIndex), 1);
+            await ref.set({ items, updatedAt: new Date().toISOString() }, { merge: true });
+            this._closeCourseModal();
+            this._loadCoursesList();
+        } catch (err) {
+            alert('Kunne ikke slette kurs: ' + err.message);
+        }
     }
 
     async renderSEOSection() {
