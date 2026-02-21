@@ -475,6 +475,18 @@ class ContentManager {
         if (heroTitle) heroTitle.style.opacity = '1';
         if (metaRow) metaRow.style.opacity = '1';
 
+        // Update back-button: teaching → undervisning, blog → blogg
+        const backBtn = document.getElementById('back-btn');
+        if (backBtn) {
+            if (isTeaching) {
+                backBtn.href = 'media.html#teaching-section';
+                backBtn.innerHTML = '<i class="fas fa-arrow-left" style="margin-right:8px;"></i> Tilbake til undervisning';
+            } else {
+                backBtn.href = 'blogg.html';
+                backBtn.innerHTML = '<i class="fas fa-arrow-left" style="margin-right:8px;"></i> Tilbake til blogg';
+            }
+        }
+
         // Populate Tags / Bottom Section
         const authorBox = document.getElementById('single-post-author-box');
         if (authorBox) {
