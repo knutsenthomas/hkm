@@ -350,7 +350,13 @@ class AdminManager {
         const closeProfileModal = document.getElementById('close-profile-modal');
         const profileForm = document.getElementById('admin-modal-profile-form');
 
-        // Removed onclick overrides to allow direct href navigation to minside
+        const openProfile = (e) => {
+            if (e) e.preventDefault();
+            this.openAdminProfileModal(user, userProfile || profile || {});
+        };
+
+        if (profileTrigger) profileTrigger.onclick = openProfile;
+        if (sidebarProfileTrigger) sidebarProfileTrigger.onclick = openProfile;
 
         if (profileModal && closeProfileModal) {
             closeProfileModal.onclick = () => {
