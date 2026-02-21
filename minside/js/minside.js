@@ -260,7 +260,7 @@ class MinSideManager {
         const greeting = hour < 12 ? 'God morgen' : hour < 17 ? 'Hei' : 'God kveld';
 
         container.innerHTML = `
-        <div style="max-width:860px">
+        <div style="padding-bottom:32px">
 
             <!-- Welcome banner -->
             <div style="background:var(--accent-gradient); border-radius:var(--radius-lg); padding:28px 32px;

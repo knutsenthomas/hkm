@@ -43,16 +43,14 @@ body {
     font-family: 'Inter', sans-serif;
     background: var(--main-bg);
     color: var(--text-main);
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     font-size: 14px;
     line-height: 1.5;
 }
 
 #app {
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    height: 100dvh;
+    min-height: 100vh;
 }
 
 /* ── Scrollbar ─────────────────────────────────────────────────── */
@@ -79,10 +77,11 @@ body {
 .profile-header {
     background: var(--main-bg);
     border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-    z-index: 100;
+    z-index: 200;
     position: sticky;
     top: 0;
+    margin-left: var(--sidebar-w);
+    transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .profile-header-inner {
@@ -321,10 +320,9 @@ body {
 /* ══════════════════════════════════════════════════════════════════
    BODY LAYOUT
    ══════════════════════════════════════════════════════════════════ */
+/* sidebar is fixed, so .body-layout is just a spacing container */
 .body-layout {
-    display: flex;
-    flex: 1;
-    overflow: hidden;
+    display: block;
 }
 
 /* ── Sidebar ───────────────────────────────────────────────────── */
@@ -332,11 +330,17 @@ body {
     width: var(--sidebar-w);
     background: var(--sidebar-bg);
     border-right: 1px solid var(--border-color);
-    flex-shrink: 0;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 1100;
     overflow-y: auto;
-    padding: 20px 16px;
+    overflow-x: hidden;
+    padding: 24px 16px;
     display: flex;
     flex-direction: column;
+    transition: var(--transition);
 }
 
 /* HKM Logo in sidebar */
@@ -438,10 +442,11 @@ body {
 
 /* ── Main Content ──────────────────────────────────────────────── */
 .main-content {
-    flex: 1;
-    overflow-y: auto;
+    margin-left: var(--sidebar-w);
     padding: 32px 40px;
+    min-height: calc(100vh - 90px);
     background: var(--main-bg);
+    transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* ── Loading State ─────────────────────────────────────────────── */
@@ -1292,9 +1297,10 @@ body {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.4);
+    background: rgba(15, 23, 42, 0.45);
     backdrop-filter: blur(2px);
-    z-index: 90;
+    z-index: 1050;
+    /* above content, below sidebar (1100) */
 }
 
 .sidebar-overlay.active {
@@ -1304,6 +1310,15 @@ body {
 /* ══════════════════════════════════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════════════════════════════════ */
+
+/* Tablet: narrower sidebar */
+@media (max-width: 1100px) {
+    :root {
+        --sidebar-w: 220px;
+    }
+}
+
+/* Profile grid stacks */
 @media (max-width: 900px) {
     .profile-grid {
         grid-template-columns: 1fr;
@@ -1314,21 +1329,26 @@ body {
     }
 }
 
+/* Mobile: sidebar hidden off-screen, full-width content */
 @media (max-width: 768px) {
+    :root {
+        --sidebar-w: 0px;
+    }
+
     .sidebar {
-        position: fixed;
-        left: -100%;
-        top: 0;
-        bottom: 0;
-        height: 100%;
-        z-index: 100;
-        transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        left: -280px;
+        width: 280px;
         box-shadow: 4px 0 40px rgba(0, 0, 0, 0.15);
-        padding-top: 24px;
+        z-index: 1200;
     }
 
     .sidebar.active {
         left: 0;
+    }
+
+    .profile-header,
+    .main-content {
+        margin-left: 0;
     }
 
     .mobile-toggle-btn {
@@ -1340,14 +1360,22 @@ body {
     }
 
     .main-content {
-        padding: 20px 18px;
+        padding: 20px 16px;
     }
 
     .profile-header-inner {
-        padding: 12px 18px;
+        padding: 12px 16px;
     }
 
     .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .giving-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .courses-grid {
         grid-template-columns: 1fr;
     }
 }
@@ -1365,5 +1393,9 @@ body {
 
     .ph-info h1 {
         font-size: 1.05rem;
+    }
+
+    .giving-stats {
+        grid-template-columns: 1fr;
     }
 }
