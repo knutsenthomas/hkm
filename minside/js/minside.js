@@ -405,30 +405,30 @@ class MinSideManager {
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">school</span>
                         Aktive Kurs
                     </h3>
-                    <p style="font-size: 2rem; font-weight: 700; color: var(--primary-orange); margin-top: 8px;">2</p>
+                    <p id="stat-active-courses" style="font-size: 2rem; font-weight: 700; color: var(--primary-orange); margin-top: 8px;">—</p>
                 </div>
                 <div class="card">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">task_alt</span>
                         Fullførte Leksjoner
                     </h3>
-                    <p style="font-size: 2rem; font-weight: 700; color: var(--accent-blue); margin-top: 8px;">12</p>
+                    <p id="stat-completed-lessons" style="font-size: 2rem; font-weight: 700; color: var(--accent-blue); margin-top: 8px;">—</p>
                 </div>
                 <div class="card">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">favorite</span>
                         Gaver denne måneden
                     </h3>
-                    <p style="font-size: 2rem; font-weight: 700; color: #e91e63; margin-top: 8px;">kr 500,-</p>
-                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Takk for ditt bidrag!</div>
+                    <p id="stat-month-giving" style="font-size: 2rem; font-weight: 700; color: #e91e63; margin-top: 8px;">—</p>
+                    <div id="stat-month-giving-sub" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;"></div>
                 </div>
                 <div class="card">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">military_tech</span>
-                        Total gitt i 2026
+                        Total gitt i ${new Date().getFullYear()}
                     </h3>
-                    <p style="font-size: 2rem; font-weight: 700; color: #10b981; margin-top: 8px;">kr 5 500,-</p>
-                    <div style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Din støtte utgjør en forskjell</div>
+                    <p id="stat-year-giving" style="font-size: 2rem; font-weight: 700; color: #10b981; margin-top: 8px;">—</p>
+                    <div id="stat-year-giving-sub" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;">Din støtte utgjør en forskjell</div>
                 </div>
             </div>
 
@@ -446,6 +446,118 @@ class MinSideManager {
                 </ul>
             </div>
         `;
+
+        // Fetch dynamic stats asynchronously
+        this._loadOverviewStats();
+    }
+
+    async _loadOverviewStats() {
+        const uid = this.currentUser?.uid;
+        const email = this.currentUser?.email;
+        const currentYear = new Date().getFullYear();
+        const currentMonth = new Date().getMonth();
+
+        const fmt = (n) => n === 0
+            ? 'kr 0,-'
+            : `kr ${n.toLocaleString('no-NO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })},-`;
+
+        const animateCount = (el, value) => {
+            if (!el) return;
+            if (typeof value !== 'number') { el.textContent = value; return; }
+            const duration = 600;
+            const start = performance.now();
+            const step = (now) => {
+                const t = Math.min((now - start) / duration, 1);
+                const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+                el.textContent = Math.round(eased * value).toLocaleString('no-NO');
+                if (t < 1) requestAnimationFrame(step);
+            };
+            requestAnimationFrame(step);
+        };
+
+        // --- Giving stats from Firebase donations ---
+        try {
+            const snapshot = await firebase.firestore()
+                .collection('donations')
+                .where('status', '==', 'succeeded')
+                .orderBy('timestamp', 'desc')
+                .get();
+
+            const donations = snapshot.docs
+                .map(d => ({ ...d.data() }))
+                .filter(d => d.uid === uid || d.email === email);
+
+            let monthTotal = 0;
+            let yearTotal = 0;
+            let hasAnyDonation = false;
+
+            donations.forEach(d => {
+                const ts = d.timestamp?.toDate ? d.timestamp.toDate() : new Date(d.timestamp || 0);
+                const amount = (d.amount || 0) / 100;
+                if (ts.getFullYear() === currentYear) {
+                    yearTotal += amount;
+                    if (ts.getMonth() === currentMonth) monthTotal += amount;
+                }
+                hasAnyDonation = true;
+            });
+
+            const monthEl = document.getElementById('stat-month-giving');
+            const yearEl = document.getElementById('stat-year-giving');
+            const monthSub = document.getElementById('stat-month-giving-sub');
+
+            if (monthEl) {
+                monthEl.textContent = fmt(monthTotal);
+                if (monthSub) {
+                    monthSub.textContent = monthTotal > 0
+                        ? 'Takk for ditt bidrag! 🙏'
+                        : (hasAnyDonation ? 'Ingen gaver denne måneden' : 'Ingen gaver registrert ennå');
+                }
+            }
+            if (yearEl) yearEl.textContent = fmt(yearTotal);
+
+        } catch (err) {
+            console.warn('Kunne ikke hente gavestatistikk:', err);
+            const monthEl = document.getElementById('stat-month-giving');
+            const yearEl = document.getElementById('stat-year-giving');
+            if (monthEl) monthEl.textContent = 'kr 0,-';
+            if (yearEl) yearEl.textContent = 'kr 0,-';
+        }
+
+        // --- Teaching / Course stats ---
+        try {
+            // Count teaching series (aktive kurs) from Firebase
+            const teachingSnap = await firebase.firestore()
+                .collection('collection_teaching')
+                .get();
+
+            const totalSeries = teachingSnap.size || 0;
+
+            // Count viewed/started items from user's progress doc (if exists)
+            let completedLessons = 0;
+            try {
+                const progressDoc = await firebase.firestore()
+                    .collection('users')
+                    .doc(uid)
+                    .collection('progress')
+                    .doc('teaching')
+                    .get();
+
+                if (progressDoc.exists) {
+                    const data = progressDoc.data() || {};
+                    completedLessons = Object.values(data).filter(v => v === true || v === 'completed').length;
+                }
+            } catch (e) { /* progress doc may not exist */ }
+
+            animateCount(document.getElementById('stat-active-courses'), totalSeries);
+            animateCount(document.getElementById('stat-completed-lessons'), completedLessons);
+
+        } catch (err) {
+            console.warn('Kunne ikke hente kursstatistikk:', err);
+            const coursesEl = document.getElementById('stat-active-courses');
+            const lessonsEl = document.getElementById('stat-completed-lessons');
+            if (coursesEl) coursesEl.textContent = '0';
+            if (lessonsEl) lessonsEl.textContent = '0';
+        }
     }
 
     renderCourses(container) {
