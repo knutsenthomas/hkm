@@ -419,18 +419,28 @@ body.admin-body {
 .nav-category-header .expand-icon {
     font-size: 16px;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    /* Default (collapsed) = arrow points down */
-    transform: rotate(0deg);
+    /* Default = Arrow Up (180) for closed state */
+    transform: rotate(180deg);
+    pointer-events: none;
+    /* Let click go to header */
 }
 
-/* When expanded (NOT collapsed) — arrow points up */
+/* When expanded (NOT collapsed) — arrow points DOWN (0deg) */
 .nav-category-header:not(.collapsed) .expand-icon {
-    transform: rotate(180deg);
+    transform: rotate(0deg);
 }
 
 .nav-category-header.collapsed .expand-icon {
-    transform: rotate(0deg);
+    transform: rotate(180deg);
 }
+
+.nav-category-header {
+    cursor: pointer;
+    user-select: none;
+    pointer-events: all;
+    background-color: transparent;
+}
+
 
 
 /* Stats Section */

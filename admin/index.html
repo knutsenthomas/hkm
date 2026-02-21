@@ -942,38 +942,45 @@
             // ── Collapsible Nav Categories ──────────────────────────────────
             const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
 
-            function setCategory(category, expanded) {
+            function setCategory(category, shouldBeOpen) {
                 const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
                 const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
                 if (!header) return;
 
-                if (expanded) {
+                if (shouldBeOpen) {
                     header.classList.remove('collapsed');
-                    items.forEach(item => item.classList.remove('nav-cat-hidden'));
+                    items.forEach(item => {
+                        item.classList.remove('nav-cat-hidden');
+                        // Force override any 'hidden' class if we want it open
+                        item.style.display = 'block';
+                    });
                 } else {
                     header.classList.add('collapsed');
-                    items.forEach(item => item.classList.add('nav-cat-hidden'));
+                    items.forEach(item => {
+                        item.classList.add('nav-cat-hidden');
+                        // Class .nav-cat-hidden has !important in CSS, but let's be safe
+                        item.style.display = 'none';
+                    });
                 }
-
-                sessionStorage.setItem(`nav_cat_${category}`, expanded ? 'open' : 'closed');
+                sessionStorage.setItem(`nav_cat_${category}`, shouldBeOpen ? 'open' : 'closed');
             }
 
-            // Init: Nettsted open by default, others closed
+            // Init state
             categoryHeaders.forEach(header => {
                 const cat = header.getAttribute('data-target-category');
                 const saved = sessionStorage.getItem(`nav_cat_${cat}`);
+                // Nettsted = open by default, others = closed
                 const defaultOpen = (cat === 'nettsted');
                 const shouldBeOpen = saved ? (saved === 'open') : defaultOpen;
                 setCategory(cat, shouldBeOpen);
             });
 
-            // Click handler: toggle on every click
+            // Click listener
             categoryHeaders.forEach(header => {
-                header.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const cat = header.getAttribute('data-target-category');
-                    const isNowCollapsed = header.classList.contains('collapsed');
-                    setCategory(cat, isNowCollapsed); // if collapsed -> expand; if expanded -> collapse
+                header.addEventListener('click', function () {
+                    const cat = this.getAttribute('data-target-category');
+                    const currentlyClosed = this.classList.contains('collapsed');
+                    setCategory(cat, currentlyClosed);
                 });
             });
 
