@@ -1032,39 +1032,255 @@ class MinSideManager {
     }
 
     // ══════════════════════════════════════════════════════════
-    // VIEW: NOTATER
+    // VIEW: NOTATER (med bruker-CRUD)
     // ══════════════════════════════════════════════════════════
     async renderNotes(container) {
         const uid = this.currentUser?.uid;
         container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
 
-        let notes = [];
+        // Fetch both personal notes and HKM notes in parallel
+        let personalNotes = [], hkmNotes = [];
         try {
-            const snap = await firebase.firestore()
-                .collection('user_notes')
-                .where('userId', '==', uid)
-                .orderBy('createdAt', 'desc')
-                .get();
-            snap.forEach(d => notes.push({ id: d.id, ...d.data() }));
-        } catch (e) { }
+            const [personalSnap, hkmSnap] = await Promise.all([
+                firebase.firestore()
+                    .collection('personal_notes')
+                    .where('userId', '==', uid)
+                    .orderBy('createdAt', 'desc')
+                    .get(),
+                firebase.firestore()
+                    .collection('user_notes')
+                    .where('userId', '==', uid)
+                    .orderBy('createdAt', 'desc')
+                    .get(),
+            ]);
+            personalSnap.forEach(d => personalNotes.push({ id: d.id, ...d.data() }));
+            hkmSnap.forEach(d => hkmNotes.push({ id: d.id, ...d.data() }));
+        } catch (e) { console.warn('renderNotes fetch:', e); }
 
-        if (notes.length === 0) {
-            container.innerHTML = `<div class="empty-state">
-                <span class="material-symbols-outlined">notes</span>
-                <h3>Ingen notater ennå</h3>
-                <p>Notater fra HKM-teamet vil vises her.</p>
-            </div>`;
-            return;
-        }
-
-        container.innerHTML = `<div class="notes-list">
-            ${notes.map(n => `
-            <div class="note-card">
-                <div class="note-author">${n.authorName || 'HKM-teamet'} · ${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
-                <div class="note-text">${n.text || ''}</div>
-            </div>`).join('')}
-        </div>`;
+        this._renderNotesUI(container, personalNotes, hkmNotes);
     }
+
+    _renderNotesUI(container, personalNotes, hkmNotes) {
+        const makePNote = (n) => `
+        <div class="personal-note-card" data-id="${n.id}">
+            <div class="personal-note-header">
+                <div class="personal-note-title">${n.title || 'Uten tittel'}</div>
+                <div class="personal-note-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
+                <div class="personal-note-actions">
+                    <button class="note-btn-edit" data-id="${n.id}" title="Rediger">
+                        <span class="material-symbols-outlined">edit</span>
+                    </button>
+                    <button class="note-btn-delete" data-id="${n.id}" title="Slett">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                </div>
+            </div>
+            <div class="personal-note-body">${n.text || ''}</div>
+        </div>`;
+
+        container.innerHTML = `
+        <div style="width:100%">
+
+            <!-- Header row -->
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+                <div>
+                    <h2 style="font-size:1.1rem; font-weight:800; letter-spacing:-0.01em;">Mine notater</h2>
+                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:3px;">
+                        Personlige notater som bare du kan se
+                    </p>
+                </div>
+                <button class="btn btn-primary" id="new-note-btn">
+                    <span class="material-symbols-outlined">add</span>
+                    Nytt notat
+                </button>
+            </div>
+
+            <!-- New note form (hidden by default) -->
+            <div class="new-note-form" id="new-note-form" style="display:none;">
+                <div class="form-group">
+                    <label>Tittel</label>
+                    <input id="note-title-input" placeholder="Gi notatet en tittel..." autocomplete="off">
+                </div>
+                <div class="form-group" style="margin-top:10px;">
+                    <label>Innhold</label>
+                    <textarea id="note-body-input" rows="5" placeholder="Skriv notat her..."></textarea>
+                </div>
+                <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+                    <button class="btn btn-ghost btn-sm" id="cancel-note-btn">Avbryt</button>
+                    <button class="btn btn-primary btn-sm" id="save-note-btn">
+                        <span class="material-symbols-outlined">save</span>
+                        Lagre notat
+                    </button>
+                </div>
+            </div>
+
+            <!-- Personal notes list -->
+            <div id="personal-notes-list" class="notes-list">
+                ${personalNotes.length === 0
+                ? `<div class="note-empty-personal">
+                        <span class="material-symbols-outlined">edit_note</span>
+                        <p>Du har ingen egne notater ennå.<br>Trykk «Nytt notat» for å begynne.</p>
+                       </div>`
+                : personalNotes.map(makePNote).join('')}
+            </div>
+
+            <!-- HKM Notes (read-only) -->
+            ${hkmNotes.length > 0 ? `
+            <div style="margin-top:32px;">
+                <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+                    <div style="flex:1; height:1px; background:var(--border-color);"></div>
+                    <span style="font-size:0.7rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap;">
+                        Notater fra HKM
+                    </span>
+                    <div style="flex:1; height:1px; background:var(--border-color);"></div>
+                </div>
+                <div class="notes-list">
+                    ${hkmNotes.map(n => `
+                    <div class="note-card">
+                        <div class="note-author">
+                            <span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:4px;">shield_person</span>
+                            ${n.authorName || 'HKM-teamet'} · ${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}
+                        </div>
+                        ${n.title ? `<div style="font-size:0.9rem; font-weight:700; margin-bottom:4px;">${n.title}</div>` : ''}
+                        <div class="note-text">${n.text || ''}</div>
+                    </div>`).join('')}
+                </div>
+            </div>` : ''}
+
+        </div>`;
+
+        // ── Wire up events ──
+        const uid = this.currentUser?.uid;
+
+        // Toggle new note form
+        document.getElementById('new-note-btn')?.addEventListener('click', () => {
+            const form = document.getElementById('new-note-form');
+            const isOpen = form.style.display !== 'none';
+            form.style.display = isOpen ? 'none' : 'block';
+            if (!isOpen) document.getElementById('note-title-input')?.focus();
+        });
+
+        document.getElementById('cancel-note-btn')?.addEventListener('click', () => {
+            document.getElementById('new-note-form').style.display = 'none';
+            document.getElementById('note-title-input').value = '';
+            document.getElementById('note-body-input').value = '';
+        });
+
+        // Save new note
+        document.getElementById('save-note-btn')?.addEventListener('click', async () => {
+            const title = document.getElementById('note-title-input').value.trim();
+            const text = document.getElementById('note-body-input').value.trim();
+            if (!text) return;
+
+            const btn = document.getElementById('save-note-btn');
+            btn.disabled = true; btn.textContent = 'Lagrer...';
+
+            try {
+                const ref = await firebase.firestore().collection('personal_notes').add({
+                    userId: uid,
+                    title: title || 'Uten tittel',
+                    text,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                });
+                // Prepend new note immediately
+                personalNotes.unshift({ id: ref.id, title: title || 'Uten tittel', text, createdAt: null });
+                this._renderNotesUI(container, personalNotes, hkmNotes);
+            } catch (e) {
+                console.error('Save note error:', e);
+                alert('Feil ved lagring: ' + e.message);
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">save</span> Lagre notat';
+            }
+        });
+
+        // Edit buttons
+        container.querySelectorAll('.note-btn-edit').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                const note = personalNotes.find(n => n.id === id);
+                if (!note) return;
+                this._openNoteEditModal(note, async (newTitle, newText) => {
+                    try {
+                        await firebase.firestore().collection('personal_notes').doc(id).update({
+                            title: newTitle,
+                            text: newText,
+                            updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        });
+                        note.title = newTitle; note.text = newText;
+                        this._renderNotesUI(container, personalNotes, hkmNotes);
+                    } catch (e) { alert('Feil ved oppdatering: ' + e.message); }
+                });
+            });
+        });
+
+        // Delete buttons
+        container.querySelectorAll('.note-btn-delete').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.dataset.id;
+                if (!confirm('Er du sikker på at du vil slette dette notatet?')) return;
+                firebase.firestore().collection('personal_notes').doc(id).delete()
+                    .then(() => {
+                        personalNotes = personalNotes.filter(n => n.id !== id);
+                        this._renderNotesUI(container, personalNotes, hkmNotes);
+                    })
+                    .catch(e => alert('Feil: ' + e.message));
+            });
+        });
+    }
+
+    _openNoteEditModal(note, onSave) {
+        const existing = document.getElementById('note-edit-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'note-edit-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.innerHTML = `
+        <div class="hkm-modal-container" style="max-width:560px">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+                <div class="hkm-modal-title" style="margin-bottom:0">Rediger notat</div>
+                <button id="close-note-modal" style="background:none;border:none;cursor:pointer;padding:4px;">
+                    <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-muted);">close</span>
+                </button>
+            </div>
+            <div class="form-group">
+                <label>Tittel</label>
+                <input id="edit-note-title" value="${note.title || ''}" autocomplete="off">
+            </div>
+            <div class="form-group" style="margin-top:12px;">
+                <label>Innhold</label>
+                <textarea id="edit-note-body" rows="7" style="resize:vertical">${note.text || ''}</textarea>
+            </div>
+            <div class="hkm-modal-actions" style="margin-top:20px;">
+                <button class="btn btn-ghost hkm-modal-btn" id="cancel-note-modal">Avbryt</button>
+                <button class="btn btn-primary hkm-modal-btn" id="save-note-modal">
+                    <span class="material-symbols-outlined">save</span> Lagre
+                </button>
+            </div>
+        </div>`;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('active'));
+        document.getElementById('edit-note-title').focus();
+
+        const close = () => { modal.classList.remove('active'); setTimeout(() => modal.remove(), 300); };
+
+        document.getElementById('close-note-modal').addEventListener('click', close);
+        document.getElementById('cancel-note-modal').addEventListener('click', close);
+        modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+        document.getElementById('save-note-modal').addEventListener('click', async () => {
+            const btn = document.getElementById('save-note-modal');
+            const title = document.getElementById('edit-note-title').value.trim();
+            const text = document.getElementById('edit-note-body').value.trim();
+            if (!text) return;
+            btn.disabled = true; btn.textContent = 'Lagrer...';
+            await onSave(title || 'Uten tittel', text);
+            close();
+        });
+    }
+
 
     // ══════════════════════════════════════════════════════════
     // DELETE ACCOUNT MODAL
