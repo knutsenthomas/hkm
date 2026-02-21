@@ -172,7 +172,22 @@ body.crm-body {
 /* Promo Cards Section */
 .crm-content {
     padding: 40px;
-    /* max-width: 1400px; Removed to allow full width */
+    margin: 0;
+}
+
+.content-header {
+    padding: 40px 0 0 0 !important;
+}
+
+.content-header .tabs-container {
+    border-bottom: none;
+    margin-bottom: 0 !important;
+    padding: 0 40px;
+}
+
+.content-header .header-search {
+    max-width: 100%;
+    width: 100%;
     margin: 0;
 }
 

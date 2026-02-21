@@ -47,6 +47,20 @@ class AdminManager {
         this.currentUserDetailId = null;
         this.userEditMode = false;
 
+        this.widgetLibrary = {
+            'visitors': { id: 'visitors', label: 'Sidevisninger', icon: 'visibility', color: 'purple', default: true },
+            'status': { id: 'status', label: 'Systemstatus', icon: 'check_circle', color: 'green', default: true },
+            'blog': { id: 'blog', label: 'Blogginnlegg', icon: 'edit_note', color: 'blue', default: true },
+            'teaching': { id: 'teaching', label: 'Undervisning', icon: 'school', color: 'mint', default: true },
+            'donations': { id: 'donations', label: 'Donasjoner', icon: 'volunteer_activism', color: 'donation', default: true },
+            'youtube': { id: 'youtube', label: 'YouTube Abonnenter', icon: 'video_library', color: 'youtube', default: true },
+            'podcast': { id: 'podcast', label: 'Podcast Episoder', icon: 'podcasts', color: 'podcast', default: false },
+            'campaigns': { id: 'campaigns', label: 'Innsamlinger', icon: 'campaign', color: 'megaphone', default: false },
+            'events': { id: 'events', label: 'Arrangementer', icon: 'event', color: 'blue', default: false },
+            'next-events': { id: 'next-events', label: 'Neste Arrangementer', icon: 'event_upcoming', color: 'purple', default: false, type: 'list' },
+            'latest-contacts': { id: 'latest-contacts', label: 'Siste Meldinger', icon: 'quick_reference_all', color: 'mint', default: false, type: 'list' }
+        };
+
         try {
             this.init();
         } catch (e) {
@@ -80,6 +94,7 @@ class AdminManager {
         this.initAuth();
         this.initDashboard();
         this.initMessageListener();
+        this.initWidgetConfig();
 
         // Expose to window for the inline navigation script
         window.adminManager = this;
@@ -505,6 +520,142 @@ class AdminManager {
 
         // Init Automation Modal
         this.initTemplateEditorModal();
+
+        // Chart Dropdown Logic (Delegated)
+        document.addEventListener('click', (e) => {
+            const btn = e.target.closest('.chart-options-btn');
+            const dropdown = document.querySelector('.chart-dropdown');
+
+            if (btn) {
+                e.stopPropagation();
+                if (dropdown) {
+                    dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
+                }
+            } else if (dropdown && dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            const item = e.target.closest('.dropdown-item');
+            if (item && item.closest('.dropdown-container')) {
+                const view = item.dataset.view;
+                const container = item.closest('.chart-container');
+                const title = container.querySelector('.card-title');
+
+                // Update Title & Data
+                const bars = container.querySelectorAll('.bar');
+                const dailyData = [40, 65, 85, 55, 75, 45, 80, 60];
+                const weeklyData = [60, 40, 50, 90, 30, 70, 45, 85];
+                const monthlyData = [30, 50, 40, 60, 80, 95, 70, 55];
+
+                const dailyLabels = ['08:00', '', '12:00', '', '16:00', '', '20:00', ''];
+                const weeklyLabels = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn', 'Tot'];
+                const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug'];
+
+                let selectedData = dailyData;
+                let selectedLabels = dailyLabels;
+
+                if (view === 'daily') {
+                    title.textContent = 'Trafikkovervåking (Daglig)';
+                    selectedData = dailyData;
+                    selectedLabels = dailyLabels;
+                } else if (view === 'weekly') {
+                    title.textContent = 'Trafikkovervåking (Ukentlig)';
+                    selectedData = weeklyData;
+                    selectedLabels = weeklyLabels;
+                } else if (view === 'monthly') {
+                    title.textContent = 'Trafikkovervåking (Månedlig)';
+                    selectedData = monthlyData;
+                    selectedLabels = monthlyLabels;
+                }
+
+                // Update Bars & Labels
+                bars.forEach((bar, index) => {
+                    if (selectedData[index] !== undefined) {
+                        const value = selectedData[index];
+                        const label = selectedLabels[index] || (view === 'daily' ? `${8 + index * 2}:00` : `Punkt ${index + 1}`);
+
+                        bar.style.height = value + '%';
+
+                        // Add detailed tooltip info
+                        const visitorCount = Math.round(value * 8.5); // Mock visitor count
+                        bar.setAttribute('data-tooltip-info', `${label}: ${visitorCount} besøkende`);
+                        bar.title = ''; // Remove native title to avoid double tooltips
+
+                        // Find or create span for label
+                        let span = bar.querySelector('span');
+                        if (!span) {
+                            span = document.createElement('span');
+                            bar.appendChild(span);
+                        }
+                        span.textContent = selectedLabels[index] || '';
+                    }
+                });
+
+                // Update Active State
+                container.querySelectorAll('.dropdown-item').forEach(i => {
+                    i.style.color = 'var(--text-muted)';
+                    i.classList.remove('active');
+                });
+                item.style.color = 'var(--accent-color)';
+                item.classList.add('active');
+
+                // Close dropdown
+                const dropdown = item.closest('.chart-dropdown');
+                if (dropdown) dropdown.style.display = 'none';
+            }
+        });
+
+        // Global Tooltip Logic
+        document.addEventListener('mouseover', (e) => {
+            const el = e.target.closest('.bar') || e.target.closest('[data-tooltip]');
+            if (el) {
+                let tooltip = document.querySelector('.hkm-tooltip');
+                if (!tooltip) {
+                    tooltip = document.createElement('div');
+                    tooltip.className = 'hkm-tooltip';
+                    document.body.appendChild(tooltip);
+                }
+                const info = el.getAttribute('data-tooltip-info') || el.getAttribute('data-tooltip');
+                if (info) {
+                    tooltip.textContent = info;
+                    tooltip.style.display = 'block';
+                }
+            }
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            const tooltip = document.querySelector('.hkm-tooltip');
+            if (tooltip && tooltip.style.display === 'block') {
+                const padding = 15;
+                let x = e.clientX + 10;
+                let y = e.clientY + 15;
+
+                // Prevent overflow right
+                const tooltipWidth = tooltip.offsetWidth;
+                if (x + tooltipWidth > window.innerWidth - padding) {
+                    x = e.clientX - tooltipWidth - 10;
+                }
+
+                // Prevent overflow bottom
+                const tooltipHeight = tooltip.offsetHeight;
+                if (y + tooltipHeight > window.innerHeight - padding) {
+                    y = e.clientY - tooltipHeight - 10;
+                }
+
+                tooltip.style.left = x + 'px';
+                tooltip.style.top = y + 'px';
+            }
+        });
+
+        document.addEventListener('mouseout', (e) => {
+            const el = e.target.closest('.bar') || e.target.closest('[data-tooltip]');
+            if (el) {
+                const tooltip = document.querySelector('.hkm-tooltip');
+                if (tooltip) tooltip.style.display = 'none';
+            }
+        });
     }
 
     filterSidebar(category) {
@@ -687,14 +838,16 @@ class AdminManager {
         const emailTargetRole = document.getElementById('target-role');
         const emailUserSelection = document.getElementById('email-user-selection');
 
-        emailTargetRole.addEventListener('change', (e) => {
-            if (e.target.value === 'selected') {
-                renderUserSelection('email-user-selection');
-                emailUserSelection.style.display = 'block';
-            } else {
-                emailUserSelection.style.display = 'none';
-            }
-        });
+        if (emailTargetRole) {
+            emailTargetRole.addEventListener('change', (e) => {
+                if (e.target.value === 'selected') {
+                    renderUserSelection('email-user-selection');
+                    if (emailUserSelection) emailUserSelection.style.display = 'block';
+                } else {
+                    if (emailUserSelection) emailUserSelection.style.display = 'none';
+                }
+            });
+        }
 
         if (emailForm) {
             emailForm.addEventListener('submit', async (e) => {
@@ -755,14 +908,16 @@ class AdminManager {
         const pushTargetRole = document.getElementById('push-target-role');
         const pushUserSelection = document.getElementById('push-user-selection');
 
-        pushTargetRole.addEventListener('change', (e) => {
-            if (e.target.value === 'selected') {
-                renderUserSelection('push-user-selection');
-                pushUserSelection.style.display = 'block';
-            } else {
-                pushUserSelection.style.display = 'none';
-            }
-        });
+        if (pushTargetRole) {
+            pushTargetRole.addEventListener('change', (e) => {
+                if (e.target.value === 'selected') {
+                    renderUserSelection('push-user-selection');
+                    if (pushUserSelection) pushUserSelection.style.display = 'block';
+                } else {
+                    if (pushUserSelection) pushUserSelection.style.display = 'none';
+                }
+            });
+        }
 
         if (pushForm) {
             pushForm.addEventListener('submit', async (e) => {
@@ -850,6 +1005,56 @@ class AdminManager {
         } catch (err) {
             console.error('Kunne ikke starte melding-notifikasjoner:', err);
         }
+    }
+
+    initWidgetConfig() {
+        const configBtn = document.getElementById('configure-widgets-btn');
+        const modal = document.getElementById('widget-config-modal');
+        const closeBtn = document.getElementById('close-widget-config');
+        const saveBtn = document.getElementById('save-widgets-btn');
+        const container = document.getElementById('widget-list-container');
+
+        if (!configBtn || !modal || !container) return;
+
+        configBtn.addEventListener('click', () => {
+            // Build the list
+            container.innerHTML = '';
+            const enabledWidgets = JSON.parse(localStorage.getItem('hkm_dashboard_widgets')) ||
+                Object.keys(this.widgetLibrary).filter(id => this.widgetLibrary[id].default);
+
+            Object.values(this.widgetLibrary).forEach(widget => {
+                const isChecked = enabledWidgets.includes(widget.id);
+                const item = document.createElement('label');
+                item.className = 'widget-config-item' + (isChecked ? ' active' : '');
+                item.innerHTML = `
+                    <input type="checkbox" value="${widget.id}" ${isChecked ? 'checked' : ''}>
+                    <span class="material-symbols-outlined">${widget.icon}</span>
+                    <span style="font-size: 14px; font-weight: 600; flex: 1;">${widget.label}</span>
+                `;
+
+                const checkbox = item.querySelector('input');
+                checkbox.addEventListener('change', () => {
+                    item.classList.toggle('active', checkbox.checked);
+                });
+
+                container.appendChild(item);
+            });
+
+            modal.style.display = 'flex';
+        });
+
+        const closeModal = () => modal.style.display = 'none';
+
+        closeBtn.addEventListener('click', closeModal);
+        window.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        saveBtn.addEventListener('click', () => {
+            const selected = Array.from(container.querySelectorAll('input:checked')).map(cb => cb.value);
+            localStorage.setItem('hkm_dashboard_widgets', JSON.stringify(selected));
+            closeModal();
+            showToast("Oversikt oppdatert!", "success");
+            this.renderOverview(); // Re-render with new widgets
+        });
     }
 
     initSearch() {
@@ -1045,16 +1250,38 @@ class AdminManager {
             return;
         }
 
-        const html = results.map((r) => `
-            <div class="search-result">
-                <div class="search-result-header">
-                    <span class="search-result-type">${this.escapeHtml(r.type)}</span>
-                    ${r.meta ? `<span class="search-result-meta">${this.escapeHtml(r.meta)}</span>` : ''}
-                </div>
-                <div class="search-result-title">${this.escapeHtml(r.title)}</div>
-                ${r.snippet ? `<div class="search-result-snippet">${this.escapeHtml(r.snippet)}</div>` : ''}
+        const getIcon = (type) => {
+            const t = type.toLowerCase();
+            if (t.includes('blog')) return 'edit_note';
+            if (t.includes('arr')) return 'event';
+            if (t.includes('und')) return 'school';
+            if (t.includes('media') || t.includes('video')) return 'play_circle';
+            if (t.includes('user') || t.includes('bruk')) return 'person';
+            if (t.includes('side') || t.includes('content')) return 'description';
+            return 'article';
+        };
+
+        const html = `
+            <div class="search-results-gallery">
+                ${results.map((r) => `
+                    <div class="search-result" onclick="window.location.hash = '${r.type === 'Blogg' ? 'blog' : (r.type === 'Undervisning' ? 'teaching' : (r.type === 'Arrangementer' ? 'events' : ''))}';">
+                        <div class="search-result-header">
+                            <span class="search-result-type-tag">${this.escapeHtml(r.type)}</span>
+                            ${r.meta ? `<span class="search-result-meta">${this.escapeHtml(r.meta)}</span>` : ''}
+                        </div>
+                        <div class="search-result-body">
+                            <div class="search-result-icon">
+                                <span class="material-symbols-outlined">${getIcon(r.type)}</span>
+                            </div>
+                            <div class="search-result-info">
+                                <div class="search-result-title">${this.escapeHtml(r.title)}</div>
+                                ${r.snippet ? `<div class="search-result-snippet">${this.escapeHtml(r.snippet)}</div>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
             </div>
-        `).join('');
+        `;
 
         resultsEl.innerHTML = html;
     }
@@ -1117,148 +1344,168 @@ class AdminManager {
 
         section.setAttribute('data-rendered', 'true');
 
-        // Basic Stats (Safe fetch)
-        let blogCount = 0;
-        let teachingCount = 0;
+        // Fetch Data
+        let blogCount = 0, teachingCount = 0, eventCount = 0, campaignCount = 0;
+        let donationCount = 0, donationTotal = 0;
+        let indexStats = {};
         let youtubeStats = { subscribers: 'N/A', videos: 'N/A', views: '0' };
-        let podcastCount = 'N/A';
-        let causesCount = 0;
-        let donationCount = 0;
-        let donationTotal = 0;
+        let podcastCount = '...';
+        let fullEvents = [], latestContactsData = [];
 
         try {
-            const blogData = await firebaseService.getPageContent('collection_blog');
-            const blogItems = Array.isArray(blogData) ? blogData : (blogData && blogData.items ? blogData.items : []);
-            blogCount = blogItems.length;
-        } catch (e) {
-            console.warn('Kunne ikke hente bloggstatistikk:', e);
-        }
+            const [blogData, teachingData, eventData, causesData, indexData, yt, pod] = await Promise.all([
+                firebaseService.getPageContent('collection_blog'),
+                firebaseService.getPageContent('collection_teaching'),
+                firebaseService.getPageContent('collection_events'),
+                firebaseService.getPageContent('collection_causes'),
+                firebaseService.getPageContent('index'),
+                this.fetchYouTubeStats(),
+                this.fetchPodcastStats()
+            ]);
 
-        try {
-            const teachingData = await firebaseService.getPageContent('collection_teaching');
-            const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData && teachingData.items ? teachingData.items : []);
-            teachingCount = teachingItems.length;
-        } catch (e) {
-            console.warn('Kunne ikke hente undervisningsstatistikk:', e);
-        }
+            blogCount = (Array.isArray(blogData) ? blogData : (blogData?.items || [])).length;
+            teachingCount = (Array.isArray(teachingData) ? teachingData : (teachingData?.items || [])).length;
 
-        try {
+            const eventsList = Array.isArray(eventData) ? eventData : (eventData?.items || []);
+            eventCount = eventsList.length;
+            fullEvents = eventsList;
+
+            campaignCount = (Array.isArray(causesData) ? causesData : (causesData?.items || [])).length;
+            indexStats = indexData?.stats || {};
+            if (yt) youtubeStats = yt;
+            if (pod) podcastCount = pod;
+
             if (firebaseService.db) {
+                // Fetch donations
                 const donationsSnapshot = await firebaseService.db.collection('donations').get();
-                if (!donationsSnapshot.empty) {
-                    donationCount = donationsSnapshot.size;
-                    donationsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.amount) donationTotal += (data.amount / 100);
-                    });
-                }
+                donationsSnapshot.forEach(doc => {
+                    const data = doc.data();
+                    donationCount++;
+                    if (data.amount) donationTotal += (data.amount / 100);
+                });
+
+                // Fetch latest contacts
+                const contactsSnapshot = await firebaseService.db.collection('contactMessages')
+                    .orderBy('timestamp', 'desc')
+                    .limit(4)
+                    .get();
+                contactsSnapshot.forEach(doc => latestContactsData.push({ id: doc.id, ...doc.data() }));
             }
         } catch (e) {
-            console.warn('Kunne ikke hente donasjoner:', e);
+            console.warn('Feil ved henting av statistikk:', e);
         }
 
-        // Fetch Media Stats
-        try {
-            const yt = await this.fetchYouTubeStats();
-            if (yt) youtubeStats = yt;
-        } catch (e) {
-            console.error('YouTube stats error:', e);
-        }
+        // Get Enabled Widgets & Order
+        const savedOrder = JSON.parse(localStorage.getItem('hkm_dashboard_widgets'));
+        const enabledWidgets = savedOrder || Object.keys(this.widgetLibrary).filter(id => this.widgetLibrary[id].default);
+        const savedSpans = JSON.parse(localStorage.getItem('hkm_dashboard_widget_spans')) || {};
 
-        const totalContent = blogCount + teachingCount;
+        // Build HTML for widgets
+        let widgetsHtml = '';
+        enabledWidgets.forEach(id => {
+            const w = this.widgetLibrary[id];
+            if (!w) return;
+
+            // Default spans if not saved
+            const savedSpansV = JSON.parse(localStorage.getItem('hkm_dashboard_widget_spans_v')) || {};
+            let span = savedSpans[id];
+            if (span === undefined) {
+                span = (w.type === 'list') ? 2 : 1;
+            }
+            const spanV = savedSpansV[id] || 1;
+
+            let value = '0', meta = '';
+            switch (id) {
+                case 'visitors':
+                    value = indexStats.website_visits || '12,450';
+                    meta = '<div class="stat-trend positive"><span class="material-symbols-outlined">trending_up</span> 12.5%</div>';
+                    break;
+                case 'status':
+                    value = '<span class="text-green" style="font-size: 24px;">Normal</span>';
+                    meta = '<span class="stat-meta">Alle systemer operative</span>';
+                    break;
+                case 'blog': value = blogCount; break;
+                case 'teaching': value = teachingCount; break;
+                case 'donations': value = donationCount; meta = `<span class="stat-meta">Totalt: ${donationTotal} kr</span>`; break;
+                case 'youtube':
+                    value = parseInt(youtubeStats.views || 0).toLocaleString('no-NO');
+                    meta = `<span class="stat-meta">${youtubeStats.subscribers} abonnenter</span>`;
+                    break;
+                case 'podcast': value = podcastCount; meta = '<span class="stat-meta">Episoder totalt</span>'; break;
+                case 'campaigns': value = campaignCount; break;
+                case 'events': value = eventCount; break;
+                case 'next-events':
+                    const now = new Date();
+                    const next = fullEvents
+                        .filter(ev => ev.date && new Date(ev.date) >= now)
+                        .sort((a, b) => new Date(a.date) - new Date(b.date))
+                        .slice(0, 3);
+
+                    value = next.length > 0 ? '' : 'Ingen kommende';
+                    meta = `<ul class="stat-list">
+                        ${next.map(ev => `
+                            <li class="stat-list-item">
+                                <span class="item-main">${ev.title}</span>
+                                <span class="item-meta">${new Date(ev.date).toLocaleDateString('no-NO', { day: '2-digit', month: 'short' })}</span>
+                            </li>
+                        `).join('')}
+                    </ul>`;
+                    break;
+                case 'latest-contacts':
+                    value = latestContactsData.length > 0 ? '' : 'Ingen meldinger';
+                    meta = `<ul class="stat-list">
+                        ${latestContactsData.map(c => `
+                            <li class="stat-list-item">
+                                <span class="item-main">${c.name || 'Ukjent'}</span>
+                                <span class="item-meta">${c.status === 'ny' ? '<span class="dot" style="background:#22c55e; width:6px; height:6px; margin-right:4px;"></span>' : ''}${c.subject || 'Ingen emne'}</span>
+                            </li>
+                        `).join('')}
+                    </ul>`;
+                    break;
+            }
+
+            widgetsHtml += `
+                <div class="stat-card modern" data-id="${w.id}" data-span="${span}" data-span-v="${spanV}">
+                    <span class="material-symbols-outlined drag-handle">drag_indicator</span>
+                    <div class="resize-handle corner-resize" data-tooltip="Dra for å endre størrelse">
+                        <span class="material-symbols-outlined">filter_list</span>
+                    </div>
+                    <div class="stat-icon-wrap ${w.color}">
+                        <span class="material-symbols-outlined">${w.icon}</span>
+                    </div>
+                    <div class="stat-content">
+                        <h3 class="stat-label">${w.label}</h3>
+                        <p class="stat-value">${value}</p>
+                        ${meta}
+                    </div>
+                </div>
+            `;
+        });
 
         section.innerHTML = `
-            <div class="stats-grid">
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap purple">
-                        <span class="material-symbols-outlined">visibility</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Sidevisninger (30 dager)</h3>
-                        <p class="stat-value" id="stats-visitors">12,450</p>
-                        <div class="stat-trend positive">
-                            <span class="material-symbols-outlined">trending_up</span>
-                            12.5%
-                        </div>
-                    </div>
-                </div>
-
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap green">
-                        <span class="material-symbols-outlined">check_circle</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Systemstatus</h3>
-                        <p class="stat-value text-green">Normal</p>
-                        <span class="stat-meta">Ingen kritiske feil</span>
-                    </div>
-                </div>
-
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap blue">
-                        <span class="material-symbols-outlined">edit_note</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Blogginnlegg</h3>
-                        <p class="stat-value" id="stats-blog-count">${blogCount}</p>
-                    </div>
-                </div>
-
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap mint">
-                        <span class="material-symbols-outlined">school</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Undervisningsserier</h3>
-                        <p class="stat-value" id="stats-teaching-count">${teachingCount}</p>
-                    </div>
-                </div>
-
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap donation">
-                        <span class="material-symbols-outlined">volunteer_activism</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Donasjoner</h3>
-                        <p class="stat-value">${donationCount}</p>
-                        <span class="stat-meta">Totalt: ${donationTotal} kr</span>
-                    </div>
-                </div>
-
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap megaphone">
-                        <span class="material-symbols-outlined">campaign</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Innsamlingsaksjoner</h3>
-                        <p class="stat-value">0</p>
-                    </div>
-                </div>
-
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap youtube">
-                        <span class="material-symbols-outlined">video_library</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">YouTube Totalt</h3>
-                        <p class="stat-value" id="stats-youtube-views">${parseInt(youtubeStats.views || 0).toLocaleString('no-NO')}</p>
-                        <span class="stat-meta" id="stats-youtube-subs">${youtubeStats.subscribers} abonnenter • ${youtubeStats.videos} videoer</span>
-                    </div>
-                </div>
-
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap podcast">
-                        <span class="material-symbols-outlined">podcasts</span>
-                    </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Podcast Episoder</h3>
-                        <p class="stat-value" id="stats-podcast-count">45</p>
-                    </div>
+            <div class="section-header-row" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 12px;">
+                <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;">Analyseoversikt</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button id="toggle-edit-mode" class="btn btn-accent btn-icon" data-tooltip="Endre rekkefølge og størrelse">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">open_with</span>
+                    </button>
+                    <button id="configure-widgets-btn" class="btn btn-accent btn-icon" data-tooltip="Tilpass oversikt">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">settings_suggest</span>
+                    </button>
                 </div>
             </div>
+            <div class="stats-grid" id="dashboard-stats-grid">
+                ${widgetsHtml}
+                ${enabledWidgets.length === 0 ? '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">Ingen analysebokser valgt. Klikk på "Tilpass oversikt" for å legge til.</p>' : ''}
+            </div>
+`;
+        // Get Main Grid Order
+        const savedMainOrder = JSON.parse(localStorage.getItem('hkm_dashboard_main_order')) || ['chart', 'top-pages'];
 
-            <div class="dashboard-main-grid">
-                <div class="chart-container card">
+        const mainWidgets = {
+            'chart': `
+                <div class="chart-container card" data-id="chart" style="position: relative;">
+                    <span class="material-symbols-outlined drag-handle">drag_indicator</span>
                     <div class="card-header-simple">
                         <div>
                             <h3 class="card-title">Trafikkovervåking (Google Analytics)</h3>
@@ -1267,23 +1514,39 @@ class AdminManager {
                                 Sanntid: 24 aktive akkurat nå
                             </div>
                         </div>
-                        <span class="material-symbols-outlined muted">more_vert</span>
+                        <div class="dropdown-container" style="position: relative;">
+                            <button class="chart-options-btn" style="background:none; border:none; cursor:pointer; color:var(--text-muted); padding:4px; display:flex; align-items:center;">
+                                <span class="material-symbols-outlined">more_vert</span>
+                            </button>
+                            <div class="chart-dropdown dropdown-menu" style="display:none; position:absolute; top:100%; right:0; background:white; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid #f1f5f9; width:180px; z-index:100; padding:8px; overflow:hidden;">
+                                <button class="dropdown-item" data-view="daily" style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-main); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">calendar_view_day</span> Daglig visning
+                                </button>
+                                <button class="dropdown-item" data-view="weekly" style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">calendar_view_week</span> Ukentlig oversikt
+                                </button>
+                                <button class="dropdown-item" data-view="monthly" style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                    <span class="material-symbols-outlined" style="font-size:18px;">calendar_month</span> Månedlig analyse
+                                </button>
+                            </div>
+                        </div>
                     </div>
                     <div class="chart-placeholder">
                         <div class="bar-chart">
-                            <div class="bar" style="height: 40%;"><span>08:00</span></div>
-                            <div class="bar" style="height: 65%;"></div>
-                            <div class="bar" style="height: 85%;"><span>12:00</span></div>
-                            <div class="bar" style="height: 55%;"></div>
-                            <div class="bar" style="height: 75%;"><span>16:00</span></div>
-                            <div class="bar" style="height: 45%;"></div>
-                            <div class="bar" style="height: 80%;"><span>20:00</span></div>
-                            <div class="bar" style="height: 60%;"></div>
+                            <div class="bar" style="height: 40%;" data-tooltip-info="08:00: 340 besøkende"><span>08:00</span></div>
+                            <div class="bar" style="height: 65%;" data-tooltip-info="10:00: 552 besøkende"></div>
+                            <div class="bar" style="height: 85%;" data-tooltip-info="12:00: 722 besøkende"><span>12:00</span></div>
+                            <div class="bar" style="height: 55%;" data-tooltip-info="14:00: 467 besøkende"></div>
+                            <div class="bar" style="height: 75%;" data-tooltip-info="16:00: 637 besøkende"><span>16:00</span></div>
+                            <div class="bar" style="height: 45%;" data-tooltip-info="18:00: 382 besøkende"></div>
+                            <div class="bar" style="height: 80%;" data-tooltip-info="20:00: 680 besøkende"><span>20:00</span></div>
+                            <div class="bar" style="height: 60%;" data-tooltip-info="22:00: 510 besøkende"></div>
                         </div>
                     </div>
-                </div>
-
-                <div class="top-pages-widget card">
+                </div>`,
+            'top-pages': `
+                <div class="top-pages-widget card" data-id="top-pages" style="position: relative;">
+                    <span class="material-symbols-outlined drag-handle">drag_indicator</span>
                     <h3 class="card-title">Topp Sider</h3>
                     <ul class="page-rank-list">
                         <li>
@@ -1314,12 +1577,150 @@ class AdminManager {
                             </div>
                         </li>
                     </ul>
-                </div>
+                </div>`
+        };
+
+        const mainGridHtml = savedMainOrder.map(id => mainWidgets[id]).join('');
+
+        section.innerHTML += `
+            <div class="dashboard-main-grid" id="dashboard-main-grid">
+                ${mainGridHtml}
             </div>
         `;
 
-        // Fetch System Health (Critical Errors)
+        // RE-INIT DROPDOWN, CONFIG BTN and SORTABLE
+        this.initWidgetConfig();
+        this.initSortableWidgets();
+        this.initSortableMainGrid();
+        this.initWidgetResizers();
+
+        // Edit Mode Toggle
+        const editToggle = document.getElementById('toggle-edit-mode');
+        const statsGrid = document.getElementById('dashboard-stats-grid');
+        const mainGrid = document.getElementById('dashboard-main-grid');
+        if (editToggle && statsGrid && mainGrid) {
+            editToggle.addEventListener('click', () => {
+                const isEditing = statsGrid.classList.toggle('edit-mode');
+                mainGrid.classList.toggle('edit-mode', isEditing);
+
+                if (isEditing) {
+                    editToggle.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">check</span>';
+                    showToast("Dra boksene for å flytte, eller bruk hjørnet for å endre størrelse", "info");
+                } else {
+                    editToggle.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">open_with</span>';
+                }
+            });
+        }
+
         this.checkSystemHealth();
+    }
+
+    initSortableWidgets() {
+        const el = document.getElementById('dashboard-stats-grid');
+        if (!el || typeof Sortable === 'undefined') return;
+
+        Sortable.create(el, {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: () => {
+                const order = Array.from(el.querySelectorAll('.stat-card.modern')).map(card => card.dataset.id);
+                localStorage.setItem('hkm_dashboard_widgets', JSON.stringify(order));
+                showToast("Rekkefølge lagret!", "success");
+            }
+        });
+    }
+
+    initSortableMainGrid() {
+        const el = document.getElementById('dashboard-main-grid');
+        if (!el || typeof Sortable === 'undefined') return;
+
+        Sortable.create(el, {
+            animation: 150,
+            handle: '.drag-handle',
+            ghostClass: 'sortable-ghost',
+            chosenClass: 'sortable-chosen',
+            onEnd: () => {
+                const order = Array.from(el.children).map(child => child.dataset.id);
+                localStorage.setItem('hkm_dashboard_main_order', JSON.stringify(order));
+                showToast("Layout lagret!", "success");
+            }
+        });
+    }
+
+    initWidgetResizers() {
+        let activeCard = null;
+        let startX, startY, startSpan, startSpanV;
+        let gridRect, colWidth, rowHeight;
+
+        const onMouseDown = (e) => {
+            const handle = e.target.closest('.corner-resize');
+            if (!handle) return;
+            e.preventDefault();
+            e.stopPropagation();
+
+            activeCard = handle.closest('.stat-card.modern');
+            const grid = activeCard.parentElement;
+            gridRect = grid.getBoundingClientRect();
+
+            const gap = 24;
+            colWidth = (gridRect.width + gap) / 4;
+            const sampleCard = grid.querySelector('.stat-card.modern[data-span-v="1"]') || activeCard;
+            rowHeight = sampleCard.offsetHeight / parseInt(sampleCard.dataset.spanV || 1);
+
+            startX = e.clientX;
+            startY = e.clientY;
+            startSpan = parseInt(activeCard.dataset.span || 1);
+            startSpanV = parseInt(activeCard.dataset.spanV || 1);
+
+            activeCard.classList.add('resizing');
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        };
+
+        const onMouseMove = (e) => {
+            if (!activeCard) return;
+
+            const deltaX = e.clientX - startX;
+            const deltaY = e.clientY - startY;
+
+            const addCols = Math.round(deltaX / colWidth);
+            const addRows = Math.round(deltaY / (rowHeight + 24));
+
+            let newSpan = Math.max(1, Math.min(4, startSpan + addCols));
+            let newSpanV = Math.max(1, Math.min(3, startSpanV + addRows));
+
+            if (newSpan.toString() !== activeCard.dataset.span || newSpanV.toString() !== activeCard.dataset.spanV) {
+                activeCard.dataset.span = newSpan;
+                activeCard.dataset.spanV = newSpanV;
+            }
+        };
+
+        const onMouseUp = () => {
+            if (!activeCard) return;
+            activeCard.classList.remove('resizing');
+
+            const id = activeCard.dataset.id;
+            const savedSpans = JSON.parse(localStorage.getItem('hkm_dashboard_widget_spans')) || {};
+            const savedSpansV = JSON.parse(localStorage.getItem('hkm_dashboard_widget_spans_v')) || {};
+
+            savedSpans[id] = parseInt(activeCard.dataset.span);
+            savedSpansV[id] = parseInt(activeCard.dataset.spanV);
+
+            localStorage.setItem('hkm_dashboard_widget_spans', JSON.stringify(savedSpans));
+            localStorage.setItem('hkm_dashboard_widget_spans_v', JSON.stringify(savedSpansV));
+
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            activeCard = null;
+        };
+
+        const grid = document.getElementById('dashboard-stats-grid');
+        if (grid) {
+            grid.addEventListener('mousedown', onMouseDown);
+        }
     }
 
     async renderContentEditor() {
@@ -1370,7 +1771,7 @@ class AdminManager {
                     </ul>
                 </div>
             </div>
-        `;
+`;
 
         // Load content lists
         this.loadContentList('collection_blog', 'blog-posts-list', 'blog');
@@ -2760,8 +3161,8 @@ class AdminManager {
                                     (item.gcalId && fi.gcalId === item.gcalId) ||
                                     (fi.title === item.title && fi.date?.split('T')[0] === item.date?.split('T')[0])
                                 );
-                            } else {
-                                // Standard index-based handling if no ID match (fallback for old items)
+                            } else if (item.isFirestore) {
+                                // Only use index-based fallback for items that we know were already in Firestore
                                 if (typeof index === 'number' && index >= 0 && !item.isSynced) {
                                     existingIdx = index;
                                 }
@@ -2866,10 +3267,11 @@ class AdminManager {
         }
 
         // Find match in Firestore
-        const matchIdx = list.findIndex(fi =>
-            (itemToDelete.gcalId && fi.gcalId === itemToDelete.gcalId) ||
-            (fi.title === itemToDelete.title && fi.date?.split('T')[0] === itemToDelete.date?.split('T')[0])
-        );
+        const matchIdx = list.findIndex(fi => {
+            if (itemToDelete.id && fi.id === itemToDelete.id) return true;
+            return (itemToDelete.gcalId && fi.gcalId === itemToDelete.gcalId) ||
+                (fi.title === itemToDelete.title && fi.date?.split('T')[0] === itemToDelete.date?.split('T')[0]);
+        });
 
         if (matchIdx >= 0) {
             list.splice(matchIdx, 1);
@@ -4030,7 +4432,7 @@ class AdminManager {
                     <h2 class="section-title">Kursadministrasjon</h2>
                     <p class="section-subtitle">Opprett og administrer kurs med leksjoner – Udemy-stil.</p>
                 </div>
-                <button class="btn-primary" id="new-course-btn" style="display:flex;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;">
+                <button class="btn-primary" id="new-course-btn" style="display:none;align-items:center;gap:8px;padding:10px 20px;border-radius:10px;">
                     <span class="material-symbols-outlined" style="font-size:1.1rem;">add</span> Nytt kurs
                 </button>
             </div>
@@ -4754,8 +5156,8 @@ class AdminManager {
      * Settings, Placeholders and Helpers
      */
     /**
- * Settings, Placeholders and Helpers
- */
+    * Settings, Placeholders and Helpers
+    */
     renderSettingsSection() {
         const section = document.getElementById('settings-section');
         if (!section) return;

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nyhetsbrev Builder | HKM Admin</title>
+    <title>Nyhetsbrevbygger | HKM Admin</title>
 
     <!-- Google Fonts & Icons -->
     <link
@@ -54,8 +54,9 @@
                             <span>Oversikt</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="nettsted">
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="nettsted">
                         <a href="index.html#content" class="nav-link" data-section="content">
                             <span class="material-symbols-outlined">description</span>
                             <span>Sideinnhold</span>
@@ -91,8 +92,9 @@
                             <span>Design & Logo</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item visible" data-nav-category="kommunikasjon">
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item visible" data-nav-category="kommunikasjon">
                         <a href="index.html#events" class="nav-link" data-section="events">
                             <span class="material-symbols-outlined">event</span>
                             <span>Arrangementer</span>
@@ -122,8 +124,11 @@
                             <span>Nyhetsbrev</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="administrasjon"><span>Administrasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="administrasjon">
+                    <li class="nav-category-header" data-target-category="administrasjon">
+                        <span>Administrasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
                         <a href="index.html#causes" class="nav-link" data-section="causes">
                             <span class="material-symbols-outlined">volunteer_activism</span>
                             <span>Gaver</span>
@@ -360,7 +365,7 @@
                 <div class="header-left">
                     <div class="welcome-banner">
                         <h1 class="welcome-title">His Kingdom Ministry</h1>
-                        <p class="welcome-subtitle">Newsletter Builder</p>
+                        <p class="welcome-subtitle">Nyhetsbrevbygger</p>
                     </div>
                 </div>
 
@@ -391,7 +396,7 @@
 
                     <div class="newsletter-meta">
                         <span class="subject-label">Emne:</span>
-                        <input type="text" id="newsletter-subject" value="Nyhet fra His Kingdom Ministry"
+                        <input type="text" id="newsletter-subject" placeholder="Skriv inn emne..."
                             class="subject-input">
                     </div>
                 </div>
@@ -641,22 +646,21 @@
         </a>
     </nav>
 
-            <!-- Global Search Modal -->
-        <div id="search-modal" class="profile-modal"
-            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2500; align-items:flex-start; justify-content:center; padding-top:10vh; box-sizing:border-box;">
-            <div class="profile-modal-content"
-                style="background:#fff; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.2); width:100%; max-width:600px; position:relative; padding:24px;">
-                <button id="close-search-modal"
-                    style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">&times;</button>
-                <div style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">Søk i systemet</div>
-                <div class="header-search" style="border: 2px solid var(--accent-color); border-radius: 8px; width: 100%; margin-bottom: 16px; position:relative;">
-                    <span class="material-symbols-outlined" style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#64748b;">search</span>
-                    <input type="text" id="global-modal-search-input" placeholder="Hva leter du etter? Skriv og trykk Enter..."
-                        style="width: 100%; padding: 14px 14px 14px 48px; border: none; border-radius: 8px; font-size: 16px; outline: none; background: transparent;" aria-label="Søk">
-                </div>
-                <div style="color: #94a3b8; font-size: 13px; text-align: center;">Trykk 'Enter' for å hente frem søkeresultatene.</div>
+    <!-- Global Search Modal -->
+    <div id="search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button id="close-search-modal" class="close-search-btn" aria-label="Lukk søk">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <div class="search-modal-title">Søk i systemet</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="global-modal-search-input" class="search-input-field"
+                    placeholder="Hva leter du etter? Skriv og trykk Enter..." aria-label="Søk">
             </div>
+            <div class="search-help-text">Trykk 'Enter' for å hente frem søkeresultatene.</div>
         </div>
+    </div>
 
     <!-- App Scripts -->
     <script type="module" src="../js/notifications.js"></script>

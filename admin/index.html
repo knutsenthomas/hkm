@@ -127,6 +127,12 @@
                             <span>Nyhetsbrev</span>
                         </a>
                     </li>
+                    <!-- Hidden anchor for FAB push-notification action -->
+                    <li class="nav-item" data-nav-category="kommunikasjon" style="display:none">
+                        <a href="#" class="nav-link" data-section="kommunikasjon" id="nav-kommunikasjon-hidden">
+                            <span>Push</span>
+                        </a>
+                    </li>
                     <li class="nav-category-header" data-target-category="administrasjon">
                         <span>Administrasjon</span><span
                             class="material-symbols-outlined expand-icon">expand_more</span>
@@ -232,25 +238,18 @@
         </header>
 
         <!-- Global Search Modal -->
-        <div id="search-modal" class="profile-modal"
-            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2500; align-items:flex-start; justify-content:center; padding-top:10vh; box-sizing:border-box;">
-            <div class="profile-modal-content"
-                style="background:#fff; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.2); width:100%; max-width:600px; position:relative; padding:24px;">
-                <button id="close-search-modal"
-                    style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">&times;</button>
-                <div style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">Søk i
-                    systemet</div>
-                <div class="header-search"
-                    style="border: 2px solid var(--accent-color); border-radius: 8px; width: 100%; margin-bottom: 16px; position:relative;">
-                    <span class="material-symbols-outlined"
-                        style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#64748b;">search</span>
-                    <input type="text" id="global-modal-search-input"
-                        placeholder="Hva leter du etter? Skriv og trykk Enter..."
-                        style="width: 100%; padding: 14px 14px 14px 48px; border: none; border-radius: 8px; font-size: 16px; outline: none; background: transparent;"
-                        aria-label="Søk">
+        <div id="search-modal" class="search-overlay">
+            <div class="search-modal-container">
+                <button id="close-search-modal" class="close-search-btn" aria-label="Lukk søk">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <div class="search-modal-title">Søk i systemet</div>
+                <div class="search-input-group">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" id="global-modal-search-input" class="search-input-field"
+                        placeholder="Hva leter du etter? Skriv og trykk Enter..." aria-label="Søk">
                 </div>
-                <div style="color: #94a3b8; font-size: 13px; text-align: center;">Trykk 'Enter' for å hente frem
-                    søkeresultatene.</div>
+                <div class="search-help-text">Trykk 'Enter' for å hente frem søkeresultatene.</div>
             </div>
         </div>
 
@@ -379,6 +378,16 @@
         <section id="content-area" class="section-container">
             <!-- Default Overview Section -->
             <div id="overview-section" class="section-content active">
+                <div class="section-header-row"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;">Analyseoversikt
+                    </h2>
+                    <button id="configure-widgets-btn" class="btn btn-secondary"
+                        style="padding: 8px 16px; font-size: 13px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">settings_suggest</span>
+                        Tilpass oversikt
+                    </button>
+                </div>
                 <!-- Stats Cards -->
                 <div class="stats-grid">
                     <div class="stat-card modern">
@@ -386,7 +395,7 @@
                             <span class="material-symbols-outlined">visibility</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Sidevisninger (30 dager)</h3>
+                            <h3 class="stat-label">Sidevisninger</h3>
                             <p class="stat-value" id="stats-visitors">12,450</p>
                             <div class="stat-trend positive">
                                 <span class="material-symbols-outlined">trending_up</span>
@@ -480,7 +489,30 @@
                                     Sanntid: 24 aktive akkurat nå
                                 </div>
                             </div>
-                            <span class="material-symbols-outlined muted">more_vert</span>
+                            <div class="dropdown-container" style="position: relative;">
+                                <button id="chart-options-btn"
+                                    style="background:none; border:none; cursor:pointer; color:var(--text-muted); padding:4px; display:flex; align-items:center;">
+                                    <span class="material-symbols-outlined">more_vert</span>
+                                </button>
+                                <div id="chart-dropdown" class="dropdown-menu"
+                                    style="display:none; position:absolute; top:100%; right:0; background:white; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid #f1f5f9; width:180px; z-index:100; padding:8px; overflow:hidden;">
+                                    <button class="dropdown-item" data-view="daily"
+                                        style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-main); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:18px;">calendar_view_day</span> Daglig visning
+                                    </button>
+                                    <button class="dropdown-item" data-view="weekly"
+                                        style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:18px;">calendar_view_week</span> Ukentlig oversikt
+                                    </button>
+                                    <button class="dropdown-item" data-view="monthly"
+                                        style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:18px;">calendar_month</span> Månedlig analyse
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="chart-placeholder">
                             <div class="bar-chart">
@@ -854,6 +886,10 @@
                 <span class="fab-label">Ny undervisning</span>
                 <div class="fab-icon"><span class="material-symbols-outlined">school</span></div>
             </button>
+            <button class="fab-item" onclick="triggerFabAction('courses', 'new-course-btn')">
+                <span class="fab-label">Nytt kurs</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">menu_book</span></div>
+            </button>
             <button class="fab-item" onclick="triggerFabAction('events', 'add-new-events')">
                 <span class="fab-label">Nytt arrangement</span>
                 <div class="fab-icon"><span class="material-symbols-outlined">event</span></div>
@@ -1077,6 +1113,36 @@
     <!-- Quill Editor for Email Templates -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <!-- Widget Config Modal -->
+    <!-- Widget Config Modal -->
+    <div id="widget-config-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"
+                style="padding: 24px 32px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 18px; font-weight: 700; margin: 0;">Tilpass oversikt</h2>
+                <button class="close-modal" id="close-widget-config"
+                    style="background: none; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 24px 32px; max-height: 450px; overflow-y: auto;">
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Velg hvilke analysebokser du
+                    ønsker å se på din oversikt.</p>
+                <div id="widget-list-container" style="display: flex; flex-direction: column;">
+                    <!-- Widgets injected via JS -->
+                </div>
+            </div>
+            <div class="modal-footer"
+                style="padding: 24px 32px; background: #f8fafc; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px;">
+                <button id="save-widgets-btn" class="btn btn-primary" style="padding: 12px 24px;">Lagre
+                    endringer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SortableJS for Drag and Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
     <!-- Admin Logic -->
     <script src="../js/notifications.js"></script>

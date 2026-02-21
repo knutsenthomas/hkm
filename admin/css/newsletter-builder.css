@@ -327,13 +327,22 @@ body.builder-active {
 
 .subject-input {
     flex: 1;
-    border: none;
-    font-size: 16px;
-    font-weight: 700;
+    border: 1px solid var(--border-color);
+    font-size: 14px;
+    font-weight: 500;
     outline: none;
-    padding: 0;
-    background: transparent;
+    padding: 8px 16px;
+    background: #f1f5f9;
     color: var(--text-main);
+    border-radius: 12px;
+    height: 40px;
+    transition: all 0.2s;
+}
+
+.subject-input:focus {
+    background: white;
+    border-color: var(--accent-orange);
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
 }
 
 .view-toggles {

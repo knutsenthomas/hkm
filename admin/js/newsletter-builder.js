@@ -1,5 +1,5 @@
 /**
- * Newsletter Builder Logic - HKM Admin
+ * Nyhetsbrevbygger Logic - HKM Admin
  * Handles block-based email design, previews, and integrations.
  */
 
@@ -129,7 +129,7 @@ class NewsletterBuilder {
     }
 
     async init() {
-        console.log("Newsletter Builder Initializing...");
+        console.log("Nyhetsbrevbygger Initializing...");
 
         // Wait for Firebase to be ready with a small retry loop
         const waitForFirebase = setInterval(() => {

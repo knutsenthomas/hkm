@@ -198,7 +198,7 @@ class ContentManager {
 
             const blogData = await firebaseService.getPageContent('collection_blog');
             const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
-            if (blogItems.length > 0) this.renderBlogPosts(blogItems, '#blogg .blog-grid');
+            if (blogItems.length > 0) this.renderBlogPosts(blogItems.slice(0, 3), '#blogg .blog-grid');
 
             const teachingData = await firebaseService.getPageContent('collection_teaching');
             const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
