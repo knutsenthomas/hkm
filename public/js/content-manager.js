@@ -363,11 +363,16 @@ class ContentManager {
         }
 
         const blogData = await firebaseService.getPageContent('collection_blog');
-        const items = Array.isArray(blogData) ? blogData : (blogData?.items || []);
-        const item = items.find(i => i.title === itemId || i.id === itemId);
+        const teachingData = await firebaseService.getPageContent('collection_teaching');
+        const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+        const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
+        const blogItem = blogItems.find(i => i.title === itemId || i.id === itemId);
+        const teachingItem = teachingItems.find(i => i.title === itemId || i.id === itemId);
+        const item = blogItem || teachingItem;
+        const isTeaching = !!teachingItem;
 
         if (!item) {
-            container.innerHTML = '<p>Innlegget ble ikke funnet.</p>';
+            container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
             return;
         }
 
@@ -386,7 +391,7 @@ class ContentManager {
         }
 
         if (categoryEl) {
-            const cat = item.category || 'Ukategorisert';
+            const cat = item.category || item.teachingType || (isTeaching ? 'Undervisning' : 'Ukategorisert');
             categoryEl.innerHTML = cat ? `<i class="fas fa-tag"></i> ${cat}` : '';
         }
 
@@ -476,6 +481,80 @@ class ContentManager {
             } else {
                 // Hide box if no tags
                 authorBox.style.display = 'none';
+            }
+        }
+
+        // --- Related Posts ---
+        const relatedContainer = document.getElementById('single-post-related');
+        if (relatedContainer) {
+            let relatedItems = [];
+            let heading = 'Relaterte innlegg';
+            let ctaLabel = 'Les mer';
+
+            if (isTeaching) {
+                heading = 'Relatert undervisning';
+                ctaLabel = 'Les undervisning';
+                const seriesIds = Array.isArray(item.seriesItems) ? item.seriesItems : [];
+                if (seriesIds.length > 0) {
+                    relatedItems = teachingItems.filter(i =>
+                        (seriesIds.includes(i.id) || seriesIds.includes(i.title)) &&
+                        (i.id || i.title) !== postId
+                    );
+                } else {
+                    const teachingType = item.teachingType || item.category;
+                    relatedItems = teachingItems
+                        .filter(i => (i.id || i.title) !== postId)
+                        .filter(i => {
+                            if (!teachingType) return true;
+                            return (i.teachingType || i.category) === teachingType;
+                        })
+                        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+                        .slice(0, 3);
+                }
+            } else if (item.relatedPosts && Array.isArray(item.relatedPosts) && item.relatedPosts.length > 0) {
+                // Fetch manually selected ones
+                relatedItems = blogItems.filter(i => (item.relatedPosts.includes(i.id) || item.relatedPosts.includes(i.title)) && (i.id || i.title) !== postId);
+            } else {
+                // Fallback: 3 most recent posts excluding current one
+                relatedItems = blogItems
+                    .filter(i => (i.id || i.title) !== postId)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 3);
+            }
+
+            if (relatedItems.length > 0) {
+                relatedContainer.style.display = 'block';
+                relatedContainer.innerHTML = `
+                    <h3 style="margin-bottom: 30px; font-size: 1.5rem; color: #334155; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+                        ${heading}
+                    </h3>
+                    <div class="blog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
+                        ${relatedItems.map(post => `
+                            <article class="blog-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #f1f5f9; transition: transform 0.2s ease;">
+                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="blog-image" style="height: 180px; overflow: hidden; position: relative;">
+                                        <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
+                                             alt="${post.title}" 
+                                             style="width: 100%; height: 100%; object-fit: cover;">
+                                        ${post.category ? `<span style="position: absolute; bottom: 10px; right: 10px; background: var(--secondary-color, #ff6b2b); color: white; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;">${post.category}</span>` : ''}
+                                    </div>
+                                    <div class="blog-content" style="padding: 20px;">
+                                        <div class="blog-meta" style="font-size: 12px; color: #64748b; margin-bottom: 10px; display: flex; gap: 15px;">
+                                            <span><i class="far fa-calendar"></i> ${post.date ? this.formatDate(post.date) : ''}</span>
+                                            ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : ''}
+                                        </div>
+                                        <h4 style="font-size: 1.1rem; margin-bottom: 15px; line-height: 1.4; font-weight: 700; color: #1e293b;">${post.title}</h4>
+                                        <span style="color: var(--primary-color, #ff6b2b); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 5px;">
+                                           ${ctaLabel} <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+                                        </span>
+                                    </div>
+                                </a>
+                            </article>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                relatedContainer.style.display = 'none';
             }
         }
     }

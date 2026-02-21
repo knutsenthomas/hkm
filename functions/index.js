@@ -97,8 +97,76 @@ exports.createPaymentIntent = onRequest({ cors: true, invoker: "public" }, async
 });
 
 /**
+ * Henter en e-postmal fra Firestore eller returnerer standardverdier.
+ */
+async function getEmailTemplate(templateId, fallback) {
+  try {
+    const doc = await db.collection("email_templates").doc(templateId).get();
+    if (doc.exists) {
+      return { ...fallback, ...doc.data() };
+    }
+  } catch (error) {
+    console.warn(`Kunne ikke hente mal ${templateId}:`, error);
+  }
+  return fallback;
+}
+
+/**
  * Helper-funksjon for å sende e-post.
  */
+async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated" }) {
+  const user = process.env.EMAIL_USER;
+  const pass = process.env.EMAIL_PASS;
+
+  if (!user || !pass) {
+    console.warn("E-postlegitimasjon mangler (EMAIL_USER / EMAIL_PASS). Kan ikke sende e-post.");
+    return false;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.hostinger.com",
+    port: 465,
+    secure: true,
+    auth: { user, pass },
+  });
+
+  try {
+    await transporter.sendMail({
+      from: `"${fromName}" <${user}>`,
+      to,
+      subject,
+      text,
+      html,
+    });
+
+    // Logg utsendelsen
+    await db.collection("email_logs").add({
+      to,
+      subject,
+      type,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      sentAt: new Date().toISOString(),
+      status: "sent"
+    });
+
+    return true;
+  } catch (error) {
+    console.error("Feil ved sending av e-post via NodeMailer:", error);
+
+    // Logg feilen
+    await db.collection("email_logs").add({
+      to,
+      subject,
+      type,
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      sentAt: new Date().toISOString(),
+      status: "failed",
+      error: error.message
+    });
+
+    return false;
+  }
+}
 
 /**
  * Trigger som sender velkomst-e-post til nye brukere.
@@ -115,21 +183,24 @@ exports.onUserCreate = onDocumentCreated("users/{userId}", async (event) => {
 
   if (!email) return;
 
-  const subject = "Velkommen til His Kingdom Ministry!";
-  const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-      <h2 style="color: #ff6b2b;">Velkommen til oss, ${name}!</h2>
+  const fallback = {
+    subject: "Velkommen til His Kingdom Ministry!",
+    body: `<h2>Velkommen til oss, {{name}}!</h2>
       <p>Vi er så glade for at du har registrert deg i vårt system.</p>
       <p>Her er litt informasjon om hva du kan gjøre:</p>
       <ul>
-        <li><strong>Min Side:</strong> Her kan du se din profil, oppdatere dine opplysninger og se din historikk.</li>
-        <li><strong>Undervisning & Ressurser:</strong> Få tilgang til eksklusivt innhold og undervisningsserier.</li>
-        <li><strong>Gaver & Støtte:</strong> Administrer dine faste bidrag og se skattefradrag.</li>
-      </ul>
-      <h3 style="margin-top: 24px;">Retningslinjer</h3>
-      <p style="font-size: 14px; color: #666;">
-        Vi ønsker å skape et trygt og inkluderende fellesskap. Vennligst behandle andre med respekt og følg våre brukervilkår som du finner på nettsiden.
-      </p>
+        <li><strong>Min Side:</strong> Se din profil og historikk.</li>
+        <li><strong>Ressurser:</strong> Tilgang til eksklusivt innhold.</li>
+      </ul>`
+  };
+
+  const template = await getEmailTemplate("welcome_email", fallback);
+  const subject = template.subject.replace("{{name}}", name);
+  const htmlBody = template.body.replace("{{name}}", name);
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+      ${htmlBody}
       <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
         Dette er en automatisk utsendt e-post fra His Kingdom Ministry.
       </div>
@@ -141,11 +212,56 @@ exports.onUserCreate = onDocumentCreated("users/{userId}", async (event) => {
       to: email,
       subject,
       html,
-      text: `Velkommen til oss, ${name}!\n\nVi er glade for at du har registrert deg. Se informasjon om Min Side og våre retningslinjer på nettsiden.`
+      text: `Velkommen til oss, ${name}!`
     });
     console.log(`Velkomst-e-post sendt til ${email}`);
   } catch (error) {
     console.error("Feil ved sending av velkomst-e-post:", error);
+  }
+});
+
+
+/**
+ * Trigger som sender bekreftelse ved påmelding til nyhetsbrev.
+ */
+exports.onNewsletterSubscribe = onDocumentCreated("newsletter_subscriptions/{id}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const subData = snapshot.data();
+  const email = subData.email;
+
+  if (!email) return;
+
+  const fallback = {
+    subject: "Bekreftelse: Du er påmeldt nyhetsbrevet vårt!",
+    body: `<h2>Takk for at du følger oss!</h2>
+      <p>Vi har nå registrert din e-postadresse <strong>{{email}}</strong> for vårt nyhetsbrev.</p>
+      <p>Du vil fremover motta oppdateringer om arrangementer og undervisning.</p>`
+  };
+
+  const template = await getEmailTemplate("newsletter_confirmation", fallback);
+  const subject = template.subject.replace("{{email}}", email);
+  const htmlBody = template.body.replace("{{email}}", email);
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+      ${htmlBody}
+      <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+        Du kan melde deg av når som helst ved å svare på denne e-posten.
+      </div>
+    </div>
+  `;
+
+  try {
+    await sendEmail({
+      to: email,
+      subject,
+      html,
+      text: `Takk for at du meldte deg på nyhetsbrevet vårt!`
+    });
+    console.log(`Nyhetsbrev-bekreftelse sendt til ${email}`);
+  } catch (error) {
+    console.error("Feil ved sending av nyhetsbrev-bekreftelse:", error);
   }
 });
 
@@ -222,31 +338,31 @@ async function getAllUsers(role) {
  * Express-style middleware for use in onRequest functions.
  */
 const verifyAdmin = async (req, res, next) => {
-    const idToken = req.headers.authorization?.split('Bearer ')[1];
+  const idToken = req.headers.authorization?.split('Bearer ')[1];
 
-    if (!idToken) {
-        res.status(401).send({ error: 'Unauthorized: Missing authorization token.' });
-        return;
+  if (!idToken) {
+    res.status(401).send({ error: 'Unauthorized: Missing authorization token.' });
+    return;
+  }
+
+  try {
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const userDoc = await db.collection('users').doc(decodedToken.uid).get();
+
+    if (userDoc.exists) {
+      const userRole = userDoc.data().role;
+      // Allow 'admin' or 'superadmin'
+      if (userRole === 'admin' || userRole === 'superadmin') {
+        req.user = decodedToken; // Pass user info to the handler
+        return next();
+      }
     }
 
-    try {
-        const decodedToken = await admin.auth().verifyIdToken(idToken);
-        const userDoc = await db.collection('users').doc(decodedToken.uid).get();
-
-        if (userDoc.exists) {
-            const userRole = userDoc.data().role;
-            // Allow 'admin' or 'superadmin'
-            if (userRole === 'admin' || userRole === 'superadmin') {
-                req.user = decodedToken; // Pass user info to the handler
-                return next();
-            }
-        }
-
-        res.status(403).send({ error: 'Forbidden: You do not have permission to perform this action.' });
-    } catch (error) {
-        console.error('Error verifying admin token:', error);
-        res.status(401).send({ error: 'Unauthorized: Invalid token.' });
-    }
+    res.status(403).send({ error: 'Forbidden: You do not have permission to perform this action.' });
+  } catch (error) {
+    console.error('Error verifying admin token:', error);
+    res.status(401).send({ error: 'Unauthorized: Invalid token.' });
+  }
 };
 
 /**
@@ -254,46 +370,46 @@ const verifyAdmin = async (req, res, next) => {
  * Krever admin-autentisering.
  */
 exports.sendBulkEmail = onRequest({ cors: true }, async (req, res) => {
-    // Wrap the core logic in the verifyAdmin middleware
-    await verifyAdmin(req, res, async () => {
-        if (req.method === 'OPTIONS') {
-            res.set('Access-Control-Allow-Origin', '*');
-            res.set('Access-Control-Allow-Methods', 'POST');
-            res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-            res.status(204).send('');
-            return;
-        }
+  // Wrap the core logic in the verifyAdmin middleware
+  await verifyAdmin(req, res, async () => {
+    if (req.method === 'OPTIONS') {
+      res.set('Access-Control-Allow-Origin', '*');
+      res.set('Access-Control-Allow-Methods', 'POST');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.status(204).send('');
+      return;
+    }
 
-        try {
-            const { targetRole, subject, message, fromName, selectedUserIds } = req.body;
+    try {
+      const { targetRole, subject, message, fromName, selectedUserIds } = req.body;
 
-            if ((!targetRole && !selectedUserIds) || !subject || !message) {
-                res.status(400).send({ error: "Mangler målgruppe, emne eller melding." });
-                return;
-            }
+      if ((!targetRole && !selectedUserIds) || !subject || !message) {
+        res.status(400).send({ error: "Mangler målgruppe, emne eller melding." });
+        return;
+      }
 
-            let users = [];
-            if (targetRole === 'selected' && selectedUserIds && selectedUserIds.length > 0) {
-                console.log(`Henter ${selectedUserIds.length} utvalgte brukere.`);
-                const userPromises = selectedUserIds.map(uid => db.collection('users').doc(uid).get());
-                const userDocs = await Promise.all(userPromises);
-                users = userDocs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } else {
-                console.log(`Starter masseutsendelse for rolle: ${targetRole}`);
-                users = await getAllUsers(targetRole);
-            }
-            
-            if (users.length === 0) {
-                res.status(404).send({ error: "Ingen brukere funnet for den valgte målgruppen." });
-                return;
-            }
-            
-            const emails = users.map(u => u.email).filter(Boolean);
-            console.log(`Fant ${emails.length} e-postadresser å sende til.`);
+      let users = [];
+      if (targetRole === 'selected' && selectedUserIds && selectedUserIds.length > 0) {
+        console.log(`Henter ${selectedUserIds.length} utvalgte brukere.`);
+        const userPromises = selectedUserIds.map(uid => db.collection('users').doc(uid).get());
+        const userDocs = await Promise.all(userPromises);
+        users = userDocs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } else {
+        console.log(`Starter masseutsendelse for rolle: ${targetRole}`);
+        users = await getAllUsers(targetRole);
+      }
 
-            // For now, lets send in parallel. If there are many users, a batching queue would be better.
-            const emailPromises = emails.map(email => {
-                const html = `
+      if (users.length === 0) {
+        res.status(404).send({ error: "Ingen brukere funnet for den valgte målgruppen." });
+        return;
+      }
+
+      const emails = users.map(u => u.email).filter(Boolean);
+      console.log(`Fant ${emails.length} e-postadresser å sende til.`);
+
+      // For now, lets send in parallel. If there are many users, a batching queue would be better.
+      const emailPromises = emails.map(email => {
+        const html = `
                   <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
                     <div style="margin-bottom: 20px;">
                       ${message.replace(/\n/g, '<br>')}
@@ -304,18 +420,18 @@ exports.sendBulkEmail = onRequest({ cors: true }, async (req, res) => {
                     </div>
                   </div>
                 `;
-                return sendEmail({ to: email, subject, html, text: message, fromName });
-            });
+        return sendEmail({ to: email, subject, html, text: message, fromName });
+      });
 
-            await Promise.all(emailPromises);
+      await Promise.all(emailPromises);
 
-            res.status(200).send({ success: true, message: `E-poster er sendt til ${emails.length} brukere.` });
+      res.status(200).send({ success: true, message: `E-poster er sendt til ${emails.length} brukere.` });
 
-        } catch (error) {
-            console.error("Feil ved masseutsendelse av e-post:", error);
-            res.status(500).send({ error: error.message });
-        }
-    });
+    } catch (error) {
+      console.error("Feil ved masseutsendelse av e-post:", error);
+      res.status(500).send({ error: error.message });
+    }
+  });
 });
 
 /**
@@ -323,116 +439,116 @@ exports.sendBulkEmail = onRequest({ cors: true }, async (req, res) => {
  * Krever admin-autentisering.
  */
 exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
-    await verifyAdmin(req, res, async () => {
-        if (req.method === 'OPTIONS') {
-            res.set('Access-Control-Allow-Origin', '*');
-            res.set('Access-Control-Allow-Methods', 'POST');
-            res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-            res.status(204).send('');
-            return;
+  await verifyAdmin(req, res, async () => {
+    if (req.method === 'OPTIONS') {
+      res.set('Access-Control-Allow-Origin', '*');
+      res.set('Access-Control-Allow-Methods', 'POST');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.status(204).send('');
+      return;
+    }
+
+    try {
+      const { targetRole, title, body, icon, click_action, selectedUserIds } = req.body;
+
+      if ((!targetRole && !selectedUserIds) || !title || !body) {
+        res.status(400).send({ error: "Mangler målgruppe, tittel eller melding." });
+        return;
+      }
+
+      let users = [];
+      if (targetRole === 'selected' && selectedUserIds && selectedUserIds.length > 0) {
+        console.log(`Henter ${selectedUserIds.length} utvalgte brukere for push-varsling.`);
+        const userPromises = selectedUserIds.map(uid => db.collection('users').doc(uid).get());
+        const userDocs = await Promise.all(userPromises);
+        users = userDocs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } else {
+        console.log(`Starter utsendelse av push-varsling for rolle: ${targetRole}`);
+        users = await getAllUsers(targetRole);
+      }
+
+      if (users.length === 0) {
+        res.status(404).send({ error: "Ingen brukere funnet for den valgte målgruppen." });
+        return;
+      }
+
+      // Create a map of token to user ID
+      const tokenUserMap = new Map();
+      users.forEach(user => {
+        if (user.fcmTokens && Array.isArray(user.fcmTokens)) {
+          user.fcmTokens.forEach(token => {
+            tokenUserMap.set(token, user.id);
+          });
         }
+      });
 
-        try {
-            const { targetRole, title, body, icon, click_action, selectedUserIds } = req.body;
+      const tokens = Array.from(tokenUserMap.keys());
 
-            if ((!targetRole && !selectedUserIds) || !title || !body) {
-                res.status(400).send({ error: "Mangler målgruppe, tittel eller melding." });
-                return;
-            }
+      if (tokens.length === 0) {
+        res.status(404).send({ error: "Ingen brukere med varslingstokens funnet." });
+        return;
+      }
 
-            let users = [];
-            if (targetRole === 'selected' && selectedUserIds && selectedUserIds.length > 0) {
-                console.log(`Henter ${selectedUserIds.length} utvalgte brukere for push-varsling.`);
-                const userPromises = selectedUserIds.map(uid => db.collection('users').doc(uid).get());
-                const userDocs = await Promise.all(userPromises);
-                users = userDocs.map(doc => ({ id: doc.id, ...doc.data() }));
-            } else {
-                console.log(`Starter utsendelse av push-varsling for rolle: ${targetRole}`);
-                users = await getAllUsers(targetRole);
-            }
-            
-            if (users.length === 0) {
-                res.status(404).send({ error: "Ingen brukere funnet for den valgte målgruppen." });
-                return;
-            }
+      console.log(`Fant ${tokens.length} tokens å sende til.`);
 
-            // Create a map of token to user ID
-            const tokenUserMap = new Map();
-            users.forEach(user => {
-                if (user.fcmTokens && Array.isArray(user.fcmTokens)) {
-                    user.fcmTokens.forEach(token => {
-                        tokenUserMap.set(token, user.id);
-                    });
-                }
-            });
-
-            const tokens = Array.from(tokenUserMap.keys());
-
-            if (tokens.length === 0) {
-                res.status(404).send({ error: "Ingen brukere med varslingstokens funnet." });
-                return;
-            }
-
-            console.log(`Fant ${tokens.length} tokens å sende til.`);
-
-            const message = {
-                notification: {
-                    title,
-                    body,
-                    icon: icon || '/img/logo-hkm.png',
-                },
-                webpush: {
-                    fcm_options: {
-                        link: click_action || 'https://his-kingdom-ministry.web.app/'
-                    }
-                }
-            };
-
-            const response = await admin.messaging().sendToDevice(tokens, message);
-            let failureCount = 0;
-            let successCount = 0;
-
-            const tokensToClean = [];
-
-            response.results.forEach((result, index) => {
-                const error = result.error;
-                if (error) {
-                    failureCount++;
-                    console.error('Failure sending notification to', tokens[index], error);
-                    // Cleanup the tokens that are not registered anymore.
-                    if (error.code === 'messaging/registration-token-not-registered' ||
-                        error.code === 'messaging/invalid-registration-token') {
-                        const token = tokens[index];
-                        tokensToClean.push(token);
-                    }
-                } else {
-                    successCount++;
-                }
-            });
-            
-            if (tokensToClean.length > 0) {
-                console.log(`Cleaning ${tokensToClean.length} invalid tokens.`);
-                const cleanupPromises = tokensToClean.map(async (token) => {
-                    const userId = tokenUserMap.get(token);
-                    if (userId) {
-                        const userRef = db.collection('users').doc(userId);
-                        return userRef.update({
-                            fcmTokens: admin.firestore.FieldValue.arrayRemove(token)
-                        });
-                    }
-                });
-                await Promise.all(cleanupPromises);
-                console.log("Token cleanup complete.");
-            }
-
-            console.log(`Successfully sent message to ${successCount} devices. Failed for ${failureCount} devices.`);
-            res.status(200).send({ success: true, message: `Varsling sendt til ${successCount} enheter. ${failureCount} feilet.` });
-
-        } catch (error) {
-            console.error("Feil ved utsendelse av push-varsling:", error);
-            res.status(500).send({ error: error.message });
+      const message = {
+        notification: {
+          title,
+          body,
+          icon: icon || '/img/logo-hkm.png',
+        },
+        webpush: {
+          fcm_options: {
+            link: click_action || 'https://his-kingdom-ministry.web.app/'
+          }
         }
-    });
+      };
+
+      const response = await admin.messaging().sendToDevice(tokens, message);
+      let failureCount = 0;
+      let successCount = 0;
+
+      const tokensToClean = [];
+
+      response.results.forEach((result, index) => {
+        const error = result.error;
+        if (error) {
+          failureCount++;
+          console.error('Failure sending notification to', tokens[index], error);
+          // Cleanup the tokens that are not registered anymore.
+          if (error.code === 'messaging/registration-token-not-registered' ||
+            error.code === 'messaging/invalid-registration-token') {
+            const token = tokens[index];
+            tokensToClean.push(token);
+          }
+        } else {
+          successCount++;
+        }
+      });
+
+      if (tokensToClean.length > 0) {
+        console.log(`Cleaning ${tokensToClean.length} invalid tokens.`);
+        const cleanupPromises = tokensToClean.map(async (token) => {
+          const userId = tokenUserMap.get(token);
+          if (userId) {
+            const userRef = db.collection('users').doc(userId);
+            return userRef.update({
+              fcmTokens: admin.firestore.FieldValue.arrayRemove(token)
+            });
+          }
+        });
+        await Promise.all(cleanupPromises);
+        console.log("Token cleanup complete.");
+      }
+
+      console.log(`Successfully sent message to ${successCount} devices. Failed for ${failureCount} devices.`);
+      res.status(200).send({ success: true, message: `Varsling sendt til ${successCount} enheter. ${failureCount} feilet.` });
+
+    } catch (error) {
+      console.error("Feil ved utsendelse av push-varsling:", error);
+      res.status(500).send({ error: error.message });
+    }
+  });
 });
 
 /**
@@ -489,5 +605,54 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public" }, async (req
   } catch (error) {
     console.error("Feil ved logging:", error);
     res.status(500).send({ error: "Kunne ikke logge feil." });
+  }
+});
+
+/**
+ * Trigger som sender bekreftelse ved innsending av kontaktskjema.
+ */
+exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+  const msgData = snapshot.data();
+  const email = msgData.email;
+  const name = msgData.name || "venn";
+
+  if (!email) return;
+
+  const fallback = {
+    subject: "Takk for din melding: {{subject}}",
+    body: `<h2>Takk for at du tok kontakt, {{name}}!</h2>
+      <p>Vi har mottatt din melding med emnet "{{subject}}".</p>
+      <p>Vi vil gå gjennom din henvendelse og svare deg så snart som mulig.</p>
+      <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
+        <strong>Din melding:</strong><br>
+        ${msgData.message ? msgData.message.replace(/\n/g, '<br>') : ''}
+      </div>`
+  };
+
+  const template = await getEmailTemplate("contact_form_confirmation", fallback);
+  const subject = template.subject.replace("{{name}}", name).replace("{{subject}}", msgData.subject || "Kontakt");
+  const htmlBody = template.body.replace("{{name}}", name).replace("{{subject}}", msgData.subject || "Kontakt");
+
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+      ${htmlBody}
+      <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+        Dette er en automatisk bekreftelse. Du trenger ikke svare på denne e-posten.
+      </div>
+    </div>
+  `;
+
+  try {
+    await sendEmail({
+      to: email,
+      subject,
+      html,
+      text: `Takk for at du tok kontakt! Vi har mottatt din melding.`
+    });
+    console.log(`Kontakt-bekreftelse sendt til ${email}`);
+  } catch (error) {
+    console.error("Feil ved sending av kontakt-bekreftelse:", error);
   }
 });

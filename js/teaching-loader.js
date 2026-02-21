@@ -20,10 +20,21 @@ async function loadTeachingCategory(categoryName, gridContainerId = 'teaching-gr
             return;
         }
 
-        // Filter items by category
-        const filteredItems = teachingData.items.filter(item =>
-            item.category && item.category.trim().toLowerCase() === categoryName.trim().toLowerCase()
-        );
+        // Filter items by category (flexible match for singular/plural)
+        const filteredItems = teachingData.items.filter(item => {
+            const itemCat = String(item.category || item.teachingType || '').trim().toLowerCase();
+            const targetCat = categoryName.trim().toLowerCase();
+
+            if (!itemCat) return false;
+            if (itemCat === targetCat) return true;
+
+            // Loose matching for plurals/singulars
+            if (targetCat.includes('bibelstudie') && itemCat.includes('bibelstudie')) return true;
+            if (targetCat.includes('seminar') && itemCat.includes('seminar')) return true;
+            if (targetCat.includes('undervisningsserie') && itemCat.includes('undervisningsserie')) return true;
+
+            return false;
+        });
 
         const container = document.getElementById(gridContainerId);
         if (!container) {
@@ -74,8 +85,15 @@ async function loadTeachingCategory(categoryName, gridContainerId = 'teaching-gr
  * @returns {HTMLElement} The card element
  */
 function createTeachingCard(item, index) {
-    const card = document.createElement('div');
+    const itemKey = item.id || item.title;
+    const isClickable = !!itemKey;
+    const detailsUrl = isClickable ? `${getLocalizedPostLink()}?id=${encodeURIComponent(itemKey)}` : '#';
+
+    const card = document.createElement(isClickable ? 'a' : 'div');
     card.className = 'media-card';
+    if (isClickable) {
+        card.href = detailsUrl;
+    }
 
     // Determine image URL (use item image or fallback to unsplash)
     const imageUrl = item.imageUrl || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop';
@@ -84,7 +102,7 @@ function createTeachingCard(item, index) {
     const title = item.title || `Undervisning ${index + 1}`;
 
     // Extract description - handle markdown/text safely
-    const description = item.description || item.content || 'Klikk for mer informasjon';
+    const description = getDescriptionText(item) || 'Klikk for mer informasjon';
 
     // Format date if available
     let dateStr = '';
@@ -116,6 +134,48 @@ function createTeachingCard(item, index) {
     `;
 
     return card;
+}
+
+function getLocalizedPostLink() {
+    const lang = document.documentElement.lang || 'no';
+    if (lang.startsWith('en')) return 'blog-post.html';
+    if (lang.startsWith('es')) return 'blog-post.html';
+    return 'blogg-post.html';
+}
+
+function getDescriptionText(item) {
+    if (typeof item.seoDescription === 'string' && item.seoDescription.trim()) {
+        return item.seoDescription.trim();
+    }
+    if (typeof item.description === 'string' && item.description.trim()) {
+        return item.description.trim();
+    }
+
+    if (item.content && typeof item.content === 'object' && Array.isArray(item.content.blocks)) {
+        const text = item.content.blocks
+            .filter(block => block.type !== 'header')
+            .map(block => {
+                if (!block || !block.data) return '';
+                if (typeof block.data.text === 'string') return stripHtml(block.data.text);
+                if (Array.isArray(block.data.items)) return stripHtml(block.data.items.join(' '));
+                if (typeof block.data.caption === 'string') return stripHtml(block.data.caption);
+                return '';
+            })
+            .filter(Boolean)
+            .join(' ');
+        if (text) return text;
+    } else if (typeof item.content === 'string' && item.content.trim()) {
+        return stripHtml(item.content.trim());
+    }
+
+    return '';
+}
+
+function stripHtml(text) {
+    return String(text || '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
 /**
@@ -191,3 +251,5 @@ function escapeHtml(text) {
     };
     return String(text).replace(/[&<>"']/g, m => map[m]);
 }
+
+window.loadTeachingCategory = loadTeachingCategory;

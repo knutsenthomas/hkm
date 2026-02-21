@@ -502,6 +502,9 @@ class AdminManager {
 
         // Set initial sidebar filter
         this.filterSidebar('nettsted');
+
+        // Init Automation Modal
+        this.initTemplateEditorModal();
     }
 
     filterSidebar(category) {
@@ -631,6 +634,9 @@ class AdminManager {
                     this.currentUserDetailId = null;
                     this.userEditMode = false;
                     this.renderUsersSection();
+                    break;
+                case 'automation':
+                    this.renderAutomationSection();
                     break;
                 case 'kommunikasjon':
                     this.renderKommunikasjonSection();
@@ -2014,6 +2020,18 @@ class AdminManager {
 
             // Handle existing tags (ensure array)
             const existingTags = Array.isArray(item.tags) ? item.tags : [];
+            const isTeachingCollection = collectionId === 'teaching';
+            const selectedTeachingType = (item.teachingType || item.category || 'Bibelstudie').toLowerCase();
+            const seriesSelection = Array.isArray(item.seriesItems) ? item.seriesItems : [];
+            const teachingCandidates = (this.currentItems || [])
+                .filter((opt, optIndex) => optIndex !== index)
+                .filter(opt => (opt.id || opt.title))
+                .map(opt => {
+                    const optId = opt.id || opt.title;
+                    const selected = seriesSelection.includes(optId) ? 'selected' : '';
+                    return `<option value="${optId}" ${selected}>${opt.title || 'Uten tittel'}</option>`;
+                })
+                .join('');
 
             const modal = document.createElement('div');
             modal.className = 'dashboard-modal';
@@ -2052,19 +2070,40 @@ class AdminManager {
                                  <label>Forfatter</label>
                                  <input type="text" id="col-item-author" class="sidebar-control" value="${item.author || ''}" placeholder="Navn">
                              </div>
+                             ${isTeachingCollection ? `
+                             <div class="sidebar-group">
+                                 <label>Type undervisning</label>
+                                 <select id="col-item-type" class="sidebar-control">
+                                     <option value="Bibelstudie" ${selectedTeachingType.includes('bibelstudie') ? 'selected' : ''}>Bibelstudie</option>
+                                     <option value="Seminarer" ${selectedTeachingType.includes('seminar') ? 'selected' : ''}>Seminar</option>
+                                     <option value="Undervisningsserier" ${selectedTeachingType.includes('undervisningsserie') ? 'selected' : ''}>Undervisningsserie</option>
+                                 </select>
+                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Velg 'Undervisningsserie' for å koble sammen flere undervisninger.</p>
+                             </div>
+                             <div class="sidebar-group" id="col-item-series-group" style="${selectedTeachingType.includes('undervisningsserie') ? '' : 'display:none;'}">
+                                 <label>Koble undervisninger i serie</label>
+                                 <select id="col-item-series-items" class="sidebar-control" multiple style="height: 140px;">
+                                     ${teachingCandidates}
+                                 </select>
+                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Hold Cmd/Ctrl nede for å velge flere undervisninger i serien.</p>
+                             </div>
+                             ` : `
                              <div class="sidebar-group">
                                  <label>Kategori</label>
                                  <input type="text" id="col-item-cat" class="sidebar-control" value="${item.category || ''}" placeholder="Eks: Undervisning">
                              </div>
+                             `}
                              
-                             <h4 class="sidebar-section-title">OMSLAGSBILDE</h4>
-                             <div class="sidebar-group">
-                                 <div class="sidebar-img-preview" id="sidebar-img-trigger">
-                                     ${item.imageUrl ? `<img src="${item.imageUrl}">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
-                                 </div>
-                                 <input type="text" id="col-item-img" class="sidebar-control" style="margin-top:8px;" placeholder="Lim inn bilde-URL" value="${item.imageUrl || ''}">
-                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Tips: Klikk på boksen over for å lime inn URL raskt.</p>
-                             </div>
+                              <h4 class="sidebar-section-title">OMSLAGSBILDE</h4>
+                              <div class="sidebar-group">
+                                  <div class="sidebar-img-preview" id="sidebar-img-trigger" style="cursor: pointer; position: relative; overflow: hidden; border: 2px dashed #e2e8f0; border-radius: 12px; height: 160px; display: flex; align-items: center; justify-content: center; background: #f8fafc; transition: all 0.2s;">
+                                      ${item.imageUrl ? `<img src="${item.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
+                                      <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.7); color: #fff; font-size: 11px; padding: 6px; text-align: center; opacity: 0; transition: opacity 0.2s;">KLIKK FOR Å ENDRE</div>
+                                  </div>
+                                  <input type="file" id="col-item-img-file" style="display: none;" accept="image/*">
+                                  <input type="text" id="col-item-img" class="sidebar-control" style="margin-top:8px;" placeholder="Eller lim inn bilde-URL" value="${item.imageUrl || ''}">
+                                  <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Tips: Klikk på boksen over for å laste opp bilde fra maskinen.</p>
+                              </div>
 
                              <h4 class="sidebar-section-title">TAGGER</h4>
                              <div class="sidebar-group">
@@ -2105,6 +2144,18 @@ class AdminManager {
 
             document.body.appendChild(modal);
 
+            if (isTeachingCollection) {
+                const typeSelect = document.getElementById('col-item-type');
+                const seriesGroup = document.getElementById('col-item-series-group');
+                if (typeSelect && seriesGroup) {
+                    const syncSeriesVisibility = () => {
+                        seriesGroup.style.display = typeSelect.value === 'Undervisningsserier' ? '' : 'none';
+                    };
+                    typeSelect.addEventListener('change', syncSeriesVisibility);
+                    syncSeriesVisibility();
+                }
+            }
+
             // --- Editor.js Data Prep ---
             let editorData = {};
             if (typeof item.content === 'object' && item.content !== null && item.content.blocks) {
@@ -2138,9 +2189,15 @@ class AdminManager {
                     class: ImageTool,
                     config: {
                         uploader: {
-                            uploadByFile(file) {
-                                showToast("Filopplasting er ikke implementert. Bruk URL.");
-                                return Promise.resolve({ success: 0 });
+                            async uploadByFile(file) {
+                                try {
+                                    const path = `editor/${collectionId}/${Date.now()}_${file.name}`;
+                                    const url = await firebaseService.uploadImage(file, path);
+                                    return { success: 1, file: { url: url } };
+                                } catch (error) {
+                                    console.error("Upload failed:", error);
+                                    return { success: 0 };
+                                }
                             },
                             uploadByUrl(url) {
                                 return Promise.resolve({ success: 1, file: { url: url } });
@@ -2221,10 +2278,10 @@ class AdminManager {
             const renderTags = () => {
                 if (!tagsContainer) return;
                 tagsContainer.innerHTML = currentTags.map(tag => `
-                < span class= "tag-badge" >
-                ${tag}
-            < button type = "button" class= "remove-tag" data - tag="${tag}" >& times;</button >
-                    </span >
+                    <span class="tag-badge">
+                        ${tag}
+                        <button type="button" class="remove-tag" data-tag="${tag}">&times;</button>
+                    </span>
                 `).join('');
 
                 // Add remove listeners
@@ -2263,7 +2320,7 @@ class AdminManager {
                     const box = document.getElementById('sidebar-img-trigger');
                     if (box) {
                         if (url && url.length > 10) {
-                            box.innerHTML = `< img src = "${url}" > `;
+                            box.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
                         } else {
                             box.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
                         }
@@ -2272,13 +2329,41 @@ class AdminManager {
             }
 
             const imgTrigger = document.getElementById('sidebar-img-trigger');
-            if (imgTrigger) {
-                imgTrigger.onclick = () => {
-                    const url = prompt("Lim inn bilde-URL her:");
-                    if (url) {
+            const imgFile = document.getElementById('col-item-img-file');
+            if (imgTrigger && imgFile) {
+                imgTrigger.onclick = () => imgFile.click();
+                imgTrigger.onmouseenter = () => {
+                    const overlay = imgTrigger.querySelector('.upload-overlay');
+                    if (overlay) overlay.style.opacity = '1';
+                };
+                imgTrigger.onmouseleave = () => {
+                    const overlay = imgTrigger.querySelector('.upload-overlay');
+                    if (overlay) overlay.style.opacity = '0';
+                };
+
+                imgFile.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    imgTrigger.style.opacity = '0.5';
+                    imgTrigger.style.pointerEvents = 'none';
+                    const originalHTML = imgTrigger.innerHTML;
+                    imgTrigger.innerHTML = '<span class="loader-sm"></span>';
+
+                    try {
+                        const path = `covers/${collectionId}/${Date.now()}_${file.name}`;
+                        const url = await firebaseService.uploadImage(file, path);
                         imgInput.value = url;
                         // Trigger input event manually to update preview
                         imgInput.dispatchEvent(new Event('input'));
+                        this.showToast('Bilde lastet opp!', 'success');
+                    } catch (err) {
+                        console.error("Upload error:", err);
+                        this.showToast('Kunne ikke laste opp bilde.', 'error');
+                        imgTrigger.innerHTML = originalHTML;
+                    } finally {
+                        imgTrigger.style.opacity = '1';
+                        imgTrigger.style.pointerEvents = 'auto';
                     }
                 };
             }
@@ -2308,7 +2393,17 @@ class AdminManager {
                     item.date = document.getElementById('col-item-date')?.value || '';
                     item.imageUrl = document.getElementById('col-item-img')?.value || '';
                     item.author = document.getElementById('col-item-author')?.value || '';
-                    item.category = document.getElementById('col-item-cat')?.value || '';
+                    if (isTeachingCollection) {
+                        const typeValue = document.getElementById('col-item-type')?.value || 'Bibelstudier';
+                        const seriesSelect = document.getElementById('col-item-series-items');
+                        item.teachingType = typeValue;
+                        item.category = typeValue;
+                        item.seriesItems = typeValue === 'Undervisningsserier' && seriesSelect
+                            ? Array.from(seriesSelect.selectedOptions).map(opt => opt.value)
+                            : [];
+                    } else {
+                        item.category = document.getElementById('col-item-cat')?.value || '';
+                    }
                     item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
                     item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
                     item.tags = currentTags;
@@ -2329,7 +2424,7 @@ class AdminManager {
                     btn.disabled = true;
 
                     try {
-                        const currentData = await firebaseService.getPageContent(`collection_${collectionId} `);
+                        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                         const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
                         // Use ID-based matching if available (most reliable)
@@ -2359,7 +2454,7 @@ class AdminManager {
                             list.unshift(item); // Push to top if truly new
                         }
 
-                        await firebaseService.savePageContent(`collection_${collectionId} `, { items: list });
+                        await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
 
                         // Force clear the public visitor cache if we modified events
                         if (collectionId === 'events') {
@@ -2393,7 +2488,7 @@ class AdminManager {
     }
 
     async addNewItem(collectionId) {
-        const btn = document.getElementById(`add - new- ${collectionId} `);
+        const btn = document.getElementById(`add-new-${collectionId}`);
         if (btn) {
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Forbereder...';
@@ -2405,7 +2500,7 @@ class AdminManager {
 
             // Create new item with empty title and a unique ID
             const newItem = {
-                id: `item - ${Date.now()} -${Math.random().toString(36).substr(2, 9)} `,
+                id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                 title: '',
                 date: new Date().toISOString().split('T')[0],
                 content: ''
@@ -2439,7 +2534,7 @@ class AdminManager {
 
         if (!confirm('Er du sikker på at du vil slette dette elementet?')) return;
 
-        const currentData = await firebaseService.getPageContent(`collection_${collectionId} `);
+        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
         const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
         // Get the actual item we want to delete from the displayed list
@@ -2458,7 +2553,7 @@ class AdminManager {
 
         if (matchIdx >= 0) {
             list.splice(matchIdx, 1);
-            await firebaseService.savePageContent(`collection_${collectionId} `, { items: list });
+            await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
 
             // Force clear public cache
             if (collectionId === 'events') {
@@ -2483,10 +2578,10 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-                < div class="section-header" >
+                <div class="section-header">
                 <h2 class="section-title">Design & Identitet</h2>
                 <p class="section-subtitle">Administrer logo, favicon, fonter, globale farger og tekststørrelser.</p>
-            </div >
+            </div>
 
                 <div class="settings-grid">
                     <!-- Site Identity Card -->
@@ -5437,6 +5532,224 @@ class AdminManager {
             console.error('Error deleting user:', error);
             this.showToast('Kunne ikke slette bruker: ' + error.message, 'error');
         }
+    }
+
+    async renderAutomationSection() {
+        const section = document.getElementById('automation-section');
+        if (!section) return;
+
+        console.log("Rendering Automation Section...");
+        this.initAutomationTabs();
+        await Promise.all([
+            this.loadEmailTemplates(),
+            this.loadEmailLogs()
+        ]);
+
+        section.setAttribute('data-rendered', 'true');
+    }
+
+    initAutomationTabs() {
+        const tabs = document.querySelectorAll('.automation-tab');
+        const panes = document.querySelectorAll('.automation-pane');
+
+        tabs.forEach(tab => {
+            if (tab.dataset.bound) return;
+            tab.dataset.bound = 'true';
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+
+                tabs.forEach(t => t.classList.toggle('active', t === tab));
+                panes.forEach(p => p.classList.toggle('active', p.id === `automation-${target}`));
+            });
+        });
+    }
+
+    async loadEmailTemplates() {
+        const tbody = document.getElementById('email-templates-body');
+        if (!tbody) return;
+
+        try {
+            // Standardmaler som alltid bør finnes
+            const defaultTemplates = [
+                { id: 'welcome_email', name: 'Velkomst-e-post', description: 'Sendes når en ny bruker registrerer seg.' },
+                { id: 'newsletter_confirmation', name: 'Nyhetsbrev-bekreftelse', description: 'Sendes ved påmelding til nyhetsbrev.' }
+            ];
+
+            tbody.innerHTML = '';
+
+            for (const t of defaultTemplates) {
+                const doc = await firebaseService.db.collection('email_templates').doc(t.id).get();
+                const data = doc.exists ? doc.data() : {};
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>
+                        <div class="user-info-cell">
+                            <span class="user-name">${t.name}</span>
+                        </div>
+                    </td>
+                    <td><span class="text-muted">${t.description}</span></td>
+                    <td>${data.updatedAt ? new Date(data.updatedAt).toLocaleDateString('no-NO') : 'Standard'}</td>
+                    <td class="col-actions">
+                        <button class="icon-btn edit-template-btn" title="Rediger mal">
+                            <span class="material-symbols-outlined">edit</span>
+                        </button>
+                    </td>
+                `;
+
+                tr.querySelector('.edit-template-btn').addEventListener('click', () => {
+                    this.openTemplateEditor(t.id, t.name, data);
+                });
+
+                tbody.appendChild(tr);
+            }
+        } catch (error) {
+            console.error("Feil ved lasting av e-postmaler:", error);
+            tbody.innerHTML = '<tr><td colspan="4">Kunne ikke laste maler.</td></tr>';
+        }
+    }
+
+    async loadEmailLogs() {
+        const tbody = document.getElementById('email-logs-body');
+        if (!tbody) return;
+
+        try {
+            const snapshot = await firebaseService.db.collection('email_logs')
+                .orderBy('timestamp', 'desc')
+                .limit(50)
+                .get();
+
+            tbody.innerHTML = snapshot.empty ? '<tr><td colspan="5">Ingen logger funnet.</td></tr>' : '';
+
+            snapshot.forEach(doc => {
+                const log = doc.data();
+                const tr = document.createElement('tr');
+                const date = log.timestamp ? log.timestamp.toDate() : new Date(log.sentAt);
+
+                tr.innerHTML = `
+                    <td>${log.to}</td>
+                    <td>${log.subject}</td>
+                    <td><span class="badge status-read">${log.type || 'automated'}</span></td>
+                    <td>${date.toLocaleString('no-NO')}</td>
+                    <td>
+                        <span class="status-pill ${log.status}">
+                            ${log.status === 'sent' ? 'Sendt' : 'Feilet'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error("Feil ved lasting av e-postlogger:", error);
+            tbody.innerHTML = '<tr><td colspan="5">Kunne ikke laste logger.</td></tr>';
+        }
+    }
+
+    initTemplateEditorModal() {
+        const modal = document.getElementById('template-editor-modal');
+        const closeBtn = document.getElementById('close-template-modal');
+        const cancelBtn = document.getElementById('cancel-template-edit');
+        const saveBtn = document.getElementById('save-template-btn');
+
+        if (!modal || !saveBtn) return;
+
+        // Initialize Quill
+        if (typeof Quill !== 'undefined' && !this.quill) {
+            this.quill = new Quill('#edit-template-body', {
+                theme: 'snow',
+                modules: {
+                    toolbar: [
+                        [{ 'header': [1, 2, 3, false] }],
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{ 'color': [] }, { 'background': [] }],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        [{ 'align': [] }],
+                        ['link', 'clean']
+                    ]
+                }
+            });
+        }
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+        };
+
+        if (closeBtn) closeBtn.onclick = closeModal;
+        if (cancelBtn) cancelBtn.onclick = closeModal;
+
+        modal.onclick = (e) => {
+            if (e.target === modal) closeModal();
+        };
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeModal();
+            }
+        });
+
+        // Insert variables logic for Quill
+        document.querySelectorAll('.insert-var-btn').forEach(btn => {
+            btn.onclick = () => {
+                const varTag = btn.dataset.var;
+                if (this.quill) {
+                    const range = this.quill.getSelection(true);
+                    this.quill.insertText(range.index, varTag);
+                    this.quill.setSelection(range.index + varTag.length);
+                }
+            };
+        });
+
+        saveBtn.onclick = async () => {
+            const templateId = document.getElementById('edit-template-id').value;
+            const subject = document.getElementById('edit-template-subject').value;
+
+            // Get content from Quill
+            const body = this.quill ? this.quill.root.innerHTML : "";
+
+            if (!subject) {
+                this.showToast("Emnefeltet kan ikke være tomt.", "error");
+                return;
+            }
+
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Lagrer...';
+
+            try {
+                await firebaseService.db.collection('email_templates').doc(templateId).set({
+                    subject,
+                    body,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+
+                this.showToast(`Malen er oppdatert.`, 'success');
+                closeModal();
+                await this.loadEmailTemplates();
+            } catch (error) {
+                console.error("Feil ved lagring av mal:", error);
+                this.showToast("Kunne ikke lagre malen.", "error");
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Lagre mal';
+            }
+        };
+    }
+
+    async openTemplateEditor(templateId, templateName, currentData) {
+        const modal = document.getElementById('template-editor-modal');
+        if (!modal) return;
+
+        document.getElementById('edit-template-id').value = templateId;
+        document.getElementById('template-editor-title').textContent = `Rediger mal: ${templateName}`;
+        document.getElementById('edit-template-subject').value = currentData.subject || "";
+
+        const bodyContent = currentData.body || "";
+
+        // Set content in Quill
+        if (this.quill) {
+            this.quill.root.innerHTML = bodyContent;
+        }
+
+        modal.style.display = 'flex';
     }
 
     async createAdminNotification(notifData) {

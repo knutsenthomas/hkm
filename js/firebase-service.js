@@ -154,6 +154,15 @@ class FirebaseService {
         return userCredential;
     }
 
+    async subscribeNewsletter(email) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        return this.db.collection('newsletter_subscriptions').add({
+            email: email,
+            subscribedAt: firebase.firestore.FieldValue.serverTimestamp(),
+            source: 'website_footer'
+        });
+    }
+
     async connectToGoogle() {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
 

@@ -893,25 +893,58 @@ new TestimonialSlider();
 // ===================================
 const newsletterForm = document.getElementById('newsletter-form');
 if (newsletterForm) {
-    newsletterForm.addEventListener('submit', (e) => {
+    newsletterForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = newsletterForm.querySelector('input[type="email"]').value;
+        const emailInput = newsletterForm.querySelector('input[type="email"]');
+        const email = emailInput.value;
+        const submitBtn = newsletterForm.querySelector('button[type="submit"]');
 
-        // Simulate form submission
-        alert(`Takk for at du meldte deg på nyhetsbrevet! Vi har sendt en bekreftelse til ${email}`);
-        newsletterForm.reset();
+        try {
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'Sender...';
+
+            if (window.firebaseService) {
+                await window.firebaseService.subscribeNewsletter(email);
+                if (window.notifications) {
+                    window.notifications.show(`Takk! Du er nå påmeldt med ${email}`, 'success');
+                } else {
+                    alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
+                }
+                newsletterForm.reset();
+            }
+        } catch (error) {
+            console.error("Newsletter error:", error);
+            if (window.notifications) {
+                window.notifications.show("Det oppsto en feil. Prøv igjen senere.", "error");
+            }
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Abonner';
+        }
     });
 }
 
-// Footer Newsletter Form
+// Footer Newsletter Form (if different)
 const footerNewsletterForm = document.querySelector('.footer-newsletter');
 if (footerNewsletterForm) {
-    footerNewsletterForm.addEventListener('submit', (e) => {
+    footerNewsletterForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = footerNewsletterForm.querySelector('input[type="email"]').value;
+        const emailInput = footerNewsletterForm.querySelector('input[type="email"]');
+        const email = emailInput.value;
 
-        alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
-        footerNewsletterForm.reset();
+        try {
+            if (window.firebaseService) {
+                await window.firebaseService.subscribeNewsletter(email);
+                if (window.notifications) {
+                    window.notifications.show(`Takk for påmeldingen!`, 'success');
+                } else {
+                    alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
+                }
+                footerNewsletterForm.reset();
+            }
+        } catch (error) {
+            console.error("Newsletter error:", error);
+        }
     });
 }
 

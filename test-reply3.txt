@@ -1,0 +1,7 @@
+So a good approach to fix this right now would be:
+1. Since we want all the sidebar items always visible and organized, we can use CSS to make sidebar categories visible always (overide the data-nav-category filter).
+2. We can add some CSS pseudo-elements (like "Nettsted", "Kommunikasjon", "Administrasjon" min-headers) right into the sidebar dynamically or by editing the HTML, so the links are grouped under those titles in the sidebar. This makes it structured.
+3. Remove the top horizontal menus ("Nettsted", "Kommunikasjon") entirely from the main views.
+4. Remove the sub-horizontal menus ("Kontakter", "Segmenter", "Meldinger") entirely from the page headers so it's ONLY the sidebar.
+
+Does that sound exactly like what you want?

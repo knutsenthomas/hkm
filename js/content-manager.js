@@ -200,6 +200,15 @@ class ContentManager {
             const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
             if (blogItems.length > 0) this.renderBlogPosts(blogItems, '#blogg .blog-grid');
 
+            const teachingData = await firebaseService.getPageContent('collection_teaching');
+            const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
+            const frontTeachingContainer = document.getElementById('siste-undervisning');
+            if (teachingItems.length > 0 && frontTeachingContainer) {
+                // Show up to 3 most recent teachings
+                frontTeachingContainer.style.display = 'block';
+                this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
+            }
+
             const causes = await this.loadCauses();
             this.renderCauses(causes);
 
@@ -281,11 +290,7 @@ class ContentManager {
             }
         }
 
-        if (this.pageId === 'undervisningsserier') {
-            const teachingData = await firebaseService.getPageContent('collection_teaching');
-            const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
-            if (teachingItems.length > 0) this.renderTeachingSeries(teachingItems, '.media-grid');
-        }
+
 
         if (this.pageId === 'donasjoner') {
             const causes = await this.loadCauses();
@@ -363,11 +368,16 @@ class ContentManager {
         }
 
         const blogData = await firebaseService.getPageContent('collection_blog');
-        const items = Array.isArray(blogData) ? blogData : (blogData?.items || []);
-        const item = items.find(i => i.title === itemId || i.id === itemId);
+        const teachingData = await firebaseService.getPageContent('collection_teaching');
+        const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+        const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
+        const blogItem = blogItems.find(i => i.title === itemId || i.id === itemId);
+        const teachingItem = teachingItems.find(i => i.title === itemId || i.id === itemId);
+        const item = blogItem || teachingItem;
+        const isTeaching = !!teachingItem;
 
         if (!item) {
-            container.innerHTML = '<p>Innlegget ble ikke funnet.</p>';
+            container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
             return;
         }
 
@@ -386,7 +396,7 @@ class ContentManager {
         }
 
         if (categoryEl) {
-            const cat = item.category || 'Ukategorisert';
+            const cat = item.category || item.teachingType || (isTeaching ? 'Undervisning' : 'Ukategorisert');
             categoryEl.innerHTML = cat ? `<i class="fas fa-tag"></i> ${cat}` : '';
         }
 
@@ -483,12 +493,35 @@ class ContentManager {
         const relatedContainer = document.getElementById('single-post-related');
         if (relatedContainer) {
             let relatedItems = [];
-            if (item.relatedPosts && Array.isArray(item.relatedPosts) && item.relatedPosts.length > 0) {
+            let heading = 'Relaterte innlegg';
+            let ctaLabel = 'Les mer';
+
+            if (isTeaching) {
+                heading = 'Relatert undervisning';
+                ctaLabel = 'Les undervisning';
+                const seriesIds = Array.isArray(item.seriesItems) ? item.seriesItems : [];
+                if (seriesIds.length > 0) {
+                    relatedItems = teachingItems.filter(i =>
+                        (seriesIds.includes(i.id) || seriesIds.includes(i.title)) &&
+                        (i.id || i.title) !== postId
+                    );
+                } else {
+                    const teachingType = item.teachingType || item.category;
+                    relatedItems = teachingItems
+                        .filter(i => (i.id || i.title) !== postId)
+                        .filter(i => {
+                            if (!teachingType) return true;
+                            return (i.teachingType || i.category) === teachingType;
+                        })
+                        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+                        .slice(0, 3);
+                }
+            } else if (item.relatedPosts && Array.isArray(item.relatedPosts) && item.relatedPosts.length > 0) {
                 // Fetch manually selected ones
-                relatedItems = items.filter(i => (item.relatedPosts.includes(i.id) || item.relatedPosts.includes(i.title)) && (i.id || i.title) !== postId);
+                relatedItems = blogItems.filter(i => (item.relatedPosts.includes(i.id) || item.relatedPosts.includes(i.title)) && (i.id || i.title) !== postId);
             } else {
                 // Fallback: 3 most recent posts excluding current one
-                relatedItems = items
+                relatedItems = blogItems
                     .filter(i => (i.id || i.title) !== postId)
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
                     .slice(0, 3);
@@ -498,7 +531,7 @@ class ContentManager {
                 relatedContainer.style.display = 'block';
                 relatedContainer.innerHTML = `
                     <h3 style="margin-bottom: 30px; font-size: 1.5rem; color: #334155; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
-                        Relaterte innlegg
+                        ${heading}
                     </h3>
                     <div class="blog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
                         ${relatedItems.map(post => `
@@ -517,7 +550,7 @@ class ContentManager {
                                         </div>
                                         <h4 style="font-size: 1.1rem; margin-bottom: 15px; line-height: 1.4; font-weight: 700; color: #1e293b;">${post.title}</h4>
                                         <span style="color: var(--primary-color, #ff6b2b); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 5px;">
-                                           Les mer <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+                                           ${ctaLabel} <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
                                         </span>
                                     </div>
                                 </a>
@@ -1801,7 +1834,7 @@ class ContentManager {
 
         if (series.length > 0) {
             container.innerHTML = series.map(item => `
-                <div class="media-card">
+                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card" style="text-decoration: none; color: inherit; display: block;">
                     <div class="media-thumbnail">
                         <img src="${item.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${item.title}">
                         <div class="media-play-button">
@@ -1811,13 +1844,13 @@ class ContentManager {
                     </div>
                     <div class="media-content">
                         <h3 class="media-title">${item.title}</h3>
-                        <p class="media-description">${this.stripHtml(item.content || '').substring(0, 100)}...</p>
+                        <p class="media-description">${this.generateExcerpt(item.content, item.title)}...</p>
                         <div class="media-meta" style="display: flex; justify-content: space-between; align-items: center;">
                             <span style="font-size: 12px; color: #6c757d;"><i class="fas fa-user"></i> ${item.author || 'His Kingdom'}</span>
                             <span style="font-size: 12px; color: #6c757d;"><i class="fas fa-calendar"></i> ${item.date ? this.formatDate(item.date) : ''}</span>
                         </div>
                     </div>
-                </div>
+                </a>
             `).join('');
         }
     }

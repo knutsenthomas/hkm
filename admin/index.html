@@ -138,6 +138,12 @@
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="automation">
+                            <span class="material-symbols-outlined">auto_mode</span>
+                            <span>Automatisering</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
                         <a href="#" class="nav-link" data-section="seo">
                             <span class="material-symbols-outlined">search_check</span>
                             <span>SEO & Meta</span>
@@ -289,6 +295,77 @@
                     <button id="admin-modal-save-btn" type="submit" class="btn-primary" style="margin-top:4px;">Lagre
                         profil</button>
                 </form>
+            </div>
+        </div>
+
+        <!-- Template Editor Modal -->
+        <div id="template-editor-modal" class="profile-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index:2100; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+            <div class="profile-modal-content card modern"
+                style="padding: 0; width:100%; max-width:800px; max-height:90vh; overflow:hidden; display:flex; flex-direction:column;">
+
+                <div class="modal-header"
+                    style="padding: 24px 32px; border-bottom: 1px solid var(--admin-border); background: var(--admin-surface-muted); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 20px; font-weight: 800; margin: 0;" id="template-editor-title">Rediger mal
+                        </h2>
+                        <p style="font-size: 13px; color: var(--admin-text-muted); margin: 4px 0 0 0;">Tilpass innholdet
+                            i den automatiserte e-posten.</p>
+                    </div>
+                    <button id="close-template-modal"
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--admin-text-muted); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div style="padding: 32px; overflow-y: auto; flex: 1;">
+                    <form id="template-editor-form">
+                        <input type="hidden" id="edit-template-id">
+
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; font-size: 13px; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">Emnefelt</label>
+                            <input type="text" id="edit-template-subject" class="form-control"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 15px; outline: none; transition: border-color 0.2s;"
+                                placeholder="Skriv inn emnefelt...">
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                style="display: block; font-size: 13px; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">E-postinnhold</label>
+
+                            <div
+                                style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                                <p style="font-size: 12px; color: #64748b; margin: 0 0 10px 0;">
+                                    <strong>Hurtig-innsetting:</strong> Klikk på knappene under for å lime inn variabler
+                                    i teksten.
+                                </p>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                    <button type="button" class="btn btn-sm insert-var-btn" data-var="{{name}}"
+                                        style="width: auto !important; display: inline-flex !important; padding: 6px 14px !important; font-size: 11px; height: auto; background: #fff; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                                        Navn</button>
+                                    <button type="button" class="btn btn-sm insert-var-btn" data-var="{{email}}"
+                                        style="width: auto !important; display: inline-flex !important; padding: 6px 14px !important; font-size: 11px; height: auto; background: #fff; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                                        E-post</button>
+                                    <button type="button" class="btn btn-sm insert-var-btn" data-var="{{address}}"
+                                        style="width: auto !important; display: inline-flex !important; padding: 6px 14px !important; font-size: 11px; height: auto; background: #fff; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                                        Adresse</button>
+                                </div>
+                            </div>
+                            <div id="quill-editor-container"
+                                style="height: 400px; border: 1px solid var(--admin-border); border-radius: 10px; overflow: hidden; background: #fff;">
+                                <div id="edit-template-body" style="height: 100%; border: none;"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer"
+                    style="padding: 20px 32px; border-top: 1px solid var(--admin-border); background: var(--admin-surface-muted); display: flex; justify-content: flex-end; gap: 12px;">
+                    <button id="cancel-template-edit" class="btn"
+                        style="background: #fff; border: 1px solid var(--admin-border); color: var(--admin-text-muted);">Avbryt</button>
+                    <button id="save-template-btn" class="btn btn-primary">Lagre mal</button>
+                </div>
             </div>
         </div>
 
@@ -547,6 +624,57 @@
                     <h2 class="section-title">SEO & Meta-tags</h2>
                 </div>
                 <div class="loader"></div>
+            </div>
+
+            <div id="automation-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Automatisering</h2>
+                    <p class="section-subtitle">Administrer automatiserte e-poster og se utsendelseshistorikk.</p>
+                </div>
+
+                <div class="card modern">
+                    <div class="automation-tabs">
+                        <button class="automation-tab active" data-tab="templates">E-postmaler</button>
+                        <button class="automation-tab" data-tab="logs">Utsendelseslogg</button>
+                    </div>
+
+                    <div id="automation-templates" class="automation-pane active">
+                        <div class="table-container">
+                            <table class="crm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Navn</th>
+                                        <th>Beskrivelse</th>
+                                        <th>Sist endret</th>
+                                        <th class="col-actions">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="email-templates-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="automation-logs" class="automation-pane">
+                        <div class="table-container">
+                            <table class="crm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mottaker</th>
+                                        <th>Emne</th>
+                                        <th>Type</th>
+                                        <th>Tidspunkt</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="email-logs-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="integrations-section" class="section-content">
@@ -889,6 +1017,10 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/embed@2.5.3"
         onerror="alert('FEIL: Videoverktøyet ble blokkert! Har du en ad-blocker på?');"></script>
+
+    <!-- Quill Editor for Email Templates -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 
     <!-- Admin Logic -->
     <script src="../js/notifications.js"></script>

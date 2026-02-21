@@ -21,9 +21,10 @@ async function loadTeachingCategory(categoryName, gridContainerId = 'teaching-gr
         }
 
         // Filter items by category
-        const filteredItems = teachingData.items.filter(item =>
-            item.category && item.category.trim().toLowerCase() === categoryName.trim().toLowerCase()
-        );
+        const filteredItems = teachingData.items.filter(item => {
+            const itemCategory = String(item.category || item.teachingType || '').trim().toLowerCase();
+            return itemCategory === categoryName.trim().toLowerCase();
+        });
 
         const container = document.getElementById(gridContainerId);
         if (!container) {
@@ -84,7 +85,7 @@ function createTeachingCard(item, index) {
     const title = item.title || `Undervisning ${index + 1}`;
 
     // Extract description - handle markdown/text safely
-    const description = item.description || item.content || 'Klikk for mer informasjon';
+    const description = getDescriptionText(item) || 'Klikk for mer informasjon';
 
     // Format date if available
     let dateStr = '';
@@ -115,7 +116,67 @@ function createTeachingCard(item, index) {
         </div>
     `;
 
+    const itemKey = item.id || item.title;
+    if (itemKey) {
+        card.style.cursor = 'pointer';
+        card.setAttribute('role', 'link');
+        card.setAttribute('tabindex', '0');
+        const detailsUrl = `${getLocalizedPostLink()}?id=${encodeURIComponent(itemKey)}`;
+        const openDetails = () => {
+            window.location.href = detailsUrl;
+        };
+        card.addEventListener('click', openDetails);
+        card.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openDetails();
+            }
+        });
+    }
+
     return card;
+}
+
+function getLocalizedPostLink() {
+    const lang = document.documentElement.lang || 'no';
+    if (lang.startsWith('en')) return 'blog-post.html';
+    if (lang.startsWith('es')) return 'blog-post.html';
+    return 'blogg-post.html';
+}
+
+function getDescriptionText(item) {
+    if (typeof item.description === 'string' && item.description.trim()) {
+        return item.description.trim();
+    }
+
+    if (typeof item.content === 'string' && item.content.trim()) {
+        return stripHtml(item.content.trim());
+    }
+
+    if (item.content && typeof item.content === 'object' && Array.isArray(item.content.blocks)) {
+        const text = item.content.blocks
+            .map(block => {
+                if (!block || !block.data) return '';
+
+                if (typeof block.data.text === 'string') return block.data.text;
+                if (Array.isArray(block.data.items)) return block.data.items.join(' ');
+                if (typeof block.data.caption === 'string') return block.data.caption;
+                return '';
+            })
+            .filter(Boolean)
+            .join(' ');
+
+        return stripHtml(text);
+    }
+
+    return '';
+}
+
+function stripHtml(text) {
+    return String(text || '')
+        .replace(/<[^>]*>/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
 }
 
 /**
