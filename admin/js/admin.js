@@ -485,53 +485,7 @@ class AdminManager {
     }
 
     filterSidebar(category) {
-        const topNavTabs = document.querySelectorAll('.top-nav-tab');
-        topNavTabs.forEach(tab => {
-            tab.classList.toggle('active', tab.getAttribute('data-category') === category);
-        });
-
-        const allNavItems = document.querySelectorAll('.nav-item');
-
-        const isCommunicationItem = (item) => {
-            const link = item.querySelector('a.nav-link, button.nav-link');
-            if (!link) return false;
-
-            const href = (link.getAttribute('href') || '');
-            const section = (link.getAttribute('data-section') || '');
-            const text = (link.textContent || '').toLowerCase();
-
-            return (
-                href.includes('kommunikasjon') ||
-                href.includes('segmenter') ||
-                href.includes('nyhetsbrev') ||
-                section === 'events' ||
-                section === 'messages' ||
-                section === 'contacts' ||
-                section === 'segments' ||
-                section === 'newsletter' ||
-                text.includes('kontakter') ||
-                text.includes('segmenter') ||
-                text.includes('nyhetsbrev') ||
-                text.includes('arrangementer') ||
-                text.includes('meldinger')
-            );
-        };
-
-        allNavItems.forEach(item => {
-            const cat = item.getAttribute('data-nav-category') || item.getAttribute('data-category') || '';
-            const isBottom = item.closest('.nav-group.bottom');
-            const isAll = cat === 'all';
-
-            let shouldShow = isBottom || isAll || cat === category;
-
-            // Fallback for communication items
-            if (!shouldShow && category === 'kommunikasjon') {
-                shouldShow = isCommunicationItem(item);
-            }
-
-            item.style.display = shouldShow ? 'block' : 'none';
-            item.classList.toggle('visible', shouldShow);
-        });
+        // Disabled per request, all items always visible
     }
 
     async logout() {
@@ -870,14 +824,49 @@ class AdminManager {
     }
 
     initSearch() {
-        const searchInput = document.querySelector('.header-search input');
-        if (!searchInput) return;
+        const searchOpener = document.getElementById('global-search-opener');
+        const searchModal = document.getElementById('search-modal');
+        const closeSearchModal = document.getElementById('close-search-modal');
+        const modalSearchInput = document.getElementById('global-modal-search-input');
 
-        searchInput.addEventListener('keydown', (e) => {
+        if (!searchOpener || !searchModal || !modalSearchInput) return;
+
+        // Open search modal
+        searchOpener.addEventListener('click', () => {
+            searchModal.style.display = 'flex';
+            setTimeout(() => modalSearchInput.focus(), 100);
+        });
+
+        // Close search modal
+        const closeModal = () => {
+            searchModal.style.display = 'none';
+        };
+
+        if (closeSearchModal) {
+            closeSearchModal.addEventListener('click', closeModal);
+        }
+
+        // Close when clicking outside of the modal content
+        searchModal.addEventListener('click', (e) => {
+            if (e.target === searchModal) {
+                closeModal();
+            }
+        });
+
+        // Escape key to close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && searchModal.style.display === 'flex') {
+                closeModal();
+            }
+        });
+
+        // Perform search on Enter
+        modalSearchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                const query = searchInput.value.trim();
+                const query = modalSearchInput.value.trim();
                 if (query) {
+                    closeModal(); // Close modal immediately upon search
                     this.performSearch(query);
                 }
             }

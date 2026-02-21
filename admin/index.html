@@ -63,6 +63,8 @@
                             <span>Oversikt</span>
                         </a>
                     </li>
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
                     <li class="nav-item" data-nav-category="nettsted">
                         <a href="#" class="nav-link" data-section="content">
                             <span class="material-symbols-outlined">description</span>
@@ -99,6 +101,8 @@
                             <span>Design & Logo</span>
                         </a>
                     </li>
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
                     <li class="nav-item" data-nav-category="kommunikasjon">
                         <a href="#" class="nav-link" data-section="events">
                             <span class="material-symbols-outlined">event</span>
@@ -116,6 +120,10 @@
                             <span class="material-symbols-outlined">mail_outline</span>
                             <span>Nyhetsbrev</span>
                         </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="administrasjon">
+                        <span>Administrasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span>
                     </li>
                     <li class="nav-item" data-nav-category="administrasjon">
                         <a href="#" class="nav-link" data-section="causes">
@@ -187,6 +195,9 @@
             </div>
 
             <div class="header-right">
+                <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
                 <img src="img/logo_circular.png" alt="HKM" class="mobile-logo-header" style="display: none;">
 
                 <button id="messages-bell" class="notification-btn">
@@ -208,18 +219,26 @@
             </div>
         </header>
 
-        <div class="content-header">
-            <div class="tabs-container">
-                <div class="top-nav-tabs">
-                    <button class="top-nav-tab active" data-category="nettsted">Nettsted</button>
-                    <button class="top-nav-tab" data-category="kommunikasjon">Kommunikasjon</button>
-                    <button class="top-nav-tab" data-category="administrasjon">Administrasjon</button>
+        <!-- Global Search Modal -->
+        <div id="search-modal" class="profile-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.5); z-index:2500; align-items:flex-start; justify-content:center; padding-top:10vh; box-sizing:border-box;">
+            <div class="profile-modal-content"
+                style="background:#fff; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.2); width:100%; max-width:600px; position:relative; padding:24px;">
+                <button id="close-search-modal"
+                    style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; cursor:pointer; color:#64748b;">&times;</button>
+                <div style="font-size: 20px; font-weight: 700; color: var(--text-main); margin-bottom: 16px;">Søk i
+                    systemet</div>
+                <div class="header-search"
+                    style="border: 2px solid var(--accent-color); border-radius: 8px; width: 100%; margin-bottom: 16px; position:relative;">
+                    <span class="material-symbols-outlined"
+                        style="position:absolute; left:16px; top:50%; transform:translateY(-50%); color:#64748b;">search</span>
+                    <input type="text" id="global-modal-search-input"
+                        placeholder="Hva leter du etter? Skriv og trykk Enter..."
+                        style="width: 100%; padding: 14px 14px 14px 48px; border: none; border-radius: 8px; font-size: 16px; outline: none; background: transparent;"
+                        aria-label="Søk">
                 </div>
-
-                <div class="header-search">
-                    <span class="material-symbols-outlined">search</span>
-                    <input type="text" placeholder="Søk i innhold..." aria-label="Søk">
-                </div>
+                <div style="color: #94a3b8; font-size: 13px; text-align: center;">Trykk 'Enter' for å hente frem
+                    søkeresultatene.</div>
             </div>
         </div>
 

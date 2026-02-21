@@ -212,7 +212,8 @@
                             <span>Oversikt</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-nav-category="nettsted">
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="nettsted">
                         <a href="index.html#content" class="nav-link" data-section="content">
                             <span class="material-symbols-outlined">description</span>
                             <span>Sideinnhold</span>
@@ -248,7 +249,8 @@
                             <span>Design & Logo</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-nav-category="kommunikasjon">
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
                         <a href="index.html#events" class="nav-link" data-section="events">
                             <span class="material-symbols-outlined">event</span>
                             <span>Arrangementer</span>
@@ -278,7 +280,8 @@
                             <span>Nyhetsbrev</span>
                         </a>
                     </li>
-                    <li class="nav-item" data-nav-category="administrasjon">
+                    <li class="nav-category-header" data-target-category="administrasjon"><span>Administrasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="administrasjon">
                         <a href="index.html#causes" class="nav-link" data-section="causes">
                             <span class="material-symbols-outlined">volunteer_activism</span>
                             <span>Gaver</span>
@@ -351,7 +354,10 @@
             </div>
 
             <div class="header-right">
-                <button class="notification-btn">
+                <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                    <button class="notification-btn">
                     <span class="material-symbols-outlined">notifications</span>
                 </button>
 

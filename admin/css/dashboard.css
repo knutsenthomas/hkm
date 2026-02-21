@@ -80,6 +80,26 @@ body.admin-body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Scrollbar styling for sidebar */
+.sidebar-nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
 }
 
 .nav-group {
@@ -263,6 +283,14 @@ body.admin-body {
     cursor: pointer;
     color: #64748b;
     position: relative;
+    background: transparent;
+    border: none;
+    transition: var(--transition);
+}
+
+.notification-btn:hover {
+    background-color: #f1f5f9;
+    color: var(--text-main);
 }
 
 .notification-dot {
@@ -352,18 +380,43 @@ body.admin-body {
     color: var(--text-main);
 }
 
-/* Sidebar Category Filtering */
+/* Sidebar nav items are now always visible */
 .nav-item {
-    display: none;
+    display: block;
     margin-bottom: 4px;
 }
 
-.nav-item.visible {
-    display: block;
+.nav-item.hidden {
+    display: none;
 }
 
-.nav-group.bottom .nav-item {
-    display: block;
+.nav-category-header {
+    font-size: 11px;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 24px 0 8px 16px;
+    padding-right: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.2s;
+}
+
+.nav-category-header:hover {
+    color: #64748b;
+}
+
+.nav-category-header .expand-icon {
+    font-size: 16px;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.nav-category-header.collapsed .expand-icon {
+    transform: rotate(180deg);
 }
 
 /* Stats Section */
@@ -1464,7 +1517,7 @@ input[type="range"] {
 
 /* Main Content Section Spacing */
 .section-container {
-    padding: 0 40px 80px;
+    padding: 24px 40px 80px;
 }
 
 /* Sidebar Overlay */

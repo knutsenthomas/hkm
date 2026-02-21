@@ -89,4 +89,44 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
     });
+
+    // Sidebar Category Accordion Logic
+    const categoryHeaders = document.querySelectorAll('.nav-category-header');
+
+    // Auto-open logic: find out which category contains the active link (if any)
+    const activeLink = document.querySelector('.nav-link.active');
+    let activeCategory = null;
+    if (activeLink) {
+        const parentItem = activeLink.closest('.nav-item');
+        if (parentItem) {
+            activeCategory = parentItem.getAttribute('data-nav-category') || parentItem.getAttribute('data-category');
+        }
+    }
+
+    categoryHeaders.forEach(header => {
+        const category = header.getAttribute('data-target-category');
+
+        // Find all nav items that belong to this category
+        const subItems = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
+
+        // Initialize state (expand if active category, otherwise collapsed)
+        // Adjust condition based on preference: currently all are expanded. We'll start with all expanded, 
+        // unless you want them collapsed by default? The user asked to HAVE collapse (an accordion).
+        // Let's keep them expanded if active, collapsed if not.
+        if (category && activeCategory && category !== activeCategory) {
+            header.classList.add('collapsed');
+            subItems.forEach(item => item.classList.add('hidden'));
+        }
+
+        header.addEventListener('click', () => {
+            const isCollapsed = header.classList.toggle('collapsed');
+            subItems.forEach(item => {
+                if (isCollapsed) {
+                    item.classList.add('hidden');
+                } else {
+                    item.classList.remove('hidden');
+                }
+            });
+        });
+    });
 });

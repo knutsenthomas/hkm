@@ -61,6 +61,8 @@
                                 <span>Oversikt</span>
                             </a>
                         </li>
+                        <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
+                                class="material-symbols-outlined expand-icon">expand_more</span></li>
                         <li class="nav-item" data-nav-category="nettsted">
                             <a href="index.html#content" class="nav-link" data-section="content">
                                 <span class="material-symbols-outlined">description</span>
@@ -97,6 +99,9 @@
                                 <span>Design & Logo</span>
                             </a>
                         </li>
+                        <li class="nav-category-header" data-target-category="kommunikasjon">
+                            <span>Kommunikasjon</span><span
+                                class="material-symbols-outlined expand-icon">expand_more</span></li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
                             <a href="index.html#events" class="nav-link" data-section="events">
                                 <span class="material-symbols-outlined">event</span>
@@ -115,6 +120,9 @@
                                 <span>Nyhetsbrev</span>
                             </a>
                         </li>
+                        <li class="nav-category-header" data-target-category="administrasjon">
+                            <span>Administrasjon</span><span
+                                class="material-symbols-outlined expand-icon">expand_more</span></li>
                         <li class="nav-item" data-nav-category="administrasjon">
                             <a href="index.html#causes" class="nav-link" data-section="causes">
                                 <span class="material-symbols-outlined">volunteer_activism</span>
@@ -185,6 +193,9 @@
                 </div>
 
                 <div class="header-right">
+                    <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
                     <button class="notification-btn">
                         <span class="material-symbols-outlined">notifications</span>
                     </button>
@@ -223,34 +234,15 @@
                 </div>
             </header>
 
-            <div class="content-header">
-                <div class="tabs-container">
-                    <div class="top-nav-tabs">
-                        <button class="top-nav-tab" onclick="location.href='index.html#nettsted'">Nettsted</button>
-                        <button class="top-nav-tab active">Kommunikasjon</button>
-                        <button class="top-nav-tab"
-                            onclick="location.href='index.html#administrasjon'">Administrasjon</button>
-                    </div>
-
-                    <div class="header-search">
-                        <span class="material-symbols-outlined">search</span>
-                        <input type="text" id="message-search" placeholder="Søk i meldinger..." aria-label="Søk">
-                    </div>
-                </div>
-
-                <div class="sub-nav-tabs">
-                    <a href="admin-kommunikasjon.html" class="sub-nav-tab">Kontakter</a>
-                    <a href="admin-segmenter.html" class="sub-nav-tab">Segmenter</a>
-                    <a href="admin-meldinger.html" class="sub-nav-tab active">Meldinger <span id="message-unread-count"
-                            class="sub-tab-badge" style="display:none;">0</span></a>
-                </div>
-            </div>
-
             <div class="crm-content">
                 <div class="card modern">
                     <div class="table-header">
                         <h3 class="card-title">Innboks</h3>
                         <div class="header-right-actions">
+                            <div class="search-box">
+                                <span class="material-symbols-outlined">search</span>
+                                <input type="text" id="message-search" placeholder="Søk...">
+                            </div>
                             <button class="btn btn-text">Filtrer</button>
                         </div>
                     </div>
