@@ -435,7 +435,7 @@ class MinSideManager {
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
                     <h3>Nyheter fra HKM</h3>
-                    <a href="#resources" onclick="window.adminSideManager.navigateTo('resources')" style="color:var(--primary-orange); font-size:0.85rem; font-weight:600; text-decoration:none;">Se alle</a>
+                    <a href="#resources" onclick="window.minSideManager.navigateTo('resources')" style="color:var(--primary-orange); font-size:0.85rem; font-weight:600; text-decoration:none;">Se alle</a>
                 </div>
                 <div id="news-feed-overview">
                     <div class="loader-placeholder" style="height:100px; background:#f8fafc; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#94a3b8;">Laster nyheter...</div>
@@ -862,8 +862,8 @@ class MinSideManager {
             && this.currentUser.providerData.some(p => p && p.providerId === 'google.com');
 
         container.innerHTML = `
-            <div style="width: 100%; margin: 0 auto;">
-                <div class="card">
+            <div style="width: 100%;">
+                <div class="card" style="width: 100%; max-width: 100%;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h3>Min Profil</h3>
                         <span class="badge" style="font-size: 0.9rem; padding: 6px 12px;">Medlem siden 2024</span>
