@@ -400,21 +400,21 @@ class MinSideManager {
             </div>
 
             <div class="stats-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px;">
-                <div class="card">
+                <div class="card stat-box">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">school</span>
                         Aktive Kurs
                     </h3>
                     <p id="stat-active-courses" style="font-size: 2rem; font-weight: 700; color: var(--primary-orange); margin-top: 8px;">—</p>
                 </div>
-                <div class="card">
+                <div class="card stat-box">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">task_alt</span>
                         Fullførte Leksjoner
                     </h3>
                     <p id="stat-completed-lessons" style="font-size: 2rem; font-weight: 700; color: var(--accent-blue); margin-top: 8px;">—</p>
                 </div>
-                <div class="card">
+                <div class="card stat-box">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">favorite</span>
                         Gaver denne måneden
@@ -422,7 +422,7 @@ class MinSideManager {
                     <p id="stat-month-giving" style="font-size: 2rem; font-weight: 700; color: #e91e63; margin-top: 8px;">—</p>
                     <div id="stat-month-giving-sub" style="font-size: 0.8rem; color: #64748b; margin-top: 4px;"></div>
                 </div>
-                <div class="card">
+                <div class="card stat-box">
                     <h3 style="font-size: 1rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 1.2rem;">military_tech</span>
                         Total gitt i ${new Date().getFullYear()}
@@ -433,22 +433,59 @@ class MinSideManager {
             </div>
 
             <div class="card">
-                <h3>Nyheter fra HKM</h3>
-                <ul style="list-style: none; margin-top: 15px;">
-                    <li style="padding: 10px 0; border-bottom: 1px solid var(--border-color);">
-                        <span class="badge" style="background: #e0f2fe; color: #0284c7;">Nyhet</span>
-                        <strong>Nyt webinar tilgjengelig:</strong> Helbredelse i dag.
-                    </li>
-                    <li style="padding: 10px 0;">
-                        <span class="badge" style="background: #fef3c7; color: #d97706;">Oppdatering</span>
-                        Nye ressurser lagt til i "Identitet i Kristus".
-                    </li>
-                </ul>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3>Nyheter fra HKM</h3>
+                    <a href="#resources" onclick="window.adminSideManager.navigateTo('resources')" style="color:var(--primary-orange); font-size:0.85rem; font-weight:600; text-decoration:none;">Se alle</a>
+                </div>
+                <div id="news-feed-overview">
+                    <div class="loader-placeholder" style="height:100px; background:#f8fafc; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#94a3b8;">Laster nyheter...</div>
+                </div>
             </div>
         `;
 
         // Fetch dynamic stats asynchronously
         this._loadOverviewStats();
+        this._loadOverviewNews();
+    }
+
+    async _loadOverviewNews() {
+        try {
+            const feed = document.getElementById('news-feed-overview');
+            if (!feed) return;
+
+            const blogSnap = await firebase.firestore().collection('content').doc('collection_blog').get();
+            const items = (blogSnap.exists ? blogSnap.data()?.items : []) || [];
+
+            // Get 2 latest
+            const latest = [...items].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 2);
+
+            if (latest.length === 0) {
+                feed.innerHTML = '<p style="color:var(--text-muted); font-size:0.9rem;">Ingen nyheter publisert ennå.</p>';
+                return;
+            }
+
+            feed.innerHTML = `
+                <ul style="list-style: none;">
+                    ${latest.map(item => `
+                        <li style="padding: 12px 0; border-bottom: 1px solid var(--border-color); display:flex; gap:12px; align-items:center;">
+                            <div style="width:40px; height:40px; border-radius:8px; background:#fff8f0; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                <span class="material-symbols-outlined" style="color:var(--primary-orange); font-size:1.2rem;">article</span>
+                            </div>
+                            <div style="flex:1;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <strong style="font-size:0.95rem;">${item.title || 'Uten tittel'}</strong>
+                                    ${item.category ? `<span class="badge" style="font-size:10px;">${item.category}</span>` : ''}
+                                </div>
+                                <p style="font-size:0.85rem; color:var(--text-muted); margin-top:2px;">${new Date(item.date).toLocaleDateString('no-NO')}</p>
+                            </div>
+                            <a href="../blogg-post.html?id=${encodeURIComponent(item.id || item.title)}" style="color:var(--text-muted);"><span class="material-symbols-outlined">chevron_right</span></a>
+                        </li>
+                    `).join('')}
+                </ul>
+            `;
+        } catch (e) {
+            console.warn('Overview news failed:', e);
+        }
     }
 
     async _loadOverviewStats() {
@@ -461,174 +498,161 @@ class MinSideManager {
             ? 'kr 0,-'
             : `kr ${n.toLocaleString('no-NO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })},-`;
 
-        const animateCount = (el, value) => {
+        const animateCount = (el, target) => {
             if (!el) return;
-            if (typeof value !== 'number') { el.textContent = value; return; }
-            const duration = 600;
+            if (typeof target !== 'number') { el.textContent = target; return; }
+            const duration = 1000;
             const start = performance.now();
+            const startVal = parseFloat(el.textContent.replace(/[^\d]/g, '')) || 0;
+
             const step = (now) => {
                 const t = Math.min((now - start) / duration, 1);
-                const eased = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
-                el.textContent = Math.round(eased * value).toLocaleString('no-NO');
+                const eased = 1 - Math.pow(1 - t, 4); // Quartic ease-out
+                const current = Math.floor(startVal + (target - startVal) * eased);
+                el.textContent = current.toLocaleString('no-NO');
                 if (t < 1) requestAnimationFrame(step);
             };
             requestAnimationFrame(step);
         };
 
-        // --- Giving stats from Firebase donations ---
+        // --- 1. Course Stats (Teaching + Courses) ---
         try {
-            const snapshot = await firebase.firestore()
-                .collection('donations')
-                .where('status', '==', 'succeeded')
-                .orderBy('timestamp', 'desc')
-                .get();
+            let totalActiveCourses = 0;
 
-            const donations = snapshot.docs
-                .map(d => ({ ...d.data() }))
-                .filter(d => d.uid === uid || d.email === email);
+            // Check siteContent/collection_courses (New system)
+            const coursesSnap = await firebase.firestore().collection('siteContent').doc('collection_courses').get();
+            if (coursesSnap.exists) {
+                totalActiveCourses += (coursesSnap.data()?.items || []).length;
+            }
+
+            // Check content/collection_teaching (Old system)
+            const teachingSnap = await firebase.firestore().collection('content').doc('collection_teaching').get();
+            if (teachingSnap.exists) {
+                totalActiveCourses += (teachingSnap.data()?.items || []).length;
+            }
+
+            animateCount(document.getElementById('stat-active-courses'), totalActiveCourses);
+
+            // Fetch progress
+            let completedCount = 0;
+            try {
+                const progDoc = await firebase.firestore().collection('users').doc(uid).collection('progress').get();
+                // This counts sub-documents or items in progress. In our Udemy-style system, 
+                // we'll eventually track per lesson. For now, let's count completed sessions if any.
+                completedCount = progDoc.size || 0;
+            } catch (e) { }
+            animateCount(document.getElementById('stat-completed-lessons'), completedCount);
+
+        } catch (err) {
+            console.warn('Course stats sync failed:', err);
+        }
+
+        // --- 2. Giving Stats (Optimized Query) ---
+        try {
+            // Fetch donations. We skip orderBy if indices are missing.
+            const query = firebase.firestore().collection('donations').where('status', '==', 'succeeded');
+            const snap = await query.get();
+
+            const donations = snap.docs
+                .map(d => d.data())
+                .filter(d => (d.uid === uid || d.email === email) && d.timestamp);
 
             let monthTotal = 0;
             let yearTotal = 0;
-            let hasAnyDonation = false;
 
             donations.forEach(d => {
-                const ts = d.timestamp?.toDate ? d.timestamp.toDate() : new Date(d.timestamp || 0);
+                const dDate = d.timestamp.toDate ? d.timestamp.toDate() : new Date(d.timestamp);
                 const amount = (d.amount || 0) / 100;
-                if (ts.getFullYear() === currentYear) {
+
+                if (dDate.getFullYear() === currentYear) {
                     yearTotal += amount;
-                    if (ts.getMonth() === currentMonth) monthTotal += amount;
+                    if (dDate.getMonth() === currentMonth) {
+                        monthTotal += amount;
+                    }
                 }
-                hasAnyDonation = true;
             });
 
-            const monthEl = document.getElementById('stat-month-giving');
-            const yearEl = document.getElementById('stat-year-giving');
-            const monthSub = document.getElementById('stat-month-giving-sub');
+            const mEl = document.getElementById('stat-month-giving');
+            const yEl = document.getElementById('stat-year-giving');
+            const mSub = document.getElementById('stat-month-giving-sub');
 
-            if (monthEl) {
-                monthEl.textContent = fmt(monthTotal);
-                if (monthSub) {
-                    monthSub.textContent = monthTotal > 0
-                        ? 'Takk for ditt bidrag! 🙏'
-                        : (hasAnyDonation ? 'Ingen gaver denne måneden' : 'Ingen gaver registrert ennå');
-                }
-            }
-            if (yearEl) yearEl.textContent = fmt(yearTotal);
+            if (mEl) mEl.textContent = fmt(monthTotal);
+            if (yEl) yEl.textContent = fmt(yearTotal);
+            if (mSub) mSub.textContent = monthTotal > 0 ? 'Takk for ditt bidrag! 🙌' : 'Ingen gaver denne måneden';
 
         } catch (err) {
-            console.warn('Kunne ikke hente gavestatistikk:', err);
-            const monthEl = document.getElementById('stat-month-giving');
-            const yearEl = document.getElementById('stat-year-giving');
-            if (monthEl) monthEl.textContent = 'kr 0,-';
-            if (yearEl) yearEl.textContent = 'kr 0,-';
-        }
-
-        // --- Teaching / Course stats ---
-        try {
-            // Count teaching series (aktive kurs) from Firebase
-            const teachingSnap = await firebase.firestore()
-                .collection('collection_teaching')
-                .get();
-
-            const totalSeries = teachingSnap.size || 0;
-
-            // Count viewed/started items from user's progress doc (if exists)
-            let completedLessons = 0;
-            try {
-                const progressDoc = await firebase.firestore()
-                    .collection('users')
-                    .doc(uid)
-                    .collection('progress')
-                    .doc('teaching')
-                    .get();
-
-                if (progressDoc.exists) {
-                    const data = progressDoc.data() || {};
-                    completedLessons = Object.values(data).filter(v => v === true || v === 'completed').length;
-                }
-            } catch (e) { /* progress doc may not exist */ }
-
-            animateCount(document.getElementById('stat-active-courses'), totalSeries);
-            animateCount(document.getElementById('stat-completed-lessons'), completedLessons);
-
-        } catch (err) {
-            console.warn('Kunne ikke hente kursstatistikk:', err);
-            const coursesEl = document.getElementById('stat-active-courses');
-            const lessonsEl = document.getElementById('stat-completed-lessons');
-            if (coursesEl) coursesEl.textContent = '0';
-            if (lessonsEl) lessonsEl.textContent = '0';
+            console.warn('Giving stats sync failed:', err);
         }
     }
 
     async renderCourses(container) {
-        // Skeleton loading state
         container.innerHTML = `
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;" id="courses-grid">
-                ${[1, 2, 3].map(() => `
-                <div class="card" style="padding: 0; overflow: hidden; animation: skeletonPulse 1.5s ease-in-out infinite;">
-                    <div style="height: 160px; background: #e2e8f0;"></div>
-                    <div style="padding: 20px;">
-                        <div style="height: 20px; background: #e2e8f0; border-radius: 6px; margin-bottom: 10px; width: 70%;"></div>
-                        <div style="height: 14px; background: #e2e8f0; border-radius: 6px; margin-bottom: 6px;"></div>
-                        <div style="height: 14px; background: #e2e8f0; border-radius: 6px; width: 80%; margin-bottom: 20px;"></div>
-                        <div style="height: 38px; background: #e2e8f0; border-radius: 8px;"></div>
-                    </div>
-                </div>`).join('')}
+            <div id="courses-view-container">
+                <div class="view-header" style="margin-bottom: 24px;">
+                    <p style="color: var(--text-muted);">Her finner du alle kursene du har tilgang til.</p>
+                </div>
+                <div id="courses-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                    <div class="loader">Laster dine kurs...</div>
+                </div>
             </div>
-            <style>@keyframes skeletonPulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
         `;
 
         try {
-            const data = await firebase.firestore().collection('siteContent').doc('collection_teaching').get();
-            const items = (data.exists ? data.data()?.items : null) || [];
+            // Fetch both Teaching (original) and Courses (new management system)
+            const [teachSnap, cursSnap] = await Promise.all([
+                firebase.firestore().collection('content').doc('collection_teaching').get(),
+                firebase.firestore().collection('siteContent').doc('collection_courses').get()
+            ]);
+
+            const teachItems = (teachSnap.exists ? teachSnap.data()?.items : []) || [];
+            const cursItems = (cursSnap.exists ? cursSnap.data()?.items : []) || [];
+
+            // Merge all items
+            const allItems = [
+                ...teachItems.map(i => ({ ...i, source: 'teaching' })),
+                ...cursItems.map(i => ({ ...i, source: 'course' }))
+            ];
 
             const grid = document.getElementById('courses-grid');
-            if (!grid) return;
-
-            if (items.length === 0) {
-                grid.innerHTML = `<div class="card" style="grid-column:1/-1; text-align:center; padding: 40px;">
-                    <span class="material-symbols-outlined" style="font-size:48px; color:#94a3b8;">school</span>
-                    <p style="color: var(--text-muted); margin-top: 12px;">Ingen undervisningsserier er publisert ennå.</p>
-                </div>`;
+            if (allItems.length === 0) {
+                grid.innerHTML = `
+                    <div class="card" style="grid-column: 1/-1; text-align: center; padding: 48px;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 16px;">school</span>
+                        <h4>Ingen kurs tilgjengelig</h4>
+                        <p style="color: var(--text-muted); margin-top: 8px;">Du har ikke meldt deg på noen kurs ennå. Utforsk katalogen på forsiden!</p>
+                        <a href="../kurs.html" class="btn btn-primary" style="margin-top: 24px; text-decoration:none;">Se kurskatalog</a>
+                    </div>
+                `;
                 return;
             }
 
-            grid.innerHTML = items.map(item => {
-                const excerpt = (item.description || item.content ||
-                    (typeof item.content === 'object' && item.content?.blocks
-                        ? item.content.blocks.filter(b => b.type === 'paragraph').map(b => b.data?.text || '').join(' ')
-                        : '')
-                ).substring(0, 100);
-
-                const imgHtml = item.imageUrl
-                    ? `<img src="${item.imageUrl}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`
-                    : `<span class="material-symbols-outlined" style="font-size:48px;">school</span>`;
-
-                const postUrl = `../blogg-post.html?id=${encodeURIComponent(item.id || item.title)}`;
+            grid.innerHTML = allItems.map(item => {
+                const img = item.imageUrl || '../img/course-placeholder.jpg';
+                const id = item.id || item.title;
+                const link = item.source === 'course' ? `../kurs-detaljer.html?id=${id}` : `../blogg-post.html?id=${id}`;
 
                 return `
-                <div class="card" style="padding:0;overflow:hidden;transition:transform .2s,box-shadow .2s;" 
-                     onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,0.12)'" 
-                     onmouseout="this.style.transform='';this.style.boxShadow=''">
-                    <div style="height:160px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;overflow:hidden;position:relative;">
-                        ${imgHtml}
-                        ${item.category ? `<span style="position:absolute;top:10px;left:10px;background:var(--primary-orange);color:white;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">${item.category}</span>` : ''}
+                    <div class="card" style="padding:0; overflow:hidden; display:flex; flex-direction:column;">
+                        <div style="height:160px; position:relative;">
+                            <img src="${img}" style="width:100%; height:100%; object-fit:cover;">
+                            <div style="position:absolute; top:12px; left:12px; padding:4px 10px; background:rgba(0,0,0,0.6); color:white; border-radius:20px; font-size:10px; font-weight:700; backdrop-filter:blur(4px);">
+                                ${item.category || (item.source === 'course' ? 'KURS' : 'UNDERVISNING')}
+                            </div>
+                        </div>
+                        <div style="padding:20px; flex:1; display:flex; flex-direction:column;">
+                            <h4 style="margin-bottom:8px;">${item.title}</h4>
+                            <p style="font-size:0.85rem; color:var(--text-muted); line-height:1.5; flex:1; margin-bottom:16px;">
+                                ${item.description ? item.description.substring(0, 80) + '...' : 'Utforsk dette dypdykket i Guds ord.'}
+                            </p>
+                            <a href="${link}" class="btn btn-outline" style="width:100%; justify-content:center; text-decoration:none;">Gå til kurs</a>
+                        </div>
                     </div>
-                    <div style="padding:20px;">
-                        <h4 style="margin-bottom:6px;">${item.title || 'Uten tittel'}</h4>
-                        <p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 8px;">${item.author ? `<span style="font-weight:500;">av ${item.author}</span> · ` : ''}${item.date ? new Date(item.date).toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</p>
-                        <p style="color:var(--text-muted);font-size:0.9rem;margin:0 0 16px;line-height:1.5;">${excerpt}${excerpt.length === 100 ? '...' : ''}</p>
-                        <a href="${postUrl}" class="btn btn-primary" style="width:100%;justify-content:center;text-decoration:none;display:flex;">
-                            <span class="material-symbols-outlined" style="font-size:1rem;">play_arrow</span> Les undervisning
-                        </a>
-                    </div>
-                </div>`;
+                `;
             }).join('');
 
         } catch (err) {
-            console.error('Kunne ikke laste kurs:', err);
-            const grid = document.getElementById('courses-grid');
-            if (grid) grid.innerHTML = `<div class="card" style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">Kunne ikke laste undervisning. Prøv igjen.</div>`;
+            console.error('Course render failed:', err);
+            document.getElementById('courses-grid').innerHTML = '<p>Kunne ikke laste kursene dine.</p>';
         }
     }
 
