@@ -2165,6 +2165,90 @@ class AdminManager {
             }
 
             // --- Initialize Editor.js ---
+            // Custom YouTube Video Tool (replaces unreliable @editorjs/embed CDN plugin)
+            class YoutubeVideoTool {
+                static get toolbox() {
+                    return {
+                        title: 'Video (YouTube)',
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M21.582 7.186a2.506 2.506 0 0 0-1.762-1.769C18.265 5 12 5 12 5s-6.265 0-7.82.417A2.506 2.506 0 0 0 2.418 7.186 26.302 26.302 0 0 0 2 12a26.302 26.302 0 0 0 .418 4.814 2.506 2.506 0 0 0 1.762 1.769C5.735 19 12 19 12 19s6.265 0 7.82-.417a2.506 2.506 0 0 0 1.762-1.769A26.302 26.302 0 0 0 22 12a26.302 26.302 0 0 0-.418-4.814zM9.954 15.477V8.523L15.818 12l-5.864 3.477z"/></svg>'
+                    };
+                }
+
+                static get isReadOnlySupported() { return true; }
+
+                constructor({ data, readOnly }) {
+                    this.data = data || {};
+                    this.readOnly = readOnly;
+                    this._wrapper = null;
+                }
+
+                _getYouTubeId(url) {
+                    if (!url) return null;
+                    const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                    return m ? m[1] : null;
+                }
+
+                render() {
+                    this._wrapper = document.createElement('div');
+                    this._wrapper.style.cssText = 'padding: 12px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;';
+
+                    const videoId = this._getYouTubeId(this.data.url || '');
+
+                    if (videoId) {
+                        this._wrapper.innerHTML = `
+                            <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;">
+                                <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen
+                                    style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>
+                            </div>`;
+                    } else {
+                        this._wrapper.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#cbd5e1"><path d="M21.582 7.186a2.506 2.506 0 0 0-1.762-1.769C18.265 5 12 5 12 5s-6.265 0-7.82.417A2.506 2.506 0 0 0 2.418 7.186 26.302 26.302 0 0 0 2 12a26.302 26.302 0 0 0 .418 4.814 2.506 2.506 0 0 0 1.762 1.769C5.735 19 12 19 12 19s6.265 0 7.82-.417a2.506 2.506 0 0 0 1.762-1.769A26.302 26.302 0 0 0 22 12a26.302 26.302 0 0 0-.418-4.814zM9.954 15.477V8.523L15.818 12l-5.864 3.477z"/></svg>
+                            <p style="margin:8px 0 0; font-size:13px;">Ingen video lastet ennå</p>
+                        </div>`;
+                    }
+
+                    if (!this.readOnly) {
+                        const inputWrap = document.createElement('div');
+                        inputWrap.style.cssText = 'display:flex; gap:8px; margin-top:8px;';
+                        const input = document.createElement('input');
+                        input.type = 'url';
+                        input.placeholder = 'Lim inn YouTube-lenke her...';
+                        input.value = this.data.url || '';
+                        input.style.cssText = 'flex:1; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none;';
+
+                        const btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.textContent = 'Last inn';
+                        btn.style.cssText = 'padding:8px 14px; background:#6366f1; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:13px; white-space:nowrap;';
+
+                        btn.onclick = () => {
+                            this.data.url = input.value.trim();
+                            const newId = this._getYouTubeId(this.data.url);
+                            const preview = this._wrapper.querySelector('div[style*="padding-bottom"], div[style*="text-align"]');
+                            if (newId) {
+                                const iframeWrap = document.createElement('div');
+                                iframeWrap.style.cssText = 'position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;';
+                                iframeWrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${newId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>`;
+                                if (preview) preview.replaceWith(iframeWrap); else this._wrapper.prepend(iframeWrap);
+                            } else {
+                                if (preview) preview.innerHTML = '<p style="text-align:center; color:#ef4444; font-size:13px;">Ugyldig YouTube-lenke</p>';
+                            }
+                        };
+
+                        inputWrap.appendChild(input);
+                        inputWrap.appendChild(btn);
+                        this._wrapper.appendChild(inputWrap);
+                    }
+
+                    return this._wrapper;
+                }
+
+                save() {
+                    const input = this._wrapper ? this._wrapper.querySelector('input[type="url"]') : null;
+                    return { url: input ? input.value.trim() : (this.data.url || '') };
+                }
+            }
+
             // Defines tools conditionally to prevent crashes if scripts fail to load
             const toolsConfig = {};
 
@@ -2219,43 +2303,10 @@ class AdminManager {
                 toolsConfig.delimiter = Delimiter;
             }
 
-            // Video / Embed tool
-            let EmbedClass = window.Embed || (typeof Embed !== 'undefined' ? Embed : null);
-            if (EmbedClass) {
-                console.log("Registering Embed tool. Class found:", EmbedClass.name || 'Anonymous');
-
-                // Manually inject toolbox if missing (crucial for EditorJS to show it)
-                if (!EmbedClass.toolbox) {
-                    try {
-                        Object.defineProperty(EmbedClass, 'toolbox', {
-                            get: () => ({
-                                title: 'Video',
-                                icon: '<svg width="20" height="20" viewBox="0 0 20 20"><path d="M17 4H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-9 9V7l5 3-5 3z"/></svg>'
-                            }),
-                            configurable: true
-                        });
-                        console.log("Injected toolbox property into EmbedClass.");
-                    } catch (e) {
-                        console.error("Failed to inject toolbox:", e);
-                    }
-                }
-
-                toolsConfig.embed = {
-                    class: EmbedClass,
-                    inlineToolbar: true,
-                    config: {
-                        services: {
-                            youtube: true,
-                            vimeo: true,
-                            facebook: true,
-                            instagram: true,
-                            twitter: true
-                        }
-                    }
-                };
-            } else {
-                console.warn("Embed tool class NOT found in window or local scope.");
-            }
+            // Video tool – custom YoutubeVideoTool (defined above, always available)
+            toolsConfig.youtubeVideo = {
+                class: YoutubeVideoTool
+            };
 
             console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
 
