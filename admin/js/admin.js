@@ -2083,10 +2083,25 @@ class AdminManager {
                                  <label>Meta-beskrivelse</label>
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
-                        </aside>
-                    </div>
-                </div>
-            `;
+                             ${collectionId === 'blog' ? `
+                             <h4 class="sidebar-section-title">RELATERTE INNLEGG</h4>
+                             <div class="sidebar-group">
+                                 <select id="col-item-related" class="sidebar-control" multiple style="height: 100px;">
+                                     ${(this.currentItems || []).map((opt, optIndex) => {
+                if (optIndex === index) return '';
+                const optId = opt.id || opt.title;
+                const selected = (item.relatedPosts || []).includes(optId) ? 'selected' : '';
+                return \`<option value="\${optId}" \${selected}>\${opt.title || 'Uten Tittel'}</option>\`;
+                                     }).join('')}
+                                 </select>
+                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Hold Cmd/Ctrl nede for å velge flere.</p>
+                             </div>
+                             ` : ''
+            }
+                        </aside >
+                    </div >
+                </div >
+                `;
 
             document.body.appendChild(modal);
 
@@ -2206,10 +2221,10 @@ class AdminManager {
             const renderTags = () => {
                 if (!tagsContainer) return;
                 tagsContainer.innerHTML = currentTags.map(tag => `
-                    <span class="tag-badge">
-                        ${tag}
-                        <button type="button" class="remove-tag" data-tag="${tag}">&times;</button>
-                    </span>
+                < span class= "tag-badge" >
+                ${ tag }
+            < button type = "button" class= "remove-tag" data - tag="${tag}" >& times;</button >
+                    </span >
                 `).join('');
 
                 // Add remove listeners
@@ -2248,7 +2263,7 @@ class AdminManager {
                     const box = document.getElementById('sidebar-img-trigger');
                     if (box) {
                         if (url && url.length > 10) {
-                            box.innerHTML = `<img src="${url}">`;
+                            box.innerHTML = `< img src = "${url}" > `;
                         } else {
                             box.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
                         }
@@ -2298,6 +2313,13 @@ class AdminManager {
                     item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
                     item.tags = currentTags;
 
+                    if (collectionId === 'blog') {
+                        const relatedSelect = document.getElementById('col-item-related');
+                        if (relatedSelect) {
+                            item.relatedPosts = Array.from(relatedSelect.selectedOptions).map(opt => opt.value);
+                        }
+                    }
+
                     // Ensure gcalId is preserved if this was a synced item
                     if (item.isSynced && item.id && !item.gcalId) {
                         item.gcalId = item.id;
@@ -2307,7 +2329,7 @@ class AdminManager {
                     btn.disabled = true;
 
                     try {
-                        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                        const currentData = await firebaseService.getPageContent(`collection_${ collectionId } `);
                         const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
                         // Use ID-based matching if available (most reliable)
@@ -2337,7 +2359,7 @@ class AdminManager {
                             list.unshift(item); // Push to top if truly new
                         }
 
-                        await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+                        await firebaseService.savePageContent(`collection_${ collectionId } `, { items: list });
 
                         // Force clear the public visitor cache if we modified events
                         if (collectionId === 'events') {
@@ -2366,12 +2388,12 @@ class AdminManager {
         } catch (err) {
             console.error('Error opening editor:', err);
             const errorMsg = err.message || JSON.stringify(err);
-            this.showToast(`Kunne ikke åpne elementet. Feilmelding: ${errorMsg}. Sjekk at Editor.js scriptet er lastet.`, 'error', 7000);
+            this.showToast(`Kunne ikke åpne elementet.Feilmelding: ${ errorMsg }. Sjekk at Editor.js scriptet er lastet.`, 'error', 7000);
         }
     }
 
     async addNewItem(collectionId) {
-        const btn = document.getElementById(`add-new-${collectionId}`);
+        const btn = document.getElementById(`add - new- ${ collectionId } `);
         if (btn) {
             btn.disabled = true;
             btn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Forbereder...';
@@ -2383,7 +2405,7 @@ class AdminManager {
 
             // Create new item with empty title and a unique ID
             const newItem = {
-                id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                id: `item - ${ Date.now() } -${ Math.random().toString(36).substr(2, 9) } `,
                 title: '',
                 date: new Date().toISOString().split('T')[0],
                 content: ''
@@ -2417,7 +2439,7 @@ class AdminManager {
 
         if (!confirm('Er du sikker på at du vil slette dette elementet?')) return;
 
-        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+        const currentData = await firebaseService.getPageContent(`collection_${ collectionId } `);
         const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
         // Get the actual item we want to delete from the displayed list
@@ -2436,7 +2458,7 @@ class AdminManager {
 
         if (matchIdx >= 0) {
             list.splice(matchIdx, 1);
-            await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+            await firebaseService.savePageContent(`collection_${ collectionId } `, { items: list });
 
             // Force clear public cache
             if (collectionId === 'events') {
@@ -2461,217 +2483,217 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            <div class="section-header">
+                < div class="section-header" >
                 <h2 class="section-title">Design & Identitet</h2>
                 <p class="section-subtitle">Administrer logo, favicon, fonter, globale farger og tekststørrelser.</p>
-            </div>
-            
-            <div class="settings-grid">
-                <!-- Site Identity Card -->
-                <div class="settings-card">
-                    <div class="settings-card-header">
-                        <span class="material-symbols-outlined">fingerprint</span>
-                        <h3>Nettstedsidentitet</h3>
-                    </div>
-                    <div class="settings-card-body">
-                        <div class="form-group">
-                            <label>Logo URL</label>
-                            <input type="text" id="site-logo-url" class="form-control" placeholder="https://...">
-                            <div class="upload-row">
-                                <input type="file" id="site-logo-file" class="form-control file-input" accept="image/*">
-                                <button class="btn-secondary" id="upload-logo-btn" type="button">Last opp logo</button>
-                            </div>
-                            <div class="preview-container" id="logo-preview-container" style="margin-top: 15px;"></div>
-                        </div>
-                        <div class="form-group">
-                            <label>Tekst ved siden av logo</label>
-                            <input type="text" id="site-logo-text" class="form-control" placeholder="His Kingdom Ministry">
-                        </div>
-                        <div class="form-group">
-                            <label>Favicon URL</label>
-                            <input type="text" id="site-favicon-url" class="form-control" placeholder="https://...">
-                            <div class="upload-row">
-                                <input type="file" id="site-favicon-file" class="form-control file-input" accept="image/png,image/x-icon,image/svg+xml">
-                                <button class="btn-secondary" id="upload-favicon-btn" type="button">Last opp favicon</button>
-                            </div>
-                            <div class="preview-container" id="favicon-preview-container" style="margin-top: 15px;"></div>
-                        </div>
-                        <div class="form-group">
-                            <label>Sidetittel (SEO)</label>
-                            <input type="text" id="site-title-seo" class="form-control" placeholder="His Kingdom Ministry">
-                        </div>
-                    </div>
-                </div>
+            </div >
 
-                <!-- Typography Card -->
-                <div class="settings-card">
-                    <div class="settings-card-header">
-                        <span class="material-symbols-outlined">palette</span>
-                        <h3>Typografi & Styling</h3>
-                    </div>
-                    <div class="settings-card-body">
-                        <div class="form-group">
-                            <label>Hovedfont (Google Fonts)</label>
-                            <select id="main-font-select" class="form-control">
-                                <option value="Inter">Inter</option>
-                                <option value="DM Sans">DM Sans</option>
-                                <option value="Merriweather">Merriweather</option>
-                                <option value="Roboto">Roboto</option>
-                                <option value="Open Sans">Open Sans</option>
-                                <option value="Montserrat">Montserrat</option>
-                                <option value="Outfit">Outfit</option>
-                            </select>
+                <div class="settings-grid">
+                    <!-- Site Identity Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <span class="material-symbols-outlined">fingerprint</span>
+                            <h3>Nettstedsidentitet</h3>
                         </div>
-
-                        <div class="premium-range-group">
-                            <div class="premium-range-header">
-                                <label>H1 Størrelse (Desktop)</label>
-                                <span class="premium-range-val" id="font-size-h1-desktop-val">48px</span>
+                        <div class="settings-card-body">
+                            <div class="form-group">
+                                <label>Logo URL</label>
+                                <input type="text" id="site-logo-url" class="form-control" placeholder="https://...">
+                                    <div class="upload-row">
+                                        <input type="file" id="site-logo-file" class="form-control file-input" accept="image/*">
+                                            <button class="btn-secondary" id="upload-logo-btn" type="button">Last opp logo</button>
+                                    </div>
+                                    <div class="preview-container" id="logo-preview-container" style="margin-top: 15px;"></div>
                             </div>
-                            <input type="range" id="font-size-h1-desktop" class="premium-slider" min="24" max="80" value="48">
-                        </div>
-
-                        <div class="premium-range-group">
-                            <div class="premium-range-header">
-                                <label>Brødtekst (Body Text)</label>
-                                <span class="premium-range-val" id="font-size-base-val">16px</span>
+                            <div class="form-group">
+                                <label>Tekst ved siden av logo</label>
+                                <input type="text" id="site-logo-text" class="form-control" placeholder="His Kingdom Ministry">
                             </div>
-                            <input type="range" id="font-size-base" class="premium-slider" min="12" max="24" value="16">
-                        </div>
-
-                        <div class="form-group">
-                            <label>Primærfarge</label>
-                            <div class="premium-color-wrapper">
-                                <input type="color" id="primary-color-picker" class="premium-color-picker-input" value="#1a1a1a">
-                                <input type="text" id="primary-color-hex" class="premium-color-hex" value="#1a1a1a">
+                            <div class="form-group">
+                                <label>Favicon URL</label>
+                                <input type="text" id="site-favicon-url" class="form-control" placeholder="https://...">
+                                    <div class="upload-row">
+                                        <input type="file" id="site-favicon-file" class="form-control file-input" accept="image/png,image/x-icon,image/svg+xml">
+                                            <button class="btn-secondary" id="upload-favicon-btn" type="button">Last opp favicon</button>
+                                    </div>
+                                    <div class="preview-container" id="favicon-preview-container" style="margin-top: 15px;"></div>
                             </div>
-                        </div>
-
-                        <!-- Live Preview Area -->
-                        <div class="live-preview-box" id="live-preview-area">
-                            <span class="preview-label">Live Forhåndsvisning</span>
-                            <h2 id="typography-preview-text">Slik ser teksten ut</h2>
-                            <p style="margin-top: 10px; opacity: 0.7;">Dette er et eksempel på brødtekst-størrelsen din.</p>
+                            <div class="form-group">
+                                <label>Sidetittel (SEO)</label>
+                                <input type="text" id="site-title-seo" class="form-control" placeholder="His Kingdom Ministry">
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <div style="margin-top: 32px; display: flex; justify-content: flex-end;">
-                <button class="btn-primary" id="save-design-settings" style="padding: 14px 32px; font-size: 16px;">
-                    <span class="material-symbols-outlined">auto_awesome</span> Lagre alle endringer
-                </button>
-            </div>
-        `;
-        section.setAttribute('data-rendered', 'true');
+                    <!-- Typography Card -->
+                    <div class="settings-card">
+                        <div class="settings-card-header">
+                            <span class="material-symbols-outlined">palette</span>
+                            <h3>Typografi & Styling</h3>
+                        </div>
+                        <div class="settings-card-body">
+                            <div class="form-group">
+                                <label>Hovedfont (Google Fonts)</label>
+                                <select id="main-font-select" class="form-control">
+                                    <option value="Inter">Inter</option>
+                                    <option value="DM Sans">DM Sans</option>
+                                    <option value="Merriweather">Merriweather</option>
+                                    <option value="Roboto">Roboto</option>
+                                    <option value="Open Sans">Open Sans</option>
+                                    <option value="Montserrat">Montserrat</option>
+                                    <option value="Outfit">Outfit</option>
+                                </select>
+                            </div>
+
+                            <div class="premium-range-group">
+                                <div class="premium-range-header">
+                                    <label>H1 Størrelse (Desktop)</label>
+                                    <span class="premium-range-val" id="font-size-h1-desktop-val">48px</span>
+                                </div>
+                                <input type="range" id="font-size-h1-desktop" class="premium-slider" min="24" max="80" value="48">
+                            </div>
+
+                            <div class="premium-range-group">
+                                <div class="premium-range-header">
+                                    <label>Brødtekst (Body Text)</label>
+                                    <span class="premium-range-val" id="font-size-base-val">16px</span>
+                                </div>
+                                <input type="range" id="font-size-base" class="premium-slider" min="12" max="24" value="16">
+                            </div>
+
+                            <div class="form-group">
+                                <label>Primærfarge</label>
+                                <div class="premium-color-wrapper">
+                                    <input type="color" id="primary-color-picker" class="premium-color-picker-input" value="#1a1a1a">
+                                        <input type="text" id="primary-color-hex" class="premium-color-hex" value="#1a1a1a">
+                                        </div>
+                                </div>
+
+                                <!-- Live Preview Area -->
+                                <div class="live-preview-box" id="live-preview-area">
+                                    <span class="preview-label">Live Forhåndsvisning</span>
+                                    <h2 id="typography-preview-text">Slik ser teksten ut</h2>
+                                    <p style="margin-top: 10px; opacity: 0.7;">Dette er et eksempel på brødtekst-størrelsen din.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 32px; display: flex; justify-content: flex-end;">
+                        <button class="btn-primary" id="save-design-settings" style="padding: 14px 32px; font-size: 16px;">
+                            <span class="material-symbols-outlined">auto_awesome</span> Lagre alle endringer
+                        </button>
+                    </div>
+                    `;
+                    section.setAttribute('data-rendered', 'true');
 
         // Logic for Dynamic Preview
         const updateLivePreview = () => {
             const font = document.getElementById('main-font-select').value;
-            const h1Size = document.getElementById('font-size-h1-desktop').value;
-            const bodySize = document.getElementById('font-size-base').value;
-            const color = document.getElementById('primary-color-hex').value;
-            const previewText = document.getElementById('typography-preview-text');
-            const previewBox = document.getElementById('live-preview-area');
+                    const h1Size = document.getElementById('font-size-h1-desktop').value;
+                    const bodySize = document.getElementById('font-size-base').value;
+                    const color = document.getElementById('primary-color-hex').value;
+                    const previewText = document.getElementById('typography-preview-text');
+                    const previewBox = document.getElementById('live-preview-area');
 
-            if (previewText) {
-                previewText.style.fontFamily = `'${font}', sans-serif`;
-                previewText.style.fontSize = `${h1Size}px`;
-                previewText.style.color = color;
+                    if (previewText) {
+                        previewText.style.fontFamily = `'${font}', sans-serif`;
+                    previewText.style.fontSize = `${h1Size}px`;
+                    previewText.style.color = color;
             }
-            if (previewBox) {
-                previewBox.style.fontFamily = `'${font}', sans-serif`;
-                previewBox.querySelector('p').style.fontSize = `${bodySize}px`;
+                    if (previewBox) {
+                        previewBox.style.fontFamily = `'${font}', sans-serif`;
+                    previewBox.querySelector('p').style.fontSize = `${bodySize}px`;
             }
         };
 
         // Add Listeners
         const syncRange = (id) => {
             const el = document.getElementById(id);
-            const valEl = document.getElementById(`${id}-val`);
+                    const valEl = document.getElementById(`${id}-val`);
             el.oninput = () => {
-                valEl.textContent = `${el.value}px`;
-                updateLivePreview();
+                        valEl.textContent = `${el.value}px`;
+                    updateLivePreview();
             };
         };
-        syncRange('font-size-base');
-        syncRange('font-size-h1-desktop');
+                    syncRange('font-size-base');
+                    syncRange('font-size-h1-desktop');
 
-        const fontSelect = document.getElementById('main-font-select');
-        fontSelect.onchange = updateLivePreview;
+                    const fontSelect = document.getElementById('main-font-select');
+                    fontSelect.onchange = updateLivePreview;
 
         const syncColor = (pickerId, hexId) => {
             const picker = document.getElementById(pickerId);
-            const hex = document.getElementById(hexId);
+                    const hex = document.getElementById(hexId);
             picker.oninput = () => {
-                hex.value = picker.value.toUpperCase();
-                updateLivePreview();
+                        hex.value = picker.value.toUpperCase();
+                    updateLivePreview();
             };
             hex.oninput = () => {
-                picker.value = hex.value;
-                updateLivePreview();
+                        picker.value = hex.value;
+                    updateLivePreview();
             };
         };
-        syncColor('primary-color-picker', 'primary-color-hex');
+                    syncColor('primary-color-picker', 'primary-color-hex');
 
-        // Load existing
-        try {
+                    // Load existing
+                    try {
             const data = await firebaseService.getPageContent('settings_design');
-            if (data) {
+                    if (data) {
                 if (data.logoUrl) {
-                    document.getElementById('site-logo-url').value = data.logoUrl;
+                        document.getElementById('site-logo-url').value = data.logoUrl;
                     this.updatePreview('logo-preview-container', data.logoUrl);
                 }
-                if (data.faviconUrl) {
-                    document.getElementById('site-favicon-url').value = data.faviconUrl;
+                    if (data.faviconUrl) {
+                        document.getElementById('site-favicon-url').value = data.faviconUrl;
                     this.updatePreview('favicon-preview-container', data.faviconUrl);
                 }
-                if (data.siteTitle) document.getElementById('site-title-seo').value = data.siteTitle;
-                if (data.logoText) document.getElementById('site-logo-text').value = data.logoText;
-                if (data.mainFont) document.getElementById('main-font-select').value = data.mainFont;
-                if (data.fontSizeBase) {
-                    document.getElementById('font-size-base').value = data.fontSizeBase;
+                    if (data.siteTitle) document.getElementById('site-title-seo').value = data.siteTitle;
+                    if (data.logoText) document.getElementById('site-logo-text').value = data.logoText;
+                    if (data.mainFont) document.getElementById('main-font-select').value = data.mainFont;
+                    if (data.fontSizeBase) {
+                        document.getElementById('font-size-base').value = data.fontSizeBase;
                     document.getElementById('font-size-base-val').textContent = `${data.fontSizeBase}px`;
                 }
-                if (data.fontSizeH1Desktop) {
-                    document.getElementById('font-size-h1-desktop').value = data.fontSizeH1Desktop;
+                    if (data.fontSizeH1Desktop) {
+                        document.getElementById('font-size-h1-desktop').value = data.fontSizeH1Desktop;
                     document.getElementById('font-size-h1-desktop-val').textContent = `${data.fontSizeH1Desktop}px`;
                 }
-                if (data.primaryColor) {
-                    document.getElementById('primary-color-picker').value = data.primaryColor;
+                    if (data.primaryColor) {
+                        document.getElementById('primary-color-picker').value = data.primaryColor;
                     document.getElementById('primary-color-hex').value = data.primaryColor;
                 }
-                updateLivePreview();
+                    updateLivePreview();
             }
         } catch (e) {
-            console.error("Load design error:", e);
+                        console.error("Load design error:", e);
         }
 
         document.getElementById('save-design-settings').onclick = async () => {
             const btn = document.getElementById('save-design-settings');
-            const data = {
-                logoUrl: document.getElementById('site-logo-url').value,
-                faviconUrl: document.getElementById('site-favicon-url').value,
-                logoText: document.getElementById('site-logo-text').value,
-                siteTitle: document.getElementById('site-title-seo').value,
-                mainFont: document.getElementById('main-font-select').value,
-                fontSizeBase: document.getElementById('font-size-base').value,
-                fontSizeH1Desktop: document.getElementById('font-size-h1-desktop').value,
-                primaryColor: document.getElementById('primary-color-hex').value,
-                updatedAt: new Date().toISOString()
+                    const data = {
+                        logoUrl: document.getElementById('site-logo-url').value,
+                    faviconUrl: document.getElementById('site-favicon-url').value,
+                    logoText: document.getElementById('site-logo-text').value,
+                    siteTitle: document.getElementById('site-title-seo').value,
+                    mainFont: document.getElementById('main-font-select').value,
+                    fontSizeBase: document.getElementById('font-size-base').value,
+                    fontSizeH1Desktop: document.getElementById('font-size-h1-desktop').value,
+                    primaryColor: document.getElementById('primary-color-hex').value,
+                    updatedAt: new Date().toISOString()
             };
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+                    btn.textContent = 'Lagrer...';
+                    btn.disabled = true;
 
-            try {
-                await firebaseService.savePageContent('settings_design', data);
-                this.showToast('✅ Design-innstillinger er lagret!', 'success', 5000);
+                    try {
+                        await firebaseService.savePageContent('settings_design', data);
+                    this.showToast('✅ Design-innstillinger er lagret!', 'success', 5000);
             } catch (err) {
-                this.showToast('❌ Feil ved lagring', 'error', 5000);
+                        this.showToast('❌ Feil ved lagring', 'error', 5000);
             } finally {
-                btn.textContent = 'Lagre alle endringer';
-                btn.disabled = false;
+                        btn.textContent = 'Lagre alle endringer';
+                    btn.disabled = false;
             }
         };
 
@@ -2681,219 +2703,219 @@ class AdminManager {
 
         const wireUpload = (fileInputId, buttonId, urlInputId, previewId, pathPrefix, idleText) => {
             const fileInput = document.getElementById(fileInputId);
-            const button = document.getElementById(buttonId);
-            const urlInput = document.getElementById(urlInputId);
+                    const button = document.getElementById(buttonId);
+                    const urlInput = document.getElementById(urlInputId);
 
-            if (!fileInput || !button || !urlInput) return;
+                    if (!fileInput || !button || !urlInput) return;
 
             button.onclick = async () => {
                 if (!firebaseService.isInitialized) {
-                    this.showToast('Firebase er ikke konfigurert. Kan ikke laste opp.', 'error', 5000);
+                        this.showToast('Firebase er ikke konfigurert. Kan ikke laste opp.', 'error', 5000);
                     return;
                 }
 
-                const file = fileInput.files && fileInput.files[0];
-                if (!file) {
-                    this.showToast('Velg en fil for opplasting.', 'warning', 3000);
+                    const file = fileInput.files && fileInput.files[0];
+                    if (!file) {
+                        this.showToast('Velg en fil for opplasting.', 'warning', 3000);
                     return;
                 }
 
-                button.disabled = true;
-                button.textContent = 'Laster opp...';
+                    button.disabled = true;
+                    button.textContent = 'Laster opp...';
 
-                try {
+                    try {
                     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
                     const uploadPath = `${pathPrefix}/${Date.now()}-${safeName}`;
                     const url = await firebaseService.uploadImage(file, uploadPath);
                     urlInput.value = url;
                     this.updatePreview(previewId, url);
                 } catch (err) {
-                    console.error('Upload error:', err);
+                        console.error('Upload error:', err);
                     this.showToast('Feil ved opplasting. Prøv igjen.', 'error', 5000);
                 } finally {
-                    button.disabled = false;
+                        button.disabled = false;
                     button.textContent = idleText;
                 }
             };
         };
 
-        wireUpload('site-logo-file', 'upload-logo-btn', 'site-logo-url', 'logo-preview-container', 'branding/logo', 'Last opp logo');
-        wireUpload('site-favicon-file', 'upload-favicon-btn', 'site-favicon-url', 'favicon-preview-container', 'branding/favicon', 'Last opp favicon');
+                    wireUpload('site-logo-file', 'upload-logo-btn', 'site-logo-url', 'logo-preview-container', 'branding/logo', 'Last opp logo');
+                    wireUpload('site-favicon-file', 'upload-favicon-btn', 'site-favicon-url', 'favicon-preview-container', 'branding/favicon', 'Last opp favicon');
     }
 
-    updatePreview(containerId, url) {
+                    updatePreview(containerId, url) {
         const container = document.getElementById(containerId);
-        if (url && url.startsWith('http')) {
-            container.innerHTML = `<img src="${url}" class="preview-img" style="margin-top: 10px; max-height: 100px; border-radius: 4px; border: 1px solid #ddd;">`;
+                    if (url && url.startsWith('http')) {
+                        container.innerHTML = `<img src="${url}" class="preview-img" style="margin-top: 10px; max-height: 100px; border-radius: 4px; border: 1px solid #ddd;">`;
         } else {
-            container.innerHTML = '';
+                        container.innerHTML = '';
         }
     }
 
-    async renderCausesManager() {
+                    async renderCausesManager() {
         const section = document.getElementById('causes-section');
-        if (!section) return;
+                    if (!section) return;
 
-        let totalDonations = 0;
-        let donationCount = 0;
-        let averageDonation = 0;
+                    let totalDonations = 0;
+                    let donationCount = 0;
+                    let averageDonation = 0;
 
-        try {
+                    try {
             if (firebaseService.db) {
                 const donationsSnapshot = await firebaseService.db.collection('donations').get();
-                donationCount = donationsSnapshot.size;
-                if (!donationsSnapshot.empty) {
-                    donationsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.amount) {
-                            totalDonations += (data.amount / 100);
-                        }
-                    });
+                    donationCount = donationsSnapshot.size;
+                    if (!donationsSnapshot.empty) {
+                        donationsSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            if (data.amount) {
+                                totalDonations += (data.amount / 100);
+                            }
+                        });
                 }
                 if (donationCount > 0) {
-                    averageDonation = totalDonations / donationCount;
+                        averageDonation = totalDonations / donationCount;
                 }
             }
         } catch (e) {
-            console.warn('Kunne ikke hente donasjoner for Gaver-siden:', e);
+                        console.warn('Kunne ikke hente donasjoner for Gaver-siden:', e);
         }
 
-        const formattedTotal = totalDonations.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
-        const formattedAverage = averageDonation.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
+                    const formattedTotal = totalDonations.toLocaleString('no-NO', {style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
+                    const formattedAverage = averageDonation.toLocaleString('no-NO', {style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
 
 
-        section.innerHTML = `
-        <div class="section-header">
-            <h2 class="section-title">Gaver & Donasjoner</h2>
-            <p class="section-subtitle">Oversikt over alle inntekter og aktive innsamlingsaksjoner.</p>
-        </div>
-
-        <div class="stats-grid">
-            <div class="stat-card modern">
-                <div class="stat-icon-wrap donation">
-                    <span class="material-symbols-outlined">payments</span>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-label">Totalt donert</h3>
-                    <p class="stat-value">${formattedTotal}</p>
-                    <span class="stat-meta">Via nettsiden</span>
-                </div>
-            </div>
-
-            <div class="stat-card modern">
-                <div class="stat-icon-wrap blue">
-                    <span class="material-symbols-outlined">volunteer_activism</span>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-label">Antall gaver</h3>
-                    <p class="stat-value">${donationCount}</p>
-                    <span class="stat-meta">Registrerte transaksjoner</span>
-                </div>
-            </div>
-
-            <div class="stat-card modern">
-                <div class="stat-icon-wrap mint">
-                    <span class="material-symbols-outlined">trending_up</span>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-label">Snittgave</h3>
-                    <p class="stat-value">${formattedAverage}</p>
-                    <span class="stat-meta">Per donasjon</span>
-                </div>
-            </div>
-
-             <div class="stat-card modern">
-                <div class="stat-icon-wrap purple">
-                     <span class="material-symbols-outlined">pie_chart</span>
-                </div>
-                <div class="stat-content">
-                    <h3 class="stat-label">Konvertering</h3>
-                    <p class="stat-value">-- %</p>
-                    <span class="stat-meta">Besøkende til givere</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header flex-between">
-                <div>
-                    <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
-                    <p class="section-subtitle" style="margin-bottom: 0;">Administrer dine pågående kampanjer.</p>
-                </div>
-                <button class="btn-primary" id="add-cause-btn">
-                    <span class="material-symbols-outlined">add</span>
-                    Ny aksjon
-                </button>
-            </div>
-            <div class="card-body" id="causes-list">
-                <div class="loader"></div>
-            </div>
-        </div>
-
-            <div id="cause-form-modal" style="display: none;">
-                <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
-                <div class="modal-content" style="max-width: 600px;">
-                    <div class="modal-header">
-                        <h3 id="form-title">Ny innsamlingsaksjon</h3>
-                        <button class="modal-close" onclick="document.getElementById('cause-form-modal').style.display = 'none'">×</button>
+                    section.innerHTML = `
+                    <div class="section-header">
+                        <h2 class="section-title">Gaver & Donasjoner</h2>
+                        <p class="section-subtitle">Oversikt over alle inntekter og aktive innsamlingsaksjoner.</p>
                     </div>
-                    <div class="modal-body">
-                        <div class="form-group">
-                            <label>Tittel</label>
-                            <input type="text" id="cause-title" class="form-control" placeholder="f.eks. Støtt vårt arbeid">
+
+                    <div class="stats-grid">
+                        <div class="stat-card modern">
+                            <div class="stat-icon-wrap donation">
+                                <span class="material-symbols-outlined">payments</span>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-label">Totalt donert</h3>
+                                <p class="stat-value">${formattedTotal}</p>
+                                <span class="stat-meta">Via nettsiden</span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Beskrivelse</label>
-                            <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
+
+                        <div class="stat-card modern">
+                            <div class="stat-icon-wrap blue">
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-label">Antall gaver</h3>
+                                <p class="stat-value">${donationCount}</p>
+                                <span class="stat-meta">Registrerte transaksjoner</span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Innsamlet beløp (kr)</label>
-                            <input type="number" id="cause-collected" class="form-control" placeholder="0" value="0">
+
+                        <div class="stat-card modern">
+                            <div class="stat-icon-wrap mint">
+                                <span class="material-symbols-outlined">trending_up</span>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-label">Snittgave</h3>
+                                <p class="stat-value">${formattedAverage}</p>
+                                <span class="stat-meta">Per donasjon</span>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Målbeløp (kr)</label>
-                            <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
-                        </div>
-                        <div class="form-group">
-                            <label>Bildekilde (URL)</label>
-                            <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/...">
+
+                        <div class="stat-card modern">
+                            <div class="stat-icon-wrap purple">
+                                <span class="material-symbols-outlined">pie_chart</span>
+                            </div>
+                            <div class="stat-content">
+                                <h3 class="stat-label">Konvertering</h3>
+                                <p class="stat-value">-- %</p>
+                                <span class="stat-meta">Besøkende til givere</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').style.display = 'none'">Avbryt</button>
-                        <button class="btn-primary" id="save-cause-btn">Lagre</button>
-                    </div>
-                </div>
-            </div>
-        `;
-        section.setAttribute('data-rendered', 'true');
 
-        await this.loadCauses();
+                    <div class="card">
+                        <div class="card-header flex-between">
+                            <div>
+                                <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
+                                <p class="section-subtitle" style="margin-bottom: 0;">Administrer dine pågående kampanjer.</p>
+                            </div>
+                            <button class="btn-primary" id="add-cause-btn">
+                                <span class="material-symbols-outlined">add</span>
+                                Ny aksjon
+                            </button>
+                        </div>
+                        <div class="card-body" id="causes-list">
+                            <div class="loader"></div>
+                        </div>
+                    </div>
+
+                    <div id="cause-form-modal" style="display: none;">
+                        <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
+                        <div class="modal-content" style="max-width: 600px;">
+                            <div class="modal-header">
+                                <h3 id="form-title">Ny innsamlingsaksjon</h3>
+                                <button class="modal-close" onclick="document.getElementById('cause-form-modal').style.display = 'none'">×</button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="form-group">
+                                    <label>Tittel</label>
+                                    <input type="text" id="cause-title" class="form-control" placeholder="f.eks. Støtt vårt arbeid">
+                                </div>
+                                <div class="form-group">
+                                    <label>Beskrivelse</label>
+                                    <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Innsamlet beløp (kr)</label>
+                                    <input type="number" id="cause-collected" class="form-control" placeholder="0" value="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Målbeløp (kr)</label>
+                                    <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Bildekilde (URL)</label>
+                                    <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/...">
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').style.display = 'none'">Avbryt</button>
+                                <button class="btn-primary" id="save-cause-btn">Lagre</button>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                    section.setAttribute('data-rendered', 'true');
+
+                    await this.loadCauses();
 
         document.getElementById('add-cause-btn').addEventListener('click', () => {
-            document.getElementById('form-title').textContent = 'Ny innsamlingsaksjon';
-            document.getElementById('cause-title').value = '';
-            document.getElementById('cause-description').value = '';
-            document.getElementById('cause-collected').value = '0';
-            document.getElementById('cause-goal').value = '100000';
-            document.getElementById('cause-image').value = '';
-            document.getElementById('cause-form-modal').dataset.editId = '';
-            document.getElementById('cause-form-modal').style.display = 'flex';
+                        document.getElementById('form-title').textContent = 'Ny innsamlingsaksjon';
+                    document.getElementById('cause-title').value = '';
+                    document.getElementById('cause-description').value = '';
+                    document.getElementById('cause-collected').value = '0';
+                    document.getElementById('cause-goal').value = '100000';
+                    document.getElementById('cause-image').value = '';
+                    document.getElementById('cause-form-modal').dataset.editId = '';
+                    document.getElementById('cause-form-modal').style.display = 'flex';
         });
 
         document.getElementById('save-cause-btn').addEventListener('click', () => this.saveCause());
     }
 
-    async loadCauses() {
+                    async loadCauses() {
         const listEl = document.getElementById('causes-list');
-        if (!listEl) return;
+                    if (!listEl) return;
 
-        try {
+                    try {
             const causesData = await firebaseService.getPageContent('collection_causes');
-            const causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+                    const causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
 
-            if (causes.length === 0) {
-                listEl.innerHTML = `
+                    if (causes.length === 0) {
+                        listEl.innerHTML = `
                     <div class="empty-state-container">
                         <span class="material-symbols-outlined empty-state-icon">volunteer_activism</span>
                         <p class="empty-state-text">Ingen innsamlingsaksjoner er opprettet ennå.</p>
@@ -2902,15 +2924,15 @@ class AdminManager {
                         </button>
                     </div>
                 `;
-                return;
+                    return;
             }
 
             const itemsHtml = causes.map((cause, index) => {
                 const checkedCollected = cause.collected || 0;
-                const checkedGoal = cause.goal || 100000;
+                    const checkedGoal = cause.goal || 100000;
                 const progress = checkedGoal > 0 ? Math.round((checkedCollected / checkedGoal) * 100) : 0;
 
-                return `
+                    return `
                     <div class="cause-item">
                         <div class="cause-header-row">
                             <div class="cause-title-wrap">
@@ -2944,917 +2966,917 @@ class AdminManager {
                             <div class="progress-bar" style="width: ${Math.min(progress, 100)}%;"></div>
                         </div>
                     </div>
-                `;
+                    `;
             }).join('');
 
-            listEl.innerHTML = itemsHtml;
+                    listEl.innerHTML = itemsHtml;
 
             // Add event listeners
             document.querySelectorAll('.edit-cause-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => this.editCause(parseInt(e.target.dataset.index)));
+                        btn.addEventListener('click', (e) => this.editCause(parseInt(e.target.dataset.index)));
             });
 
             document.querySelectorAll('.delete-cause-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => this.deleteCause(parseInt(e.target.dataset.index)));
+                        btn.addEventListener('click', (e) => this.deleteCause(parseInt(e.target.dataset.index)));
             });
         } catch (error) {
-            console.error('Error loading causes:', error);
-            listEl.innerHTML = '<p style="color:#ef4444;">Feil ved lasting av innsamlingsaksjoner.</p>';
+                        console.error('Error loading causes:', error);
+                    listEl.innerHTML = '<p style="color:#ef4444;">Feil ved lasting av innsamlingsaksjoner.</p>';
         }
     }
 
-    async saveCause() {
+                    async saveCause() {
         const title = document.getElementById('cause-title').value.trim();
-        const description = document.getElementById('cause-description').value.trim();
-        const collected = parseInt(document.getElementById('cause-collected').value) || 0;
-        const goal = parseInt(document.getElementById('cause-goal').value) || 100000;
-        const image = document.getElementById('cause-image').value.trim();
-        const editId = document.getElementById('cause-form-modal').dataset.editId;
+                    const description = document.getElementById('cause-description').value.trim();
+                    const collected = parseInt(document.getElementById('cause-collected').value) || 0;
+                    const goal = parseInt(document.getElementById('cause-goal').value) || 100000;
+                    const image = document.getElementById('cause-image').value.trim();
+                    const editId = document.getElementById('cause-form-modal').dataset.editId;
 
-        if (!title) {
-            this.showToast('Tittel er påkrevd', 'warning', 3000);
-            return;
+                    if (!title) {
+                        this.showToast('Tittel er påkrevd', 'warning', 3000);
+                    return;
         }
 
-        try {
-            let causesData = await firebaseService.getPageContent('collection_causes');
-            let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+                    try {
+                        let causesData = await firebaseService.getPageContent('collection_causes');
+                    let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
 
-            const newCause = { title, description, collected, goal, image };
+                    const newCause = {title, description, collected, goal, image};
 
-            if (editId !== '') {
-                causes[parseInt(editId)] = newCause;
+                    if (editId !== '') {
+                        causes[parseInt(editId)] = newCause;
             } else {
-                causes.push(newCause);
+                        causes.push(newCause);
             }
 
-            await firebaseService.savePageContent('collection_causes', { items: causes });
-            document.getElementById('cause-form-modal').style.display = 'none';
-            await this.loadCauses();
-            this.showToast('✅ Innsamlingsaksjon lagret!', 'success');
+                    await firebaseService.savePageContent('collection_causes', {items: causes });
+                    document.getElementById('cause-form-modal').style.display = 'none';
+                    await this.loadCauses();
+                    this.showToast('✅ Innsamlingsaksjon lagret!', 'success');
         } catch (error) {
-            console.error('Error saving cause:', error);
-            this.showToast('Feil ved lagring av innsamlingsaksjon', 'error', 5000);
+                        console.error('Error saving cause:', error);
+                    this.showToast('Feil ved lagring av innsamlingsaksjon', 'error', 5000);
         }
     }
 
-    editCause(index) {
+                    editCause(index) {
         const listEl = document.getElementById('causes-list');
         const causesData = firebaseService.getPageContent('collection_causes').then(async (data) => {
             const causes = data && Array.isArray(data.items) ? data.items : [];
-            if (causes[index]) {
+                    if (causes[index]) {
                 const cause = causes[index];
-                document.getElementById('form-title').textContent = 'Rediger innsamlingsaksjon';
-                document.getElementById('cause-title').value = cause.title || '';
-                document.getElementById('cause-description').value = cause.description || '';
-                document.getElementById('cause-collected').value = cause.collected || 0;
-                document.getElementById('cause-goal').value = cause.goal || 100000;
-                document.getElementById('cause-image').value = cause.image || '';
-                document.getElementById('cause-form-modal').dataset.editId = index;
-                document.getElementById('cause-form-modal').style.display = 'flex';
+                    document.getElementById('form-title').textContent = 'Rediger innsamlingsaksjon';
+                    document.getElementById('cause-title').value = cause.title || '';
+                    document.getElementById('cause-description').value = cause.description || '';
+                    document.getElementById('cause-collected').value = cause.collected || 0;
+                    document.getElementById('cause-goal').value = cause.goal || 100000;
+                    document.getElementById('cause-image').value = cause.image || '';
+                    document.getElementById('cause-form-modal').dataset.editId = index;
+                    document.getElementById('cause-form-modal').style.display = 'flex';
             }
         });
     }
 
-    async deleteCause(index) {
+                    async deleteCause(index) {
         if (!confirm('Er du sikker på at du vil slette denne innsamlingsaksjon?')) return;
 
-        try {
-            let causesData = await firebaseService.getPageContent('collection_causes');
-            let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
-            causes.splice(index, 1);
-            await firebaseService.savePageContent('collection_causes', { items: causes });
-            await this.loadCauses();
-            this.showToast('✅ Innsamlingsaksjon slettet!', 'success');
+                    try {
+                        let causesData = await firebaseService.getPageContent('collection_causes');
+                    let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+                    causes.splice(index, 1);
+                    await firebaseService.savePageContent('collection_causes', {items: causes });
+                    await this.loadCauses();
+                    this.showToast('✅ Innsamlingsaksjon slettet!', 'success');
         } catch (error) {
-            console.error('Error deleting cause:', error);
-            this.showToast('Feil ved sletting av innsamlingsaksjon', 'error', 5000);
+                        console.error('Error deleting cause:', error);
+                    this.showToast('Feil ved sletting av innsamlingsaksjon', 'error', 5000);
         }
     }
 
-    async renderHeroManager() {
+                    async renderHeroManager() {
         const section = document.getElementById('hero-section');
-        if (!section) return;
+                    if (!section) return;
 
-        section.innerHTML = `
-            <div class="section-header flex-between">
-                <div>
-                    <h2 class="section-title">Forside-innhold</h2>
-                    <p class="section-subtitle">Administrer slides og statistikk på forsiden.</p>
-                </div>
-                <button class="btn-primary" id="add-hero-slide">
-                    <span class="material-symbols-outlined">add</span> Ny Slide
-                </button>
-            </div>
-            
-            <div class="collection-grid" id="hero-slides-list">
-                <div class="loader">Laster slides...</div>
-            </div>
-
-            <div class="section-header" style="margin-top: 40px; border-top: 1px solid #e2e8f0; pt-4">
-                <div style="padding-top: 24px;">
-                    <h3 class="section-title">Nøkkeltall (Forside-statistikk)</h3>
-                    <p class="section-subtitle">Rediger tallene som vises i "Funfacts"-seksjonen på forsiden.</p>
-                </div>
-            </div>
-
-            <div class="card" style="max-width: 800px;">
-                <div class="card-body">
-                    <form id="stats-form">
-                        <div class="form-grid-2" style="gap: 20px;">
-                            <div class="form-group">
-                                <label>Land besøkt</label>
-                                <input type="number" id="stat-countries" class="form-control" name="countries_visited" placeholder="f.eks. 12">
-                            </div>
-                            <div class="form-group">
-                                <label>Podcast-episoder</label>
-                                <input type="number" id="stat-podcast" class="form-control" name="podcast_episodes" placeholder="f.eks. 45">
-                            </div>
-                            <div class="form-group">
-                                <label>YouTube-videoer</label>
-                                <input type="number" id="stat-yt-videos" class="form-control" name="youtube_videos" placeholder="f.eks. 449">
-                            </div>
-                            <div class="form-group">
-                                <label>YouTube-visninger</label>
-                                <input type="number" id="stat-yt-views" class="form-control" name="youtube_views" placeholder="f.eks. 56000">
-                            </div>
+                    section.innerHTML = `
+                    <div class="section-header flex-between">
+                        <div>
+                            <h2 class="section-title">Forside-innhold</h2>
+                            <p class="section-subtitle">Administrer slides og statistikk på forsiden.</p>
                         </div>
-                        <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-                            <button type="submit" class="btn-primary" id="save-stats-btn">
-                                <span class="material-symbols-outlined">save</span> Lagre statistikk
-                            </button>
+                        <button class="btn-primary" id="add-hero-slide">
+                            <span class="material-symbols-outlined">add</span> Ny Slide
+                        </button>
+                    </div>
+
+                    <div class="collection-grid" id="hero-slides-list">
+                        <div class="loader">Laster slides...</div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 40px; border-top: 1px solid #e2e8f0; pt-4">
+                        <div style="padding-top: 24px;">
+                            <h3 class="section-title">Nøkkeltall (Forside-statistikk)</h3>
+                            <p class="section-subtitle">Rediger tallene som vises i "Funfacts"-seksjonen på forsiden.</p>
                         </div>
-                    </form>
-                </div>
-            </div>
-        `;
-        section.setAttribute('data-rendered', 'true');
+                    </div>
+
+                    <div class="card" style="max-width: 800px;">
+                        <div class="card-body">
+                            <form id="stats-form">
+                                <div class="form-grid-2" style="gap: 20px;">
+                                    <div class="form-group">
+                                        <label>Land besøkt</label>
+                                        <input type="number" id="stat-countries" class="form-control" name="countries_visited" placeholder="f.eks. 12">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Podcast-episoder</label>
+                                        <input type="number" id="stat-podcast" class="form-control" name="podcast_episodes" placeholder="f.eks. 45">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>YouTube-videoer</label>
+                                        <input type="number" id="stat-yt-videos" class="form-control" name="youtube_videos" placeholder="f.eks. 449">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>YouTube-visninger</label>
+                                        <input type="number" id="stat-yt-views" class="form-control" name="youtube_views" placeholder="f.eks. 56000">
+                                    </div>
+                                </div>
+                                <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                                    <button type="submit" class="btn-primary" id="save-stats-btn">
+                                        <span class="material-symbols-outlined">save</span> Lagre statistikk
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    `;
+                    section.setAttribute('data-rendered', 'true');
 
         document.getElementById('add-hero-slide').onclick = () => this.editHeroSlide();
-        this.loadHeroSlides();
-        this.loadIndexStats();
+                    this.loadHeroSlides();
+                    this.loadIndexStats();
 
         document.getElementById('stats-form').onsubmit = async (e) => {
-            e.preventDefault();
-            await this.saveIndexStats();
+                        e.preventDefault();
+                    await this.saveIndexStats();
         };
     }
 
-    async loadHeroSlides() {
+                    async loadHeroSlides() {
         const container = document.getElementById('hero-slides-list');
-        if (!container) return;
+                    if (!container) return;
 
-        try {
+                    try {
             const data = await firebaseService.getPageContent('hero_slides');
-            this.heroSlides = data ? data.slides || [] : [];
-            this.renderHeroSlides(this.heroSlides);
+                    this.heroSlides = data ? data.slides || [] : [];
+                    this.renderHeroSlides(this.heroSlides);
         } catch (e) {
-            container.innerHTML = '<p>Kunne ikke laste slides.</p>';
-            this.showToast('Kunne ikke laste slides.', 'error', 5000);
+                        container.innerHTML = '<p>Kunne ikke laste slides.</p>';
+                    this.showToast('Kunne ikke laste slides.', 'error', 5000);
         }
     }
 
-    async loadIndexStats() {
+                    async loadIndexStats() {
         try {
             const data = await firebaseService.getPageContent('index');
-            if (data && data.stats) {
+                    if (data && data.stats) {
                 const stats = data.stats;
-                if (document.getElementById('stat-countries')) document.getElementById('stat-countries').value = stats.countries_visited || '';
-                if (document.getElementById('stat-podcast')) document.getElementById('stat-podcast').value = stats.podcast_episodes || '';
-                if (document.getElementById('stat-yt-videos')) document.getElementById('stat-yt-videos').value = stats.youtube_videos || '';
-                if (document.getElementById('stat-yt-views')) document.getElementById('stat-yt-views').value = stats.youtube_views || '';
+                    if (document.getElementById('stat-countries')) document.getElementById('stat-countries').value = stats.countries_visited || '';
+                    if (document.getElementById('stat-podcast')) document.getElementById('stat-podcast').value = stats.podcast_episodes || '';
+                    if (document.getElementById('stat-yt-videos')) document.getElementById('stat-yt-videos').value = stats.youtube_videos || '';
+                    if (document.getElementById('stat-yt-views')) document.getElementById('stat-yt-views').value = stats.youtube_views || '';
             }
         } catch (e) {
-            console.error('Kunne ikke laste statistikk:', e);
+                        console.error('Kunne ikke laste statistikk:', e);
         }
     }
 
-    async saveIndexStats() {
+                    async saveIndexStats() {
         const btn = document.getElementById('save-stats-btn');
-        const originalText = btn.innerHTML;
-        btn.disabled = true;
-        btn.innerHTML = '<span class="material-symbols-outlined">sync</span> Lagrer...';
+                    const originalText = btn.innerHTML;
+                    btn.disabled = true;
+                    btn.innerHTML = '<span class="material-symbols-outlined">sync</span> Lagrer...';
 
-        try {
+                    try {
             const countries = document.getElementById('stat-countries').value;
-            const podcast = document.getElementById('stat-podcast').value;
-            const yt_videos = document.getElementById('stat-yt-videos').value;
-            const yt_views = document.getElementById('stat-yt-views').value;
+                    const podcast = document.getElementById('stat-podcast').value;
+                    const yt_videos = document.getElementById('stat-yt-videos').value;
+                    const yt_views = document.getElementById('stat-yt-views').value;
 
-            // Get existing index content to avoid overwriting other parts
-            let indexContent = {};
-            try {
-                indexContent = await firebaseService.getPageContent('index') || {};
+                    // Get existing index content to avoid overwriting other parts
+                    let indexContent = { };
+                    try {
+                        indexContent = await firebaseService.getPageContent('index') || {};
             } catch (e) { }
 
-            indexContent.stats = {
-                countries_visited: countries,
-                podcast_episodes: podcast,
-                youtube_videos: yt_videos,
-                youtube_views: yt_views
+                    indexContent.stats = {
+                        countries_visited: countries,
+                    podcast_episodes: podcast,
+                    youtube_videos: yt_videos,
+                    youtube_views: yt_views
             };
 
-            await firebaseService.savePageContent('index', indexContent);
-            this.showToast('🚀 Statistikk er nå oppdatert på forsiden!', 'success', 5000);
+                    await firebaseService.savePageContent('index', indexContent);
+                    this.showToast('🚀 Statistikk er nå oppdatert på forsiden!', 'success', 5000);
         } catch (e) {
-            console.error('Feil ved lagring av statistikk:', e);
-            this.showToast('Kunne ikke lagre statistikk.', 'error', 5000);
+                        console.error('Feil ved lagring av statistikk:', e);
+                    this.showToast('Kunne ikke lagre statistikk.', 'error', 5000);
         } finally {
-            btn.disabled = false;
-            btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    btn.innerHTML = originalText;
         }
     }
 
-    async renderProfileSection() {
+                    async renderProfileSection() {
         const section = document.getElementById('profile-section');
-        if (!section) return;
+                    if (!section) return;
 
-        const authUser = firebaseService.auth && firebaseService.auth.currentUser ? firebaseService.auth.currentUser : null;
-        if (!authUser) return;
+                    const authUser = firebaseService.auth && firebaseService.auth.currentUser ? firebaseService.auth.currentUser : null;
+                    if (!authUser) return;
 
-        section.innerHTML = `
-            <div style="width: 100%; margin: 0 auto; padding: 0 16px;">
-                <div class="card" style="padding: 24px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-                        <h3>Min Profil</h3>
-                        <span class="badge" style="font-size: 0.9rem; padding: 6px 12px;">Medlem siden 2024</span>
+                    section.innerHTML = `
+                    <div style="width: 100%; margin: 0 auto; padding: 0 16px;">
+                        <div class="card" style="padding: 24px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                                <h3>Min Profil</h3>
+                                <span class="badge" style="font-size: 0.9rem; padding: 6px 12px;">Medlem siden 2024</span>
+                            </div>
+
+                            <div style="background: white; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; margin-bottom: 30px; display: flex; align-items: center; gap: 24px;">
+                                <div id="profile-picture-container-admin" style="position: relative; width: 100px; height: 100px; border-radius: 50%; background: #D17D39; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700; overflow: hidden; border: 4px solid white; box-shadow: var(--shadow);">
+                                    ${(authUser.photoURL ? `<img src="${authUser.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : (authUser.displayName || authUser.email || '?').charAt(0).toUpperCase())}
+                                    <label for="profile-upload-admin" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;">
+                                        <span class="material-symbols-outlined">photo_camera</span>
+                                    </label>
+                                    <input type="file" id="profile-upload-admin" style="display: none;" accept="image/*">
+                                </div>
+                                <div>
+                                    <h4 style="margin-bottom: 4px;">Profilbilde</h4>
+                                    <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
+                                    <div style="display: flex; gap: 10px;">
+                                        <button type="button" id="upload-profile-btn-admin" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white; border-radius: 8px; cursor: pointer;">Last opp nytt</button>
+                                        ${Array.isArray(authUser.providerData) && authUser.providerData.some(p => p && p.providerId === 'google.com')
+                                            ? `<button type="button" id="google-photo-btn-admin" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white; border-radius: 8px; cursor: pointer;">Hent fra Google</button>`
+                                            : ''}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form id="admin-profile-full-form">
+                                <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personalia</h4>
+                                <div class="form-grid-2" style="gap: 20px; margin-bottom: 20px;">
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Navn</label>
+                                        <input type="text" name="displayName" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Telefon</label>
+                                        <input type="tel" name="phone" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    </div>
+                                    <div style="grid-column: span 2;">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">E-post</label>
+                                        <input type="email" name="email" disabled style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: #f8fafc; color: #64748b;">
+                                    </div>
+                                </div>
+
+                                <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Adresse</h4>
+                                <div class="form-grid-2" style="gap: 20px; margin-bottom: 20px;">
+                                    <div style="grid-column: span 2;">
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Gateadresse</label>
+                                        <input type="text" name="address" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Postnummer</label>
+                                        <input type="text" name="zip" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    </div>
+                                    <div>
+                                        <label style="display: block; margin-bottom: 8px; font-weight: 500;">Sted</label>
+                                        <input type="text" name="city" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
+                                    </div>
+                                </div>
+
+                                <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Kommunikasjon</h4>
+                                <div style="margin-bottom: 30px;">
+                                    <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
+                                        <input type="checkbox" name="newsletter" style="width: 18px; height: 18px; accent-color: #D17D39;">
+                                            <span>Motta nyhetsbrev på e-post</span>
+                                    </label>
+                                </div>
+
+                                <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personvern & Samtykke</h4>
+                                <div id="admin-consent-status-display" style="padding: 15px; background: #f1f5f9; border-radius: 8px; margin-bottom: 30px;">
+                                    <div class="loader">Henter samtykkestatus...</div>
+                                </div>
+
+                                <div style="display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border-color); padding-top: 24px;">
+                                    <button type="submit" id="save-profile-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; border:none; border-radius:10px; padding:12px 16px; color:#fff; font-weight:600; cursor:pointer; background: linear-gradient(135deg, #D17D39, #B54D2B);">
+                                        <span class="material-symbols-outlined">save</span> Lagre endringer
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
                     </div>
-                    
-                    <div style="background: white; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; margin-bottom: 30px; display: flex; align-items: center; gap: 24px;">
-                        <div id="profile-picture-container-admin" style="position: relative; width: 100px; height: 100px; border-radius: 50%; background: #D17D39; display: flex; align-items: center; justify-content: center; color: white; font-size: 2.5rem; font-weight: 700; overflow: hidden; border: 4px solid white; box-shadow: var(--shadow);">
-                            ${(authUser.photoURL ? `<img src="${authUser.photoURL}" style="width: 100%; height: 100%; object-fit: cover;">` : (authUser.displayName || authUser.email || '?').charAt(0).toUpperCase())}
-                            <label for="profile-upload-admin" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white; opacity: 0; transition: opacity 0.3s ease; cursor: pointer;">
-                                <span class="material-symbols-outlined">photo_camera</span>
-                            </label>
-                            <input type="file" id="profile-upload-admin" style="display: none;" accept="image/*">
-                        </div>
-                        <div>
-                            <h4 style="margin-bottom: 4px;">Profilbilde</h4>
-                            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Last opp et bilde fra din enhet eller bruk bildet fra Google.</p>
-                            <div style="display: flex; gap: 10px;">
-                                <button type="button" id="upload-profile-btn-admin" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white; border-radius: 8px; cursor: pointer;">Last opp nytt</button>
-                                ${Array.isArray(authUser.providerData) && authUser.providerData.some(p => p && p.providerId === 'google.com')
-                ? `<button type="button" id="google-photo-btn-admin" style="padding: 6px 12px; font-size: 0.85rem; border: 1px solid var(--border-color); background: white; border-radius: 8px; cursor: pointer;">Hent fra Google</button>`
-                : ''}
-                            </div>
-                        </div>
-                    </div>
+                    `;
+                    section.setAttribute('data-rendered', 'true');
 
-                    <form id="admin-profile-full-form">
-                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personalia</h4>
-                        <div class="form-grid-2" style="gap: 20px; margin-bottom: 20px;">
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Navn</label>
-                                <input type="text" name="displayName" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Telefon</label>
-                                <input type="tel" name="phone" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div style="grid-column: span 2;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">E-post</label>
-                                <input type="email" name="email" disabled style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; background: #f8fafc; color: #64748b;">
-                            </div>
-                        </div>
-
-                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Adresse</h4>
-                        <div class="form-grid-2" style="gap: 20px; margin-bottom: 20px;">
-                            <div style="grid-column: span 2;">
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Gateadresse</label>
-                                <input type="text" name="address" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Postnummer</label>
-                                <input type="text" name="zip" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                            <div>
-                                <label style="display: block; margin-bottom: 8px; font-weight: 500;">Sted</label>
-                                <input type="text" name="city" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px;">
-                            </div>
-                        </div>
-
-                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Kommunikasjon</h4>
-                        <div style="margin-bottom: 30px;">
-                            <label style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px; cursor: pointer;">
-                                <input type="checkbox" name="newsletter" style="width: 18px; height: 18px; accent-color: #D17D39;">
-                                <span>Motta nyhetsbrev på e-post</span>
-                            </label>
-                        </div>
-
-                        <h4 style="margin-bottom: 16px; color: #D17D39; border-bottom: 1px solid var(--border-color); padding-bottom: 8px;">Personvern & Samtykke</h4>
-                        <div id="admin-consent-status-display" style="padding: 15px; background: #f1f5f9; border-radius: 8px; margin-bottom: 30px;">
-                            <div class="loader">Henter samtykkestatus...</div>
-                        </div>
-
-                        <div style="display: flex; gap: 16px; align-items: center; border-top: 1px solid var(--border-color); padding-top: 24px;">
-                            <button type="submit" id="save-profile-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%; border:none; border-radius:10px; padding:12px 16px; color:#fff; font-weight:600; cursor:pointer; background: linear-gradient(135deg, #D17D39, #B54D2B);">
-                                <span class="material-symbols-outlined">save</span> Lagre endringer
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        `;
-        section.setAttribute('data-rendered', 'true');
-
-        // Load existing profile data from the same source as Min Side
-        const profile = await firebaseService.getPageContent('settings_profile');
-        let userProfile = null;
-        try {
+                    // Load existing profile data from the same source as Min Side
+                    const profile = await firebaseService.getPageContent('settings_profile');
+                    let userProfile = null;
+                    try {
             const userDoc = await firebase.firestore().collection('users').doc(authUser.uid).get();
-            if (userDoc.exists) userProfile = userDoc.data();
+                    if (userDoc.exists) userProfile = userDoc.data();
         } catch (e) {
-            console.warn('Kunne ikke hente users-profil i admin:', e);
+                        console.warn('Kunne ikke hente users-profil i admin:', e);
         }
 
-        const mergedName = (userProfile && userProfile.displayName) || (authUser && authUser.displayName) || (profile && profile.fullName) || '';
-        const mergedPhoto = (userProfile && userProfile.photoURL) || authUser.photoURL || (profile && profile.photoUrl) || '';
-        const mergedAddress = (userProfile && userProfile.address) || (profile && profile.address) || '';
-        const mergedZip = (userProfile && userProfile.zip) || (profile && profile.zip) || '';
-        const mergedCity = (userProfile && userProfile.city) || (profile && profile.city) || '';
-        const mergedPhone = (userProfile && userProfile.phone) || (profile && profile.phone) || '';
-        const mergedBio = (userProfile && userProfile.bio) || (profile && profile.bio) || '';
-        const mergedNewsletter = userProfile && typeof userProfile.newsletter === 'boolean' ? userProfile.newsletter : true;
+                    const mergedName = (userProfile && userProfile.displayName) || (authUser && authUser.displayName) || (profile && profile.fullName) || '';
+                    const mergedPhoto = (userProfile && userProfile.photoURL) || authUser.photoURL || (profile && profile.photoUrl) || '';
+                    const mergedAddress = (userProfile && userProfile.address) || (profile && profile.address) || '';
+                    const mergedZip = (userProfile && userProfile.zip) || (profile && profile.zip) || '';
+                    const mergedCity = (userProfile && userProfile.city) || (profile && profile.city) || '';
+                    const mergedPhone = (userProfile && userProfile.phone) || (profile && profile.phone) || '';
+                    const mergedBio = (userProfile && userProfile.bio) || (profile && profile.bio) || '';
+                    const mergedNewsletter = userProfile && typeof userProfile.newsletter === 'boolean' ? userProfile.newsletter : true;
 
-        const form = document.getElementById('admin-profile-full-form');
-        if (!form) return;
+                    const form = document.getElementById('admin-profile-full-form');
+                    if (!form) return;
 
-        form.querySelector('[name="displayName"]').value = mergedName;
-        form.querySelector('[name="email"]').value = authUser.email || '';
-        form.querySelector('[name="address"]').value = mergedAddress;
-        form.querySelector('[name="zip"]').value = mergedZip;
-        form.querySelector('[name="city"]').value = mergedCity;
-        form.querySelector('[name="phone"]').value = mergedPhone;
-        form.querySelector('[name="newsletter"]').checked = mergedNewsletter;
+                    form.querySelector('[name="displayName"]').value = mergedName;
+                    form.querySelector('[name="email"]').value = authUser.email || '';
+                    form.querySelector('[name="address"]').value = mergedAddress;
+                    form.querySelector('[name="zip"]').value = mergedZip;
+                    form.querySelector('[name="city"]').value = mergedCity;
+                    form.querySelector('[name="phone"]').value = mergedPhone;
+                    form.querySelector('[name="newsletter"]').checked = mergedNewsletter;
 
-        const pictureContainer = document.getElementById('profile-picture-container-admin');
-        if (mergedPhoto) {
+                    const pictureContainer = document.getElementById('profile-picture-container-admin');
+                    if (mergedPhoto) {
             const overlay = pictureContainer.querySelector('label[for="profile-upload-admin"]');
-            const input = pictureContainer.querySelector('#profile-upload-admin');
-            pictureContainer.innerHTML = `<img src="${mergedPhoto}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            if (overlay) pictureContainer.appendChild(overlay);
-            if (input) pictureContainer.appendChild(input);
+                    const input = pictureContainer.querySelector('#profile-upload-admin');
+                    pictureContainer.innerHTML = `<img src="${mergedPhoto}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                        if (overlay) pictureContainer.appendChild(overlay);
+                        if (input) pictureContainer.appendChild(input);
         }
 
-        // Consent status
-        try {
+                        // Consent status
+                        try {
             const consentDiv = document.getElementById('admin-consent-status-display');
-            const userDoc = await firebase.firestore().collection("users").doc(authUser.uid).get();
-            if (consentDiv) {
+                        const userDoc = await firebase.firestore().collection("users").doc(authUser.uid).get();
+                        if (consentDiv) {
                 if (userDoc.exists && userDoc.data().privacySettings) {
-                    const choices = userDoc.data().privacySettings.choices || {};
-                    consentDiv.innerHTML = `
+                    const choices = userDoc.data().privacySettings.choices || { };
+                        consentDiv.innerHTML = `
                         <p style="font-size: 0.95rem; line-height: 1.5;">
                             <strong>Aktivt samtykke:</strong><br>
-                            Nødvendige: <span style="color: green;">Ja</span><br>
-                            Statistikk: ${choices.analytics ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}<br>
-                            Markedsføring: ${choices.marketing ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}
-                        </p>
-                    `;
+                                Nødvendige: <span style="color: green;">Ja</span><br>
+                                    Statistikk: ${choices.analytics ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}<br>
+                                        Markedsføring: ${choices.marketing ? '<span style="color: green;">Ja</span>' : '<span style="color: red;">Nei</span>'}
+                                    </p>
+                                    `;
                 } else {
-                    consentDiv.innerHTML = '<p style="font-size: 0.95rem;">Ingen lagret samtykkestatus funnet.</p>';
+                                        consentDiv.innerHTML = '<p style="font-size: 0.95rem;">Ingen lagret samtykkestatus funnet.</p>';
                 }
             }
         } catch (e) {
             const consentDiv = document.getElementById('admin-consent-status-display');
-            if (consentDiv) consentDiv.textContent = 'Kunne ikke hente samtykkestatus.';
+                                    if (consentDiv) consentDiv.textContent = 'Kunne ikke hente samtykkestatus.';
         }
 
-        // Image upload
-        const fileInput = document.getElementById('profile-upload-admin');
-        const uploadBtn = document.getElementById('upload-profile-btn-admin');
+                                    // Image upload
+                                    const fileInput = document.getElementById('profile-upload-admin');
+                                    const uploadBtn = document.getElementById('upload-profile-btn-admin');
         if (uploadBtn && fileInput) uploadBtn.onclick = () => fileInput.click();
         fileInput.onchange = async () => {
             if (fileInput.files.length === 0) return;
-            uploadBtn.disabled = true;
-            uploadBtn.textContent = 'Laster opp...';
-            try {
+                                    uploadBtn.disabled = true;
+                                    uploadBtn.textContent = 'Laster opp...';
+                                    try {
                 const url = await firebaseService.uploadImage(fileInput.files[0], `profiles/${authUser.uid}/avatar.jpg`);
-                await authUser.updateProfile({ photoURL: url });
-                await firebase.firestore().collection('users').doc(authUser.uid).set({
-                    photoURL: url,
-                    displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
-                    email: authUser.email || '',
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                await firebaseService.savePageContent('settings_profile', {
-                    fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
-                    photoUrl: url,
-                    updatedAt: new Date().toISOString()
+                                    await authUser.updateProfile({photoURL: url });
+                                    await firebase.firestore().collection('users').doc(authUser.uid).set({
+                                        photoURL: url,
+                                    displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
+                                    email: authUser.email || '',
+                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, {merge: true });
+                                    await firebaseService.savePageContent('settings_profile', {
+                                        fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || '',
+                                    photoUrl: url,
+                                    updatedAt: new Date().toISOString()
                 });
 
-                const overlay = pictureContainer.querySelector('label[for="profile-upload-admin"]');
-                const input = pictureContainer.querySelector('#profile-upload-admin');
-                pictureContainer.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
-                if (overlay) pictureContainer.appendChild(overlay);
-                if (input) pictureContainer.appendChild(input);
-                await this.updateUserInfo(authUser);
-                this.showToast('Profilbilde oppdatert.', 'success', 4000);
+                                    const overlay = pictureContainer.querySelector('label[for="profile-upload-admin"]');
+                                    const input = pictureContainer.querySelector('#profile-upload-admin');
+                                    pictureContainer.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+                                        if (overlay) pictureContainer.appendChild(overlay);
+                                        if (input) pictureContainer.appendChild(input);
+                                        await this.updateUserInfo(authUser);
+                                        this.showToast('Profilbilde oppdatert.', 'success', 4000);
             } catch (err) {
-                this.showToast('Opplasting feilet: ' + err.message, 'error', 6000);
+                                            this.showToast('Opplasting feilet: ' + err.message, 'error', 6000);
             } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.textContent = 'Last opp nytt';
+                                            uploadBtn.disabled = false;
+                                        uploadBtn.textContent = 'Last opp nytt';
             }
         };
 
-        // Google photo sync
-        const googlePhotoBtn = document.getElementById('google-photo-btn-admin');
-        if (googlePhotoBtn) {
-            googlePhotoBtn.onclick = async () => {
-                const provider = (authUser.providerData || []).find(p => p && p.providerId === 'google.com');
-                if (!provider || !provider.photoURL) return;
-                try {
-                    await authUser.updateProfile({ photoURL: provider.photoURL });
-                    await firebase.firestore().collection('users').doc(authUser.uid).set({
-                        photoURL: provider.photoURL,
-                        displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
-                        email: authUser.email || '',
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
-                    await firebaseService.savePageContent('settings_profile', {
-                        fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
-                        photoUrl: provider.photoURL,
-                        updatedAt: new Date().toISOString()
-                    });
-                    await this.renderProfileSection();
-                    await this.updateUserInfo(authUser);
-                    this.showToast('Profilbilde hentet fra Google.', 'success', 4000);
-                } catch (err) {
-                    this.showToast('Kunne ikke hente bilde fra Google.', 'error', 5000);
-                }
-            };
+                                        // Google photo sync
+                                        const googlePhotoBtn = document.getElementById('google-photo-btn-admin');
+                                        if (googlePhotoBtn) {
+                                            googlePhotoBtn.onclick = async () => {
+                                                const provider = (authUser.providerData || []).find(p => p && p.providerId === 'google.com');
+                                                if (!provider || !provider.photoURL) return;
+                                                try {
+                                                    await authUser.updateProfile({ photoURL: provider.photoURL });
+                                                    await firebase.firestore().collection('users').doc(authUser.uid).set({
+                                                        photoURL: provider.photoURL,
+                                                        displayName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
+                                                        email: authUser.email || '',
+                                                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                                    }, { merge: true });
+                                                    await firebaseService.savePageContent('settings_profile', {
+                                                        fullName: form.querySelector('[name="displayName"]').value || authUser.displayName || provider.displayName || '',
+                                                        photoUrl: provider.photoURL,
+                                                        updatedAt: new Date().toISOString()
+                                                    });
+                                                    await this.renderProfileSection();
+                                                    await this.updateUserInfo(authUser);
+                                                    this.showToast('Profilbilde hentet fra Google.', 'success', 4000);
+                                                } catch (err) {
+                                                    this.showToast('Kunne ikke hente bilde fra Google.', 'error', 5000);
+                                                }
+                                            };
         }
 
         // Save full profile
         form.onsubmit = async (event) => {
-            event.preventDefault();
-            const btn = document.getElementById('save-profile-btn');
-            const data = {
-                fullName: form.querySelector('[name="displayName"]').value || '',
-                address: form.querySelector('[name="address"]').value || '',
-                zip: form.querySelector('[name="zip"]').value || '',
-                city: form.querySelector('[name="city"]').value || '',
-                phone: form.querySelector('[name="phone"]').value || '',
-                bio: mergedBio || '',
-                newsletter: form.querySelector('[name="newsletter"]').checked,
-                photoUrl: authUser.photoURL || mergedPhoto || '',
-                updatedAt: new Date().toISOString()
+                                            event.preventDefault();
+                                        const btn = document.getElementById('save-profile-btn');
+                                        const data = {
+                                            fullName: form.querySelector('[name="displayName"]').value || '',
+                                        address: form.querySelector('[name="address"]').value || '',
+                                        zip: form.querySelector('[name="zip"]').value || '',
+                                        city: form.querySelector('[name="city"]').value || '',
+                                        phone: form.querySelector('[name="phone"]').value || '',
+                                        bio: mergedBio || '',
+                                        newsletter: form.querySelector('[name="newsletter"]').checked,
+                                        photoUrl: authUser.photoURL || mergedPhoto || '',
+                                        updatedAt: new Date().toISOString()
             };
 
-            const original = btn.textContent;
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+                                        const original = btn.textContent;
+                                        btn.textContent = 'Lagrer...';
+                                        btn.disabled = true;
 
-            try {
-                const authUpdates = {};
-                if (data.fullName && data.fullName !== authUser.displayName) authUpdates.displayName = data.fullName;
+                                        try {
+                const authUpdates = { };
+                                        if (data.fullName && data.fullName !== authUser.displayName) authUpdates.displayName = data.fullName;
                 if (Object.keys(authUpdates).length > 0) {
-                    await authUser.updateProfile(authUpdates);
+                                            await authUser.updateProfile(authUpdates);
                 }
 
-                await firebase.firestore().collection('users').doc(authUser.uid).set({
-                    displayName: data.fullName,
-                    address: data.address,
-                    zip: data.zip,
-                    city: data.city,
-                    phone: data.phone,
-                    bio: data.bio,
-                    newsletter: data.newsletter,
-                    photoURL: data.photoUrl,
-                    email: authUser.email || '',
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
+                                        await firebase.firestore().collection('users').doc(authUser.uid).set({
+                                            displayName: data.fullName,
+                                        address: data.address,
+                                        zip: data.zip,
+                                        city: data.city,
+                                        phone: data.phone,
+                                        bio: data.bio,
+                                        newsletter: data.newsletter,
+                                        photoURL: data.photoUrl,
+                                        email: authUser.email || '',
+                                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, {merge: true });
 
-                await firebaseService.savePageContent('settings_profile', data);
-                this.showToast('✅ Profilen er lagret!', 'success', 5000);
-                await this.updateUserInfo(authUser);
+                                        await firebaseService.savePageContent('settings_profile', data);
+                                        this.showToast('✅ Profilen er lagret!', 'success', 5000);
+                                        await this.updateUserInfo(authUser);
             } catch (err) {
-                console.error(err);
-                this.showToast('❌ Feil ved lagring', 'error', 5000);
+                                            console.error(err);
+                                        this.showToast('❌ Feil ved lagring', 'error', 5000);
             } finally {
-                btn.textContent = original;
-                btn.disabled = false;
+                                            btn.textContent = original;
+                                        btn.disabled = false;
             }
         };
     }
 
-    renderHeroSlides(slides) {
+                                        renderHeroSlides(slides) {
         const container = document.getElementById('hero-slides-list');
-        if (slides.length === 0) {
-            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">Ingen slides ennå. Legg til din første!</p>';
-            return;
+                                        if (slides.length === 0) {
+                                            container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: #94a3b8;">Ingen slides ennå. Legg til din første!</p>';
+                                        return;
         }
 
         container.innerHTML = slides.map((slide, index) => `
-            <div class="item-card">
-                <div class="item-thumb">
-                    <img src="${slide.imageUrl || 'https://via.placeholder.com/400x225?text=Ingen+bilde'}" alt="Slide Thumb">
-                </div>
-                <div class="item-content">
-                    <h4 style="margin-bottom: 4px;">${slide.title || 'Uten tittel'}</h4>
-                    <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">${slide.subtitle || ''}</p>
-                    <div class="item-actions">
-                        <button class="icon-btn" onclick="adminManager.editHeroSlide(${index})">
-                            <span class="material-symbols-outlined">edit</span>
-                        </button>
-                        <button class="icon-btn delete" onclick="adminManager.deleteHeroSlide(${index})">
-                            <span class="material-symbols-outlined">delete</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+                                        <div class="item-card">
+                                            <div class="item-thumb">
+                                                <img src="${slide.imageUrl || 'https://via.placeholder.com/400x225?text=Ingen+bilde'}" alt="Slide Thumb">
+                                            </div>
+                                            <div class="item-content">
+                                                <h4 style="margin-bottom: 4px;">${slide.title || 'Uten tittel'}</h4>
+                                                <p style="font-size: 13px; color: #64748b; margin-bottom: 12px;">${slide.subtitle || ''}</p>
+                                                <div class="item-actions">
+                                                    <button class="icon-btn" onclick="adminManager.editHeroSlide(${index})">
+                                                        <span class="material-symbols-outlined">edit</span>
+                                                    </button>
+                                                    <button class="icon-btn delete" onclick="adminManager.deleteHeroSlide(${index})">
+                                                        <span class="material-symbols-outlined">delete</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        `).join('');
     }
 
-    async editHeroSlide(index = -1) {
+                                        async editHeroSlide(index = -1) {
         const isNew = index === -1;
-        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', btnText: '', btnLink: '' } : this.heroSlides[index];
+                                        const slide = isNew ? {title: '', subtitle: '', imageUrl: '', btnText: '', btnLink: '' } : this.heroSlides[index];
 
-        const modal = document.createElement('div');
-        modal.className = 'dashboard-modal';
-        modal.innerHTML = `
-            <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-                    <div class="card-header flex-between">
-                        <h3 class="card-title">${isNew ? 'Legg til ny slide' : 'Rediger slide'}</h3>
-                        <button class="icon-btn" id="close-modal"><span class="material-symbols-outlined">close</span></button>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label>Bilde URL / Last opp</label>
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="slide-img-url" class="form-control" value="${slide.imageUrl || ''}" style="flex: 1;">
-                                <button class="btn-primary" id="upload-slide-img" style="padding: 0 12px;"><span class="material-symbols-outlined">upload</span></button>
-                                <input type="file" id="slide-file-input" style="display: none;" accept="image/*">
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Overskrift</label>
-                            <input type="text" id="slide-title" class="form-control" value="${slide.title || ''}">
-                        </div>
-                        <div class="form-group">
-                            <label>Undertekst</label>
-                            <textarea id="slide-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label>Knapptekst</label>
-                            <input type="text" id="slide-btn-text" class="form-control" value="${slide.btnText || ''}">
-                        </div>
-                        <div class="form-group">
-                            <label>Knapp-lenke</label>
-                            <input type="text" id="slide-btn-link" class="form-control" value="${slide.btnLink || ''}">
-                        </div>
-                        <div style="margin-top: 24px;">
-                            <button class="btn-primary" style="width: 100%;" id="save-slide-btn">Lagre slide</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        document.body.appendChild(modal);
+                                        const modal = document.createElement('div');
+                                        modal.className = 'dashboard-modal';
+                                        modal.innerHTML = `
+                                        <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                                            <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+                                                <div class="card-header flex-between">
+                                                    <h3 class="card-title">${isNew ? 'Legg til ny slide' : 'Rediger slide'}</h3>
+                                                    <button class="icon-btn" id="close-modal"><span class="material-symbols-outlined">close</span></button>
+                                                </div>
+                                                <div class="card-body">
+                                                    <div class="form-group">
+                                                        <label>Bilde URL / Last opp</label>
+                                                        <div style="display: flex; gap: 8px;">
+                                                            <input type="text" id="slide-img-url" class="form-control" value="${slide.imageUrl || ''}" style="flex: 1;">
+                                                                <button class="btn-primary" id="upload-slide-img" style="padding: 0 12px;"><span class="material-symbols-outlined">upload</span></button>
+                                                                <input type="file" id="slide-file-input" style="display: none;" accept="image/*">
+                                                                </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Overskrift</label>
+                                                            <input type="text" id="slide-title" class="form-control" value="${slide.title || ''}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Undertekst</label>
+                                                            <textarea id="slide-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Knapptekst</label>
+                                                            <input type="text" id="slide-btn-text" class="form-control" value="${slide.btnText || ''}">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Knapp-lenke</label>
+                                                            <input type="text" id="slide-btn-link" class="form-control" value="${slide.btnLink || ''}">
+                                                        </div>
+                                                        <div style="margin-top: 24px;">
+                                                            <button class="btn-primary" style="width: 100%;" id="save-slide-btn">Lagre slide</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            `;
+                                            document.body.appendChild(modal);
 
-        const imgInput = document.getElementById('slide-img-url');
-        const fileInput = document.getElementById('slide-file-input');
-        const uploadBtn = document.getElementById('upload-slide-img');
+                                            const imgInput = document.getElementById('slide-img-url');
+                                            const fileInput = document.getElementById('slide-file-input');
+                                            const uploadBtn = document.getElementById('upload-slide-img');
 
         uploadBtn.onclick = () => fileInput.click();
         fileInput.onchange = async () => {
             if (fileInput.files.length === 0) return;
-            uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
-            try {
+                                            uploadBtn.disabled = true;
+                                            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
+                                            try {
                 const url = await firebaseService.uploadImage(fileInput.files[0], `hero/${Date.now()}_${fileInput.files[0].name}`);
-                imgInput.value = url;
+                                            imgInput.value = url;
             } catch (err) {
-                this.showToast('Opplasting feilet: ' + err.message, 'error', 5000);
+                                                this.showToast('Opplasting feilet: ' + err.message, 'error', 5000);
             } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
+                                                uploadBtn.disabled = false;
+                                            uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
             }
         };
 
         document.getElementById('close-modal').onclick = () => modal.remove();
         document.getElementById('save-slide-btn').onclick = async () => {
             const btn = document.getElementById('save-slide-btn');
-            const updatedSlide = {
-                imageUrl: document.getElementById('slide-img-url').value,
-                title: document.getElementById('slide-title').value,
-                subtitle: document.getElementById('slide-subtitle').value,
-                btnText: document.getElementById('slide-btn-text').value,
-                btnLink: document.getElementById('slide-btn-link').value
+                                            const updatedSlide = {
+                                                imageUrl: document.getElementById('slide-img-url').value,
+                                            title: document.getElementById('slide-title').value,
+                                            subtitle: document.getElementById('slide-subtitle').value,
+                                            btnText: document.getElementById('slide-btn-text').value,
+                                            btnLink: document.getElementById('slide-btn-link').value
             };
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+                                            btn.textContent = 'Lagrer...';
+                                            btn.disabled = true;
 
-            if (isNew) {
-                this.heroSlides.push(updatedSlide);
+                                            if (isNew) {
+                                                this.heroSlides.push(updatedSlide);
             } else {
-                this.heroSlides[index] = updatedSlide;
+                                                this.heroSlides[index] = updatedSlide;
             }
 
-            try {
-                await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
-                modal.remove();
-                this.renderHeroSlides(this.heroSlides);
-                this.showToast('✅ Slide lagret!', 'success');
+                                            try {
+                                                await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
+                                            modal.remove();
+                                            this.renderHeroSlides(this.heroSlides);
+                                            this.showToast('✅ Slide lagret!', 'success');
             } catch (err) {
-                this.showToast('Feil ved lagring', 'error', 5000);
-                btn.textContent = 'Lagre slide';
-                btn.disabled = false;
+                                                this.showToast('Feil ved lagring', 'error', 5000);
+                                            btn.textContent = 'Lagre slide';
+                                            btn.disabled = false;
             }
         };
     }
 
-    async deleteHeroSlide(index) {
+                                            async deleteHeroSlide(index) {
         if (!confirm('Vil du slette denne sliden?')) return;
-        this.heroSlides.splice(index, 1);
-        try {
-            await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
-            this.renderHeroSlides(this.heroSlides);
-            this.showToast('✅ Slettet!', 'success');
+                                            this.heroSlides.splice(index, 1);
+                                            try {
+                                                await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
+                                            this.renderHeroSlides(this.heroSlides);
+                                            this.showToast('✅ Slettet!', 'success');
         } catch (err) {
-            this.showToast('❌ Feil ved sletting', 'error', 5000);
+                                                this.showToast('❌ Feil ved sletting', 'error', 5000);
         }
     }
 
-    async renderTeachingManager() {
-        this.renderCollectionEditor('teaching', 'Undervisning');
+                                            async renderTeachingManager() {
+                                                this.renderCollectionEditor('teaching', 'Undervisning');
     }
 
-    async renderSEOSection() {
+                                            async renderSEOSection() {
         const section = document.getElementById('seo-section');
-        if (!section) return;
+                                            if (!section) return;
 
-        section.innerHTML = `
-        <div class="section-header">
-            <h2 class="section-title">SEO & Synlighet</h2>
-            <p class="section-subtitle">Styr hvordan nettsiden din ser ut i søkemotorer og sosiale medier.</p>
-        </div>
-        
-        <div class="ai-info-card">
-            <div class="ai-icon-circle">
-                <span class="material-symbols-outlined">auto_awesome</span>
-            </div>
-            <div class="ai-content">
-                <h4>AI-Søk Optimalisering</h4>
-                <p>Ved å legge til GEO-data og tydelige SEO-titler hjelper du AIer som ChatGPT og Perplexity å finne innholdet ditt mer presist. Dette øker sjansen for at kirken blir anbefalt i samtaler.</p>
-            </div>
-        </div>
+                                            section.innerHTML = `
+                                            <div class="section-header">
+                                                <h2 class="section-title">SEO & Synlighet</h2>
+                                                <p class="section-subtitle">Styr hvordan nettsiden din ser ut i søkemotorer og sosiale medier.</p>
+                                            </div>
 
-        <div class="grid-2">
-            <!-- Global SEO Card -->
-            <div class="card">
-                <div class="card-header"><h3 class="card-title">Global SEO</h3></div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label>Nettsteds Tittel (Prefix/Suffix)</label>
-                        <input type="text" id="seo-global-title" class="form-control" placeholder="His Kingdom Ministry">
-                    </div>
-                    <div class="form-group">
-                        <label>Standard Beskrivelse (Meta Description)</label>
-                        <textarea id="seo-global-desc" class="form-control" style="height: 100px;"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label>Søkeord (Keywords)</label>
-                        <input type="text" id="seo-global-keywords" class="form-control" placeholder="tro, jesus, undervisning">
-                        <span class="helper-text">Separer med komma.</span>
-                    </div>
-                    
-                    <div class="divider"></div>
-                    
-                    <h4 style="font-size: 15px; margin-bottom: 16px; color: var(--text-main);">GEO Metadata (Lokal SEO)</h4>
-                    <div class="form-group">
-                        <label>GEO Posisjon (Lat, Long)</label>
-                        <input type="text" id="seo-global-geo-pos" class="form-control" placeholder="59.9139, 10.7522">
-                    </div>
-                    <div class="grid-2-cols" style="gap: 16px;">
-                        <div class="form-group">
-                            <label>GEO Region</label>
-                            <input type="text" id="seo-global-geo-region" class="form-control" placeholder="NO-Oslo">
-                        </div>
-                        <div class="form-group">
-                            <label>GEO Sted</label>
-                            <input type="text" id="seo-global-geo-place" class="form-control" placeholder="Oslo">
-                        </div>
-                    </div>
-                    <div style="margin-top: 10px;">
-                        <button class="btn-primary" id="save-global-seo" style="width: 100%;">Lagre Globale Innstillinger</button>
-                    </div>
-                </div>
-            </div>
+                                            <div class="ai-info-card">
+                                                <div class="ai-icon-circle">
+                                                    <span class="material-symbols-outlined">auto_awesome</span>
+                                                </div>
+                                                <div class="ai-content">
+                                                    <h4>AI-Søk Optimalisering</h4>
+                                                    <p>Ved å legge til GEO-data og tydelige SEO-titler hjelper du AIer som ChatGPT og Perplexity å finne innholdet ditt mer presist. Dette øker sjansen for at kirken blir anbefalt i samtaler.</p>
+                                                </div>
+                                            </div>
 
-            <!-- Open Graph / Social Media Card -->
-            <div class="card">
-                <div class="card-header"><h3 class="card-title">Sosiale Medier (Open Graph)</h3></div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label style="margin-bottom: 12px; display: block;">Dele-bilde (OG Image)</label>
-                        
-                        <!-- Modern Upload Area -->
-                        <div class="upload-area" id="upload-og-img">
-                            <span class="material-symbols-outlined upload-icon">add_photo_alternate</span>
-                            <span class="upload-label">Last opp bilde</span>
-                            <span class="upload-hint">Anbefalt størrelse: 1200 x 630 px</span>
-                        </div>
-                        <input type="file" id="og-file-input" style="display: none;" accept="image/*">
-                        <input type="hidden" id="seo-og-image">
-                    </div>
-                    
-                    <div id="og-preview" style="margin-top: 20px; border-radius: 12px; overflow: hidden; display: none; border: 1px solid var(--border-color);"></div>
-                    <p style="font-size: 13px; color: #64748b; margin-top: 16px; line-height: 1.5;">Dette bildet vises når du deler linker til nettsiden på Facebook, LinkedIn, Slack og andre plattformer.</p>
-                </div>
-            </div>
-        </div>
+                                            <div class="grid-2">
+                                                <!-- Global SEO Card -->
+                                                <div class="card">
+                                                    <div class="card-header"><h3 class="card-title">Global SEO</h3></div>
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label>Nettsteds Tittel (Prefix/Suffix)</label>
+                                                            <input type="text" id="seo-global-title" class="form-control" placeholder="His Kingdom Ministry">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Standard Beskrivelse (Meta Description)</label>
+                                                            <textarea id="seo-global-desc" class="form-control" style="height: 100px;"></textarea>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Søkeord (Keywords)</label>
+                                                            <input type="text" id="seo-global-keywords" class="form-control" placeholder="tro, jesus, undervisning">
+                                                                <span class="helper-text">Separer med komma.</span>
+                                                        </div>
 
-        <div class="card" style="margin-top: 32px;">
-            <div class="card-header flex-between">
-                <div>
-                    <h3 class="card-title">Sidespesifikk SEO</h3>
-                    <p class="section-subtitle" style="margin-bottom: 0;">Overstyr globale innstillinger for enkeltsider.</p>
-                </div>
-                <select id="seo-page-selector" class="form-control" style="width: 250px;">
-                    <option value="index">Forside</option>
-                    <option value="om-oss">Om Oss</option>
-                    <option value="media">Media</option>
-                    <option value="arrangementer">Arrangementer</option>
-                    <option value="blogg">Blogg</option>
-                    <option value="donasjoner">Donasjoner</option>
-                    <option value="kontakt">Kontakt</option>
-                    <option value="undervisning">Undervisning</option>
-                    <option value="bibelstudier">Bibelstudier</option>
-                    <option value="seminarer">Seminarer</option>
-                    <option value="podcast">Podcast</option>
-                </select>
-            </div>
-            <div class="card-body">
-                <div class="form-group">
-                    <label>Side-tittel (Vises i fanen)</label>
-                    <input type="text" id="seo-page-title" class="form-control" placeholder="La stå tom for å bruke standard">
-                </div>
-                <div class="form-group">
-                    <label>Side-beskrivelse</label>
-                    <textarea id="seo-page-desc" class="form-control" style="height: 80px;" placeholder="Optimalisert beskrivelse for denne spesifikke siden..."></textarea>
-                </div>
-                <div class="grid-2-cols" style="gap: 24px;">
-                    <div class="form-group">
-                        <label>GEO Posisjon (Side)</label>
-                        <input type="text" id="seo-page-geo-pos" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label>GEO Sted (Side)</label>
-                        <input type="text" id="seo-page-geo-place" class="form-control">
-                    </div>
-                </div>
-                <button class="btn-secondary" id="save-page-seo" style="width: 100%; margin-top: 10px;">Lagre SEO for denne siden</button>
-            </div>
-        </div>
-        `;
-        section.setAttribute('data-rendered', 'true');
+                                                        <div class="divider"></div>
 
-        // Load Data
-        const seoData = await firebaseService.getPageContent('settings_seo') || {};
-        document.getElementById('seo-global-title').value = seoData.globalTitle || '';
-        document.getElementById('seo-global-desc').value = seoData.globalDescription || '';
-        document.getElementById('seo-global-keywords').value = seoData.globalKeywords || '';
-        document.getElementById('seo-og-image').value = seoData.ogImage || '';
-        document.getElementById('seo-global-geo-pos').value = seoData.geoPosition || '';
-        document.getElementById('seo-global-geo-region').value = seoData.geoRegion || '';
-        document.getElementById('seo-global-geo-place').value = seoData.geoPlacename || '';
+                                                        <h4 style="font-size: 15px; margin-bottom: 16px; color: var(--text-main);">GEO Metadata (Lokal SEO)</h4>
+                                                        <div class="form-group">
+                                                            <label>GEO Posisjon (Lat, Long)</label>
+                                                            <input type="text" id="seo-global-geo-pos" class="form-control" placeholder="59.9139, 10.7522">
+                                                        </div>
+                                                        <div class="grid-2-cols" style="gap: 16px;">
+                                                            <div class="form-group">
+                                                                <label>GEO Region</label>
+                                                                <input type="text" id="seo-global-geo-region" class="form-control" placeholder="NO-Oslo">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>GEO Sted</label>
+                                                                <input type="text" id="seo-global-geo-place" class="form-control" placeholder="Oslo">
+                                                            </div>
+                                                        </div>
+                                                        <div style="margin-top: 10px;">
+                                                            <button class="btn-primary" id="save-global-seo" style="width: 100%;">Lagre Globale Innstillinger</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Open Graph / Social Media Card -->
+                                                <div class="card">
+                                                    <div class="card-header"><h3 class="card-title">Sosiale Medier (Open Graph)</h3></div>
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label style="margin-bottom: 12px; display: block;">Dele-bilde (OG Image)</label>
+
+                                                            <!-- Modern Upload Area -->
+                                                            <div class="upload-area" id="upload-og-img">
+                                                                <span class="material-symbols-outlined upload-icon">add_photo_alternate</span>
+                                                                <span class="upload-label">Last opp bilde</span>
+                                                                <span class="upload-hint">Anbefalt størrelse: 1200 x 630 px</span>
+                                                            </div>
+                                                            <input type="file" id="og-file-input" style="display: none;" accept="image/*">
+                                                                <input type="hidden" id="seo-og-image">
+                                                                </div>
+
+                                                                <div id="og-preview" style="margin-top: 20px; border-radius: 12px; overflow: hidden; display: none; border: 1px solid var(--border-color);"></div>
+                                                                <p style="font-size: 13px; color: #64748b; margin-top: 16px; line-height: 1.5;">Dette bildet vises når du deler linker til nettsiden på Facebook, LinkedIn, Slack og andre plattformer.</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="card" style="margin-top: 32px;">
+                                                    <div class="card-header flex-between">
+                                                        <div>
+                                                            <h3 class="card-title">Sidespesifikk SEO</h3>
+                                                            <p class="section-subtitle" style="margin-bottom: 0;">Overstyr globale innstillinger for enkeltsider.</p>
+                                                        </div>
+                                                        <select id="seo-page-selector" class="form-control" style="width: 250px;">
+                                                            <option value="index">Forside</option>
+                                                            <option value="om-oss">Om Oss</option>
+                                                            <option value="media">Media</option>
+                                                            <option value="arrangementer">Arrangementer</option>
+                                                            <option value="blogg">Blogg</option>
+                                                            <option value="donasjoner">Donasjoner</option>
+                                                            <option value="kontakt">Kontakt</option>
+                                                            <option value="undervisning">Undervisning</option>
+                                                            <option value="bibelstudier">Bibelstudier</option>
+                                                            <option value="seminarer">Seminarer</option>
+                                                            <option value="podcast">Podcast</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="form-group">
+                                                            <label>Side-tittel (Vises i fanen)</label>
+                                                            <input type="text" id="seo-page-title" class="form-control" placeholder="La stå tom for å bruke standard">
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label>Side-beskrivelse</label>
+                                                            <textarea id="seo-page-desc" class="form-control" style="height: 80px;" placeholder="Optimalisert beskrivelse for denne spesifikke siden..."></textarea>
+                                                        </div>
+                                                        <div class="grid-2-cols" style="gap: 24px;">
+                                                            <div class="form-group">
+                                                                <label>GEO Posisjon (Side)</label>
+                                                                <input type="text" id="seo-page-geo-pos" class="form-control">
+                                                            </div>
+                                                            <div class="form-group">
+                                                                <label>GEO Sted (Side)</label>
+                                                                <input type="text" id="seo-page-geo-place" class="form-control">
+                                                            </div>
+                                                        </div>
+                                                        <button class="btn-secondary" id="save-page-seo" style="width: 100%; margin-top: 10px;">Lagre SEO for denne siden</button>
+                                                    </div>
+                                                </div>
+                                                `;
+                                                section.setAttribute('data-rendered', 'true');
+
+                                                // Load Data
+                                                const seoData = await firebaseService.getPageContent('settings_seo') || { };
+                                                document.getElementById('seo-global-title').value = seoData.globalTitle || '';
+                                                document.getElementById('seo-global-desc').value = seoData.globalDescription || '';
+                                                document.getElementById('seo-global-keywords').value = seoData.globalKeywords || '';
+                                                document.getElementById('seo-og-image').value = seoData.ogImage || '';
+                                                document.getElementById('seo-global-geo-pos').value = seoData.geoPosition || '';
+                                                document.getElementById('seo-global-geo-region').value = seoData.geoRegion || '';
+                                                document.getElementById('seo-global-geo-place').value = seoData.geoPlacename || '';
 
         const updateOGPreview = () => {
             const url = document.getElementById('seo-og-image').value;
-            const preview = document.getElementById('og-preview');
-            if (url) {
-                preview.innerHTML = `<img src="${url}" style="width: 100%; display: block;">`;
-                preview.style.display = 'block';
+                                                const preview = document.getElementById('og-preview');
+                                                if (url) {
+                                                    preview.innerHTML = `<img src="${url}" style="width: 100%; display: block;">`;
+                                                preview.style.display = 'block';
             } else {
-                preview.style.display = 'none';
+                                                    preview.style.display = 'none';
             }
         };
-        updateOGPreview();
+                                                updateOGPreview();
 
-        // Page SEO Loading
-        const pageSelector = document.getElementById('seo-page-selector');
+                                                // Page SEO Loading
+                                                const pageSelector = document.getElementById('seo-page-selector');
         const loadPageSEO = () => {
             const pageId = pageSelector.value;
-            const pageSEO = (seoData.pages && seoData.pages[pageId]) || {};
-            document.getElementById('seo-page-title').value = pageSEO.title || '';
-            document.getElementById('seo-page-desc').value = pageSEO.description || '';
-            document.getElementById('seo-page-geo-pos').value = pageSEO.geoPosition || '';
-            document.getElementById('seo-page-geo-place').value = pageSEO.geoPlacename || '';
+                                                const pageSEO = (seoData.pages && seoData.pages[pageId]) || { };
+                                                document.getElementById('seo-page-title').value = pageSEO.title || '';
+                                                document.getElementById('seo-page-desc').value = pageSEO.description || '';
+                                                document.getElementById('seo-page-geo-pos').value = pageSEO.geoPosition || '';
+                                                document.getElementById('seo-page-geo-place').value = pageSEO.geoPlacename || '';
         };
-        pageSelector.onchange = loadPageSEO;
-        loadPageSEO();
+                                                pageSelector.onchange = loadPageSEO;
+                                                loadPageSEO();
 
-        // Image Upload
-        const ogFileInput = document.getElementById('og-file-input');
-        const uploadOGBtn = document.getElementById('upload-og-img');
+                                                // Image Upload
+                                                const ogFileInput = document.getElementById('og-file-input');
+                                                const uploadOGBtn = document.getElementById('upload-og-img');
         uploadOGBtn.onclick = () => ogFileInput.click();
         ogFileInput.onchange = async () => {
             if (ogFileInput.files.length === 0) return;
-            uploadOGBtn.disabled = true;
-            uploadOGBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
-            try {
+                                                uploadOGBtn.disabled = true;
+                                                uploadOGBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
+                                                try {
                 const url = await firebaseService.uploadImage(ogFileInput.files[0], `seo/og_image_${Date.now()}`);
-                document.getElementById('seo-og-image').value = url;
-                updateOGPreview();
-            } catch (err) { showToast('Upload failed'); }
-            finally {
-                uploadOGBtn.disabled = false;
-                uploadOGBtn.innerHTML = '<span class="material-symbols-outlined">upload</span>';
+                                                document.getElementById('seo-og-image').value = url;
+                                                updateOGPreview();
+            } catch (err) {showToast('Upload failed'); }
+                                                finally {
+                                                    uploadOGBtn.disabled = false;
+                                                uploadOGBtn.innerHTML = '<span class="material-symbols-outlined">upload</span>';
             }
         };
 
         // Save Global
         document.getElementById('save-global-seo').onclick = async () => {
             const btn = document.getElementById('save-global-seo');
-            seoData.globalTitle = document.getElementById('seo-global-title').value;
-            seoData.globalDescription = document.getElementById('seo-global-desc').value;
-            seoData.globalKeywords = document.getElementById('seo-global-keywords').value;
-            seoData.ogImage = document.getElementById('seo-og-image').value;
-            seoData.geoPosition = document.getElementById('seo-global-geo-pos').value;
-            seoData.geoRegion = document.getElementById('seo-global-geo-region').value;
-            seoData.geoPlacename = document.getElementById('seo-global-geo-place').value;
+                                                seoData.globalTitle = document.getElementById('seo-global-title').value;
+                                                seoData.globalDescription = document.getElementById('seo-global-desc').value;
+                                                seoData.globalKeywords = document.getElementById('seo-global-keywords').value;
+                                                seoData.ogImage = document.getElementById('seo-og-image').value;
+                                                seoData.geoPosition = document.getElementById('seo-global-geo-pos').value;
+                                                seoData.geoRegion = document.getElementById('seo-global-geo-region').value;
+                                                seoData.geoPlacename = document.getElementById('seo-global-geo-place').value;
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
-            try {
-                await firebaseService.savePageContent('settings_seo', seoData);
-                this.showToast('✅ Globale SEO-innstillinger lagret!', 'success', 5000);
-            } catch (err) { this.showToast('❌ Feil ved lagring', 'error', 5000); }
-            finally {
-                btn.textContent = 'Lagre Globale Innstillinger';
-                btn.disabled = false;
+                                                btn.textContent = 'Lagrer...';
+                                                btn.disabled = true;
+                                                try {
+                                                    await firebaseService.savePageContent('settings_seo', seoData);
+                                                this.showToast('✅ Globale SEO-innstillinger lagret!', 'success', 5000);
+            } catch (err) {this.showToast('❌ Feil ved lagring', 'error', 5000); }
+                                                finally {
+                                                    btn.textContent = 'Lagre Globale Innstillinger';
+                                                btn.disabled = false;
             }
         };
 
         // Save Page SEO
         document.getElementById('save-page-seo').onclick = async () => {
             const btn = document.getElementById('save-page-seo');
-            const pageId = pageSelector.value;
-            if (!seoData.pages) seoData.pages = {};
-            seoData.pages[pageId] = {
-                title: document.getElementById('seo-page-title').value,
-                description: document.getElementById('seo-page-desc').value
+                                                const pageId = pageSelector.value;
+                                                if (!seoData.pages) seoData.pages = { };
+                                                seoData.pages[pageId] = {
+                                                    title: document.getElementById('seo-page-title').value,
+                                                description: document.getElementById('seo-page-desc').value
             };
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
-            try {
-                await firebaseService.savePageContent('settings_seo', seoData);
-                showToast(`SEO for ${pageId} lagret!`);
-            } catch (err) { showToast('Feil ved lagring'); }
-            finally {
-                btn.textContent = 'Lagre SEO for denne siden';
-                btn.disabled = false;
+                                                btn.textContent = 'Lagrer...';
+                                                btn.disabled = true;
+                                                try {
+                                                    await firebaseService.savePageContent('settings_seo', seoData);
+                                                showToast(`SEO for ${pageId} lagret!`);
+            } catch (err) {showToast('Feil ved lagring'); }
+                                                finally {
+                                                    btn.textContent = 'Lagre SEO for denne siden';
+                                                btn.disabled = false;
             }
         };
     }
 
-    async renderIntegrationsSection() {
+                                                async renderIntegrationsSection() {
         const section = document.getElementById('integrations-section');
-        if (!section) return;
+                                                if (!section) return;
 
-        section.innerHTML = `
-            <div class="section-header">
-                <h2 class="section-title">Integrasjoner</h2>
-                <p class="section-subtitle">Koble nettsiden din til eksterne tjenester som Google Calendar.</p>
-            </div>
-            
-            <div class="grid-2-cols" style="gap: 24px;">
-                <!-- Google Calendar Integration -->
-                <div class="card">
-                    <div class="card-header flex-between">
-                        <h3 class="card-title">Google Calendar</h3>
-                        <div class="status-badge" id="gcal-status" style="font-size: 12px; padding: 4px 8px; border-radius: 12px; background: #fee2e2; color: #991b1b;">Frakoblet</div>
-                    </div>
-                    <div class="card-body">
-                        <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Hent arrangementer automatisk fra din Google-kalender til nettsiden.</p>
-                        
-                        <div class="form-group">
-                            <label>Google API Key</label>
-                            <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
-                            <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Sørg for at 'Google Calendar API' er aktivert i Cloud Console.</p>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Calendar ID</label>
-                            <div id="gcal-list" class="gcal-list"></div>
-                            <button type="button" class="btn btn-outline" id="add-gcal" style="margin-top: 10px;">Legg til kalender</button>
-                            <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Legg inn flere kalendere for filtrering. Calendar ID finner du under "Integrer kalender".</p>
-                        </div>
+                                                section.innerHTML = `
+                                                <div class="section-header">
+                                                    <h2 class="section-title">Integrasjoner</h2>
+                                                    <p class="section-subtitle">Koble nettsiden din til eksterne tjenester som Google Calendar.</p>
+                                                </div>
 
-                        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-                            <h4 style="margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                                <span class="material-symbols-outlined" style="font-size: 18px; color: #f39c12;">sync</span>
-                                Synkronisering (To-veis)
-                            </h4>
-                            <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Aktiver to-veis synkronisering for å sende endringer fra dashbordet tilbake til Google Calendar.</p>
-                            
-                            <div id="google-auth-status" style="margin-bottom: 15px;">
-                                ${this.googleAccessToken ? `
+                                                <div class="grid-2-cols" style="gap: 24px;">
+                                                    <!-- Google Calendar Integration -->
+                                                    <div class="card">
+                                                        <div class="card-header flex-between">
+                                                            <h3 class="card-title">Google Calendar</h3>
+                                                            <div class="status-badge" id="gcal-status" style="font-size: 12px; padding: 4px 8px; border-radius: 12px; background: #fee2e2; color: #991b1b;">Frakoblet</div>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Hent arrangementer automatisk fra din Google-kalender til nettsiden.</p>
+
+                                                            <div class="form-group">
+                                                                <label>Google API Key</label>
+                                                                <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
+                                                                    <p style="font-size: 11px; color: #94a3b8; margin-top: 4px;">Sørg for at 'Google Calendar API' er aktivert i Cloud Console.</p>
+                                                            </div>
+
+                                                            <div class="form-group">
+                                                                <label>Calendar ID</label>
+                                                                <div id="gcal-list" class="gcal-list"></div>
+                                                                <button type="button" class="btn btn-outline" id="add-gcal" style="margin-top: 10px;">Legg til kalender</button>
+                                                                <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Legg inn flere kalendere for filtrering. Calendar ID finner du under "Integrer kalender".</p>
+                                                            </div>
+
+                                                            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+                                                                <h4 style="margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                                                                    <span class="material-symbols-outlined" style="font-size: 18px; color: #f39c12;">sync</span>
+                                                                    Synkronisering (To-veis)
+                                                                </h4>
+                                                                <p style="font-size: 12px; color: #64748b; margin-bottom: 12px;">Aktiver to-veis synkronisering for å sende endringer fra dashbordet tilbake til Google Calendar.</p>
+
+                                                                <div id="google-auth-status" style="margin-bottom: 15px;">
+                                                                    ${this.googleAccessToken ? `
                                     <div style="display: flex; align-items: center; gap: 10px; padding: 10px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
                                         <span class="material-symbols-outlined" style="color: #16a34a;">check_circle</span>
                                         <div style="flex: 1;">
@@ -3869,285 +3891,285 @@ class AdminManager {
                                         Koble til Google for skrivetilgang
                                     </button>
                                 `}
-                            </div>
-                        </div>
+                                                                </div>
+                                                            </div>
 
-                        <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
-                            <h4 style="margin-bottom: 12px; font-size: 14px;">Visningsinnstillinger</h4>
-                            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                <input type="checkbox" id="gcal-show-month" style="width: 18px; height: 18px;">
-                                <label for="gcal-show-month" style="margin-bottom: 0; cursor: pointer;">Vis Månedskalender</label>
-                            </div>
-                            <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                                <input type="checkbox" id="gcal-show-agenda" style="width: 18px; height: 18px;">
-                                <label for="gcal-show-agenda" style="margin-bottom: 0; cursor: pointer;">Vis Agendaoversikt (Kommende arrangementer)</label>
-                            </div>
-                        </div>
+                                                            <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+                                                                <h4 style="margin-bottom: 12px; font-size: 14px;">Visningsinnstillinger</h4>
+                                                                <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                                                                    <input type="checkbox" id="gcal-show-month" style="width: 18px; height: 18px;">
+                                                                        <label for="gcal-show-month" style="margin-bottom: 0; cursor: pointer;">Vis Månedskalender</label>
+                                                                </div>
+                                                                <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+                                                                    <input type="checkbox" id="gcal-show-agenda" style="width: 18px; height: 18px;">
+                                                                        <label for="gcal-show-agenda" style="margin-bottom: 0; cursor: pointer;">Vis Agendaoversikt (Kommende arrangementer)</label>
+                                                                </div>
+                                                            </div>
 
-                        <div style="margin-top: 10px;">
-                            <button class="btn-primary" id="save-gcal-settings" style="width: 100%;">Lagre Kalender-innstillinger</button>
-                        </div>
-                    </div>
-                </div>
+                                                            <div style="margin-top: 10px;">
+                                                                <button class="btn-primary" id="save-gcal-settings" style="width: 100%;">Lagre Kalender-innstillinger</button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
 
-                <!-- Guidance Card -->
-                <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
-                    <div class="card-body">
-                        <h4 style="margin-bottom: 15px;">Slik setter du opp Google Calendar:</h4>
-                        <ol style="font-size: 13px; padding-left: 20px; line-height: 1.6; color: #334155;">
-                            <li>Gå til <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>.</li>
-                            <li>Opprett et prosjekt og aktiver <b>Google Calendar API</b>.</li>
-                            <li>Gå til "Credentials" og opprett en <b>API Key</b> (begrens den gjerne til ditt domene).</li>
-                            <li>I Google Calendar: Gå til innstillinger for kalenderen du vil dele.</li>
-                            <li>Under "Access permissions", huk av for <b>Make available to public</b>.</li>
-                            <li>Finn <b>Calendar ID</b> under "Integrate calendar" og lim den inn her.</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        `;
+                                                    <!-- Guidance Card -->
+                                                    <div class="card" style="background: #f8fafc; border: 1px dashed #cbd5e1;">
+                                                        <div class="card-body">
+                                                            <h4 style="margin-bottom: 15px;">Slik setter du opp Google Calendar:</h4>
+                                                            <ol style="font-size: 13px; padding-left: 20px; line-height: 1.6; color: #334155;">
+                                                                <li>Gå til <a href="https://console.cloud.google.com/" target="_blank">Google Cloud Console</a>.</li>
+                                                                <li>Opprett et prosjekt og aktiver <b>Google Calendar API</b>.</li>
+                                                                <li>Gå til "Credentials" og opprett en <b>API Key</b> (begrens den gjerne til ditt domene).</li>
+                                                                <li>I Google Calendar: Gå til innstillinger for kalenderen du vil dele.</li>
+                                                                <li>Under "Access permissions", huk av for <b>Make available to public</b>.</li>
+                                                                <li>Finn <b>Calendar ID</b> under "Integrate calendar" og lim den inn her.</li>
+                                                            </ol>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                `;
 
-        // Bind Google Auth listeners
-        const connectBtn = document.getElementById('connect-google-btn');
-        if (connectBtn) {
-            connectBtn.onclick = async () => {
-                try {
-                    const result = await firebaseService.connectToGoogle();
-                    this.googleAccessToken = result.accessToken;
-                    this.showToast('Tilkoblet Google! Du har nå skrivetilgang.', 'success');
-                    this.renderIntegrationsSection(); // Refresh UI to show connected state
-                } catch (error) {
-                    console.error('Google connection failed:', error);
-                    this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
-                }
-            };
+                                                // Bind Google Auth listeners
+                                                const connectBtn = document.getElementById('connect-google-btn');
+                                                if (connectBtn) {
+                                                    connectBtn.onclick = async () => {
+                                                        try {
+                                                            const result = await firebaseService.connectToGoogle();
+                                                            this.googleAccessToken = result.accessToken;
+                                                            this.showToast('Tilkoblet Google! Du har nå skrivetilgang.', 'success');
+                                                            this.renderIntegrationsSection(); // Refresh UI to show connected state
+                                                        } catch (error) {
+                                                            console.error('Google connection failed:', error);
+                                                            this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
+                                                        }
+                                                    };
         }
 
-        const disconnectBtn = document.getElementById('disconnect-google');
-        if (disconnectBtn) {
-            disconnectBtn.onclick = () => {
-                this.googleAccessToken = null;
-                this.showToast('Koblet fra Google. Skrivetilgang deaktivert.');
-                this.renderIntegrationsSection();
-            };
+                                                const disconnectBtn = document.getElementById('disconnect-google');
+                                                if (disconnectBtn) {
+                                                    disconnectBtn.onclick = () => {
+                                                        this.googleAccessToken = null;
+                                                        this.showToast('Koblet fra Google. Skrivetilgang deaktivert.');
+                                                        this.renderIntegrationsSection();
+                                                    };
         }
 
-        // Load existing settings
-        const settings = await firebaseService.getPageContent('settings_integrations') || {};
-        const gcal = settings.googleCalendar || {};
+                                                // Load existing settings
+                                                const settings = await firebaseService.getPageContent('settings_integrations') || { };
+                                                const gcal = settings.googleCalendar || { };
 
-        document.getElementById('gcal-api-key').value = gcal.apiKey || '';
-        document.getElementById('gcal-show-month').checked = settings.showMonthView !== false; // Default true
-        document.getElementById('gcal-show-agenda').checked = settings.showAgendaView !== false; // Default true
+                                                document.getElementById('gcal-api-key').value = gcal.apiKey || '';
+                                                document.getElementById('gcal-show-month').checked = settings.showMonthView !== false; // Default true
+                                                document.getElementById('gcal-show-agenda').checked = settings.showAgendaView !== false; // Default true
 
-        const listEl = document.getElementById('gcal-list');
-        const addBtn = document.getElementById('add-gcal');
-        const savedCalendars = Array.isArray(settings.googleCalendars)
-            ? settings.googleCalendars
-            : (gcal.calendarId ? [{ id: gcal.calendarId, label: gcal.label || '' }] : []);
+                                                const listEl = document.getElementById('gcal-list');
+                                                const addBtn = document.getElementById('add-gcal');
+                                                const savedCalendars = Array.isArray(settings.googleCalendars)
+                                                ? settings.googleCalendars
+                                                : (gcal.calendarId ? [{id: gcal.calendarId, label: gcal.label || '' }] : []);
 
-        const renderCalendarRow = (value = {}) => {
+                                                const renderCalendarRow = (value = { }) => {
             const row = document.createElement('div');
-            row.className = 'gcal-row';
-            row.style.display = 'grid';
-            row.style.gridTemplateColumns = '1fr 2fr auto';
-            row.style.gap = '8px';
-            row.style.marginBottom = '8px';
+                                                row.className = 'gcal-row';
+                                                row.style.display = 'grid';
+                                                row.style.gridTemplateColumns = '1fr 2fr auto';
+                                                row.style.gap = '8px';
+                                                row.style.marginBottom = '8px';
 
-            row.innerHTML = `
-                <input type="text" class="form-control gcal-label" placeholder="Navn (f.eks. Moter)" value="${this.escapeHtml(value.label || '')}">
-                <input type="text" class="form-control gcal-id" placeholder="Calendar ID" value="${this.escapeHtml(value.id || '')}">
-                <button type="button" class="btn btn-outline gcal-remove">Fjern</button>
-            `;
+                                                row.innerHTML = `
+                                                <input type="text" class="form-control gcal-label" placeholder="Navn (f.eks. Moter)" value="${this.escapeHtml(value.label || '')}">
+                                                    <input type="text" class="form-control gcal-id" placeholder="Calendar ID" value="${this.escapeHtml(value.id || '')}">
+                                                        <button type="button" class="btn btn-outline gcal-remove">Fjern</button>
+                                                        `;
 
             row.querySelector('.gcal-remove').addEventListener('click', () => {
-                row.remove();
+                                                            row.remove();
             });
 
-            listEl.appendChild(row);
+                                                        listEl.appendChild(row);
         };
 
         if (savedCalendars.length > 0) {
-            savedCalendars.forEach(renderCalendarRow);
+                                                            savedCalendars.forEach(renderCalendarRow);
         } else {
-            renderCalendarRow();
+                                                            renderCalendarRow();
         }
 
-        if (addBtn) {
-            addBtn.addEventListener('click', () => renderCalendarRow());
+                                                        if (addBtn) {
+                                                            addBtn.addEventListener('click', () => renderCalendarRow());
         }
 
         if (gcal.apiKey && (savedCalendars.length > 0 || gcal.calendarId)) {
             const statusBadge = document.getElementById('gcal-status');
-            statusBadge.textContent = 'Konfigurert';
-            statusBadge.style.background = '#dcfce7';
-            statusBadge.style.color = '#166534';
+                                                        statusBadge.textContent = 'Konfigurert';
+                                                        statusBadge.style.background = '#dcfce7';
+                                                        statusBadge.style.color = '#166534';
         }
 
         document.getElementById('save-gcal-settings').onclick = async (e) => {
             const btn = e.target;
-            const apiKey = document.getElementById('gcal-api-key').value.trim();
-            const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
+                                                        const apiKey = document.getElementById('gcal-api-key').value.trim();
+                                                        const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
             const calendars = rows.map(row => {
                 const label = row.querySelector('.gcal-label')?.value.trim();
-                const id = row.querySelector('.gcal-id')?.value.trim();
-                return { label, id };
+                                                        const id = row.querySelector('.gcal-id')?.value.trim();
+                                                        return {label, id};
             }).filter(item => item.id);
 
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
+                                                        btn.textContent = 'Lagrer...';
+                                                        btn.disabled = true;
 
-            try {
+                                                        try {
                 const newSettings = {
-                    ...settings,
-                    showMonthView: document.getElementById('gcal-show-month').checked,
-                    showAgendaView: document.getElementById('gcal-show-agenda').checked,
-                    googleCalendar: {
-                        apiKey,
-                        calendarId: calendars[0]?.id || '',
-                        label: calendars[0]?.label || '',
-                        lastUpdated: new Date().toISOString()
+                                                            ...settings,
+                                                            showMonthView: document.getElementById('gcal-show-month').checked,
+                                                        showAgendaView: document.getElementById('gcal-show-agenda').checked,
+                                                        googleCalendar: {
+                                                            apiKey,
+                                                            calendarId: calendars[0]?.id || '',
+                                                        label: calendars[0]?.label || '',
+                                                        lastUpdated: new Date().toISOString()
                     },
-                    googleCalendars: calendars
+                                                        googleCalendars: calendars
                 };
 
-                await firebaseService.savePageContent('settings_integrations', newSettings);
+                                                        await firebaseService.savePageContent('settings_integrations', newSettings);
 
-                btn.textContent = 'Lagret!';
-                const statusBadge = document.getElementById('gcal-status');
+                                                        btn.textContent = 'Lagret!';
+                                                        const statusBadge = document.getElementById('gcal-status');
                 if (apiKey && calendars.length > 0) {
-                    statusBadge.textContent = 'Konfigurert';
-                    statusBadge.style.background = '#dcfce7';
-                    statusBadge.style.color = '#166534';
+                                                            statusBadge.textContent = 'Konfigurert';
+                                                        statusBadge.style.background = '#dcfce7';
+                                                        statusBadge.style.color = '#166534';
                 }
-                setTimeout(() => { btn.textContent = 'Lagre Kalender-innstillinger'; btn.disabled = false; }, 2000);
+                setTimeout(() => {btn.textContent = 'Lagre Kalender-innstillinger'; btn.disabled = false; }, 2000);
             } catch (err) {
-                console.error("Save Error:", err);
-                btn.textContent = 'Feil ved lagring';
-                btn.style.setProperty('background', '#ef4444', 'important');
+                                                            console.error("Save Error:", err);
+                                                        btn.textContent = 'Feil ved lagring';
+                                                        btn.style.setProperty('background', '#ef4444', 'important');
                 setTimeout(() => {
-                    btn.textContent = 'Lagre Kalender-innstillinger';
-                    btn.disabled = false;
-                    btn.style.setProperty('background', '', '');
+                                                            btn.textContent = 'Lagre Kalender-innstillinger';
+                                                        btn.disabled = false;
+                                                        btn.style.setProperty('background', '', '');
                 }, 2000);
             }
         };
 
-        section.setAttribute('data-rendered', 'true');
+                                                        section.setAttribute('data-rendered', 'true');
     }
 
-    /**
-     * Settings, Placeholders and Helpers
-     */
-    /**
- * Settings, Placeholders and Helpers
- */
-    renderSettingsSection() {
+                                                        /**
+                                                         * Settings, Placeholders and Helpers
+                                                         */
+                                                        /**
+                                                     * Settings, Placeholders and Helpers
+                                                     */
+                                                        renderSettingsSection() {
         const section = document.getElementById('settings-section');
-        if (!section) return;
+                                                        if (!section) return;
 
-        section.innerHTML = `
-        <div class="section-header">
-            <div>
-                <h2 class="section-title">Innstillinger & Verktøy</h2>
-                <p class="section-subtitle">Administrer systeminnstillinger og datasync.</p>
-            </div>
-        </div>
+                                                        section.innerHTML = `
+                                                        <div class="section-header">
+                                                            <div>
+                                                                <h2 class="section-title">Innstillinger & Verktøy</h2>
+                                                                <p class="section-subtitle">Administrer systeminnstillinger og datasync.</p>
+                                                            </div>
+                                                        </div>
 
-        <!-- System Status Banner -->
-        <div class="status-banner success">
-            <div class="status-icon-pulse">
-                <span class="material-symbols-outlined">check_circle</span>
-            </div>
-            <div class="status-content">
-                <span class="status-label">SYSTEMSTATUS: NORMAL</span>
-                <p>Alle systemer fungerer optimalt. Siste backup ble kjørt automatisk i natt.</p>
-            </div>
-            <div class="status-action">
-                <a href="admin-logger.html" class="btn-text-white" style="text-decoration: none; display: inline-block;">Se logger</a>
-            </div>
-        </div>
+                                                        <!-- System Status Banner -->
+                                                        <div class="status-banner success">
+                                                            <div class="status-icon-pulse">
+                                                                <span class="material-symbols-outlined">check_circle</span>
+                                                            </div>
+                                                            <div class="status-content">
+                                                                <span class="status-label">SYSTEMSTATUS: NORMAL</span>
+                                                                <p>Alle systemer fungerer optimalt. Siste backup ble kjørt automatisk i natt.</p>
+                                                            </div>
+                                                            <div class="status-action">
+                                                                <a href="admin-logger.html" class="btn-text-white" style="text-decoration: none; display: inline-block;">Se logger</a>
+                                                            </div>
+                                                        </div>
 
-        <div class="grid-2-cols" style="gap: 24px; margin-top: 24px;">
-            <!-- Firebase Config Card -->
-            <div class="card">
-                <div class="card-header flex-between">
-                    <h3 class="card-title">Firebase Konfigurasjon</h3>
-                    <div class="status-badge success">
-                        <span class="dot"></span> Tilkoblet
-                    </div>
-                </div>
-                <div class="card-body">
-                    <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">
-                        Endre konfigurasjonen kun hvis du vet hva du gjør. Feil her kan stoppe nettsiden.
-                    </p>
-                    
-                    <div class="code-editor-container">
-                        <div class="code-editor-header">
-                            <span class="lang-tag">JSON</span>
-                            <span class="file-name">firebase-config.js</span>
-                        </div>
-                        <div class="code-editor-wrap">
-                            <div class="line-numbers">
-                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
-                            </div>
-                            <textarea id="fb-config" class="code-input" spellcheck="false">${localStorage.getItem('hkm_firebase_config') || ''}</textarea>
-                        </div>
-                    </div>
+                                                        <div class="grid-2-cols" style="gap: 24px; margin-top: 24px;">
+                                                            <!-- Firebase Config Card -->
+                                                            <div class="card">
+                                                                <div class="card-header flex-between">
+                                                                    <h3 class="card-title">Firebase Konfigurasjon</h3>
+                                                                    <div class="status-badge success">
+                                                                        <span class="dot"></span> Tilkoblet
+                                                                    </div>
+                                                                </div>
+                                                                <div class="card-body">
+                                                                    <p style="font-size: 14px; color: #64748b; margin-bottom: 16px;">
+                                                                        Endre konfigurasjonen kun hvis du vet hva du gjør. Feil her kan stoppe nettsiden.
+                                                                    </p>
 
-                    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
-                        <button class="btn-primary" id="save-fb" style="width: 100%;">
-                            <span class="material-symbols-outlined">save</span>
-                            Lagre & Koble til
-                        </button>
-                    </div>
-                </div>
-            </div>
+                                                                    <div class="code-editor-container">
+                                                                        <div class="code-editor-header">
+                                                                            <span class="lang-tag">JSON</span>
+                                                                            <span class="file-name">firebase-config.js</span>
+                                                                        </div>
+                                                                        <div class="code-editor-wrap">
+                                                                            <div class="line-numbers">
+                                                                                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                                                                            </div>
+                                                                            <textarea id="fb-config" class="code-input" spellcheck="false">${localStorage.getItem('hkm_firebase_config') || ''}</textarea>
+                                                                        </div>
+                                                                    </div>
 
-            <!-- Data Tools Card -->
-            <div class="card">
-                <div class="card-header"><h3 class="card-title">Datasynkronisering & Verktøy</h3></div>
-                <div class="card-body">
-                    <div class="tools-grid">
-                        <!-- Import Tool -->
-                        <div class="tool-card">
-                            <div class="tool-icon-circle sync">
-                                <span class="material-symbols-outlined">sync</span>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Importer Innhold</h4>
-                                <p>Hent innhold fra statiske sider til databasen.</p>
-                            </div>
-                            <button class="btn-secondary btn-sm" id="sync-existing-content">
-                                Kjør Import
-                            </button>
-                            <div id="sync-status" class="tool-status"></div>
-                        </div>
+                                                                    <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                                                                        <button class="btn-primary" id="save-fb" style="width: 100%;">
+                                                                            <span class="material-symbols-outlined">save</span>
+                                                                            Lagre & Koble til
+                                                                        </button>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
 
-                        <!-- Cache Tool -->
-                        <div class="tool-card">
-                            <div class="tool-icon-circle warning">
-                                <span class="material-symbols-outlined">delete_forever</span>
-                            </div>
-                            <div class="tool-info">
-                                <h4>Nullstille Cache</h4>
-                                <p>Tøm lokal lagring og last siden på nytt.</p>
-                            </div>
-                            <button class="btn-outline-danger btn-sm" onclick="localStorage.clear(); window.location.reload();">
-                                Tøm Cache
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-        section.setAttribute('data-rendered', 'true');
+                                                            <!-- Data Tools Card -->
+                                                            <div class="card">
+                                                                <div class="card-header"><h3 class="card-title">Datasynkronisering & Verktøy</h3></div>
+                                                                <div class="card-body">
+                                                                    <div class="tools-grid">
+                                                                        <!-- Import Tool -->
+                                                                        <div class="tool-card">
+                                                                            <div class="tool-icon-circle sync">
+                                                                                <span class="material-symbols-outlined">sync</span>
+                                                                            </div>
+                                                                            <div class="tool-info">
+                                                                                <h4>Importer Innhold</h4>
+                                                                                <p>Hent innhold fra statiske sider til databasen.</p>
+                                                                            </div>
+                                                                            <button class="btn-secondary btn-sm" id="sync-existing-content">
+                                                                                Kjør Import
+                                                                            </button>
+                                                                            <div id="sync-status" class="tool-status"></div>
+                                                                        </div>
+
+                                                                        <!-- Cache Tool -->
+                                                                        <div class="tool-card">
+                                                                            <div class="tool-icon-circle warning">
+                                                                                <span class="material-symbols-outlined">delete_forever</span>
+                                                                            </div>
+                                                                            <div class="tool-info">
+                                                                                <h4>Nullstille Cache</h4>
+                                                                                <p>Tøm lokal lagring og last siden på nytt.</p>
+                                                                            </div>
+                                                                            <button class="btn-outline-danger btn-sm" onclick="localStorage.clear(); window.location.reload();">
+                                                                                Tøm Cache
+                                                                            </button>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        `;
+                                                        section.setAttribute('data-rendered', 'true');
 
         document.getElementById('save-fb').addEventListener('click', () => {
             const val = document.getElementById('fb-config').value;
-            localStorage.setItem('hkm_firebase_config', val);
-            this.showToast('✅ Lagret! Laster på nytt...', 'success', 5000);
+                                                        localStorage.setItem('hkm_firebase_config', val);
+                                                        this.showToast('✅ Lagret! Laster på nytt...', 'success', 5000);
             setTimeout(() => window.location.reload(), 2000);
         });
 
@@ -4155,911 +4177,911 @@ class AdminManager {
     }
 
 
-    async seedExistingData() {
+                                                        async seedExistingData() {
         const statusEl = document.getElementById('sync-status');
-        const btn = document.getElementById('sync-existing-content');
+                                                        const btn = document.getElementById('sync-existing-content');
 
-        if (!confirm('Dette vil overskrive eventuelle endringer du har gjort i dashboardet med innhold fra de statiske HTML-filene. Fortsette?')) return;
+                                                        if (!confirm('Dette vil overskrive eventuelle endringer du har gjort i dashboardet med innhold fra de statiske HTML-filene. Fortsette?')) return;
 
-        btn.disabled = true;
-        statusEl.innerHTML = '<span style="color: #64748b;">Starter synkronisering...</span>';
+                                                        btn.disabled = true;
+                                                        statusEl.innerHTML = '<span style="color: #64748b;">Starter synkronisering...</span>';
 
-        try {
-            // 1. Hero Slides
-            statusEl.innerHTML += '<br>Syncing Hero Slides...';
-            const heroSlides = [
-                {
-                    imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop',
-                    title: 'Tenk & gi nestekjærlighet',
-                    subtitle: 'Vi er her for å støtte deg på din åndelige reise. Bli med i et trygt miljø der vi utforsker Guds ord, deler livet og styrker relasjonen til Jesus.',
-                    btnText: 'Utforsk mer',
-                    btnLink: 'om-oss.html'
+                                                        try {
+                                                            // 1. Hero Slides
+                                                            statusEl.innerHTML += '<br>Syncing Hero Slides...';
+                                                        const heroSlides = [
+                                                        {
+                                                            imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop',
+                                                        title: 'Tenk & gi nestekjærlighet',
+                                                        subtitle: 'Vi er her for å støtte deg på din åndelige reise. Bli med i et trygt miljø der vi utforsker Guds ord, deler livet og styrker relasjonen til Jesus.',
+                                                        btnText: 'Utforsk mer',
+                                                        btnLink: 'om-oss.html'
                 },
-                {
-                    imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop',
-                    title: 'Vekst gjennom felleskap',
-                    subtitle: 'Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et felleskap som utforsker Guds ord og styrker troen.',
-                    btnText: 'Les mer',
-                    btnLink: 'om-oss.html'
+                                                        {
+                                                            imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop',
+                                                        title: 'Vekst gjennom felleskap',
+                                                        subtitle: 'Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et felleskap som utforsker Guds ord og styrker troen.',
+                                                        btnText: 'Les mer',
+                                                        btnLink: 'om-oss.html'
                 },
-                {
-                    imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop',
-                    title: 'Støtt vårt arbeid',
-                    subtitle: 'Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet gjennom undervisning, reisevirksomhet og felleskap.',
-                    btnText: 'Gi gave nå',
-                    btnLink: 'donasjoner.html'
+                                                        {
+                                                            imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop',
+                                                        title: 'Støtt vårt arbeid',
+                                                        subtitle: 'Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet gjennom undervisning, reisevirksomhet og felleskap.',
+                                                        btnText: 'Gi gave nå',
+                                                        btnLink: 'donasjoner.html'
                 }
-            ];
-            await firebaseService.savePageContent('hero_slides', { slides: heroSlides });
+                                                        ];
+                                                        await firebaseService.savePageContent('hero_slides', {slides: heroSlides });
 
-            // 2. Blog Posts
-            statusEl.innerHTML += '<br>Syncing Blog Posts...';
-            const blogPosts = [
-                {
-                    title: 'Hvordan bevare troen i en travel hverdag',
-                    date: '05 Feb, 2024',
-                    category: 'Undervisning',
-                    content: 'Vi utforsker praktiske tips og bibelske prinsipper for å opprettholde en nær relasjon med Gud til tross for en hektisk tidsplan...',
-                    imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                                                        // 2. Blog Posts
+                                                        statusEl.innerHTML += '<br>Syncing Blog Posts...';
+                                                            const blogPosts = [
+                                                            {
+                                                                title: 'Hvordan bevare troen i en travel hverdag',
+                                                            date: '05 Feb, 2024',
+                                                            category: 'Undervisning',
+                                                            content: 'Vi utforsker praktiske tips og bibelske prinsipper for å opprettholde en nær relasjon med Gud til tross for en hektisk tidsplan...',
+                                                            imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
                 },
-                {
-                    title: 'Rapport fra misjonsturen til Kenya',
-                    date: '28 Jan, 2024',
-                    category: 'Reise',
-                    content: 'Bli med på reisen gjennom våre opplevelser i Kenya. Vi så Guds godhet i aksjon gjennom helbredelse, omsorg og glede...',
-                    imageUrl: 'https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                                                            {
+                                                                title: 'Rapport fra misjonsturen til Kenya',
+                                                            date: '28 Jan, 2024',
+                                                            category: 'Reise',
+                                                            content: 'Bli med på reisen gjennom våre opplevelser i Kenya. Vi så Guds godhet i aksjon gjennom helbredelse, omsorg og glede...',
+                                                            imageUrl: 'https://images.unsplash.com/photo-1489392191049-fc10c97e64b6?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
                 },
-                {
-                    title: 'Ny Podcast Episode: Tro, tvil og vekst',
-                    date: '15 Jan, 2024',
-                    category: 'Podcast',
-                    content: 'Lytt til vår nyeste episode hvor vi diskuterer de ærlige sidene ved troslivet og hvordan vi kan finne hvile i Guds løfter...',
-                    imageUrl: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                                                            {
+                                                                title: 'Ny Podcast Episode: Tro, tvil og vekst',
+                                                            date: '15 Jan, 2024',
+                                                            category: 'Podcast',
+                                                            content: 'Lytt til vår nyeste episode hvor vi diskuterer de ærlige sidene ved troslivet og hvordan vi kan finne hvile i Guds løfter...',
+                                                            imageUrl: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
                 },
-                {
-                    title: 'Viktigheten av å stå sammen',
-                    date: '10 Jan, 2024',
-                    category: 'Felleskap',
-                    content: 'Hvorfor felleskapet er essensielt for den kristne vandringen og hvordan vi kan støtte hverandre gjennom livets ulike sesonger...',
-                    imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                                                            {
+                                                                title: 'Viktigheten av å stå sammen',
+                                                            date: '10 Jan, 2024',
+                                                            category: 'Felleskap',
+                                                            content: 'Hvorfor felleskapet er essensielt for den kristne vandringen og hvordan vi kan støtte hverandre gjennom livets ulike sesonger...',
+                                                            imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
                 },
-                {
-                    title: 'Min reise fra mørke til lys',
-                    date: '02 Jan, 2024',
-                    category: 'Vitnesbyrd',
-                    content: 'Et sterkt vitnesbyrd om hvordan Gud forandret et liv preget av håpløshet til et liv fylt med mening, fred og fremtidstro...',
-                    imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                                                            {
+                                                                title: 'Min reise fra mørke til lys',
+                                                            date: '02 Jan, 2024',
+                                                            category: 'Vitnesbyrd',
+                                                            content: 'Et sterkt vitnesbyrd om hvordan Gud forandret et liv preget av håpløshet til et liv fylt med mening, fred og fremtidstro...',
+                                                            imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
                 }
-            ];
-            await firebaseService.savePageContent('collection_blog', { items: blogPosts });
+                                                            ];
+                                                            await firebaseService.savePageContent('collection_blog', {items: blogPosts });
 
-            // 3. Teaching Series
-            statusEl.innerHTML += '<br>Syncing Teaching Series...';
-            const teachingSeries = [
-                {
-                    title: 'Tro og Tvil',
-                    content: 'Hvordan håndtere tvil og styrke din tro i utfordrende tider.',
-                    category: '5 episoder',
-                    author: 'His Kingdom',
-                    date: '02 Feb, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop'
+                                                            // 3. Teaching Series
+                                                            statusEl.innerHTML += '<br>Syncing Teaching Series...';
+                                                                const teachingSeries = [
+                                                                {
+                                                                    title: 'Tro og Tvil',
+                                                                content: 'Hvordan håndtere tvil og styrke din tro i utfordrende tider.',
+                                                                category: '5 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '02 Feb, 2024',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Guds Karakter',
-                    content: 'Utforsk Guds egenskaper og hva de betyr for våre liv.',
-                    category: '8 episoder',
-                    author: 'His Kingdom',
-                    date: '25 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Guds Karakter',
+                                                                content: 'Utforsk Guds egenskaper og hva de betyr for våre liv.',
+                                                                category: '8 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '25 Jan, 2024',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Åndelige Gaver',
-                    content: 'Oppdag og bruk dine åndelige gaver til Guds ære.',
-                    category: '6 episoder',
-                    author: 'His Kingdom',
-                    date: '15 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Åndelige Gaver',
+                                                                content: 'Oppdag og bruk dine åndelige gaver til Guds ære.',
+                                                                category: '6 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '15 Jan, 2024',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Kristen Disippelskap',
-                    content: 'Lær hva det betyr å være en disippel av Jesus.',
-                    category: '10 episoder',
-                    author: 'His Kingdom',
-                    date: '10 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Kristen Disippelskap',
+                                                                content: 'Lær hva det betyr å være en disippel av Jesus.',
+                                                                category: '10 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '10 Jan, 2024',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Bønneliv',
-                    content: 'Utvikle et kraftfullt og meningsfullt bønneliv.',
-                    category: '7 episoder',
-                    author: 'His Kingdom',
-                    date: '05 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Bønneliv',
+                                                                content: 'Utvikle et kraftfullt og meningsfullt bønneliv.',
+                                                                category: '7 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '05 Jan, 2024',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Å Finne Guds Vilje',
-                    content: 'Hvordan søke og følge Guds plan for ditt liv.',
-                    category: '4 episoder',
-                    author: 'His Kingdom',
-                    date: '02 Jan, 2024',
-                    imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Å Finne Guds Vilje',
+                                                                content: 'Hvordan søke og følge Guds plan for ditt liv.',
+                                                                category: '4 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '02 Jan, 2024',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Tilgivelse og Forsoning',
-                    content: 'Kraften i tilgivelse og hvordan leve i forsoning.',
-                    category: '5 episoder',
-                    author: 'His Kingdom',
-                    date: '28 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Tilgivelse og Forsoning',
+                                                                content: 'Kraften i tilgivelse og hvordan leve i forsoning.',
+                                                                category: '5 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '28 Dec, 2023',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Åndelig Krigføring',
-                    content: 'Stå fast i kampen mot åndelige krefter.',
-                    category: '6 episoder',
-                    author: 'His Kingdom',
-                    date: '20 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Åndelig Krigføring',
+                                                                content: 'Stå fast i kampen mot åndelige krefter.',
+                                                                category: '6 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '20 Dec, 2023',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Din Identitet i Kristus',
-                    content: 'Forstå hvem du er som Guds barn.',
-                    category: '5 episoder',
-                    author: 'His Kingdom',
-                    date: '15 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Din Identitet i Kristus',
+                                                                content: 'Forstå hvem du er som Guds barn.',
+                                                                category: '5 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '15 Dec, 2023',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Kallet til Tjeneste',
-                    content: 'Hvordan tjene Gud og andre effektivt.',
-                    category: '8 episoder',
-                    author: 'His Kingdom',
-                    date: '10 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Kallet til Tjeneste',
+                                                                content: 'Hvordan tjene Gud og andre effektivt.',
+                                                                category: '8 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '10 Dec, 2023',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Helliggjørelse',
-                    content: 'Vokse i hellighet og likhet med Kristus.',
-                    category: '7 episoder',
-                    author: 'His Kingdom',
-                    date: '05 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Helliggjørelse',
+                                                                content: 'Vokse i hellighet og likhet med Kristus.',
+                                                                category: '7 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '05 Dec, 2023',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?w=600&h=400&fit=crop'
                 },
-                {
-                    title: 'Endetidsprofetier',
-                    content: 'Forstå Bibelens profetier om endetiden.',
-                    category: '9 episoder',
-                    author: 'His Kingdom',
-                    date: '01 Dec, 2023',
-                    imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop'
+                                                                {
+                                                                    title: 'Endetidsprofetier',
+                                                                content: 'Forstå Bibelens profetier om endetiden.',
+                                                                category: '9 episoder',
+                                                                author: 'His Kingdom',
+                                                                date: '01 Dec, 2023',
+                                                                imageUrl: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&h=400&fit=crop'
                 }
-            ];
-            await firebaseService.savePageContent('collection_teaching', { items: teachingSeries });
+                                                                ];
+                                                                await firebaseService.savePageContent('collection_teaching', {items: teachingSeries });
 
-            // 4. Page Content (index)
-            statusEl.innerHTML += '<br>Syncing Page Text...';
-            const indexContent = {
-                about: {
-                    label: 'Velkommen til Fellesskapet',
-                    title: 'Vi er en Non-Profit Organisasjon',
-                    description: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.',
-                    features: {
-                        mission: {
-                            title: 'Vårt Oppdrag',
-                            text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.'
+                                                                // 4. Page Content (index)
+                                                                statusEl.innerHTML += '<br>Syncing Page Text...';
+                                                                    const indexContent = {
+                                                                        about: {
+                                                                        label: 'Velkommen til Fellesskapet',
+                                                                    title: 'Vi er en Non-Profit Organisasjon',
+                                                                    description: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.',
+                                                                    features: {
+                                                                        mission: {
+                                                                        title: 'Vårt Oppdrag',
+                                                                    text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.'
                         },
-                        story: {
-                            title: 'Vår Historie',
-                            text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.'
+                                                                    story: {
+                                                                        title: 'Vår Historie',
+                                                                    text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.'
                         }
                     }
                 },
-                features: {
-                    teaching: { title: 'Undervisning', text: 'Bibelskoler, seminarer og dyptgående undervisning.' },
-                    podcast: { title: 'Podcast', text: 'Lytt til våre samtaler om tro, liv og åndelig vekst.' },
-                    travel: { title: 'Reisevirksomhet', text: 'Forkynnelse og konferanser rundt om i verden.' }
+                                                                    features: {
+                                                                        teaching: {title: 'Undervisning', text: 'Bibelskoler, seminarer og dyptgående undervisning.' },
+                                                                    podcast: {title: 'Podcast', text: 'Lytt til våre samtaler om tro, liv og åndelig vekst.' },
+                                                                    travel: {title: 'Reisevirksomhet', text: 'Forkynnelse og konferanser rundt om i verden.' }
                 },
-                stats: {
-                    youtube_videos: '449',
-                    youtube_views: '56699',
-                    podcast_episodes: '45',
-                    countries_visited: '9'
+                                                                    stats: {
+                                                                        youtube_videos: '449',
+                                                                    youtube_views: '56699',
+                                                                    podcast_episodes: '45',
+                                                                    countries_visited: '9'
                 }
             };
-            await firebaseService.savePageContent('index', indexContent);
+                                                                    await firebaseService.savePageContent('index', indexContent);
 
-            // 5. om-oss content
-            statusEl.innerHTML += '<br>Syncing Om Oss...';
-            const omOssContent = {
-                hero: { title: 'Om Oss', subtitle: 'Lær mer om vår visjon, oppdrag og historie' },
-                intro: {
-                    label: 'Velkommen til Fellesskapet',
-                    title: 'Vi er en Non-Profit Organisasjon',
-                    text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.'
+                                                                    // 5. om-oss content
+                                                                    statusEl.innerHTML += '<br>Syncing Om Oss...';
+                                                                        const omOssContent = {
+                                                                            hero: {title: 'Om Oss', subtitle: 'Lær mer om vår visjon, oppdrag og historie' },
+                                                                        intro: {
+                                                                            label: 'Velkommen til Fellesskapet',
+                                                                        title: 'Vi er en Non-Profit Organisasjon',
+                                                                        text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.'
                 },
-                mission: { title: 'Vårt Oppdrag', text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.' },
-                history: { title: 'Vår Historie', text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.' },
-                values: {
-                    title: 'Hva Vi Står For',
-                    bible: { title: 'Bibeltro Undervisning', text: 'Vi forankrer alt vi gjør i Guds ord og søker å leve etter Bibelens prinsipper.' },
-                    prayer: { title: 'Bønn & Tilbedelse', text: 'Bønn er hjertet av alt vi gjør, og vi søker Guds nærvær i alt.' },
-                    community: { title: 'Fellesskap', text: 'Vi tror på kraften i felleskap og støtter hverandre i troen.' },
-                    love: { title: 'Kjærlighet & Omsorg', text: 'Vi møter alle med Kristi kjærlighet og omsorg.' }
+                                                                        mission: {title: 'Vårt Oppdrag', text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.' },
+                                                                        history: {title: 'Vår Historie', text: 'Startet med en visjon om å samle mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.' },
+                                                                        values: {
+                                                                            title: 'Hva Vi Står For',
+                                                                        bible: {title: 'Bibeltro Undervisning', text: 'Vi forankrer alt vi gjør i Guds ord og søker å leve etter Bibelens prinsipper.' },
+                                                                        prayer: {title: 'Bønn & Tilbedelse', text: 'Bønn er hjertet av alt vi gjør, og vi søker Guds nærvær i alt.' },
+                                                                        community: {title: 'Fellesskap', text: 'Vi tror på kraften i felleskap og støtter hverandre i troen.' },
+                                                                        love: {title: 'Kjærlighet & Omsorg', text: 'Vi møter alle med Kristi kjærlighet og omsorg.' }
                 }
             };
-            await firebaseService.savePageContent('om-oss', omOssContent);
+                                                                        await firebaseService.savePageContent('om-oss', omOssContent);
 
-            // 6. kontakt content
-            statusEl.innerHTML += '<br>Syncing Kontakt...';
-            const kontaktContent = {
-                hero: { title: 'Kontakt Oss', subtitle: 'Vi vil gjerne høre fra deg. Send oss en melding eller besøk oss.' },
-                info: {
-                    title: 'Ta Kontakt',
-                    text: 'Har du spørsmål, bønnebehov eller ønsker du å vite mer om vår tjeneste? Ikke nøl med å ta kontakt med oss.',
-                    email: 'post@hiskingdomministry.no',
-                    phone: '+47 930 94 615',
-                    address: 'Norge'
+                                                                        // 6. kontakt content
+                                                                        statusEl.innerHTML += '<br>Syncing Kontakt...';
+                                                                            const kontaktContent = {
+                                                                                hero: {title: 'Kontakt Oss', subtitle: 'Vi vil gjerne høre fra deg. Send oss en melding eller besøk oss.' },
+                                                                            info: {
+                                                                                title: 'Ta Kontakt',
+                                                                            text: 'Har du spørsmål, bønnebehov eller ønsker du å vite mer om vår tjeneste? Ikke nøl med å ta kontakt med oss.',
+                                                                            email: 'post@hiskingdomministry.no',
+                                                                            phone: '+47 930 94 615',
+                                                                            address: 'Norge'
                 }
             };
-            await firebaseService.savePageContent('kontakt', kontaktContent);
+                                                                            await firebaseService.savePageContent('kontakt', kontaktContent);
 
-            // 7. media content
-            statusEl.innerHTML += '<br>Syncing Media...';
-            const mediaContent = {
-                hero: { title: 'Media', subtitle: 'Utforsk våre videoer, podcaster og annet innhold' },
-                youtube: { title: 'Siste Videoer', description: 'Se våre nyeste videoer og undervisninger' },
-                podcast: { title: 'Siste Episoder', description: 'Lytt til våre podcaster om tro, liv og åndelig vekst' },
-                teaching: { title: 'Undervisningsressurser', description: 'Dyptgående bibelstudier og undervisningsserier' }
+                                                                            // 7. media content
+                                                                            statusEl.innerHTML += '<br>Syncing Media...';
+                                                                                const mediaContent = {
+                                                                                    hero: {title: 'Media', subtitle: 'Utforsk våre videoer, podcaster og annet innhold' },
+                                                                                youtube: {title: 'Siste Videoer', description: 'Se våre nyeste videoer og undervisninger' },
+                                                                                podcast: {title: 'Siste Episoder', description: 'Lytt til våre podcaster om tro, liv og åndelig vekst' },
+                                                                                teaching: {title: 'Undervisningsressurser', description: 'Dyptgående bibelstudier og undervisningsserier' }
             };
-            await firebaseService.savePageContent('media', mediaContent);
+                                                                                await firebaseService.savePageContent('media', mediaContent);
 
-            // 8. donasjoner content
-            statusEl.innerHTML += '<br>Syncing Donasjoner...';
-            const donasjonerContent = {
-                hero: { title: 'Donasjoner' },
-                intro: {
-                    title: 'Våre aktive innsamlingsaksjoner',
-                    description: 'Din gave utgjør en forskjell. Velg et prosjekt du ønsker å støtte og bli med på å forandre liv.'
+                                                                                // 8. donasjoner content
+                                                                                statusEl.innerHTML += '<br>Syncing Donasjoner...';
+                                                                                    const donasjonerContent = {
+                                                                                        hero: {title: 'Donasjoner' },
+                                                                                    intro: {
+                                                                                        title: 'Våre aktive innsamlingsaksjoner',
+                                                                                    description: 'Din gave utgjør en forskjell. Velg et prosjekt du ønsker å støtte og bli med på å forandre liv.'
                 },
-                form: {
-                    title: 'Støtt vårt arbeid',
-                    description: 'Din gave gjør en reell forskjell. Velg beløp og betalingsmetode nedenfor.'
+                                                                                    form: {
+                                                                                        title: 'Støtt vårt arbeid',
+                                                                                    description: 'Din gave gjør en reell forskjell. Velg beløp og betalingsmetode nedenfor.'
                 }
             };
-            await firebaseService.savePageContent('donasjoner', donasjonerContent);
+                                                                                    await firebaseService.savePageContent('donasjoner', donasjonerContent);
 
-            // 9. blogg content
-            statusEl.innerHTML += '<br>Syncing Blogg...';
-            const bloggContent = {
-                hero: { title: 'Nyheter / Blogg', subtitle: 'Les våre siste artikler og oppdateringer' },
-                section: { title: 'Siste Nytt', label: 'Nyheter & Blogg', description: 'Les våre siste artikler og oppdateringer.' }
+                                                                                    // 9. blogg content
+                                                                                    statusEl.innerHTML += '<br>Syncing Blogg...';
+                                                                                        const bloggContent = {
+                                                                                            hero: {title: 'Nyheter / Blogg', subtitle: 'Les våre siste artikler og oppdateringer' },
+                                                                                        section: {title: 'Siste Nytt', label: 'Nyheter & Blogg', description: 'Les våre siste artikler og oppdateringer.' }
             };
-            await firebaseService.savePageContent('blogg', bloggContent);
+                                                                                        await firebaseService.savePageContent('blogg', bloggContent);
 
-            // 10. arrangementer content
-            statusEl.innerHTML += '<br>Syncing Arrangementer...';
-            const arrangementerContent = {
-                hero: { title: 'Arrangementer', subtitle: 'Bli med på våre kommende hendelser' },
-                section: { title: 'Kommende Arrangementer', description: 'Se våre kommende arrangementer og meld deg på.' }
+                                                                                        // 10. arrangementer content
+                                                                                        statusEl.innerHTML += '<br>Syncing Arrangementer...';
+                                                                                            const arrangementerContent = {
+                                                                                                hero: {title: 'Arrangementer', subtitle: 'Bli med på våre kommende hendelser' },
+                                                                                            section: {title: 'Kommende Arrangementer', description: 'Se våre kommende arrangementer og meld deg på.' }
             };
-            await firebaseService.savePageContent('arrangementer', arrangementerContent);
+                                                                                            await firebaseService.savePageContent('arrangementer', arrangementerContent);
 
-            // 11. undervisning content
-            statusEl.innerHTML += '<br>Syncing Undervisning...';
-            const undervisningContent = {
-                hero: { title: 'Undervisning', subtitle: 'Dyptgående bibelundervisning' }
+                                                                                            // 11. undervisning content
+                                                                                            statusEl.innerHTML += '<br>Syncing Undervisning...';
+                                                                                                const undervisningContent = {
+                                                                                                    hero: {title: 'Undervisning', subtitle: 'Dyptgående bibelundervisning' }
             };
-            await firebaseService.savePageContent('undervisning', undervisningContent);
+                                                                                                await firebaseService.savePageContent('undervisning', undervisningContent);
 
-            // 12. bibelstudier content
-            statusEl.innerHTML += '<br>Syncing Bibelstudier...';
-            const bibelstudierContent = {
-                hero: { title: 'Bibelstudier', subtitle: 'Utforsk Guds ord sammen med oss' }
+                                                                                                // 12. bibelstudier content
+                                                                                                statusEl.innerHTML += '<br>Syncing Bibelstudier...';
+                                                                                                    const bibelstudierContent = {
+                                                                                                        hero: {title: 'Bibelstudier', subtitle: 'Utforsk Guds ord sammen med oss' }
             };
-            await firebaseService.savePageContent('bibelstudier', bibelstudierContent);
+                                                                                                    await firebaseService.savePageContent('bibelstudier', bibelstudierContent);
 
-            // 13. seminarer content
-            statusEl.innerHTML += '<br>Syncing Seminarer...';
-            const seminarerContent = {
-                hero: { title: 'Seminarer', subtitle: 'Temabaserte undervisningsdager' }
+                                                                                                    // 13. seminarer content
+                                                                                                    statusEl.innerHTML += '<br>Syncing Seminarer...';
+                                                                                                        const seminarerContent = {
+                                                                                                            hero: {title: 'Seminarer', subtitle: 'Temabaserte undervisningsdager' }
             };
-            await firebaseService.savePageContent('seminarer', seminarerContent);
+                                                                                                        await firebaseService.savePageContent('seminarer', seminarerContent);
 
-            // 14. podcast content
-            statusEl.innerHTML += '<br>Syncing Podcast...';
-            const podcastContent = {
-                hero: { title: 'Podcast', subtitle: 'Lytt til våre samtaler' }
+                                                                                                        // 14. podcast content
+                                                                                                        statusEl.innerHTML += '<br>Syncing Podcast...';
+                                                                                                            const podcastContent = {
+                                                                                                                hero: {title: 'Podcast', subtitle: 'Lytt til våre samtaler' }
             };
-            await firebaseService.savePageContent('podcast', podcastContent);
+                                                                                                            await firebaseService.savePageContent('podcast', podcastContent);
 
-            // 15. default SEO settings
-            statusEl.innerHTML += '<br>Syncing SEO-innstillinger...';
-            const seoDefaults = {
-                globalTitle: 'His Kingdom Ministry',
-                globalDescription: 'His Kingdom Ministry driver med åndelig samlinger, undervisning og forkynnelse. Velkommen til vårt fellesskap.',
-                globalKeywords: 'tro, bibel, undervisning, bønn, fellesskap, jesus, kristendom',
-                ogImage: '',
-                pages: {
-                    index: { title: 'Forside | His Kingdom Ministry', description: 'Velkommen til His Kingdom Ministry.' },
-                    'om-oss': { title: 'Om Oss | His Kingdom Ministry', description: 'Les om vår visjon og historie.' },
-                    media: { title: 'Media & Undervisning', description: 'Se våre videoer og undervisning.' },
-                    blogg: { title: 'Siste Nytt & Blogg', description: 'Følg med på hva som skjer.' }
+                                                                                                            // 15. default SEO settings
+                                                                                                            statusEl.innerHTML += '<br>Syncing SEO-innstillinger...';
+                                                                                                                const seoDefaults = {
+                                                                                                                    globalTitle: 'His Kingdom Ministry',
+                                                                                                                globalDescription: 'His Kingdom Ministry driver med åndelig samlinger, undervisning og forkynnelse. Velkommen til vårt fellesskap.',
+                                                                                                                globalKeywords: 'tro, bibel, undervisning, bønn, fellesskap, jesus, kristendom',
+                                                                                                                ogImage: '',
+                                                                                                                pages: {
+                                                                                                                    index: {title: 'Forside | His Kingdom Ministry', description: 'Velkommen til His Kingdom Ministry.' },
+                                                                                                                'om-oss': {title: 'Om Oss | His Kingdom Ministry', description: 'Les om vår visjon og historie.' },
+                                                                                                                media: {title: 'Media & Undervisning', description: 'Se våre videoer og undervisning.' },
+                                                                                                                blogg: {title: 'Siste Nytt & Blogg', description: 'Følg med på hva som skjer.' }
                 }
             };
-            await firebaseService.savePageContent('settings_seo', seoDefaults);
+                                                                                                                await firebaseService.savePageContent('settings_seo', seoDefaults);
 
-            statusEl.innerHTML = '<span style="color: #10b981; font-weight: 600;">✅ Datasynkronisering fullført!</span>';
-            showToast('Synkronisering ferdig! Innholdet er nå tilgjengelig i dashboardet.');
+                                                                                                                statusEl.innerHTML = '<span style="color: #10b981; font-weight: 600;">✅ Datasynkronisering fullført!</span>';
+                                                                                                                showToast('Synkronisering ferdig! Innholdet er nå tilgjengelig i dashboardet.');
         } catch (err) {
-            console.error(err);
-            statusEl.innerHTML = '<span style="color: #ef4444;">❌ Synkronisering feilet: ' + err.message + '</span>';
+                                                                                                                    console.error(err);
+                                                                                                                statusEl.innerHTML = '<span style="color: #ef4444;">❌ Synkronisering feilet: ' + err.message + '</span>';
         } finally {
-            btn.disabled = false;
+                                                                                                                    btn.disabled = false;
         }
     }
 
-    createPlaceholderSection(id) {
+                                                                                                                createPlaceholderSection(id) {
         const contentArea = document.getElementById('content-area');
-        const section = document.createElement('div');
-        section.id = `${id}-section`;
-        section.className = 'section-content';
-        section.innerHTML = `<div class="card"><div class="card-body"><h2>${id}</h2><p>Kommer snart...</p></div></div>`;
-        contentArea.appendChild(section);
+                                                                                                                const section = document.createElement('div');
+                                                                                                                section.id = `${id}-section`;
+                                                                                                                section.className = 'section-content';
+                                                                                                                section.innerHTML = `<div class="card"><div class="card-body"><h2>${id}</h2><p>Kommer snart...</p></div></div>`;
+                                                                                                                contentArea.appendChild(section);
     }
 
-    async loadPageFields(pageId) {
+                                                                                                                async loadPageFields(pageId) {
         const container = document.getElementById('editor-fields');
-        container.innerHTML = '<div class="loader">Laster...</div>';
+                                                                                                                container.innerHTML = '<div class="loader">Laster...</div>';
 
-        try {
-            const data = await firebaseService.getPageContent(pageId) || {};
+                                                                                                                try {
+            const data = await firebaseService.getPageContent(pageId) || { };
 
-            // For subpages, ensure hero fields exist so they show up in the editor
-            if (pageId !== 'index') {
-                if (!data.hero) data.hero = {};
-                if (data.hero.title === undefined) data.hero.title = "";
-                if (data.hero.subtitle === undefined) data.hero.subtitle = "";
+                                                                                                                // For subpages, ensure hero fields exist so they show up in the editor
+                                                                                                                if (pageId !== 'index') {
+                if (!data.hero) data.hero = { };
+                                                                                                                if (data.hero.title === undefined) data.hero.title = "";
+                                                                                                                if (data.hero.subtitle === undefined) data.hero.subtitle = "";
 
-                // Support both backgroundImage and bg keys
-                if (pageId === 'for-bedrifter' || pageId === 'bnn' || pageId === 'for-menigheter' || pageId === 'blogg') {
+                                                                                                                // Support both backgroundImage and bg keys
+                                                                                                                if (pageId === 'for-bedrifter' || pageId === 'bnn' || pageId === 'for-menigheter' || pageId === 'blogg') {
                     if (data.hero.bg === undefined && data.hero.backgroundImage === undefined) {
-                        data.hero.bg = ""; // Default to .bg for these
+                                                                                                                    data.hero.bg = ""; // Default to .bg for these
                     } else if (data.hero.bg === undefined && data.hero.backgroundImage !== undefined) {
-                        data.hero.bg = data.hero.backgroundImage; // Migrate if needed
+                                                                                                                    data.hero.bg = data.hero.backgroundImage; // Migrate if needed
                     }
                 } else {
                     if (data.hero.backgroundImage === undefined) data.hero.backgroundImage = "";
                 }
             }
 
-            this.renderFields(data);
+                                                                                                                this.renderFields(data);
         } catch (e) {
-            container.innerHTML = '<p>Error.</p>';
+                                                                                                                    container.innerHTML = '<p>Error.</p>';
         }
     }
 
-    renderFields(data) {
+                                                                                                                renderFields(data) {
         const container = document.getElementById('editor-fields');
-        container.innerHTML = '';
-        const flattenedData = this.flatten(data);
+                                                                                                                container.innerHTML = '';
+                                                                                                                const flattenedData = this.flatten(data);
 
-        if (Object.keys(flattenedData).length === 0) {
-            container.innerHTML = '<p>Ingen redigerbare felt funnet for denne siden.</p>';
-            return;
+                                                                                                                if (Object.keys(flattenedData).length === 0) {
+                                                                                                                    container.innerHTML = '<p>Ingen redigerbare felt funnet for denne siden.</p>';
+                                                                                                                return;
         }
 
         Object.keys(flattenedData).forEach(key => {
             const value = flattenedData[key];
-            const formGroup = document.createElement('div');
-            formGroup.className = 'form-group';
+                                                                                                                const formGroup = document.createElement('div');
+                                                                                                                formGroup.className = 'form-group';
 
-            const label = document.createElement('label');
+                                                                                                                const label = document.createElement('label');
             label.textContent = key.replace(/\./g, ' > ').toUpperCase();
 
-            let inputElement;
+                                                                                                                let inputElement;
             if (typeof value === 'string' && (value.length > 100 || key.includes('description') || key.includes('content'))) {
-                inputElement = document.createElement('textarea');
-                inputElement.style.height = '120px';
-                formGroup.classList.add('is-textarea');
+                                                                                                                    inputElement = document.createElement('textarea');
+                                                                                                                inputElement.style.height = '120px';
+                                                                                                                formGroup.classList.add('is-textarea');
             } else {
-                inputElement = document.createElement('input');
-                inputElement.type = 'text';
+                                                                                                                    inputElement = document.createElement('input');
+                                                                                                                inputElement.type = 'text';
             }
-            inputElement.className = 'form-control';
-            inputElement.value = value || '';
-            inputElement.setAttribute('data-key', key);
+                                                                                                                inputElement.className = 'form-control';
+                                                                                                                inputElement.value = value || '';
+                                                                                                                inputElement.setAttribute('data-key', key);
 
-            formGroup.appendChild(label);
-            formGroup.appendChild(inputElement);
+                                                                                                                formGroup.appendChild(label);
+                                                                                                                formGroup.appendChild(inputElement);
 
-            // Add image preview if it's a background image field
-            if (key.includes('backgroundImage') || key.includes('imageUrl') || key.endsWith('.bg')) {
+                                                                                                                // Add image preview if it's a background image field
+                                                                                                                if (key.includes('backgroundImage') || key.includes('imageUrl') || key.endsWith('.bg')) {
                 const preview = document.createElement('div');
-                preview.className = 'img-preview-mini';
-                preview.style.marginTop = '10px';
-                preview.style.height = '60px';
-                preview.style.width = '100px';
-                preview.style.background = '#f1f5f9';
-                preview.style.borderRadius = '4px';
-                preview.style.overflow = 'hidden';
-                preview.style.display = 'flex';
-                preview.style.alignItems = 'center';
-                preview.style.justifyContent = 'center';
-                preview.style.border = '1px solid #e2e8f0';
+                                                                                                                preview.className = 'img-preview-mini';
+                                                                                                                preview.style.marginTop = '10px';
+                                                                                                                preview.style.height = '60px';
+                                                                                                                preview.style.width = '100px';
+                                                                                                                preview.style.background = '#f1f5f9';
+                                                                                                                preview.style.borderRadius = '4px';
+                                                                                                                preview.style.overflow = 'hidden';
+                                                                                                                preview.style.display = 'flex';
+                                                                                                                preview.style.alignItems = 'center';
+                                                                                                                preview.style.justifyContent = 'center';
+                                                                                                                preview.style.border = '1px solid #e2e8f0';
 
                 const updateMiniPreview = (url) => {
                     if (url && url.length > 5) {
-                        preview.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
+                                                                                                                    preview.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
                     } else {
-                        preview.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px; color:#cbd5e1;">image</span>';
+                                                                                                                    preview.innerHTML = '<span class="material-symbols-outlined" style="font-size:20px; color:#cbd5e1;">image</span>';
                     }
                 };
 
-                updateMiniPreview(value);
+                                                                                                                updateMiniPreview(value);
                 inputElement.addEventListener('input', (e) => updateMiniPreview(e.target.value));
-                formGroup.appendChild(preview);
+                                                                                                                formGroup.appendChild(preview);
             }
 
-            container.appendChild(formGroup);
+                                                                                                                container.appendChild(formGroup);
         });
     }
 
-    async savePageContent() {
+                                                                                                                async savePageContent() {
         const pageId = document.querySelector('.page-item.active').dataset.page;
-        const inputs = document.querySelectorAll('#editor-fields .form-control');
-        const dataToSave = {};
+                                                                                                                const inputs = document.querySelectorAll('#editor-fields .form-control');
+                                                                                                                const dataToSave = { };
 
         inputs.forEach(input => {
             const keys = input.dataset.key.split('.');
-            let curr = dataToSave;
+                                                                                                                let curr = dataToSave;
             keys.forEach((k, i) => {
                 if (i === keys.length - 1) {
-                    curr[k] = input.value;
+                                                                                                                    curr[k] = input.value;
                 } else {
-                    curr[k] = curr[k] || {};
-                    curr = curr[k];
+                                                                                                                    curr[k] = curr[k] || {};
+                                                                                                                curr = curr[k];
                 }
             });
         });
 
-        try {
-            await firebaseService.savePageContent(pageId, dataToSave);
-            this.showToast('✅ Innholdet er lagret!', 'success', 5000);
+                                                                                                                try {
+                                                                                                                    await firebaseService.savePageContent(pageId, dataToSave);
+                                                                                                                this.showToast('✅ Innholdet er lagret!', 'success', 5000);
         } catch (err) {
-            this.showToast('❌ Feil ved lagring', 'error', 5000);
+                                                                                                                    this.showToast('❌ Feil ved lagring', 'error', 5000);
         }
     }
 
-    flatten(obj, prefix = '') {
+                                                                                                                flatten(obj, prefix = '') {
         return Object.keys(obj).reduce((acc, k) => {
             const pre = prefix.length ? prefix + '.' : '';
-            if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
-                Object.assign(acc, this.flatten(obj[k], pre + k));
-            } else { acc[pre + k] = obj[k]; }
-            return acc;
-        }, {});
+                                                                                                                if (typeof obj[k] === 'object' && obj[k] !== null && !Array.isArray(obj[k])) {
+                                                                                                                    Object.assign(acc, this.flatten(obj[k], pre + k));
+            } else {acc[pre + k] = obj[k]; }
+                                                                                                                return acc;
+        }, { });
     }
-    async renderUsersSection() {
+                                                                                                                async renderUsersSection() {
         const section = document.getElementById('users-section');
-        if (!section) return;
+                                                                                                                if (!section) return;
 
-        // If a user is selected, render the detail view instead of the list
-        if (this.currentUserDetailId) {
-            await this.renderUserDetailView(this.currentUserDetailId);
-            return;
+                                                                                                                // If a user is selected, render the detail view instead of the list
+                                                                                                                if (this.currentUserDetailId) {
+                                                                                                                    await this.renderUserDetailView(this.currentUserDetailId);
+                                                                                                                return;
         }
 
-        section.innerHTML = `
-            <div class="section-header flex-between">
-                <div>
-                    <h2 class="section-title">Brukerhåndtering</h2>
-                    <p class="section-subtitle">Oversikt over alle registrerte brukere og deres tilgangsnivåer.</p>
-                </div>
-                <!-- Skjult knapp slik at FAB (pluss-knappen) fortsatt fungerer -->
-                <button id="add-user-btn" style="display: none;"></button>
-            </div>
+                                                                                                                section.innerHTML = `
+                                                                                                                <div class="section-header flex-between">
+                                                                                                                    <div>
+                                                                                                                        <h2 class="section-title">Brukerhåndtering</h2>
+                                                                                                                        <p class="section-subtitle">Oversikt over alle registrerte brukere og deres tilgangsnivåer.</p>
+                                                                                                                    </div>
+                                                                                                                    <!-- Skjult knapp slik at FAB (pluss-knappen) fortsatt fungerer -->
+                                                                                                                    <button id="add-user-btn" style="display: none;"></button>
+                                                                                                                </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <div class="header-search" style="width: 100%; max-width: 400px;">
-                        <span class="material-symbols-outlined">search</span>
-                        <input type="text" id="user-search-input" placeholder="Søk etter navn eller e-post...">
-                    </div>
-                </div>
-                <div class="card-body" id="users-list-container">
-                    <div class="loader"></div>
-                </div>
-            </div>
-        `;
+                                                                                                                <div class="card">
+                                                                                                                    <div class="card-header">
+                                                                                                                        <div class="header-search" style="width: 100%; max-width: 400px;">
+                                                                                                                            <span class="material-symbols-outlined">search</span>
+                                                                                                                            <input type="text" id="user-search-input" placeholder="Søk etter navn eller e-post...">
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                    <div class="card-body" id="users-list-container">
+                                                                                                                        <div class="loader"></div>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                `;
 
-        section.setAttribute('data-rendered', 'true');
+                                                                                                                section.setAttribute('data-rendered', 'true');
 
-        const addUserBtn = document.getElementById('add-user-btn');
-        if (addUserBtn) {
-            addUserBtn.onclick = () => this.openUserModal();
+                                                                                                                const addUserBtn = document.getElementById('add-user-btn');
+                                                                                                                if (addUserBtn) {
+                                                                                                                    addUserBtn.onclick = () => this.openUserModal();
         }
 
-        const searchInput = document.getElementById('user-search-input');
-        if (searchInput) {
-            searchInput.oninput = (e) => {
-                const query = e.target.value.toLowerCase();
-                this.filterUsersTable(query);
-            };
+                                                                                                                const searchInput = document.getElementById('user-search-input');
+                                                                                                                if (searchInput) {
+                                                                                                                    searchInput.oninput = (e) => {
+                                                                                                                        const query = e.target.value.toLowerCase();
+                                                                                                                        this.filterUsersTable(query);
+                                                                                                                    };
         }
 
-        await this.loadUsersList();
+                                                                                                                await this.loadUsersList();
     }
 
-    async loadUsersList() {
+                                                                                                                async loadUsersList() {
         const container = document.getElementById('users-list-container');
-        if (!container) return;
+                                                                                                                if (!container) return;
 
-        try {
+                                                                                                                try {
             const snapshot = await firebaseService.db.collection('users').orderBy('createdAt', 'desc').get();
-            const users = [];
+                                                                                                                const users = [];
             snapshot.forEach(doc => {
-                users.push({ id: doc.id, ...doc.data() });
+                                                                                                                    users.push({ id: doc.id, ...doc.data() });
             });
 
-            this.allUsersData = users; // Cache for filtering
-            this.renderUsersTable(users);
+                                                                                                                this.allUsersData = users; // Cache for filtering
+                                                                                                                this.renderUsersTable(users);
         } catch (error) {
-            console.error('Error fetching users:', error);
-            container.innerHTML = `<p class="error-text">Kunne ikke laste brukere: ${error.message}</p>`;
+                                                                                                                    console.error('Error fetching users:', error);
+                                                                                                                container.innerHTML = `<p class="error-text">Kunne ikke laste brukere: ${error.message}</p>`;
         }
     }
 
-    renderUsersTable(users) {
+                                                                                                                renderUsersTable(users) {
         const container = document.getElementById('users-list-container');
-        if (!container) return;
+                                                                                                                if (!container) return;
 
-        if (users.length === 0) {
-            container.innerHTML = '<p class="empty-text">Ingen brukere funnet.</p>';
-            return;
+                                                                                                                if (users.length === 0) {
+                                                                                                                    container.innerHTML = '<p class="empty-text">Ingen brukere funnet.</p>';
+                                                                                                                return;
         }
 
-        let tableHtml = `
-            <div class="table-responsive">
-                <table class="hkm-table">
-                    <thead>
-                        <tr>
-                            <th>Bruker</th>
-                            <th>E-post</th>
-                            <th>Rolle</th>
-                            <th>Opprettet</th>
-                            <th style="text-align:right;">Handlinger</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-        `;
+                                                                                                                let tableHtml = `
+                                                                                                                <div class="table-responsive">
+                                                                                                                    <table class="hkm-table">
+                                                                                                                        <thead>
+                                                                                                                            <tr>
+                                                                                                                                <th>Bruker</th>
+                                                                                                                                <th>E-post</th>
+                                                                                                                                <th>Rolle</th>
+                                                                                                                                <th>Opprettet</th>
+                                                                                                                                <th style="text-align:right;">Handlinger</th>
+                                                                                                                            </tr>
+                                                                                                                        </thead>
+                                                                                                                        <tbody>
+                                                                                                                            `;
 
         users.forEach(user => {
             const name = user.displayName || user.fullName || 'Ukjent Navn';
             const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-            const roleClass = `role-badge-${user.role || 'medlem'}`;
-            const roleLabel = (user.role || 'medlem').charAt(0).toUpperCase() + (user.role || 'medlem').slice(1);
+                                                                                                                            const roleClass = `role-badge-${user.role || 'medlem'}`;
+                                                                                                                            const roleLabel = (user.role || 'medlem').charAt(0).toUpperCase() + (user.role || 'medlem').slice(1);
 
-            const createdAt = user.createdAt ? (user.createdAt.toDate ? user.createdAt.toDate().toLocaleDateString('no-NO') : new Date(user.createdAt).toLocaleDateString('no-NO')) : '---';
+                                                                                                                            const createdAt = user.createdAt ? (user.createdAt.toDate ? user.createdAt.toDate().toLocaleDateString('no-NO') : new Date(user.createdAt).toLocaleDateString('no-NO')) : '---';
 
-            tableHtml += `
-                <tr>
-                    <td>
-                        <div class="user-cell">
-                            <div class="user-avatar-sm" style="${user.photoURL ? `background-image: url('${user.photoURL}'); background-size: cover;` : ''}">
-                                ${!user.photoURL ? initials : ''}
-                            </div>
-                            <div class="user-cell-info">
-                                <div class="user-cell-name">${this.escapeHtml(name)}</div>
-                                <div class="user-cell-id">ID: ${user.id.substring(0, 8)}...</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>${this.escapeHtml(user.email || 'Ingen e-post')}</td>
-                    <td><span class="role-badge ${roleClass}">${roleLabel}</span></td>
-                    <td>${createdAt}</td>
-                    <td style="text-align:right;">
-                        <div class="item-actions">
-                            <button class="icon-btn edit-user-btn" data-id="${user.id}" title="Rediger">
-                                <span class="material-symbols-outlined">edit</span>
-                            </button>
-                            <button class="icon-btn delete-user-btn danger" data-id="${user.id}" title="Slett">
-                                <span class="material-symbols-outlined">delete</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
+                                                                                                                            tableHtml += `
+                                                                                                                            <tr>
+                                                                                                                                <td>
+                                                                                                                                    <div class="user-cell">
+                                                                                                                                        <div class="user-avatar-sm" style="${user.photoURL ? `background-image: url('${user.photoURL}'); background-size: cover;` : ''}">
+                                                                                                                                            ${!user.photoURL ? initials : ''}
+                                                                                                                                        </div>
+                                                                                                                                        <div class="user-cell-info">
+                                                                                                                                            <div class="user-cell-name">${this.escapeHtml(name)}</div>
+                                                                                                                                            <div class="user-cell-id">ID: ${user.id.substring(0, 8)}...</div>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </td>
+                                                                                                                                <td>${this.escapeHtml(user.email || 'Ingen e-post')}</td>
+                                                                                                                                <td><span class="role-badge ${roleClass}">${roleLabel}</span></td>
+                                                                                                                                <td>${createdAt}</td>
+                                                                                                                                <td style="text-align:right;">
+                                                                                                                                    <div class="item-actions">
+                                                                                                                                        <button class="icon-btn edit-user-btn" data-id="${user.id}" title="Rediger">
+                                                                                                                                            <span class="material-symbols-outlined">edit</span>
+                                                                                                                                        </button>
+                                                                                                                                        <button class="icon-btn delete-user-btn danger" data-id="${user.id}" title="Slett">
+                                                                                                                                            <span class="material-symbols-outlined">delete</span>
+                                                                                                                                        </button>
+                                                                                                                                    </div>
+                                                                                                                                </td>
+                                                                                                                            </tr>
+                                                                                                                            `;
         });
 
-        tableHtml += `
-                    </tbody>
-                </table>
-            </div>
-        `;
+                                                                                                                            tableHtml += `
+                                                                                                                        </tbody>
+                                                                                                                    </table>
+                                                                                                                </div>
+                                                                                                                `;
 
-        container.innerHTML = tableHtml;
+                                                                                                                container.innerHTML = tableHtml;
 
         // Add event listeners
         container.querySelectorAll('.edit-user-btn').forEach(btn => {
-            btn.onclick = () => {
-                const userId = btn.getAttribute('data-id');
-                this.currentUserDetailId = userId;
-                this.userEditMode = false; // Start in read-only mode as requested
-                this.renderUsersSection();
-            };
+                                                                                                                    btn.onclick = () => {
+                                                                                                                        const userId = btn.getAttribute('data-id');
+                                                                                                                        this.currentUserDetailId = userId;
+                                                                                                                        this.userEditMode = false; // Start in read-only mode as requested
+                                                                                                                        this.renderUsersSection();
+                                                                                                                    };
         });
 
         container.querySelectorAll('.delete-user-btn').forEach(btn => {
-            btn.onclick = () => {
-                const userId = btn.getAttribute('data-id');
-                const userData = this.allUsersData.find(u => u.id === userId);
-                const userName = userData ? (userData.displayName || userData.fullName || 'Ukjent') : 'Ukjent';
-                this.showDeleteUserConfirmationModal(userId, userName);
-            };
+                                                                                                                    btn.onclick = () => {
+                                                                                                                        const userId = btn.getAttribute('data-id');
+                                                                                                                        const userData = this.allUsersData.find(u => u.id === userId);
+                                                                                                                        const userName = userData ? (userData.displayName || userData.fullName || 'Ukjent') : 'Ukjent';
+                                                                                                                        this.showDeleteUserConfirmationModal(userId, userName);
+                                                                                                                    };
         });
     }
 
-    showDeleteUserConfirmationModal(userId, userName) {
+                                                                                                                showDeleteUserConfirmationModal(userId, userName) {
         // Remove existing if any
         const existing = document.getElementById('hkm-delete-modal-overlay');
-        if (existing) existing.remove();
+                                                                                                                if (existing) existing.remove();
 
-        const warningMsg = `Er du sikker på at du vil slette brukeren "${userName}" fra oversikten? Dette sletter kun profildata i Firestore og kan ikke angres.`;
+                                                                                                                const warningMsg = `Er du sikker på at du vil slette brukeren "${userName}" fra oversikten? Dette sletter kun profildata i Firestore og kan ikke angres.`;
 
-        const modalHtml = `
-            <div id="hkm-delete-modal-overlay" class="hkm-modal-overlay">
-                <div class="hkm-modal-container">
-                    <div class="hkm-modal-icon">
-                        <span class="material-symbols-outlined">warning</span>
-                    </div>
-                    <h3 class="hkm-modal-title">\u26A0\uFE0F Slett bruker?</h3>
-                    <p class="hkm-modal-message">${warningMsg}</p>
-                    <div class="hkm-modal-actions">
-                        <button id="hkm-modal-cancel" class="hkm-modal-btn hkm-modal-btn-cancel">Avbryt</button>
-                        <button id="hkm-modal-confirm" class="hkm-modal-btn hkm-modal-btn-delete">Slett bruker</button>
-                    </div>
-                </div>
-            </div>
-        `;
+                                                                                                                const modalHtml = `
+                                                                                                                <div id="hkm-delete-modal-overlay" class="hkm-modal-overlay">
+                                                                                                                    <div class="hkm-modal-container">
+                                                                                                                        <div class="hkm-modal-icon">
+                                                                                                                            <span class="material-symbols-outlined">warning</span>
+                                                                                                                        </div>
+                                                                                                                        <h3 class="hkm-modal-title">\u26A0\uFE0F Slett bruker?</h3>
+                                                                                                                        <p class="hkm-modal-message">${warningMsg}</p>
+                                                                                                                        <div class="hkm-modal-actions">
+                                                                                                                            <button id="hkm-modal-cancel" class="hkm-modal-btn hkm-modal-btn-cancel">Avbryt</button>
+                                                                                                                            <button id="hkm-modal-confirm" class="hkm-modal-btn hkm-modal-btn-delete">Slett bruker</button>
+                                                                                                                        </div>
+                                                                                                                    </div>
+                                                                                                                </div>
+                                                                                                                `;
 
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
+                                                                                                                document.body.insertAdjacentHTML('beforeend', modalHtml);
 
-        const overlay = document.getElementById('hkm-delete-modal-overlay');
-        const cancelBtn = document.getElementById('hkm-modal-cancel');
-        const confirmBtn = document.getElementById('hkm-modal-confirm');
+                                                                                                                const overlay = document.getElementById('hkm-delete-modal-overlay');
+                                                                                                                const cancelBtn = document.getElementById('hkm-modal-cancel');
+                                                                                                                const confirmBtn = document.getElementById('hkm-modal-confirm');
 
         // Close on cancel or overlay click
         const closeModal = () => {
-            overlay.classList.remove('active');
+                                                                                                                    overlay.classList.remove('active');
             setTimeout(() => overlay.remove(), 200);
         };
 
-        cancelBtn.onclick = closeModal;
+                                                                                                                cancelBtn.onclick = closeModal;
         overlay.onclick = (e) => {
             if (e.target === overlay) closeModal();
         };
 
         // Confirm deletion
         confirmBtn.onclick = async () => {
-            confirmBtn.disabled = true;
-            confirmBtn.textContent = 'Sletter...';
-            await this.deleteUser(userId);
-            closeModal();
+                                                                                                                    confirmBtn.disabled = true;
+                                                                                                                confirmBtn.textContent = 'Sletter...';
+                                                                                                                await this.deleteUser(userId);
+                                                                                                                closeModal();
         };
 
         // Show with animation
         requestAnimationFrame(() => {
-            overlay.classList.add('active');
+                                                                                                                    overlay.classList.add('active');
         });
     }
 
-    filterUsersTable(query) {
+                                                                                                                filterUsersTable(query) {
         if (!this.allUsersData) return;
         const filtered = this.allUsersData.filter(user => {
             const name = (user.displayName || user.fullName || '').toLowerCase();
-            const email = (user.email || '').toLowerCase();
-            return name.includes(query) || email.includes(query);
+                                                                                                                const email = (user.email || '').toLowerCase();
+                                                                                                                return name.includes(query) || email.includes(query);
         });
-        this.renderUsersTable(filtered);
+                                                                                                                this.renderUsersTable(filtered);
     }
 
-    openUserModal(userData = null) {
+                                                                                                                openUserModal(userData = null) {
         const modalId = 'user-edit-modal';
-        let modal = document.getElementById(modalId);
+                                                                                                                let modal = document.getElementById(modalId);
 
-        if (!modal) {
-            modal = document.createElement('div');
-            modal.id = modalId;
-            modal.className = 'profile-modal';
-            modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;';
-            document.body.appendChild(modal);
+                                                                                                                if (!modal) {
+                                                                                                                    modal = document.createElement('div');
+                                                                                                                modal.id = modalId;
+                                                                                                                modal.className = 'profile-modal';
+                                                                                                                modal.style.cssText = 'display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;';
+                                                                                                                document.body.appendChild(modal);
         }
 
-        const ROLES = window.HKM_ROLES;
+                                                                                                                const ROLES = window.HKM_ROLES;
         const rolesOptions = Object.values(ROLES).map(role =>
-            `<option value="${role}" ${userData && userData.role === role ? 'selected' : ''}>${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
-        ).join('');
+                                                                                                                `<option value="${role}" ${userData && userData.role === role ? 'selected' : ''}>${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
+                                                                                                                ).join('');
 
-        modal.innerHTML = `
-            <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
-                <button class="close-modal-btn" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
-                <h3 style="font-size:20px; font-weight:700; margin-bottom:20px;">${userData ? 'Rediger bruker' : 'Opprett ny bruker'}</h3>
-                
-                <form id="user-edit-form" style="display:grid; gap:16px;">
-                    <input type="hidden" name="id" value="${userData ? userData.id : ''}">
-                    
-                    <div class="form-group">
-                        <label>Fullt navn</label>
-                        <input type="text" name="displayName" class="form-control" value="${userData ? (userData.displayName || userData.fullName || '') : ''}" required>
-                    </div>
+                                                                                                                modal.innerHTML = `
+                                                                                                                <div class="profile-modal-content" style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
+                                                                                                                    <button class="close-modal-btn" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
+                                                                                                                    <h3 style="font-size:20px; font-weight:700; margin-bottom:20px;">${userData ? 'Rediger bruker' : 'Opprett ny bruker'}</h3>
 
-                    <div class="form-group">
-                        <label>E-post</label>
-                        <input type="email" name="email" class="form-control" value="${userData ? (userData.email || '') : ''}" required ${userData ? 'readonly' : ''}>
-                        ${!userData ? '<p class="helper-text">Brukeren må fortsatt registrere seg selv via "Min Side" for å kunne logge inn.</p>' : ''}
-                    </div>
+                                                                                                                    <form id="user-edit-form" style="display:grid; gap:16px;">
+                                                                                                                        <input type="hidden" name="id" value="${userData ? userData.id : ''}">
 
-                    <div class="form-group">
-                        <label>Rolle / Tilgangsnivå</label>
-                        <select name="role" class="form-control">
-                            ${rolesOptions}
-                        </select>
-                    </div>
+                                                                                                                            <div class="form-group">
+                                                                                                                                <label>Fullt navn</label>
+                                                                                                                                <input type="text" name="displayName" class="form-control" value="${userData ? (userData.displayName || userData.fullName || '') : ''}" required>
+                                                                                                                            </div>
 
-                    <div class="form-group">
-                        <label>Telefon</label>
-                        <input type="tel" name="phone" class="form-control" value="${userData ? (userData.phone || '') : ''}">
-                    </div>
+                                                                                                                            <div class="form-group">
+                                                                                                                                <label>E-post</label>
+                                                                                                                                <input type="email" name="email" class="form-control" value="${userData ? (userData.email || '') : ''}" required ${userData ? 'readonly' : ''}>
+                                                                                                                                    ${!userData ? '<p class="helper-text">Brukeren må fortsatt registrere seg selv via "Min Side" for å kunne logge inn.</p>' : ''}
+                                                                                                                            </div>
 
-                    <div class="form-group">
-                        <label>Adresse</label>
-                        <input type="text" name="address" class="form-control" value="${userData ? (userData.address || '') : ''}">
-                    </div>
+                                                                                                                            <div class="form-group">
+                                                                                                                                <label>Rolle / Tilgangsnivå</label>
+                                                                                                                                <select name="role" class="form-control">
+                                                                                                                                    ${rolesOptions}
+                                                                                                                                </select>
+                                                                                                                            </div>
 
-                    <div class="form-grid-2 zip-city">
-                        <div class="form-group">
-                            <label>Postnummer</label>
-                            <input type="text" name="zip" class="form-control" value="${userData ? (userData.zip || '') : ''}">
-                        </div>
-                        <div class="form-group">
-                            <label>Poststed</label>
-                            <input type="text" name="city" class="form-control" value="${userData ? (userData.city || '') : ''}">
-                        </div>
-                    </div>
+                                                                                                                            <div class="form-group">
+                                                                                                                                <label>Telefon</label>
+                                                                                                                                <input type="tel" name="phone" class="form-control" value="${userData ? (userData.phone || '') : ''}">
+                                                                                                                            </div>
 
-                    <div class="form-grid-2">
-                        <div class="form-group">
-                            <label>Fødselsdato</label>
-                            <input type="date" name="birthdate" class="form-control" value="${userData ? (userData.birthdate || '') : ''}">
-                        </div>
-                        <div class="form-group">
-                            <label>Medlemsnummer</label>
-                            <input type="text" name="membershipNumber" class="form-control" value="${userData ? (userData.membershipNumber || '') : ''}">
-                        </div>
-                    </div>
+                                                                                                                            <div class="form-group">
+                                                                                                                                <label>Adresse</label>
+                                                                                                                                <input type="text" name="address" class="form-control" value="${userData ? (userData.address || '') : ''}">
+                                                                                                                            </div>
 
-                    <div class="form-group">
-                        <label>Interne notater</label>
-                        <textarea name="adminNotes" class="form-control" style="min-height:80px; resize:vertical;">${userData ? (userData.adminNotes || '') : ''}</textarea>
-                    </div>
+                                                                                                                            <div class="form-grid-2 zip-city">
+                                                                                                                                <div class="form-group">
+                                                                                                                                    <label>Postnummer</label>
+                                                                                                                                    <input type="text" name="zip" class="form-control" value="${userData ? (userData.zip || '') : ''}">
+                                                                                                                                </div>
+                                                                                                                                <div class="form-group">
+                                                                                                                                    <label>Poststed</label>
+                                                                                                                                    <input type="text" name="city" class="form-control" value="${userData ? (userData.city || '') : ''}">
+                                                                                                                                </div>
+                                                                                                                            </div>
 
-                    <div class="form-group">
-                        <label>Fødselsnummer (11 siffer - for skattefradrag)</label>
-                        <input type="password" name="ssn" class="form-control" value="${userData ? (userData.ssn || '') : ''}" placeholder="00000000000" maxlength="11" autocomplete="off">
-                        <p class="helper-text">Lagres kryptert/sikkert i Firestore for rapportering til Skatteetaten.</p>
-                    </div>
+                                                                                                                            <div class="form-grid-2">
+                                                                                                                                <div class="form-group">
+                                                                                                                                    <label>Fødselsdato</label>
+                                                                                                                                    <input type="date" name="birthdate" class="form-control" value="${userData ? (userData.birthdate || '') : ''}">
+                                                                                                                                </div>
+                                                                                                                                <div class="form-group">
+                                                                                                                                    <label>Medlemsnummer</label>
+                                                                                                                                    <input type="text" name="membershipNumber" class="form-control" value="${userData ? (userData.membershipNumber || '') : ''}">
+                                                                                                                                </div>
+                                                                                                                            </div>
 
-                    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
-                        <button type="button" class="btn-cancel" style="padding:10px 20px; border-radius:8px; border:1px solid #e2e8f0; background:none; cursor:pointer;">Avbryt</button>
-                        <button type="submit" class="btn-primary">Lagre endringer</button>
-                    </div>
-                </form>
-            </div>
-        `;
+                                                                                                                            <div class="form-group">
+                                                                                                                                <label>Interne notater</label>
+                                                                                                                                <textarea name="adminNotes" class="form-control" style="min-height:80px; resize:vertical;">${userData ? (userData.adminNotes || '') : ''}</textarea>
+                                                                                                                            </div>
 
-        modal.style.display = 'flex';
+                                                                                                                            <div class="form-group">
+                                                                                                                                <label>Fødselsnummer (11 siffer - for skattefradrag)</label>
+                                                                                                                                <input type="password" name="ssn" class="form-control" value="${userData ? (userData.ssn || '') : ''}" placeholder="00000000000" maxlength="11" autocomplete="off">
+                                                                                                                                    <p class="helper-text">Lagres kryptert/sikkert i Firestore for rapportering til Skatteetaten.</p>
+                                                                                                                            </div>
 
-        const closeBtn = modal.querySelector('.close-modal-btn');
-        const cancelBtn = modal.querySelector('.btn-cancel');
-        const form = modal.querySelector('#user-edit-form');
+                                                                                                                            <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:8px;">
+                                                                                                                                <button type="button" class="btn-cancel" style="padding:10px 20px; border-radius:8px; border:1px solid #e2e8f0; background:none; cursor:pointer;">Avbryt</button>
+                                                                                                                                <button type="submit" class="btn-primary">Lagre endringer</button>
+                                                                                                                            </div>
+                                                                                                                    </form>
+                                                                                                                </div>
+                                                                                                                `;
+
+                                                                                                                modal.style.display = 'flex';
+
+                                                                                                                const closeBtn = modal.querySelector('.close-modal-btn');
+                                                                                                                const cancelBtn = modal.querySelector('.btn-cancel');
+                                                                                                                const form = modal.querySelector('#user-edit-form');
 
         const closeModal = () => modal.style.display = 'none';
-        closeBtn.onclick = closeModal;
-        cancelBtn.onclick = closeModal;
+                                                                                                                closeBtn.onclick = closeModal;
+                                                                                                                cancelBtn.onclick = closeModal;
         modal.onclick = (e) => { if (e.target === modal) closeModal(); };
 
         form.onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(form);
-            const data = {
-                displayName: formData.get('displayName'),
-                email: formData.get('email'),
-                role: formData.get('role'),
-                phone: formData.get('phone'),
-                address: formData.get('address'),
-                zip: formData.get('zip'),
-                city: formData.get('city'),
-                birthdate: formData.get('birthdate'),
-                membershipNumber: formData.get('membershipNumber'),
-                adminNotes: formData.get('adminNotes'),
-                ssn: formData.get('ssn')
+                                                                                                                    e.preventDefault();
+                                                                                                                const formData = new FormData(form);
+                                                                                                                const data = {
+                                                                                                                    displayName: formData.get('displayName'),
+                                                                                                                email: formData.get('email'),
+                                                                                                                role: formData.get('role'),
+                                                                                                                phone: formData.get('phone'),
+                                                                                                                address: formData.get('address'),
+                                                                                                                zip: formData.get('zip'),
+                                                                                                                city: formData.get('city'),
+                                                                                                                birthdate: formData.get('birthdate'),
+                                                                                                                membershipNumber: formData.get('membershipNumber'),
+                                                                                                                adminNotes: formData.get('adminNotes'),
+                                                                                                                ssn: formData.get('ssn')
             };
-            const userId = formData.get('id');
-            await this.saveUser(userId, data);
-            closeModal();
+                                                                                                                const userId = formData.get('id');
+                                                                                                                await this.saveUser(userId, data);
+                                                                                                                closeModal();
         };
     }
 
-    async renderUserDetailView(userId) {
+                                                                                                                async renderUserDetailView(userId) {
         const section = document.getElementById('users-section');
-        if (!section) return;
+                                                                                                                if (!section) return;
 
-        section.innerHTML = `
-            <div class="section-header">
-                <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-                    <button id="back-to-users-btn" class="icon-btn" title="Tilbake til oversikt">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </button>
-                    <h2 class="section-title">Brukerprofil</h2>
-                </div>
-                <p class="section-subtitle">Detaljert informasjon og rettigheter for valgt bruker.</p>
-            </div>
+                                                                                                                section.innerHTML = `
+                                                                                                                <div class="section-header">
+                                                                                                                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                                                                                                                        <button id="back-to-users-btn" class="icon-btn" title="Tilbake til oversikt">
+                                                                                                                            <span class="material-symbols-outlined">arrow_back</span>
+                                                                                                                        </button>
+                                                                                                                        <h2 class="section-title">Brukerprofil</h2>
+                                                                                                                    </div>
+                                                                                                                    <p class="section-subtitle">Detaljert informasjon og rettigheter for valgt bruker.</p>
+                                                                                                                </div>
 
-            <div id="user-detail-container" class="loader"></div>
-        `;
+                                                                                                                <div id="user-detail-container" class="loader"></div>
+                                                                                                                `;
 
-        const backBtn = document.getElementById('back-to-users-btn');
-        if (backBtn) {
-            backBtn.onclick = () => {
-                this.currentUserDetailId = null;
-                this.userEditMode = false;
-                this.renderUsersSection();
-            };
+                                                                                                                const backBtn = document.getElementById('back-to-users-btn');
+                                                                                                                if (backBtn) {
+                                                                                                                    backBtn.onclick = () => {
+                                                                                                                        this.currentUserDetailId = null;
+                                                                                                                        this.userEditMode = false;
+                                                                                                                        this.renderUsersSection();
+                                                                                                                    };
         }
 
-        const container = document.getElementById('user-detail-container');
-        try {
+                                                                                                                const container = document.getElementById('user-detail-container');
+                                                                                                                try {
             const doc = await firebaseService.db.collection('users').doc(userId).get();
-            if (!doc.exists) {
-                container.innerHTML = '<p class="error-text">Bruker ble ikke funnet.</p>';
-                return;
+                                                                                                                if (!doc.exists) {
+                                                                                                                    container.innerHTML = '<p class="error-text">Bruker ble ikke funnet.</p>';
+                                                                                                                return;
             }
-            const userData = { id: doc.id, ...doc.data() };
-            this.renderUserDetailLayout(container, userData);
+                                                                                                                const userData = {id: doc.id, ...doc.data() };
+                                                                                                                this.renderUserDetailLayout(container, userData);
         } catch (err) {
-            console.error('Error loading user details:', err);
-            container.innerHTML = `<p class="error-text">Feil ved lasting av brukerdetaljer: ${err.message}</p>`;
+                                                                                                                    console.error('Error loading user details:', err);
+                                                                                                                container.innerHTML = `<p class="error-text">Feil ved lasting av brukerdetaljer: ${err.message}</p>`;
         }
     }
 
-    renderUserDetailLayout(container, userData) {
+                                                                                                                renderUserDetailLayout(container, userData) {
         const name = userData.displayName || userData.fullName || 'Ukjent Navn';
         const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
-        const ROLES = window.HKM_ROLES;
+                                                                                                                const ROLES = window.HKM_ROLES;
         const rolesOptions = Object.values(ROLES).map(role =>
-            `<option value="${role}" ${userData.role === role ? 'selected' : ''}>${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
-        ).join('');
+                                                                                                                `<option value="${role}" ${userData.role === role ? 'selected' : ''}>${role.charAt(0).toUpperCase() + role.slice(1)}</option>`
+                                                                                                                ).join('');
 
-        container.innerHTML = `
-            <div style="max-width: 900px;">
-                <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-body" style="display: flex; align-items: center; gap: 32px; padding: 32px;">
-                        <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover; background-position: center;` : 'background-color: var(--accent-color);'}">
-                            ${!userData.photoURL ? initials : ''}
-                            ${this.userEditMode ? `
+                                                                                                                container.innerHTML = `
+                                                                                                                <div style="max-width: 900px;">
+                                                                                                                    <div class="card" style="margin-bottom: 24px;">
+                                                                                                                        <div class="card-body" style="display: flex; align-items: center; gap: 32px; padding: 32px;">
+                                                                                                                            <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover; background-position: center;` : 'background-color: var(--accent-color);'}">
+                                                                                                                                ${!userData.photoURL ? initials : ''}
+                                                                                                                                ${this.userEditMode ? `
                                 <div id="change-photo-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; border-radius: inherit; cursor: pointer; color: white;">
                                     <span class="material-symbols-outlined">photo_camera</span>
                                 </div>
                                 <input type="file" id="user-photo-input" style="display: none;" accept="image/*">
                             ` : ''}
-                        </div>
-                        <div style="flex:1;">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                                <div>
-                                    <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${this.escapeHtml(name)}</h3>
-                                    <p style="color: var(--text-muted); font-size: 15px;">${this.escapeHtml(userData.email || 'Ingen e-post')}</p>
-                                </div>
-                                <div style="display:flex; gap:12px;">
-                                    ${!this.userEditMode ? `
+                                                                                                                            </div>
+                                                                                                                            <div style="flex:1;">
+                                                                                                                                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                                                                                                                    <div>
+                                                                                                                                        <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${this.escapeHtml(name)}</h3>
+                                                                                                                                        <p style="color: var(--text-muted); font-size: 15px;">${this.escapeHtml(userData.email || 'Ingen e-post')}</p>
+                                                                                                                                    </div>
+                                                                                                                                    <div style="display:flex; gap:12px;">
+                                                                                                                                        ${!this.userEditMode ? `
                                         <button id="activate-edit-btn" class="btn-secondary">
                                             <span class="material-symbols-outlined">edit</span>
                                             Aktiver redigering
@@ -5072,17 +5094,17 @@ class AdminManager {
                                             Lagre endringer
                                         </button>
                                     `}
-                                </div>
-                            </div>
-                            <div style="margin-top:16px; display:flex; gap:16px;">
-                                <span class="role-badge role-badge-${userData.role || 'medlem'}">${(userData.role || 'medlem').toUpperCase()}</span>
-                                <span style="font-size:13px; color:var(--text-muted);">Opprettet: ${userData.createdAt ? (userData.createdAt.toDate ? userData.createdAt.toDate().toLocaleDateString('no-NO') : new Date(userData.createdAt).toLocaleDateString('no-NO')) : 'Ukjent'}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                <div style="margin-top:16px; display:flex; gap:16px;">
+                                                                                                                                    <span class="role-badge role-badge-${userData.role || 'medlem'}">${(userData.role || 'medlem').toUpperCase()}</span>
+                                                                                                                                    <span style="font-size:13px; color:var(--text-muted);">Opprettet: ${userData.createdAt ? (userData.createdAt.toDate ? userData.createdAt.toDate().toLocaleDateString('no-NO') : new Date(userData.createdAt).toLocaleDateString('no-NO')) : 'Ukjent'}</span>
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                        </div>
+                                                                                                                    </div>
 
-                ${this.userEditMode ? `
+                                                                                                                    ${this.userEditMode ? `
                     <div id="upload-progress-container" style="display: none; margin-bottom: 24px;">
                         <div style="height: 4px; background: #eee; border-radius: 2px; overflow: hidden;">
                             <div id="upload-progress-bar" style="height: 100%; background: var(--accent-color); width: 0%; transition: width 0.3s ease;"></div>
@@ -5091,345 +5113,345 @@ class AdminManager {
                     </div>
                 ` : ''}
 
-                <form id="user-detail-form" class="${!this.userEditMode ? 'readonly-form' : ''}">
-                    <input type="hidden" name="id" value="${userData.id}">
-                    
-                    <div class="grid-2-cols equal" style="margin-bottom: 24px; gap: 24px;">
-                        <div class="card">
-                            <div class="card-header"><h4 class="card-title">Personalia</h4></div>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label>Fullt navn</label>
-                                    <input type="text" name="displayName" class="form-control" value="${this.escapeHtml(name)}" ${!this.userEditMode ? 'disabled' : ''} required>
-                                </div>
-                                <div class="form-group">
-                                    <label>E-post (kun lesetilgang)</label>
-                                    <input type="email" class="form-control" value="${this.escapeHtml(userData.email || '')}" disabled>
-                                </div>
-                                <div class="form-group">
-                                    <label>Telefon</label>
-                                    <input type="tel" name="phone" class="form-control" value="${this.escapeHtml(userData.phone || '')}" ${!this.userEditMode ? 'disabled' : ''}>
-                                </div>
-                                <div class="form-group">
-                                    <label>Fødselsdato</label>
-                                    <input type="date" name="birthdate" class="form-control" value="${userData.birthdate || ''}" ${!this.userEditMode ? 'disabled' : ''}>
-                                </div>
-                            </div>
-                        </div>
+                                                                                                                    <form id="user-detail-form" class="${!this.userEditMode ? 'readonly-form' : ''}">
+                                                                                                                        <input type="hidden" name="id" value="${userData.id}">
 
-                        <div class="card">
-                            <div class="card-header"><h4 class="card-title">Adresse</h4></div>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label>Gateadresse</label>
-                                    <input type="text" name="address" class="form-control" value="${this.escapeHtml(userData.address || '')}" ${!this.userEditMode ? 'disabled' : ''}>
-                                </div>
-                                <div class="form-grid-2 zip-city">
-                                    <div class="form-group">
-                                        <label>Postnr</label>
-                                        <input type="text" name="zip" class="form-control" value="${this.escapeHtml(userData.zip || '')}" ${!this.userEditMode ? 'disabled' : ''}>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Sted</label>
-                                        <input type="text" name="city" class="form-control" value="${this.escapeHtml(userData.city || '')}" ${!this.userEditMode ? 'disabled' : ''}>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label>Fødselsnummer (kun for skattefradrag)</label>
-                                    <input type="password" name="ssn" class="form-control" value="${userData.ssn || ''}" placeholder="11 siffer" maxlength="11" autocomplete="off" ${!this.userEditMode ? 'disabled' : ''}>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                                                                                                            <div class="grid-2-cols equal" style="margin-bottom: 24px; gap: 24px;">
+                                                                                                                                <div class="card">
+                                                                                                                                    <div class="card-header"><h4 class="card-title">Personalia</h4></div>
+                                                                                                                                    <div class="card-body">
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Fullt navn</label>
+                                                                                                                                            <input type="text" name="displayName" class="form-control" value="${this.escapeHtml(name)}" ${!this.userEditMode ? 'disabled' : ''} required>
+                                                                                                                                        </div>
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>E-post (kun lesetilgang)</label>
+                                                                                                                                            <input type="email" class="form-control" value="${this.escapeHtml(userData.email || '')}" disabled>
+                                                                                                                                        </div>
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Telefon</label>
+                                                                                                                                            <input type="tel" name="phone" class="form-control" value="${this.escapeHtml(userData.phone || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                        </div>
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Fødselsdato</label>
+                                                                                                                                            <input type="date" name="birthdate" class="form-control" value="${userData.birthdate || ''}" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
 
-                    <div class="grid-2-cols equal" style="gap: 24px;">
-                        <div class="card">
-                            <div class="card-header"><h4 class="card-title">Medlemskap & Tilgang</h4></div>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label>Rolle / Tilgangsnivå</label>
-                                    <select name="role" class="form-control" ${!this.userEditMode ? 'disabled' : ''}>
-                                        ${rolesOptions}
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Medlemsnummer</label>
-                                    <input type="text" name="membershipNumber" class="form-control" value="${this.escapeHtml(userData.membershipNumber || '')}" ${!this.userEditMode ? 'disabled' : ''}>
-                                </div>
-                            </div>
-                        </div>
+                                                                                                                                <div class="card">
+                                                                                                                                    <div class="card-header"><h4 class="card-title">Adresse</h4></div>
+                                                                                                                                    <div class="card-body">
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Gateadresse</label>
+                                                                                                                                            <input type="text" name="address" class="form-control" value="${this.escapeHtml(userData.address || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                        </div>
+                                                                                                                                        <div class="form-grid-2 zip-city">
+                                                                                                                                            <div class="form-group">
+                                                                                                                                                <label>Postnr</label>
+                                                                                                                                                <input type="text" name="zip" class="form-control" value="${this.escapeHtml(userData.zip || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                            </div>
+                                                                                                                                            <div class="form-group">
+                                                                                                                                                <label>Sted</label>
+                                                                                                                                                <input type="text" name="city" class="form-control" value="${this.escapeHtml(userData.city || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                            </div>
+                                                                                                                                        </div>
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Fødselsnummer (kun for skattefradrag)</label>
+                                                                                                                                            <input type="password" name="ssn" class="form-control" value="${userData.ssn || ''}" placeholder="11 siffer" maxlength="11" autocomplete="off" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </div>
 
-                        <div class="card">
-                            <div class="card-header"><h4 class="card-title">Interne notater</h4></div>
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <label>Notater (kun synlig for admin)</label>
-                                    <textarea name="adminNotes" class="form-control" style="min-height:120px;" ${!this.userEditMode ? 'disabled' : ''}>${this.escapeHtml(userData.adminNotes || '')}</textarea>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                                                                                                            <div class="grid-2-cols equal" style="gap: 24px;">
+                                                                                                                                <div class="card">
+                                                                                                                                    <div class="card-header"><h4 class="card-title">Medlemskap & Tilgang</h4></div>
+                                                                                                                                    <div class="card-body">
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Rolle / Tilgangsnivå</label>
+                                                                                                                                            <select name="role" class="form-control" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                                ${rolesOptions}
+                                                                                                                                            </select>
+                                                                                                                                        </div>
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Medlemsnummer</label>
+                                                                                                                                            <input type="text" name="membershipNumber" class="form-control" value="${this.escapeHtml(userData.membershipNumber || '')}" ${!this.userEditMode ? 'disabled' : ''}>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
 
-                    <div class="card" style="margin-top: 24px;">
-                        <div class="card-header">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span class="material-symbols-outlined" style="color: var(--accent-color);">mail</span>
-                                <h4 class="card-title">Kommunikasjon</h4>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Send e-post til bruker</label>
-                                <input type="text" id="manual-email-subject" class="form-control" placeholder="Emne..." style="margin-bottom:12px;">
-                                <textarea id="manual-email-message" class="form-control" style="min-height:150px;" placeholder="Skriv meldingen her..."></textarea>
-                            </div>
-                            <div style="display:flex; justify-content:flex-end; margin-top:16px;">
-                                <button type="button" id="send-manual-email-btn" class="btn-primary">
-                                    <span class="material-symbols-outlined">send</span>
-                                    Send e-post
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        `;
+                                                                                                                                <div class="card">
+                                                                                                                                    <div class="card-header"><h4 class="card-title">Interne notater</h4></div>
+                                                                                                                                    <div class="card-body">
+                                                                                                                                        <div class="form-group">
+                                                                                                                                            <label>Notater (kun synlig for admin)</label>
+                                                                                                                                            <textarea name="adminNotes" class="form-control" style="min-height:120px;" ${!this.userEditMode ? 'disabled' : ''}>${this.escapeHtml(userData.adminNotes || '')}</textarea>
+                                                                                                                                        </div>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </div>
 
-        // Event Listeners
-        if (this.userEditMode) {
+                                                                                                                            <div class="card" style="margin-top: 24px;">
+                                                                                                                                <div class="card-header">
+                                                                                                                                    <div style="display:flex; align-items:center; gap:8px;">
+                                                                                                                                        <span class="material-symbols-outlined" style="color: var(--accent-color);">mail</span>
+                                                                                                                                        <h4 class="card-title">Kommunikasjon</h4>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                                <div class="card-body">
+                                                                                                                                    <div class="form-group">
+                                                                                                                                        <label>Send e-post til bruker</label>
+                                                                                                                                        <input type="text" id="manual-email-subject" class="form-control" placeholder="Emne..." style="margin-bottom:12px;">
+                                                                                                                                            <textarea id="manual-email-message" class="form-control" style="min-height:150px;" placeholder="Skriv meldingen her..."></textarea>
+                                                                                                                                    </div>
+                                                                                                                                    <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+                                                                                                                                        <button type="button" id="send-manual-email-btn" class="btn-primary">
+                                                                                                                                            <span class="material-symbols-outlined">send</span>
+                                                                                                                                            Send e-post
+                                                                                                                                        </button>
+                                                                                                                                    </div>
+                                                                                                                                </div>
+                                                                                                                            </div>
+                                                                                                                    </form>
+                                                                                                                </div>
+                                                                                                                `;
+
+                                                                                                                // Event Listeners
+                                                                                                                if (this.userEditMode) {
             const overlay = document.getElementById('change-photo-overlay');
-            const fileInput = document.getElementById('user-photo-input');
-            if (overlay && fileInput) {
-                overlay.onclick = () => fileInput.click();
+                                                                                                                const fileInput = document.getElementById('user-photo-input');
+                                                                                                                if (overlay && fileInput) {
+                                                                                                                    overlay.onclick = () => fileInput.click();
                 fileInput.onchange = async (e) => {
                     const file = e.target.files[0];
-                    if (file) {
-                        await this.handleUserPhotoUpload(userData.id, file);
+                                                                                                                if (file) {
+                                                                                                                    await this.handleUserPhotoUpload(userData.id, file);
                     }
                 };
             }
         }
 
-        const activateEditBtn = document.getElementById('activate-edit-btn');
-        if (activateEditBtn) {
-            activateEditBtn.onclick = () => {
-                this.userEditMode = true;
-                this.renderUserDetailLayout(container, userData);
-            };
+                                                                                                                const activateEditBtn = document.getElementById('activate-edit-btn');
+                                                                                                                if (activateEditBtn) {
+                                                                                                                    activateEditBtn.onclick = () => {
+                                                                                                                        this.userEditMode = true;
+                                                                                                                        this.renderUserDetailLayout(container, userData);
+                                                                                                                    };
         }
 
-        const cancelEditBtn = document.getElementById('cancel-edit-btn');
-        if (cancelEditBtn) {
-            cancelEditBtn.onclick = () => {
-                this.userEditMode = false;
-                this.renderUserDetailLayout(container, userData);
-            };
+                                                                                                                const cancelEditBtn = document.getElementById('cancel-edit-btn');
+                                                                                                                if (cancelEditBtn) {
+                                                                                                                    cancelEditBtn.onclick = () => {
+                                                                                                                        this.userEditMode = false;
+                                                                                                                        this.renderUserDetailLayout(container, userData);
+                                                                                                                    };
         }
 
-        const saveBtn = document.getElementById('save-user-detail-btn');
-        if (saveBtn) {
-            saveBtn.onclick = async () => {
-                const form = document.getElementById('user-detail-form');
-                const formData = new FormData(form);
-                const updates = {
-                    displayName: formData.get('displayName'),
-                    phone: formData.get('phone'),
-                    gender: userData.gender || null, // preserve or null
-                    birthdate: formData.get('birthdate'),
-                    address: formData.get('address'),
-                    zip: formData.get('zip'),
-                    city: formData.get('city'),
-                    ssn: formData.get('ssn'),
-                    membershipNumber: formData.get('membershipNumber'),
-                    role: formData.get('role'),
-                    adminNotes: formData.get('adminNotes')
-                };
+                                                                                                                const saveBtn = document.getElementById('save-user-detail-btn');
+                                                                                                                if (saveBtn) {
+                                                                                                                    saveBtn.onclick = async () => {
+                                                                                                                        const form = document.getElementById('user-detail-form');
+                                                                                                                        const formData = new FormData(form);
+                                                                                                                        const updates = {
+                                                                                                                            displayName: formData.get('displayName'),
+                                                                                                                            phone: formData.get('phone'),
+                                                                                                                            gender: userData.gender || null, // preserve or null
+                                                                                                                            birthdate: formData.get('birthdate'),
+                                                                                                                            address: formData.get('address'),
+                                                                                                                            zip: formData.get('zip'),
+                                                                                                                            city: formData.get('city'),
+                                                                                                                            ssn: formData.get('ssn'),
+                                                                                                                            membershipNumber: formData.get('membershipNumber'),
+                                                                                                                            role: formData.get('role'),
+                                                                                                                            adminNotes: formData.get('adminNotes')
+                                                                                                                        };
 
-                saveBtn.disabled = true;
-                saveBtn.textContent = 'Lagrer...';
+                                                                                                                        saveBtn.disabled = true;
+                                                                                                                        saveBtn.textContent = 'Lagrer...';
 
-                try {
-                    await this.saveUser(userData.id, updates);
-                    this.userEditMode = false;
-                    // reload details to reflect fresh data
-                    await this.renderUserDetailView(userData.id);
-                } catch (e) {
-                    saveBtn.disabled = false;
-                    saveBtn.textContent = 'Lagre endringer';
-                }
-            };
+                                                                                                                        try {
+                                                                                                                            await this.saveUser(userData.id, updates);
+                                                                                                                            this.userEditMode = false;
+                                                                                                                            // reload details to reflect fresh data
+                                                                                                                            await this.renderUserDetailView(userData.id);
+                                                                                                                        } catch (e) {
+                                                                                                                            saveBtn.disabled = false;
+                                                                                                                            saveBtn.textContent = 'Lagre endringer';
+                                                                                                                        }
+                                                                                                                    };
         }
 
-        const sendMailBtn = document.getElementById('send-manual-email-btn');
-        if (sendMailBtn) {
-            sendMailBtn.onclick = async () => {
-                const subject = document.getElementById('manual-email-subject').value;
-                const message = document.getElementById('manual-email-message').value;
+                                                                                                                const sendMailBtn = document.getElementById('send-manual-email-btn');
+                                                                                                                if (sendMailBtn) {
+                                                                                                                    sendMailBtn.onclick = async () => {
+                                                                                                                        const subject = document.getElementById('manual-email-subject').value;
+                                                                                                                        const message = document.getElementById('manual-email-message').value;
 
-                if (!subject || !message) {
-                    this.showToast('Vennligst fyll ut både emne og melding.', 'warning');
-                    return;
-                }
+                                                                                                                        if (!subject || !message) {
+                                                                                                                            this.showToast('Vennligst fyll ut både emne og melding.', 'warning');
+                                                                                                                            return;
+                                                                                                                        }
 
-                sendMailBtn.disabled = true;
-                const originalText = sendMailBtn.innerHTML;
-                sendMailBtn.innerHTML = '<span class="material-symbols-outlined">sync</span> Sender...';
+                                                                                                                        sendMailBtn.disabled = true;
+                                                                                                                        const originalText = sendMailBtn.innerHTML;
+                                                                                                                        sendMailBtn.innerHTML = '<span class="material-symbols-outlined">sync</span> Sender...';
 
-                try {
-                    await this.sendEmailToUser(userData.email, subject, message);
-                    document.getElementById('manual-email-subject').value = '';
-                    document.getElementById('manual-email-message').value = '';
-                } finally {
-                    sendMailBtn.disabled = false;
-                    sendMailBtn.innerHTML = originalText;
-                }
-            };
+                                                                                                                        try {
+                                                                                                                            await this.sendEmailToUser(userData.email, subject, message);
+                                                                                                                            document.getElementById('manual-email-subject').value = '';
+                                                                                                                            document.getElementById('manual-email-message').value = '';
+                                                                                                                        } finally {
+                                                                                                                            sendMailBtn.disabled = false;
+                                                                                                                            sendMailBtn.innerHTML = originalText;
+                                                                                                                        }
+                                                                                                                    };
         }
     }
 
-    async saveUser(userId, data) {
+                                                                                                                async saveUser(userId, data) {
         // Remove undefined/null fields to prevent Firestore errors and clean up data
-        const cleanData = {};
+        const cleanData = { };
         Object.keys(data).forEach(key => {
             if (data[key] !== undefined && data[key] !== null) {
-                cleanData[key] = data[key];
+                                                                                                                    cleanData[key] = data[key];
             }
         });
 
-        try {
+                                                                                                                try {
             if (userId) {
-                // Update
-                await firebaseService.db.collection('users').doc(userId).set({
-                    ...cleanData,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                this.showToast('Bruker oppdatert.', 'success');
+                                                                                                                    // Update
+                                                                                                                    await firebaseService.db.collection('users').doc(userId).set({
+                                                                                                                        ...cleanData,
+                                                                                                                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                                                                                                    }, { merge: true });
+                                                                                                                this.showToast('Bruker oppdatert.', 'success');
             } else {
                 // Create (Placeholder for Firestore metadata - User still needs Auth account)
                 const newDoc = await firebaseService.db.collection('users').add({
-                    ...cleanData,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                                                                                                                    ...cleanData,
+                                                                                                                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // Admin Notification
-                await this.createAdminNotification({
-                    type: 'NEW_USER',
-                    userId: newDoc.id,
-                    userEmail: cleanData.email,
-                    userName: cleanData.displayName,
-                    message: `Ny bruker registrert: ${cleanData.displayName || cleanData.email}`
+                                                                                                                // Admin Notification
+                                                                                                                await this.createAdminNotification({
+                                                                                                                    type: 'NEW_USER',
+                                                                                                                userId: newDoc.id,
+                                                                                                                userEmail: cleanData.email,
+                                                                                                                userName: cleanData.displayName,
+                                                                                                                message: `Ny bruker registrert: ${cleanData.displayName || cleanData.email}`
                 });
 
-                this.showToast('Brukerrettigheter opprettet og admin varslet.', 'success');
+                                                                                                                this.showToast('Brukerrettigheter opprettet og admin varslet.', 'success');
             }
-            await this.loadUsersList();
+                                                                                                                await this.loadUsersList();
         } catch (error) {
-            console.error('Error saving user:', error);
-            this.showToast('Kunne ikke lagre bruker: ' + error.message, 'error');
+                                                                                                                    console.error('Error saving user:', error);
+                                                                                                                this.showToast('Kunne ikke lagre bruker: ' + error.message, 'error');
         }
     }
 
-    async handleUserPhotoUpload(userId, file) {
+                                                                                                                async handleUserPhotoUpload(userId, file) {
         const progressBar = document.getElementById('upload-progress-bar');
-        const progressContainer = document.getElementById('upload-progress-container');
-        const avatar = document.querySelector('.user-avatar-lg');
+                                                                                                                const progressContainer = document.getElementById('upload-progress-container');
+                                                                                                                const avatar = document.querySelector('.user-avatar-lg');
 
-        if (progressContainer) progressContainer.style.display = 'block';
+                                                                                                                if (progressContainer) progressContainer.style.display = 'block';
 
-        try {
+                                                                                                                try {
             const path = `profiles/${userId}/avatar_${Date.now()}.jpg`;
             const url = await firebaseService.uploadImage(file, path, (progress) => {
                 if (progressBar) progressBar.style.value = progress;
             });
 
-            // Update local state and UI immediately
-            if (avatar) {
-                avatar.style.backgroundImage = `url('${url}')`;
-                avatar.style.backgroundColor = 'transparent';
-                avatar.innerHTML = `
-                    <div id="change-photo-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; border-radius: inherit; cursor: pointer; color: white;">
-                        <span class="material-symbols-outlined">photo_camera</span>
-                    </div>
-                    <input type="file" id="user-photo-input" style="display: none;" accept="image/*">
-                `;
-                // Re-bind listeners as internalHTML was reset
-                const overlay = document.getElementById('change-photo-overlay');
-                const fileInput = document.getElementById('user-photo-input');
-                if (overlay && fileInput) {
-                    overlay.onclick = () => fileInput.click();
+                                                                                                                // Update local state and UI immediately
+                                                                                                                if (avatar) {
+                                                                                                                    avatar.style.backgroundImage = `url('${url}')`;
+                                                                                                                avatar.style.backgroundColor = 'transparent';
+                                                                                                                avatar.innerHTML = `
+                                                                                                                <div id="change-photo-overlay" style="position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; border-radius: inherit; cursor: pointer; color: white;">
+                                                                                                                    <span class="material-symbols-outlined">photo_camera</span>
+                                                                                                                </div>
+                                                                                                                <input type="file" id="user-photo-input" style="display: none;" accept="image/*">
+                                                                                                                    `;
+                                                                                                                    // Re-bind listeners as internalHTML was reset
+                                                                                                                    const overlay = document.getElementById('change-photo-overlay');
+                                                                                                                    const fileInput = document.getElementById('user-photo-input');
+                                                                                                                    if (overlay && fileInput) {
+                                                                                                                        overlay.onclick = () => fileInput.click();
                     fileInput.onchange = (e) => this.handleUserPhotoUpload(userId, e.target.files[0]);
                 }
             }
 
-            // Update in Firestore
-            await firebaseService.db.collection('users').doc(userId).update({
-                photoURL: url,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                                                                                                                    // Update in Firestore
+                                                                                                                    await firebaseService.db.collection('users').doc(userId).update({
+                                                                                                                        photoURL: url,
+                                                                                                                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            this.showToast('Profilbilde er oppdatert.', 'success');
+                                                                                                                    this.showToast('Profilbilde er oppdatert.', 'success');
         } catch (error) {
-            console.error('Error uploading photo:', error);
-            this.showToast('Kunne ikke laste opp bilde: ' + error.message, 'error');
+                                                                                                                        console.error('Error uploading photo:', error);
+                                                                                                                    this.showToast('Kunne ikke laste opp bilde: ' + error.message, 'error');
         } finally {
             if (progressContainer) progressContainer.style.display = 'none';
         }
     }
 
-    async sendEmailToUser(email, subject, message) {
+                                                                                                                    async sendEmailToUser(email, subject, message) {
         if (!email) {
-            this.showToast('Brukeren mangler e-postadresse.', 'error');
-            return;
+                                                                                                                        this.showToast('Brukeren mangler e-postadresse.', 'error');
+                                                                                                                    return;
         }
 
-        try {
+                                                                                                                    try {
             const response = await fetch('https://sendmanualemail-7fskzic55a-uc.a.run.app', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: email,
-                    subject: subject,
-                    message: message,
-                    fromName: 'His Kingdom Ministry'
+                                                                                                                        method: 'POST',
+                                                                                                                    headers: {'Content-Type': 'application/json' },
+                                                                                                                    body: JSON.stringify({
+                                                                                                                        to: email,
+                                                                                                                    subject: subject,
+                                                                                                                    message: message,
+                                                                                                                    fromName: 'His Kingdom Ministry'
                 })
             });
 
-            const result = await response.json();
-            if (result.success) {
-                this.showToast('E-post er sendt!', 'success');
+                                                                                                                    const result = await response.json();
+                                                                                                                    if (result.success) {
+                                                                                                                        this.showToast('E-post er sendt!', 'success');
             } else {
                 throw new Error(result.error || 'Kunne ikke sende e-post.');
             }
         } catch (error) {
-            console.error('Feil ved sending av e-post:', error);
-            this.showToast('Feil ved sending: ' + error.message, 'error');
+                                                                                                                        console.error('Feil ved sending av e-post:', error);
+                                                                                                                    this.showToast('Feil ved sending: ' + error.message, 'error');
         }
     }
 
-    async deleteUser(userId) {
+                                                                                                                    async deleteUser(userId) {
         try {
-            await firebaseService.db.collection('users').doc(userId).delete();
-            this.showToast('Bruker fjernet fra oversikten.', 'success');
-            await this.loadUsersList();
+                                                                                                                        await firebaseService.db.collection('users').doc(userId).delete();
+                                                                                                                    this.showToast('Bruker fjernet fra oversikten.', 'success');
+                                                                                                                    await this.loadUsersList();
         } catch (error) {
-            console.error('Error deleting user:', error);
-            this.showToast('Kunne ikke slette bruker: ' + error.message, 'error');
+                                                                                                                        console.error('Error deleting user:', error);
+                                                                                                                    this.showToast('Kunne ikke slette bruker: ' + error.message, 'error');
         }
     }
 
-    async createAdminNotification(notifData) {
+                                                                                                                    async createAdminNotification(notifData) {
         try {
-            await firebaseService.db.collection('admin_notifications').add({
-                ...notifData,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                read: false
-            });
-            console.log("Admin notification created:", notifData);
+                                                                                                                        await firebaseService.db.collection('admin_notifications').add({
+                                                                                                                            ...notifData,
+                                                                                                                            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                                                                                                                            read: false
+                                                                                                                        });
+                                                                                                                    console.log("Admin notification created:", notifData);
         } catch (err) {
-            console.warn("Failed to create admin notification:", err);
+                                                                                                                        console.warn("Failed to create admin notification:", err);
         }
     }
 }
 
-// Start the manager
-window.adminManager = new AdminManager();
+                                                                                                                    // Start the manager
+                                                                                                                    window.adminManager = new AdminManager();

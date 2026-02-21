@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/cookie-consent.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
-<!-- Tailwind CSS Play CDN -->
+    <!-- Tailwind CSS Play CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -41,8 +41,7 @@
             <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
-                        class="w-full h-full object-cover">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
             </a>
@@ -164,11 +163,6 @@
     <section class="page-hero subpage-hero" id="blog-hero"
         style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1507413245164-6160d8298b31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
         <div>
-            <div class="breadcrumbs" style="margin-bottom: 20px;">
-                <a href="index.html">Hjem</a><i class="fas fa-chevron-right"></i>
-                <a href="blogg.html">Blogg</a><i class="fas fa-chevron-right"></i>
-                <span>Min reise fra mørke til lys</span>
-            </div>
             <h1 class="page-hero-title">Min reise fra mørke til lys</h1>
             <div class="blog-meta"
                 style="display: flex; gap: 20px; justify-content: center; color: white; margin-top: 20px;">
@@ -179,7 +173,7 @@
         </div>
     </section>
 
-    <section class="section" style="padding: 80px 0;">
+    <section class="section" style="padding: 40px 20px 80px 20px;">
         <div class="container" style="max-width: 800px;">
             <article class="blog-post-content">
                 <p class="lead" style="font-size: 1.2em; color: #666; margin-bottom: 30px;">
@@ -228,11 +222,18 @@
                 </div>
             </article>
 
+
+            <!-- Related Posts Container -->
+            <div id="single-post-related" style="margin-top: 60px; display: none;">
+                <!-- Content injected by JS -->
+            </div>
+
             <div class="blog-navigation"
                 style="display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #eee;">
                 <a href="blogg-post-4.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Forrige
                     innlegg</a>
-                <a href="blogg.html" class="btn btn-outline">Tilbake til blogg <i class="fas fa-arrow-right"></i></a>
+                <a href="blogg.html" class="btn btn-outline">Tilbake til blogg <i class="fas fa-arrow-right"
+                        style="margin-left: 12px;"></i></a>
             </div>
         </div>
     </section>

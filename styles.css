@@ -1,9 +1,3 @@
-/* CMS Loading protections - Removed blocking hide rule to prevent site hang visibility issues */
-body.cms-loading .hero-content {
-    /* visibility: hidden; */
-    /* opacity: 0 !important; */
-}
-
 /* Profil-ikon i header */
 .profile-btn {
     display: flex;
@@ -459,9 +453,26 @@ th {
 /* Global heart icon spacing for buttons and links site-wide */
 .btn i.fa-heart,
 .button i.fa-heart,
-a i.fa-heart,
-.header-donate-btn i.fa-heart,
-.footer-donate-btn i.fa-heart,
+a.btn i.fa-heart,
+a.button i.fa-heart {
+    margin-left: 0 !important;
+    vertical-align: middle;
+}
+
+.header-donate-btn,
+.footer-donate-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+}
+
+.header-donate-btn i,
+.footer-donate-btn i,
+.header-donate-btn .heart,
+.footer-donate-btn .heart {
+    margin-left: 10px !important;
+    display: inline-block !important;
+}
+
 .heart {
     margin-left: 10px !important;
     vertical-align: middle;
@@ -487,6 +498,8 @@ a.button {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 12px !important;
+    /* Proper spacing between icons and text */
     padding: 12px 28px !important;
     border-radius: 50px !important;
     font-weight: bold !important;
@@ -4754,8 +4767,8 @@ ol.block-list {
     /* Brand Gradient */
     border: none;
     /* No border */
-    width: 50px;
-    height: 50px;
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -5156,14 +5169,13 @@ ol.block-list {
     .blog-card {
         display: flex;
         flex-direction: row;
-        align-items: center;
+        align-items: stretch;
     }
 
     .blog-image {
         flex: 1;
-        height: auto;
-        min-width: 150px;
-        max-width: 200px;
+        min-width: 250px;
+        max-width: 300px;
     }
 
     .blog-content {
@@ -5175,10 +5187,12 @@ ol.block-list {
 @media (max-width: 768px) {
     .blog-card {
         flex-direction: column;
+        align-items: stretch;
     }
 
     .blog-image {
         max-width: 100%;
+        width: 100%;
     }
 }
 
@@ -5192,17 +5206,21 @@ ol.block-list {
         font-size: 1.2rem;
     }
 }
+
 /* --- Global Mobile Aesthetics & Responsiveness Overrides --- */
 @media (max-width: 768px) {
+
     /* Hero titles size reduction */
     .hero-title {
-        font-size: clamp(2rem, 8vw, 2.8rem) !important; 
+        font-size: clamp(2rem, 8vw, 2.8rem) !important;
         line-height: 1.15 !important;
     }
+
     .page-hero-title {
         font-size: clamp(1.8rem, 8vw, 2.8rem) !important;
         line-height: 1.15 !important;
     }
+
     .page-hero {
         padding-top: 130px !important;
         padding-bottom: 50px !important;
@@ -5214,14 +5232,17 @@ ol.block-list {
         padding-right: 15px !important;
         height: 70px !important;
     }
+
     .header .logo {
         gap: 8px !important;
-        max-width: 70% !important;
+        max-width: 65% !important;
     }
+
     .header .logo-icon {
-        width: 32px !important;
-        height: 32px !important;
+        width: 38px !important;
+        height: 38px !important;
     }
+
     .header .logo span {
         font-size: 16px !important;
         white-space: nowrap;
@@ -5242,22 +5263,28 @@ ol.block-list {
     .container {
         padding: 0 15px !important;
     }
+
     .section-title {
         font-size: 28px !important;
     }
-    .section-description, .section-text, p {
+
+    .section-description,
+    .section-text,
+    p {
         margin-left: 0 !important;
         margin-right: 0 !important;
         text-align: left !important;
     }
+
     .about-content {
         padding: 0 !important;
     }
+
     .about-features {
         margin-left: 0 !important;
         margin-right: 0 !important;
     }
-    
+
     /* Om oss - circular video/image crop */
     .circular-image {
         width: 250px !important;
@@ -5265,9 +5292,12 @@ ol.block-list {
     }
 
     /* Contact forms and other inputs */
-    input, textarea, select {
+    input,
+    textarea,
+    select {
         width: 100% !important;
-        font-size: 16px !important; /* Prevents auto-zoom on iOS */
+        font-size: 16px !important;
+        /* Prevents auto-zoom on iOS */
     }
 
     /* Features Grid improvements */
@@ -5279,6 +5309,7 @@ ol.block-list {
     .donation-methods .method-card {
         padding: 15px !important;
     }
+
     .bank-account-box {
         padding: 10px !important;
         word-break: break-all;
@@ -5288,5 +5319,187 @@ ol.block-list {
     /* Hide text from language pill to save space */
     .lang-switcher .lang-btn span {
         display: none !important;
+    }
+}
+
+/* ===================================
+   Print Styles
+   =================================== */
+@media print {
+
+    /* Enable high-quality printing */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Hide UI noise and irrelevant metrics */
+    .header,
+    .header-actions,
+    .footer,
+    .mega-menu,
+    .scroll-to-top,
+    .cookie-consent,
+    .blog-share,
+    .blog-navigation,
+    #single-post-related,
+    .social-link,
+    .btn,
+    .pagination,
+    .loading-spinner,
+    .blog-tags,
+    button,
+    .blog-cta,
+    #menu-toggle,
+    .lang-switcher,
+    aside,
+    nav,
+    #single-post-views,
+    [id*="view-count"] {
+        display: none !important;
+    }
+
+    /* Force hide ALL icons in meta row for print */
+    .blog-meta i,
+    .blog-meta .fas,
+    .blog-meta .far,
+    .blog-meta .fab {
+        display: none !important;
+    }
+
+    /* Page Setup */
+    @page {
+        margin: 10mm;
+    }
+
+    /* Magazine-style Layout Reset */
+    body {
+        background: white !important;
+        color: #1a1a1a !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        font-size: 11pt !important;
+        line-height: 1.6 !important;
+        text-align: left !important;
+    }
+
+    .container {
+        max-width: 100% !important;
+        padding: 0 10mm !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Premium Hero Section - More Compact */
+    .page-hero,
+    .subpage-hero {
+        background-color: #1a1a1a !important;
+        min-height: 50mm !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        /* Push text to bottom */
+        align-items: flex-start !important;
+        padding: 10mm 15mm !important;
+        margin: 0 0 10mm 0 !important;
+        border-radius: 0 !important;
+        position: relative !important;
+        page-break-inside: avoid;
+        border-bottom: 4pt solid #f39c12;
+    }
+
+    /* Darker overlay for text pop in print */
+    .page-hero::before,
+    .subpage-hero::before {
+        content: "" !important;
+        position: absolute !important;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: linear-gradient(to top, rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.4)) !important;
+        z-index: 2 !important;
+    }
+
+    .page-hero-title,
+    .blog-meta {
+        position: relative !important;
+        z-index: 10 !important;
+        color: white !important;
+        text-align: left !important;
+        width: 100% !important;
+    }
+
+    .page-hero-title {
+        font-size: 34pt !important;
+        text-shadow: 2px 2px 8pt rgba(0, 0, 0, 1) !important;
+        margin: 0 0 5pt 0 !important;
+        font-weight: 800 !important;
+        line-height: 1.1 !important;
+        letter-spacing: -0.5pt !important;
+    }
+
+    .blog-meta {
+        font-size: 11pt !important;
+        display: flex !important;
+        gap: 15pt !important;
+        opacity: 0.9 !important;
+        text-shadow: 1px 1px 4pt rgba(0, 0, 0, 0.8) !important;
+        justify-content: flex-start !important;
+        /* Force left alignment */
+        flex-wrap: nowrap !important;
+    }
+
+    /* Content Area - Premium Serif Stack */
+    .blog-post-content {
+        margin-top: 10mm !important;
+        color: #1a1a1a !important;
+        font-family: "Charter", "Bitstream Charter", "Sitka Text", "Cambria", serif !important;
+        font-size: 12pt !important;
+        line-height: 1.7 !important;
+    }
+
+    .blog-post-content h2 {
+        font-family: -apple-system, sans-serif !important;
+        font-weight: 700 !important;
+        font-size: 20pt !important;
+        margin: 25pt 0 12pt !important;
+        color: #000 !important;
+        border-left: 5pt solid #f39c12;
+        padding-left: 15pt;
+        page-break-after: avoid;
+    }
+
+    blockquote {
+        margin: 25pt 0 !important;
+        padding: 20pt 30pt !important;
+        border-left: 5pt solid #e74c3c !important;
+        background: #fcfcfc !important;
+        border: 0.5pt solid #eee !important;
+        font-style: italic !important;
+        font-size: 13pt !important;
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+        height: auto !important;
+        border-radius: 4pt !important;
+        margin: 25pt 0 !important;
+        border: 0.5pt solid #eee !important;
+        page-break-inside: avoid;
+    }
+
+    /* Print Footer - Professional Branding */
+    body::after {
+        content: "Dokument fra His Kingdom Ministry (www.hiskingdomministry.no) - © 2026";
+        display: block;
+        text-align: left;
+        font-size: 9pt;
+        color: #999;
+        margin-top: 12mm;
+        padding: 8mm 5mm;
+        border-top: 0.5pt solid #eee;
     }
 }

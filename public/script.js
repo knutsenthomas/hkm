@@ -662,7 +662,15 @@ class CounterAnimation {
 
     animateCounters() {
         this.counters.forEach(counter => {
-            const target = parseInt(counter.getAttribute('data-target'));
+            const rawVal = counter.getAttribute('data-target');
+            const target = parseInt(rawVal) || 0;
+
+            if (target <= 0) {
+                counter.textContent = rawVal && !isNaN(parseInt(rawVal)) ? rawVal : '0';
+                counter.dataset.animated = 'true';
+                return;
+            }
+
             const duration = 2000;
             const increment = target / (duration / 16);
             let current = 0;
@@ -713,7 +721,7 @@ function initYouTubeStats() {
             const applyCount = (el, value) => {
                 if (!el) return;
                 el.setAttribute('data-target', String(value));
-                if (el.dataset.animated === 'true') {
+                if (el.dataset.animated === 'true' || el.textContent === 'NaN' || el.textContent === '0') {
                     el.textContent = value;
                 }
             };
@@ -784,7 +792,7 @@ function initPodcastStats() {
 
             const count = Array.isArray(items) ? items.length : 1;
             podcastEl.setAttribute('data-target', String(count));
-            if (podcastEl.dataset.animated === 'true') {
+            if (podcastEl.dataset.animated === 'true' || podcastEl.textContent === 'NaN' || podcastEl.textContent === '0') {
                 podcastEl.textContent = count;
             }
         })

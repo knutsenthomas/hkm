@@ -47,8 +47,7 @@
             <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo"
-                        class="w-full h-full object-cover">
+                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
             </a>
@@ -78,10 +77,10 @@
 
                 <!-- Unified Toggle Button -->
                 <button
-                    class="w-[50px] h-[50px] rounded-full flex items-center justify-center cursor-pointer transition-all duration-300 bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 text-white active:scale-95 focus:outline-none focus:ring-0 z-[10002]"
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
                     id="menu-toggle" aria-label="Toggle menu">
-                    <i class="fas fa-bars text-xl transition-all duration-300 open-icon"></i>
-                    <i class="fas fa-times text-xl transition-all duration-300 close-icon hidden"></i>
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
             </div>
         </div>
@@ -170,46 +169,60 @@
 
     <!-- Hero Slider -->
     <section class="hero-slider" id="home">
-        <!-- Slide 1 -->
-        <div class="hero-slide active">
-            <div class="hero-bg"
-                style="background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop')">
-            </div>
-            <div class="container hero-container">
-                <div class="hero-content">
-                    <h1 class="hero-title">Think & give love.</h1>
-                    <p class="hero-subtitle">We are here to support you on your spiritual journey. Join a safe
-                        environment
-                        where we explore God's word, share life, and strengthen the relationship with Jesus together.
-                    </p>
+        <div class="slider-container">
+            <!-- Slide 1 -->
+            <div class="hero-slide active">
+                <div class="hero-bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop')">
+                </div>
+                <div class="container hero-container">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Think & give love.</h1>
+                        <p class="hero-subtitle">We are here to support you on your spiritual journey. Join a safe
+                            environment
+                            where we explore God's word, share life, and strengthen the relationship with Jesus
+                            together.
+                        </p>
+                        <div class="slide-buttons">
+                            <a href="about.html" class="btn btn-primary">Read more</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Slide 2 -->
-        <div class="hero-slide">
-            <div class="hero-bg"
-                style="background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop')">
-            </div>
-            <div class="container hero-container">
-                <div class="hero-content">
-                    <h1 class="hero-title">Growth through community.</h1>
-                    <p class="hero-subtitle">Wherever you are on your journey, we want to walk with you. Experience the
-                        strength of a living community that builds each other up in faith and love.</p>
+            <!-- Slide 2 -->
+            <div class="hero-slide">
+                <div class="hero-bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop')">
+                </div>
+                <div class="container hero-container">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Growth through community.</h1>
+                        <p class="hero-subtitle">Wherever you are on your journey, we want to walk with you. Experience
+                            the
+                            strength of a living community that builds each other up in faith and love.</p>
+                        <div class="slide-buttons">
+                            <a href="about.html" class="btn btn-primary">Discover more</a>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Slide 3 -->
-        <div class="hero-slide">
-            <div class="hero-bg"
-                style="background-image: url('https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop')">
-            </div>
-            <div class="container hero-container">
-                <div class="hero-content">
-                    <h1 class="hero-title">Support our work.</h1>
-                    <p class="hero-subtitle">Your gift makes a difference for many. Help us reach even more people with
-                        the gospel through teaching, travel, and care.</p>
+            <!-- Slide 3 -->
+            <div class="hero-slide">
+                <div class="hero-bg"
+                    style="background-image: url('https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop')">
+                </div>
+                <div class="container hero-container">
+                    <div class="hero-content">
+                        <h1 class="hero-title">Support our work.</h1>
+                        <p class="hero-subtitle">Your gift makes a difference for many. Help us reach even more people
+                            with
+                            the gospel through teaching, travel, and care.</p>
+                        <div class="slide-buttons">
+                            <a href="donations.html" class="btn btn-primary">Support now</a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

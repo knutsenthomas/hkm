@@ -107,6 +107,12 @@ class ContentManager {
             if (cachedPage) {
                 this.updateDOM(JSON.parse(cachedPage));
             }
+
+            const cachedHero = localStorage.getItem('hkm_cache_hero_slides');
+            if (cachedHero) {
+                const heroData = JSON.parse(cachedHero);
+                if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
+            }
         } catch (e) {
             console.warn("[ContentManager] Early cache read failed", e);
         }
@@ -182,7 +188,10 @@ class ContentManager {
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
             const heroData = await firebaseService.getPageContent('hero_slides');
-            if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
+            if (heroData && heroData.slides) {
+                localStorage.setItem('hkm_cache_hero_slides', JSON.stringify(heroData));
+                this.renderHeroSlides(heroData.slides);
+            }
 
             const events = await this.loadEvents();
             this.renderEvents(events || []);
@@ -190,6 +199,9 @@ class ContentManager {
             const blogData = await firebaseService.getPageContent('collection_blog');
             const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
             if (blogItems.length > 0) this.renderBlogPosts(blogItems, '#blogg .blog-grid');
+
+            const causes = await this.loadCauses();
+            this.renderCauses(causes);
 
             this.enableHeroAnimations();
         }
@@ -293,7 +305,7 @@ class ContentManager {
 
     renderCauses(causes) {
         const container = document.querySelector('.causes-grid');
-        const section = document.querySelector('.donations-page.section');
+        const section = document.querySelector('.donations-page.section') || document.querySelector('.causes');
 
         if (!container || !section) return;
 
@@ -382,7 +394,65 @@ class ContentManager {
             heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${item.imageUrl}')`;
         }
 
+        // --- Calculate Reading Time ---
+        let readingTime = 5; // default fallback
+        if (item.content) {
+            const textContent = this.stripHtml(this.parseBlocks(item.content));
+            const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
+            readingTime = Math.max(1, Math.ceil(wordCount / 225)); // 225 words per minute
+        }
 
+        const readingTimeEl = document.getElementById('single-post-readingtime');
+        if (readingTimeEl) {
+            const timeLabel = this.getTranslation('reading_time') || 'min lesing';
+            readingTimeEl.innerHTML = `<i class="far fa-clock"></i> ${readingTime} ${timeLabel}`;
+            readingTimeEl.style.display = 'inline-block';
+        }
+
+        // --- View Counter ---
+        const postId = item.id || item.title;
+        let viewCount = 1;
+
+        if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
+            try {
+                // Determine doc reference based on a secure collection pattern.
+                // In an ideal world we don't spam get/set. If cache works, rely on it. Just trigger an increment.
+                const docRef = window.firebaseService.db.collection('blog_stats').doc(postId);
+
+                // Read current stats (if exists) before incrementing, allows immediate update while updating remote.
+                const docSnap = await docRef.get();
+                if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
+                    viewCount = docSnap.data().views + 1;
+                }
+
+                // Increment view asynchronously
+                docRef.set({
+                    views: window.firebase.firestore.FieldValue.increment(1)
+                }, { merge: true }).catch(err => {
+                    console.warn('[ContentManager] Kunne ikke oppdatere visninger, kanskje manglende tilgang:', err);
+                });
+            } catch (err) {
+                console.warn('[ContentManager] Feil ved henting av visninger:', err);
+            }
+        }
+
+        let viewsEl = document.getElementById('single-post-views');
+        if (!viewsEl && document.querySelector('.blog-meta')) {
+            viewsEl = document.createElement('span');
+            viewsEl.id = 'single-post-views';
+
+            // Insert after readingTimeEl if we can, otherwise just append to meta box
+            if (readingTimeEl && readingTimeEl.parentNode) {
+                readingTimeEl.parentNode.appendChild(viewsEl);
+            } else {
+                document.querySelector('.blog-meta').appendChild(viewsEl);
+            }
+        }
+        if (viewsEl) {
+            const viewsLabel = this.getTranslation('views') || 'visninger';
+            viewsEl.innerHTML = `<i class="far fa-eye"></i> ${viewCount} ${viewsLabel}`;
+            viewsEl.style.display = 'inline-block';
+        }
 
         container.innerHTML = this.parseBlocks(item.content) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
@@ -469,24 +539,32 @@ class ContentManager {
                 gcalEvents = results.flat();
             }
 
-            if (gcalEvents.length > 0) {
-                finalEvents = [...gcalEvents, ...monthHolidays];
-            } else {
-                // 3. Fallback to cached events from Firestore (if any)
-                const eventData = await firebaseService.getPageContent('collection_events');
-                const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
+            // 3. Fetch Firestore events (always, to allow overrides or manual events)
+            const eventData = await firebaseService.getPageContent('collection_events');
+            const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
+            const taggedFirebase = firebaseItems.map(event => ({
+                ...event,
+                sourceId: 'manual',
+                sourceLabel: 'Interne arrangementer'
+            }));
 
-                if (firebaseItems.length > 0) {
-                    const tagged = firebaseItems.map(event => ({
-                        ...event,
-                        sourceId: 'manual',
-                        sourceLabel: 'Arrangementer'
-                    }));
-                    finalEvents = [...tagged, ...monthHolidays];
-                } else {
-                    // 4. Only holidays if nothing else finnes
-                    finalEvents = monthHolidays;
-                }
+            // 4. Merge Logic
+            if (gcalEvents.length > 0) {
+                // Use GCal as base, but override with Firebase if ID or Title/Date matches
+                finalEvents = gcalEvents.map(gEvent => {
+                    return this._mergeEventWithFirestore(gEvent, taggedFirebase);
+                });
+
+                // Add Firebase events that DON'T match GCal
+                const uniqueFirebase = taggedFirebase.filter(fEvent =>
+                    !gcalEvents.some(gEvent =>
+                        (fEvent.gcalId && fEvent.gcalId === gEvent.id) ||
+                        (gEvent.title === fEvent.title && this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start)))
+                    )
+                );
+                finalEvents = [...finalEvents, ...uniqueFirebase, ...monthHolidays];
+            } else {
+                finalEvents = [...taggedFirebase, ...monthHolidays];
             }
 
             // Save to Cache
@@ -835,7 +913,10 @@ class ContentManager {
                 } catch (e) { }
             }
 
-            const html = events.slice(0, 3).map(event => {
+            // Filter out holidays from the "boxes" (cards) view
+            const filteredEvents = (events || []).filter(e => !e.isHoliday);
+            const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
+            const html = displayEvents.map(event => {
                 try {
                     const eventKey = this.getEventKey(event);
                     const startValue = event.start || event.date;
@@ -854,8 +935,7 @@ class ContentManager {
                         ? startDate.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
                         : '';
 
-                    const imageUrl = event.imageUrl || event.image || event.imageLink;
-                    const imageSrc = imageUrl || this.generateEventImage(event.title);
+                    const imageSrc = this._getEventImage(event);
                     const imageAlt = event.title || 'Arrangement';
 
                     const detailsUrl = this.getLocalizedLink('arrangement-detaljer.html') + '?id=' + encodeURIComponent(eventKey);
@@ -1048,27 +1128,30 @@ class ContentManager {
             : this.getTranslation('location_not_set');
 
         titleEl.textContent = event.title || 'Arrangement';
-        dateEl.innerHTML = `< i class="far fa-calendar-alt" ></i > ${dateLabel} `;
-        timeEl.innerHTML = `< i class="far fa-clock" ></i > ${timeLabel} `;
-        locationEl.innerHTML = `< i class="fas fa-map-marker-alt" ></i > ${event.location || 'Sted ikke satt'} `;
-        const rawDescription = event.description || '';
-        const safeHtml = this.sanitizeEventHtml(rawDescription);
-        if (safeHtml) {
-            descEl.innerHTML = safeHtml;
+        dateEl.innerHTML = `<i class="far fa-calendar-alt"></i> ${dateLabel}`;
+        timeEl.innerHTML = `<i class="far fa-clock"></i> ${timeLabel}`;
+        locationEl.innerHTML = `<i class="fas fa-map-marker-alt"></i> ${event.location || 'Sted ikke satt'}`;
+
+        // Handle both Google Calendar 'description' and Firebase 'content'
+        const contentData = event.content || event.description || '';
+        let finalHtml = '';
+
+        if (typeof contentData === 'object' && contentData.blocks) {
+            finalHtml = this.parseBlocks(contentData);
+        } else {
+            finalHtml = this.sanitizeEventHtml(contentData);
+        }
+
+        if (finalHtml) {
+            descEl.innerHTML = finalHtml;
         } else {
             descEl.textContent = 'Beskrivelse kommer.';
         }
 
-        const imageUrl = event.imageUrl || event.image || event.imageLink;
-        if (imageUrl) {
-            imageEl.src = imageUrl;
-            imageEl.alt = event.title || 'Arrangement';
-            imageWrap.style.display = 'block';
-        } else {
-            imageEl.src = this.generateEventImage(event.title);
-            imageEl.alt = event.title || 'Arrangement';
-            imageWrap.style.display = 'block';
-        }
+        const imageSrc = this._getEventImage(event);
+        imageEl.src = imageSrc;
+        imageEl.alt = event.title || 'Arrangement';
+        imageWrap.style.display = 'block';
 
         const videoLink = this.extractVideoLink(event);
         const videoLinkEl = modal.querySelector('.event-modal-video-link');
@@ -1149,6 +1232,15 @@ class ContentManager {
 
     sanitizeEventHtml(value) {
         if (!value) return '';
+
+        // Handle potential object values to prevent [object Object] rendering
+        if (typeof value === 'object') {
+            if (value.html) return this.sanitizeEventHtml(value.html);
+            if (value.text) return this.sanitizeEventHtml(value.text);
+            if (value.content && typeof value.content === 'string') return this.sanitizeEventHtml(value.content);
+            return ''; // Hide objects that aren't strings or handled formats
+        }
+
         let safe = String(value);
         safe = safe.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '');
         safe = safe.replace(/\son\w+="[^"]*"/gi, '');
@@ -1229,7 +1321,7 @@ class ContentManager {
             const year = dateValue.getFullYear();
             const month = String(dateValue.getMonth() + 1).padStart(2, '0');
             const day = String(dateValue.getDate()).padStart(2, '0');
-            return `${year} -${month} -${day} `;
+            return `${year}-${month}-${day}`;
         };
 
         const addHoliday = (date, title) => {
@@ -1394,8 +1486,23 @@ class ContentManager {
 
             // Default text update (never allow image URL as text)
             if (typeof value === 'string' && value.startsWith('http')) return;
+
             const newText = String(value).trim();
             const currentText = (el.textContent || "").trim();
+
+            // Specific handling for funfact counters
+            if (el.classList.contains('funfact-number')) {
+                const parsedNum = parseInt(newText) || 0;
+                if (parsedNum > 0) {
+                    el.setAttribute('data-target', String(parsedNum));
+                    // If animation already happened, update text too
+                    if (el.getAttribute('data-animated') === 'true' || currentText === '0' || currentText === 'NaN') {
+                        el.textContent = parsedNum;
+                    }
+                }
+                return;
+            }
+
             if (currentText !== newText) {
                 el.textContent = value;
             }
@@ -1431,7 +1538,7 @@ class ContentManager {
 
         // Apply Typography
         if (data.mainFont) {
-            document.body.style.fontFamily = `'${data.mainFont}', sans - serif`;
+            document.body.style.fontFamily = `'${data.mainFont}', sans-serif`;
             if (!document.getElementById('google-font-injection')) {
                 const link = document.createElement('link');
                 link.id = 'google-font-injection';
@@ -1518,37 +1625,81 @@ class ContentManager {
      * Dynamically render Hero Slides
      */
     renderHeroSlides(slides) {
+        // Skip slider modifications for translated pages (EN/ES)
+        const lang = document.documentElement.lang || 'no';
+        if (lang !== 'no') {
+            console.log('[ContentManager] Skipping renderHeroSlides for translated page:', lang);
+            return;
+        }
+
         const sliderContainer = document.querySelector('.slider-container');
         if (!sliderContainer) return;
 
         if (slides && slides.length > 0) {
-            document.body.classList.remove('hero-animate');
-            sliderContainer.innerHTML = slides.map((slide, index) => `
-                <div class="hero-slide ${index === 0 ? 'active' : ''}">
-                    <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
-                    <div class="container hero-container">
-                        <div class="hero-content">
-                            <h1 class="hero-title">${slide.title}</h1>
-                            <p class="hero-subtitle">${slide.subtitle}</p>
-                            ${slide.btnText ? `
-                                <div class="slide-buttons">
-                                    <a href="${slide.btnLink}" class="btn btn-primary">${slide.btnText}</a>
-                                </div>
-                            ` : ''}
+            // Extract current data from DOM for comparison to avoid flicker if same
+            const currentSlides = Array.from(sliderContainer.querySelectorAll('.hero-slide')).map(s => ({
+                title: s.querySelector('.hero-title')?.textContent?.trim() || '',
+                subtitle: s.querySelector('.hero-subtitle')?.textContent?.trim() || '',
+                imageUrl: (s.querySelector('.hero-bg')?.style.backgroundImage || '').replace(/url\(["']?(.*?)["']?\)/, '$1') || '',
+                btnText: s.querySelector('.btn')?.textContent?.trim() || '',
+                btnLink: s.querySelector('.btn')?.getAttribute('href') || ''
+            }));
+
+            // Compare incoming slides data with what is currently in the DOM
+            const isDifferent = slides.length !== currentSlides.length || slides.some((slide, i) => {
+                const current = currentSlides[i];
+                if (!current) return true;
+
+                const title = (slide.title || '').trim();
+                const subtitle = (slide.subtitle || '').trim();
+                const btnText = (slide.btnText || '').trim();
+                const btnLink = (slide.btnLink || '').trim();
+
+                // Advanced URL comparison: strip quotes and normalize protocol
+                const clean = (url) => (url || '').replace(/['"]/g, '').replace(/^https?:/, '').trim();
+                const currentImg = clean(current.imageUrl);
+                const incomingImg = clean(slide.imageUrl);
+
+                return title !== current.title ||
+                    subtitle !== current.subtitle ||
+                    currentImg !== incomingImg ||
+                    btnText !== current.btnText ||
+                    btnLink !== current.btnLink;
+            });
+
+            if (isDifferent) {
+                console.log("[ContentManager] Hero content changed or updated from dashboard, re-rendering...");
+                document.body.classList.remove('hero-animate');
+
+                sliderContainer.innerHTML = slides.map((slide, index) => `
+                    <div class="hero-slide ${index === 0 ? 'active' : ''}">
+                        <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                        <div class="container hero-container">
+                            <div class="hero-content">
+                                <h1 class="hero-title">${slide.title}</h1>
+                                <p class="hero-subtitle">${slide.subtitle}</p>
+                                ${slide.btnText ? `
+                                    <div class="slide-buttons">
+                                        <a href="${slide.btnLink}" class="btn btn-primary">${slide.btnText}</a>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
 
-            // Re-init HeroSlider from script.js
-            if (window.heroSlider) {
-                window.heroSlider.stopAutoPlay();
-                window.heroSlider.slides = document.querySelectorAll('.hero-slide');
-                window.heroSlider.currentIndex = 0;
-                window.heroSlider.startAutoPlay();
+                // Re-init HeroSlider from script.js
+                if (window.heroSlider) {
+                    window.heroSlider.stopAutoPlay();
+                    window.heroSlider.slides = document.querySelectorAll('.hero-slide');
+                    window.heroSlider.currentIndex = 0;
+                    window.heroSlider.startAutoPlay();
+                }
+
+                this.enableHeroAnimations();
+            } else {
+                console.log("[ContentManager] Hero content matches DOM, skipping re-render to prevent flicker.");
             }
-
-            this.enableHeroAnimations();
         }
     }
 
@@ -1672,7 +1823,10 @@ class ContentManager {
                 if (!eventKey.includes('|')) {
                     const freshEvent = await this.fetchSingleGoogleCalendarEvent(apiKey, calendar.id, eventKey);
                     if (freshEvent) {
-                        event = freshEvent;
+                        // Load Firestore items to ensure overrides (images and text from dashboard) are applied
+                        const eventData = await firebaseService.getPageContent('collection_events');
+                        const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
+                        event = this._mergeEventWithFirestore(freshEvent, firebaseItems);
                         this.populateEventDetailsDOM(event);
                         break;
                     }
@@ -1709,7 +1863,9 @@ class ContentManager {
                 'not_found': 'Arrangementet ble ikke funnet.',
                 'location_not_set': 'Sted ikke oppgitt',
                 'no_description': 'Ingen beskrivelse tilgjengelig.',
-                'read_more': 'Les mer'
+                'read_more': 'Les mer',
+                'reading_time': 'min lesing',
+                'views': 'visninger'
             },
             'en': {
                 'loading': 'Loading...',
@@ -1718,7 +1874,9 @@ class ContentManager {
                 'not_found': 'Event not found.',
                 'location_not_set': 'Location not specified',
                 'no_description': 'No description available.',
-                'read_more': 'Read more'
+                'read_more': 'Read more',
+                'reading_time': 'min read',
+                'views': 'views'
             },
             'es': {
                 'loading': 'Cargando...',
@@ -1727,7 +1885,9 @@ class ContentManager {
                 'not_found': 'Evento no encontrado.',
                 'location_not_set': 'Ubicación no especificada',
                 'no_description': 'No hay descripción disponible.',
-                'read_more': 'Leer más'
+                'read_more': 'Leer más',
+                'reading_time': 'min lectura',
+                'views': 'vistas'
             }
         };
         return (strings[lang] && strings[lang][key]) || strings['no'][key] || key;
@@ -1755,12 +1915,7 @@ class ContentManager {
         if (titleEl) titleEl.textContent = event.title;
         if (breadcrumbEl) breadcrumbEl.textContent = event.title;
 
-        // Preload logic: If dashboard image is set, use it immediately
-        let dashboardImage = '';
-        if (event.dashboardImage) {
-            dashboardImage = event.dashboardImage;
-        }
-        const imageUrl = dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+        const imageUrl = this._getEventImage(event);
         if (imgEl && imageUrl) {
             // Hide image until loaded
             imgEl.style.opacity = '0';
@@ -1773,6 +1928,12 @@ class ContentManager {
                 imgEl.style.visibility = 'visible';
                 imgEl.style.opacity = '1';
                 imgEl.classList.add('fade-in');
+
+                // Also update Hero Background when image is ready
+                const pageHero = document.querySelector('.page-hero');
+                if (pageHero) {
+                    pageHero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${imageUrl}')`;
+                }
             };
             tempImg.onerror = function () {
                 imgEl.src = '../img/placeholder-event.jpg';
@@ -1839,7 +2000,7 @@ class ContentManager {
 
         sidebarContainer.innerHTML = others.map(event => {
             const key = this.getEventKey(event);
-            const img = event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+            const img = this._getEventImage(event);
             const date = this.parseEventDate(event.start || event.date);
             const dateStr = date ? date.toLocaleDateString(locale, { day: 'numeric', month: 'short' }) : '';
 
@@ -2003,8 +2164,10 @@ class ContentManager {
                     case 'embed': // Keep for backward compatibility
                     case 'video': // New key
                         return `
-                            <div class="block-embed">
-                                <iframe src="${block.data.embed}" width="${block.data.width}" height="${block.data.height}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                            <div class="block-embed-wrapper">
+                                <div class="block-embed">
+                                    <iframe src="${block.data.embed}" width="${block.data.width}" height="${block.data.height}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                                </div>
                                 ${block.data.caption ? `<div class="block-embed-caption">${block.data.caption}</div>` : ''}
                             </div>
                         `;
@@ -2079,6 +2242,34 @@ class ContentManager {
         return imageLibrary.default;
     }
 
+    _getEventImage(event) {
+        if (!event) return this.generateEventImage('default');
+        return event.dashboardImage || event.imageUrl || event.image || event.imageLink || this.generateEventImage(event.title);
+    }
+
+    _mergeEventWithFirestore(gEvent, firebaseItems) {
+        if (!firebaseItems || !Array.isArray(firebaseItems)) return gEvent;
+
+        const override = firebaseItems.find(fEvent =>
+            (fEvent.gcalId && fEvent.gcalId === gEvent.id) ||
+            (fEvent.title === gEvent.title && this.isSameDay(this.parseEventDate(fEvent.date), this.parseEventDate(gEvent.start)))
+        );
+
+        if (override) {
+            // Apply overrides while preserving GCal source identity where needed
+            return {
+                ...gEvent,
+                ...override,
+                // Specifically ensure these fields from Firestore are used if they exist
+                title: override.title || gEvent.title,
+                description: override.content || override.description || gEvent.description,
+                imageUrl: override.dashboardImage || override.imageUrl || gEvent.imageUrl,
+                sourceId: gEvent.sourceId || override.sourceId
+            };
+        }
+        return gEvent;
+    }
+
     formatDate(dateStr) {
         if (!dateStr) return '';
         try {
@@ -2087,6 +2278,13 @@ class ContentManager {
         } catch (e) {
             return dateStr;
         }
+    }
+
+    isSameDay(d1, d2) {
+        if (!d1 || !d2) return false;
+        return d1.getFullYear() === d2.getFullYear() &&
+            d1.getMonth() === d2.getMonth() &&
+            d1.getDate() === d2.getDate();
     }
 
     /**

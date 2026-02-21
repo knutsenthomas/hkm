@@ -394,7 +394,65 @@ class ContentManager {
             heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${item.imageUrl}')`;
         }
 
+        // --- Calculate Reading Time ---
+        let readingTime = 5; // default fallback
+        if (item.content) {
+            const textContent = this.stripHtml(this.parseBlocks(item.content));
+            const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
+            readingTime = Math.max(1, Math.ceil(wordCount / 225)); // 225 words per minute
+        }
 
+        const readingTimeEl = document.getElementById('single-post-readingtime');
+        if (readingTimeEl) {
+            const timeLabel = this.getTranslation('reading_time') || 'min lesing';
+            readingTimeEl.innerHTML = `<i class="far fa-clock"></i> ${readingTime} ${timeLabel}`;
+            readingTimeEl.style.display = 'inline-block';
+        }
+
+        // --- View Counter ---
+        const postId = item.id || item.title;
+        let viewCount = 1;
+
+        if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
+            try {
+                // Determine doc reference based on a secure collection pattern.
+                // In an ideal world we don't spam get/set. If cache works, rely on it. Just trigger an increment.
+                const docRef = window.firebaseService.db.collection('blog_stats').doc(postId);
+
+                // Read current stats (if exists) before incrementing, allows immediate update while updating remote.
+                const docSnap = await docRef.get();
+                if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
+                    viewCount = docSnap.data().views + 1;
+                }
+
+                // Increment view asynchronously
+                docRef.set({
+                    views: window.firebase.firestore.FieldValue.increment(1)
+                }, { merge: true }).catch(err => {
+                    console.warn('[ContentManager] Kunne ikke oppdatere visninger, kanskje manglende tilgang:', err);
+                });
+            } catch (err) {
+                console.warn('[ContentManager] Feil ved henting av visninger:', err);
+            }
+        }
+
+        let viewsEl = document.getElementById('single-post-views');
+        if (!viewsEl && document.querySelector('.blog-meta')) {
+            viewsEl = document.createElement('span');
+            viewsEl.id = 'single-post-views';
+
+            // Insert after readingTimeEl if we can, otherwise just append to meta box
+            if (readingTimeEl && readingTimeEl.parentNode) {
+                readingTimeEl.parentNode.appendChild(viewsEl);
+            } else {
+                document.querySelector('.blog-meta').appendChild(viewsEl);
+            }
+        }
+        if (viewsEl) {
+            const viewsLabel = this.getTranslation('views') || 'visninger';
+            viewsEl.innerHTML = `<i class="far fa-eye"></i> ${viewCount} ${viewsLabel}`;
+            viewsEl.style.display = 'inline-block';
+        }
 
         container.innerHTML = this.parseBlocks(item.content) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
@@ -418,6 +476,57 @@ class ContentManager {
             } else {
                 // Hide box if no tags
                 authorBox.style.display = 'none';
+            }
+        }
+
+        // --- Related Posts ---
+        const relatedContainer = document.getElementById('single-post-related');
+        if (relatedContainer) {
+            let relatedItems = [];
+            if (item.relatedPosts && Array.isArray(item.relatedPosts) && item.relatedPosts.length > 0) {
+                // Fetch manually selected ones
+                relatedItems = items.filter(i => (item.relatedPosts.includes(i.id) || item.relatedPosts.includes(i.title)) && (i.id || i.title) !== postId);
+            } else {
+                // Fallback: 3 most recent posts excluding current one
+                relatedItems = items
+                    .filter(i => (i.id || i.title) !== postId)
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 3);
+            }
+
+            if (relatedItems.length > 0) {
+                relatedContainer.style.display = 'block';
+                relatedContainer.innerHTML = `
+                    <h3 style="margin-bottom: 30px; font-size: 1.5rem; color: #334155; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+                        Relaterte innlegg
+                    </h3>
+                    <div class="blog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
+                        ${relatedItems.map(post => `
+                            <article class="blog-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #f1f5f9; transition: transform 0.2s ease;">
+                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" style="text-decoration: none; color: inherit; display: block;">
+                                    <div class="blog-image" style="height: 180px; overflow: hidden; position: relative;">
+                                        <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
+                                             alt="${post.title}" 
+                                             style="width: 100%; height: 100%; object-fit: cover;">
+                                        ${post.category ? `<span style="position: absolute; bottom: 10px; right: 10px; background: var(--secondary-color, #ff6b2b); color: white; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;">${post.category}</span>` : ''}
+                                    </div>
+                                    <div class="blog-content" style="padding: 20px;">
+                                        <div class="blog-meta" style="font-size: 12px; color: #64748b; margin-bottom: 10px; display: flex; gap: 15px;">
+                                            <span><i class="far fa-calendar"></i> ${post.date ? this.formatDate(post.date) : ''}</span>
+                                            ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : ''}
+                                        </div>
+                                        <h4 style="font-size: 1.1rem; margin-bottom: 15px; line-height: 1.4; font-weight: 700; color: #1e293b;">${post.title}</h4>
+                                        <span style="color: var(--primary-color, #ff6b2b); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 5px;">
+                                           Les mer <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+                                        </span>
+                                    </div>
+                                </a>
+                            </article>
+                        `).join('')}
+                    </div>
+                `;
+            } else {
+                relatedContainer.style.display = 'none';
             }
         }
     }
@@ -1434,10 +1543,13 @@ class ContentManager {
 
             // Specific handling for funfact counters
             if (el.classList.contains('funfact-number')) {
-                el.setAttribute('data-target', newText);
-                // If animation already happened, update text too
-                if (el.getAttribute('data-animated') === 'true' || currentText === '0') {
-                    el.textContent = newText;
+                const parsedNum = parseInt(newText) || 0;
+                if (parsedNum > 0) {
+                    el.setAttribute('data-target', String(parsedNum));
+                    // If animation already happened, update text too
+                    if (el.getAttribute('data-animated') === 'true' || currentText === '0' || currentText === 'NaN') {
+                        el.textContent = parsedNum;
+                    }
                 }
                 return;
             }
@@ -1564,6 +1676,13 @@ class ContentManager {
      * Dynamically render Hero Slides
      */
     renderHeroSlides(slides) {
+        // Skip slider modifications for translated pages (EN/ES)
+        const lang = document.documentElement.lang || 'no';
+        if (lang !== 'no') {
+            console.log('[ContentManager] Skipping renderHeroSlides for translated page:', lang);
+            return;
+        }
+
         const sliderContainer = document.querySelector('.slider-container');
         if (!sliderContainer) return;
 
@@ -1795,7 +1914,9 @@ class ContentManager {
                 'not_found': 'Arrangementet ble ikke funnet.',
                 'location_not_set': 'Sted ikke oppgitt',
                 'no_description': 'Ingen beskrivelse tilgjengelig.',
-                'read_more': 'Les mer'
+                'read_more': 'Les mer',
+                'reading_time': 'min lesing',
+                'views': 'visninger'
             },
             'en': {
                 'loading': 'Loading...',
@@ -1804,7 +1925,9 @@ class ContentManager {
                 'not_found': 'Event not found.',
                 'location_not_set': 'Location not specified',
                 'no_description': 'No description available.',
-                'read_more': 'Read more'
+                'read_more': 'Read more',
+                'reading_time': 'min read',
+                'views': 'views'
             },
             'es': {
                 'loading': 'Cargando...',
@@ -1813,7 +1936,9 @@ class ContentManager {
                 'not_found': 'Evento no encontrado.',
                 'location_not_set': 'Ubicación no especificada',
                 'no_description': 'No hay descripción disponible.',
-                'read_more': 'Leer más'
+                'read_more': 'Leer más',
+                'reading_time': 'min lectura',
+                'views': 'vistas'
             }
         };
         return (strings[lang] && strings[lang][key]) || strings['no'][key] || key;

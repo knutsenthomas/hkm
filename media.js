@@ -234,19 +234,37 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
         return videos;
     }
 
-    // Hent alle (eller mange) videoer fra en kanal med YouTube Data API v3
+    /**
+     * Hent alle videoer fra en kanal. 
+     * Vi prøver først "uploads"-spillelisten (UU...) som er mest pålitelig og billigst i bruk.
+     */
     async function fetchAllChannelVideos(channelId) {
+        // 1. Forsøk å hente via "uploads"-spillelisten (Mest pålitelig)
+        const uploadsPlaylistId = channelId.replace(/^UC/, 'UU');
+        try {
+            console.log(`[YouTube API] Prøver å hente uploads-spilleliste: ${uploadsPlaylistId}`);
+            const videos = await fetchAllPlaylistVideos(uploadsPlaylistId);
+            if (videos && videos.length > 0) {
+                return videos;
+            }
+            console.warn("[YouTube API] Uploads-spilleliste var tom, prøver Search...");
+        } catch (e) {
+            console.warn("[YouTube API] Henting av uploads-spilleliste feilet, prøver Search-endepunkt...", e);
+        }
+
+        // 2. Fallback til Search-endepunkt (Hvis uploads-metoden feiler eller er tom)
         let videos = [];
         let nextPageToken = '';
+        let count = 0;
         do {
             let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${channelId}&order=date&maxResults=50&type=video&key=${YT_API_KEY}`;
             if (nextPageToken) url += `&pageToken=${nextPageToken}`;
+
             const resp = await fetch(url);
             const data = await resp.json();
 
             if (data.error) {
                 console.error("[YouTube API] Search Error:", data.error);
-                console.log("[YouTube API] Full error object:", data);
                 throw new Error(data.error.message);
             }
 
@@ -255,13 +273,14 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
                     title: item.snippet.title,
                     pubDate: item.snippet.publishedAt,
                     link: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-                    thumbnail: item.snippet.thumbnails && item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : '',
+                    thumbnail: item.snippet.thumbnails && item.snippet.thumbnails.high ? item.snippet.thumbnails.high.url : (item.snippet.thumbnails?.default?.url || ''),
                     description: item.snippet.description || ''
                 })));
             }
 
             nextPageToken = data.nextPageToken;
-        } while (nextPageToken);
+            count++;
+        } while (nextPageToken && count < 3); // Begrens til 150 videoer for ytelse
 
         return videos;
     }
@@ -317,22 +336,33 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
                 allVideosCache[playlistId] = videos || [];
             }
         } else if (playlistId === 'all') {
-            // Hent alle videoer fra kanal via YouTube RSS + rss2json (samme som opprinnelig oppsett)
             if (allVideosCache['all']) {
                 videos = allVideosCache['all'];
             } else {
-                const rssFeedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId || YT_CHANNEL_ID}`;
-                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+                // 1) Prøv YouTube Data API først (mer pålitelig)
                 try {
-                    console.log('Henter videoer fra kanal (ALL) via RSS2JSON');
-                    const response = await fetch(proxyUrl);
-                    const data = await response.json();
-                    videos = data.items || [];
-                    allVideosCache['all'] = videos;
+                    console.log('Henter videoer fra kanal (ALL) via Data API');
+                    videos = await fetchAllChannelVideos(channelId || YT_CHANNEL_ID);
                 } catch (e) {
-                    console.error('Feil ved henting av kanalvideoer (ALL/RSS):', e);
+                    console.warn('Data API feilet for kanal (ALL), prøver RSS:', e);
                     videos = [];
                 }
+
+                // 2) Fallback til RSS hvis Data API feiler
+                if (!videos || videos.length === 0) {
+                    const rssFeedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId || YT_CHANNEL_ID}`;
+                    const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+                    try {
+                        console.log('Henter videoer fra kanal (ALL) via RSS2JSON (Fallback)');
+                        const response = await fetch(proxyUrl);
+                        const data = await response.json();
+                        videos = data.items || [];
+                    } catch (e) {
+                        console.error('Feil ved henting av kanalvideoer (ALL/RSS):', e);
+                        videos = [];
+                    }
+                }
+                allVideosCache['all'] = videos;
             }
         }
         currentCategory = playlistId || 'all';

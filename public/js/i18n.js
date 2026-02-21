@@ -18,23 +18,13 @@ const i18nManager = {
      */
     detectLanguage() {
         const path = window.location.pathname;
-        let lang = null;
+        let currentLang = 'no';
 
-        // Priority 1: URL path (e.g., /en/ or /es/)
-        if (path.includes('/en/')) lang = 'en';
-        else if (path.includes('/es/')) lang = 'es';
+        // Set language based strictly on the URL path
+        if (path.includes('/en/')) currentLang = 'en';
+        else if (path.includes('/es/')) currentLang = 'es';
 
-        // Priority 2: localStorage
-        if (!lang) {
-            lang = localStorage.getItem(this.storageKey);
-        }
-
-        // Priority 3: default
-        if (!lang) {
-            lang = this.defaultLang;
-        }
-
-        this.setLanguage(lang, false);
+        document.documentElement.lang = currentLang;
     },
 
     /**
