@@ -1455,10 +1455,20 @@ class AdminManager {
 
             let value = '0', meta = '';
             switch (id) {
-                case 'visitors':
-                    value = indexStats.website_visits || '12,450';
-                    meta = '<div class="stat-trend positive"><span class="material-symbols-outlined">trending_up</span> 12.5%</div>';
+                case 'visitors': {
+                    const cachedVisits = localStorage.getItem('hkm_stat_visits');
+                    const liveVisits = indexStats.website_visits;
+                    if (liveVisits) {
+                        localStorage.setItem('hkm_stat_visits', liveVisits);
+                        value = liveVisits.toLocaleString('no-NO');
+                    } else if (cachedVisits) {
+                        value = parseInt(cachedVisits).toLocaleString('no-NO');
+                    } else {
+                        value = '—';
+                    }
+                    meta = '';
                     break;
+                }
                 case 'status':
                     value = '<span class="text-green" style="font-size: 24px;">Normal</span>';
                     meta = '<span class="stat-meta">Alle systemer operative</span>';
