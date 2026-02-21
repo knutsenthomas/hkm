@@ -2240,8 +2240,27 @@ class ContentManager {
                         return `<blockquote class="block-quote"><p>${block.data.text}</p><cite>${block.data.caption}</cite></blockquote>`;
                     case 'delimiter':
                         return `<div class="block-delimiter">***</div>`;
+                    case 'youtubeVideo': {
+                        const ytUrl = block.data?.url || '';
+                        const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                        const ytId = ytMatch ? ytMatch[1] : null;
+                        if (!ytId) return '';
+                        return `
+                            <div class="block-embed-wrapper" style="margin: 28px 0;">
+                                <div class="block-embed" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; box-shadow: 0 4px 24px rgba(0,0,0,0.10);">
+                                    <iframe
+                                        src="https://www.youtube.com/embed/${ytId}"
+                                        frameborder="0"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                        allowfullscreen
+                                        style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px;">
+                                    </iframe>
+                                </div>
+                            </div>
+                        `;
+                    }
                     case 'embed': // Keep for backward compatibility
-                    case 'video': // New key
+                    case 'video': // Legacy key
                         return `
                             <div class="block-embed-wrapper">
                                 <div class="block-embed">
