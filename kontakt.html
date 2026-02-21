@@ -96,6 +96,28 @@
             color: var(--text-dark);
         }
 
+        .form-group label .required-star {
+            color: #e74c3c;
+            margin-left: 3px;
+            font-weight: 700;
+        }
+
+        .form-control.field-error {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.12);
+        }
+
+        .form-error-msg {
+            font-size: 12px;
+            color: #e74c3c;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-error-msg.visible {
+            display: block;
+        }
+
         .form-control {
             width: 100%;
             padding: 15px 20px;
@@ -337,30 +359,40 @@
 
                 <!-- Contact Form -->
                 <div class="contact-form-container">
-                    <form id="contact-form">
+                    <form id="contact-form" novalidate>
                         <div class="form-group">
-                            <label for="name">Navn</label>
-                            <input type="text" id="name" name="name" class="form-control" required>
+                            <label for="name">Navn <span class="required-star">*</span></label>
+                            <input type="text" id="name" name="name" class="form-control" required
+                                placeholder="Ditt fulle navn">
+                            <span class="form-error-msg" id="err-name">Vennligst fyll inn navn.</span>
                         </div>
 
                         <div class="form-group">
-                            <label for="phone">Telefon</label>
-                            <input type="tel" id="phone" name="phone" class="form-control" required>
+                            <label for="phone">Telefon <span
+                                    style="font-size:12px; font-weight:400; color:#94a3b8;">(valgfritt)</span></label>
+                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+47 000 00 000">
                         </div>
 
                         <div class="form-group">
-                            <label for="email">E-post</label>
-                            <input type="email" id="email" name="email" class="form-control" required>
+                            <label for="email">E-post <span class="required-star">*</span></label>
+                            <input type="email" id="email" name="email" class="form-control" required
+                                placeholder="din@epost.no">
+                            <span class="form-error-msg" id="err-email">Vennligst fyll inn en gyldig
+                                e-postadresse.</span>
                         </div>
 
                         <div class="form-group">
-                            <label for="subject">Emne</label>
-                            <input type="text" id="subject" name="subject" class="form-control" required>
+                            <label for="subject">Emne <span class="required-star">*</span></label>
+                            <input type="text" id="subject" name="subject" class="form-control" required
+                                placeholder="Hva gjelder henvendelsen?">
+                            <span class="form-error-msg" id="err-subject">Vennligst fyll inn emne.</span>
                         </div>
 
                         <div class="form-group">
-                            <label for="message">Melding</label>
-                            <textarea id="message" name="message" rows="5" class="form-control" required></textarea>
+                            <label for="message">Melding <span class="required-star">*</span></label>
+                            <textarea id="message" name="message" rows="5" class="form-control" required
+                                placeholder="Skriv meldingen din her..."></textarea>
+                            <span class="form-error-msg" id="err-message">Vennligst skriv en melding.</span>
                         </div>
 
                         <button type="submit" class="btn btn-primary">Send melding</button>
@@ -508,7 +540,6 @@
 
                 const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse';
 
-                // Mapping fra lokale felter til Google Forms entry-ID-er
                 const FIELD_MAP = {
                     name: 'entry.599509457',
                     phone: 'entry.1400512221',
@@ -517,8 +548,31 @@
                     message: 'entry.900097937'
                 };
 
+                function showError(fieldId, errId) {
+                    const field = document.getElementById(fieldId);
+                    const err = document.getElementById(errId);
+                    if (field) field.classList.add('field-error');
+                    if (err) err.classList.add('visible');
+                }
+
+                function clearErrors() {
+                    document.querySelectorAll('.form-control').forEach(f => f.classList.remove('field-error'));
+                    document.querySelectorAll('.form-error-msg').forEach(e => e.classList.remove('visible'));
+                }
+
+                // Clear error styling when user starts typing
+                ['name', 'email', 'subject', 'message'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.addEventListener('input', () => {
+                        el.classList.remove('field-error');
+                        const err = document.getElementById('err-' + id);
+                        if (err) err.classList.remove('visible');
+                    });
+                });
+
                 form.addEventListener('submit', function (e) {
                     e.preventDefault();
+                    clearErrors();
 
                     const name = document.getElementById('name').value.trim();
                     const phone = document.getElementById('phone').value.trim();
@@ -526,14 +580,27 @@
                     const subject = document.getElementById('subject').value.trim();
                     const message = document.getElementById('message').value.trim();
 
-                    if (!name || !phone || !email || !subject || !message) {
-                        if (statusEl) statusEl.textContent = 'Vennligst fyll ut alle felter.';
+                    let valid = true;
+
+                    if (!name) { showError('name', 'err-name'); valid = false; }
+                    if (!email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { showError('email', 'err-email'); valid = false; }
+                    if (!subject) { showError('subject', 'err-subject'); valid = false; }
+                    if (!message) { showError('message', 'err-message'); valid = false; }
+
+                    if (!valid) {
+                        if (statusEl) {
+                            statusEl.style.color = '#e74c3c';
+                            statusEl.textContent = 'Vennligst fyll ut alle obligatoriske felt (*).';
+                        }
+                        // Scroll to first error
+                        const firstError = form.querySelector('.field-error');
+                        if (firstError) firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
                         return;
                     }
 
                     const formData = new URLSearchParams();
                     formData.append(FIELD_MAP.name, name);
-                    formData.append(FIELD_MAP.phone, phone);
+                    if (phone) formData.append(FIELD_MAP.phone, phone);
                     formData.append(FIELD_MAP.email, email);
                     formData.append(FIELD_MAP.subject, subject);
                     formData.append(FIELD_MAP.message, message);
@@ -555,28 +622,32 @@
                         }
                     }
 
+                    const submitBtn = form.querySelector('button[type="submit"]');
+                    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Sender…'; }
+
                     if (statusEl) {
-                        statusEl.style.color = '#ffffff';
+                        statusEl.style.color = '#64748b';
                         statusEl.textContent = 'Sender melding…';
                     }
 
                     fetch(FORM_ACTION, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: {
-                            'Content-Type': 'application/x-www-form-urlencoded'
-                        },
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                         body: formData.toString()
                     }).then(() => {
                         form.reset();
+                        clearErrors();
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send melding'; }
                         if (statusEl) {
-                            statusEl.style.color = '#4caf50';
-                            statusEl.textContent = 'Takk for meldingen! Vi tar kontakt så snart vi kan.';
+                            statusEl.style.color = '#16a34a';
+                            statusEl.textContent = '✅ Takk for meldingen! Vi tar kontakt så snart vi kan.';
                         }
                     }).catch(() => {
+                        if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Send melding'; }
                         if (statusEl) {
-                            statusEl.style.color = '#ff5252';
-                            statusEl.textContent = 'Noe gikk galt ved sending av skjemaet. Prøv igjen senere.';
+                            statusEl.style.color = '#e74c3c';
+                            statusEl.textContent = 'Noe gikk galt ved sending. Prøv igjen senere.';
                         }
                     });
                 });
