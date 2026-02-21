@@ -8,6 +8,7 @@ class MinSideManager {
         this.profileData = {};
 
         this.views = {
+            overview: this.renderOverview,
             profile: this.renderProfile,
             activity: this.renderActivity,
             notifications: this.renderNotifications,
@@ -33,7 +34,7 @@ class MinSideManager {
                 this.profileData = await this.getMergedProfile(user);
                 this.updateHeader();
                 this.initNotificationBadge();
-                const startView = window.location.hash.replace('#', '') || 'profile';
+                const startView = window.location.hash.replace('#', '') || 'overview';
                 this.loadView(startView);
             } else {
                 window.location.href = 'login.html';
@@ -79,7 +80,7 @@ class MinSideManager {
     }
 
     loadView(viewId) {
-        if (!this.views[viewId]) viewId = 'profile';
+        if (!this.views[viewId]) viewId = 'overview';
         window.location.hash = viewId;
 
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
@@ -245,6 +246,178 @@ class MinSideManager {
         if (s < 86400) return `${Math.floor(s / 3600)} t siden`;
         if (s < 604800) return `${Math.floor(s / 86400)} d siden`;
         return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    // ══════════════════════════════════════════════════════════
+    // VIEW: OVERSIKT (Dashboard forside)
+    // ══════════════════════════════════════════════════════════
+    async renderOverview(container) {
+        const p = this.profileData;
+        const user = this.currentUser;
+        const name = (p.displayName || user?.displayName || user?.email || 'Venn').split(' ')[0];
+        const year = new Date().getFullYear();
+        const hour = new Date().getHours();
+        const greeting = hour < 12 ? 'God morgen' : hour < 17 ? 'Hei' : 'God kveld';
+
+        container.innerHTML = `
+        <div style="max-width:860px">
+
+            <!-- Welcome banner -->
+            <div style="background:var(--accent-gradient); border-radius:var(--radius-lg); padding:28px 32px;
+                margin-bottom:24px; box-shadow:0 8px 30px var(--accent-glow); display:flex;
+                align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+                <div>
+                    <h2 style="font-size:1.5rem; font-weight:800; color:#fff; letter-spacing:-0.02em; margin-bottom:6px;">
+                        ${greeting}, ${name}! 👋
+                    </h2>
+                    <p style="color:rgba(255,255,255,0.85); font-size:0.9rem; font-weight:500;">
+                        "For jeg vet hvilke tanker jeg har med dere, sier Herren..." — Jer 29:11
+                    </p>
+                </div>
+                <div style="background:rgba(255,255,255,0.15); border-radius:var(--radius-sm);
+                    padding:12px 18px; backdrop-filter:blur(4px);">
+                    <div style="color:rgba(255,255,255,0.8); font-size:0.7rem; font-weight:700;
+                        text-transform:uppercase; letter-spacing:0.08em; margin-bottom:3px;">Medlem siden</div>
+                    <div style="color:#fff; font-size:1.1rem; font-weight:800;" id="ov-member-since">—</div>
+                </div>
+            </div>
+
+            <!-- Stats row -->
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:24px;">
+                <div class="stat-chip">
+                    <div class="stat-chip-label">Uleste varslinger</div>
+                    <div class="stat-chip-value" id="ov-notif-count">—</div>
+                    <div class="stat-chip-sub">Trykk for å se alle</div>
+                </div>
+                <div class="stat-chip">
+                    <div class="stat-chip-label">Gitt totalt i ${year}</div>
+                    <div class="stat-chip-value" id="ov-year-total">—</div>
+                    <div class="stat-chip-sub" id="ov-year-sub">Se gavehistorikk</div>
+                </div>
+                <div class="stat-chip">
+                    <div class="stat-chip-label">Tilgjengelige kurs</div>
+                    <div class="stat-chip-value" id="ov-courses-count">—</div>
+                    <div class="stat-chip-sub">Undervisning fra HKM</div>
+                </div>
+            </div>
+
+            <!-- Quick actions -->
+            <div class="info-card" style="margin-bottom:20px">
+                <div class="info-card-header"><h3>Hurtiglenker</h3></div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px;
+                    background:var(--border-color);">
+                    ${[
+                { view: 'profile', icon: 'person', label: 'Min profil', sub: 'Kontakt & personlig info' },
+                { view: 'giving', icon: 'volunteer_activism', label: 'Gaver', sub: 'Gavehistorikk & skattefradrag' },
+                { view: 'courses', icon: 'school', label: 'Kurs', sub: 'Undervisning fra HKM' },
+                { view: 'notifications', icon: 'notifications', label: 'Varslinger', sub: 'Meldinger fra HKM' },
+            ].map(a => `
+                    <button class="ov-action-btn" data-view="${a.view}">
+                        <div style="width:40px;height:40px;border-radius:12px;background:var(--accent-light);
+                            display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
+                            <span class="material-symbols-outlined" style="font-size:20px;color:var(--accent-color);">${a.icon}</span>
+                        </div>
+                        <div style="font-size:0.88rem;font-weight:800;color:var(--text-main);margin-bottom:2px;">${a.label}</div>
+                        <div style="font-size:0.75rem;color:var(--text-muted);">${a.sub}</div>
+                    </button>`).join('')}
+                </div>
+            </div>
+
+            <!-- Recent notifications -->
+            <div class="info-card">
+                <div class="info-card-header">
+                    <h3>Siste varslinger</h3>
+                    <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('notifications')">
+                        Se alle
+                    </button>
+                </div>
+                <div id="ov-recent-notifs">
+                    <div class="loading-state" style="min-height:80px"><div class="spinner"></div></div>
+                </div>
+            </div>
+
+        </div>`;
+
+        // Quick action clicks
+        container.querySelectorAll('.ov-action-btn').forEach(btn => {
+            btn.addEventListener('click', () => this.loadView(btn.dataset.view));
+        });
+
+        // Stat: member since
+        if (p.createdAt?.toDate) {
+            document.getElementById('ov-member-since').textContent =
+                p.createdAt.toDate().getFullYear();
+        } else {
+            document.getElementById('ov-member-since').textContent = new Date().getFullYear();
+        }
+
+        // Parallel fetches
+        const uid = user?.uid;
+        try {
+            const [notifSnap, donationsSnap, coursesSnap, recentSnap] = await Promise.all([
+                firebase.firestore().collection('user_notifications')
+                    .where('userId', '==', uid).where('read', '==', false).get(),
+                firebase.firestore().collection('donations')
+                    .where('userId', '==', uid).get(),
+                firebase.firestore().collection('teaching').get(),
+                firebase.firestore().collection('user_notifications')
+                    .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get(),
+            ]);
+
+            // Notif count
+            const notifEl = document.getElementById('ov-notif-count');
+            if (notifEl) notifEl.textContent = notifSnap.size || '0';
+
+            // Year total giving
+            let yearTotal = 0;
+            donationsSnap.forEach(d => {
+                const donation = d.data();
+                if (donation.timestamp?.toDate?.()?.getFullYear?.() === new Date().getFullYear()) {
+                    yearTotal += (donation.amount || 0) / 100;
+                }
+            });
+            const yearEl = document.getElementById('ov-year-total');
+            if (yearEl) yearEl.textContent = yearTotal > 0
+                ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}`
+                : 'Ingen';
+
+            // Courses count
+            const coursesEl = document.getElementById('ov-courses-count');
+            if (coursesEl) coursesEl.textContent = coursesSnap.size || '0';
+
+            // Recent notifications list
+            const recentEl = document.getElementById('ov-recent-notifs');
+            if (recentEl) {
+                if (recentSnap.empty) {
+                    recentEl.innerHTML = `<div style="padding:24px 22px; color:var(--text-muted); font-size:0.87rem;">Ingen varslinger ennå.</div>`;
+                } else {
+                    recentEl.innerHTML = recentSnap.docs.map(doc => {
+                        const d = doc.data();
+                        const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
+                        return `<div style="display:flex;align-items:center;gap:14px;padding:13px 22px;
+                            border-bottom:1px solid var(--border-color);transition:background 0.15s;"
+                            onmouseover="this.style.background='var(--main-bg)'"
+                            onmouseout="this.style.background=''">
+                            <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
+                                background:${!d.read ? 'var(--accent-color)' : '#e2e8f0'};"></div>
+                            <div style="flex:1;min-width:0;">
+                                <div style="font-size:0.88rem;font-weight:700;color:var(--text-main);
+                                    margin-bottom:2px;">${d.title || 'Varsling'}</div>
+                                <div style="font-size:0.78rem;color:var(--text-muted);
+                                    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.body || ''}</div>
+                            </div>
+                            <div style="font-size:0.73rem;color:#94a3b8;white-space:nowrap;">${this._timeAgo(date)}</div>
+                        </div>`;
+                    }).join('') + `<div style="padding:12px 22px;">
+                        <button class="btn btn-ghost btn-sm" style="width:100%"
+                            onclick="window.minSideManager.loadView('notifications')">
+                            Vis alle varslinger
+                        </button></div>`;
+                }
+            }
+        } catch (e) {
+            console.warn('Overview fetch error:', e);
+        }
     }
 
     // ══════════════════════════════════════════════════════════
