@@ -461,6 +461,20 @@ class ContentManager {
 
         container.innerHTML = this.parseBlocks(item.content) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
+        // Hide skeleton, reveal real content with fade-in
+        const skeleton = document.getElementById('post-skeleton');
+        if (skeleton) skeleton.style.display = 'none';
+        container.style.display = 'block';
+        requestAnimationFrame(() => {
+            container.style.opacity = '0';
+            container.style.transition = 'opacity 0.4s ease';
+            requestAnimationFrame(() => { container.style.opacity = '1'; });
+        });
+        const heroTitle = document.getElementById('single-post-title');
+        const metaRow = document.getElementById('blog-meta-row');
+        if (heroTitle) heroTitle.style.opacity = '1';
+        if (metaRow) metaRow.style.opacity = '1';
+
         // Populate Tags / Bottom Section
         const authorBox = document.getElementById('single-post-author-box');
         if (authorBox) {
