@@ -343,20 +343,34 @@ class AdminManager {
             }
         }
 
-        // Profile modal listeners (if still used via other triggers)
+        // Profile trigger in dashboard header -> Open full profile section
         const profileTrigger = document.getElementById('admin-profile-trigger');
-        const sidebarProfileTrigger = document.getElementById('admin-profile-trigger-sidebar');
+        if (profileTrigger) {
+            profileTrigger.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
+                    window.adminManager.onSectionSwitch('profile');
+
+                    const navLinks = document.querySelectorAll('.nav-link[data-section]');
+                    navLinks.forEach(l => {
+                        l.classList.toggle('active', l.getAttribute('data-section') === 'profile');
+                    });
+
+                    const sections = document.querySelectorAll('.section-content');
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === 'profile-section') {
+                            section.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }
+
+        // Modal variables (if still used via other triggers)
         const profileModal = document.getElementById('profile-modal');
         const closeProfileModal = document.getElementById('close-profile-modal');
         const profileForm = document.getElementById('admin-modal-profile-form');
-
-        const openProfile = (e) => {
-            if (e) e.preventDefault();
-            this.openAdminProfileModal(user, userProfile || profile || {});
-        };
-
-        if (profileTrigger) profileTrigger.onclick = openProfile;
-        if (sidebarProfileTrigger) sidebarProfileTrigger.onclick = openProfile;
 
         if (profileModal && closeProfileModal) {
             closeProfileModal.onclick = () => {
