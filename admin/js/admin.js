@@ -2048,6 +2048,9 @@ class AdminManager {
                              </span>
                         </div>
                         <div class="editor-header-right">
+                             <button class="btn-ghost" id="print-col-item" title="Skriv ut" style="display:flex; align-items:center; gap:6px;">
+                                <span class="material-symbols-outlined">print</span> Skriv ut
+                             </button>
                              <button class="btn-primary" id="save-col-item">
                                 <span class="material-symbols-outlined">publish</span> Lagre og publiser
                              </button>
@@ -2421,6 +2424,269 @@ class AdminManager {
 
             const closeBtn = document.getElementById('close-col-modal');
             if (closeBtn) closeBtn.onclick = () => modal.remove();
+
+            // --- Print Button ---
+            const printBtn = document.getElementById('print-col-item');
+            if (printBtn) {
+                printBtn.onclick = async () => {
+                    printBtn.disabled = true;
+                    printBtn.innerHTML = '<span class="material-symbols-outlined">hourglass_empty</span> Forbereder...';
+
+                    let printData;
+                    try {
+                        printData = await editor.save();
+                    } catch (e) {
+                        console.error('Could not save editor for print:', e);
+                        printBtn.disabled = false;
+                        printBtn.innerHTML = '<span class="material-symbols-outlined">print</span> Skriv ut';
+                        return;
+                    }
+
+                    const title = document.getElementById('col-item-title-v2')?.value || '(Uten tittel)';
+                    const author = document.getElementById('col-item-author')?.value || '';
+                    const date = document.getElementById('col-item-date')?.value || '';
+
+                    // Render each Editor.js block to HTML
+                    const blocksHtml = (printData.blocks || []).map(block => {
+                        switch (block.type) {
+                            case 'paragraph':
+                                return `<p>${block.data.text || ''}</p>`;
+                            case 'header':
+                                return `<h${block.data.level}>${block.data.text || ''}</h${block.data.level}>`;
+                            case 'list': {
+                                const tag = block.data.style === 'ordered' ? 'ol' : 'ul';
+                                const items = (block.data.items || []).map(i => `<li>${i}</li>`).join('');
+                                return `<${tag}>${items}</${tag}>`;
+                            }
+                            case 'quote':
+                                return `<blockquote><p>${block.data.text || ''}</p>${block.data.caption ? `<cite>— ${block.data.caption}</cite>` : ''}</blockquote>`;
+                            case 'delimiter':
+                                return `<div class="print-delimiter">⁂</div>`;
+                            case 'image':
+                                return `<figure><img src="${block.data.file?.url || block.data.url || ''}" alt="${block.data.caption || ''}"><figcaption>${block.data.caption || ''}</figcaption></figure>`;
+                            case 'youtubeVideo': {
+                                const ytUrl = block.data.url || '';
+                                return ytUrl
+                                    ? `<div class="print-video-ref"><span>🎥 Video: </span><a href="${ytUrl}">${ytUrl}</a></div>`
+                                    : '';
+                            }
+                            default:
+                                return '';
+                        }
+                    }).join('\n');
+
+                    const formattedDate = date
+                        ? new Date(date).toLocaleDateString('nb-NO', { year: 'numeric', month: 'long', day: 'numeric' })
+                        : '';
+
+                    const printWindow = window.open('', '_blank', 'width=900,height=700');
+                    printWindow.document.write(`<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>${title}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', Georgia, serif;
+            font-size: 11pt;
+            color: #1e293b;
+            background: white;
+            line-height: 1.75;
+        }
+
+        .page {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 50px 60px 80px;
+        }
+
+        .print-header {
+            border-bottom: 2px solid #0f172a;
+            padding-bottom: 24px;
+            margin-bottom: 36px;
+        }
+
+        .print-category {
+            font-size: 9pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        h1.print-title {
+            font-size: 28pt;
+            font-weight: 800;
+            line-height: 1.15;
+            color: #0f172a;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .print-meta {
+            font-size: 10pt;
+            color: #64748b;
+            display: flex;
+            gap: 24px;
+        }
+
+        .print-meta span { display: flex; align-items: center; gap: 6px; }
+
+        .print-body p {
+            font-size: 11pt;
+            margin-bottom: 16px;
+            color: #334155;
+        }
+
+        .print-body h2 {
+            font-size: 18pt;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 36px 0 12px;
+            letter-spacing: -0.01em;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 24px;
+        }
+
+        .print-body h3 {
+            font-size: 14pt;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 28px 0 10px;
+        }
+
+        .print-body h4 {
+            font-size: 12pt;
+            font-weight: 700;
+            color: #334155;
+            margin: 20px 0 8px;
+        }
+
+        .print-body ul, .print-body ol {
+            padding-left: 24px;
+            margin-bottom: 16px;
+        }
+
+        .print-body li {
+            margin-bottom: 6px;
+            color: #334155;
+        }
+
+        .print-body blockquote {
+            border-left: 4px solid #0f172a;
+            padding: 16px 24px;
+            margin: 28px 0;
+            background: #f8fafc;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .print-body blockquote p {
+            font-size: 13pt;
+            font-style: italic;
+            color: #1e293b;
+            margin: 0 0 8px;
+        }
+
+        .print-body blockquote cite {
+            font-size: 10pt;
+            color: #64748b;
+            font-style: normal;
+        }
+
+        .print-body figure {
+            margin: 28px 0;
+            text-align: center;
+        }
+
+        .print-body figure img {
+            max-width: 100%;
+            border-radius: 6px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .print-body figure figcaption {
+            font-size: 9pt;
+            color: #94a3b8;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .print-delimiter {
+            text-align: center;
+            font-size: 18pt;
+            color: #94a3b8;
+            margin: 32px 0;
+            letter-spacing: 12px;
+        }
+
+        .print-video-ref {
+            background: #f1f5f9;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 10pt;
+            color: #475569;
+            margin: 20px 0;
+        }
+
+        .print-video-ref a {
+            color: #6366f1;
+            word-break: break-all;
+        }
+
+        .print-footer {
+            margin-top: 60px;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 20px;
+            font-size: 9pt;
+            color: #94a3b8;
+            text-align: center;
+        }
+
+        @media print {
+            body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .page { padding: 20px 40px; }
+            h2, h3 { page-break-after: avoid; }
+            figure, blockquote { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="print-header">
+            <div class="print-category">His Kingdom Ministry${collectionId === 'blog' ? ' — Blogg' : collectionId === 'teaching' ? ' — Undervisning' : ''}</div>
+            <h1 class="print-title">${title}</h1>
+            <div class="print-meta">
+                ${author ? `<span>✍️ ${author}</span>` : ''}
+                ${formattedDate ? `<span>📅 ${formattedDate}</span>` : ''}
+            </div>
+        </div>
+        <div class="print-body">
+            ${blocksHtml}
+        </div>
+        <div class="print-footer">
+            His Kingdom Ministry &nbsp;·&nbsp; Skrevet ut ${new Date().toLocaleDateString('nb-NO')}
+        </div>
+    </div>
+    <script>
+        window.onload = function() {
+            window.print();
+        };
+    <\/script>
+</body>
+</html>`);
+                    printWindow.document.close();
+
+                    printBtn.disabled = false;
+                    printBtn.innerHTML = '<span class="material-symbols-outlined">print</span> Skriv ut';
+                };
+            }
 
             const saveBtn = document.getElementById('save-col-item');
             if (saveBtn) {
