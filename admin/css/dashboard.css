@@ -4567,3 +4567,35 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 .widget-config-item.active .material-symbols-outlined {
     color: var(--accent-color);
 }
+
+/* ── Activity Log Filter Buttons ─────────────────────────────────────── */
+.log-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.log-filter-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(var(--accent-rgb, 99, 102, 241), 0.06);
+}
+
+.log-filter-btn.active {
+    background: var(--accent-gradient);
+    border-color: transparent;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 2px 8px var(--accent-glow);
+}

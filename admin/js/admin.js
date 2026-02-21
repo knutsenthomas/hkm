@@ -998,8 +998,24 @@ class AdminManager {
                     }
 
                     pushStatusEl.className = 'status-message success';
+
+                    // 3. Log this push send to Firestore
+                    try {
+                        await firebaseService.db.collection('push_log').add({
+                            title: payload.title,
+                            body: payload.body,
+                            targetRole: targetRole,
+                            sentBy: firebase.auth().currentUser?.email || 'ukjent',
+                            sentAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    } catch (logErr) {
+                        console.warn('Push log write failed:', logErr);
+                    }
+
                     pushForm.reset();
                     if (pushUserSelection) pushUserSelection.style.display = 'none';
+                    // Refresh activity log
+                    this.loadActivityLog('all');
 
                 } catch (error) {
                     console.error('Feil ved utsendelse av push-varsling:', error);
@@ -1010,6 +1026,122 @@ class AdminManager {
                     btn.textContent = 'Send Push-varsling';
                 }
             });
+        }
+
+        // Load activity log
+        this.loadActivityLog('all');
+
+        // Filter buttons
+        document.querySelectorAll('.log-filter-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.loadActivityLog(btn.dataset.filter);
+            });
+        });
+    }
+
+    async loadActivityLog(filter = 'all') {
+        const container = document.getElementById('activity-log-list');
+        if (!container) return;
+        container.innerHTML = '<div class="loader" style="padding:24px;">Laster...</div>';
+
+        try {
+            const db = firebaseService.db;
+            const results = [];
+
+            // Fetch push log
+            if (filter === 'all' || filter === 'push') {
+                const pushSnap = await db.collection('push_log').orderBy('sentAt', 'desc').limit(30).get();
+                pushSnap.forEach(doc => {
+                    const d = doc.data();
+                    results.push({
+                        type: 'push',
+                        icon: 'campaign',
+                        color: '#3b82f6',
+                        bg: '#eff6ff',
+                        title: d.title || 'Push-varsling',
+                        meta: `${d.body || ''} · Til: ${d.targetRole === 'all' ? 'Alle' : d.targetRole} · Sendt av ${d.sentBy || '?'}`,
+                        date: d.sentAt?.toDate ? d.sentAt.toDate() : new Date(0)
+                    });
+                });
+            }
+
+            // Fetch contact messages
+            if (filter === 'all' || filter === 'message') {
+                const msgSnap = await db.collection('contactMessages').orderBy('createdAt', 'desc').limit(20).get();
+                msgSnap.forEach(doc => {
+                    const d = doc.data();
+                    results.push({
+                        type: 'message',
+                        icon: 'mail',
+                        color: '#10b981',
+                        bg: '#f0fdf4',
+                        title: `Melding fra ${d.name || 'ukjent'}`,
+                        meta: `${d.subject || d.email || ''} · Status: ${d.status || 'ny'}`,
+                        date: d.createdAt?.toDate ? d.createdAt.toDate() : (d.timestamp?.toDate ? d.timestamp.toDate() : new Date(0))
+                    });
+                });
+            }
+
+            // Fetch new user events
+            if (filter === 'all' || filter === 'new_user') {
+                const notifSnap = await db.collection('admin_notifications')
+                    .where('type', '==', 'NEW_USER_REGISTRATION')
+                    .orderBy('timestamp', 'desc').limit(20).get();
+                notifSnap.forEach(doc => {
+                    const d = doc.data();
+                    results.push({
+                        type: 'new_user',
+                        icon: 'person_add',
+                        color: '#f59e0b',
+                        bg: '#fffbeb',
+                        title: `Ny bruker: ${d.userName || d.userEmail || 'ukjent'}`,
+                        meta: d.userEmail || '',
+                        date: d.timestamp?.toDate ? d.timestamp.toDate() : new Date(0)
+                    });
+                });
+            }
+
+            // Sort by date descending
+            results.sort((a, b) => b.date - a.date);
+
+            if (results.length === 0) {
+                container.innerHTML = `
+                    <div style="padding:40px; text-align:center; color:#94a3b8;">
+                        <span class="material-symbols-outlined" style="font-size:40px; display:block; margin-bottom:8px;">history</span>
+                        Ingen aktiviteter funnet.
+                    </div>`;
+                return;
+            }
+
+            const timeAgo = (date) => {
+                const diff = Math.floor((Date.now() - date) / 1000);
+                if (diff < 60) return 'Akkurat nå';
+                if (diff < 3600) return `${Math.floor(diff / 60)} min siden`;
+                if (diff < 86400) return `${Math.floor(diff / 3600)} t siden`;
+                if (diff < 604800) return `${Math.floor(diff / 86400)} d siden`;
+                return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+            };
+
+            container.innerHTML = results.map(item => `
+                <div style="display:flex; align-items:flex-start; gap:14px; padding:14px 0;
+                    border-bottom:1px solid var(--border-color);">
+                    <div style="width:38px; height:38px; border-radius:50%; background:${item.bg};
+                        display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                        <span class="material-symbols-outlined" style="font-size:18px; color:${item.color};">${item.icon}</span>
+                    </div>
+                    <div style="flex:1; min-width:0;">
+                        <div style="font-weight:600; font-size:0.9rem; margin-bottom:2px;">${item.title}</div>
+                        <div style="font-size:0.82rem; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.meta}</div>
+                    </div>
+                    <div style="font-size:0.75rem; color:#94a3b8; flex-shrink:0; text-align:right;">${timeAgo(item.date)}</div>
+                </div>
+            `).join('');
+
+        } catch (err) {
+            console.error('Activity log error:', err);
+            container.innerHTML = `<div style="padding:20px; color:#94a3b8; text-align:center;">Kunne ikke laste aktivitetslogg.</div>`;
         }
     }
 

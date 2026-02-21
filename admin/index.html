@@ -795,29 +795,18 @@
 
             <div id="kommunikasjon-section" class="section-content">
                 <div class="section-header">
-                    <h2 class="section-title">Kommunikasjon & Varslinger</h2>
-                    <p class="section-subtitle">Send push-varslinger direkte til app-brukere.</p>
+                    <h2 class="section-title">Push-varslinger</h2>
+                    <p class="section-subtitle">Send push-varslinger direkte til brukerne.</p>
                 </div>
 
-                <div class="card modern mb-4">
-                    <div class="card-body">
-                        <div class="promo-icon purple">
-                            <span class="material-symbols-outlined">person_search</span>
-                        </div>
-                        <h3 class="card-title">CRM & Kontakter</h3>
-                        <p>Få full oversikt over medlemmer, frivillige og givere. Segmenter listen din for mer målrettet
-                            kommunikasjon.</p>
-                        <a href="admin-kommunikasjon.html" class="btn-primary mt-3">Åpne CRM</a>
-                    </div>
-                </div>
-
+                <!-- Push form -->
                 <div class="card modern">
                     <div class="card-body">
                         <div class="promo-icon blue">
-                            <span class="material-symbols-outlined">smartphone</span>
+                            <span class="material-symbols-outlined">campaign</span>
                         </div>
-                        <h3 class="card-title">Push-varslinger</h3>
-                        <p>Send korte varsler direkte til brukernes telefoner via mobil-appen.</p>
+                        <h3 class="card-title">Send Push-varsling</h3>
+                        <p>Send korte varsler direkte til brukernes telefoner og Min Side-appen.</p>
                         <form id="push-notification-form" class="mt-4">
                             <div class="form-group">
                                 <label for="push-target-role">Målgruppe</label>
@@ -843,9 +832,43 @@
                                 <input type="text" id="push-click-action" name="click_action" class="form-control"
                                     placeholder="https://his-kingdom-ministry.web.app/arrangementer">
                             </div>
-                            <button type="submit" class="btn-primary">Send Push-varsling</button>
+                            <button type="submit" class="btn-primary">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:18px; vertical-align:middle;">send</span>
+                                Send Push-varsling
+                            </button>
                             <div id="push-status" class="status-message" style="margin-top: 15px;"></div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- Unified Activity Log -->
+                <div class="card modern mt-4">
+                    <div class="card-body">
+                        <div
+                            style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+                            <h3 class="card-title" style="margin:0;">Aktivitetslogg</h3>
+                            <div id="log-filters" style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button class="log-filter-btn active" data-filter="all">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">list</span> Alle
+                                </button>
+                                <button class="log-filter-btn" data-filter="push">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">campaign</span>
+                                    Push-varslinger
+                                </button>
+                                <button class="log-filter-btn" data-filter="message">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">mail</span>
+                                    Meldinger
+                                </button>
+                                <button class="log-filter-btn" data-filter="new_user">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">person_add</span>
+                                    Nye brukere
+                                </button>
+                            </div>
+                        </div>
+                        <div id="activity-log-list">
+                            <div class="loader">Laster aktiviteter...</div>
+                        </div>
                     </div>
                 </div>
             </div>
