@@ -780,7 +780,7 @@ class MinSideManager {
     // ══════════════════════════════════════════════════════════
     async renderActivity(container) {
         const uid = this.currentUser?.uid;
-        container.innerHTML = `<div class="activity-list" id="activity-inner"><div class="loading-state" style="min-height:120px"><div class="spinner"></div></div></div>`;
+        container.innerHTML = `<div style="width:100%;display:block" id="activity-inner"><div class="loading-state" style="min-height:120px"><div class="spinner"></div></div></div>`;
         const list = container.querySelector('#activity-inner');
 
         try {
@@ -801,9 +801,9 @@ class MinSideManager {
             }
 
             const iconMap = {
-                push: { icon: 'campaign', bg: '#1e3a5f', color: '#60a5fa' },
-                message: { icon: 'mail', bg: '#14352a', color: '#34d399' },
-                default: { icon: 'notifications', bg: '#2d1f4e', color: '#a78bfa' },
+                push: { icon: 'campaign', bg: 'var(--accent-light)', color: 'var(--accent-color)' },
+                message: { icon: 'mail', bg: '#f0fdf4', color: '#16a34a' },
+                default: { icon: 'notifications', bg: '#faf5ff', color: '#9333ea' },
             };
 
             list.innerHTML = snap.docs.map(doc => {
@@ -997,7 +997,7 @@ class MinSideManager {
     // VIEW: KURS
     // ══════════════════════════════════════════════════════════
     async renderCourses(container) {
-        container.innerHTML = `<div class="loading-state"><div class="spinner"></div></div>`;
+        container.innerHTML = `<div style="width:100%"><div class="loading-state"><div class="spinner"></div></div></div>`;
         let courses = [];
         try {
             const snap = await firebase.firestore().collection('teaching').orderBy('createdAt', 'desc').get();
@@ -1005,11 +1005,11 @@ class MinSideManager {
         } catch (e) { }
 
         if (courses.length === 0) {
-            container.innerHTML = `<div class="empty-state">
+            container.innerHTML = `<div style="width:100%"><div class="empty-state">
                 <span class="material-symbols-outlined">school</span>
                 <h3>Ingen kurs ennå</h3>
                 <p>Undervisnings- og kursinnhold fra HKM vil vises her.</p>
-            </div>`;
+            </div></div>`;
             return;
         }
 
