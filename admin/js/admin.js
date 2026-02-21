@@ -948,19 +948,58 @@ class AdminManager {
                         payload.selectedUserIds = selectedUserIds;
                     }
 
-                    const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendPushNotification', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
-                        body: JSON.stringify(payload)
-                    });
+                    // 1. Save to Firestore user_notifications (in-app notifications)
+                    try {
+                        let targetUsers = [];
+                        const allUsersSnap = await firebaseService.db.collection('users').get();
+                        allUsersSnap.forEach(doc => {
+                            const data = doc.data();
+                            if (targetRole === 'all') {
+                                targetUsers.push(doc.id);
+                            } else if (targetRole === 'medlem' && data.role === 'medlem') {
+                                targetUsers.push(doc.id);
+                            } else if (targetRole === 'selected' && payload.selectedUserIds?.includes(doc.id)) {
+                                targetUsers.push(doc.id);
+                            }
+                        });
 
-                    const result = await response.json();
-                    if (!response.ok) throw new Error(result.error || `Server responded with ${response.status}`);
+                        const batch = firebaseService.db.batch();
+                        targetUsers.forEach(userId => {
+                            const ref = firebaseService.db.collection('user_notifications').doc();
+                            batch.set(ref, {
+                                userId,
+                                title: payload.title,
+                                body: payload.body,
+                                type: 'push',
+                                link: payload.click_action || '',
+                                read: false,
+                                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                            });
+                        });
+                        await batch.commit();
+                        pushStatusEl.textContent = `Varsling lagret for ${targetUsers.length} bruker(e). Sender push...`;
+                    } catch (firestoreErr) {
+                        console.warn('Firestore notification write failed:', firestoreErr);
+                    }
 
-                    pushStatusEl.textContent = result.message || 'Push-varsling er sendt!';
+                    // 2. Attempt Cloud Function push (FCM)
+                    try {
+                        const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendPushNotification', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                            body: JSON.stringify(payload)
+                        });
+                        const result = await response.json();
+                        if (!response.ok) throw new Error(result.error || `Server responded with ${response.status}`);
+                        pushStatusEl.textContent = result.message || 'Push-varsling er sendt!';
+                    } catch (fcmErr) {
+                        console.warn('FCM push failed (in-app notification was still saved):', fcmErr);
+                        pushStatusEl.textContent = 'Varsling lagret i appen. (Push til telefon krevde innstillinger.)';
+                    }
+
                     pushStatusEl.className = 'status-message success';
                     pushForm.reset();
-                    pushUserSelection.style.display = 'none';
+                    if (pushUserSelection) pushUserSelection.style.display = 'none';
 
                 } catch (error) {
                     console.error('Feil ved utsendelse av push-varsling:', error);

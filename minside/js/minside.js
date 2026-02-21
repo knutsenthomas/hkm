@@ -6,7 +6,8 @@ class MinSideManager {
             courses: this.renderCourses,
             resources: this.renderResources,
             giving: this.renderGiving,
-            profile: this.renderProfile
+            profile: this.renderProfile,
+            notifications: this.renderNotifications
         };
 
         this.init();
@@ -26,6 +27,7 @@ class MinSideManager {
                 await this.syncProfileFromGoogleProvider();
                 await this.updateUserProfile(user);
                 this.updateRoleLinks(user);
+                this.initNotificationBadge();
                 this.loadView(this.getCurrentViewFromHash() || 'overview');
             } else {
                 // Redirect to login if not authenticated
@@ -371,7 +373,8 @@ class MinSideManager {
             courses: 'Mine Kurs',
             resources: 'Ressurser',
             giving: 'Gaver & Betalinger',
-            profile: 'Min Profil'
+            profile: 'Min Profil',
+            notifications: 'Varslinger'
         };
         document.getElementById('page-title').textContent = names[viewId] || 'Min Side';
 
@@ -1284,6 +1287,137 @@ class MinSideManager {
             console.log("Admin notification created:", notifData);
         } catch (err) {
             console.warn("Failed to create admin notification:", err);
+        }
+    }
+
+    // ── Notifications View ──────────────────────────────────────────────────────
+
+    async renderNotifications(container) {
+        container.innerHTML = `
+            <div class="card" style="padding: 0; overflow: hidden;">
+                <div style="padding: 20px 24px; border-bottom: 1px solid var(--border-color); display:flex; align-items:center; justify-content:space-between;">
+                    <h3 style="margin:0;">Varslinger</h3>
+                    <button id="mark-all-read-btn" style="background:none; border:none; color:var(--primary-orange); font-weight:600; font-size:0.85rem; cursor:pointer;">Merk alle som lest</button>
+                </div>
+                <div id="notifications-list" style="min-height: 120px;">
+                    <div class="loader" style="padding: 40px; text-align:center; color:#94a3b8;">Laster varslinger...</div>
+                </div>
+            </div>
+        `;
+
+        const list = container.querySelector('#notifications-list');
+        const markAllBtn = container.querySelector('#mark-all-read-btn');
+        const uid = this.currentUser?.uid;
+        if (!uid) return;
+
+        try {
+            const snap = await firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .orderBy('createdAt', 'desc')
+                .limit(30)
+                .get();
+
+            if (snap.empty) {
+                list.innerHTML = `
+                    <div style="padding: 48px 24px; text-align: center; color: #94a3b8;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; display:block; margin-bottom:12px;">notifications_off</span>
+                        <p>Ingen varslinger ennå.</p>
+                    </div>`;
+                return;
+            }
+
+            const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+            list.innerHTML = items.map(n => {
+                const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date();
+                const timeAgo = this._timeAgo(date);
+                const isUnread = !n.read;
+                return `
+                    <div data-notif-id="${n.id}" style="display:flex; align-items:flex-start; gap:14px; padding:16px 24px;
+                        border-bottom:1px solid var(--border-color); background:${isUnread ? '#fff8f0' : 'white'};
+                        transition: background 0.3s;">
+                        <div style="width:40px; height:40px; border-radius:50%; background:${isUnread ? 'var(--primary-orange)' : '#e2e8f0'};
+                            display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                            <span class="material-symbols-outlined" style="font-size:20px; color:${isUnread ? 'white' : '#64748b'};">
+                                ${n.type === 'push' ? 'campaign' : 'notifications'}
+                            </span>
+                        </div>
+                        <div style="flex:1; min-width:0;">
+                            <div style="font-weight:${isUnread ? '700' : '500'}; font-size:0.95rem; margin-bottom:3px;">${n.title || 'Varsling'}</div>
+                            <div style="font-size:0.85rem; color:#64748b; margin-bottom:4px;">${n.body || ''}</div>
+                            <div style="font-size:0.75rem; color:#94a3b8;">${timeAgo}</div>
+                        </div>
+                        ${isUnread ? `<div style="width:8px; height:8px; border-radius:50%; background:var(--primary-orange); flex-shrink:0; margin-top:6px;"></div>` : ''}
+                    </div>`;
+            }).join('');
+
+            // Mark all as read when viewed
+            const unreadIds = items.filter(n => !n.read).map(n => n.id);
+            if (unreadIds.length > 0) {
+                const batch = firebase.firestore().batch();
+                unreadIds.forEach(id => {
+                    batch.update(firebase.firestore().collection('user_notifications').doc(id), { read: true });
+                });
+                await batch.commit();
+                this._updateNotifBadge(0);
+            }
+
+            markAllBtn.addEventListener('click', async () => {
+                const allIds = items.filter(n => !n.read).map(n => n.id);
+                if (allIds.length === 0) return;
+                const batch = firebase.firestore().batch();
+                allIds.forEach(id => batch.update(firebase.firestore().collection('user_notifications').doc(id), { read: true }));
+                await batch.commit();
+                // Refresh
+                container.querySelectorAll('[data-notif-id]').forEach(el => {
+                    el.style.background = 'white';
+                    const dot = el.querySelector('div[style*="border-radius:50%; background:var"]');
+                    if (dot) dot.remove();
+                });
+                this._updateNotifBadge(0);
+            });
+
+        } catch (err) {
+            console.error('Feil ved henting av varslinger:', err);
+            list.innerHTML = `<div style="padding: 24px; color:#94a3b8; text-align:center;">Kunne ikke laste varslinger.</div>`;
+        }
+    }
+
+    _timeAgo(date) {
+        const now = new Date();
+        const diff = Math.floor((now - date) / 1000);
+        if (diff < 60) return 'Akkurat nå';
+        if (diff < 3600) return `${Math.floor(diff / 60)} min siden`;
+        if (diff < 86400) return `${Math.floor(diff / 3600)} t siden`;
+        if (diff < 604800) return `${Math.floor(diff / 86400)} dager siden`;
+        return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+    }
+
+    _updateNotifBadge(count) {
+        const badge = document.getElementById('notif-badge');
+        if (!badge) return;
+        if (count > 0) {
+            badge.textContent = count > 9 ? '9+' : count;
+            badge.style.display = 'inline-block';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+
+    async initNotificationBadge() {
+        const uid = this.currentUser?.uid;
+        if (!uid || !firebase.firestore) return;
+        try {
+            firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .where('read', '==', false)
+                .onSnapshot(snap => {
+                    this._updateNotifBadge(snap.size);
+                });
+        } catch (err) {
+            console.warn('Notification badge failed:', err);
         }
     }
 
