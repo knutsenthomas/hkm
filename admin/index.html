@@ -968,61 +968,70 @@
 
             // ── Collapsible nav categories ─────────────────────────────
             const COLLAPSE_KEY = 'adminNavCollapsed';
-            const savedCollapsed = JSON.parse(localStorage.getItem(COLLAPSE_KEY) || '{"kommunikasjon":true,"administrasjon":true}');
+            let savedCollapsed;
+            try {
+                savedCollapsed = JSON.parse(localStorage.getItem(COLLAPSE_KEY) || 'null');
+            } catch (e) { savedCollapsed = null; }
+            // Default: nettsted open, others closed
+            if (!savedCollapsed || typeof savedCollapsed !== 'object') {
+                savedCollapsed = { nettsted: false, kommunikasjon: true, administrasjon: true };
+            }
+            // Ensure nettsted has a value
+            if (!savedCollapsed.hasOwnProperty('nettsted')) savedCollapsed.nettsted = false;
 
             function applyCollapseState(category, isCollapsed, animate) {
                 const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
                 const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
                 if (!header) return;
+
                 if (isCollapsed) {
                     header.classList.add('collapsed');
-                    items.forEach(item => {
-                        if (animate) {
-                            item.style.transition = 'opacity 0.2s, transform 0.2s';
+                    if (animate) {
+                        items.forEach(item => {
                             item.style.opacity = '0';
-                            item.style.transform = 'translateY(-6px)';
-                            setTimeout(() => { item.style.display = 'none'; }, 200);
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    });
+                            item.style.transform = 'translateY(-4px)';
+                        });
+                        setTimeout(() => {
+                            items.forEach(item => {
+                                item.classList.add('hidden');
+                                item.style.opacity = '';
+                                item.style.transform = '';
+                            });
+                        }, 180);
+                    } else {
+                        items.forEach(item => item.classList.add('hidden'));
+                    }
                 } else {
                     header.classList.remove('collapsed');
                     items.forEach(item => {
-                        item.style.display = '';
+                        item.classList.remove('hidden');
                         if (animate) {
                             item.style.opacity = '0';
-                            item.style.transform = 'translateY(-6px)';
-                            item.style.transition = 'opacity 0.2s, transform 0.2s';
-                            requestAnimationFrame(() => {
-                                requestAnimationFrame(() => {
-                                    item.style.opacity = '1';
-                                    item.style.transform = 'translateY(0)';
-                                });
-                            });
-                        } else {
-                            item.style.opacity = '';
-                            item.style.transform = '';
+                            item.style.transform = 'translateY(-4px)';
+                            item.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+                            requestAnimationFrame(() => requestAnimationFrame(() => {
+                                item.style.opacity = '1';
+                                item.style.transform = 'translateY(0)';
+                                setTimeout(() => { item.style.transition = ''; item.style.opacity = ''; item.style.transform = ''; }, 220);
+                            }));
                         }
                     });
                 }
             }
 
-            // Apply initial states (no animation)
+            // Apply initial states
             ['nettsted', 'kommunikasjon', 'administrasjon'].forEach(cat => {
-                const isCollapsed = savedCollapsed[cat] !== false && cat !== 'nettsted';
-                // nettsted: open by default unless explicitly collapsed
-                const actualCollapsed = savedCollapsed.hasOwnProperty(cat) ? savedCollapsed[cat] : (cat !== 'nettsted');
-                applyCollapseState(cat, actualCollapsed, false);
+                const isCollapsed = savedCollapsed[cat] !== false;
+                applyCollapseState(cat, isCollapsed, false);
             });
 
-            // Wire click handlers
+            // Wire click handlers on category headers
             document.querySelectorAll('.nav-category-header[data-target-category]').forEach(header => {
                 header.addEventListener('click', () => {
                     const cat = header.dataset.targetCategory;
                     const isNowCollapsed = !header.classList.contains('collapsed');
                     savedCollapsed[cat] = isNowCollapsed;
-                    localStorage.setItem(COLLAPSE_KEY, JSON.stringify(savedCollapsed));
+                    try { localStorage.setItem(COLLAPSE_KEY, JSON.stringify(savedCollapsed)); } catch (e) { }
                     applyCollapseState(cat, isNowCollapsed, true);
                 });
             });
