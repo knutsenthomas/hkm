@@ -560,58 +560,151 @@ class MinSideManager {
         }
     }
 
-    renderCourses(container) {
+    async renderCourses(container) {
+        // Skeleton loading state
         container.innerHTML = `
-            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;">
-                <!-- Course Card 1 -->
-                <div class="card" style="padding: 0; overflow: hidden;">
-                    <div style="height: 160px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
-                        <span class="material-symbols-outlined" style="font-size: 48px;">school</span>
-                    </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px;" id="courses-grid">
+                ${[1, 2, 3].map(() => `
+                <div class="card" style="padding: 0; overflow: hidden; animation: skeletonPulse 1.5s ease-in-out infinite;">
+                    <div style="height: 160px; background: #e2e8f0;"></div>
                     <div style="padding: 20px;">
-                        <h4>Identitet i Kristus</h4>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 8px 0 16px;">Lær hvem du er skapt til å være.</p>
-                        <div style="background: #f1f5f9; height: 6px; border-radius: 99px; overflow: hidden; margin-bottom: 16px;">
-                            <div style="width: 45%; height: 100%; background: var(--primary-orange);"></div>
-                        </div>
-                        <button class="btn btn-primary" style="width: 100%; justify-content: center;">Fortsett</button>
+                        <div style="height: 20px; background: #e2e8f0; border-radius: 6px; margin-bottom: 10px; width: 70%;"></div>
+                        <div style="height: 14px; background: #e2e8f0; border-radius: 6px; margin-bottom: 6px;"></div>
+                        <div style="height: 14px; background: #e2e8f0; border-radius: 6px; width: 80%; margin-bottom: 20px;"></div>
+                        <div style="height: 38px; background: #e2e8f0; border-radius: 8px;"></div>
                     </div>
-                </div>
-
-                <!-- Course Card 2 -->
-                <div class="card" style="padding: 0; overflow: hidden;">
-                    <div style="height: 160px; background: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
-                         <span class="material-symbols-outlined" style="font-size: 48px;">play_circle</span>
-                    </div>
-                    <div style="padding: 20px;">
-                        <h4>Helbredelsesskolen</h4>
-                        <p style="color: var(--text-muted); font-size: 0.9rem; margin: 8px 0 16px;">Praktisk undervisning om helbredelse.</p>
-                         <div style="background: #f1f5f9; height: 6px; border-radius: 99px; overflow: hidden; margin-bottom: 16px;">
-                            <div style="width: 10%; height: 100%; background: var(--primary-orange);"></div>
-                        </div>
-                        <button class="btn btn-primary" style="width: 100%; justify-content: center;">Start</button>
-                    </div>
-                </div>
+                </div>`).join('')}
             </div>
+            <style>@keyframes skeletonPulse{0%,100%{opacity:1}50%{opacity:.4}}</style>
         `;
+
+        try {
+            const data = await firebase.firestore().collection('siteContent').doc('collection_teaching').get();
+            const items = (data.exists ? data.data()?.items : null) || [];
+
+            const grid = document.getElementById('courses-grid');
+            if (!grid) return;
+
+            if (items.length === 0) {
+                grid.innerHTML = `<div class="card" style="grid-column:1/-1; text-align:center; padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size:48px; color:#94a3b8;">school</span>
+                    <p style="color: var(--text-muted); margin-top: 12px;">Ingen undervisningsserier er publisert ennå.</p>
+                </div>`;
+                return;
+            }
+
+            grid.innerHTML = items.map(item => {
+                const excerpt = (item.description || item.content ||
+                    (typeof item.content === 'object' && item.content?.blocks
+                        ? item.content.blocks.filter(b => b.type === 'paragraph').map(b => b.data?.text || '').join(' ')
+                        : '')
+                ).substring(0, 100);
+
+                const imgHtml = item.imageUrl
+                    ? `<img src="${item.imageUrl}" style="width:100%;height:100%;object-fit:cover;" loading="lazy">`
+                    : `<span class="material-symbols-outlined" style="font-size:48px;">school</span>`;
+
+                const postUrl = `../blogg-post.html?id=${encodeURIComponent(item.id || item.title)}`;
+
+                return `
+                <div class="card" style="padding:0;overflow:hidden;transition:transform .2s,box-shadow .2s;" 
+                     onmouseover="this.style.transform='translateY(-4px)';this.style.boxShadow='0 8px 30px rgba(0,0,0,0.12)'" 
+                     onmouseout="this.style.transform='';this.style.boxShadow=''">
+                    <div style="height:160px;background:#e2e8f0;display:flex;align-items:center;justify-content:center;color:#94a3b8;overflow:hidden;position:relative;">
+                        ${imgHtml}
+                        ${item.category ? `<span style="position:absolute;top:10px;left:10px;background:var(--primary-orange);color:white;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;">${item.category}</span>` : ''}
+                    </div>
+                    <div style="padding:20px;">
+                        <h4 style="margin-bottom:6px;">${item.title || 'Uten tittel'}</h4>
+                        <p style="color:var(--text-muted);font-size:0.85rem;margin:0 0 8px;">${item.author ? `<span style="font-weight:500;">av ${item.author}</span> · ` : ''}${item.date ? new Date(item.date).toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}</p>
+                        <p style="color:var(--text-muted);font-size:0.9rem;margin:0 0 16px;line-height:1.5;">${excerpt}${excerpt.length === 100 ? '...' : ''}</p>
+                        <a href="${postUrl}" class="btn btn-primary" style="width:100%;justify-content:center;text-decoration:none;display:flex;">
+                            <span class="material-symbols-outlined" style="font-size:1rem;">play_arrow</span> Les undervisning
+                        </a>
+                    </div>
+                </div>`;
+            }).join('');
+
+        } catch (err) {
+            console.error('Kunne ikke laste kurs:', err);
+            const grid = document.getElementById('courses-grid');
+            if (grid) grid.innerHTML = `<div class="card" style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">Kunne ikke laste undervisning. Prøv igjen.</div>`;
+        }
     }
 
-    renderResources(container) {
+    async renderResources(container) {
         container.innerHTML = `
             <div class="card">
-                <h3>Tilgjengelige Ressurser</h3>
-                <p>Her kan du laste ned PDF-er og arbeidsbøker.</p>
-                <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 10px;">
-                    <a href="#" style="display: flex; align-items: center; gap: 10px; padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; text-decoration: none; color: inherit;">
-                        <span class="material-symbols-outlined" style="color: #ef4444;">picture_as_pdf</span>
-                         <div>
-                            <strong>Arbeidsbok: Identitet</strong>
-                            <div style="font-size: 0.8rem; color: var(--text-muted);">PDF • 2.4 MB</div>
-                         </div>
-                    </a>
+                <h3 style="margin-bottom:6px;">Ressurser</h3>
+                <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:20px;">Artikler og innlegg fra His Kingdom Ministry</p>
+                <div id="resources-list" style="display:flex;flex-direction:column;gap:12px;">
+                    ${[1, 2, 3].map(() => `
+                    <div style="display:flex;align-items:center;gap:12px;padding:14px;border:1px solid var(--border-color);border-radius:8px;animation:skeletonPulse 1.5s ease-in-out infinite;">
+                        <div style="width:44px;height:44px;background:#e2e8f0;border-radius:8px;flex-shrink:0;"></div>
+                        <div style="flex:1;">
+                            <div style="height:14px;background:#e2e8f0;border-radius:6px;margin-bottom:6px;width:60%;"></div>
+                            <div style="height:12px;background:#e2e8f0;border-radius:6px;width:40%;"></div>
+                        </div>
+                    </div>`).join('')}
                 </div>
             </div>
         `;
+
+        try {
+            const data = await firebase.firestore().collection('siteContent').doc('collection_blog').get();
+            const items = (data.exists ? data.data()?.items : null) || [];
+
+            const list = document.getElementById('resources-list');
+            if (!list) return;
+
+            if (items.length === 0) {
+                list.innerHTML = `<p style="color:var(--text-muted);text-align:center;padding:20px 0;">Ingen ressurser tilgjengelig ennå.</p>`;
+                return;
+            }
+
+            // Show up to 10 latest
+            const sorted = [...items].sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0)).slice(0, 10);
+
+            list.innerHTML = sorted.map(item => {
+                const excerpt = (typeof item.content === 'string'
+                    ? item.content
+                    : (item.content?.blocks?.filter(b => b.type === 'paragraph').map(b => b.data?.text || '').join(' ') || '')
+                ).replace(/<[^>]+>/g, '').substring(0, 80);
+
+                const url = `../blogg-post.html?id=${encodeURIComponent(item.id || item.title)}`;
+                const dateStr = item.date ? new Date(item.date).toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' }) : '';
+
+                const categoryColors = {
+                    'Undervisning': '#e0f2fe:#0284c7',
+                    'Nyhet': '#dcfce7:#16a34a',
+                    'Vitnesbyrd': '#fef3c7:#d97706',
+                };
+                const [bg, fg] = (categoryColors[item.category] || '#f1f5f9:#475569').split(':');
+
+                return `
+                <a href="${url}" style="display:flex;align-items:flex-start;gap:12px;padding:14px;border:1px solid var(--border-color);border-radius:10px;text-decoration:none;color:inherit;transition:border-color .2s,box-shadow .2s;"
+                   onmouseover="this.style.borderColor='var(--primary-orange)';this.style.boxShadow='0 2px 12px rgba(209,125,57,.1)'"
+                   onmouseout="this.style.borderColor='';this.style.boxShadow=''">
+                    <div style="width:44px;height:44px;border-radius:8px;background:#fff8f0;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid #ffe4cc;">
+                        <span class="material-symbols-outlined" style="color:var(--primary-orange);font-size:1.3rem;">article</span>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;flex-wrap:wrap;">
+                            <strong style="font-size:0.95rem;">${item.title || 'Uten tittel'}</strong>
+                            ${item.category ? `<span style="font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;background:${bg};color:${fg};">${item.category}</span>` : ''}
+                        </div>
+                        <p style="font-size:0.8rem;color:var(--text-muted);margin:0;">${excerpt}${excerpt.length === 80 ? '...' : ''}</p>
+                        <p style="font-size:0.75rem;color:#94a3b8;margin:4px 0 0;">${item.author ? item.author + ' · ' : ''}${dateStr}</p>
+                    </div>
+                    <span class="material-symbols-outlined" style="color:#94a3b8;flex-shrink:0;">chevron_right</span>
+                </a>`;
+            }).join('');
+
+        } catch (err) {
+            console.error('Kunne ikke laste ressurser:', err);
+            const list = document.getElementById('resources-list');
+            if (list) list.innerHTML = `<p style="color:var(--text-muted);text-align:center;">Kunne ikke laste ressurser. Prøv igjen.</p>`;
+        }
     }
 
     async renderGiving(container) {
