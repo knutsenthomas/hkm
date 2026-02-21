@@ -413,11 +413,19 @@ body.admin-body {
 .nav-category-header .expand-icon {
     font-size: 16px;
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Default (collapsed) = arrow points down */
+    transform: rotate(0deg);
+}
+
+/* When expanded (NOT collapsed) — arrow points up */
+.nav-category-header:not(.collapsed) .expand-icon {
+    transform: rotate(180deg);
 }
 
 .nav-category-header.collapsed .expand-icon {
-    transform: rotate(180deg);
+    transform: rotate(0deg);
 }
+
 
 /* Stats Section */
 .welcome-banner {
