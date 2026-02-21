@@ -1075,7 +1075,7 @@ class MinSideManager {
                     </button>
                 </div>
             </div>
-            <div class="personal-note-body">${n.text || ''}</div>
+            <div class="personal-note-body rte-content">${n.text || ''}</div>
         </div>`;
 
         container.innerHTML = `
@@ -1103,7 +1103,23 @@ class MinSideManager {
                 </div>
                 <div class="form-group" style="margin-top:10px;">
                     <label>Innhold</label>
-                    <textarea id="note-body-input" rows="5" placeholder="Skriv notat her..."></textarea>
+                    <div class="rte-wrapper">
+                        <div class="rte-toolbar" id="rte-toolbar-new">
+                            <button type="button" class="rte-btn" data-cmd="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
+                            <button type="button" class="rte-btn" data-cmd="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
+                            <button type="button" class="rte-btn" data-cmd="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
+                            <div class="rte-divider"></div>
+                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="Overskrift"><span class="material-symbols-outlined">title</span></button>
+                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="Avsnitt"><span class="material-symbols-outlined">format_paragraph</span></button>
+                            <div class="rte-divider"></div>
+                            <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                            <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Numrert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                            <div class="rte-divider"></div>
+                            <button type="button" class="rte-btn" data-cmd="removeFormat" title="Fjern formatering"><span class="material-symbols-outlined">format_clear</span></button>
+                        </div>
+                        <div class="rte-editor" id="note-body-editor" contenteditable="true"
+                            data-placeholder="Skriv notat her..."></div>
+                    </div>
                 </div>
                 <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
                     <button class="btn btn-ghost btn-sm" id="cancel-note-btn">Avbryt</button>
@@ -1152,6 +1168,9 @@ class MinSideManager {
         // ── Wire up events ──
         const uid = this.currentUser?.uid;
 
+        // Wire RTE toolbar
+        this._wireRteToolbar('rte-toolbar-new', 'note-body-editor');
+
         // Toggle new note form
         document.getElementById('new-note-btn')?.addEventListener('click', () => {
             const form = document.getElementById('new-note-form');
@@ -1163,14 +1182,16 @@ class MinSideManager {
         document.getElementById('cancel-note-btn')?.addEventListener('click', () => {
             document.getElementById('new-note-form').style.display = 'none';
             document.getElementById('note-title-input').value = '';
-            document.getElementById('note-body-input').value = '';
+            document.getElementById('note-body-editor').innerHTML = '';
         });
 
         // Save new note
         document.getElementById('save-note-btn')?.addEventListener('click', async () => {
             const title = document.getElementById('note-title-input').value.trim();
-            const text = document.getElementById('note-body-input').value.trim();
-            if (!text) return;
+            const editor = document.getElementById('note-body-editor');
+            const text = editor?.innerHTML?.trim() || '';
+            const plain = editor?.innerText?.trim() || '';
+            if (!plain) { editor?.focus(); return; }
 
             const btn = document.getElementById('save-note-btn');
             btn.disabled = true; btn.textContent = 'Lagrer...';
@@ -1237,7 +1258,7 @@ class MinSideManager {
         modal.id = 'note-edit-modal';
         modal.className = 'hkm-modal-overlay';
         modal.innerHTML = `
-        <div class="hkm-modal-container" style="max-width:560px">
+        <div class="hkm-modal-container" style="max-width:640px; width:95vw">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
                 <div class="hkm-modal-title" style="margin-bottom:0">Rediger notat</div>
                 <button id="close-note-modal" style="background:none;border:none;cursor:pointer;padding:4px;">
@@ -1246,11 +1267,26 @@ class MinSideManager {
             </div>
             <div class="form-group">
                 <label>Tittel</label>
-                <input id="edit-note-title" value="${note.title || ''}" autocomplete="off">
+                <input id="edit-note-title" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off">
             </div>
             <div class="form-group" style="margin-top:12px;">
                 <label>Innhold</label>
-                <textarea id="edit-note-body" rows="7" style="resize:vertical">${note.text || ''}</textarea>
+                <div class="rte-wrapper">
+                    <div class="rte-toolbar" id="rte-toolbar-edit">
+                        <button type="button" class="rte-btn" data-cmd="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
+                        <button type="button" class="rte-btn" data-cmd="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
+                        <button type="button" class="rte-btn" data-cmd="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
+                        <div class="rte-divider"></div>
+                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="Overskrift"><span class="material-symbols-outlined">title</span></button>
+                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="Avsnitt"><span class="material-symbols-outlined">format_paragraph</span></button>
+                        <div class="rte-divider"></div>
+                        <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                        <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Numrert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                        <div class="rte-divider"></div>
+                        <button type="button" class="rte-btn" data-cmd="removeFormat" title="Fjern formatering"><span class="material-symbols-outlined">format_clear</span></button>
+                    </div>
+                    <div class="rte-editor" id="edit-note-body" contenteditable="true"></div>
+                </div>
             </div>
             <div class="hkm-modal-actions" style="margin-top:20px;">
                 <button class="btn btn-ghost hkm-modal-btn" id="cancel-note-modal">Avbryt</button>
@@ -1262,6 +1298,12 @@ class MinSideManager {
 
         document.body.appendChild(modal);
         requestAnimationFrame(() => modal.classList.add('active'));
+
+        // Set existing content into editor
+        const editEditor = document.getElementById('edit-note-body');
+        if (editEditor) editEditor.innerHTML = note.text || '';
+
+        this._wireRteToolbar('rte-toolbar-edit', 'edit-note-body');
         document.getElementById('edit-note-title').focus();
 
         const close = () => { modal.classList.remove('active'); setTimeout(() => modal.remove(), 300); };
@@ -1273,11 +1315,46 @@ class MinSideManager {
         document.getElementById('save-note-modal').addEventListener('click', async () => {
             const btn = document.getElementById('save-note-modal');
             const title = document.getElementById('edit-note-title').value.trim();
-            const text = document.getElementById('edit-note-body').value.trim();
-            if (!text) return;
+            const editor = document.getElementById('edit-note-body');
+            const text = editor?.innerHTML?.trim() || '';
+            const plain = editor?.innerText?.trim() || '';
+            if (!plain) { editor?.focus(); return; }
             btn.disabled = true; btn.textContent = 'Lagrer...';
             await onSave(title || 'Uten tittel', text);
             close();
+        });
+    }
+
+    // ── Rich Text Editor helper ──────────────────────────────────
+    _wireRteToolbar(toolbarId, editorId) {
+        const toolbar = document.getElementById(toolbarId);
+        const editor = document.getElementById(editorId);
+        if (!toolbar || !editor) return;
+
+        // Execute formatting commands
+        toolbar.querySelectorAll('.rte-btn').forEach(btn => {
+            btn.addEventListener('mousedown', e => {
+                e.preventDefault(); // keep focus in editor
+                const cmd = btn.dataset.cmd;
+                const val = btn.dataset.val || null;
+                document.execCommand(cmd, false, val);
+                editor.focus();
+                this._updateRteActiveStates(toolbar);
+            });
+        });
+
+        // Update active states on selection change
+        editor.addEventListener('keyup', () => this._updateRteActiveStates(toolbar));
+        editor.addEventListener('mouseup', () => this._updateRteActiveStates(toolbar));
+        editor.addEventListener('focus', () => toolbar.classList.add('rte-focused'));
+        editor.addEventListener('blur', () => toolbar.classList.remove('rte-focused'));
+    }
+
+    _updateRteActiveStates(toolbar) {
+        const cmds = ['bold', 'italic', 'underline', 'insertUnorderedList', 'insertOrderedList'];
+        cmds.forEach(cmd => {
+            const btn = toolbar.querySelector(`[data-cmd="${cmd}"]`);
+            if (btn) btn.classList.toggle('active', document.queryCommandState(cmd));
         });
     }
 

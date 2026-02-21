@@ -1203,6 +1203,125 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════════
+   RICH TEXT EDITOR
+   ══════════════════════════════════════════════════════════════════ */
+.rte-wrapper {
+    border: 1.5px solid var(--border-solid);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--card-bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.rte-wrapper:focus-within {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.rte-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--main-bg);
+    flex-wrap: wrap;
+}
+
+.rte-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: background 0.15s, color 0.15s;
+    flex-shrink: 0;
+}
+
+.rte-btn .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.rte-btn:hover {
+    background: var(--border-color);
+    color: var(--text-main);
+}
+
+.rte-btn.active {
+    background: var(--accent-light);
+    color: var(--accent-color);
+}
+
+.rte-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border-solid);
+    margin: 0 4px;
+    flex-shrink: 0;
+}
+
+.rte-editor {
+    padding: 14px 16px;
+    min-height: 140px;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--text-main);
+    outline: none;
+    white-space: pre-wrap;
+    overflow-y: auto;
+    font-family: inherit;
+}
+
+.rte-editor:empty::before {
+    content: attr(data-placeholder);
+    color: #94a3b8;
+    pointer-events: none;
+}
+
+/* Rendered RTE content (display in note cards) */
+.rte-content h2 {
+    font-size: 1rem;
+    font-weight: 800;
+    margin: 10px 0 6px;
+    color: var(--text-main);
+}
+
+.rte-content p {
+    margin: 0 0 6px;
+}
+
+.rte-content ul,
+.rte-content ol {
+    padding-left: 20px;
+    margin: 6px 0;
+}
+
+.rte-content li {
+    margin-bottom: 3px;
+}
+
+.rte-content b,
+.rte-content strong {
+    font-weight: 700;
+}
+
+.rte-content em,
+.rte-content i {
+    font-style: italic;
+}
+
+.rte-content u {
+    text-decoration: underline;
+}
+
+
+
+/* ══════════════════════════════════════════════════════════════════
    QUICK ACTION BUTTONS (Overview)
    ══════════════════════════════════════════════════════════════════ */
 .ov-action-btn {
