@@ -751,8 +751,8 @@ class MinSideManager {
                         <h3>Gavehistorikk</h3>
                         <div class="filter-controls">
                             <select id="year-filter" class="select-field" style="padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border-color);">
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
+                                <option value="${new Date().getFullYear()}">${new Date().getFullYear()}</option>
+                                <option value="${new Date().getFullYear() - 1}">${new Date().getFullYear() - 1}</option>
                             </select>
                         </div>
                     </div>
@@ -819,11 +819,27 @@ class MinSideManager {
         const totalYearEl = document.getElementById('this-year-total');
         const lastGiftAmountEl = document.getElementById('last-gift-amount');
         const lastGiftDateEl = document.getElementById('last-gift-date');
+        const taxCard = document.querySelector('.giving-container > .card:last-child');
 
         if (!donations || donations.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="4" class="text-center">Ingen gaver funnet.</td></tr>';
+            // Hide summary cards and tax info for users with no donations
+            if (totalYearEl) totalYearEl.textContent = '—';
+            if (lastGiftAmountEl) lastGiftAmountEl.textContent = '—';
+            if (lastGiftDateEl) lastGiftDateEl.textContent = '';
+            if (taxCard) taxCard.style.display = 'none';
+            if (tbody) tbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; padding: 40px 16px; color: #94a3b8;">
+                        <span class="material-symbols-outlined" style="font-size: 40px; display: block; margin-bottom: 12px;">volunteer_activism</span>
+                        <span>Ingen registrerte gaver ennå.</span>
+                    </td>
+                </tr>
+            `;
             return;
         }
+
+        // Show tax card if hidden
+        if (taxCard) taxCard.style.display = '';
 
         let yearTotal = 0;
         const currentYear = new Date().getFullYear();
@@ -866,7 +882,7 @@ class MinSideManager {
                 <div class="card" style="width: 100%; max-width: 100%;">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                         <h3>Min Profil</h3>
-                        <span class="badge" style="font-size: 0.9rem; padding: 6px 12px;">Medlem siden 2024</span>
+                        <span id="member-since-badge" class="badge" style="font-size: 0.9rem; padding: 6px 12px;">Laster...</span>
                     </div>
                     
                     <div style="background: white; border-bottom: 1px solid var(--border-color); padding-bottom: 30px; margin-bottom: 30px; display: flex; align-items: center; gap: 24px;">
@@ -1025,6 +1041,14 @@ class MinSideManager {
                 if (data.zip) form.querySelector('[name="zip"]').value = data.zip;
                 if (data.city) form.querySelector('[name="city"]').value = data.city;
                 form.querySelector('[name="newsletter"]').checked = data.newsletter !== false; // Default true
+
+                // Update "Medlem siden" badge dynamically
+                const badge = document.getElementById('member-since-badge');
+                if (badge) {
+                    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+                    const joinYear = createdAt ? createdAt.getFullYear() : new Date().getFullYear();
+                    badge.textContent = `Medlem siden ${joinYear}`;
+                }
             }
         } catch (e) {
             console.warn('Could not load user profile data:', e);

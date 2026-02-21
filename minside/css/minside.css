@@ -255,6 +255,16 @@ body {
     box-shadow: var(--shadow);
     padding: 24px;
     margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Profile and giving views always take full width */
+#content-area>div,
+#content-area>div>.card {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .btn {
