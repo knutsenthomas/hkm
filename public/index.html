@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="css/cookie-consent.css">
 
     <!-- Tailwind CSS Play CDN -->
-    <script type="module" src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -39,9 +39,8 @@
 
 <body class="cms-loading">
     <!-- Header -->
-    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
-            id="header-container">
+    <header class="header" id="header">
+        <div class="header-content" id="header-container">
             <!-- Logo -->
             <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
@@ -52,7 +51,7 @@
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
+            <div class="header-actions">
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
