@@ -865,7 +865,7 @@ class MinSideManager {
             inner.innerHTML = items.map(n => {
                 const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
                 return `<div class="activity-item ${!n.read ? 'unread' : ''}">
-                    <div class="activity-icon" style="background:${!n.read ? '#1e3a5f' : '#1c2030'}">
+                    <div class="activity-icon" style="background:${!n.read ? 'var(--accent-light)' : 'var(--main-bg)'}">
                         <span class="material-symbols-outlined" style="color:${!n.read ? '#60a5fa' : '#475569'}">campaign</span>
                     </div>
                     <div class="activity-content">
