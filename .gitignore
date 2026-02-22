@@ -1,9 +1,0 @@
-.DS_Store
-wishon/
-stitch/
-*.psd
-node_modules/
-.env
-dist/
-.firebase/
-firebase-debug.log
