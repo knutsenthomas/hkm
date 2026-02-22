@@ -4,11 +4,15 @@
     "version": "1.0.0",
     "type": "module",
     "scripts": {
-        "dev": "vite",
-        "build": "vite build",
+        "dev": "npm run watch:css & npm run dev:vite",
+        "dev:vite": "vite",
+        "build": "npm run build:css && vite build",
+        "build:css": "tailwindcss -i ./input.css -o ./styles.css --minify",
+        "watch:css": "tailwindcss -i ./input.css -o ./styles.css --watch",
         "preview": "vite preview"
     },
     "devDependencies": {
+        "tailwindcss": "^3.4.1",
         "vite": "^5.0.0"
     }
 }

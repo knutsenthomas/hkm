@@ -6,27 +6,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard | His Kingdom Ministry</title>
 
-    <!--Preload av fonter-->
-    <link rel="preload" href="/fonts/min-font.woff2" as="font" type="font/woff2" crossorigin>
-
-    <!-- Google Fonts -->
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-    <!-- Material Symbols -->
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="/fonts/min-font.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" as="style">
+
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
-    <link rel="stylesheet" href="css/dashboard.css?v=admin_users_v8_collection_mobile">
+    <link rel="stylesheet" href="css/dashboard.css?v=fouc_fix_v1">
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/admin-unified.css?v=3">
 
-    <!-- Error Logger -->
+    <!-- Error Logger (Deferred by default as module) -->
     <script type="module" src="../js/error-logger.js"></script>
 </head>
 
-<body class="admin-body">
+<body class="admin-body cloak">
     <!-- Global Error UI (Hidden by default) -->
     <div id="global-error-container"
         style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
@@ -125,6 +126,13 @@
                         <a href="admin-nyhetsbrev.html" class="nav-link">
                             <span class="material-symbols-outlined">mail_outline</span>
                             <span>Nyhetsbrev</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="#" class="nav-link" data-section="messages">
+                            <span class="material-symbols-outlined">inbox</span>
+                            <span>Meldinger</span>
+                            <span id="messages-badge" class="nav-badge" style="display: none;">0</span>
                         </a>
                     </li>
                     <!-- Hidden anchor for FAB push-notification action -->
@@ -1112,11 +1120,11 @@
         });
     </script>
 
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <!-- Firebase SDK (Compat) - Deferred to reduce render blocking -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" defer></script>
 
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>

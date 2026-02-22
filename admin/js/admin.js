@@ -101,6 +101,12 @@ class AdminManager {
         console.log("AdminManager initialized successfully.");
     }
 
+    removeSplashScreen() {
+        // Since splash screen is removed, we just remove the cloak to reveal the UI
+        document.body.classList.remove('cloak');
+        console.log("UI revealed (cloak removed)");
+    }
+
     showToast(message, type = 'success', duration = 5000) {
         if (window.showToast) {
             window.showToast(message, type, duration);
@@ -1794,6 +1800,9 @@ class AdminManager {
         }
 
         this.checkSystemHealth();
+
+        // Remove splash/cloak after initial render
+        setTimeout(() => this.removeSplashScreen(), 300);
     }
 
     initSortableWidgets() {

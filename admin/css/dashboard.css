@@ -871,7 +871,8 @@ body.admin-body {
     font-weight: 600;
     color: #64748b;
     margin-bottom: 4px;
-    white-space: nowrap;
+    white-space: normal;
+    /* Endret fra nowrap for å tillate bryting på små skjermer */
 }
 
 .stat-value {
@@ -4315,6 +4316,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 
     /* Stats cards styling */
     .stat-card.modern {
+        display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
         padding: 18px !important;
@@ -4340,6 +4342,9 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
         font-weight: 600 !important;
         margin-bottom: 6px !important;
         color: #64748b !important;
+        white-space: normal !important;
+        overflow-wrap: break-word !important;
+        line-height: 1.2 !important;
     }
 
     .stat-value {
@@ -4598,4 +4603,91 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     color: #fff;
     font-weight: 600;
     box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+html {
+    background-color: #f8fafc;
+}
+
+.cloak {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
+body.admin-body {
+    transition: opacity 0.4s ease;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.8;
+    }
+}
+
+/* Skeleton Loading */
+.skeleton {
+    background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 50%, #f1f5f9 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+    border-radius: 8px;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Material Symbols Placeholder */
+.material-symbols-outlined {
+    display: inline-block;
+    min-width: 24px;
+    min-height: 24px;
+    vertical-align: middle;
+    line-height: 1;
+}
+
+.loader {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #f1f5f9;
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 20px auto;
+}
+
+/* --- Navigation Badges --- */
+.nav-badge {
+    background-color: var(--accent-color);
+    color: white;
+    font-size: 10px;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: auto;
+    min-width: 18px;
+    text-align: center;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

@@ -117,9 +117,13 @@ th {
 
 /* === Header Width Expansion === */
 #header-container {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     max-width: 1600px !important;
     padding-left: 5% !important;
     padding-right: 5% !important;
+    height: 100px !important;
 }
 
 @media (max-width: 1600px) {
@@ -5502,4 +5506,14 @@ ol.block-list {
         padding: 8mm 5mm;
         border-top: 0.5pt solid #eee;
     }
+}
+
+/* --- FOUC Prevention for Public Site --- */
+.cms-loading {
+    opacity: 0 !important;
+    transition: opacity 0.4s ease;
+}
+
+body:not(.cms-loading) {
+    opacity: 1;
 }

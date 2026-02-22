@@ -1251,3 +1251,14 @@ document.addEventListener('DOMContentLoaded', () => {
     initTeamCards();
     updateCopyrightYear();
 });
+
+// Reveal site after all initializations
+window.addEventListener('load', () => {
+    document.body.classList.remove('cms-loading');
+    console.log("Public UI revealed (cms-loading removed)");
+});
+
+// Fallback if load takes too long
+setTimeout(() => {
+    document.body.classList.remove('cms-loading');
+}, 2000);
