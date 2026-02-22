@@ -3,6 +3,10 @@
 // JavaScript Functionality
 // ===================================
 
+// Import styles for Vite build
+import './styles.css';
+import './css/notifications.css';
+
 // DOM Elements
 const header = document.getElementById('header');
 const mobileToggle = document.getElementById('mobile-toggle');
