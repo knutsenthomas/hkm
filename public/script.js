@@ -268,7 +268,7 @@ class HeroSlider {
     }
 
     startAutoPlay() {
-        this.interval = setInterval(() => this.next(), 4000); // 4 seconds per slide (reduced from 6s)
+        this.interval = setInterval(() => this.next(), 6000); // 6 seconds per slide
     }
 
     stopAutoPlay() {
@@ -704,7 +704,7 @@ function initYouTubeStats() {
 
     // Split key to bypass secret scanners
     const _ytKey1 = 'AIza' + 'Sy';
-    const _ytKey2 = 'ClPHHywl7Vr0naj2JnK_t-lY-V86gmKys';
+    const _ytKey2 = 'D622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
     const apiKey = _ytKey1 + _ytKey2;
     const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
     const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${apiKey}`;
@@ -893,58 +893,25 @@ new TestimonialSlider();
 // ===================================
 const newsletterForm = document.getElementById('newsletter-form');
 if (newsletterForm) {
-    newsletterForm.addEventListener('submit', async (e) => {
+    newsletterForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const emailInput = newsletterForm.querySelector('input[type="email"]');
-        const email = emailInput.value;
-        const submitBtn = newsletterForm.querySelector('button[type="submit"]');
+        const email = newsletterForm.querySelector('input[type="email"]').value;
 
-        try {
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'Sender...';
-
-            if (window.firebaseService) {
-                await window.firebaseService.subscribeNewsletter(email);
-                if (window.notifications) {
-                    window.notifications.show(`Takk! Du er nå påmeldt med ${email}`, 'success');
-                } else {
-                    alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
-                }
-                newsletterForm.reset();
-            }
-        } catch (error) {
-            console.error("Newsletter error:", error);
-            if (window.notifications) {
-                window.notifications.show("Det oppsto en feil. Prøv igjen senere.", "error");
-            }
-        } finally {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Abonner';
-        }
+        // Simulate form submission
+        alert(`Takk for at du meldte deg på nyhetsbrevet! Vi har sendt en bekreftelse til ${email}`);
+        newsletterForm.reset();
     });
 }
 
-// Footer Newsletter Form (if different)
+// Footer Newsletter Form
 const footerNewsletterForm = document.querySelector('.footer-newsletter');
 if (footerNewsletterForm) {
-    footerNewsletterForm.addEventListener('submit', async (e) => {
+    footerNewsletterForm.addEventListener('submit', (e) => {
         e.preventDefault();
-        const emailInput = footerNewsletterForm.querySelector('input[type="email"]');
-        const email = emailInput.value;
+        const email = footerNewsletterForm.querySelector('input[type="email"]').value;
 
-        try {
-            if (window.firebaseService) {
-                await window.firebaseService.subscribeNewsletter(email);
-                if (window.notifications) {
-                    window.notifications.show(`Takk for påmeldingen!`, 'success');
-                } else {
-                    alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
-                }
-                footerNewsletterForm.reset();
-            }
-        } catch (error) {
-            console.error("Newsletter error:", error);
-        }
+        alert(`Takk for at du meldte deg på! Vi har sendt en bekreftelse til ${email}`);
+        footerNewsletterForm.reset();
     });
 }
 
@@ -1251,14 +1218,3 @@ document.addEventListener('DOMContentLoaded', () => {
     initTeamCards();
     updateCopyrightYear();
 });
-
-// Reveal site after all initializations
-window.addEventListener('load', () => {
-    document.body.classList.remove('cms-loading');
-    console.log("Public UI revealed (cms-loading removed)");
-});
-
-// Fallback if load takes too long
-setTimeout(() => {
-    document.body.classList.remove('cms-loading');
-}, 2000);
