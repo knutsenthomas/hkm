@@ -14,11 +14,12 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="styles.css?v=10">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/cookie-consent.css">
 
     <!-- Tailwind CSS Play CDN -->
-    <script type="module" src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -39,9 +40,8 @@
 
 <body class="cms-loading">
     <!-- Header -->
-    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
-            id="header-container">
+    <header class="header" id="header">
+        <div class="header-content" id="header-container">
             <!-- Logo -->
             <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
@@ -52,7 +52,7 @@
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
-            <div class="flex items-center gap-5 header-actions">
+            <div class="header-actions">
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
@@ -70,7 +70,7 @@
                 </div>
                 <a href="donasjoner.html"
                     class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Gi gave<i class="fas fa-heart text-sm" style="margin-left: 0.2em; vertical-align: middle;"></i>
+                    Gi gave <i class="fas fa-heart heart text-sm" style="vertical-align: middle;"></i>
                 </a>
 
                 <!-- Unified Toggle Button -->
@@ -144,6 +144,7 @@
                             <li><a href="arrangementer.html">Arrangementer</a></li>
                             <li><a href="media.html">Media & Podcast</a></li>
                             <li><a href="blogg.html">Nyheter & Blogg</a></li>
+                            <li><a href="kurs.html">Kurs</a></li>
                             <li><a href="minside/index.html">Min Side</a></li>
                         </ul>
                     </div>
@@ -173,40 +174,12 @@
                 </div>
                 <div class="container hero-container">
                     <div class="hero-content">
-                        <h1 class="hero-title">Tenk & gi nestekjærlighet</h1>
-                        <p class="hero-subtitle">Vi er her for å støtte deg på din åndelige reise. Bli med i et trygt
-                            miljø
-                            der vi utforsker Guds ord, deler livet og styrker relasjonen til Jesus.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 2 -->
-            <div class="hero-slide">
-                <div class="hero-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop')">
-                </div>
-                <div class="container hero-container">
-                    <div class="hero-content">
-                        <h1 class="hero-title">Vekst gjennom felleskap.</h1>
-                        <p class="hero-subtitle">Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg.
-                            Opplev
-                            styrken i et levende felleskap som bygger hverandre opp i tro og kjærlighet.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Slide 3 -->
-            <div class="hero-slide">
-                <div class="hero-bg"
-                    style="background-image: url('https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop')">
-                </div>
-                <div class="container hero-container">
-                    <div class="hero-content">
-                        <h1 class="hero-title">Støtt vårt arbeid.</h1>
-                        <p class="hero-subtitle">Din gave gjør en forskjell for many. Hjelp oss å nå enda flere
-                            mennesker
-                            med evangeliet gjennom undervisning, reisevirksomhet og omsorg.</p>
+                        <h1 class="hero-title">Vekst gjennom fellesskap</h1>
+                        <p class="hero-subtitle">Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli
+                            med i et fellesskap som utforsker Guds ord og styrker troen.</p>
+                        <div class="slide-buttons">
+                            <a href="om-oss.html" class="btn btn-primary">Les mer</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -318,7 +291,8 @@
                         <i class="fab fa-youtube"></i>
                     </div>
                     <div class="funfact-content">
-                        <span class="funfact-number" id="yt-video-count" data-target="0">0</span>
+                        <span class="funfact-number" id="yt-video-count" data-target="0"
+                            data-content-key="stats.youtube_videos">0</span>
                         <span class="funfact-label">YouTube-videoer</span>
                     </div>
                 </div>
@@ -328,7 +302,8 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <div class="funfact-content">
-                        <span class="funfact-number" id="yt-view-count" data-target="0">0</span>
+                        <span class="funfact-number" id="yt-view-count" data-target="0"
+                            data-content-key="stats.youtube_views">0</span>
                         <span class="funfact-label">YouTube-visninger</span>
                     </div>
                 </div>
@@ -338,7 +313,8 @@
                         <i class="fas fa-microphone"></i>
                     </div>
                     <div class="funfact-content">
-                        <span class="funfact-number" id="podcast-episode-count" data-target="45">0</span>
+                        <span class="funfact-number" id="podcast-episode-count" data-target="45"
+                            data-content-key="stats.podcast_episodes">0</span>
                         <span class="funfact-label">Podcast-episoder</span>
                     </div>
                 </div>
@@ -348,7 +324,7 @@
                         <i class="fas fa-globe"></i>
                     </div>
                     <div class="funfact-content">
-                        <span class="funfact-number" data-target="8">0</span>
+                        <span class="funfact-number" data-target="9" data-content-key="stats.countries_visited">0</span>
                         <span class="funfact-label">Land besøkt</span>
                     </div>
                 </div>
@@ -357,7 +333,7 @@
     </section>
 
     <!-- Causes / Fundraising -->
-    <section class="causes" id="innsamling">
+    <section class="causes" id="innsamling" style="display: none;">
         <div class="container">
             <div class="section-header">
                 <span class="section-label">Støtt vårt arbeid</span>
@@ -366,77 +342,7 @@
             </div>
 
             <div class="causes-grid">
-                <div class="cause-card">
-                    <div class="cause-image">
-                        <img src="https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop"
-                            alt="Støtt vårt arbeid">
-                    </div>
-                    <div class="cause-content">
-                        <h3 class="cause-title">Støtt vårt arbeid</h3>
-                        <p class="cause-text">Hjelp oss å fortsette med undervisning, podcast og reisevirksomhet for å
-                            nå flere mennesker med evangeliet.</p>
-
-                        <div class="cause-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" data-progress="65"></div>
-                            </div>
-                            <div class="progress-stats">
-                                <span><strong>65.000 kr</strong> samlet inn</span>
-                                <span><strong>100.000 kr</strong> mål</span>
-                            </div>
-                        </div>
-
-                        <a href="donasjoner.html" class="btn btn-primary btn-block">Donér nå</a>
-                    </div>
-                </div>
-
-                <div class="cause-card">
-                    <div class="cause-image">
-                        <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=600&h=400&fit=crop"
-                            alt="Bibelskole">
-                    </div>
-                    <div class="cause-content">
-                        <h3 class="cause-title">Bibelskole 2026</h3>
-                        <p class="cause-text">Støtt vår årlige bibelskole hvor vi tilbyr dyptgående undervisning i Guds
-                            ord for åndelig vekst.</p>
-
-                        <div class="cause-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" data-progress="42"></div>
-                            </div>
-                            <div class="progress-stats">
-                                <span><strong>21.000 kr</strong> samlet inn</span>
-                                <span><strong>50.000 kr</strong> mål</span>
-                            </div>
-                        </div>
-
-                        <a href="donasjoner.html" class="btn btn-primary btn-block">Donér nå</a>
-                    </div>
-                </div>
-
-                <div class="cause-card">
-                    <div class="cause-image">
-                        <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=600&h=400&fit=crop"
-                            alt="Misjonsreise">
-                    </div>
-                    <div class="cause-content">
-                        <h3 class="cause-title">Misjonsreise Afrika</h3>
-                        <p class="cause-text">Støtt vår kommende misjonsreise til Afrika hvor vi skal forkynne
-                            evangeliet og holde konferanser.</p>
-
-                        <div class="cause-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" data-progress="28"></div>
-                            </div>
-                            <div class="progress-stats">
-                                <span><strong>28.000 kr</strong> samlet inn</span>
-                                <span><strong>100.000 kr</strong> mål</span>
-                            </div>
-                        </div>
-
-                        <a href="donasjoner.html" class="btn btn-primary btn-block">Donér nå</a>
-                    </div>
-                </div>
+                <!-- Dynamisk innhold fra Firebase -->
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
@@ -460,6 +366,26 @@
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
                 <a href="arrangementer.html" class="btn btn-outline">Se alle arrangementer</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Teaching / Undervisning (Dynamic) -->
+    <section class="teaching-front" id="siste-undervisning"
+        style="display: none; padding: 100px 0 50px 0; background-color: #f8fafc;">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-label">Aktuelt</span>
+                <h2 class="section-title">Siste undervisning</h2>
+                <p class="section-description">Lytt og lær fra våre nyeste ressurser, seminarer og bibelstudier.</p>
+            </div>
+
+            <div class="media-grid" id="front-teaching-grid">
+                <!-- Teaching items loaded dynamically -->
+            </div>
+
+            <div class="section-footer" style="text-align: center; margin-top: 50px;">
+                <a href="media.html" class="btn btn-outline">Se alle ressurser</a>
             </div>
         </div>
     </section>
@@ -718,10 +644,11 @@
     </footer>
 
     <!-- Firebase SDK (Compat) -->
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
     <!-- Firebase Config & Service -->
     <script type="module" src="js/firebase-config.js"></script>
@@ -729,12 +656,20 @@
     <script type="module" src="js/user-roles.js"></script>
 
     <!-- App Scripts -->
+    <script src="js/notifications.js"></script>
     <script type="module" src="js/i18n.js"></script>
     <script type="module" src="script.js"></script>
-    <script type="module" src="js/content-manager.js?v=author"></script>
+    <script type="module" src="js/content-manager.js?v=1719"></script>
     <script type="module" src="js/cookie-consent.js"></script>
-    <script>
-            (function () {
+    <script type="module">
+            (async function () {
+                // Wait for firebaseService to be available and initialized
+                let count = 0;
+                while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                    await new Promise(r => setTimeout(r, 50));
+                    count++;
+                }
+
                 const adminLink = document.getElementById('admin-link');
                 const firebaseService = window.firebaseService;
 
@@ -757,11 +692,42 @@
                     adminLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
                 });
             })();
+        // Dynamisk profil-lenke i header
+        (async function () {
+            let count = 0;
+            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                await new Promise(r => setTimeout(r, 50));
+                count++;
+            }
+            const profileLink = document.getElementById('header-profile-link');
+            const firebaseService = window.firebaseService;
+            if (!profileLink || !firebaseService || !firebaseService.isInitialized) return;
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) return;
+                let role = 'medlem';
+                try {
+                    role = await firebaseService.getUserRole(user.uid);
+                } catch (err) {
+                    console.warn('Kunne ikke hente rolle for profil-lenke:', err);
+                }
+                const canAccessAdmin = window.HKM_PERMISSIONS
+                    && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                    && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+                profileLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
+            });
+        })();
     </script>
 
-    <script>
+    <script type="module">
         // Load and manage Causes section
-        (function () {
+        (async function () {
+            // Wait for firebaseService to be available and initialized
+            let count = 0;
+            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                await new Promise(r => setTimeout(r, 50));
+                count++;
+            }
+
             const firebaseService = window.firebaseService;
             if (!firebaseService || !firebaseService.isInitialized) return;
 
