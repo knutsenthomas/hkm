@@ -5517,38 +5517,3 @@ ol.block-list {
 body:not(.cms-loading) {
     opacity: 1;
 }
-/* --- Header & Layout Fixes --- */
-.header-content {
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-    height: 100px !important;
-    padding: 0 20px !important;
-    width: 100% !important;
-}
-
-.header-actions {
-    display: flex !important;
-    align-items: center !important;
-    gap: 20px !important;
-}
-
-.logo {
-    display: flex !important;
-    align-items: center !important;
-    gap: 12px !important;
-    color: white !important;
-    text-decoration: none !important;
-}
-
-@media (max-width: 768px) {
-    .header-content {
-        height: 80px !important;
-    }
-    
-    .header-donate-btn {
-        display: none !important;
-    }
-}
