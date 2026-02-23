@@ -1,0 +1,20 @@
+{
+    "name": "HKM Admin",
+    "short_name": "HKM Admin",
+    "start_url": "/admin/index.html",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1e293b",
+    "icons": [
+        {
+            "src": "/admin/img/logo_circular.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/admin/img/logo_circular.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}
