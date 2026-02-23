@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Systemlogger | HKM Admin</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Material Symbols -->
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/dashboard.css">
+
+    <style>
+        .logs-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .logs-header {
+            padding: 20px 24px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logs-filters {
+            display: flex;
+            gap: 12px;
+        }
+
+        .log-filter-btn {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #64748b;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .log-filter-btn:hover {
+            border-color: #94a3b8;
+            color: #475569;
+        }
+
+        .log-filter-btn.active {
+            background: #eff6ff;
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .logs-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 760px;
+        }
+
+        .logs-table-wrap {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .logs-table th {
+            text-align: left;
+            padding: 12px 24px;
+            background: #f1f5f9;
+            color: #64748b;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .logs-table td {
+            padding: 12px 24px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+            font-size: 13px;
+            vertical-align: top;
+        }
+
+        .logs-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .log-level {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .log-level.info {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+
+        .log-level.warn {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .log-level.error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .log-level.success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .log-time {
+            color: #94a3b8;
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .log-msg {
+            font-family: 'Fira Code', monospace;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 1024px) {
+            .content-wrapper {
+                padding: 16px !important;
+            }
+
+            .logs-header {
+                padding: 14px 16px;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: flex-start;
+            }
+
+            .logs-filters {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .logs-table {
+                min-width: 700px;
+            }
+
+            .log-time {
+                white-space: nowrap;
+                font-size: 11px;
+                line-height: 1.4;
+            }
+
+            .log-msg {
+                white-space: normal;
+                word-break: break-word;
+                overflow-wrap: anywhere;
+                font-size: 12px;
+            }
+        }
+    </style>
+
+    <link rel="stylesheet" href="css/admin-unified.css">
+
+    <!-- Firebase SDK (Compat) -->
+    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Core Firebase Logic -->
+    <script defer src="../js/firebase-config.js"></script>
+    <script defer src="../js/firebase-service.js"></script>
+</head>
+
+<body class="admin-body">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <img src="img/logo_circular.png" alt="HKM Logo">
+                <h1 class="logo-text">HKM Studio</h1>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <ul class="nav-list">
+                    <li class="nav-item visible" data-nav-category="all">
+                        <a href="index.html" class="nav-link" data-section="overview">
+                            <span class="material-symbols-outlined">home</span>
+                            <span>Oversikt</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="nettsted">
+                        <a href="index.html#content" class="nav-link" data-section="content">
+                            <span class="material-symbols-outlined">description</span>
+                            <span>Sideinnhold</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="index.html#blog" class="nav-link" data-section="blog">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            <span>Blogg</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="index.html#media" class="nav-link" data-section="media">
+                            <span class="material-symbols-outlined">image</span>
+                            <span>Media</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="index.html#hero" class="nav-link" data-section="hero">
+                            <span class="material-symbols-outlined">view_carousel</span>
+                            <span>Hero Slider</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="index.html#teaching" class="nav-link" data-section="teaching">
+                            <span class="material-symbols-outlined">school</span>
+                            <span>Undervisning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="index.html#design" class="nav-link" data-section="design">
+                            <span class="material-symbols-outlined">palette</span>
+                            <span>Design & Logo</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="index.html#events" class="nav-link" data-section="events">
+                            <span class="material-symbols-outlined">event</span>
+                            <span>Arrangementer</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-kommunikasjon.html" class="nav-link">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Kontakter</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-segmenter.html" class="nav-link">
+                            <span class="material-symbols-outlined">segment</span>
+                            <span>Segmenter</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="index.html#messages" class="nav-link" data-section="messages">
+                            <span class="material-symbols-outlined">mail</span>
+                            <span>Meldinger</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-nyhetsbrev.html" class="nav-link">
+                            <span class="material-symbols-outlined">mail_outline</span>
+                            <span>Nyhetsbrev</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="administrasjon"><span>Administrasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="index.html#causes" class="nav-link" data-section="causes">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                            <span>Gaver</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="index.html#users" class="nav-link" data-section="users">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Brukere</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="index.html#seo" class="nav-link" data-section="seo">
+                            <span class="material-symbols-outlined">search_check</span>
+                            <span>SEO & Meta</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="index.html#settings" class="nav-link" data-section="settings">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>Innstillinger</span>
+                        </a>
+                    </li>
+                    <li class="nav-item visible" data-nav-category="administrasjon">
+                        <a href="admin-logger.html" class="nav-link active">
+                            <span class="material-symbols-outlined">assignment</span>
+                            <span>Systemlogger</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-group bottom">
+                <ul class="nav-list">
+                    <li class="nav-item visible" data-nav-category="all">
+                        <a href="../minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <span>Min Side</span>
+                        </a>
+                    </li>
+                    <li class="nav-item visible" data-nav-category="all">
+                        <a href="/" target="_blank" class="nav-link">
+                            <span class="material-symbols-outlined">visibility</span>
+                            <span>Se nettside</span>
+                        </a>
+                    </li>
+                    <li class="nav-item visible" data-nav-category="all">
+                        <button id="logout-btn" class="nav-link logout">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logg ut</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <a href="index.html" class="btn-back">
+                    <span class="material-symbols-outlined">arrow_back</span>
+                </a>
+                <div class="welcome-banner">
+                    <h1 class="welcome-title">Systemlogger</h1>
+                    <p class="welcome-subtitle">Oversikt over systemhendelser og feilmeldinger.</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+                    <button class="notification-btn">
+                    <span class="material-symbols-outlined">notifications</span>
+                </button>
+
+                <a href="#" class="user-profile-link" id="admin-profile-trigger">
+                    <div class="user-info-text">
+                        <span id="admin-name" class="user-name">Laster...</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                    <div id="admin-avatar" class="user-avatar">?</div>
+                </a>
+
+                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </header>
+
+        <div class="content-wrapper" style="padding: 40px;">
+            <div class="logs-container">
+                <div class="logs-header">
+                    <div class="logs-filters">
+                        <button class="log-filter-btn active" data-filter="all">Alle</button>
+                        <button class="log-filter-btn" data-filter="error">Feil</button>
+                        <button class="log-filter-btn" data-filter="warn">Advarsler</button>
+                        <button class="log-filter-btn" data-filter="info">Info</button>
+                    </div>
+                    <div style="color: #64748b; font-size: 13px;">
+                        Viser siste <span id="log-count">0</span> hendelser
+                    </div>
+                </div>
+
+                <div class="logs-table-wrap">
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 150px;">Tidspunkt</th>
+                                <th style="width: 80px;">Nivå</th>
+                                <th>Melding</th>
+                                <th style="width: 120px;">Kilde</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-body">
+                            <!-- Logs will be injected here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <nav class="mobile-bottom-nav">
+        <a href="index.html" class="mobile-nav-item" data-section="overview">
+            <span class="material-symbols-outlined">grid_view</span>
+            <span>Oversikt</span>
+        </a>
+        <a href="admin-kommunikasjon.html" class="mobile-nav-item">
+            <span class="material-symbols-outlined">group</span>
+            <span>Kontakter</span>
+        </a>
+        <a href="../minside/index.html" class="mobile-nav-item">
+            <span class="material-symbols-outlined">account_circle</span>
+            <span>Min Side</span>
+        </a>
+        <a href="index.html#settings" class="mobile-nav-item" data-section="settings">
+            <span class="material-symbols-outlined">settings</span>
+            <span>Innstillinger</span>
+        </a>
+    </nav>
+
+    <!-- FAB Menu -->
+    <div class="fab-menu-container">
+        <div class="fab-menu" id="fab-menu">
+            <button class="fab-item" onclick="triggerFabAction('blog', 'add-new-blog')">
+                <span class="fab-label">Ny blogg</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">edit_document</span></div>
+            </button>
+            <button class="fab-item" onclick="window.location.href='admin-nyhetsbrev.html'">
+                <span class="fab-label">Nytt nyhetsbrev</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">mark_email_unread</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('teaching', 'add-new-teaching')">
+                <span class="fab-label">Ny undervisning</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">school</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('events', 'add-new-events')">
+                <span class="fab-label">Nytt arrangement</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">event</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('users', 'add-user-btn')">
+                <span class="fab-label">Ny bruker</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('kommunikasjon', 'push-title')">
+                <span class="fab-label">Ny push-varsling</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">send_to_mobile</span></div>
+            </button>
+        </div>
+        <button class="mobile-fab" id="main-fab">
+            <span class="material-symbols-outlined">add</span>
+        </button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mainFab = document.getElementById('main-fab');
+            const fabMenu = document.getElementById('fab-menu');
+            if (mainFab && fabMenu) {
+                mainFab.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    mainFab.classList.toggle('active');
+                    fabMenu.classList.toggle('active');
+                });
+                document.addEventListener('click', (e) => {
+                    if (fabMenu.classList.contains('active') && !fabMenu.contains(e.target) && e.target !== mainFab) {
+                        mainFab.classList.remove('active');
+                        fabMenu.classList.remove('active');
+                    }
+                });
+            }
+
+            window.triggerFabAction = function (sectionId, btnId) {
+                sessionStorage.setItem('pendingFabAction', btnId);
+                window.location.href = 'index.html#' + sectionId;
+            };
+        });
+    </script>
+
+    <script type="module" src="js/admin-header.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const logsBody = document.getElementById('logs-body');
+            const logCount = document.getElementById('log-count');
+
+            // Mock Data Generator for demo/fallback
+            const generateMockLogs = () => {
+                const types = ['info', 'warn', 'error', 'success'];
+                const sources = ['System', 'Firebase', 'Auth', 'UserAction'];
+                const messages = [
+                    'Database backup completed successfully',
+                    'Failed to load user profile image',
+                    'New user registered: thomas@hkm.no',
+                    'API rate limit approaching',
+                    'Page cache cleared manually',
+                    'Login attempt failed from IP 192.168.1.1',
+                    'Settings updated by Admin'
+                ];
+
+                return Array.from({ length: 15 }, (_, i) => {
+                    const date = new Date();
+                    date.setMinutes(date.getMinutes() - i * 12);
+                    const type = types[Math.floor(Math.random() * types.length)];
+                    return {
+                        timestamp: date.toISOString(),
+                        level: type,
+                        message: messages[Math.floor(Math.random() * messages.length)],
+                        source: sources[Math.floor(Math.random() * sources.length)]
+                    };
+                });
+            };
+
+            // Fetch logs (Replace with real Firebase fetches later if needed)
+            // For now we use mock data to populate the view as requested
+            let logs = [];
+
+            try {
+                // If real collection exists:
+                // const snapshot = await firebase.firestore().collection('system_logs').orderBy('timestamp', 'desc').limit(50).get();
+                // logs = snapshot.docs.map(doc => doc.data());
+
+                // Fallback to mock if empty or not implemented
+                if (logs.length === 0) logs = generateMockLogs();
+            } catch (e) {
+                console.warn('Could not fetch real logs, using mock data', e);
+                logs = generateMockLogs();
+            }
+
+            const renderLogs = (filter = 'all') => {
+                const filtered = logs.filter(log => filter === 'all' || log.level === filter);
+                logCount.textContent = filtered.length;
+
+                logsBody.innerHTML = filtered.map(log => `
+                    <tr>
+                        <td class="log-time">${new Date(log.timestamp).toLocaleString('no-NO')}</td>
+                        <td><span class="log-level ${log.level}">${log.level}</span></td>
+                        <td class="log-msg">${log.message}</td>
+                        <td style="font-size: 13px; color: #64748b;">${log.source}</td>
+                    </tr>
+                `).join('');
+            };
+
+            renderLogs();
+
+            // Filter Click Handlers
+            document.querySelectorAll('.log-filter-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
+                    e.target.classList.add('active');
+                    renderLogs(e.target.dataset.filter);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

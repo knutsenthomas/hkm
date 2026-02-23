@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidad | His Kingdom Ministry</title>
+    <meta name="description" content="Política de Privacidad de His Kingdom Ministry. Lea cómo manejamos sus datos.">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Styles -->
+    <link rel="stylesheet" href="../styles.css">
+    <link rel="stylesheet" href="../css/cookie-consent.css">
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#f39c12',
+                        'primary-red': '#e74c3c',
+                        'text-dark': '#333333',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                        class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="flex items-center gap-5 header-actions">
+                <div class="lang-switcher relative group">
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                    </button>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="no">🇳🇴 Norsk</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en">🇺🇸 English</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="es">🇪🇸 Español</a>
+                    </div>
+                </div>
+                <a href="donasjoner.html"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Gi gave <i class="fas fa-heart text-sm"></i>
+                </a>
+
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle meny">
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="¿Qué estás buscando?"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="../personvern.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="../en/privacy.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="privacidad.html" class="text-sm font-bold text-primary-orange">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Cuadrícula de Contenido del Menú -->
+                <div class="mega-menu-grid">
+                    <!-- Columna 1: Involúcrate -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Involúcrate</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donaciones.html">Apoya el Trabajo</a></li>
+                            <li><a href="donaciones.html#faste-givere">Hazte Donante Mensual</a></li>
+                            <li><a href="para-iglesias.html">Para Iglesias</a></li>
+                            <li><a href="para-empresas.html">Para Empresas</a></li>
+                            <li><a href="bnn.html">Red de Negocios</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Columna 2: Conócenos -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Conócenos</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="sobre-nosotros.html">Sobre la Fundación</a></li>
+                            <li><a href="sobre-nosotros.html#historie">Nuestra Historia</a></li>
+                            <li><a href="contacto.html">Dónde Trabajamos</a></li>
+                            <li><a href="contacto.html">Contáctanos</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Columna 3: Recursos y Medios -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Recursos</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="eventos.html">Eventos</a></li>
+                            <li><a href="media.html">Medios y Podcast</a></li>
+                            <li><a href="blog.html">Noticias y Blog</a></li>
+                            <li><a href="../minside/index.html">Mi Cuenta</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Pie del Menú -->
+                <div class="mega-menu-footer">
+                    <a href="donaciones.html" class="btn btn-primary btn-large btn-block">Apoya Ahora <i
+                            class="fas fa-heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="donaciones.html#skattefradrag">Deducción Fiscal</a>
+                        <a href="sobre-nosotros.html">Sobre Nosotros</a>
+                        <a href="privacidad.html">Privacidad</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Hero de Página -->
+    <section class="page-hero" data-content-key="hero.backgroundImage" style="padding-top: 160px;">
+        <div class="container">
+            <h1 class="page-hero-title">Política de Privacidad</h1>
+            <p class="page-hero-subtitle">Última actualización: 13 de febrero de 2026</p>
+        </div>
+    </section>
+
+    <!-- Contenido -->
+    <section class="legal-page-body">
+        <div class="container">
+            <div class="legal-text-container">
+                <p>En His Kingdom Ministry ("nosotros", "nuestro"), nos comprometemos a garantizar que se sienta seguro
+                    al visitar nuestros
+                    sitios web y utilizar nuestros servicios. Esta política de privacidad explica de manera simple y
+                    clara qué
+                    información recopilamos sobre usted, por qué lo hacemos y qué derechos tiene.</p>
+
+                <p>Como organización cristiana basada en la confianza y el compañerismo, tratamos sus datos con el
+                    máximo
+                    respeto y confidencialidad.</p>
+
+                <h2>1. ¿Qué información recopilamos?</h2>
+                <p>Solo recopilamos información que es necesaria para darle acceso a nuestros cursos, enseñanzas y
+                    comunidad.</p>
+                <ul>
+                    <li><strong>Al registrarse en "Mi Cuenta":</strong> Nombre, dirección de correo electrónico y
+                        contraseña (cifrada).</li>
+                    <li><strong>Al usar el portal de cursos:</strong> Información sobre qué cursos asiste y su
+                        progreso (por ejemplo, qué videos ha terminado de ver). Hacemos esto para que pueda continuar
+                        fácilmente
+                        donde lo dejó.</li>
+                    <li><strong>Al inscribirse en eventos:</strong> Información de contacto y cualquier necesidad
+                        dietética (si
+                        proporciona esto voluntariamente).</li>
+                </ul>
+
+                <h2>2. ¿Cómo usamos la información?</h2>
+                <p>Usamos su información para los siguientes propósitos:</p>
+                <ul>
+                    <li>Para darle acceso a su perfil personal y material del curso.</li>
+                    <li>Para enviarle información relevante sobre los cursos en los que participa.</li>
+                    <li>Para mejorar nuestros servicios y sitios web basados en estadísticas generales de uso
+                        (anonimizadas).</li>
+                    <li>Para mantener la seguridad de su cuenta de usuario.</li>
+                </ul>
+
+                <h2>3. Cookies</h2>
+                <p>Utilizamos cookies para garantizar que el sitio web funcione de manera óptima.</p>
+                <p><strong>Cookies necesarias:</strong> Estas son estrictamente necesarias para que pueda iniciar sesión
+                    y
+                    navegar de forma segura en "Mi Cuenta". Estas no se pueden desactivar.</p>
+                <p><strong>Estadísticas y análisis:</strong> Podemos utilizar herramientas para comprender cómo se
+                    utiliza el sitio web,
+                    para que podamos mejorarlo. Puede optar por no participar en esto.</p>
+                <p>Puede cambiar su configuración de cookies en cualquier momento a través del enlace en la parte
+                    inferior del sitio web.</p>
+
+                <h2>4. Almacenamiento y eliminación</h2>
+                <p>Sus datos personales se almacenan de forma segura en nuestra base de datos (proporcionada por Google
+                    Firebase). Conservamos
+                    su información mientras tenga una cuenta de usuario activa con nosotros.</p>
+                <p>Puede solicitar eliminar su cuenta y todos los datos asociados en cualquier momento contactándonos, o
+                    utilizando la función "Eliminar cuenta" dentro de su perfil.</p>
+
+                <h2>5. Intercambio de información</h2>
+                <p><strong>Nunca</strong> vendemos sus datos personales a terceros.</p>
+                <p>Si realiza una donación o compra un curso, su información de pago será procesada directamente por
+                    nuestro proveedor de pagos (por ejemplo, Vipps o Stripe). No almacenamos números de tarjeta ni
+                    información bancaria
+                    nosotros mismos.</p>
+
+                <h2>6. Sus derechos</h2>
+                <p>De acuerdo con el GDPR (Reglamento General de Protección de Datos), usted tiene derecho a:</p>
+                <ul>
+                    <li>Acceder a la información que tenemos almacenada sobre usted.</li>
+                    <li>Corrección de información incorrecta.</li>
+                    <li>Eliminación de su información ("el derecho al olvido").</li>
+                    <li>Retirar su consentimiento en cualquier momento.</li>
+                </ul>
+
+                <h2>7. Contáctenos</h2>
+                <p>Si tiene preguntas sobre privacidad o desea ejercer sus derechos, le invitamos a
+                    contactarnos:</p>
+                <p>
+                    <strong>Correo:</strong> post@hiskingdomministry.no<br>
+                    <strong>Dirección:</strong> Noruega
+                </p>
+                <p style="margin-top: 40px; font-size: 0.9rem; color: #718096;">Esta política se actualizó por última
+                    vez el 13 de febrero de
+                    2026.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pie de Página -->
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Sección Izquierda: Marca + Enlaces -->
+                <div class="footer-left">
+                    <!-- Marca / Introducción -->
+                    <div class="footer-brand">
+                        <a href="index.html" class="logo">
+                            <div class="logo-icon">
+                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro
+                            dedicada al
+                            crecimiento espiritual a través de la enseñanza, podcasts y viajes misioneros.</p>
+                    </div>
+
+                    <!-- Cuadrícula de Enlaces -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>Sobre Nosotros</h4>
+                            <ul>
+                                <li><a href="index.html#hjem">Inicio</a></li>
+                                <li><a href="sobre-nosotros.html">Quiénes Somos</a></li>
+                                <li><a href="sobre-nosotros.html#visjon">Nuestra Visión</a></li>
+                                <li><a href="contacto.html">Contáctanos</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Recursos</h4>
+                            <ul>
+                                <li><a href="media.html#teaching-section">Enseñanza</a></li>
+                                <li><a href="eventos.html">Cursos en Línea</a></li>
+                                <li><a href="blog.html">Libros y Blog</a></li>
+                                <li><a href="../minside/index.html">Mi Cuenta</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Medios</h4>
+                            <ul>
+                                <li><a href="media.html#podcast-section">Podcast</a></li>
+                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involúcrate</h4>
+                            <ul>
+                                <li><a href="eventos.html">Calendario</a></li>
+                                <li><a href="donaciones.html">Hacer una Donación</a></li>
+                                <li><a href="privacidad.html">Privacidad</a></li>
+                                <li><a href="accesibilidad.html">Accesibilidad</a></li>
+                                <li><a href="#"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sección Derecha: Tarjetas -->
+                <div class="footer-right">
+                    <!-- Tarjeta Síguenos -->
+                    <div class="footer-card">
+                        <h3>Síguenos</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Tarjeta Contáctanos -->
+                    <div class="footer-card contact-card">
+                        <h3>Contáctanos</h3>
+                        <a href="contacto.html" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Correo:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Teléfono:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Número de Cuenta:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Todos los derechos reservados.</p>
+                <a href="../admin/login.html" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js"></script>
+    <script type="module" src="../js/i18n.js"></script>
+    <script type="module" src="../script.js"></script>
+    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../js/cookie-consent.js"></script>
+</body>
+
+</html>

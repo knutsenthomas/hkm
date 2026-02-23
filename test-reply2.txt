@@ -1,0 +1,1 @@
+Alright, so you want to keep the FAB menu but remove the top horizontal navigation (Nettsted / Kommunikasjon / Administrasjon) and instead show all links in the sidebar at all times, categorizing them visually perhaps if you'd like it to be more organized?

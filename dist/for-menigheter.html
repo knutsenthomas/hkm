@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Menigheter | His Kingdom Ministry</title>
+    <meta name="description" content="Informasjon til menigheter som ønsker samarbeid med His Kingdom Ministry.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#f39c12',
+                        'primary-red': '#e74c3c',
+                        'text-dark': '#333333',
+                    }
+                }
+            }
+        }
+    </script>
+  <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
+  <script type="module" crossorigin src="/assets/script-DY1rU6PL.js"></script>
+  <script type="module" crossorigin src="/assets/firebase-config-BNsh33Gw.js"></script>
+  <script type="module" crossorigin src="/assets/firebase-service-DNKZ8naa.js"></script>
+  <script type="module" crossorigin src="/assets/user-roles-D0mdCVLS.js"></script>
+  <script type="module" crossorigin src="/assets/content-manager-BKpvcVNi.js"></script>
+  <script type="module" crossorigin src="/assets/cookie-consent-DUwA3p5Q.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/blogg-post-XLTJYYHb.css">
+  <link rel="stylesheet" crossorigin href="/assets/notifications-DQiJY5Sp.css">
+  <link rel="stylesheet" crossorigin href="/assets/cookie-consent-_nwlpFTp.css">
+</head>
+
+<body class="cms-loading">
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="/assets/logo-hkm-B4n9sAJj.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="flex items-center gap-5 header-actions">
+                <div class="lang-switcher relative group">
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                    </button>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="no">🇳🇴 Norsk</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en">🇺🇸 English</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="es">🇪🇸 Español</a>
+                    </div>
+                </div>
+                <a href="donasjoner.html"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Gi gave <i class="fas fa-heart heart text-sm" style="vertical-align: middle;"></i>
+                </a>
+
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle meny">
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..."
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="for-menigheter.html" class="text-sm font-bold text-primary-orange">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="en/for-churches.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="es/para-iglesias.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Engasjer deg</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donasjoner.html">Støtt arbeidet</a></li>
+                            <li><a href="bli-fast-giver.html">Bli fast giver</a></li>
+                            <li><a href="for-menigheter.html">For menigheter</a></li>
+                            <li><a href="for-bedrifter.html">For bedrifter</a></li>
+                            <li><a href="bnn.html">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Bli kjent med oss</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="om-oss.html">Om oss</a></li>
+                            <li><a href="kontakt.html">Kontakt oss</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser & Media -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Ressurser</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="arrangementer.html">Arrangementer</a></li>
+                            <li><a href="media.html">Media & Podcast</a></li>
+                            <li><a href="blogg.html">Nyheter & Blogg</a></li>
+                            <li><a href="minside/index.html">Min Side</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                        <a href="donasjoner.html" class="btn btn-primary btn-large btn-block flex items-center justify-center">Støtt nå<i class="fas fa-heart"></i></a> <div class="menu-footer-links">
+                        <a href="donasjoner.html#skattefradrag">Skattefradrag</a>
+                        <a href="om-oss.html">Om oss</a>
+                        <a href="personvern.html">Personvern</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main>
+        <!-- Page Hero -->
+        <section class="page-hero" data-content-key="hero.bg"
+            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); display: flex; align-items: center; min-height: 350px;">
+            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">For Menigheter</h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Vi ønsker å stå sammen med lokale menigheter for å utruste troende og spre evangeliet.</p>
+            </div>
+        </section>
+
+        <!-- Content Sections -->
+        <section class="section" style="background: white;">
+            <div class="container">
+                <div class="flex flex-col lg:flex-row gap-12 lg:gap-20 items-center">
+                    <div class="about-content flex-1">
+                        <span class="section-label" data-content-key="intro.label">Samarbeid</span>
+                        <h2 class="section-title" data-content-key="intro.title">Et felles oppdrag</h2>
+                        <p class="section-text" data-content-key="intro.text">His Kingdom Ministry brenner for å se den lokale kirken blomstre. Vi tilbyr ressurser, seminarer og undervisning som kan komplementere deres eksisterende arbeid og inspirere til dypere etterfølgelse av Jesus.</p>
+                        <ul class="my-8 grid gap-3">
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Seminarer om bønn og disippelskap</li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Ressurser for smågrupper</li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Besøk av våre undervisere</li>
+                            <li><i class="fas fa-check-circle text-primary-orange mr-2"></i> Felles bønneinitiativ</li>
+                        </ul>
+                        <a href="kontakt.html" class="btn btn-primary">Ta kontakt for samarbeid</a>
+                    </div>
+                    <div class="about-image flex-1 flex justify-center">
+                        <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                            data-content-key="intro.image" alt="Menighetssamarbeid"
+                            class="rounded-2xl shadow-lg object-cover w-full max-w-md h-72 lg:h-96">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA Section -->
+        <section class="cta-section"
+            style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
+            <div class="container flex flex-col items-center justify-center text-center py-16 md:py-20">
+                <h2 class="mb-7 text-3xl md:text-4xl font-bold md:font-extrabold leading-tight" style="color: white; margin-bottom: 2rem;">Vil dere høre mer?</h2>
+                <p class="mb-8 text-lg opacity-90">Vi sender gjerne mer informasjon om hvordan vi kan støtte deres menighet.</p>
+                <a href="kontakt.html" class="btn btn-primary rounded-full px-6 py-3 font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform shadow-md">Kontakt oss i dag</a>
+            </main>
+
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer" id="kontakt">
+            <div class="container">
+                <div class="footer-layout-v2">
+                    <!-- Left Section: Brand + Links -->
+                    <div class="footer-left">
+                        <!-- Brand / Intro -->
+                        <div class="footer-brand">
+                            <a href="index.html" class="logo">
+                                <div class="logo-icon">
+                                    <img src="/assets/logo-hkm-B4n9sAJj.png" alt="His Kingdom Ministry Logo">
+                                </div>
+                                <span class="logo-text">His Kingdom Ministry</span>
+                            </a>
+                            <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til
+                                åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                        </div>
+
+                        <!-- Links Grid -->
+                        <div class="footer-nav-grid">
+                            <div class="nav-col">
+                                <h4>Om oss</h4>
+                                <ul>
+                                    <li><a href="index.html#hjem">Hjem</a></li>
+                                    <li><a href="om-oss.html">Om oss</a></li>
+                                    <li><a href="om-oss.html#visjon">Vår visjon</a></li>
+                                    <li><a href="kontakt.html">Kontakt oss</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="nav-col">
+                                <h4>Ressurser</h4>
+                                <ul>
+                                    <li><a href="media.html#teaching-section">Undervisning</a></li>
+                                    <li><a href="arrangementer.html">E-kurs</a></li>
+                                    <li><a href="blogg.html">Bøker & Blogg</a></li>
+                                    <li><a href="minside/index.html">Min Side</a></li>
+                                </ul>
+                            </div>
+
+                            <div class="nav-col">
+                                <h4>Media</h4>
+                                <ul>
+                                    <li><a href="media.html#podcast-section">Podcast</a></li>
+                                    <li><a href="media.html">Videoer</a></li>
+                                    <li><a href="https://www.youtube.com/@HisKingdomMinistry"
+                                            target="_blank">YouTube</a>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="nav-col">
+                                <h4>Involvering</h4>
+                                <ul>
+                                    <li><a href="arrangementer.html">Kalender</a></li>
+                                    <li><a href="donasjoner.html">Gi en gave</a></li>
+                                    <li><a href="personvern.html">Personvern</a></li>
+                                    <li><a href="tilgjengelighet.html">Tilgjengelighet</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Section: Cards -->
+                    <div class="footer-right">
+                        <!-- Follow Us Card -->
+                        <div class="footer-card">
+                            <h3>Følg oss</h3>
+                            <div class="footer-social-icons">
+                                <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                        class="fab fa-facebook-f"></i></a>
+                                <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                        class="fab fa-instagram"></i></a>
+                                <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                        class="fab fa-youtube"></i></a>
+                            </div>
+                        </div>
+
+                        <!-- Contact Us Card -->
+                        <div class="footer-card contact-card">
+                            <h3>Kontakt oss</h3>
+                            <a href="kontakt.html" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+
+                            <div class="contact-details">
+                                <div class="detail-item">
+                                    <strong>E-post:</strong>
+                                    <p>post@hiskingdomministry.no</p>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Telefon:</strong>
+                                    <p>+47 930 94 615</p>
+                                </div>
+                                <div class="detail-item">
+                                    <strong>Vipps:</strong>
+                                    <p>938361</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.
+                    </p>
+                    <a href="admin/login.html" class="admin-link" id="admin-link">Admin</a>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <!-- Firebase & Scripts -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+
+    <!-- App Scripts -->
+</body>
+
+</html>

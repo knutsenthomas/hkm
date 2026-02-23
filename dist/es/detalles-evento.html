@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalles del Evento | His Kingdom Ministry</title>
+    <meta name="description" content="Información detallada sobre nuestros eventos en His Kingdom Ministry.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* Charitics-inspired Event Details Styles */
+        :root {
+            --charitics-orange: #F15A24;
+            --charitics-dark: #121212;
+            --charitics-gray: #777777;
+            --charitics-bg-light: #F9F9F9;
+        }
+
+        .header.scrolled {
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Page Hero */
+        .page-hero {
+            position: relative;
+            padding: 160px 0 100px;
+            background-color: var(--charitics-dark);
+            background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1600&q=80');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+        }
+
+        .page-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(rgba(18, 18, 18, 0.85), rgba(18, 18, 18, 0.7));
+            z-index: 1;
+        }
+
+        .page-hero-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .page-hero h1 {
+            font-size: 52px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            letter-spacing: -0.01em;
+        }
+
+        .hero-breadcrumbs {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .hero-breadcrumbs a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .hero-breadcrumbs a:hover {
+            opacity: 1;
+        }
+
+        .hero-breadcrumbs .separator {
+            color: var(--charitics-orange);
+            font-weight: bold;
+        }
+
+        .hero-breadcrumbs .current {
+            color: var(--charitics-orange);
+        }
+
+        /* Layout Grid */
+        .event-details-layout {
+            padding: 100px 0;
+            background: #fff;
+        }
+
+        .event-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 50px;
+        }
+
+        /* Sidebar (Left) */
+        .sidebar-left {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .sidebar-widget {
+            background: var(--charitics-bg-light);
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .widget-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--charitics-dark);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        .widget-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--charitics-orange);
+        }
+
+        .search-widget .search-form {
+            position: relative;
+            display: flex;
+        }
+
+        .search-widget input {
+            width: 100%;
+            padding: 15px 20px;
+            border: none;
+            border-radius: 30px 0 0 30px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-widget button {
+            background: var(--charitics-orange);
+            color: white;
+            border: none;
+            padding: 0 25px;
+            border-radius: 0 30px 30px 0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .search-widget button:hover {
+            background: #d4491c;
+        }
+
+        .category-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .category-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-list li:last-child {
+            border-bottom: none;
+        }
+
+        .category-list a {
+            color: #444;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .category-list a:hover {
+            color: var(--charitics-orange);
+        }
+
+        .category-count {
+            color: var(--charitics-gray);
+            font-size: 14px;
+        }
+
+        .recent-events-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .recent-event-item {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .recent-event-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .recent-event-info h4 {
+            font-size: 15px;
+            margin: 0 0 5px;
+            line-height: 1.4;
+        }
+
+        .recent-event-info h4 a {
+            color: var(--charitics-dark);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .recent-event-info h4 a:hover {
+            color: var(--charitics-orange);
+        }
+
+        .recent-event-date {
+            font-size: 13px;
+            color: var(--charitics-gray);
+        }
+
+        /* Main Content (Right) */
+        .main-content-right {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .event-large-image-wrap {
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.06);
+        }
+
+        .event-large-image-wrap img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .event-detail-header {
+            margin-top: 10px;
+        }
+
+        .event-meta-info {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 25px;
+            font-size: 15px;
+            color: var(--charitics-gray);
+            font-weight: 500;
+        }
+
+        .event-meta-info i {
+            color: var(--charitics-orange);
+            margin-right: 8px;
+        }
+
+        .event-main-title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--charitics-dark);
+            margin-bottom: 25px;
+            line-height: 1.25;
+        }
+
+        .event-description {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .event-description p {
+            margin-bottom: 25px;
+        }
+
+        .event-description h3 {
+            font-size: 24px;
+            margin: 40px 0 20px;
+            color: var(--charitics-dark);
+        }
+
+        .event-details-checklist {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 30px 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .event-details-checklist li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+            color: #444;
+        }
+
+        .event-details-checklist li i {
+            color: var(--charitics-orange);
+            font-size: 14px;
+        }
+
+        .registration-footer {
+            background: var(--charitics-bg-light);
+            padding: 40px;
+            border-radius: 12px;
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-cta-text h3 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .footer-cta-text p {
+            color: var(--charitics-gray);
+            margin: 0;
+        }
+
+        .btn-register {
+            background: var(--charitics-orange);
+            color: white;
+            padding: 16px 45px;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(241, 90, 36, 0.2);
+        }
+
+        .btn-register:hover {
+            background: var(--charitics-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 1024px) {
+            .event-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar-left {
+                order: 2;
+            }
+
+            .main-content-right {
+                order: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-hero h1 {
+                font-size: 36px;
+            }
+
+            .event-main-title {
+                font-size: 28px;
+            }
+
+            .registration-footer {
+                flex-direction: column;
+                text-align: center;
+                gap: 25px;
+            }
+        }
+    </style>
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#f39c12',
+                        'primary-red': '#e74c3c',
+                        'text-dark': '#333333',
+                    }
+                }
+            }
+        }
+    </script>
+  <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
+  <script type="module" crossorigin src="/assets/script-DY1rU6PL.js"></script>
+  <script type="module" crossorigin src="/assets/firebase-config-BNsh33Gw.js"></script>
+  <script type="module" crossorigin src="/assets/firebase-service-DNKZ8naa.js"></script>
+  <script type="module" crossorigin src="/assets/i18n-CkTTiwon.js"></script>
+  <script type="module" crossorigin src="/assets/content-manager-CnziVa9u.js"></script>
+  <script type="module" crossorigin src="/assets/cookie-consent-DUwA3p5Q.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/blogg-post-XLTJYYHb.css">
+  <link rel="stylesheet" crossorigin href="/assets/notifications-DQiJY5Sp.css">
+  <link rel="stylesheet" crossorigin href="/assets/cookie-consent-_nwlpFTp.css">
+</head>
+
+<body class="header-always-scrolled">
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                        class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="flex items-center gap-5 header-actions">
+                <div class="lang-switcher relative group">
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                    </button>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="no">🇳🇴 Norsk</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en">🇺🇸 English</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="es">🇪🇸 Español</a>
+                    </div>
+                </div>
+                <a href="donasjoner.html"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Gi gave <i class="fas fa-heart text-sm"></i>
+                </a>
+
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle meny">
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="¿Qué estás buscando?"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="../arrangement-detaljer.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="../en/event-details.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="detalles-evento.html" class="text-sm font-bold text-primary-orange">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <div class="mega-menu-grid">
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Participa</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donaciones.html">Apoya nuestro trabajo</a></li>
+                            <li><a href="donantes-regulares.html">Hazte donante regular</a></li>
+                            <li><a href="para-iglesias.html">Para iglesias</a></li>
+                            <li><a href="para-empresas.html">Para empresas</a></li>
+                            <li><a href="bnn.html">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Conócenos</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="sobre-nosotros.html">Sobre la fundación</a></li>
+                            <li><a href="sobre-nosotros.html#historia">Nuestra historia</a></li>
+                            <li><a href="contacto.html">Dónde trabajamos</a></li>
+                            <li><a href="contacto.html">Contáctanos</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Recursos</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="eventos.html">Eventos</a></li>
+                            <li><a href="media.html">Media & Podcast</a></li>
+                            <li><a href="blog.html">Noticias & Blog</a></li>
+                            <li><a href="../minside/index.html">Mi Página</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mega-menu-footer">
+                    <a href="donaciones.html" class="btn btn-primary btn-large btn-block">Apoya ahora <i
+                            class="fas fa-heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="donaciones.html#deduccion-fiscal">Deducción Fiscal</a>
+                        <a href="sobre-nosotros.html">Sobre nosotros</a>
+                        <a href="privacy.html">Privacidad</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Page Hero -->
+    <section class="page-hero" data-content-key="hero.backgroundImage">
+        <div class="container page-hero-content">
+            <h1 id="hero-title">Detalles del Evento</h1>
+            <nav class="hero-breadcrumbs">
+                <a href="index.html">Inicio</a>
+                <span class="separator">/</span>
+                <a href="eventos.html">Eventos</a>
+                <span class="separator">/</span>
+                <span class="current" id="breadcrumb-current">Detalles</span>
+            </nav>
+        </div>
+    </section>
+
+    <!-- Main Layout -->
+    <main class="event-details-layout">
+        <div class="container event-container">
+
+            <!-- Sidebar (Left) -->
+            <aside class="sidebar-left">
+                <!-- Search -->
+                <div class="sidebar-widget search-widget">
+                    <h3 class="widget-title">Buscar</h3>
+                    <form class="search-form">
+                        <input type="text" placeholder="Buscar eventos...">
+                        <button type="submit"><i class="fas fa-search"></i></button>
+                    </form>
+                </div>
+
+                <!-- Categories -->
+                <div class="sidebar-widget category-widget">
+                    <h3 class="widget-title">Categorías</h3>
+                    <ul class="category-list">
+                        <li><a href="#">Encuentros & Conferencias</a> <span class="category-count">(04)</span></li>
+                        <li><a href="#">Reuniones de Oración</a> <span class="category-count">(07)</span></li>
+                        <li><a href="#">Enseñanza</a> <span class="category-count">(03)</span></li>
+                        <li><a href="#">Business Network</a> <span class="category-count">(02)</span></li>
+                    </ul>
+                </div>
+
+                <!-- Recent Events -->
+                <div class="sidebar-widget recent-events-widget">
+                    <h3 class="widget-title">Eventos Recientes</h3>
+                    <div class="recent-events-list" id="recent-events-sidebar">
+                        <!-- Populated by JS -->
+                        <p>Cargando recientes...</p>
+                    </div>
+                </div>
+
+                <!-- Contact Info Widget -->
+                <div class="sidebar-widget contact-widget">
+                    <h3 class="widget-title">¿Preguntas?</h3>
+                    <p style="font-size: 15px; color: #666; margin-bottom: 20px;">Contáctenos si tiene alguna pregunta
+                        sobre el evento.</p>
+                    <div style="font-size: 15px; color: #121212;">
+                        <p><i class="fas fa-envelope" style="color:var(--charitics-orange); margin-right: 10px;"></i>
+                            post@hiskingdomministry.no</p>
+                        <p><i class="fas fa-phone-alt" style="color:var(--charitics-orange); margin-right: 10px;"></i>
+                            +47 930 94 615</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Content Area (Right) -->
+            <div class="main-content-right">
+                <!-- Main Image -->
+                <div class="event-large-image-wrap">
+                    <img src="../img/placeholder-event.jpg" alt="Imagen del Evento" id="event-hero-image">
+                </div>
+
+                <!-- Event Details Header -->
+                <div class="event-detail-header">
+                    <div class="event-meta-info">
+                        <span><i class="fas fa-calendar-alt"></i> <span id="event-time">Cargando...</span></span>
+                        <span><i class="fas fa-map-marker-alt"></i> <span id="event-location">Cargando...</span></span>
+                    </div>
+                    <h2 class="event-main-title" id="event-title">Título del Evento</h2>
+
+                    <div class="event-description" id="event-description">
+                        <p>Cargando descripción...</p>
+                    </div>
+
+                    <!-- Registration CTA -->
+                    <div class="registration-footer">
+                        <div class="footer-cta-text">
+                            <h3>¡Únete a nosotros!</h3>
+                            <p>Asegura tu lugar para este evento hoy mismo.</p>
+                        </div>
+                        <a href="contacto.html" class="btn-register">Regístrate Ahora</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- CTA Section -->
+    <section class="cta section" style="background: var(--bg-light);">
+        <div class="container" style="text-align: center;">
+            <h2 class="section-title">¿Deseas saber más sobre nuestras reuniones?</h2>
+            <p class="section-description" style="margin-left: auto; margin-right: auto;">No dudes en contactarnos si
+                tienes preguntas o necesidades especiales de oración.</p>
+            <a href="contacto.html" class="btn btn-primary">Contáctanos ahora</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contacto">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <!-- Brand / Intro -->
+                    <div class="footer-brand">
+                        <a href="index.html" class="logo">
+                            <div class="logo-icon">
+                                <img src="/assets/logo-hkm-B4n9sAJj.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro
+                            dedicada al crecimiento espiritual a través de la enseñanza, el podcast y los viajes
+                            misioneros.</p>
+                    </div>
+
+                    <!-- Links Grid -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>Sobre nosotros</h4>
+                            <ul>
+                                <li><a href="index.html">Inicio</a></li>
+                                <li><a href="sobre-nosotros.html">¿Quiénes somos?</a></li>
+                                <li><a href="sobre-nosotros.html#vision">Nuestra visión</a></li>
+                                <li><a href="contacto.html">Contáctanos</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Recursos</h4>
+                            <ul>
+                                <li><a href="media.html#teaching-section">Enseñanza</a></li>
+                                <li><a href="eventos.html">Cursos en línea</a></li>
+                                <li><a href="blog.html">Libros & Blog</a></li>
+                                <li><a href="../minside/index.html">Mi Página</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="media.html#podcast-section">Podcast</a></li>
+                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Participación</h4>
+                            <ul>
+                                <li><a href="eventos.html">Calendario</a></li>
+                                <li><a href="donaciones.html">Haz un donativo</a></li>
+                                <li><a href="privacy.html">Privacidad</a></li>
+                                <li><a href="accessibility.html">Accesibilidad</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <!-- Follow Us Card -->
+                    <div class="footer-card">
+                        <h3>Síguenos</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Us Card -->
+                    <div class="footer-card contact-card">
+                        <h3>Contáctanos</h3>
+                        <a href="contacto.html" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Teléfono:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 His Kingdom Ministry. Todos los derechos reservados.</p>
+                <a href="../admin/login.html" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+
+    <!-- App Scripts -->
+</body>
+
+</html>

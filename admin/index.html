@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | His Kingdom Ministry</title>
+
+    <!-- Preconnect for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <!-- Preload critical fonts -->
+    <link rel="preload" href="/fonts/min-font.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" as="style">
+
+    <!-- Google Fonts & Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
+
+    <link rel="stylesheet" href="css/dashboard.css?v=fouc_fix_v1">
+    <link rel="stylesheet" href="../css/notifications.css">
+    <link rel="stylesheet" href="css/admin-unified.css?v=3">
+
+    <!-- Error Logger (Deferred by default as module) -->
+    <script type="module" src="../js/error-logger.js"></script>
+</head>
+
+<body class="admin-body cloak">
+    <!-- Global Error UI (Hidden by default) -->
+    <div id="global-error-container"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.95); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <span class="material-symbols-outlined"
+            style="font-size: 64px; color: #ef4444; margin-bottom: 20px;">error</span>
+        <h2 style="font-size: 24px; color: #1e293b; margin-bottom: 10px;">Noe gikk galt</h2>
+        <p id="global-error-message" style="color: #64748b; max-width: 500px; margin-bottom: 30px;">En uventet feil har
+            oppstått.</p>
+        <button onclick="window.location.reload()"
+            style="padding: 12px 24px; background: #ef4444; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Last
+            inn på nytt</button>
+    </div>
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+            <div class="logo" style="margin-bottom: 0;">
+                <img src="img/logo_circular.png" alt="HKM Logo">
+                <h1 class="logo-text">HKM Studio</h1>
+            </div>
+            <button id="mobile-sidebar-close"
+                style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;"
+                class="mobile-sidebar-close-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <ul class="nav-list">
+                    <li class="nav-item visible" data-nav-category="all">
+                        <a href="#" class="nav-link active" data-section="overview">
+                            <span class="material-symbols-outlined">home</span>
+                            <span>Oversikt</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="content">
+                            <span class="material-symbols-outlined">description</span>
+                            <span>Sideinnhold</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="blog">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            <span>Blogg</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="media">
+                            <span class="material-symbols-outlined">image</span>
+                            <span>Media</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="hero">
+                            <span class="material-symbols-outlined">view_carousel</span>
+                            <span>Hero Slider</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="teaching">
+                            <span class="material-symbols-outlined">school</span>
+                            <span>Undervisning</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="courses">
+                            <span class="material-symbols-outlined">menu_book</span>
+                            <span>Kursadministrasjon</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="#" class="nav-link" data-section="design">
+                            <span class="material-symbols-outlined">palette</span>
+                            <span>Design & Logo</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="#" class="nav-link" data-section="events">
+                            <span class="material-symbols-outlined">event</span>
+                            <span>Arrangementer</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-kommunikasjon.html" class="nav-link">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Kontakter</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-nyhetsbrev.html" class="nav-link">
+                            <span class="material-symbols-outlined">mail_outline</span>
+                            <span>Nyhetsbrev</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="#" class="nav-link" data-section="messages">
+                            <span class="material-symbols-outlined">inbox</span>
+                            <span>Meldinger</span>
+                            <span id="messages-badge" class="nav-badge" style="display: none;">0</span>
+                        </a>
+                    </li>
+                    <!-- Hidden anchor for FAB push-notification action -->
+                    <li class="nav-item" data-nav-category="kommunikasjon" style="display:none">
+                        <a href="#" class="nav-link" data-section="kommunikasjon" id="nav-kommunikasjon-hidden">
+                            <span>Push</span>
+                        </a>
+                    </li>
+                    <li class="nav-category-header" data-target-category="administrasjon">
+                        <span>Administrasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="causes">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                            <span>Gaver</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="users">
+                            <span class="material-symbols-outlined">group</span>
+                            <span>Brukere</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="automation">
+                            <span class="material-symbols-outlined">auto_mode</span>
+                            <span>Automatisering</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="seo">
+                            <span class="material-symbols-outlined">search_check</span>
+                            <span>SEO & Meta</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="#" class="nav-link" data-section="settings">
+                            <span class="material-symbols-outlined">settings</span>
+                            <span>Innstillinger</span>
+                        </a>
+                    </li>
+                    <li class="nav-item visible" data-nav-category="administrasjon">
+                        <a href="admin-logger.html" class="nav-link">
+                            <span class="material-symbols-outlined">assignment</span>
+                            <span>Systemlogger</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="nav-group bottom">
+                <ul class="nav-list">
+                    <li class="nav-item" data-nav-category="all">
+                        <a href="../minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
+                            <span class="material-symbols-outlined">account_circle</span>
+                            <span>Min Side</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="all">
+                        <a href="/" target="_blank" class="nav-link">
+                            <span class="material-symbols-outlined">visibility</span>
+                            <span>Se nettside</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-nav-category="all">
+                        <button id="logout-btn" class="nav-link logout">
+                            <span class="material-symbols-outlined">logout</span>
+                            <span>Logg ut</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="header-left">
+                <div class="welcome-banner">
+                    <h1 class="welcome-title">Velkommen tilbake!</h1>
+                    <p class="welcome-subtitle">Oversikt over nettstedets aktivitet.</p>
+                </div>
+            </div>
+
+            <div class="header-right">
+                <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
+                    <span class="material-symbols-outlined">search</span>
+                </button>
+                <img src="img/logo_circular.png" alt="HKM" class="mobile-logo-header" style="display: none;">
+
+                <button id="messages-bell" class="notification-btn">
+                    <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                    <span id="notification-dot" class="notification-dot"></span>
+                </button>
+
+                <a href="#" class="user-profile-link" id="admin-profile-trigger">
+                    <div class="user-info-text">
+                        <span id="admin-name" class="user-name">Laster...</span>
+                        <span class="user-role">Administrator</span>
+                    </div>
+                    <div id="admin-avatar" class="user-avatar">?</div>
+                </a>
+
+                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Global Search Modal -->
+        <div id="search-modal" class="search-overlay">
+            <div class="search-modal-container">
+                <button id="close-search-modal" class="close-search-btn" aria-label="Lukk søk">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+                <div class="search-modal-title">Søk i systemet</div>
+                <div class="search-input-group">
+                    <span class="material-symbols-outlined">search</span>
+                    <input type="text" id="global-modal-search-input" class="search-input-field"
+                        placeholder="Hva leter du etter? Skriv og trykk Enter..." aria-label="Søk">
+                </div>
+                <div class="search-help-text">Trykk 'Enter' for å hente frem søkeresultatene.</div>
+            </div>
+        </div>
+
+        <!-- Profile Modal -->
+        <div id="profile-modal" class="profile-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.25); z-index:2000; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+            <div class="profile-modal-content"
+                style="background:#fff; border-radius:16px; box-shadow:0 8px 32px rgba(0,0,0,0.15); padding:32px; width:100%; max-width:600px; max-height:90vh; overflow-y:auto; position:relative;">
+                <button id="close-profile-modal"
+                    style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
+                <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+                    <div id="modal-admin-avatar" class="user-avatar" style="width:64px; height:64px; font-size:28px;">
+                    </div>
+                    <div>
+                        <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">
+                            Navn</div>
+                        <div id="modal-admin-role" class="user-role">Administrator</div>
+                    </div>
+                </div>
+                <div style="margin-bottom:16px;">
+                    <strong>E-post:</strong> <span id="modal-admin-email">epost@eksempel.no</span>
+                </div>
+                <form id="admin-modal-profile-form" style="width:100%; display:grid; gap:12px; margin-top:8px;">
+                    <div>
+                        <label for="admin-modal-display-name"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Navn</label>
+                        <input id="admin-modal-display-name" name="displayName" type="text"
+                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label for="admin-modal-phone"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Telefon</label>
+                        <input id="admin-modal-phone" name="phone" type="tel"
+                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label for="admin-modal-address"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Adresse</label>
+                        <input id="admin-modal-address" name="address" type="text"
+                            style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px;">
+                    </div>
+                    <div>
+                        <label for="admin-modal-bio"
+                            style="display:block; font-size:13px; color:#64748b; margin-bottom:4px;">Bio</label>
+                        <textarea id="admin-modal-bio" name="bio"
+                            style="width:100%; min-height:78px; padding:10px; border:1px solid #e2e8f0; border-radius:8px;"></textarea>
+                    </div>
+                    <button id="admin-modal-save-btn" type="submit" class="btn-primary" style="margin-top:4px;">Lagre
+                        profil</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Template Editor Modal -->
+        <div id="template-editor-modal" class="profile-modal"
+            style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); z-index:2100; align-items:center; justify-content:center; padding:20px; box-sizing:border-box;">
+            <div class="profile-modal-content card modern"
+                style="padding: 0; width:100%; max-width:800px; max-height:90vh; overflow:hidden; display:flex; flex-direction:column;">
+
+                <div class="modal-header"
+                    style="padding: 24px 32px; border-bottom: 1px solid var(--admin-border); background: var(--admin-surface-muted); display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 20px; font-weight: 800; margin: 0;" id="template-editor-title">Rediger mal
+                        </h2>
+                        <p style="font-size: 13px; color: var(--admin-text-muted); margin: 4px 0 0 0;">Tilpass innholdet
+                            i den automatiserte e-posten.</p>
+                    </div>
+                    <button id="close-template-modal"
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; color: var(--admin-text-muted); display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+
+                <div style="padding: 32px; overflow-y: auto; flex: 1;">
+                    <form id="template-editor-form">
+                        <input type="hidden" id="edit-template-id">
+
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label
+                                style="display: block; font-size: 13px; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">Emnefelt</label>
+                            <input type="text" id="edit-template-subject" class="form-control"
+                                style="width: 100%; padding: 12px 16px; border: 1px solid var(--admin-border); border-radius: 10px; font-size: 15px; outline: none; transition: border-color 0.2s;"
+                                placeholder="Skriv inn emnefelt...">
+                        </div>
+
+                        <div class="form-group">
+                            <label
+                                style="display: block; font-size: 13px; font-weight: 700; color: var(--admin-text); margin-bottom: 8px;">E-postinnhold</label>
+
+                            <div
+                                style="background: #f8fafc; padding: 12px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                                <p style="font-size: 12px; color: #64748b; margin: 0 0 10px 0;">
+                                    <strong>Hurtig-innsetting:</strong> Klikk på knappene under for å lime inn variabler
+                                    i teksten.
+                                </p>
+                                <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+                                    <button type="button" class="btn btn-sm insert-var-btn" data-var="{{name}}"
+                                        style="width: auto !important; display: inline-flex !important; padding: 6px 14px !important; font-size: 11px; height: auto; background: #fff; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                                        Navn</button>
+                                    <button type="button" class="btn btn-sm insert-var-btn" data-var="{{email}}"
+                                        style="width: auto !important; display: inline-flex !important; padding: 6px 14px !important; font-size: 11px; height: auto; background: #fff; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                                        E-post</button>
+                                    <button type="button" class="btn btn-sm insert-var-btn" data-var="{{address}}"
+                                        style="width: auto !important; display: inline-flex !important; padding: 6px 14px !important; font-size: 11px; height: auto; background: #fff; border: 1px solid #cbd5e1; color: #475569; border-radius: 6px; cursor: pointer; font-weight: 600;">+
+                                        Adresse</button>
+                                </div>
+                            </div>
+                            <div id="quill-editor-container"
+                                style="height: 400px; border: 1px solid var(--admin-border); border-radius: 10px; overflow: hidden; background: #fff;">
+                                <div id="edit-template-body" style="height: 100%; border: none;"></div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer"
+                    style="padding: 20px 32px; border-top: 1px solid var(--admin-border); background: var(--admin-surface-muted); display: flex; justify-content: flex-end; gap: 12px;">
+                    <button id="cancel-template-edit" class="btn"
+                        style="background: #fff; border: 1px solid var(--admin-border); color: var(--admin-text-muted);">Avbryt</button>
+                    <button id="save-template-btn" class="btn btn-primary">Lagre mal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dynamic Section Content -->
+        <section id="content-area" class="section-container">
+            <!-- Default Overview Section -->
+            <div id="overview-section" class="section-content active">
+                <div class="section-header-row"
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                    <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;">Analyseoversikt
+                    </h2>
+                    <button id="configure-widgets-btn" class="btn btn-secondary"
+                        style="padding: 8px 16px; font-size: 13px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">settings_suggest</span>
+                        Tilpass oversikt
+                    </button>
+                </div>
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap purple">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Sidevisninger</h3>
+                            <p class="stat-value" id="stats-visitors">12,450</p>
+                            <div class="stat-trend positive">
+                                <span class="material-symbols-outlined">trending_up</span>
+                                12.5%
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap green">
+                            <span class="material-symbols-outlined">check_circle</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Systemstatus</h3>
+                            <p class="stat-value text-green">Normal</p>
+                            <span class="stat-meta">Ingen kritiske feil</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue">
+                            <span class="material-symbols-outlined">edit_note</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Blogginnlegg</h3>
+                            <p class="stat-value" id="stats-blog-count">4</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap mint">
+                            <span class="material-symbols-outlined">school</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Undervisningsserier</h3>
+                            <p class="stat-value" id="stats-teaching-count">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap donation">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Donasjoner</h3>
+                            <p class="stat-value">0</p>
+                            <span class="stat-meta">Totalt: 0 kr</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap megaphone">
+                            <span class="material-symbols-outlined">campaign</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Innsamlingsaksjoner</h3>
+                            <p class="stat-value">0</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap youtube">
+                            <span class="material-symbols-outlined">video_library</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">YouTube Totalt</h3>
+                            <p class="stat-value" id="stats-youtube-views">56 699</p>
+                            <span class="stat-meta" id="stats-youtube-subs">446 abonnenter • 449 videoer</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap podcast">
+                            <span class="material-symbols-outlined">podcasts</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Podcast Episoder</h3>
+                            <p class="stat-value" id="stats-podcast-count">45</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chart Section -->
+                <div class="dashboard-main-grid">
+                    <div class="chart-container card">
+                        <div class="card-header-simple">
+                            <div>
+                                <h3 class="card-title">Trafikkovervåking (Google Analytics)</h3>
+                                <div class="live-indicator">
+                                    <span class="dot"></span>
+                                    Sanntid: 24 aktive akkurat nå
+                                </div>
+                            </div>
+                            <div class="dropdown-container" style="position: relative;">
+                                <button id="chart-options-btn"
+                                    style="background:none; border:none; cursor:pointer; color:var(--text-muted); padding:4px; display:flex; align-items:center;">
+                                    <span class="material-symbols-outlined">more_vert</span>
+                                </button>
+                                <div id="chart-dropdown" class="dropdown-menu"
+                                    style="display:none; position:absolute; top:100%; right:0; background:white; border-radius:12px; box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid #f1f5f9; width:180px; z-index:100; padding:8px; overflow:hidden;">
+                                    <button class="dropdown-item" data-view="daily"
+                                        style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-main); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:18px;">calendar_view_day</span> Daglig visning
+                                    </button>
+                                    <button class="dropdown-item" data-view="weekly"
+                                        style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:18px;">calendar_view_week</span> Ukentlig oversikt
+                                    </button>
+                                    <button class="dropdown-item" data-view="monthly"
+                                        style="width:100%; text-align:left; padding:10px 12px; border:none; background:none; border-radius:8px; font-size:13px; font-weight:600; color:var(--text-muted); cursor:pointer; display:flex; align-items:center; gap:8px;">
+                                        <span class="material-symbols-outlined"
+                                            style="font-size:18px;">calendar_month</span> Månedlig analyse
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-placeholder">
+                            <div class="bar-chart">
+                                <div class="bar" style="height: 40%;"><span>08:00</span></div>
+                                <div class="bar" style="height: 65%;"></div>
+                                <div class="bar" style="height: 85%;"><span>12:00</span></div>
+                                <div class="bar" style="height: 55%;"></div>
+                                <div class="bar" style="height: 75%;"><span>16:00</span></div>
+                                <div class="bar" style="height: 45%;"></div>
+                                <div class="bar" style="height: 80%;"><span>20:00</span></div>
+                                <div class="bar" style="height: 60%;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="top-pages-widget card">
+                        <h3 class="card-title">Topp Sider</h3>
+                        <ul class="page-rank-list">
+                            <li>
+                                <div class="page-info">
+                                    <span class="page-url">/index.html</span>
+                                    <span class="page-count">4,230</span>
+                                </div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar" style="width: 85%;"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="page-info">
+                                    <span class="page-url">/blogg.html</span>
+                                    <span class="page-count">2,150</span>
+                                </div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar" style="width: 45%;"></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="page-info">
+                                    <span class="page-url">/media.html</span>
+                                    <span class="page-count">1,890</span>
+                                </div>
+                                <div class="progress-bar-wrap">
+                                    <div class="progress-bar" style="width: 35%;"></div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div id="search-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Søk</h2>
+                    <p class="section-subtitle">Resultater for søk.</p>
+                </div>
+                <div class="card">
+                    <div class="card-body" id="search-results">
+                        <p class="section-subtitle">Skriv inn et søkeord i feltet øverst og trykk Enter.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pre-rendered Placeholders for Dynamic Content -->
+            <div id="content-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Sideinnhold</h2>
+                    <p class="section-subtitle">Laster innhold...</p>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="blog-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Blogg</h2>
+                    <p class="section-subtitle">Laster innlegg...</p>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="events-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Arrangementer</h2>
+                    <p class="section-subtitle">Laster arrangementer...</p>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="messages-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Meldinger</h2>
+                    <p class="section-subtitle">Laster meldinger...</p>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="media-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Media-integrasjoner</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="causes-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Gaver & Donasjoner</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="hero-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Hero Slider</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="teaching-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Undervisning</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="courses-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Kursadministrasjon</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="design-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Design & Identitet</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="profile-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Brukerprofil</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="settings-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Innstillinger</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="seo-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">SEO & Meta-tags</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="automation-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Automatisering</h2>
+                    <p class="section-subtitle">Administrer automatiserte e-poster og se utsendelseshistorikk.</p>
+                </div>
+
+                <div class="card modern">
+                    <div class="automation-tabs">
+                        <button class="automation-tab active" data-tab="templates">E-postmaler</button>
+                        <button class="automation-tab" data-tab="logs">Utsendelseslogg</button>
+                    </div>
+
+                    <div id="automation-templates" class="automation-pane active">
+                        <div class="table-container">
+                            <table class="crm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Navn</th>
+                                        <th>Beskrivelse</th>
+                                        <th>Sist endret</th>
+                                        <th class="col-actions">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="email-templates-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div id="automation-logs" class="automation-pane">
+                        <div class="table-container">
+                            <table class="crm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mottaker</th>
+                                        <th>Emne</th>
+                                        <th>Type</th>
+                                        <th>Tidspunkt</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="email-logs-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="integrations-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Integrasjoner</h2>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="users-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Brukerhåndtering</h2>
+                    <p class="section-subtitle">Oversikt over alle registrerte brukere og deres tilgangsnivåer.</p>
+                </div>
+                <div class="loader"></div>
+            </div>
+
+            <div id="newsletter-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">E-post & Nyhetsbrev</h2>
+                    <p class="section-subtitle">Skap og send profesjonelle nyhetsbrev og viktige meldinger.</p>
+                </div>
+
+                <div class="card modern newsletter-promo">
+                    <div class="card-body">
+                        <div class="newsletter-content">
+                            <div class="promo-icon purple">
+                                <span class="material-symbols-outlined">auto_awesome</span>
+                            </div>
+                            <div>
+                                <h3 class="card-title">Nyhetsbrev Builder</h3>
+                                <p>Bruk vårt nye blokk-baserte verktøy for å designe vakre e-poster som ser bra ut på
+                                    alle enheter.</p>
+                            </div>
+                        </div>
+                        <div class="newsletter-action">
+                            <a href="admin-nyhetsbrev.html" class="btn-primary">Åpne Email Builder</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-body">
+                        <h3 class="card-title">Hurtigmelding (Tekst)</h3>
+                        <form id="bulk-email-form">
+                            <p class="section-subtitle mb-4">For raske beskjeder uten design.</p>
+                            <div class="form-group">
+                                <label for="target-role">Målgruppe</label>
+                                <select id="target-role" name="targetRole" class="form-control">
+                                    <option value="all">Alle Brukere</option>
+                                    <option value="medlem">Bare Medlemmer</option>
+                                    <option value="selected">Valgte brukere</option>
+                                </select>
+                            </div>
+                            <div id="email-user-selection" class="user-selection-container" style="display: none;">
+                                <!-- User list will be injected here -->
+                            </div>
+                            <div class="form-group">
+                                <label for="email-subject">Emne</label>
+                                <input type="text" id="email-subject" name="subject" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email-message">Melding</label>
+                                <textarea id="email-message" name="message" class="form-control" rows="6"
+                                    required></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary">Send E-poster</button>
+                            <div id="email-status" class="status-message" style="margin-top: 15px;"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div id="kommunikasjon-section" class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Push-varslinger</h2>
+                    <p class="section-subtitle">Send push-varslinger direkte til brukerne.</p>
+                </div>
+
+                <!-- Push form -->
+                <div class="card modern">
+                    <div class="card-body">
+                        <div class="promo-icon blue">
+                            <span class="material-symbols-outlined">campaign</span>
+                        </div>
+                        <h3 class="card-title">Send Push-varsling</h3>
+                        <p>Send korte varsler direkte til brukernes telefoner og Min Side-appen.</p>
+                        <form id="push-notification-form" class="mt-4">
+                            <div class="form-group">
+                                <label for="push-target-role">Målgruppe</label>
+                                <select id="push-target-role" name="targetRole" class="form-control">
+                                    <option value="all">Alle Brukere</option>
+                                    <option value="medlem">Bare Medlemmer</option>
+                                    <option value="selected">Valgte brukere</option>
+                                </select>
+                            </div>
+                            <div id="push-user-selection" class="user-selection-container" style="display: none;">
+                                <!-- User list will be injected here -->
+                            </div>
+                            <div class="form-group">
+                                <label for="push-title">Tittel</label>
+                                <input type="text" id="push-title" name="title" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="push-body">Melding</label>
+                                <textarea id="push-body" name="body" class="form-control" rows="3" required></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="push-click-action">Link (valgfri)</label>
+                                <input type="text" id="push-click-action" name="click_action" class="form-control"
+                                    placeholder="https://his-kingdom-ministry.web.app/arrangementer">
+                            </div>
+                            <button type="submit" class="btn-primary">
+                                <span class="material-symbols-outlined"
+                                    style="font-size:18px; vertical-align:middle;">send</span>
+                                Send Push-varsling
+                            </button>
+                            <div id="push-status" class="status-message" style="margin-top: 15px;"></div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Unified Activity Log -->
+                <div class="card modern mt-4">
+                    <div class="card-body">
+                        <div
+                            style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
+                            <h3 class="card-title" style="margin:0;">Aktivitetslogg</h3>
+                            <div id="log-filters" style="display:flex; gap:8px; flex-wrap:wrap;">
+                                <button class="log-filter-btn active" data-filter="all">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">list</span> Alle
+                                </button>
+                                <button class="log-filter-btn" data-filter="push">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">campaign</span>
+                                    Push-varslinger
+                                </button>
+                                <button class="log-filter-btn" data-filter="message">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">mail</span>
+                                    Meldinger
+                                </button>
+                                <button class="log-filter-btn" data-filter="new_user">
+                                    <span class="material-symbols-outlined" style="font-size:15px;">person_add</span>
+                                    Nye brukere
+                                </button>
+                            </div>
+                        </div>
+                        <div id="activity-log-list">
+                            <div class="loader">Laster aktiviteter...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </section>
+    </main>
+
+    <nav class="mobile-bottom-nav">
+        <a href="index.html#overview" class="mobile-nav-item active" data-section="overview">
+            <span class="material-symbols-outlined">grid_view</span>
+            <span>Oversikt</span>
+        </a>
+        <a href="admin-kommunikasjon.html" class="mobile-nav-item">
+            <span class="material-symbols-outlined">group</span>
+            <span>Kontakter</span>
+        </a>
+        <a href="../minside/index.html" class="mobile-nav-item">
+            <span class="material-symbols-outlined">account_circle</span>
+            <span>Min Side</span>
+        </a>
+        <a href="index.html#settings" class="mobile-nav-item" data-section="settings">
+            <span class="material-symbols-outlined">settings</span>
+            <span>Innstillinger</span>
+        </a>
+    </nav>
+
+    <div class="fab-menu-container">
+        <div class="fab-menu" id="fab-menu">
+            <button class="fab-item" onclick="triggerFabAction('blog', 'add-new-blog')">
+                <span class="fab-label">Ny blogg</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">edit_document</span></div>
+            </button>
+            <button class="fab-item" onclick="window.location.href='admin-nyhetsbrev.html'">
+                <span class="fab-label">Nytt nyhetsbrev</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">mark_email_unread</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('teaching', 'add-new-teaching')">
+                <span class="fab-label">Ny undervisning</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">school</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('courses', 'new-course-btn')">
+                <span class="fab-label">Nytt kurs</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">menu_book</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('events', 'add-new-events')">
+                <span class="fab-label">Nytt arrangement</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">event</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('users', 'add-user-btn')">
+                <span class="fab-label">Ny bruker</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
+            </button>
+            <button class="fab-item" onclick="triggerFabAction('kommunikasjon', 'push-title')">
+                <span class="fab-label">Ny push-varsling</span>
+                <div class="fab-icon"><span class="material-symbols-outlined">send_to_mobile</span></div>
+            </button>
+        </div>
+        <button class="mobile-fab" id="main-fab">
+            <span class="material-symbols-outlined">add</span>
+        </button>
+    </div>
+
+    <!-- App Scripts -->
+    <script type="module" src="js/admin-header.js"></script>
+    <!-- Core Dashboard Logic (Non-Module for compatibility) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const sidebar = document.querySelector('.sidebar');
+            const mobileToggle = document.getElementById('mobile-nav-toggle');
+
+            // All hamburger/overlay logic is now handled by admin-header.js
+
+            const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+            if (mobileSidebarClose) {
+                mobileSidebarClose.addEventListener('click', () => {
+                    sidebar.classList.remove('active');
+                    const overlay = document.querySelector('.sidebar-overlay');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                        overlay.style.removeProperty('display');
+                        overlay.style.removeProperty('opacity');
+                        overlay.style.removeProperty('pointer-events');
+                    }
+                });
+            }
+
+            const navLinks = document.querySelectorAll('.nav-link[data-section], .mobile-nav-item[data-section]');
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    const targetSectionId = link.getAttribute('data-section');
+                    if (!targetSectionId) return;
+
+                    e.preventDefault();
+
+                    // Close sidebar on mobile
+                    sidebar.classList.remove('active');
+                    const overlay = document.querySelector('.sidebar-overlay');
+                    if (overlay) {
+                        overlay.classList.remove('active');
+                        overlay.style.removeProperty('display');
+                        overlay.style.removeProperty('opacity');
+                        overlay.style.removeProperty('pointer-events');
+                    }
+
+                    // Update Active Link UI
+                    document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+
+                    // Sync desktop/mobile active states
+                    const sameSectionLinks = document.querySelectorAll(`[data-section="${targetSectionId}"]`);
+                    sameSectionLinks.forEach(l => l.classList.add('active'));
+
+                    // Trigger module-based rendering if available
+                    if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
+                        window.adminManager.onSectionSwitch(targetSectionId);
+                    }
+
+                    // Update Visible Section
+                    const sections = document.querySelectorAll('.section-content');
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === `${targetSectionId}-section`) {
+                            section.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // ── Collapsible Nav Categories ──────────────────────────────────
+            const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
+
+            function setCategory(category, shouldBeOpen) {
+                const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
+                const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
+                if (!header) return;
+
+                if (shouldBeOpen) {
+                    header.classList.remove('collapsed');
+                    items.forEach(item => {
+                        item.classList.remove('nav-cat-hidden');
+                        // Force override any 'hidden' class if we want it open
+                        item.style.display = 'block';
+                    });
+                } else {
+                    header.classList.add('collapsed');
+                    items.forEach(item => {
+                        item.classList.add('nav-cat-hidden');
+                        // Class .nav-cat-hidden has !important in CSS, but let's be safe
+                        item.style.display = 'none';
+                    });
+                }
+                sessionStorage.setItem(`nav_cat_${category}`, shouldBeOpen ? 'open' : 'closed');
+            }
+
+            // Init state
+            categoryHeaders.forEach(header => {
+                const cat = header.getAttribute('data-target-category');
+                const saved = sessionStorage.getItem(`nav_cat_${cat}`);
+                // Nettsted = open by default, others = closed
+                const defaultOpen = (cat === 'nettsted');
+                const shouldBeOpen = saved ? (saved === 'open') : defaultOpen;
+                setCategory(cat, shouldBeOpen);
+            });
+
+            // Click listener
+            categoryHeaders.forEach(header => {
+                header.addEventListener('click', function () {
+                    const cat = this.getAttribute('data-target-category');
+                    const currentlyClosed = this.classList.contains('collapsed');
+                    setCategory(cat, currentlyClosed);
+                });
+            });
+
+            const hash = window.location.hash.substring(1);
+            if (hash) {
+                const targetLink = document.querySelector(`.nav-link[data-section="${hash}"]`);
+                if (targetLink) {
+                    setTimeout(() => targetLink.click(), 100); // Small delay to ensure render
+                }
+
+                const pendingBtnId = sessionStorage.getItem('pendingFabAction');
+                if (pendingBtnId) {
+                    sessionStorage.removeItem('pendingFabAction');
+                    setTimeout(() => {
+                        const btn = document.getElementById(pendingBtnId);
+                        if (btn) {
+                            if (btn.tagName === 'INPUT' || btn.tagName === 'TEXTAREA') {
+                                btn.focus();
+                            } else {
+                                btn.click();
+                            }
+                        }
+                    }, 600);
+                }
+            } else {
+                const overviewLink = document.querySelector('.nav-link[data-section="overview"]');
+                if (overviewLink) overviewLink.classList.add('active');
+            }
+
+            // FAB Menu Logic
+            const mainFab = document.getElementById('main-fab');
+            const fabMenu = document.getElementById('fab-menu');
+            if (mainFab && fabMenu) {
+                mainFab.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    mainFab.classList.toggle('active');
+                    fabMenu.classList.toggle('active');
+                });
+                document.addEventListener('click', (e) => {
+                    if (fabMenu.classList.contains('active') && !fabMenu.contains(e.target) && e.target !== mainFab) {
+                        mainFab.classList.remove('active');
+                        fabMenu.classList.remove('active');
+                    }
+                });
+            }
+
+            // Global function to trigger specific add buttons
+            window.triggerFabAction = function (sectionId, btnId) {
+                // Navigate to section
+                const link = document.querySelector(`.nav-link[data-section="${sectionId}"]`);
+                if (link) {
+                    link.click();
+                }
+                // Close FAB
+                if (mainFab) mainFab.classList.remove('active');
+                if (fabMenu) fabMenu.classList.remove('active');
+
+                // Wait for render, then click add button
+                setTimeout(() => {
+                    const btn = document.getElementById(btnId);
+                    if (btn) {
+                        if (btn.tagName === 'INPUT' || btn.tagName === 'TEXTAREA') {
+                            btn.focus();
+                        } else {
+                            btn.click();
+                        }
+                    }
+                }, 300);
+            };
+        });
+    </script>
+
+    <!-- Firebase SDK (Compat) - Deferred to reduce render blocking -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" defer></script>
+
+    <!-- Firebase Config & Service -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/user-roles.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=editorjs5"></script>
+
+    <!-- Editor.js & Plugins (Versioned) -->
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.29.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/header@2.8.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/list@1.9.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/image@2.9.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/quote@2.6.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@editorjs/delimiter@1.4.0"></script>
+
+    <!-- @editorjs/embed removed – using custom built-in YoutubeVideoTool instead -->
+
+    <!-- Quill Editor for Email Templates -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+
+    <!-- Widget Config Modal -->
+    <!-- Widget Config Modal -->
+    <div id="widget-config-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"
+                style="padding: 24px 32px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h2 style="font-size: 18px; font-weight: 700; margin: 0;">Tilpass oversikt</h2>
+                <button class="close-modal" id="close-widget-config"
+                    style="background: none; border: none; cursor: pointer;">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body" style="padding: 24px 32px; max-height: 450px; overflow-y: auto;">
+                <p style="font-size: 14px; color: var(--text-muted); margin-bottom: 20px;">Velg hvilke analysebokser du
+                    ønsker å se på din oversikt.</p>
+                <div id="widget-list-container" style="display: flex; flex-direction: column;">
+                    <!-- Widgets injected via JS -->
+                </div>
+            </div>
+            <div class="modal-footer"
+                style="padding: 24px 32px; background: #f8fafc; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 12px;">
+                <button id="save-widgets-btn" class="btn btn-primary" style="padding: 12px 24px;">Lagre
+                    endringer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SortableJS for Drag and Drop -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
+
+    <!-- Admin Logic -->
+    <script src="../js/notifications.js"></script>
+    <script type="module" src="js/admin.js?v=admin_users_v7"></script>
+    <script>
+        window.addEventListener('load', () => {
+            if (!window.adminManager) {
+                window.adminManager = new AdminManager();
+            }
+        });
+    </script>
+</body>
+
+</html>

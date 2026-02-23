@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | His Kingdom Ministry</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+
+    <!-- Tailwind CSS Play CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#f39c12',
+                        'primary-red': '#e74c3c',
+                        'text-dark': '#333333',
+                    }
+                }
+            }
+        }
+    </script>
+  <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
+  <script type="module" crossorigin src="/assets/script-DY1rU6PL.js"></script>
+  <script type="module" crossorigin src="/assets/firebase-config-BNsh33Gw.js"></script>
+  <script type="module" crossorigin src="/assets/firebase-service-DNKZ8naa.js"></script>
+  <script type="module" crossorigin src="/assets/i18n-CkTTiwon.js"></script>
+  <script type="module" crossorigin src="/assets/content-manager-BKpvcVNi.js"></script>
+  <script type="module" crossorigin src="/assets/cookie-consent-DUwA3p5Q.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/blogg-post-XLTJYYHb.css">
+  <link rel="stylesheet" crossorigin href="/assets/notifications-DQiJY5Sp.css">
+  <link rel="stylesheet" crossorigin href="/assets/cookie-consent-_nwlpFTp.css">
+</head>
+
+<body class="cms-loading">
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="flex items-center gap-5 header-actions">
+                <div class="lang-switcher relative group">
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                    </button>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="no">🇳🇴 Norsk</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en">🇺🇸 English</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="es">🇪🇸 Español</a>
+                    </div>
+                </div>
+                <a href="donasjoner.html"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Gi gave <i class="fas fa-heart text-sm"></i>
+                </a>
+
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle meny">
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Search..."
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-100">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="../om-oss.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="about.html" class="text-sm font-bold text-primary-orange">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="../es/sobre-nosotros.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Get Involved -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Get Involved</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donations.html">Support our work</a></li>
+                            <li><a href="regular-donors.html">Become a regular donor</a></li>
+                            <li><a href="for-churches.html">For churches</a></li>
+                            <li><a href="for-businesses.html">For businesses</a></li>
+                            <li><a href="bnn.html">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Get to Know Us -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Get to Know Us</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="about.html">About the foundation</a></li>
+                            <li><a href="about.html#history">Our history</a></li>
+                            <li><a href="contact.html">Where we work</a></li>
+                            <li><a href="contact.html">Contact us</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Resources & Media -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Resources</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="events.html">Events</a></li>
+                            <li><a href="media.html">Media & Podcast</a></li>
+                            <li><a href="blog.html">News & Blog</a></li>
+                            <li><a href="../minside/index.html">My Page</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="donations.html" class="btn btn-primary btn-large btn-block">Support now <i
+                            class="fas fa-heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="donations.html#tax-deduction">Tax Deduction</a>
+                        <a href="about.html">About us</a>
+                        <a href="privacy.html">Privacy Policy</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Page Hero -->
+    <section class="page-hero" data-content-key="hero.backgroundImage" style="padding-top: 160px;">
+        <div class="container">
+            <h1 class="page-hero-title">Who We Are</h1>
+            <p class="page-hero-subtitle">Learn more about His Kingdom Ministry and the hearts behind the service.</p>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section class="about">
+        <div class="container">
+            <div class="about-grid">
+                <div class="about-image">
+                    <div class="circular-image">
+                        <img src="https://static.wixstatic.com/media/db4f96_2b25900fd882417e8fc88a62002ba11a~mv2.jpg/v1/fill/w_865,h_675,al_c,q_85,enc_avif,quality_auto/FullSizeRender_edited_edited_edited_edited%20(1).jpg"
+                            alt="Hilde and Thomas">
+                        <a class="play-button" href="https://www.youtube.com/watch?v=Z3jXbw0yC5E" target="_blank"
+                            rel="noopener" aria-label="Watch video about His Kingdom Ministry">
+                            <i class="fas fa-play"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="about-content">
+                    <span class="section-label">Who We Are</span>
+                    <h2 class="section-title">His Kingdom Ministry</h2>
+                    <p class="section-text">His Kingdom Ministry is a Christian organization based in Lyngdal. We
+                        conduct teaching, prayer, and missions, and want to help people grow in their faith. Among other
+                        things, we have a podcast with weekly devotionals, and we arrange various gatherings and
+                        seminars.</p>
+
+                    <a href="contact.html" class="btn btn-primary">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vision & Values Section -->
+    <section class="vision-values">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-label">Our History</span>
+                <h2 class="section-title">How it began: A Journey of Love</h2>
+            </div>
+            <p class="section-description">More coming soon...</p>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="team-section">
+        <div class="container">
+            <div class="section-header center">
+                <span class="section-label">Our Team</span>
+                <h2 class="section-title">Meet the hearts behind His Kingdom Ministry</h2>
+            </div>
+
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-image">
+                        <img src="/assets/Hilde%20Karin%20Knutsen-r6y0eNcl.jpg" alt="Hilde Karin Knutsen">
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Hilde Karin Knutsen</h3>
+                        <p class="team-role">Prophetic Intercessor and Teacher</p>
+                        <p class="team-bio">Welcome to my page. My name is Hilde Karin. I am married to Thomas. We live
+                            in Norway. I have traveled as a missionary and prophetic intercessor for more than half my
+                            life. By God's grace, through Biblical principles and by the Holy Spirit's leading, I am a
+                            prophetic voice ready to help you grow in your personal relationship with Jesus Christ and
+                            equip you to become everything He has made you to be. I love to see God's work manifesting
+                            in your life, whether it's miracles, inner and physical healing, salvation etc. I love to
+                            see you become free from all bondage, and be able to walk with God and manifest His life in
+                            and through you. I love to see you grow in your relationship with and faith in Jesus Christ,
+                            and I would love to teach you more about living a life of prayer, how you can hear God more
+                            clearly and see your prayers answered.</p>
+                        <button class="team-toggle" type="button">Read more</button>
+                        <div class="team-social">
+                            <a href="https://www.instagram.com/freedomisathand/" aria-label="Instagram"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.facebook.com/hiskingdomministry777" aria-label="Facebook"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" aria-label="YouTube"><i
+                                    class="fab fa-youtube"></i></a>
+                            <a href="https://www.tiktok.com/@hilde707" aria-label="TikTok"><i
+                                    class="fab fa-tiktok"></i></a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="team-image">
+                        <img src="/assets/Thomas-89FNcdZs.jpeg" class="team-photo-focus" alt="Thomas Knutsen">
+                    </div>
+                    <div class="team-info">
+                        <h3 class="team-name">Thomas Knutsen</h3>
+                        <p class="team-role">CEO and Worship</p>
+                        <p class="team-bio">Hello and welcome to our page. We are so glad you came to our ministry site.
+                            I have not traveled around the world. I have worked and lived mostly in the same city my
+                            whole life. I worked in the same church for 15 years before I met Hilde. We connected right
+                            away and are so blessed that God united our lives together. I have worked in many different
+                            departments in the church, such as children, youth, worship, and administration. I have been
+                            a worship leader since I was 15 years old and love to worship God. I am responsible for
+                            everything technical in His Kingdom Ministry from the website to video and podcast editing.
+                            I believe that God will change many lives through this ministry.</p>
+                        <button class="team-toggle" type="button">Read more</button>
+                        <div class="team-social">
+                            <a href="https://www.instagram.com/tkdesignandmusic/" aria-label="Instagram"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.facebook.com/thomas.knutsen.75" aria-label="Facebook"><i
+                                    class="fab fa-facebook-f"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2>Join the Community</h2>
+                <p>We want to be a place where you can grow in your faith and experience God's presence.</p>
+                <div class="cta-buttons">
+                    <a href="events.html" class="btn btn-primary">See Events</a>
+                    <a href="contact.html" class="btn btn-outline">Contact Us</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer" id="contact">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <div class="footer-brand">
+                        <a href="index.html" class="logo">
+                            <div class="logo-icon">
+                                <img src="/assets/logo-hkm-B4n9sAJj.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
+                            spiritual growth through teaching, podcast, and missionary travel.</p>
+                    </div>
+
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>About us</h4>
+                            <ul>
+                                <li><a href="index.html">Home</a></li>
+                                <li><a href="about.html">Who are we?</a></li>
+                                <li><a href="about.html#vision">Our vision</a></li>
+                                <li><a href="contact.html">Contact us</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="media.html#teaching-section">Teaching</a></li>
+                                <li><a href="events.html">E-courses</a></li>
+                                <li><a href="blog.html">Books & Blog</a></li>
+                                <li><a href="../minside/index.html">My Page</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="media.html#podcast-section">Podcast</a></li>
+                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvement</h4>
+                            <ul>
+                                <li><a href="events.html">Calendar</a></li>
+                                <li><a href="donations.html">Give a gift</a></li>
+                                <li><a href="privacy.html">Privacy Policy</a></li>
+                                <li><a href="accessibility.html">Accessibility</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <div class="footer-card">
+                        <h3>Follow Us</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-card contact-card">
+                        <h3>Contact Us</h3>
+                        <a href="contact.html" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Account nr.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
+                <a href="../admin/login.html" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+
+    <!-- App Scripts -->
+</body>
+
+</html>

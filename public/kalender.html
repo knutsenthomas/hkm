@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalender | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Se vår kalenderoversikt over alle kommende møter, seminarer og konferanser hos His Kingdom Ministry.">
+
+    <!-- Google Fonts: Inter for hele siden -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="css/cookie-consent.css">
+<!-- Tailwind CSS Play CDN -->
+    <script type="module" src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-orange': '#f39c12',
+                        'primary-red': '#e74c3c',
+                        'text-dark': '#333333',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Header -->
+    <!-- Header -->
+    <!-- Header (Mega Menu Style) -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+            id="header-container">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                        class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Ministry</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="flex items-center gap-5 header-actions">
+                <div class="lang-switcher relative group">
+                    <button
+                        class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                    </button>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="no">🇳🇴 Norsk</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en">🇺🇸 English</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="es">🇪🇸 Español</a>
+                    </div>
+                </div>
+                <a href="donasjoner.html"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Gi gave <i class="fas fa-heart text-sm"></i>
+                </a>
+
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle meny">
+                    <i class="fas fa-bars text-lg open-icon"></i>
+                    <i class="fas fa-times text-lg close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="mega-menu" id="mega-menu">
+        <div class="mega-menu-container">
+
+
+            <!-- Menu Header (Close & Search) -->
+            <div class="mega-menu-header">
+                <!-- Mirrored Header Structure for Precision Alignment -->
+                <div class="header-container-mirror">
+                    <!-- Brand Logo in Menu -->
+                    <a href="index.html" class="logo">
+                        <div class="logo-icon">
+                            <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                        </div>
+                        <span>His Kingdom Ministry</span>
+                    </a>
+
+                    <!-- Right Controls Wrapper -->
+                    <div class="header-actions-mirror">
+                        <!-- Independent Close Button -->
+                        <button class="menu-close" id="menu-close" aria-label="Lukk meny">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search & Lang Row (Below Header) -->
+                <div class="menu-controls-row">
+                    <div class="menu-search">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Søk...">
+                    </div>
+
+                    <div class="mega-menu-lang in-header mobile-only">
+                        <a href="kalender.html" class="active"><i class="fas fa-globe"></i> NO</a>
+                        <a href="en/calendar.html"><i class="fas fa-globe"></i> EN</a>
+                        <a href="es/calendario.html"><i class="fas fa-globe"></i> ES</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Engasjer deg</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donasjoner.html">Støtt arbeidet</a></li>
+                            <li><a href="bli-fast-giver.html">Bli fast giver</a></li>
+                            <li><a href="for-menigheter.html">For menigheter</a></li>
+                            <li><a href="for-bedrifter.html">For bedrifter</a></li>
+                            <li><a href="bnn.html">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Bli kjent med oss</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="om-oss.html">Om oss</a></li>
+                            <li><a href="kontakt.html">Kontakt oss</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser & Media -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title">Ressurser</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="arrangementer.html">Arrangementer</a></li>
+                            <li><a href="media.html">Media & Podcast</a></li>
+                            <li><a href="blogg.html">Nyheter & Blogg</a></li>
+                            <li><a href="minside/index.html">Min Side</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block">Støtt nå <i
+                            class="fas fa-heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="donasjoner.html#skattefradrag">Skattefradrag</a>
+                        <a href="om-oss.html">Om oss</a>
+                        <a href="personvern.html">Personvern</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <main>
+        <section class="page-hero" data-content-key="hero.backgroundImage"
+            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1506784983877-45594efa4cbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); padding-top: 160px;">
+            <div class="container">
+                <div class="page-hero-content">
+                    <h1 class="page-title">Månedskalender</h1>
+                    <div class="breadcrumbs">
+                        <a href="index.html">Hjem</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <a href="arrangementer.html">Arrangementer</a>
+                        <i class="fas fa-chevron-right"></i>
+                        <span>Kalender</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="calendar-section">
+            <div class="container">
+                <div class="calendar-container" data-cal-view="month">
+                    <div class="calendar-view-toggle">
+                        <button class="cal-view-btn active" data-cal-view="month">Månedsvisning</button>
+                        <button class="cal-view-btn" data-cal-view="agenda">Agenda</button>
+                    </div>
+
+                    <div class="calendar-header">
+                        <h2 class="calendar-title" id="current-month-year">Februar 2024</h2>
+                        <div class="calendar-nav">
+                            <button class="cal-btn" id="prev-month"><i class="fas fa-chevron-left"></i></button>
+                            <button class="cal-btn" id="today-btn"
+                                style="width: auto; padding: 0 15px; border-radius: 20px; font-size: 13px; font-weight: 600;">I
+                                dag</button>
+                            <button class="cal-btn" id="next-month"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- Header days -->
+                        <div class="cal-day-header">Man</div>
+                        <div class="cal-day-header">Tir</div>
+                        <div class="cal-day-header">Ons</div>
+                        <div class="cal-day-header">Tor</div>
+                        <div class="cal-day-header">Fre</div>
+                        <div class="cal-day-header">Lør</div>
+                        <div class="cal-day-header">Søn</div>
+
+                        <!-- Calendar cells will be injected here -->
+                    </div>
+
+                    <div class="calendar-agenda-card">
+                        <div class="calendar-agenda-header">
+                            <div>
+                                <h3 class="calendar-agenda-title">Agenda-oversikt</h3>
+                            </div>
+                        </div>
+                        <ul class="calendar-agenda-list" id="calendar-agenda-list"></ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="calendar-section" style="padding-top: 20px;">
+            <div class="container">
+                <div class="section-header" style="margin-bottom: 30px; text-align: left;">
+                    <span class="section-label">Helligdager & høytider</span>
+                    <h2 class="section-title" style="font-size: 28px; margin-bottom: 10px;">Hvorfor markerer vi disse
+                        dagene?</h2>
+                    <p class="section-description" style="margin: 0; max-width: 760px;">
+                        Her finner du en kort forklaring på noen av de viktigste kristne høytidsdagene og norske
+                        helligdagene som ofte påvirker kalenderen vår.
+                    </p>
+                </div>
+
+                <div class="values-grid">
+                    <div class="value-card">
+                        <h3>1. nyttårsdag</h3>
+                        <p>Første dag i det nye året. En dag for ettertanke, takk for året som ligger bak, og bønn
+                            for året som kommer.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Palmesøndag</h3>
+                        <p>Markerer Jesu inntog i Jerusalem, der folket hilste ham med palmegrener og ropte «Hosianna».
+                            Innleder påskeuken.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Skjærtorsdag</h3>
+                        <p>Til minne om Jesu siste måltid med disiplene, der han innstiftet nattverden og viste veien
+                            til tjenende lederskap ved å vaske disiplenes føtter.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Langfredag</h3>
+                        <p>Vi minnes Jesu lidelse og død på korset. En stille og alvorlig dag som peker på den store
+                            kjærligheten Gud har vist oss.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>1. påskedag</h3>
+                        <p>Feiringen av Jesu oppstandelse. Denne dagen står i sentrum av den kristne tro og minner oss
+                            om seier over synd, død og mørke.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>2. påskedag</h3>
+                        <p>Fortsetter gleden over oppstandelsen, og peker på møtene den oppstandne Jesus hadde med
+                            disiplene.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Kristi himmelfartsdag</h3>
+                        <p>Feirer at Jesus for opp til himmelen før Faderen, og at han fortsatt ber for oss og regjerer
+                            som Herre.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>1. pinsedag</h3>
+                        <p>Til minne om at Den hellige ånd ble utøst over de første troende i Jerusalem. Pinsen blir
+                            ofte kalt «kirkens fødselsdag».</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>2. pinsedag</h3>
+                        <p>En forlengelse av pinsefeiringen, der fokuset fortsatt er på Den hellige ånds nærvær og
+                            gaver i våre liv.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Arbeidernes dag (1. mai)</h3>
+                        <p>Norsk offentlig fridag som hedrer arbeideres rettigheter. For mange også en dag for å be for
+                            rettferdighet og gode arbeidsforhold.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>Grunnlovsdagen (17. mai)</h3>
+                        <p>Feiring av Norges grunnlov fra 1814. En festdag for frihet, fellesskap og takknemlighet for
+                            landet vårt.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>1. juledag</h3>
+                        <p>Markerer selve juledagen og feirer at Guds Sønn ble født i verden. Fokus er på inkarnasjonen
+                            – at Gud ble menneske.</p>
+                    </div>
+                    <div class="value-card">
+                        <h3>2. juledag</h3>
+                        <p>En roligere oppfølgingsdag i julen som gir rom for ettertanke, familie og hvile etter selve
+                            høytidsdagen.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <!-- Brand / Intro -->
+                    <div class="footer-brand">
+                        <a href="index.html" class="logo">
+                            <div class="logo-icon">
+                                <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til
+                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                    </div>
+
+                    <!-- Links Grid -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>Om oss</h4>
+                            <ul>
+                                <li><a href="index.html#hjem">Hjem</a></li>
+                                <li><a href="om-oss.html">Om oss</a></li>
+                                <li><a href="om-oss.html#visjon">Vår visjon</a></li>
+                                <li><a href="kontakt.html">Kontakt oss</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Ressurser</h4>
+                            <ul>
+                                <li><a href="media.html#teaching-section">Undervisning</a></li>
+                                <li><a href="arrangementer.html">E-kurs</a></li>
+                                <li><a href="blogg.html">Bøker & Blogg</a></li>
+                                <li><a href="minside/index.html" target="_blank">Min Side</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="media.html#podcast-section">Podcast</a></li>
+                                <li><a href="media.html">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvering</h4>
+                            <ul>
+                                <li><a href="arrangementer.html">Kalender</a></li>
+                                <li><a href="donasjoner.html">Gi en gave</a></li>
+                                <li><a href="personvern.html">Personvern</a></li>
+                                <li><a href="tilgjengelighet.html">Tilgjengelighet</a></li>
+                                <li><a href="#"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <!-- Follow Us Card -->
+                    <div class="footer-card">
+                        <h3>Følg oss</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Us Card -->
+                    <div class="footer-card contact-card">
+                        <h3>Kontakt oss</h3>
+                        <a href="kontakt.html" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>E-post:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Telefon:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Konto nr.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
+                <a href="admin/login.html" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-service.js"></script>
+
+    <!-- App Scripts -->
+    <script type="module" src="script.js"></script>
+    <script type="module" src="js/content-manager.js?v=author"></script>
+    <script type="module" src="js/cookie-consent.js"></script>
+</body>
+
+</html>
