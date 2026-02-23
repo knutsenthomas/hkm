@@ -24,7 +24,7 @@
     <link rel="stylesheet" href="css/admin-unified.css?v=3">
 
     <!-- PWA Meta Tags -->
-    <link rel="manifest" href="../manifest.json">
+    <link rel="manifest" href="/manifest.json">
     <meta name="theme-color" content="#1e293b">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -36,7 +36,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('../sw.js')
+                navigator.serviceWorker.register('/sw.js')
                     .then(reg => console.log('Service Worker registrert!', reg))
                     .catch(err => console.log('Service Worker feilet:', err));
             });
@@ -1137,11 +1137,11 @@
         });
     </script>
 
-    <!-- Firebase SDK (Compat) - Deferred to reduce render blocking -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" defer></script>
+    <!-- Firebase SDK (Compat) - Removed defer to ensure global 'firebase' is available immediately -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>
