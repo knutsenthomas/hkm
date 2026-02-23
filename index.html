@@ -14,10 +14,10 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="styles.css?v=2026.02.22.1">
+    <link rel="stylesheet" href="styles.css?v=2026.02.23.1">
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/cookie-consent.css">
-    <!-- VERSION CHECK: 2026.02.22.20.48 -->
+    <!-- VERSION CHECK: 2026.02.23.17.47 -->
 
 
 
@@ -649,36 +649,36 @@
     <script type="module" src="js/content-manager.js?v=1719"></script>
     <script type="module" src="js/cookie-consent.js"></script>
     <script type="module">
-            (async function () {
-                // Wait for firebaseService to be available and initialized
-                let count = 0;
-                while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
-                    await new Promise(r => setTimeout(r, 50));
-                    count++;
+        (async function () {
+            // Wait for firebaseService to be available and initialized
+            let count = 0;
+            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                await new Promise(r => setTimeout(r, 50));
+                count++;
+            }
+
+            const adminLink = document.getElementById('admin-link');
+            const firebaseService = window.firebaseService;
+
+            if (!adminLink || !firebaseService || !firebaseService.isInitialized) return;
+
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) return;
+
+                let role = 'medlem';
+                try {
+                    role = await firebaseService.getUserRole(user.uid);
+                } catch (err) {
+                    console.warn('Kunne ikke hente rolle for admin-lenke:', err);
                 }
 
-                const adminLink = document.getElementById('admin-link');
-                const firebaseService = window.firebaseService;
+                const canAccessAdmin = window.HKM_PERMISSIONS
+                    && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                    && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
 
-                if (!adminLink || !firebaseService || !firebaseService.isInitialized) return;
-
-                firebase.auth().onAuthStateChanged(async (user) => {
-                    if (!user) return;
-
-                    let role = 'medlem';
-                    try {
-                        role = await firebaseService.getUserRole(user.uid);
-                    } catch (err) {
-                        console.warn('Kunne ikke hente rolle for admin-lenke:', err);
-                    }
-
-                    const canAccessAdmin = window.HKM_PERMISSIONS
-                        && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-                        && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
-
-                    adminLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
-                });
-            })();
+                adminLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
+            });
+        })();
         // Dynamisk profil-lenke i header
         (async function () {
             let count = 0;
