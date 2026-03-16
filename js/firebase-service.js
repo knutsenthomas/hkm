@@ -8,24 +8,101 @@ class FirebaseService {
         this.db = null;
         this.auth = null;
         this.storage = null;
+        this._activeConfig = null;
         this.isInitialized = false;
+        this._authPersistencePromise = null;
+        this._defaultReadTimeoutMs = 12000;
+        this._retryReadTimeoutMs = 20000;
+        this._memoCache = new Map(); // In-memory cache for repeated content requests
+        this._inFlightContentRequests = new Map();
+        this._memoCacheTimestamps = new Map();
+        this._contentMemoTtlMs = 2 * 60 * 1000;
+        this._collectionCacheTtlMs = 60 * 1000; // 1 min for collections
+        this._fetchErrorNoticeTimestamps = new Map();
+        this._userRoleCacheTtlMs = 10 * 60 * 1000; // 10 min fallback cache for auth/routing stability
+        this._userRoleCacheKeyPrefix = 'hkm_user_role_cache:';
+        this.tryAutoInit();
+    }
 
-        // Try load from localStorage first
+    getStoredConfig() {
         const savedConfig = localStorage.getItem('hkm_firebase_config');
-        if (savedConfig) {
-            try {
-                const config = JSON.parse(savedConfig);
-                this.init(config);
-                return;
-            } catch (e) {
-                console.error("Local config error:", e);
-            }
+        if (!savedConfig) return null;
+
+        try {
+            return JSON.parse(savedConfig);
+        } catch (e) {
+            console.error("Local config error:", e);
+            return null;
+        }
+    }
+
+    _isValidFirebaseConfig(config) {
+        if (!config || typeof config !== 'object') return false;
+        const apiKey = typeof config.apiKey === 'string' ? config.apiKey.trim() : '';
+        const projectId = typeof config.projectId === 'string' ? config.projectId.trim() : '';
+        const appId = typeof config.appId === 'string' ? config.appId.trim() : '';
+        return Boolean(apiKey && apiKey !== 'YOUR_API_KEY' && projectId && appId);
+    }
+
+    _isAdminLikeRoute() {
+        const path = String(window?.location?.pathname || '').toLowerCase();
+        return path.includes('/admin/') || path.includes('/minside/');
+    }
+
+    _isLocalDevHost() {
+        const host = String(window?.location?.hostname || '').toLowerCase();
+        return host === 'localhost' || host === '127.0.0.1';
+    }
+
+    _shouldPreferRestPublicReads() {
+        // Defaulting to false to prefer the native SDK even in local dev.
+        // The REST API triggers browser-level 404 errors for missing documents,
+        // while the SDK handles them silently.
+        return false;
+    }
+
+    _getReadableConfig() {
+        if (this._isValidFirebaseConfig(this._activeConfig)) return this._activeConfig;
+        if (this._isValidFirebaseConfig(window.firebaseConfig)) return window.firebaseConfig;
+        return null;
+    }
+
+    tryAutoInit() {
+        if (this.isInitialized) return true;
+
+        // Check if firebase is available globally (from script tag)
+        if (typeof firebase === 'undefined') {
+            return false;
         }
 
-        // Only initialize if static config is provided
-        if (window.firebaseConfig && window.firebaseConfig.apiKey !== "YOUR_API_KEY") {
-            this.init(window.firebaseConfig);
+        const storedConfigRaw = this.getStoredConfig();
+        const storedConfig = this._isValidFirebaseConfig(storedConfigRaw) ? storedConfigRaw : null;
+        const bundledConfig = this._isValidFirebaseConfig(window.firebaseConfig) ? window.firebaseConfig : null;
+        const isAdminRoute = this._isAdminLikeRoute();
+
+        // Public pages should prefer bundled config so a stale admin override in localStorage
+        // does not break content loading on the frontend.
+        if (!isAdminRoute && bundledConfig) {
+            if (storedConfig && storedConfig.projectId && bundledConfig.projectId &&
+                storedConfig.projectId !== bundledConfig.projectId) {
+                console.warn(
+                    `[FirebaseService] Ignoring stored Firebase config on public page (projectId=${storedConfig.projectId}); using bundled config (${bundledConfig.projectId}).`
+                );
+            }
+            this.init(bundledConfig);
+            return this.isInitialized;
         }
+
+        if (storedConfig) {
+            this.init(storedConfig);
+            if (this.isInitialized) return true;
+        }
+
+        if (bundledConfig) {
+            this.init(bundledConfig);
+        }
+
+        return this.isInitialized;
     }
 
     init(config) {
@@ -42,12 +119,44 @@ class FirebaseService {
             } else {
                 this.app = firebase.app();
             }
+            if (this._isValidFirebaseConfig(config)) {
+                this._activeConfig = { ...config };
+            }
 
             this.db = firebase.firestore();
             this.auth = firebase.auth();
             this.storage = firebase.storage();
+
+            // Improve Firestore reliability in local/dev environments where WebChannel can hang.
+            // Must be set before first Firestore operation.
+            try {
+                const localDev = this._isLocalDevHost();
+                const primarySettings = localDev
+                    ? {
+                        experimentalForceLongPolling: true,
+                        useFetchStreams: false,
+                        merge: true
+                    }
+                    : {
+                        experimentalAutoDetectLongPolling: true,
+                        useFetchStreams: false,
+                        merge: true
+                    };
+                this.db.settings(primarySettings);
+            } catch (settingsError) {
+                try {
+                    // Fallback for SDK variants that reject one of the options above.
+                    this.db.settings({ experimentalAutoDetectLongPolling: true, merge: true });
+                } catch (fallbackSettingsError) {
+                    console.warn("[FirebaseService] Could not apply Firestore transport settings:", fallbackSettingsError || settingsError);
+                }
+            }
+
             this.isInitialized = true;
             console.log("✅ Firebase initialized (Compat)");
+
+            // Be explicit about local auth persistence for stable admin sessions.
+            this.ensureAuthPersistence().catch(() => { });
 
             // Enable offline persistence for faster subsequent loads
             // Use synchronizeTabs: true to allow multiple tabs to share the same persistence layer
@@ -63,24 +172,392 @@ class FirebaseService {
         }
     }
 
+    _decodeFirestoreRestFields(fields = {}) {
+        const out = {};
+        Object.keys(fields || {}).forEach((key) => {
+            out[key] = this._decodeFirestoreRestValue(fields[key]);
+        });
+        return out;
+    }
+
+    _decodeFirestoreRestValue(value) {
+        if (!value || typeof value !== 'object') return null;
+
+        if (Object.prototype.hasOwnProperty.call(value, 'nullValue')) return null;
+        if (Object.prototype.hasOwnProperty.call(value, 'stringValue')) return value.stringValue;
+        if (Object.prototype.hasOwnProperty.call(value, 'booleanValue')) return Boolean(value.booleanValue);
+        if (Object.prototype.hasOwnProperty.call(value, 'integerValue')) return Number(value.integerValue);
+        if (Object.prototype.hasOwnProperty.call(value, 'doubleValue')) return Number(value.doubleValue);
+        if (Object.prototype.hasOwnProperty.call(value, 'timestampValue')) return value.timestampValue;
+        if (Object.prototype.hasOwnProperty.call(value, 'referenceValue')) return value.referenceValue;
+        if (Object.prototype.hasOwnProperty.call(value, 'bytesValue')) return value.bytesValue;
+        if (Object.prototype.hasOwnProperty.call(value, 'geoPointValue')) {
+            const gp = value.geoPointValue || {};
+            return {
+                latitude: Number(gp.latitude),
+                longitude: Number(gp.longitude)
+            };
+        }
+        if (Object.prototype.hasOwnProperty.call(value, 'mapValue')) {
+            return this._decodeFirestoreRestFields((value.mapValue && value.mapValue.fields) || {});
+        }
+        if (Object.prototype.hasOwnProperty.call(value, 'arrayValue')) {
+            const values = (value.arrayValue && value.arrayValue.values) || [];
+            return values.map((v) => this._decodeFirestoreRestValue(v));
+        }
+
+        // Unknown Firestore Value shape - return as-is to avoid data loss.
+        return value;
+    }
+
+    async _fetchDocViaRest(collectionId, docId) {
+        if (typeof fetch !== 'function') return undefined;
+
+        const safeCollectionId = typeof collectionId === 'string' ? collectionId.trim() : '';
+        const safeDocId = typeof docId === 'string' ? docId.trim() : '';
+        if (!safeCollectionId || !safeDocId) return undefined;
+
+        const cfg = this._getReadableConfig();
+        if (!this._isValidFirebaseConfig(cfg)) return undefined;
+
+        const projectId = encodeURIComponent(cfg.projectId);
+        const encodedDocId = encodeURIComponent(safeDocId);
+        const apiKey = encodeURIComponent(cfg.apiKey);
+        const url = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents/${safeCollectionId}/${encodedDocId}?key=${apiKey}`;
+
+        const responseRes = await this._withTimeout(fetch(url, {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' },
+            cache: 'no-store'
+        }), this._retryReadTimeoutMs);
+
+        if (responseRes.timedOut) {
+            throw new Error(`REST fetch timeout for ${safeCollectionId}/${safeDocId}`);
+        }
+
+        const response = responseRes.value;
+        if (!response) return undefined;
+
+        if (response.status === 404) {
+            return null;
+        }
+
+        if (!response.ok) {
+            let errorText = '';
+            try {
+                errorText = await response.text();
+            } catch (e) {
+                errorText = '';
+            }
+            throw new Error(`REST fetch failed for ${safeCollectionId}/${safeDocId}: ${response.status}${errorText ? ` ${errorText}` : ''}`);
+        }
+
+        const payload = await response.json();
+        if (!payload || typeof payload !== 'object') return null;
+        return this._decodeFirestoreRestFields(payload.fields || {});
+    }
+
+    async _tryRestDocFallback(collectionId, docId, originalError) {
+        try {
+            const restData = await this._fetchDocViaRest(collectionId, docId);
+            if (typeof restData === 'undefined') return { used: false, data: null };
+
+            console.warn(
+                `[FirebaseService] Using REST fallback for ${collectionId}/${docId} after SDK read failure:`,
+                originalError && originalError.message ? originalError.message : originalError
+            );
+            return { used: true, data: restData };
+        } catch (restError) {
+            console.error(`[FirebaseService] REST fallback failed for ${collectionId}/${docId}:`, restError);
+            return { used: false, data: null };
+        }
+    }
+
+    async ensureAuthPersistence() {
+        if (!this.auth || typeof firebase === 'undefined') return false;
+        if (this._authPersistencePromise) return this._authPersistencePromise;
+
+        const localPersistence = firebase?.auth?.Auth?.Persistence?.LOCAL;
+        if (!localPersistence) return false;
+
+        this._authPersistencePromise = this.auth.setPersistence(localPersistence)
+            .then(() => true)
+            .catch((err) => {
+                console.warn("[FirebaseService] Could not enforce LOCAL auth persistence:", err);
+                return false;
+            });
+
+        return this._authPersistencePromise;
+    }
+
+    _sanitizeFirestorePayload(value, options = {}) {
+        const utils = window.HKMAdminUtils;
+        if (utils && typeof utils.sanitizeForFirestore === 'function') {
+            return utils.sanitizeForFirestore(value, options);
+        }
+
+        const walk = (input) => {
+            if (input === undefined) return undefined;
+            if (input === null) return input;
+            if (typeof input === 'number') return Number.isFinite(input) ? input : undefined;
+            if (typeof input === 'string') return input;
+            if (Array.isArray(input)) return input.map(walk).filter((v) => v !== undefined);
+            if (typeof input === 'object') {
+                const proto = Object.getPrototypeOf(input);
+                if (proto && proto !== Object.prototype && proto !== null) return input;
+                const out = {};
+                Object.keys(input).forEach((key) => {
+                    const sanitized = walk(input[key]);
+                    if (sanitized !== undefined) out[key] = sanitized;
+                });
+                return out;
+            }
+            return input;
+        };
+
+        return walk(value);
+    }
+
     /**
      * Get content for a specific page section
      * @param {string} pageId - e.g., 'index'
      */
-    async getPageContent(pageId) {
-        if (!this.isInitialized) return null;
+    _getCachedContent(pageId) {
+        if (!this._memoCache.has(pageId)) return undefined;
+        const cachedAt = this._memoCacheTimestamps.get(pageId) || 0;
+        if (Date.now() - cachedAt > this._contentMemoTtlMs) {
+            this._memoCache.delete(pageId);
+            this._memoCacheTimestamps.delete(pageId);
+            return undefined;
+        }
+        return this._memoCache.get(pageId);
+    }
+
+    _setCachedContent(pageId, data) {
+        this._memoCache.set(pageId, data);
+        this._memoCacheTimestamps.set(pageId, Date.now());
+    }
+
+    invalidatePageContentCache(pageId) {
+        if (!pageId) return;
+        this._memoCache.delete(pageId);
+        this._memoCacheTimestamps.delete(pageId);
+        this._inFlightContentRequests.delete(pageId);
+    }
+
+    invalidateCollectionCache(cacheKey) {
+        if (!cacheKey) return;
+        this._memoCache.delete(cacheKey);
+        this._memoCacheTimestamps.delete(cacheKey);
+        this._inFlightContentRequests.delete(cacheKey);
+    }
+
+    _getCachedUserRole(uid) {
+        const safeUid = typeof uid === 'string' ? uid.trim() : '';
+        if (!safeUid) return '';
 
         try {
-            // Use cache-first intelligence (removed source: 'server' for speed)
-            const docSnap = await this.db.collection("content").doc(pageId).get();
-            if (docSnap.exists) {
-                return docSnap.data();
+            const raw = localStorage.getItem(`${this._userRoleCacheKeyPrefix}${safeUid}`);
+            if (!raw) return '';
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return '';
+            const role = typeof parsed.role === 'string' ? parsed.role.trim().toLowerCase() : '';
+            const cachedAt = Number(parsed.cachedAt || 0);
+            if (!role) return '';
+            if (!Number.isFinite(cachedAt) || (Date.now() - cachedAt > this._userRoleCacheTtlMs)) {
+                localStorage.removeItem(`${this._userRoleCacheKeyPrefix}${safeUid}`);
+                return '';
             }
-            return null;
-        } catch (error) {
-            console.error(`❌ Failed to load content for page '${pageId}':`, error);
-            return null;
+            return role;
+        } catch (e) {
+            return '';
         }
+    }
+
+    _setCachedUserRole(uid, role) {
+        const safeUid = typeof uid === 'string' ? uid.trim() : '';
+        const normalizedRole = typeof role === 'string' ? role.trim().toLowerCase() : '';
+        if (!safeUid || !normalizedRole) return;
+
+        try {
+            localStorage.setItem(`${this._userRoleCacheKeyPrefix}${safeUid}`, JSON.stringify({
+                role: normalizedRole,
+                cachedAt: Date.now()
+            }));
+        } catch (e) {
+            // noop
+        }
+    }
+
+    _notifyContentFetchFailure(pageId, error) {
+        const now = Date.now();
+        const lastAt = this._fetchErrorNoticeTimestamps.get(pageId) || 0;
+        if (now - lastAt < 15000) return;
+        this._fetchErrorNoticeTimestamps.set(pageId, now);
+
+        const detail = {
+            pageId,
+            message: error?.message || 'Ukjent feil'
+        };
+
+        try {
+            window.dispatchEvent(new CustomEvent('hkm:firebase-fetch-error', { detail }));
+        } catch (e) {
+            // noop
+        }
+
+        if (typeof window.showToast === 'function') {
+            window.showToast('Kunne ikke laste oppdatert innhold. Viser lagret innhold hvis tilgjengelig.', 'warning', 5000);
+        }
+    }
+
+    async _withTimeout(promise, timeoutMs = this._defaultReadTimeoutMs) {
+        let timerId;
+        const timeoutToken = Symbol('timeout');
+        try {
+            const result = await Promise.race([
+                promise,
+                new Promise((resolve) => {
+                    timerId = setTimeout(() => resolve(timeoutToken), timeoutMs);
+                })
+            ]);
+            return {
+                timedOut: result === timeoutToken,
+                value: result === timeoutToken ? null : result
+            };
+        } finally {
+            if (timerId) clearTimeout(timerId);
+        }
+    }
+
+    async _readWithRetry(readFactory, label) {
+        let fetchRes = await this._withTimeout(readFactory(), this._defaultReadTimeoutMs);
+        if (!fetchRes.timedOut) return fetchRes;
+
+        console.warn(
+            `[FirebaseService] ${label} timed out after ${this._defaultReadTimeoutMs}ms. Retrying once (${this._retryReadTimeoutMs}ms)...`
+        );
+
+        fetchRes = await this._withTimeout(readFactory(), this._retryReadTimeoutMs);
+        return fetchRes;
+    }
+
+    async getPageContent(pageId, options = {}) {
+        if (!this.isInitialized) return null;
+        if (!pageId) return null;
+
+        // Return memoized result if available to prevent redundant SDK processing
+        const cached = this._getCachedContent(pageId);
+        if (typeof cached !== 'undefined') {
+            return cached;
+        }
+
+        if (this._inFlightContentRequests.has(pageId)) {
+            return this._inFlightContentRequests.get(pageId);
+        }
+
+        const requestPromise = (async () => {
+            try {
+                if (this._shouldPreferRestPublicReads()) {
+                    const restData = await this._fetchDocViaRest('content', pageId);
+                    this._setCachedContent(pageId, restData ?? null);
+                    return restData ?? null;
+                }
+
+                // Use cache-first intelligence
+                const docRef = this.db.collection("content").doc(pageId);
+                const fetchRes = await this._readWithRetry(() => docRef.get(), `content/${pageId}`);
+                if (fetchRes.timedOut) {
+                    throw new Error(`Fetch timeout for content/${pageId} (after retry)`);
+                }
+                const docSnap = fetchRes.value;
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    this._setCachedContent(pageId, data); // Memoize
+                    return data;
+                }
+                this._setCachedContent(pageId, null);
+                return null;
+            } catch (error) {
+                const restFallback = await this._tryRestDocFallback('content', pageId, error);
+                if (restFallback.used) {
+                    this._setCachedContent(pageId, restFallback.data ?? null);
+                    return restFallback.data ?? null;
+                }
+                console.warn(`[FirebaseService] Content document '${pageId}' does not exist yet. This is normal if it hasn't been saved in the dashboard.`);
+                if (window.hkmLogger) {
+                    window.hkmLogger.warn(`Content Missing [${pageId}]: Document not found in Firestore.`);
+                }
+                if (!options.silent) {
+                    this._notifyContentFetchFailure(pageId, error);
+                }
+                return null;
+            } finally {
+                this._inFlightContentRequests.delete(pageId);
+            }
+        })();
+
+        this._inFlightContentRequests.set(pageId, requestPromise);
+        return requestPromise;
+    }
+
+    async getManyPageContents(pageIds = [], options = {}) {
+        if (!Array.isArray(pageIds) || pageIds.length === 0) return {};
+        const uniqueIds = [...new Set(pageIds.filter(Boolean))];
+        const pairs = await Promise.all(
+            uniqueIds.map(async (id) => [id, await this.getPageContent(id, options)])
+        );
+        return Object.fromEntries(pairs);
+    }
+
+    /**
+     * Optimized Collection Fetching with Cache
+     * @param {string} colId - Collection name
+     * @param {string} cacheKey - Unique key for the query (e.g. 'user_notifs:123')
+     * @param {function} queryBuilder - Fn that takes collection ref and returns query
+     */
+    async getCachedCollection(colId, cacheKey, queryBuilder, options = {}) {
+        if (!this.isInitialized) return [];
+
+        const now = Date.now();
+        const cached = this._memoCache.get(cacheKey);
+        const cachedAt = this._memoCacheTimestamps.get(cacheKey) || 0;
+
+        if (typeof cached !== 'undefined' && (now - cachedAt < this._collectionCacheTtlMs)) {
+            return cached;
+        }
+
+        if (this._inFlightContentRequests.has(cacheKey)) {
+            return this._inFlightContentRequests.get(cacheKey);
+        }
+
+        const fetchPromise = (async () => {
+            try {
+                const colRef = this.db.collection(colId);
+                const query = queryBuilder ? queryBuilder(colRef) : colRef;
+                const fetchRes = await this._readWithRetry(() => query.get(), `collection:${cacheKey}`);
+                if (fetchRes.timedOut) {
+                    throw new Error(`Fetch timeout for collection cache [${cacheKey}] (after retry)`);
+                }
+                const snap = fetchRes.value;
+                const data = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                this._memoCache.set(cacheKey, data);
+                this._memoCacheTimestamps.set(cacheKey, now);
+                return data;
+            } catch (error) {
+                console.error(`❌ Collection Fetch failed [${cacheKey}]:`, error);
+                if (window.hkmLogger) {
+                    window.hkmLogger.error(`Collection Fetch Failed [${cacheKey}]: ${error.message}`);
+                }
+                return cached || []; // return stale cache on error if available
+            } finally {
+                this._inFlightContentRequests.delete(cacheKey);
+            }
+        })();
+
+        this._inFlightContentRequests.set(cacheKey, fetchPromise);
+        return fetchPromise;
     }
 
     /**
@@ -90,7 +567,21 @@ class FirebaseService {
      */
     async updatePageContent(pageId, data) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        await this.db.collection("content").doc(pageId).set(data, { merge: true });
+        const safePageId = typeof pageId === 'string' ? pageId.trim() : '';
+        if (!safePageId) throw new Error("Invalid pageId");
+        if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error("Invalid content payload");
+
+        const sanitized = this._sanitizeFirestorePayload(data, {
+            stripUndefined: true,
+            stripEmptyStrings: false
+        });
+
+        if (!sanitized || typeof sanitized !== 'object') {
+            throw new Error("Empty content payload");
+        }
+
+        await this.db.collection("content").doc(safePageId).set(sanitized, { merge: true });
+        this.invalidatePageContentCache(safePageId);
     }
 
     async savePageContent(pageId, data) {
@@ -108,7 +599,11 @@ class FirebaseService {
         try {
             return this.db.collection("content").doc(pageId).onSnapshot((doc) => {
                 if (doc.exists) {
-                    callback(doc.data());
+                    const data = doc.data();
+                    this._setCachedContent(pageId, data);
+                    callback(data);
+                } else {
+                    this._setCachedContent(pageId, null);
                 }
             });
         } catch (error) {
@@ -122,11 +617,13 @@ class FirebaseService {
      */
     async login(email, password) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
+        await this.ensureAuthPersistence();
         return this.auth.signInWithEmailAndPassword(email, password);
     }
 
     async loginWithGoogle() {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
+        await this.ensureAuthPersistence();
         const provider = new firebase.auth.GoogleAuthProvider();
         return this.auth.signInWithPopup(provider);
     }
@@ -165,6 +662,7 @@ class FirebaseService {
 
     async connectToGoogle() {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
+        await this.ensureAuthPersistence();
 
         const provider = new firebase.auth.GoogleAuthProvider();
         // Request write access to calendar events
@@ -182,22 +680,52 @@ class FirebaseService {
         }
     }
 
-    async getUserRole(uid) {
+    async getUserRole(uid, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const safeUid = typeof uid === 'string' ? uid.trim() : '';
+        if (!safeUid) return 'medlem';
+        const timeoutMs = Number.isFinite(options?.timeoutMs) && options.timeoutMs > 0
+            ? Math.round(options.timeoutMs)
+            : 2500;
+        const cachedRole = this._getCachedUserRole(safeUid);
         const fallbackSuperadmins = ['thomas@hiskingdomministry.no'];
         const currentUser = this.auth && this.auth.currentUser ? this.auth.currentUser : null;
         if (currentUser && fallbackSuperadmins.includes((currentUser.email || '').toLowerCase())) {
+            this._setCachedUserRole(safeUid, 'superadmin');
             return 'superadmin';
         }
-        const doc = await this.db.collection('users').doc(uid).get();
-        if (doc.exists) {
-            const rawRole = doc.data().role;
-            if (typeof rawRole === 'string' && rawRole.trim()) {
-                return rawRole.trim().toLowerCase();
+
+        try {
+            const fetchRes = await this._withTimeout(this.db.collection('users').doc(safeUid).get(), timeoutMs);
+            if (fetchRes.timedOut) {
+                throw new Error(`Fetch timeout for users/${safeUid}`);
             }
-            return 'medlem';
+
+            const doc = fetchRes.value;
+            if (doc && doc.exists) {
+                const rawRole = doc.data()?.role;
+                if (typeof rawRole === 'string' && rawRole.trim()) {
+                    const role = rawRole.trim().toLowerCase();
+                    this._setCachedUserRole(safeUid, role);
+                    return role;
+                }
+                this._setCachedUserRole(safeUid, 'medlem');
+                return 'medlem';
+            }
+
+            if (cachedRole) {
+                console.warn(`[FirebaseService] users/${safeUid} missing, using cached role '${cachedRole}' temporarily.`);
+                return cachedRole;
+            }
+
+            return 'medlem'; // Default fallback
+        } catch (error) {
+            if (cachedRole) {
+                console.warn(`[FirebaseService] getUserRole fallback to cached role '${cachedRole}' for ${safeUid}:`, error);
+                return cachedRole;
+            }
+            throw error;
         }
-        return 'medlem'; // Default fallback
     }
 
     async sendEmailVerification() {
@@ -298,8 +826,94 @@ class FirebaseService {
     }
 
     onAuthChange(callback) {
-        if (!this.isInitialized) return;
-        this.auth.onAuthStateChanged(callback);
+        if (!this.isInitialized) {
+            this.tryAutoInit();
+        }
+        if (!this.isInitialized) return false;
+        const subscribe = () => {
+            this.auth.onAuthStateChanged(callback);
+        };
+
+        // Let persistence settle first to reduce transient null auth events on slower browsers.
+        if (typeof this.ensureAuthPersistence === 'function') {
+            const persistencePromise = this.ensureAuthPersistence().catch(() => false);
+            if (persistencePromise && typeof persistencePromise.finally === 'function') {
+                persistencePromise.finally(subscribe);
+                return true;
+            }
+        }
+
+        subscribe();
+        return true;
+    }
+
+    async getSiteContent(docId) {
+        if (!this.isInitialized) return null;
+        const safeDocId = typeof docId === 'string' ? docId.trim() : '';
+        if (!safeDocId) return null;
+
+        const cacheKey = `siteContent:${safeDocId}`;
+        const cached = this._getCachedContent(cacheKey);
+        if (typeof cached !== 'undefined') return cached;
+
+        try {
+            if (this._shouldPreferRestPublicReads()) {
+                const restData = await this._fetchDocViaRest('siteContent', safeDocId);
+                this._setCachedContent(cacheKey, restData ?? null);
+                return restData ?? null;
+            }
+
+            const fetchRes = await this._readWithRetry(() => this.db.collection('siteContent').doc(safeDocId).get(), `siteContent/${safeDocId}`);
+            if (fetchRes.timedOut) {
+                throw new Error(`Fetch timeout for siteContent/${safeDocId} (after retry)`);
+            }
+            const snap = fetchRes.value;
+            const data = snap.exists ? (snap.data() || null) : null;
+            this._setCachedContent(cacheKey, data);
+            return data;
+        } catch (error) {
+            const restFallback = await this._tryRestDocFallback('siteContent', safeDocId, error);
+            if (restFallback.used) {
+                this._setCachedContent(cacheKey, restFallback.data ?? null);
+                return restFallback.data ?? null;
+            }
+            console.error(`❌ Failed to load siteContent '${safeDocId}':`, error);
+            return null;
+        }
+    }
+
+    async saveSiteContent(docId, data, options = { merge: true }) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const safeDocId = typeof docId === 'string' ? docId.trim() : '';
+        if (!safeDocId) throw new Error("Invalid siteContent docId");
+        if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error("Invalid siteContent payload");
+
+        const sanitized = this._sanitizeFirestorePayload(data, {
+            stripUndefined: true,
+            stripEmptyStrings: false
+        });
+
+        if (!sanitized || typeof sanitized !== 'object') throw new Error("Empty siteContent payload");
+
+        await this.db.collection('siteContent').doc(safeDocId).set(sanitized, options || { merge: true });
+        this.invalidatePageContentCache(`siteContent:${safeDocId}`);
+    }
+
+    subscribeToSiteContent(docId, callback) {
+        if (!this.isInitialized) return null;
+        const safeDocId = typeof docId === 'string' ? docId.trim() : '';
+        if (!safeDocId || typeof callback !== 'function') return null;
+
+        try {
+            return this.db.collection('siteContent').doc(safeDocId).onSnapshot((doc) => {
+                const data = doc.exists ? (doc.data() || null) : null;
+                this._setCachedContent(`siteContent:${safeDocId}`, data);
+                callback(data, doc);
+            });
+        } catch (error) {
+            console.error(`❌ Failed to subscribe to siteContent '${safeDocId}':`, error);
+            return null;
+        }
     }
 }
 

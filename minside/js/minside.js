@@ -26,18 +26,36 @@ class MinSideManager {
     async init() {
         this.setupNavigation();
 
+        // Wait for Firebase to be ready with a small timeout
+        let count = 0;
+        while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+            await new Promise(r => setTimeout(r, 50));
+            count++;
+        }
+
         firebase.auth().onAuthStateChanged(async (user) => {
-            if (user) {
-                this.currentUser = user;
-                await this.syncUserProfile(user);
-                await this.syncProfileFromGoogleProvider();
-                this.profileData = await this.getMergedProfile(user);
-                this.updateHeader();
-                this.initNotificationBadge();
-                const startView = window.location.hash.replace('#', '') || 'overview';
-                this.loadView(startView);
-            } else {
-                window.location.href = 'login.html';
+            try {
+                if (user) {
+                    this.currentUser = user;
+                    await this.syncUserProfile(user);
+                    await this.syncProfileFromGoogleProvider();
+                    this.profileData = await this.getMergedProfile(user);
+                    await this.refreshProfileSubCollections(user.uid);
+                    this.updateHeader();
+                    this.initNotificationBadge();
+                    this.showPendingFlashNotice();
+
+                    const startView = window.location.hash.replace('#', '') || 'overview';
+                    this.loadView(startView);
+                } else {
+                    window.location.href = 'login.html';
+                }
+            } catch (error) {
+                console.error('Init Error:', error);
+                const area = document.getElementById('content-area');
+                if (area) {
+                    area.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Feil ved oppstart</h3><p>${error.message}</p></div>`;
+                }
             }
         });
     }
@@ -99,6 +117,49 @@ class MinSideManager {
         }, 80);
     }
 
+    _notify(message, type = 'warning', duration = 4500) {
+        if (!message) return;
+        if (typeof window.showToast === 'function') {
+            window.showToast(message, type, duration);
+            return;
+        }
+
+        let host = document.getElementById('minside-inline-notice');
+        if (!host) {
+            host = document.createElement('div');
+            host.id = 'minside-inline-notice';
+            host.style.cssText = 'position:fixed;top:16px;right:16px;z-index:9999;max-width:360px;padding:12px 14px;border-radius:12px;font:500 14px/1.35 Inter,system-ui,sans-serif;box-shadow:0 8px 24px rgba(15,23,42,.1);';
+            document.body.appendChild(host);
+        }
+        const palette = type === 'success'
+            ? { bg: '#ecfdf5', fg: '#166534' }
+            : type === 'error'
+                ? { bg: '#fef2f2', fg: '#991b1b' }
+                : { bg: '#fffbeb', fg: '#92400e' };
+        host.style.background = palette.bg;
+        host.style.color = palette.fg;
+        host.style.border = '1px solid rgba(15,23,42,.08)';
+        host.textContent = String(message);
+        clearTimeout(this._inlineNoticeTimer);
+        this._inlineNoticeTimer = setTimeout(() => {
+            if (host && host.parentNode) host.parentNode.removeChild(host);
+        }, Math.max(1500, duration));
+    }
+
+    showPendingFlashNotice() {
+        try {
+            const raw = sessionStorage.getItem('hkm_flash_notice');
+            if (!raw) return;
+            sessionStorage.removeItem('hkm_flash_notice');
+            const notice = JSON.parse(raw);
+            if (!notice || !notice.message) return;
+            if (notice.createdAt && (Date.now() - notice.createdAt > 30000)) return;
+            this._notify(notice.message, notice.type || 'warning', notice.duration || 5000);
+        } catch (e) {
+            // noop
+        }
+    }
+
     // ──────────────────────────────────────────────────────────
     // HEADER
     // ──────────────────────────────────────────────────────────
@@ -129,6 +190,13 @@ class MinSideManager {
         // Role
         const roleEl = document.getElementById('ph-role');
         if (roleEl) roleEl.textContent = this._roleLabel(p.role);
+
+        // Admin link visibility
+        const normalizedRole = String(p.role || '').trim().toLowerCase();
+        const canAccessAdmin = normalizedRole === 'admin' || normalizedRole === 'superadmin';
+
+        document.getElementById('ph-admin-link')?.classList.toggle('is-hidden', !canAccessAdmin);
+        document.getElementById('sidebar-admin-link')?.classList.toggle('is-hidden', !canAccessAdmin);
     }
 
     _setAvatarEl(el, photoURL, name) {
@@ -141,13 +209,113 @@ class MinSideManager {
     }
 
     _roleLabel(role) {
-        const map = { admin: 'Administrator', pastor: 'Pastor', leder: 'Leder', frivillig: 'Frivillig', giver: 'Fast Giver' };
+        const map = {
+            superadmin: 'Administrator',
+            admin: 'Administrator',
+            pastor: 'Pastor',
+            leder: 'Leder',
+            frivillig: 'Frivillig',
+            giver: 'Fast Giver'
+        };
         return map[role] || 'Medlem';
     }
 
     // ──────────────────────────────────────────────────────────
     // FIREBASE SYNC
     // ──────────────────────────────────────────────────────────
+    _emptyProfileSubCollections() {
+        return {
+            communication: { items: [], count: 0 },
+            activity: { items: [], count: 0 },
+            notes: { personal: [], shared: [], count: 0 }
+        };
+    }
+
+    _normalizeNotificationDoc(docLike) {
+        const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
+        return {
+            id: docLike?.id || raw.id || '',
+            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : 'Varsling',
+            body: typeof raw.body === 'string' ? raw.body : '',
+            type: typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default',
+            link: typeof raw.link === 'string' ? raw.link : '',
+            read: raw.read === true,
+            createdAt: raw.createdAt || null,
+        };
+    }
+
+    _normalizeNoteDoc(docLike, fallbackSource = 'personal') {
+        const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
+        return {
+            id: docLike?.id || raw.id || '',
+            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : 'Uten tittel',
+            text: typeof raw.text === 'string' ? raw.text : '',
+            authorName: typeof raw.authorName === 'string' && raw.authorName.trim() ? raw.authorName.trim() : 'HKM-teamet',
+            createdAt: raw.createdAt || null,
+            updatedAt: raw.updatedAt || null,
+            source: raw.source || fallbackSource,
+            userId: raw.userId || this.currentUser?.uid || '',
+        };
+    }
+
+    async refreshProfileSubCollections(uid) {
+        if (!uid) {
+            this.profileData.subCollections = this._emptyProfileSubCollections();
+            return this.profileData.subCollections;
+        }
+
+        const empty = this._emptyProfileSubCollections();
+
+        try {
+            const [notifications, personalNotes, sharedNotes] = await Promise.all([
+                window.firebaseService.getCachedCollection('user_notifications', `notifs:${uid}`,
+                    ref => ref.where('userId', '==', uid).orderBy('createdAt', 'desc').limit(30)),
+                window.firebaseService.getCachedCollection('personal_notes', `personal_notes:${uid}`,
+                    ref => ref.where('userId', '==', uid).orderBy('createdAt', 'desc').limit(30)),
+                window.firebaseService.getCachedCollection('user_notes', `shared_notes:${uid}`,
+                    ref => ref.where('userId', '==', uid).orderBy('createdAt', 'desc').limit(30)),
+            ]);
+
+            const normalizedNotifs = (notifications || []).map(d => this._normalizeNotificationDoc(d));
+            const communicationItems = normalizedNotifs.filter(item =>
+                ['push', 'message', 'email', 'announcement'].includes(item.type) || !!item.body
+            );
+
+            const normalizedPersonal = (personalNotes || []).map(d => this._normalizeNoteDoc(d, 'personal'));
+            const normalizedShared = (sharedNotes || []).map(d => this._normalizeNoteDoc(d, 'shared'));
+
+            const mapped = {
+                communication: {
+                    items: communicationItems,
+                    count: communicationItems.length
+                },
+                activity: {
+                    items: normalizedNotifs,
+                    count: normalizedNotifs.length
+                },
+                notes: {
+                    personal: normalizedPersonal,
+                    shared: normalizedShared,
+                    count: normalizedPersonal.length + normalizedShared.length
+                }
+            };
+
+            this.profileData = {
+                ...this.profileData,
+                subCollections: mapped
+            };
+
+            return mapped;
+        } catch (e) {
+            console.warn('refreshProfileSubCollections:', e);
+            this.profileData = {
+                ...this.profileData,
+                subCollections: empty
+            };
+            return empty;
+        }
+    }
+
     async getMergedProfile(user) {
         if (!user) return {};
         let data = {};
@@ -157,10 +325,14 @@ class MinSideManager {
         } catch (e) { console.warn('getMergedProfile:', e); }
 
         const google = (user.providerData || []).find(p => p.providerId === 'google.com') || {};
+        const role = await window.firebaseService.getUserRole(user.uid);
+
         return {
             ...data,
             displayName: data.displayName || user.displayName || google.displayName || user.email || '',
             photoURL: data.photoURL || user.photoURL || google.photoURL || '',
+            role: role || data.role || 'medlem',
+            subCollections: this.profileData?.subCollections || data.subCollections || this._emptyProfileSubCollections(),
         };
     }
 
@@ -239,8 +411,11 @@ class MinSideManager {
         el.style.display = count > 0 ? 'inline-block' : 'none';
     }
 
-    _timeAgo(date) {
-        const s = Math.floor((Date.now() - date) / 1000);
+    _timeAgo(dateVal) {
+        const date = (dateVal instanceof Date) ? dateVal : (dateVal?.toDate ? dateVal.toDate() : new Date(dateVal));
+        if (isNaN(date.getTime())) return '';
+        const s = Math.floor((Date.now() - date.getTime()) / 1000);
+        if (s < 0) return 'Akkurat nå';
         if (s < 60) return 'Akkurat nå';
         if (s < 3600) return `${Math.floor(s / 60)} min siden`;
         if (s < 86400) return `${Math.floor(s / 3600)} t siden`;
@@ -260,30 +435,26 @@ class MinSideManager {
         const greeting = hour < 12 ? 'God morgen' : hour < 17 ? 'Hei' : 'God kveld';
 
         container.innerHTML = `
-        <div style="padding-bottom:32px">
+        <div class="ms-overview-wrap">
 
             <!-- Welcome banner -->
-            <div style="background:var(--accent-gradient); border-radius:var(--radius-lg); padding:28px 32px;
-                margin-bottom:24px; box-shadow:0 8px 30px var(--accent-glow); display:flex;
-                align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+            <div class="ms-overview-banner">
                 <div>
-                    <h2 style="font-size:1.5rem; font-weight:800; color:#fff; letter-spacing:-0.02em; margin-bottom:6px;">
+                    <h2 class="ms-overview-banner-title">
                         ${greeting}, ${name}! 👋
                     </h2>
-                    <p style="color:rgba(255,255,255,0.85); font-size:0.9rem; font-weight:500;">
+                    <p class="ms-overview-banner-quote">
                         "For jeg vet hvilke tanker jeg har med dere, sier Herren..." — Jer 29:11
                     </p>
                 </div>
-                <div style="background:rgba(255,255,255,0.15); border-radius:var(--radius-sm);
-                    padding:12px 18px; backdrop-filter:blur(4px);">
-                    <div style="color:rgba(255,255,255,0.8); font-size:0.7rem; font-weight:700;
-                        text-transform:uppercase; letter-spacing:0.08em; margin-bottom:3px;">Medlem siden</div>
-                    <div style="color:#fff; font-size:1.1rem; font-weight:800;" id="ov-member-since">—</div>
+                <div class="ms-overview-banner-chip">
+                    <div class="ms-overview-banner-chip-label">Medlem siden</div>
+                    <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
                 </div>
             </div>
 
             <!-- Stats row -->
-            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-bottom:24px;">
+            <div class="ms-overview-stats">
                 <div class="stat-chip">
                     <div class="stat-chip-label">Uleste varslinger</div>
                     <div class="stat-chip-value" id="ov-notif-count">—</div>
@@ -302,10 +473,9 @@ class MinSideManager {
             </div>
 
             <!-- Quick actions -->
-            <div class="info-card" style="margin-bottom:20px">
+            <div class="info-card ms-overview-card-gap">
                 <div class="info-card-header"><h3>Hurtiglenker</h3></div>
-                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:1px;
-                    background:var(--border-color);">
+                <div class="ms-overview-actions-grid">
                     ${[
                 { view: 'profile', icon: 'person', label: 'Min profil', sub: 'Kontakt & personlig info' },
                 { view: 'giving', icon: 'volunteer_activism', label: 'Gaver', sub: 'Gavehistorikk & skattefradrag' },
@@ -313,12 +483,11 @@ class MinSideManager {
                 { view: 'notifications', icon: 'notifications', label: 'Varslinger', sub: 'Meldinger fra HKM' },
             ].map(a => `
                     <button class="ov-action-btn" data-view="${a.view}">
-                        <div style="width:40px;height:40px;border-radius:12px;background:var(--accent-light);
-                            display:flex;align-items:center;justify-content:center;margin-bottom:10px;">
-                            <span class="material-symbols-outlined" style="font-size:20px;color:var(--accent-color);">${a.icon}</span>
+                        <div class="ms-overview-action-icon-wrap">
+                            <span class="material-symbols-outlined ms-overview-action-icon">${a.icon}</span>
                         </div>
-                        <div style="font-size:0.88rem;font-weight:800;color:var(--text-main);margin-bottom:2px;">${a.label}</div>
-                        <div style="font-size:0.75rem;color:var(--text-muted);">${a.sub}</div>
+                        <div class="ms-overview-action-label">${a.label}</div>
+                        <div class="ms-overview-action-sub">${a.sub}</div>
                     </button>`).join('')}
                 </div>
             </div>
@@ -332,7 +501,7 @@ class MinSideManager {
                     </button>
                 </div>
                 <div id="ov-recent-notifs">
-                    <div class="loading-state" style="min-height:80px"><div class="spinner"></div></div>
+                    <div class="loading-state ms-loading-min-80"><div class="spinner"></div></div>
                 </div>
             </div>
 
@@ -389,27 +558,21 @@ class MinSideManager {
             const recentEl = document.getElementById('ov-recent-notifs');
             if (recentEl) {
                 if (recentSnap.empty) {
-                    recentEl.innerHTML = `<div style="padding:24px 22px; color:var(--text-muted); font-size:0.87rem;">Ingen varslinger ennå.</div>`;
+                    recentEl.innerHTML = `<div class="ms-overview-notifs-empty">Ingen varslinger ennå.</div>`;
                 } else {
                     recentEl.innerHTML = recentSnap.docs.map(doc => {
-                        const d = doc.data();
+                        const d = this._normalizeNotificationDoc(doc);
                         const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
-                        return `<div style="display:flex;align-items:center;gap:14px;padding:13px 22px;
-                            border-bottom:1px solid var(--border-color);transition:background 0.15s;"
-                            onmouseover="this.style.background='var(--main-bg)'"
-                            onmouseout="this.style.background=''">
-                            <div style="width:8px;height:8px;border-radius:50%;flex-shrink:0;
-                                background:${!d.read ? 'var(--accent-color)' : '#e2e8f0'};"></div>
-                            <div style="flex:1;min-width:0;">
-                                <div style="font-size:0.88rem;font-weight:700;color:var(--text-main);
-                                    margin-bottom:2px;">${d.title || 'Varsling'}</div>
-                                <div style="font-size:0.78rem;color:var(--text-muted);
-                                    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${d.body || ''}</div>
+                        return `<div class="ms-overview-notif-row">
+                            <div class="ms-overview-notif-dot ${d.read ? 'is-read' : ''}"></div>
+                            <div class="ms-overview-notif-main">
+                                <div class="ms-overview-notif-title">${d.title}</div>
+                                <div class="ms-overview-notif-body">${d.body || ''}</div>
                             </div>
-                            <div style="font-size:0.73rem;color:#94a3b8;white-space:nowrap;">${this._timeAgo(date)}</div>
+                            <div class="ms-overview-notif-time">${this._timeAgo(date)}</div>
                         </div>`;
-                    }).join('') + `<div style="padding:12px 22px;">
-                        <button class="btn btn-ghost btn-sm" style="width:100%"
+                    }).join('') + `<div class="ms-overview-notifs-footer">
+                        <button class="btn btn-ghost btn-sm ms-btn-full"
                             onclick="window.minSideManager.loadView('notifications')">
                             Vis alle varslinger
                         </button></div>`;
@@ -480,7 +643,7 @@ class MinSideManager {
                         </div>
                     </div>
                     <!-- Inline edit form -->
-                    <div class="edit-form" id="contact-edit-form" style="display:none">
+                    <div class="edit-form is-hidden" id="contact-edit-form">
                         <div class="form-group">
                             <label>Fullt navn</label>
                             <input name="displayName" value="${p.displayName || ''}" autocomplete="name">
@@ -550,7 +713,7 @@ class MinSideManager {
                             </div>
                         </div>
                     </div>
-                    <div class="edit-form" id="personal-edit-form" style="display:none">
+                    <div class="edit-form is-hidden" id="personal-edit-form">
                         <div class="form-row">
                             <div class="form-group">
                                 <label>Kjønn</label>
@@ -595,8 +758,8 @@ class MinSideManager {
                     <div class="info-card-header">
                         <h3>Kontoadministrasjon</h3>
                     </div>
-                    <div style="padding: 16px 20px;">
-                        <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:14px;">
+                    <div class="ms-card-body-pad">
+                        <p class="ms-danger-copy">
                             Sletting av konto er permanent og kan ikke angres.
                         </p>
                         <button class="btn btn-danger" id="delete-account-btn">
@@ -630,9 +793,9 @@ class MinSideManager {
                                 `).join('')}
                             </div>
                         ` : `
-                            <div class="empty-state" style="padding:32px 20px;">
-                                <span class="material-symbols-outlined" style="font-size:36px;">group_off</span>
-                                <p style="font-size:0.82rem;">Ingen familiemedlemmer registrert.</p>
+                            <div class="empty-state ms-empty-state-compact">
+                                <span class="material-symbols-outlined ms-empty-state-icon-compact">group_off</span>
+                                <p class="ms-empty-state-copy-compact">Ingen familiemedlemmer registrert.</p>
                             </div>
                         `}
                     </div>
@@ -663,8 +826,8 @@ class MinSideManager {
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
-                    <div style="padding:12px 20px;">
-                        <button class="btn btn-primary btn-sm" id="save-prefs-btn" style="width:100%">Lagre preferanser</button>
+                    <div class="ms-card-footer-pad">
+                        <button class="btn btn-primary btn-sm ms-btn-full" id="save-prefs-btn">Lagre preferanser</button>
                     </div>
                 </div>
 
@@ -677,11 +840,11 @@ class MinSideManager {
         const contactForm = document.getElementById('contact-edit-form');
         const contactDisp = document.getElementById('contact-display');
         toggleContact?.addEventListener('click', () => {
-            const open = contactForm.style.display === 'none';
-            contactForm.style.display = open ? 'grid' : 'none';
+            if (!contactForm) return;
+            contactForm.classList.toggle('is-hidden');
         });
         document.getElementById('cancel-contact-edit')?.addEventListener('click', () => {
-            contactForm.style.display = 'none';
+            contactForm?.classList.add('is-hidden');
         });
         document.getElementById('save-contact-btn')?.addEventListener('click', async () => {
             await this._saveProfileFields(contactForm, ['displayName', 'phone', 'address', 'zip', 'city']);
@@ -694,10 +857,10 @@ class MinSideManager {
         const togglePersonal = document.getElementById('toggle-personal-edit');
         const personalForm = document.getElementById('personal-edit-form');
         togglePersonal?.addEventListener('click', () => {
-            personalForm.style.display = personalForm.style.display === 'none' ? 'grid' : 'none';
+            personalForm?.classList.toggle('is-hidden');
         });
         document.getElementById('cancel-personal-edit')?.addEventListener('click', () => {
-            personalForm.style.display = 'none';
+            personalForm?.classList.add('is-hidden');
         });
         document.getElementById('save-personal-btn')?.addEventListener('click', async () => {
             await this._saveProfileFields(personalForm, ['gender', 'maritalStatus', 'birthday', 'ssn']);
@@ -780,7 +943,7 @@ class MinSideManager {
     // ══════════════════════════════════════════════════════════
     async renderActivity(container) {
         const uid = this.currentUser?.uid;
-        container.innerHTML = `<div style="width:100%;display:block" id="activity-inner"><div class="loading-state" style="min-height:120px"><div class="spinner"></div></div></div>`;
+        container.innerHTML = `<div class="ms-full-width" id="activity-inner"><div class="loading-state ms-loading-min-120"><div class="spinner"></div></div></div>`;
         const list = container.querySelector('#activity-inner');
 
         try {
@@ -801,30 +964,40 @@ class MinSideManager {
             }
 
             const iconMap = {
-                push: { icon: 'campaign', bg: 'var(--accent-light)', color: 'var(--accent-color)' },
-                message: { icon: 'mail', bg: '#f0fdf4', color: '#16a34a' },
-                default: { icon: 'notifications', bg: '#faf5ff', color: '#9333ea' },
+                push: { icon: 'campaign', toneClass: 'activity-icon-tone-push' },
+                message: { icon: 'mail', toneClass: 'activity-icon-tone-message' },
+                default: { icon: 'notifications', toneClass: 'activity-icon-tone-default' },
             };
 
-            list.innerHTML = snap.docs.map(doc => {
-                const d = doc.data();
+            const items = snap.docs.map(doc => this._normalizeNotificationDoc(doc));
+
+            list.innerHTML = items.map(d => {
                 const date = d.createdAt?.toDate ? d.createdAt.toDate() : new Date(0);
                 const m = iconMap[d.type] || iconMap.default;
                 return `
-                <div class="activity-item ${!d.read ? 'unread' : ''}">
-                    <div class="activity-icon" style="background:${m.bg}">
-                        <span class="material-symbols-outlined" style="color:${m.color}">${m.icon}</span>
+                <div class="activity-item ${!d.read ? 'unread' : ''}" data-id="${d.id}" style="cursor: pointer;">
+                    <div class="activity-icon ${m.toneClass}">
+                        <span class="material-symbols-outlined">${m.icon}</span>
                     </div>
                     <div class="activity-content">
-                        <div class="activity-title">${d.title || 'Varsling'}</div>
+                        <div class="activity-title">${d.title}</div>
                         ${d.body ? `<div class="activity-body">${d.body}</div>` : ''}
-                        ${d.link ? `<a href="${d.link}" target="_blank" style="font-size:0.78rem; color:var(--accent);">Åpne lenke →</a>` : ''}
                         <div class="activity-time">${this._timeAgo(date)}</div>
                     </div>
                 </div>`;
             }).join('');
 
+            list.querySelectorAll('.activity-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const notif = items.find(n => n.id === el.dataset.id);
+                    if (notif) this.showNotificationModal(notif);
+                    if (notif && !notif.read) el.classList.remove('unread');
+                });
+            });
+
         } catch (err) {
+            console.error('renderActivity error:', err);
+            this._notify('Kunne ikke laste aktivitet akkurat nå.', 'warning');
             list.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><p>Kunne ikke laste aktivitet.</p></div>`;
         }
     }
@@ -835,12 +1008,12 @@ class MinSideManager {
     async renderNotifications(container) {
         const uid = this.currentUser?.uid;
         container.innerHTML = `
-        <div style="width:100%">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-                <h2 style="font-size:1.05rem; font-weight:700;">Varslinger</h2>
+        <div class="ms-full-width">
+            <div class="ms-section-header-row">
+                <h2 class="ms-section-title">Varslinger</h2>
                 <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">Merk alle lest</button>
             </div>
-            <div id="notifs-inner"><div class="loading-state" style="min-height:80px"><div class="spinner"></div></div></div>
+            <div id="notifs-inner"><div class="loading-state ms-loading-min-80"><div class="spinner"></div></div></div>
         </div>`;
 
         const inner = container.querySelector('#notifs-inner');
@@ -861,21 +1034,37 @@ class MinSideManager {
                 return;
             }
 
-            const items = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+            const items = snap.docs.map(d => this._normalizeNotificationDoc(d));
             inner.innerHTML = items.map(n => {
                 const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
-                return `<div class="activity-item ${!n.read ? 'unread' : ''}">
-                    <div class="activity-icon" style="background:${!n.read ? 'var(--accent-light)' : 'var(--main-bg)'}">
-                        <span class="material-symbols-outlined" style="color:${!n.read ? '#60a5fa' : '#475569'}">campaign</span>
+                return `<div class="activity-item ${!n.read ? 'unread' : ''}" data-id="${n.id}" style="cursor: pointer;">
+                    <div class="activity-icon ${!n.read ? 'activity-icon-tone-notif-unread' : 'activity-icon-tone-notif-read'}">
+                        <span class="material-symbols-outlined">campaign</span>
                     </div>
                     <div class="activity-content">
-                        <div class="activity-title">${n.title || 'Varsling'}</div>
+                        <div class="activity-title">${n.title}</div>
                         ${n.body ? `<div class="activity-body">${n.body}</div>` : ''}
                         <div class="activity-time">${this._timeAgo(date)}</div>
                     </div>
-                    ${!n.read ? `<div style="width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0;margin-top:6px"></div>` : ''}
+                    ${!n.read ? `<div class="ms-unread-dot"></div>` : ''}
                 </div>`;
             }).join('');
+
+            inner.querySelectorAll('.activity-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const notif = items.find(n => n.id === el.dataset.id);
+                    if (notif) this.showNotificationModal(notif);
+                    if (notif && !notif.read) {
+                        el.classList.remove('unread');
+                        el.querySelector('.ms-unread-dot')?.remove();
+                        const icon = el.querySelector('.activity-icon');
+                        if (icon) {
+                            icon.classList.remove('activity-icon-tone-notif-unread');
+                            icon.classList.add('activity-icon-tone-notif-read');
+                        }
+                    }
+                });
+            });
 
             // Mark all read
             const unread = items.filter(n => !n.read);
@@ -895,6 +1084,8 @@ class MinSideManager {
             });
 
         } catch (err) {
+            console.error('renderNotifications error:', err);
+            this._notify('Kunne ikke laste varslinger akkurat nå.', 'warning');
             inner.innerHTML = `<div class="empty-state"><p>Kunne ikke laste varslinger.</p></div>`;
         }
     }
@@ -944,7 +1135,7 @@ class MinSideManager {
                     <h3>Gavehistorikk</h3>
                 </div>
                 ${donations.length === 0 ? `
-                    <div class="empty-state" style="padding:48px 24px">
+                    <div class="empty-state ms-empty-state-giving">
                         <span class="material-symbols-outlined">volunteer_activism</span>
                         <h3>Ingen gaver ennå</h3>
                         <p>Dine donasjoner til HKM vises her.</p>
@@ -975,7 +1166,7 @@ class MinSideManager {
             </div>
 
             ${yearTotal >= 500 ? `
-            <div class="info-card" style="margin-top:16px">
+            <div class="info-card ms-info-card-top-gap">
                 <div class="info-card-header">
                     <h3>Skattefradrag</h3>
                 </div>
@@ -986,7 +1177,7 @@ class MinSideManager {
                         <span class="info-row-value">kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</span>
                     </div>
                 </div>
-                <div style="padding:12px 20px; font-size:0.8rem; color:var(--text-muted);">
+                <div class="ms-muted-note-pad">
                     Gaver over kr 500 er skattefradragsberettiget. Kontakt HKM for bekreftelse.
                 </div>
             </div>` : ''}
@@ -997,7 +1188,7 @@ class MinSideManager {
     // VIEW: KURS
     // ══════════════════════════════════════════════════════════
     async renderCourses(container) {
-        container.innerHTML = `<div style="width:100%"><div class="loading-state"><div class="spinner"></div></div></div>`;
+        container.innerHTML = `<div class="ms-full-width"><div class="loading-state"><div class="spinner"></div></div></div>`;
         let courses = [];
         try {
             const snap = await firebase.firestore().collection('teaching').orderBy('createdAt', 'desc').get();
@@ -1005,7 +1196,7 @@ class MinSideManager {
         } catch (e) { }
 
         if (courses.length === 0) {
-            container.innerHTML = `<div style="width:100%"><div class="empty-state">
+            container.innerHTML = `<div class="ms-full-width"><div class="empty-state">
                 <span class="material-symbols-outlined">school</span>
                 <h3>Ingen kurs ennå</h3>
                 <p>Undervisnings- og kursinnhold fra HKM vil vises her.</p>
@@ -1017,7 +1208,7 @@ class MinSideManager {
             ${courses.map(c => `
             <div class="course-card">
                 <div class="course-thumb">
-                    ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" loading="lazy">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;"><span class="material-symbols-outlined" style="font-size:40px;color:var(--border-light)">school</span></div>`}
+                    ${c.imageUrl ? `<img src="${c.imageUrl}" alt="${c.title}" loading="lazy">` : `<div class="ms-course-thumb-empty"><span class="material-symbols-outlined ms-course-thumb-empty-icon">school</span></div>`}
                     ${c.category ? `<span class="course-badge">${c.category}</span>` : ''}
                 </div>
                 <div class="course-body">
@@ -1053,9 +1244,12 @@ class MinSideManager {
                     .orderBy('createdAt', 'desc')
                     .get(),
             ]);
-            personalSnap.forEach(d => personalNotes.push({ id: d.id, ...d.data() }));
-            hkmSnap.forEach(d => hkmNotes.push({ id: d.id, ...d.data() }));
-        } catch (e) { console.warn('renderNotes fetch:', e); }
+            personalSnap.forEach(d => personalNotes.push(this._normalizeNoteDoc(d, 'personal')));
+            hkmSnap.forEach(d => hkmNotes.push(this._normalizeNoteDoc(d, 'shared')));
+        } catch (e) {
+            console.warn('renderNotes fetch:', e);
+            this._notify('Kunne ikke laste notater akkurat nå.', 'warning');
+        }
 
         this._renderNotesUI(container, personalNotes, hkmNotes);
     }
@@ -1079,13 +1273,13 @@ class MinSideManager {
         </div>`;
 
         container.innerHTML = `
-        <div style="width:100%">
+        <div class="ms-full-width">
 
             <!-- Header row -->
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:20px;">
+            <div class="ms-section-header-row ms-section-header-lg">
                 <div>
-                    <h2 style="font-size:1.1rem; font-weight:800; letter-spacing:-0.01em;">Mine notater</h2>
-                    <p style="font-size:0.8rem; color:var(--text-muted); margin-top:3px;">
+                    <h2 class="ms-section-title ms-section-title-lg">Mine notater</h2>
+                    <p class="ms-section-subtitle">
                         Personlige notater som bare du kan se
                     </p>
                 </div>
@@ -1096,12 +1290,12 @@ class MinSideManager {
             </div>
 
             <!-- New note form (hidden by default) -->
-            <div class="new-note-form" id="new-note-form" style="display:none;">
+            <div class="new-note-form is-hidden" id="new-note-form">
                 <div class="form-group">
                     <label>Tittel</label>
                     <input id="note-title-input" placeholder="Gi notatet en tittel..." autocomplete="off">
                 </div>
-                <div class="form-group" style="margin-top:10px;">
+                <div class="form-group ms-form-group-gap-10">
                     <label>Innhold</label>
                     <div class="rte-wrapper">
                         <div class="rte-toolbar" id="rte-toolbar-new">
@@ -1121,7 +1315,7 @@ class MinSideManager {
                             data-placeholder="Skriv notat her..."></div>
                     </div>
                 </div>
-                <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:12px;">
+                <div class="ms-actions-row-end">
                     <button class="btn btn-ghost btn-sm" id="cancel-note-btn">Avbryt</button>
                     <button class="btn btn-primary btn-sm" id="save-note-btn">
                         <span class="material-symbols-outlined">save</span>
@@ -1142,22 +1336,22 @@ class MinSideManager {
 
             <!-- HKM Notes (read-only) -->
             ${hkmNotes.length > 0 ? `
-            <div style="margin-top:32px;">
-                <div style="display:flex; align-items:center; gap:8px; margin-bottom:14px;">
-                    <div style="flex:1; height:1px; background:var(--border-color);"></div>
-                    <span style="font-size:0.7rem; font-weight:700; color:#94a3b8; text-transform:uppercase; letter-spacing:0.08em; white-space:nowrap;">
+            <div class="ms-section-top-gap">
+                <div class="ms-divider-row">
+                    <div class="ms-divider-line"></div>
+                    <span class="ms-divider-label">
                         Notater fra HKM
                     </span>
-                    <div style="flex:1; height:1px; background:var(--border-color);"></div>
+                    <div class="ms-divider-line"></div>
                 </div>
                 <div class="notes-list">
                     ${hkmNotes.map(n => `
                     <div class="note-card">
                         <div class="note-author">
-                            <span class="material-symbols-outlined" style="font-size:14px; vertical-align:middle; margin-right:4px;">shield_person</span>
+                            <span class="material-symbols-outlined ms-note-author-icon">shield_person</span>
                             ${n.authorName || 'HKM-teamet'} · ${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}
                         </div>
-                        ${n.title ? `<div style="font-size:0.9rem; font-weight:700; margin-bottom:4px;">${n.title}</div>` : ''}
+                        ${n.title ? `<div class="ms-note-title">${n.title}</div>` : ''}
                         <div class="note-text">${n.text || ''}</div>
                     </div>`).join('')}
                 </div>
@@ -1174,13 +1368,14 @@ class MinSideManager {
         // Toggle new note form
         document.getElementById('new-note-btn')?.addEventListener('click', () => {
             const form = document.getElementById('new-note-form');
-            const isOpen = form.style.display !== 'none';
-            form.style.display = isOpen ? 'none' : 'block';
-            if (!isOpen) document.getElementById('note-title-input')?.focus();
+            if (!form) return;
+            const willOpen = form.classList.contains('is-hidden');
+            form.classList.toggle('is-hidden');
+            if (willOpen) document.getElementById('note-title-input')?.focus();
         });
 
         document.getElementById('cancel-note-btn')?.addEventListener('click', () => {
-            document.getElementById('new-note-form').style.display = 'none';
+            document.getElementById('new-note-form')?.classList.add('is-hidden');
             document.getElementById('note-title-input').value = '';
             document.getElementById('note-body-editor').innerHTML = '';
         });
@@ -1258,18 +1453,18 @@ class MinSideManager {
         modal.id = 'note-edit-modal';
         modal.className = 'hkm-modal-overlay';
         modal.innerHTML = `
-        <div class="hkm-modal-container" style="max-width:640px; width:95vw">
-            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
-                <div class="hkm-modal-title" style="margin-bottom:0">Rediger notat</div>
-                <button id="close-note-modal" style="background:none;border:none;cursor:pointer;padding:4px;">
-                    <span class="material-symbols-outlined" style="font-size:20px;color:var(--text-muted);">close</span>
+        <div class="hkm-modal-container ms-note-modal-wide">
+            <div class="ms-note-modal-header">
+                <div class="hkm-modal-title ms-note-modal-title">Rediger notat</div>
+                <button id="close-note-modal" class="ms-icon-button">
+                    <span class="material-symbols-outlined ms-icon-button-icon">close</span>
                 </button>
             </div>
             <div class="form-group">
                 <label>Tittel</label>
                 <input id="edit-note-title" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off">
             </div>
-            <div class="form-group" style="margin-top:12px;">
+            <div class="form-group ms-form-group-gap-12">
                 <label>Innhold</label>
                 <div class="rte-wrapper">
                     <div class="rte-toolbar" id="rte-toolbar-edit">
@@ -1288,7 +1483,7 @@ class MinSideManager {
                     <div class="rte-editor" id="edit-note-body" contenteditable="true"></div>
                 </div>
             </div>
-            <div class="hkm-modal-actions" style="margin-top:20px;">
+            <div class="hkm-modal-actions ms-modal-actions-top">
                 <button class="btn btn-ghost hkm-modal-btn" id="cancel-note-modal">Avbryt</button>
                 <button class="btn btn-primary hkm-modal-btn" id="save-note-modal">
                     <span class="material-symbols-outlined">save</span> Lagre
@@ -1360,6 +1555,75 @@ class MinSideManager {
 
 
     // ══════════════════════════════════════════════════════════
+    // NOTIFICATION MODAL
+    // ══════════════════════════════════════════════════════════
+    showNotificationModal(notif) {
+        const existing = document.getElementById('notif-modal');
+        if (existing) existing.remove();
+
+        const modal = document.createElement('div');
+        modal.id = 'notif-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.innerHTML = `
+        <div class="hkm-modal-container">
+            <div class="ms-note-modal-header" style="margin-bottom: 16px;">
+                <div class="hkm-modal-title" style="margin-bottom:0; padding-right: 32px;">${notif.title || 'Varsel'}</div>
+                <button id="close-notif-modal" class="ms-icon-button">
+                    <span class="material-symbols-outlined ms-icon-button-icon">close</span>
+                </button>
+            </div>
+            ${notif.body ? `<div class="hkm-modal-message" style="text-align:left; white-space:pre-wrap; line-height:1.6; color:var(--text);">${notif.body}</div>` : ''}
+            ${notif.link ? `<div style="margin-top: 24px;">
+                <a href="${notif.link}" target="_blank" class="btn btn-primary" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;">
+                    Åpne lenke <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>
+                </a>
+            </div>` : ''}
+            <div class="hkm-modal-actions ms-modal-actions-top" style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 16px;">
+                <button class="btn btn-ghost hkm-modal-btn" id="delete-notif-modal" style="color: var(--danger); justify-content: center;">
+                    <span class="material-symbols-outlined">delete</span> Slett varsel
+                </button>
+            </div>
+        </div>`;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('active'));
+
+        const close = () => { modal.classList.remove('active'); setTimeout(() => modal.remove(), 300); };
+        modal.querySelector('#close-notif-modal').addEventListener('click', close);
+        modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+        // Delete action
+        modal.querySelector('#delete-notif-modal').addEventListener('click', async () => {
+            if (!confirm('Er du sikker på at du vil slette dette varselet?')) return;
+            const btn = modal.querySelector('#delete-notif-modal');
+            btn.disabled = true;
+            btn.textContent = 'Sletter...';
+
+            try {
+                if (notif.id) {
+                    await firebase.firestore().collection('user_notifications').doc(notif.id).delete();
+                }
+                // Remove from DOM
+                document.querySelectorAll(`.activity-item[data-id="${notif.id}"]`).forEach(el => el.remove());
+                close();
+            } catch (err) {
+                console.error('Error deleting notification:', err);
+                alert('Kunne ikke slette varsel: ' + err.message);
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">delete</span> Slett varsel';
+            }
+        });
+
+        // Mark as read in Firestore
+        if (!notif.read && notif.id) {
+            firebase.firestore().collection('user_notifications').doc(notif.id).set({ read: true }, { merge: true })
+                .catch(e => console.warn('Could not mark notification as read.', e));
+            notif.read = true;
+            this._loadUnreadBadge(); // Update bell icon badge
+        }
+    }
+
+    // ══════════════════════════════════════════════════════════
     // DELETE ACCOUNT MODAL
     // ══════════════════════════════════════════════════════════
     showDeleteConfirmModal() {
@@ -1370,7 +1634,7 @@ class MinSideManager {
         modal.id = 'confirm-delete-modal';
         modal.className = 'hkm-modal-overlay';
         modal.innerHTML = `
-        <div class="hkm-modal-container">
+                    < div class= "hkm-modal-container" >
             <div class="hkm-modal-icon">
                 <span class="material-symbols-outlined">warning</span>
             </div>
@@ -1383,7 +1647,7 @@ class MinSideManager {
                 <button class="btn btn-ghost hkm-modal-btn" id="cancel-delete-btn">Avbryt</button>
                 <button class="btn btn-danger hkm-modal-btn" id="confirm-delete-btn">Slett konto</button>
             </div>
-        </div>`;
+        </div > `;
 
         document.body.appendChild(modal);
         requestAnimationFrame(() => modal.classList.add('active'));

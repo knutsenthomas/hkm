@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>His Kingdom Designs | Ressurser & Design</title>
+    <meta name="description"
+        content="Utforsk eksklusive ressurser, bøker og design fra His Kingdom Designs. Bookle-inspirert butikk med sikker handel via Wix.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <!-- Swiper CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css?v=bookle-v1">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#f39c12',
+                        'primary-dark': '#d35400',
+                        'accent-red': '#e74c3c',
+                        'bookle-bg': '#f8fafc',
+                    },
+                    borderRadius: {
+                        '3xl': '1.5rem',
+                        '4xl': '2rem',
+                    },
+                    boxShadow: {
+                        'bookle': '0 4px 20px rgba(15, 23, 42, 0.04)',
+                        'bookle-hover': '0 20px 40px rgba(15, 23, 42, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .shop-card-title {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            min-height: 3rem;
+        }
+
+        .skeleton-pulse {
+            background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: pulse 1.5s infinite linear;
+        }
+
+        @keyframes pulse {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+
+        .bookle-hero {
+            background:
+                radial-gradient(circle at 10% 20%, rgba(243, 156, 18, 0.05), transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(231, 76, 60, 0.03), transparent 40%),
+                #ffffff;
+        }
+
+        /* Swiper Customization */
+        .swiper-button-next,
+        .swiper-button-prev {
+            width: 44px;
+            height: 44px;
+            background: white;
+            border-radius: 50%;
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .swiper-button-next:hover,
+        .swiper-button-prev:hover {
+            transform: scale(1.1);
+            background: #f39c12;
+            color: white;
+        }
+
+        .swiper-button-next:after,
+        .swiper-button-prev:after {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+
+            .swiper-button-next,
+            .swiper-button-prev {
+                width: 36px;
+                height: 36px;
+                top: auto;
+                bottom: 120px;
+            }
+
+            .swiper-button-next:after,
+            .swiper-button-prev:after {
+                font-size: 14px;
+            }
+
+            .swiper-button-next {
+                right: 16px !important;
+            }
+
+            .swiper-button-prev {
+                left: 16px !important;
+            }
+        }
+
+        .swiper-pagination-bullet-active {
+            background: #f39c12 !important;
+        }
+
+        .subscription-showcase {
+            background: linear-gradient(180deg, #ffffff 0%, #fffcf6 100%);
+            border: 1px solid #eef2f7;
+            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.07);
+        }
+
+        .subscription-showcase::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 10% 20%, rgba(249, 115, 22, 0.09), transparent 44%),
+                radial-gradient(circle at 92% 85%, rgba(251, 191, 36, 0.10), transparent 48%);
+            opacity: 1;
+            pointer-events: none;
+        }
+
+        .subscription-photo-card {
+            border: 1px solid #eef2f7;
+            box-shadow: 0 14px 32px rgba(15, 23, 42, 0.10);
+        }
+
+        .subscription-glass {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #eef2f7;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+        }
+
+        .filter-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(148, 163, 184, 0.45) transparent;
+        }
+
+        .filter-scroll::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .filter-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .filter-scroll::-webkit-scrollbar-thumb {
+            background: rgba(148, 163, 184, 0.35);
+            border-radius: 999px;
+        }
+
+        .unified-category-btn {
+            border: 1px solid transparent;
+            background: #f1f5f9;
+            color: #334155;
+            box-shadow: none;
+        }
+
+        .unified-category-btn:hover {
+            border-color: #e2e8f0;
+            color: #0f172a;
+            background: #e2e8f0;
+        }
+
+        .unified-category-btn.active {
+            background: #0f172a;
+            border-color: #0f172a;
+            color: #ffffff !important;
+            box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[26000] transition-all duration-300" id="header"
+        style="background: transparent; box-shadow: none;">
+        <div class="header-content" id="header-container">
+            <!-- Logo -->
+            <a href="index.html" class="flex items-center gap-3 font-bold transition-all duration-300 logo">
+                <div
+                    class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
+                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-xl">His Kingdom Designs</span>
+            </a>
+
+            <!-- Right Actions: Donate + Language + Hamburger -->
+            <div class="header-actions flex items-center gap-4">
+                <div class="lang-switcher relative group hidden md:block">
+                    <button class="flex items-center gap-2 font-medium hover:text-primary transition-colors lang-btn">
+                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                    </button>
+                    <div
+                        class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100 transition-all z-[10002]">
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="no">🇳🇴 Norsk</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="en">🇺🇸 English</a>
+                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                            data-lang="es">🇪🇸 Español</a>
+                    </div>
+                </div>
+                <a href="donasjoner.html"
+                    class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
+                    Gi gave <i class="fas fa-heart heart text-sm btn-heart-icon"></i>
+                </a>
+
+                <!-- Unified Toggle Button -->
+                <button
+                    class="menu-toggle h-11 w-11 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false">
+                    <i class="fas fa-bars text-xl open-icon"></i>
+                    <i class="fas fa-times text-xl close-icon hidden"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="index.html" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="en/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="es/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donasjoner.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a></li>
+                            <li><a href="bli-fast-giver.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a></li>
+                            <li><a href="for-menigheter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For menigheter</a></li>
+                            <li><a href="for-bedrifter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a></li>
+                            <li><a href="bnn.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="om-oss.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Om oss</a></li>
+                            <li><a href="kontakt.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Kontakt oss</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser & Media -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="butikk.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Butikk</a></li>
+                            <li><a href="arrangementer.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Arrangementer</a></li>
+                            <li><a href="media.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="blogg.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
+                            <li><a href="kurs.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Kurs</a></li>
+                            <li><a href="minside/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Min Side</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="butikk.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="donasjoner.html#skattefradrag" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="om-oss.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="personvern.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="relative !p-0 !m-0">
+        <!-- Elegant Hero Slider (Full Screen) -->
+        <section class="h-screen overflow-hidden !p-0 !m-0">
+            <div class="swiper product-hero-swiper w-full h-screen overflow-hidden shadow-2xl">
+                <div class="swiper-wrapper" id="hero-slider-wrapper">
+                    <!-- Default fallback slide (vises hvis JS/API ikke laster) -->
+                    <div class="swiper-slide bg-slate-950 h-screen flex items-center">
+                        <div
+                            class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.25),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(59,130,246,0.15),transparent_35%),linear-gradient(135deg,#020617,#0f172a_60%,#111827)]">
+                        </div>
+                        <div class="container mx-auto px-6 md:px-12 relative z-10">
+                            <div
+                                class="max-w-2xl text-white space-y-5 flex flex-col items-center md:items-start text-center md:text-left">
+                                <span
+                                    class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-black uppercase tracking-[0.2em]">
+                                    <span data-content-key="heroFallback.badge">HKM Butikk</span>
+                                </span>
+                                <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight"
+                                    data-content-key="heroFallback.title">
+                                    Ressurser og design som bygger tro
+                                </h2>
+                                <p class="text-base md:text-lg text-slate-200 leading-relaxed max-w-lg mx-auto md:mx-0"
+                                    data-content-key="heroFallback.subtitle">
+                                    Produktene hentes automatisk fra Wix. Hvis de ikke vises med en gang kan du fortsatt
+                                    handle trygt i den eksterne butikken.
+                                </p>
+                                <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
+                                    <a href="https://www.hiskingdomministry.no/butikk" target="_blank"
+                                        rel="noopener noreferrer"
+                                        class="w-full md:w-auto px-8 py-4 rounded-full bg-primary text-white font-black hover:brightness-110 transition-all shadow-xl"
+                                        data-content-key="heroFallback.ctaExternal">
+                                        Åpne Wix-butikken
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Navigation -->
+                <div class="swiper-button-next !text-slate-900 border-none"></div>
+                <div class="swiper-button-prev !text-slate-900 border-none"></div>
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+
+        <!-- About Shop Section -->
+        <section class="py-20 md:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="grid grid-cols-1 lg:grid-cols-[1.05fr_0.95fr] gap-8 lg:gap-12 items-center">
+                    <div>
+                        <span
+                            class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-orange-50 text-orange-700 border border-orange-100 text-[11px] font-black uppercase tracking-[0.18em]">
+                            <i class="fas fa-store text-[10px]"></i>
+                            <span data-content-key="aboutStore.badge">Om butikken</span>
+                        </span>
+                        <h2 class="mt-5 text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight"
+                            data-content-key="aboutStore.title">
+                            His Kingdom Designs-butikken
+                        </h2>
+                        <p class="mt-5 text-lg text-slate-600 leading-relaxed max-w-2xl"
+                            data-content-key="aboutStore.description">
+                            Her finner du klær, kopper, klistermerker, gavekort og andre ressurser med design som
+                            peker på tro, håp og kjærlighet. Produktene synkroniseres fra Wix-butikken og oppdateres
+                            fortløpende.
+                        </p>
+                        <p class="mt-4 text-base text-slate-500 leading-relaxed max-w-2xl"
+                            data-content-key="aboutStore.description2">
+                            Du kan bruke filterpanelet for å finne riktig kategori, størrelse, farge og prisnivå. Vi
+                            viser produktene direkte her, men du handler trygt via den eksterne Wix-butikken.
+                        </p>
+
+                        <div class="mt-7 flex flex-col sm:flex-row gap-4">
+                            <a href="#shop-content"
+                                class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full bg-slate-900 text-white font-black hover:bg-slate-800 transition-colors">
+                                <span data-content-key="aboutStore.ctaProducts">Gå til produkter</span>
+                                <i class="fas fa-arrow-down text-sm"></i>
+                            </a>
+                            <a href="https://www.hiskingdomministry.no/butikk" target="_blank" rel="noopener noreferrer"
+                                class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border-2 border-slate-200 text-slate-900 font-black hover:border-slate-900 transition-colors">
+                                <span data-content-key="aboutStore.ctaExternal">Åpne Wix-butikken</span>
+                                <i class="fas fa-external-link-alt text-sm"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[1.75rem] border border-slate-200 bg-slate-50 p-5 md:p-6 shadow-sm">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="rounded-2xl bg-white border border-slate-200 p-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                                    <i class="fas fa-layer-group"></i>
+                                </div>
+                                <h3 class="mt-3 text-sm font-black uppercase tracking-[0.12em] text-slate-500"
+                                    data-content-key="aboutStore.features.selectionLabel">Utvalg</h3>
+                                <p class="mt-2 font-semibold text-slate-900 leading-snug"
+                                    data-content-key="aboutStore.features.selectionText">Klær, kopper, plakater,
+                                    stickers og mer</p>
+                            </div>
+
+                            <div class="rounded-2xl bg-white border border-slate-200 p-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                                    <i class="fas fa-filter"></i>
+                                </div>
+                                <h3 class="mt-3 text-sm font-black uppercase tracking-[0.12em] text-slate-500"
+                                    data-content-key="aboutStore.features.filteringLabel">Filtrering</h3>
+                                <p class="mt-2 font-semibold text-slate-900 leading-snug"
+                                    data-content-key="aboutStore.features.filteringText">Finn raskt produkter etter
+                                    kategori, pris og egenskaper</p>
+                            </div>
+
+                            <div class="rounded-2xl bg-white border border-slate-200 p-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                                    <i class="fas fa-rotate"></i>
+                                </div>
+                                <h3 class="mt-3 text-sm font-black uppercase tracking-[0.12em] text-slate-500"
+                                    data-content-key="aboutStore.features.updatesLabel">Oppdateringer</h3>
+                                <p class="mt-2 font-semibold text-slate-900 leading-snug"
+                                    data-content-key="aboutStore.features.updatesText">Produkter hentes automatisk fra
+                                    Wix og vises her</p>
+                            </div>
+
+                            <div class="rounded-2xl bg-white border border-slate-200 p-4">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                                    <i class="fas fa-shield-halved"></i>
+                                </div>
+                                <h3 class="mt-3 text-sm font-black uppercase tracking-[0.12em] text-slate-500"
+                                    data-content-key="aboutStore.features.secureLabel">Trygg handel</h3>
+                                <p class="mt-2 font-semibold text-slate-900 leading-snug"
+                                    data-content-key="aboutStore.features.secureText">Bestillingen fullføres trygt i
+                                    Wix-butikken</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it Works Section -->
+        <section class="py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight"
+                        data-content-key="howItWorks.title">Hvordan fungerer det?
+                    </h2>
+                    <div class="w-20 h-1.5 bg-orange-500 mx-auto rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="text-center group">
+                        <div
+                            class="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-orange-500 group-hover:text-white transition-all duration-500 rotate-3 group-hover:rotate-0 shadow-sm group-hover:shadow-xl group-hover:shadow-orange-200">
+                            <i class="fas fa-shopping-bag text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-4" data-content-key="howItWorks.step1Title">Velg
+                            din vare</h3>
+                        <p class="text-slate-500 leading-relaxed" data-content-key="howItWorks.step1Text">Velg noen av
+                            alle de fantastiske produktene vi har.
+                        </p>
+                    </div>
+                    <div class="text-center group">
+                        <div
+                            class="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-orange-500 group-hover:text-white transition-all duration-500 -rotate-3 group-hover:rotate-0 shadow-sm group-hover:shadow-xl group-hover:shadow-orange-200">
+                            <i class="fas fa-shopping-cart text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-4" data-content-key="howItWorks.step2Title">
+                            Handlekurv</h3>
+                        <p class="text-slate-500 leading-relaxed" data-content-key="howItWorks.step2Text">Legg dem i
+                            handlekurven og betal.</p>
+                    </div>
+                    <div class="text-center group">
+                        <div
+                            class="w-24 h-24 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 group-hover:bg-orange-500 group-hover:text-white transition-all duration-500 rotate-6 group-hover:rotate-0 shadow-sm group-hover:shadow-xl group-hover:shadow-orange-200">
+                            <i class="fas fa-box-open text-3xl"></i>
+                        </div>
+                        <h3 class="text-xl font-black text-slate-900 mb-4" data-content-key="howItWorks.step3Title">
+                            Leveranse</h3>
+                        <p class="text-slate-500 leading-relaxed" data-content-key="howItWorks.step3Text">Få dem levert
+                            hjem til deg eller nærmeste hentested.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visual Categories Grid -->
+        <section class="py-24 bg-slate-50 border-y border-slate-100">
+            <div class="max-w-7xl mx-auto px-6">
+                <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-16">
+                    <div>
+                        <h2 class="text-4xl md:text-6xl font-black text-slate-900 tracking-tighter"
+                            data-content-key="categoriesShowcase.title">Våres produkter</h2>
+                        <p class="text-slate-500 mt-4 text-lg" data-content-key="categoriesShowcase.description">Utforsk
+                            vårt kuraterte utvalg av design og ressurser.</p>
+                    </div>
+                    <a href="#shop-content"
+                        class="inline-flex items-center gap-3 px-8 py-4 rounded-full border-2 border-slate-900 font-bold hover:bg-slate-900 hover:text-white transition-all group">
+                        <span data-content-key="categoriesShowcase.cta">Handle nå</span> <i
+                            class="fas fa-arrow-right group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Klær -->
+                    <div class="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-200 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                        onclick="filterByCategory('klær')">
+                        <img src="https://static.wixstatic.com/media/db4f96_0c13fad03a484dc99999f5994f4c6125~mv2.png"
+                            alt="Klær"
+                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/45 to-slate-900/15 opacity-80 group-hover:opacity-95 transition-opacity">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform duration-500"
+                                data-content-key="categoriesShowcase.cards.clothes">
+                                Klær</h3>
+                        </div>
+                    </div>
+                    <!-- Barneklær -->
+                    <div class="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-200 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                        onclick="filterByCategory('barn-ungdom')">
+                        <img src="https://static.wixstatic.com/media/3a1544_300b913214034fab9cb980bd8ff860a9~mv2.jpg"
+                            alt="Barneklær"
+                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/45 to-slate-900/15 opacity-80 group-hover:opacity-95 transition-opacity">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform duration-500 text-center px-4"
+                                data-content-key="categoriesShowcase.cards.youth">
+                                Barneklær</h3>
+                        </div>
+                    </div>
+                    <!-- Babyklær -->
+                    <div class="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-200 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                        onclick="filterByCategory('baby')">
+                        <img src="https://static.wixstatic.com/media/3a1544_1c3f4174fd34423a99f4c0eb938c08c3~mv2.jpg"
+                            alt="Babyklær"
+                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/45 to-slate-900/15 opacity-80 group-hover:opacity-95 transition-opacity">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform duration-500 text-center px-4"
+                                data-content-key="categoriesShowcase.cards.baby">
+                                Babyklær</h3>
+                        </div>
+                    </div>
+                    <!-- Klistermerker -->
+                    <div class="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-200 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                        onclick="filterByCategory('klistermerker')">
+                        <img src="https://static.wixstatic.com/media/3a1544_f39058e35f7442c3a1fc6f74705a4120~mv2.jpg"
+                            alt="Klistermerker"
+                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/45 to-slate-900/15 opacity-80 group-hover:opacity-95 transition-opacity">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform duration-500 text-center px-4 leading-none"
+                                data-content-key="categoriesShowcase.cards.stickers">
+                                Klistermerker</h3>
+                        </div>
+                    </div>
+                    <!-- Tilbehør -->
+                    <div class="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-200 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                        onclick="filterByCategory('tilbehør')">
+                        <img src="https://static.wixstatic.com/media/db4f96_d5b19d7b00974b7090be39b4eb30e77c~mv2.png"
+                            alt="Tilbehør"
+                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/45 to-slate-900/15 opacity-80 group-hover:opacity-95 transition-opacity">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform duration-500"
+                                data-content-key="categoriesShowcase.cards.accessories">
+                                Tilbehør</h3>
+                        </div>
+                    </div>
+                    <!-- Kopper -->
+                    <div class="group relative aspect-[4/5] overflow-hidden rounded-[2.5rem] bg-slate-200 cursor-pointer shadow-lg hover:shadow-2xl transition-all duration-500"
+                        onclick="filterByCategory('kopper-flasker')">
+                        <img src="https://static.wixstatic.com/media/3a1544_1d119b2ec68d4de8a47714198d913102~mv2.jpg"
+                            alt="Kopper"
+                            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950/95 via-slate-900/45 to-slate-900/15 opacity-80 group-hover:opacity-95 transition-opacity">
+                        </div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <h3 class="text-4xl md:text-5xl font-black text-white tracking-tighter drop-shadow-[0_8px_24px_rgba(0,0,0,0.8)] group-hover:scale-110 transition-transform duration-500"
+                                data-content-key="categoriesShowcase.cards.mugs">
+                                Kopper</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Subscription Packages Section -->
+        <section class="py-24 bg-white overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6">
+                <div
+                    class="subscription-showcase relative rounded-[2rem] md:rounded-[2.4rem] overflow-hidden p-6 md:p-8 lg:p-10">
+                    <div
+                        class="relative z-10 grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-8 lg:gap-12 items-center">
+                        <div class="order-2 lg:order-1">
+                            <figure class="subscription-photo-card overflow-hidden rounded-[1.6rem] bg-slate-200">
+                                <img src="https://static.wixstatic.com/media/3a1544_1d119b2ec68d4de8a47714198d913102~mv2.jpg"
+                                    class="w-full h-[300px] md:h-[420px] object-cover object-center"
+                                    alt="Abonnementspakke med koppdesign" loading="lazy">
+                            </figure>
+
+                            <div class="mt-4 subscription-glass rounded-2xl p-4 md:p-5">
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-bold"
+                                            data-content-key="subscription.packageLabel">
+                                            Velg pakke
+                                        </p>
+                                        <p class="mt-1 text-slate-900 font-black"
+                                            data-content-key="subscription.packageSummary">Stickers, t-skjorter eller
+                                            kopper</p>
+                                    </div>
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                                        <i class="fas fa-box"></i>
+                                    </div>
+                                </div>
+                                <div class="mt-4 grid grid-cols-3 gap-2">
+                                    <span
+                                        class="rounded-xl bg-white px-3 py-2 text-center text-xs md:text-sm font-bold text-slate-700"
+                                        data-content-key="subscription.chip1">Stickers</span>
+                                    <span
+                                        class="rounded-xl bg-white px-3 py-2 text-center text-xs md:text-sm font-bold text-slate-700"
+                                        data-content-key="subscription.chip2">T-skjorter</span>
+                                    <span
+                                        class="rounded-xl bg-white px-3 py-2 text-center text-xs md:text-sm font-bold text-slate-700"
+                                        data-content-key="subscription.chip3">Kopper</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="order-1 lg:order-2">
+                            <span
+                                class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 text-[11px] md:text-xs font-black uppercase tracking-[0.18em] text-orange-700">
+                                <i class="fas fa-star text-[10px]"></i>
+                                <span data-content-key="subscription.badge">Månedlig abonnement</span>
+                            </span>
+
+                            <h2
+                                class="mt-5 text-4xl md:text-6xl font-black text-slate-900 leading-[0.95] tracking-tight">
+                                <span data-content-key="subscription.titleLine1">Abonner på</span>
+                                <span class="block text-orange-600" data-content-key="subscription.titleLine2">månedlige
+                                    pakker</span>
+                            </h2>
+
+                            <p class="mt-5 text-lg md:text-xl text-slate-600 leading-relaxed max-w-xl"
+                                data-content-key="subscription.description">
+                                Velg mellom klistermerker, t-skjorter eller kopper. Få ferdig kuratert design levert
+                                rett i postkassen hver måned.
+                            </p>
+
+                            <ul class="mt-7 space-y-3">
+                                <li class="flex items-center gap-3 text-slate-800 font-semibold">
+                                    <span
+                                        class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs shrink-0">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span data-content-key="subscription.benefit1">Gratis frakt på alle
+                                        abonnement</span>
+                                </li>
+                                <li class="flex items-center gap-3 text-slate-800 font-semibold">
+                                    <span
+                                        class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs shrink-0">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span data-content-key="subscription.benefit2">Eksklusive design kun for
+                                        abonnenter</span>
+                                </li>
+                                <li class="flex items-center gap-3 text-slate-800 font-semibold">
+                                    <span
+                                        class="w-8 h-8 rounded-full bg-orange-100 text-orange-600 flex items-center justify-center text-xs shrink-0">
+                                        <i class="fas fa-check"></i>
+                                    </span>
+                                    <span data-content-key="subscription.benefit3">Ingen bindingstid - avslutt når du
+                                        vil</span>
+                                </li>
+                            </ul>
+
+                            <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                                <button onclick="filterByCategory('abonnement')"
+                                    class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full text-white font-black text-lg bg-gradient-to-r from-orange-500 to-amber-500 shadow-xl shadow-orange-200/80 hover:brightness-105 transition-all">
+                                    <span data-content-key="subscription.ctaPrimary">Bestill abonnement</span>
+                                    <i class="fas fa-arrow-right text-sm"></i>
+                                </button>
+                                <a href="#shop-content"
+                                    class="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full border-2 border-slate-900 text-slate-900 font-black text-lg hover:bg-slate-900 hover:text-white transition-all">
+                                    <span data-content-key="subscription.ctaSecondary">Se alle produkter</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Gift Card Section (Minimal Banner) -->
+        <section class="py-24 bg-white relative overflow-hidden">
+            <div class="max-w-7xl mx-auto px-6">
+                <div
+                    class="relative overflow-hidden rounded-[2rem] md:rounded-[2.5rem] border border-white bg-[#f5efe6] shadow-[0_24px_70px_rgba(15,23,42,0.10)]">
+                    <div
+                        class="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.72),transparent_42%),radial-gradient(circle_at_85%_90%,rgba(251,146,60,0.12),transparent_50%)]">
+                    </div>
+
+                    <div
+                        class="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_1.2fr_0.9fr] items-center gap-8 lg:gap-4 px-5 py-8 sm:px-8 sm:py-10 md:px-10 lg:px-12 lg:py-12">
+                        <div class="relative h-[180px] sm:h-[260px] md:h-[320px] hidden sm:block">
+                            <div
+                                class="absolute left-0 top-6 w-[44%] h-[62%] rounded-[1.35rem] overflow-hidden shadow-xl -rotate-[13deg]">
+                                <img src="https://static.wixstatic.com/media/3a1544_f39058e35f7442c3a1fc6f74705a4120~mv2.jpg"
+                                    alt="Produktdesign" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="absolute left-[24%] top-0 w-[47%] h-[56%] rounded-[1.35rem] overflow-hidden shadow-xl rotate-[11deg]">
+                                <img src="https://static.wixstatic.com/media/db4f96_0c13fad03a484dc99999f5994f4c6125~mv2.png"
+                                    alt="Klesdesign" class="w-full h-full object-cover">
+                            </div>
+                            <div
+                                class="absolute left-[12%] bottom-0 w-[56%] h-[54%] rounded-[1.35rem] overflow-hidden shadow-xl -rotate-[8deg]">
+                                <img src="https://static.wixstatic.com/media/3a1544_1d119b2ec68d4de8a47714198d913102~mv2.jpg"
+                                    alt="Kopper og gaveidéer" class="w-full h-full object-cover">
+                            </div>
+                        </div>
+
+                        <div class="text-center lg:text-left py-1 lg:py-4">
+                            <span
+                                class="inline-flex items-center gap-2 rounded-full border border-orange-100 bg-white/85 px-4 py-2 text-[11px] font-black uppercase tracking-[0.18em] text-orange-700">
+                                <span data-content-key="giftCard.badge">Gavekort</span>
+                            </span>
+
+                            <h2
+                                class="mt-5 text-3xl sm:text-4xl md:text-5xl lg:text-[3.35rem] font-black leading-[1.02] tracking-tight text-slate-900">
+                                <span data-content-key="giftCard.titleLine1">En minimalistisk gave</span>
+                                <span class="block" data-content-key="giftCard.titleLine2">som alltid passer</span>
+                            </h2>
+
+                            <p class="mt-5 text-base md:text-lg text-slate-700/80 leading-relaxed max-w-xl mx-auto lg:mx-0"
+                                data-content-key="giftCard.description">
+                                Velg beløp, legg ved en personlig melding, og gi mottakeren friheten til å velge noe de
+                                faktisk ønsker seg.
+                            </p>
+
+                            <div class="mt-7 flex flex-col sm:flex-row items-center lg:items-start gap-4">
+                                <button onclick="filterByCategory('digitale-filer')"
+                                    class="inline-flex shrink-0 whitespace-nowrap items-center justify-center gap-2.5 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-3.5 text-base md:text-lg font-black text-white shadow-[0_12px_28px_rgba(249,115,22,0.26)] transition-all hover:brightness-105 hover:-translate-y-0.5">
+                                    <span data-content-key="giftCard.cta">Kjøp gavekort</span>
+                                    <i class="fas fa-arrow-right text-sm"></i>
+                                </button>
+                                <p class="text-sm font-semibold text-slate-700/80" data-content-key="giftCard.helper">
+                                    Perfekt for bursdag, takkegave eller høytid
+                                </p>
+                            </div>
+                        </div>
+
+                        <div
+                            class="relative flex justify-center lg:justify-end items-end h-[250px] sm:h-[320px] lg:h-[380px]">
+                            <svg class="hidden lg:block absolute inset-0 w-full h-full" viewBox="0 0 260 360"
+                                fill="none" aria-hidden="true">
+                                <path d="M10 280C40 230 72 210 115 205C155 200 173 164 210 130" stroke="#f97316"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-dasharray="14 14" opacity="0.75" />
+                                <path d="M188 118L213 122L201 143" stroke="#f59e0b" stroke-width="3"
+                                    stroke-linecap="round" stroke-linejoin="round" opacity="0.9" />
+                            </svg>
+
+                            <span class="hidden lg:block absolute left-6 top-10 text-2xl text-amber-400/85">✦</span>
+                            <span class="hidden lg:block absolute left-14 bottom-14 text-2xl text-amber-400/85">✦</span>
+
+                            <div class="relative w-[210px] sm:w-[245px] lg:w-[290px] h-full">
+                                <div
+                                    class="absolute inset-0 rounded-[1.8rem] bg-white/35 border border-white/60 translate-y-3">
+                                </div>
+                                <div
+                                    class="absolute inset-0 rounded-[1.8rem] overflow-hidden shadow-[0_20px_40px_rgba(15,23,42,0.12)] border border-white/70 bg-white">
+                                    <div
+                                        class="w-full h-full bg-gradient-to-br from-white to-slate-50 p-5 sm:p-6 flex flex-col">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-12 h-12 rounded-2xl bg-white border border-slate-200 shadow-sm p-2">
+                                                <img src="img/logo-hkm.png" alt="HKM logo"
+                                                    class="w-full h-full object-contain">
+                                            </div>
+                                            <div>
+                                                <p class="text-[10px] uppercase tracking-[0.16em] text-slate-500 font-bold"
+                                                    data-content-key="giftCard.cardBrand">
+                                                    His Kingdom Designs
+                                                </p>
+                                                <p class="text-sm font-black text-slate-900"
+                                                    data-content-key="giftCard.cardType">Digitalt gavekort</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="mt-6 sm:mt-8">
+                                            <p class="text-[11px] uppercase tracking-[0.18em] text-orange-600 font-black"
+                                                data-content-key="giftCard.cardEyebrow">
+                                                Gavekort
+                                            </p>
+                                            <p class="mt-2 text-2xl sm:text-[1.7rem] leading-tight font-black text-slate-900"
+                                                data-content-key="giftCard.cardHeadline">
+                                                Gi valgfri gave
+                                            </p>
+                                            <p class="mt-2 text-sm text-slate-600 leading-relaxed"
+                                                data-content-key="giftCard.cardDescription">
+                                                Velg beløp og legg ved en personlig melding.
+                                            </p>
+                                        </div>
+
+                                        <div class="mt-auto pt-5">
+                                            <div class="rounded-2xl bg-orange-50 border border-orange-100 px-4 py-3">
+                                                <div
+                                                    class="flex items-center justify-between gap-3 text-xs font-bold text-slate-700">
+                                                    <span data-content-key="giftCard.cardPriceFrom">Fra 100 kr</span>
+                                                    <span class="text-orange-600"
+                                                        data-content-key="giftCard.cardDelivery">Sendes digitalt</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="sm:hidden relative z-10 px-5 pb-6">
+                        <div class="grid grid-cols-3 gap-3">
+                            <img src="https://static.wixstatic.com/media/3a1544_f39058e35f7442c3a1fc6f74705a4120~mv2.jpg"
+                                alt="Produktdesign" class="h-20 w-full rounded-2xl object-cover shadow-lg">
+                            <img src="https://static.wixstatic.com/media/db4f96_0c13fad03a484dc99999f5994f4c6125~mv2.png"
+                                alt="Klesdesign" class="h-20 w-full rounded-2xl object-cover shadow-lg">
+                            <img src="https://static.wixstatic.com/media/3a1544_1d119b2ec68d4de8a47714198d913102~mv2.jpg"
+                                alt="Koppdesign" class="h-20 w-full rounded-2xl object-cover shadow-lg">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Unified Filter + Product Grid -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 scroll-mt-24" id="shop-content">
+            <div class="text-center mb-10">
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight"
+                    data-content-key="productBrowser.title">Finn din favoritt</h2>
+                <div class="w-14 h-1.5 bg-orange-500 mx-auto rounded-full mt-3"></div>
+            </div>
+
+            <div class="bg-white border border-slate-200 rounded-[1.6rem] shadow-sm p-4 md:p-5 mb-10">
+                <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <span
+                            class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-100 text-slate-700">
+                            <i class="fas fa-sliders text-sm"></i>
+                        </span>
+                        <div id="butikk-count"
+                            class="text-xs md:text-sm font-black text-orange-600 uppercase tracking-[0.14em]">
+                            Henter produkter...
+                        </div>
+                    </div>
+                    <div class="relative w-full xl:w-[320px]">
+                        <input type="text" id="shop-search" data-content-key="productBrowser.searchPlaceholder"
+                            placeholder="Søk i arkivet..."
+                            class="w-full h-11 pl-11 pr-4 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold focus:ring-4 focus:ring-orange-500/10 focus:border-orange-200 placeholder:text-slate-400 transition-all"
+                            disabled>
+                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    </div>
+                </div>
+
+                <div class="mt-4 border-t border-slate-100 pt-4">
+                    <div class="filter-scroll overflow-x-auto pb-2 -mx-1 px-1">
+                        <div class="flex items-center gap-2 min-w-max">
+                            <button
+                                class="category-btn unified-category-btn active px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="all">Alle
+                                varene</button>
+                            <!-- Kilde fra Wix dashboard -->
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="abonnement">Abonnement</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="armband-smykker">Armbånd & smykker</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="baby">Baby</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="barn-ungdom">Barn & Ungdom</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="bilder-plakater">Bilder & plakater</button>
+                            <!-- "CHRISTMAS" er skjult da den mangler aktiv-flagg i bildet, men greit å ha klar -->
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="christmas">Christmas</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="dameklaer">Dameklær</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="digitale-filer">Digitale filer</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="english">English products</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="espanol">Español</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="genser">Genser</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="handlenett">Handlenett / Totebag</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="hatter-caps">Hatter /caps</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="humor">Humor</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="israel">Israel</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="jesus">Jesus</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="joggebukser">Joggebukser</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="klistermerker">Klistermerker</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="klær">Klær</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="kopper-flasker">Kopper og flasker</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="kreative-boker">Kreative bøker</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="mirakel-familie">Mirakel familie</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="mobildeksel">Mobildeksel</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="norske">NORSKE produkter</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="paske">Påske</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="russ">RUSS</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="salg">SALG</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="spiritual-battle">Spiritual Battle</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="sport">Sport / Performance</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="t-shirts">T-shirts</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="tilbehor">Tilbehør</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="undervisning">Undervisning</button>
+                            <button
+                                class="category-btn unified-category-btn px-4 py-2 rounded-full font-bold text-sm transition-all"
+                                data-category="varna">Varna - Evangeliesenteret</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(240px,320px)_1fr] gap-3 items-start">
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
+                        <div class="flex items-center justify-between gap-4 mb-2.5">
+                            <p class="text-[11px] font-black uppercase tracking-[0.14em] text-slate-500"
+                                data-content-key="productBrowser.priceLabel">Pris</p>
+                            <span id="price-value-display"
+                                class="inline-flex items-center rounded-full bg-white px-2.5 py-1 text-[11px] font-black text-orange-600 border border-orange-100">5000
+                                kr</span>
+                        </div>
+                        <input type="range" id="price-filter" min="0" max="5000" step="10" value="5000"
+                            class="w-full h-2 bg-white rounded-lg appearance-none cursor-pointer accent-orange-500">
+                        <div class="mt-2 flex justify-between text-[10px] font-bold text-slate-500">
+                            <span>0 kr</span>
+                            <span>5000 kr</span>
+                        </div>
+                    </div>
+
+                    <div class="min-w-0">
+                        <div class="flex items-center justify-between gap-4 mb-2">
+                            <p class="text-[11px] font-black uppercase tracking-[0.14em] text-slate-500"
+                                data-content-key="productBrowser.moreFiltersLabel">Flere filtre</p>
+                        </div>
+                        <div id="dynamic-filters" class="filter-scroll overflow-x-auto pb-2">
+                            <!-- Populated by window.renderFilters() in wix-store.js -->
+                        </div>
+                    </div>
+
+                    <div class="lg:col-span-2 flex justify-start lg:justify-end pt-1">
+                        <button onclick="window.resetFilters && window.resetFilters()"
+                            class="w-full sm:w-auto h-11 px-4 rounded-xl bg-slate-50 border border-slate-200 text-[11px] font-black uppercase tracking-[0.14em] text-slate-600 hover:bg-slate-100 hover:border-slate-300 transition-all">
+                            <span data-content-key="productBrowser.resetFiltersLabel">Nullstill filtre</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grid Container -->
+            <div id="butikk-grid-container" class="relative">
+
+                <!-- Skeleton Loader -->
+                <div id="butikk-loader" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+                    <!-- Cards loop -->
+                    <div class="bg-white p-4 rounded-2xl border border-slate-50 shadow-sm space-y-3">
+                        <div class="aspect-[3/4] rounded-xl skeleton-pulse bg-slate-100"></div>
+                        <div class="h-3 w-1/3 rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="h-5 w-full rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="flex justify-between mt-3">
+                            <div class="h-5 w-1/4 rounded-full skeleton-pulse bg-slate-100"></div>
+                            <div class="h-8 w-8 rounded-full skeleton-pulse bg-slate-100"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-50 shadow-sm space-y-3">
+                        <div class="aspect-[3/4] rounded-xl skeleton-pulse bg-slate-100"></div>
+                        <div class="h-3 w-1/3 rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="h-5 w-full rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="flex justify-between mt-3">
+                            <div class="h-5 w-1/4 rounded-full skeleton-pulse bg-slate-100"></div>
+                            <div class="h-8 w-8 rounded-full skeleton-pulse bg-slate-100"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-50 shadow-sm space-y-3">
+                        <div class="aspect-[3/4] rounded-xl skeleton-pulse bg-slate-100"></div>
+                        <div class="h-3 w-1/3 rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="h-5 w-full rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="flex justify-between mt-3">
+                            <div class="h-5 w-1/4 rounded-full skeleton-pulse bg-slate-100"></div>
+                            <div class="h-8 w-8 rounded-full skeleton-pulse bg-slate-100"></div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl border border-slate-50 shadow-sm space-y-3 hidden lg:block">
+                        <div class="aspect-[3/4] rounded-xl skeleton-pulse bg-slate-100"></div>
+                        <div class="h-3 w-1/3 rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="h-5 w-full rounded-full skeleton-pulse bg-slate-100"></div>
+                        <div class="flex justify-between mt-3">
+                            <div class="h-5 w-1/4 rounded-full skeleton-pulse bg-slate-100"></div>
+                            <div class="h-8 w-8 rounded-full skeleton-pulse bg-slate-100"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="butikk-grid"
+                    class="hidden grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 opacity-0 transition-opacity duration-500">
+                    <!-- Products will be injected here -->
+                </div>
+
+                <!-- Error / Empty State -->
+                <div id="butikk-error"
+                    class="hidden text-center py-20 px-8 rounded-4xl bg-white border border-slate-100 shadow-bookle">
+                    <span
+                        class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-widest border border-orange-100 mb-6">
+                        <i class="fas fa-magic"></i> <span data-content-key="productBrowser.error.badge">His Kingdom
+                            Designs</span>
+                    </span>
+                    <h1 class="text-4xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight mb-6"
+                        data-content-key="productBrowser.error.title">
+                        Kreative Ressurser
+                    </h1>
+                    <p class="text-slate-600 mb-8 max-w-md mx-auto" data-content-key="productBrowser.error.description">
+                        Vi har for øyeblikket problemer med å hente katalogen. Du kan se alle våre produkter
+                        direkte i
+                        Wix-butikken.
+                    </p>
+                    <a href="https://www.hiskingdomministry.no/butikk"
+                        class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-orange-500 text-white font-bold hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20">
+                        <span data-content-key="productBrowser.error.cta">Besøk Wix-butikken nå</span> <i
+                            class="fas fa-external-link-alt"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <div class="footer-left">
+                    <div class="footer-brand">
+                        <a href="index.html" class="logo">
+                            <div class="logo-icon">
+                                <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                            </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til
+                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                    </div>
+
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>Om oss</h4>
+                            <ul>
+                                <li><a href="index.html#hjem">Hjem</a></li>
+                                <li><a href="om-oss.html">Om oss</a></li>
+                                <li><a href="om-oss.html#visjon">Vår visjon</a></li>
+                                <li><a href="kontakt.html">Kontakt oss</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Ressurser</h4>
+                            <ul>
+                                <li><a href="media.html#teaching-section">Undervisning</a></li>
+                                <li><a href="arrangementer.html">E-kurs</a></li>
+                                <li><a href="blogg.html">Bøker & Blogg</a></li>
+                                <li><a href="butikk.html">Butikk</a></li>
+                                <li><a href="minside/index.html" target="_blank">Min Side</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="media.html#podcast-section">Podcast</a></li>
+                                <li><a href="media.html">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvering</h4>
+                            <ul>
+                                <li><a href="arrangementer.html">Kalender</a></li>
+                                <li><a href="donasjoner.html">Gi en gave</a></li>
+                                <li><a href="personvern.html">Personvern</a></li>
+                                <li><a href="tilgjengelighet.html">Tilgjengelighet</a></li>
+                                <li><a href="#"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-right">
+                    <div class="footer-card">
+                        <h3>Følg oss</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-card contact-card">
+                        <h3>Kontakt oss</h3>
+                        <a href="kontakt.html" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>E-post:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Telefon:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Konto nr.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
+                <a href="admin/login.html" class="admin-link" id="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+            (function () {
+                const header = document.getElementById("header");
+                const menuToggle = document.getElementById("menu-toggle");
+                const megaMenu = document.getElementById("mega-menu");
+                const openIcon = menuToggle && menuToggle.querySelector(".open-icon");
+                const closeIcon = menuToggle && menuToggle.querySelector(".close-icon");
+
+                if (!menuToggle || !megaMenu) return;
+
+                function setMenuOpen(isOpen) {
+                    megaMenu.classList.toggle("opacity-0", !isOpen);
+                    megaMenu.classList.toggle("invisible", !isOpen);
+                    megaMenu.classList.toggle("opacity-100", isOpen);
+                    megaMenu.classList.toggle("visible", isOpen);
+                    megaMenu.classList.toggle("active", isOpen);
+                    megaMenu.setAttribute("aria-hidden", isOpen ? "false" : "true");
+                    menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+                    if (header) header.classList.toggle("menu-open", isOpen);
+                    document.body.style.overflow = isOpen ? "hidden" : "";
+                    if (openIcon) openIcon.classList.toggle("hidden", isOpen);
+                    if (closeIcon) closeIcon.classList.toggle("hidden", !isOpen);
+                }
+
+                function isMenuOpen() {
+                    return megaMenu.classList.contains("active") || megaMenu.classList.contains("opacity-100");
+                }
+
+                menuToggle.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    setMenuOpen(!isMenuOpen());
+                });
+
+                megaMenu.addEventListener("click", function (e) {
+                    if (e.target === megaMenu || e.target.closest("a")) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                document.addEventListener("keydown", function (e) {
+                    if (e.key === "Escape" && isMenuOpen()) {
+                        setMenuOpen(false);
+                    }
+                });
+
+                const yearEl = document.getElementById("copyright-year");
+                if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+            })();
+    </script>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
+
+    <!-- Firebase Config & Content Manager -->
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js?v=20260226-0023"></script>
+    <script src="js/notifications.js?v=20260226-0021"></script>
+    <script src="js/content-manager.js?v=1723"></script>
+
+    <script>
+        // API Config
+        window.HKM_WIX_STORE_CONFIG = {
+            clientId: '', // Add Client ID if using direct SDK mode
+            useProxy: true,
+            localProxyUrl: 'http://127.0.0.1:5001/his-kingdom-ministry/us-central1/wixProducts',
+            remoteProxyUrl: 'https://us-central1-his-kingdom-ministry.cloudfunctions.net/wixProducts',
+            limit: 100
+        };
+    </script>
+    <script src="js/wix-store.js?v=20260226-0039"></script>
+    <!-- Swiper JS -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+</body>
+
+</html>

@@ -4,12 +4,220 @@ const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
+require("dotenv").config({ path: path.join(__dirname, ".env.local"), override: true, quiet: true });
+const { createClient, OAuthStrategy, ApiKeyStrategy } = require("@wix/sdk");
+const { products } = require("@wix/stores");
 
 admin.initializeApp();
 const db = admin.firestore();
 
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
+
+function parseWixApiKeyMetadata(apiKey) {
+  if (!apiKey || typeof apiKey !== "string") return {};
+
+  try {
+    const parts = apiKey.split(".");
+    if (parts.length < 2) return {};
+    const payloadJson = Buffer.from(parts[1], "base64url").toString("utf8");
+    const payload = JSON.parse(payloadJson);
+    const rawData = typeof payload.data === "string" ? payload.data : null;
+    if (!rawData) return {};
+    const data = JSON.parse(rawData);
+    return {
+      accountId: data && data.tenant && data.tenant.type === "account" ? data.tenant.id : undefined,
+      apiKeyId: data && data.id ? data.id : undefined,
+      appId: data && data.identity ? data.identity.id : undefined,
+    };
+  } catch (error) {
+    return {};
+  }
+}
+
+function getWixClient() {
+  const clientId = process.env.WIX_CLIENT_ID;
+  const apiKey = process.env.WIX_API_KEY;
+  const siteId = process.env.WIX_SITE_ID;
+  const parsedApiKeyMeta = parseWixApiKeyMetadata(apiKey);
+  const accountId = process.env.WIX_ACCOUNT_ID || parsedApiKeyMeta.accountId;
+
+  if (apiKey && (siteId || accountId)) {
+    return createClient({
+      modules: { products },
+      auth: siteId ?
+        ApiKeyStrategy({
+          apiKey,
+          siteId,
+          ...(accountId ? { accountId } : {}),
+        }) :
+        ApiKeyStrategy({
+          apiKey,
+          accountId,
+        }),
+    });
+  }
+
+  if (!clientId) throw new Error("Missing WIX_CLIENT_ID.");
+
+  return createClient({
+    modules: { products },
+    auth: OAuthStrategy({ clientId }),
+  });
+}
+
+function wixPickFirstString(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
+
+function wixPickFirstNumber(...values) {
+  for (const value of values) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "string" && value.trim()) {
+      const parsed = Number(value.replace(",", "."));
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return null;
+}
+
+function formatWixPrice(amount, currency = "NOK", locale = "no-NO") {
+  if (amount == null) return "Se pris på Wix";
+  try {
+    return new Intl.NumberFormat(locale, {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  } catch (error) {
+    return `${amount} ${currency}`;
+  }
+}
+
+/**
+ * Konverterer Wix' interne bildeformat (wix:image://v1/...) til en offentlig URL.
+ */
+function getWixImageUrl(wixUrl) {
+  if (!wixUrl || typeof wixUrl !== "string") return "";
+  if (wixUrl.startsWith("http")) return wixUrl;
+
+  // Format: wix:image://v1/c9f56a_...~mv2.jpg/filename.jpg#originWidth=100&originHeight=100
+  if (wixUrl.startsWith("wix:image://v1/")) {
+    const parts = wixUrl.replace("wix:image://v1/", "").split("/");
+    if (parts.length > 0) {
+      const imageId = parts[0];
+      return `https://static.wixstatic.com/media/${imageId}`;
+    }
+  }
+
+  // Format: wix:image://v1/c9f56a_...~mv2.jpg#originWidth=100&originHeight=100
+  if (wixUrl.includes("wix:image")) {
+    const match = wixUrl.match(/wix:image:\/\/v1\/([^\/#\?]+)/);
+    if (match && match[1]) {
+      return `https://static.wixstatic.com/media/${match[1]}`;
+    }
+  }
+
+  return wixUrl;
+}
+
+function normalizeWixProduct(item, req) {
+  const locale = req.query.locale || "no-NO";
+  const fallbackBaseUrl = req.query.storeBaseUrl || "https://www.hiskingdomministry.no";
+  const fallbackStoreUrl = req.query.externalStoreBaseUrl || "https://www.hiskingdomministry.no/butikk";
+  const productPathPrefix = String(req.query.productPathPrefix || "/product-page/").replace(/^\/+|\/+$/g, "");
+
+  const slug = wixPickFirstString(
+    item.slug,
+    item.handle,
+    item.seoData && item.seoData.slug,
+  );
+
+  const directUrl = wixPickFirstString(
+    item.productUrl,
+    item.url,
+    item.productPageUrl,
+    item.onlineStoreUrl,
+    item.link,
+    item.seoData && item.seoData.canonicalUrl,
+    item.seoData && item.seoData.url,
+  );
+
+  let productUrl = fallbackStoreUrl;
+  if (directUrl) {
+    productUrl = /^https?:\/\//i.test(directUrl) ?
+      directUrl :
+      `${fallbackBaseUrl.replace(/\/+$/, "")}/${String(directUrl).replace(/^\/+/, "")}`;
+  } else if (slug) {
+    productUrl = `${fallbackBaseUrl.replace(/\/+$/, "")}/${productPathPrefix}/${encodeURIComponent(slug)}`;
+  }
+
+  const rawImageUrl = wixPickFirstString(
+    item.imageUrl,
+    item.image && item.image.url,
+    item.mainImage,
+    item.mainImage && item.mainImage.url,
+    item.mainMedia && item.mainMedia.url,
+    item.mainMedia && item.mainMedia.image && item.mainMedia.image.url,
+    item.mainMedia && item.mainMedia.image && item.mainMedia.image.imageUrl,
+    item.media && item.media.mainMedia && item.media.mainMedia.image && item.media.mainMedia.image.url,
+    item.mediaItems && item.mediaItems[0] && item.mediaItems[0].url,
+    item.mediaItems && item.mediaItems[0] && item.mediaItems[0].image && item.mediaItems[0].image.url,
+    item.images && item.images[0] && item.images[0].url,
+  );
+
+  const imageUrl = getWixImageUrl(rawImageUrl);
+
+  const priceValue = wixPickFirstNumber(
+    item.priceValue,
+    item.price,
+    item.price && item.price.amount,
+    item.price && item.price.value,
+    item.price && item.price.price,
+    item.priceData && item.priceData.price,
+    item.priceData && item.priceData.amount,
+    item.discountedPrice && item.discountedPrice.amount,
+  );
+
+  const currency = wixPickFirstString(
+    item.currency,
+    item.currencyCode,
+    item.price && item.price.currency,
+    item.price && item.price.currencyCode,
+    item.priceData && item.priceData.currency,
+    "NOK",
+  ) || "NOK";
+
+  const formattedPrice = wixPickFirstString(
+    item.formattedPrice,
+    item.priceFormatted,
+    item.price && item.price.formatted,
+    item.price && item.price.formattedPrice,
+    item.priceData && item.priceData.formatted,
+  ) || formatWixPrice(priceValue, currency, locale);
+
+  return {
+    id: wixPickFirstString(item.id, item._id, item.productId),
+    name: wixPickFirstString(item.name, item.title, item.productName),
+    slug,
+    productUrl,
+    imageUrl,
+    priceValue,
+    currency,
+    formattedPrice,
+    // Keep common Wix fields so the frontend normalizer can still work if needed.
+    priceData: item.priceData,
+    mainMedia: item.mainMedia,
+    collectionIds: item.collectionIds || [],
+    productOptions: item.productOptions || [],
+    variants: item.variants || [],
+  };
+}
 
 exports.getPodcast = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
   const rssUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
@@ -23,6 +231,428 @@ exports.getPodcast = onRequest({ cors: true, invoker: "public" }, async (req, re
     console.error("Error fetching podcast:", error);
     res.status(500).send("Error fetching podcast");
   }
+});
+
+/**
+ * Henter produkter fra Wix Stores via Wix SDK og returnerer et frontend-vennlig JSON-format.
+ * Frontend (`js/wix-store.js`) leser `items` direkte.
+ */
+const cors = require("cors")({ origin: true });
+const DEFAULT_FACEBOOK_PAGE_ID = "hiskingdomministry777";
+const DEFAULT_FACEBOOK_PAGE_URL = "https://www.facebook.com/hiskingdomministry777?locale=nb_NO";
+
+function getFacebookPageConfig(overrides = {}) {
+  const overridePageId = typeof overrides.pageId === "string" ? overrides.pageId.trim() : "";
+  const overridePageUrl = typeof overrides.pageUrl === "string" ? overrides.pageUrl.trim() : "";
+
+  return {
+    graphVersion: process.env.META_FACEBOOK_GRAPH_VERSION || "v25.0",
+    pageId: overridePageId ||
+      process.env.META_FACEBOOK_PAGE_ID ||
+      process.env.FACEBOOK_PAGE_ID ||
+      "",
+    pageUrl: overridePageUrl ||
+      process.env.META_FACEBOOK_PAGE_URL ||
+      DEFAULT_FACEBOOK_PAGE_URL,
+    accessToken: process.env.META_FACEBOOK_PAGE_ACCESS_TOKEN ||
+      process.env.FACEBOOK_PAGE_ACCESS_TOKEN ||
+      "",
+  };
+}
+
+function trimText(value, maxLength = 180) {
+  if (typeof value !== "string") return "";
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (normalized.length <= maxLength) return normalized;
+  return `${normalized.slice(0, Math.max(0, maxLength - 1)).trimEnd()}…`;
+}
+
+function formatFacebookPostDate(dateValue) {
+  if (!dateValue) return "";
+  try {
+    return new Date(dateValue).toLocaleDateString("nb-NO", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+  } catch (error) {
+    return "";
+  }
+}
+
+function resolveFacebookPostImage(post) {
+  const pickFirstString = (...values) => {
+    for (const value of values) {
+      if (typeof value === "string" && value.trim()) return value.trim();
+    }
+    return "";
+  };
+
+  const walkAttachment = (attachment) => {
+    if (!attachment || typeof attachment !== "object") return "";
+
+    const directImage = pickFirstString(
+      attachment.media && attachment.media.image && attachment.media.image.src,
+      attachment.media && attachment.media.source,
+      attachment.media && attachment.media.src,
+      attachment.url,
+    );
+    if (directImage) return directImage;
+
+    const subattachments = Array.isArray(attachment.subattachments && attachment.subattachments.data) ?
+      attachment.subattachments.data :
+      [];
+
+    for (const item of subattachments) {
+      const nested = walkAttachment(item);
+      if (nested) return nested;
+    }
+
+    return "";
+  };
+
+  const attachments = Array.isArray(post && post.attachments && post.attachments.data) ?
+    post.attachments.data :
+    [];
+
+  return pickFirstString(
+    post && post.full_picture,
+    ...attachments.map((attachment) => walkAttachment(attachment)),
+  );
+}
+
+function extractFacebookPageIdentifier(value) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  if (!/^https?:\/\//i.test(trimmed)) {
+    return trimmed.replace(/^@+/, "").trim();
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    const queryId = parsed.searchParams.get("id");
+    if (queryId && queryId.trim()) {
+      return queryId.trim();
+    }
+
+    const ignoredSegments = new Set([
+      "pages",
+      "pg",
+      "profile.php",
+      "posts",
+      "events",
+      "watch",
+      "photos",
+      "videos",
+      "reel",
+      "share",
+    ]);
+    const segments = parsed.pathname
+      .split("/")
+      .map((segment) => segment.trim())
+      .filter(Boolean);
+
+    for (const segment of segments) {
+      if (!ignoredSegments.has(segment.toLowerCase())) {
+        return segment;
+      }
+    }
+  } catch (error) {
+    return trimmed
+      .replace(/^https?:\/\//i, "")
+      .replace(/^www\./i, "")
+      .replace(/^facebook\.com\//i, "")
+      .split(/[/?#]/)[0]
+      .replace(/^@+/, "")
+      .trim();
+  }
+
+  return "";
+}
+
+function buildFacebookPageCandidates(config = {}) {
+  const seen = new Set();
+  const candidates = [];
+
+  const pushCandidate = (value) => {
+    const normalized = extractFacebookPageIdentifier(value);
+    if (!normalized) return;
+
+    const key = normalized.toLowerCase();
+    if (seen.has(key)) return;
+
+    seen.add(key);
+    candidates.push(normalized);
+  };
+
+  const pageIdCandidate = extractFacebookPageIdentifier(config.pageId);
+  const pageUrlCandidate = extractFacebookPageIdentifier(config.pageUrl);
+
+  if (pageUrlCandidate && pageUrlCandidate !== DEFAULT_FACEBOOK_PAGE_ID) {
+    pushCandidate(pageUrlCandidate);
+  }
+
+  pushCandidate(pageIdCandidate);
+
+  if (pageUrlCandidate && pageUrlCandidate === DEFAULT_FACEBOOK_PAGE_ID) {
+    pushCandidate(pageUrlCandidate);
+  }
+
+  pushCandidate(process.env.META_FACEBOOK_PAGE_ID || process.env.FACEBOOK_PAGE_ID || "");
+  pushCandidate(process.env.META_FACEBOOK_PAGE_URL || "");
+  pushCandidate(DEFAULT_FACEBOOK_PAGE_ID);
+
+  return candidates;
+}
+
+function buildCanonicalFacebookPageUrl(pageId, fallbackUrl = "") {
+  if (typeof fallbackUrl === "string" && fallbackUrl.trim()) {
+    return fallbackUrl.trim();
+  }
+  if (typeof pageId === "string" && pageId.trim()) {
+    return `https://www.facebook.com/${pageId.trim()}`;
+  }
+  return DEFAULT_FACEBOOK_PAGE_URL;
+}
+
+async function fetchFacebookGraphJson(graphVersion, pathName, accessToken, params = {}) {
+  const url = new URL(`https://graph.facebook.com/${graphVersion}/${pathName}`);
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      url.searchParams.set(key, String(value));
+    }
+  });
+  url.searchParams.set("access_token", accessToken);
+
+  const response = await fetch(url.toString(), {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+  const payload = await response.json();
+
+  return { response, payload };
+}
+
+function normalizeFacebookPost(post, index, fallbackPageUrl) {
+  const message = typeof post.message === "string" ? post.message.trim() : "";
+  const lines = message.split(/\n+/).map((line) => line.trim()).filter(Boolean);
+  const rawTitle = lines[0] || message || "Nytt innlegg fra Facebook";
+  const title = trimText(rawTitle, 78);
+  const excerptSource = lines.length > 1 ? lines.slice(1).join(" ") : message;
+  const excerpt = trimText(
+    excerptSource || "Se siste oppdatering, bilder og meldinger fra Facebook-siden vår.",
+    180,
+  );
+
+  return {
+    id: post.id || `facebook-${index}`,
+    title,
+    excerpt,
+    date: formatFacebookPostDate(post.created_time),
+    cta: "Les på Facebook",
+    link: (typeof post.permalink_url === "string" && post.permalink_url.trim()) ?
+      post.permalink_url.trim() :
+      fallbackPageUrl,
+    image: resolveFacebookPostImage(post),
+  };
+}
+
+exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
+  return cors(req, res, async () => {
+    if (req.method === "OPTIONS") {
+      return res.status(204).send("");
+    }
+
+    if (req.method !== "GET") {
+      return res.status(405).json({ ok: false, error: "Method not allowed. Use GET." });
+    }
+
+    const limit = Math.min(Math.max(Number(req.query.limit) || 3, 1), 6);
+    const queryPageId = typeof req.query.pageId === "string" ? req.query.pageId : "";
+    const queryPageUrl = typeof req.query.pageUrl === "string" ? req.query.pageUrl : "";
+    const config = getFacebookPageConfig({
+      pageId: queryPageId,
+      pageUrl: queryPageUrl,
+    });
+
+    if (!config.accessToken) {
+      return res.status(503).json({
+        ok: false,
+        error: "Facebook feed is not configured. Missing META_FACEBOOK_PAGE_ACCESS_TOKEN.",
+        pageUrl: config.pageUrl,
+        items: [],
+      });
+    }
+
+    try {
+      const fields = [
+        "message",
+        "permalink_url",
+        "created_time",
+        "full_picture",
+        "attachments{media,media_type,subattachments,url}",
+      ].join(",");
+      const pageCandidates = buildFacebookPageCandidates(config);
+      let lastError = "";
+
+      for (const pageCandidate of pageCandidates) {
+        let resolvedTargets = [{
+          id: pageCandidate,
+          pageUrl: buildCanonicalFacebookPageUrl(pageCandidate, config.pageUrl),
+        }];
+
+        try {
+          const pageLookup = await fetchFacebookGraphJson(
+            config.graphVersion,
+            encodeURIComponent(pageCandidate),
+            config.accessToken,
+            { fields: "id,link" },
+          );
+          const lookupMessage = pageLookup.payload && pageLookup.payload.error && pageLookup.payload.error.message ?
+            pageLookup.payload.error.message :
+            "";
+
+          if (pageLookup.response.ok && pageLookup.payload && !pageLookup.payload.error) {
+            const resolvedId = typeof pageLookup.payload.id === "string" ? pageLookup.payload.id.trim() : "";
+            const resolvedLink = typeof pageLookup.payload.link === "string" ? pageLookup.payload.link.trim() : "";
+
+            if (resolvedId && resolvedId !== pageCandidate) {
+              resolvedTargets = [{
+                id: resolvedId,
+                pageUrl: buildCanonicalFacebookPageUrl(resolvedId, resolvedLink || config.pageUrl),
+              }, {
+                id: pageCandidate,
+                pageUrl: buildCanonicalFacebookPageUrl(pageCandidate, config.pageUrl),
+              }];
+            } else if (resolvedLink) {
+              resolvedTargets[0].pageUrl = buildCanonicalFacebookPageUrl(pageCandidate, resolvedLink);
+            }
+          } else if (lookupMessage) {
+            console.warn(`Meta Facebook page lookup error for "${pageCandidate}":`, lookupMessage);
+          }
+        } catch (lookupError) {
+          console.warn(`Meta Facebook page lookup failed for "${pageCandidate}":`, lookupError && lookupError.message ? lookupError.message : lookupError);
+        }
+
+        for (const target of resolvedTargets) {
+          for (const edge of ["published_posts", "posts"]) {
+            const { response, payload } = await fetchFacebookGraphJson(
+              config.graphVersion,
+              `${encodeURIComponent(target.id)}/${edge}`,
+              config.accessToken,
+              {
+                fields,
+                limit,
+              },
+            );
+
+            if (!response.ok || payload.error) {
+              lastError = payload && payload.error && payload.error.message ?
+                payload.error.message :
+                `Meta API responded with ${response.status}`;
+              console.warn(`Meta Facebook feed error for "${target.id}" (${edge}):`, lastError);
+              continue;
+            }
+
+            const rawItems = Array.isArray(payload.data) ? payload.data : [];
+            if (!rawItems.length) {
+              continue;
+            }
+
+            const items = rawItems
+              .map((post, index) => normalizeFacebookPost(post, index, target.pageUrl))
+              .filter((item) => item && (item.link || item.title || item.excerpt));
+
+            if (!items.length) {
+              continue;
+            }
+
+            return res.status(200).json({
+              ok: true,
+              pageUrl: target.pageUrl,
+              resolvedPageId: target.id,
+              sourceEdge: edge,
+              count: items.length,
+              items,
+            });
+          }
+        }
+      }
+
+      return res.status(502).json({
+        ok: false,
+        error: lastError || "Could not resolve a working Facebook page identifier for the feed.",
+        pageUrl: config.pageUrl,
+        items: [],
+      });
+    } catch (error) {
+      console.error("Error fetching Facebook feed:", error);
+      return res.status(500).json({
+        ok: false,
+        error: error && error.message ? error.message : String(error),
+        pageUrl: config.pageUrl,
+        items: [],
+      });
+    }
+  });
+});
+
+exports.wixProducts = onRequest({ invoker: "public" }, (req, res) => {
+  return cors(req, res, async () => {
+    if (req.method === "OPTIONS") {
+      return res.status(204).send("");
+    }
+
+    if (req.method !== "GET") {
+      return res.status(405).json({ error: "Method not allowed. Use GET." });
+    }
+
+    try {
+      const limit = Math.min(Math.max(Number(req.query.limit) || 100, 1), 100);
+      const skip = Math.max(Number(req.query.offset || req.query.skip) || 0, 0);
+
+      const wixClient = getWixClient();
+      let authMode = (process.env.WIX_API_KEY && process.env.WIX_SITE_ID) ? "api-key" : "oauth";
+
+      if (authMode === "oauth" && wixClient.auth && typeof wixClient.auth.generateVisitorTokens === "function") {
+        try {
+          await wixClient.auth.generateVisitorTokens();
+        } catch (authError) {
+          console.warn("Wix visitor token generation failed:", authError && authError.message ? authError.message : authError);
+        }
+      }
+
+      const result = await wixClient.products.queryProducts()
+        .limit(limit)
+        .skip(skip)
+        .descending("_createdDate")
+        .find();
+
+      const rawItems = Array.isArray(result.items) ? result.items : [];
+      const items = rawItems.map((item) => normalizeWixProduct(item, req)).filter((item) => item.name);
+
+      return res.status(200).json({
+        ok: true,
+        source: "wix-sdk",
+        authMode,
+        total: typeof result.totalCount === "number" ? result.totalCount : items.length,
+        count: items.length,
+        items,
+      });
+    } catch (error) {
+      console.error("Error fetching Wix products:", error);
+      return res.status(500).json({
+        ok: false,
+        error: "Could not load products from Wix.",
+        details: error && error.message ? error.message : String(error),
+        fallbackUrl: "https://www.hiskingdomministry.no/butikk",
+        hint: "Set WIX_CLIENT_ID (OAuth) or preferably WIX_API_KEY + (WIX_SITE_ID or WIX_ACCOUNT_ID) in Firebase Functions env. Some Wix stores need site-scoped auth.",
+      });
+    }
+  });
 });
 
 /**

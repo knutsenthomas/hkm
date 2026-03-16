@@ -11,12 +11,25 @@
       ]
     }
   ],
+  "firestore": {
+    "rules": "firestore.rules"
+  },
   "hosting": {
     "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/facebook-feed",
+        "function": "facebookFeed"
+      },
+      {
+        "source": "/api/wix-products",
+        "function": "wixProducts"
+      }
     ]
   }
 }

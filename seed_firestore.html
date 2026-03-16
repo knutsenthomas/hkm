@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Firestore Seed Utility - HKM</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 40px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+
+        .btn {
+            background: #1B4965;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #14374d;
+        }
+
+        #log {
+            margin-top: 20px;
+            background: #eee;
+            padding: 15px;
+            border-radius: 4px;
+            white-space: pre-wrap;
+            font-family: monospace;
+            font-size: 13px;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Firestore Seed Utility</h1>
+    <p>Denne siden vil opprette manglende dokumenter i Firestore for å fjerne 404-feil og aktivere dynamisk innhold.</p>
+
+    <div class="card">
+        <h3>Handling</h3>
+        <button id="seedBtn" class="btn">Start Seeding</button>
+        <div id="log">Venter på start...</div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
+
+    <script>
+        const logEl = document.getElementById('log');
+        const btn = document.getElementById('seedBtn');
+
+        function log(msg, type = '') {
+            const span = document.createElement('span');
+            span.className = type;
+            span.textContent = `[${new Date().toLocaleTimeString()}] ${msg}\n`;
+            logEl.appendChild(span);
+        }
+
+        btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            logEl.innerHTML = '';
+            log('Starter seeding...');
+
+            if (typeof firebaseService === 'undefined') {
+                log('FEIL: firebase-service.js ikke lastet.', 'error');
+                return;
+            }
+
+            try {
+                // 1. settings_global (Footer etc)
+                log('Oppretter settings_global...');
+                await firebaseService.db.collection('content').doc('settings_global').set({
+                    brand: {
+                        name: 'His Kingdom Ministry',
+                        logoAlt: 'His Kingdom Ministry Logo'
+                    },
+                    header: {
+                        currentLanguage: 'NO',
+                        languages: {
+                            no: '🇳🇴 Norsk',
+                            en: '🇺🇸 English',
+                            es: '🇪🇸 Español'
+                        },
+                        donateLabel: 'Gi gave',
+                        menuToggleLabel: 'Toggle meny'
+                    },
+                    menu: {
+                        searchPlaceholder: 'Søk...',
+                        mobileLanguages: {
+                            no: 'NO',
+                            en: 'EN',
+                            es: 'ES'
+                        },
+                        sections: {
+                            engage: {
+                                title: 'Engasjer deg',
+                                supportWork: 'Støtt arbeidet',
+                                regularDonor: 'Bli fast giver',
+                                churches: 'For menigheter',
+                                businesses: 'For bedrifter',
+                                network: 'Business Network'
+                            },
+                            about: {
+                                title: 'Bli kjent med oss',
+                                about: 'Om oss',
+                                contact: 'Kontakt oss'
+                            },
+                            resources: {
+                                title: 'Ressurser',
+                                store: 'Butikk',
+                                events: 'Arrangementer',
+                                media: 'Media & Podcast',
+                                blog: 'Nyheter & Blogg',
+                                courses: 'Kurs',
+                                myPage: 'Min Side'
+                            }
+                        },
+                        footer: {
+                            cta: 'Støtt nå',
+                            store: 'Butikk',
+                            taxDeduction: 'Skattefradrag',
+                            about: 'Om oss',
+                            privacy: 'Personvern'
+                        }
+                    },
+                    footer: {
+                        description: 'His Kingdom Ministry er en tverrkirkelig organisasjon som brenner for å se Guds rike utbre seg.',
+                        title_about: 'Om oss',
+                        title_resources: 'Ressurser',
+                        title_media: 'Media',
+                        title_involvement: 'Engasjer deg',
+                        title_follow: 'Følg oss',
+                        title_contact: 'Kontakt oss',
+                        links: {
+                            about: {
+                                home: 'Hjem',
+                                about: 'Om oss',
+                                vision: 'Vår visjon',
+                                contact: 'Kontakt oss'
+                            },
+                            resources: {
+                                teaching: 'Undervisning',
+                                courses: 'E-kurs',
+                                blog: 'Bøker & Blogg',
+                                store: 'Butikk',
+                                myPage: 'Min Side'
+                            },
+                            media: {
+                                podcast: 'Podcast',
+                                videos: 'Videoer',
+                                youtube: 'YouTube'
+                            },
+                            involvement: {
+                                calendar: 'Kalender',
+                                donate: 'Gi en gave',
+                                privacy: 'Personvern',
+                                accessibility: 'Tilgjengelighet',
+                                cookies: 'Cookies'
+                            }
+                        },
+                        contact: {
+                            emailLabel: 'E-post:',
+                            phoneLabel: 'Telefon:',
+                            vippsLabel: 'Vipps:',
+                            accountLabel: 'Konto nr.:'
+                        },
+                        contactButton: 'Kontaktskjema',
+                        copyright: 'His Kingdom Ministry. Alle rettigheter reservert.',
+                        adminLink: 'Admin'
+                    },
+                    contact: {
+                        email: 'post@hiskingdomministry.no',
+                        phone: '+47 930 94 615',
+                        vipps: '938361',
+                        account: '3000.66.08759',
+                        address: 'Mandal, Norge'
+                    }
+                }, { merge: true });
+                log('✅ settings_global opprettet!', 'success');
+
+                // 2. index (Hero etc)
+                log('Oppretter index (forside)...');
+                await firebaseService.db.collection('content').doc('index').set({
+                    hero: {
+                        title: 'Vekst gjennom fellesskap',
+                        subtitle: 'Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et fellesskap som utforsker Guds ord og styrker troen.',
+                        btnText: 'Les mer'
+                    },
+                    intro: {
+                        imageAlt: 'Fellesskap',
+                        label: 'Velkommen til fellesskapet',
+                        title: 'Vi er en Non-profit organisasjon',
+                        text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.'
+                    },
+                    shopPromo: {
+                        title: 'Designprodukter som inspirerer',
+                        description: 'Besøk vår butikk for å se vårt utvalg av produkter.',
+                        ctaPrimary: 'Til butikken'
+                    },
+                    features: {
+                        header: {
+                            label: 'Neste steg',
+                            title: 'Bli involvert',
+                            description: 'Det finnes flere naturlige måter å bli med i arbeidet på. Velg det som passer deg best akkurat nå.'
+                        },
+                        teaching: {
+                            title: 'Undervisning',
+                            text: 'Bibelskoler, seminarer og dyptgående undervisning.',
+                            image: '/img/get-involved-teaching.svg',
+                            btnText: 'Les mer'
+                        },
+                        podcast: {
+                            title: 'Podcast',
+                            text: 'Lytt til våre samtaler om tro, liv og åndelig vekst.',
+                            image: '/img/get-involved-podcast.svg',
+                            btnText: 'Lytt nå'
+                        },
+                        travel: {
+                            title: 'Reisevirksomhet',
+                            text: 'Forkynnelse og konferanser rundt om i verden.',
+                            image: '/img/get-involved-travel.svg',
+                            btnText: 'Oppdag mer'
+                        }
+                    },
+                    stats: {
+                        youtube_videos_label: 'YouTube-videoer',
+                        youtube_views_label: 'YouTube-visninger',
+                        podcast_episodes_label: 'Podcast-episoder',
+                        countries_visited_label: 'Land besøkt'
+                    },
+                    impact: {
+                        label: 'Impact',
+                        title: 'Resultater i tall',
+                        description: 'Noen nøkkeltall som viser hvor langt arbeidet vårt rekker.'
+                    },
+                    about: {
+                        btnText: 'Oppdag mer'
+                    },
+                    causes: {
+                        card: {
+                            defaultTitle: 'Innsamlingsaksjon',
+                            collectedLabel: 'samlet inn',
+                            goalLabel: 'Mål',
+                            cta: 'Støtt prosjektet'
+                        }
+                    }
+                }, { merge: true });
+                log('✅ index opprettet!', 'success');
+
+                log('Oppretter settings_facebook_feed...');
+                await firebaseService.db.collection('content').doc('settings_facebook_feed').set({
+                    facebookFeed: {
+                        enabled: true,
+                        useLiveFeed: true,
+                        livePostCount: 3,
+                        pageId: '',
+                        label: 'Følg oss på Facebook',
+                        title: 'Siste fra Facebook-siden vår',
+                        description: 'Se oppdateringer, kunngjøringer og glimt fra arbeidet vårt direkte fra Facebook.',
+                        pageUrl: 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO',
+                        pageCta: 'Åpne Facebook-siden',
+                        posts: {
+                            first: {
+                                image: '',
+                                date: 'Denne uken',
+                                title: 'Nye glimt fra tjenesten',
+                                excerpt: 'Følg med på oppdateringer, bilder og korte refleksjoner fra arbeidet vårt.',
+                                cta: 'Les på Facebook',
+                                link: 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO'
+                            },
+                            second: {
+                                image: '',
+                                date: 'Siste oppdatering',
+                                title: 'Kunngjøringer og invitasjoner',
+                                excerpt: 'Her kan du raskt se nye invitasjoner, arrangementer og meldinger vi deler.',
+                                cta: 'Se innlegget',
+                                link: 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO'
+                            },
+                            third: {
+                                image: '',
+                                date: 'Fra fellesskapet',
+                                title: 'Vitnesbyrd og hverdagsøyeblikk',
+                                excerpt: 'Vi deler små øyeblikk, takknemlighet og ting som skjer i og rundt fellesskapet.',
+                                cta: 'Gå til Facebook',
+                                link: 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO'
+                            }
+                        }
+                    }
+                }, { merge: true });
+                log('✅ settings_facebook_feed opprettet!', 'success');
+
+                log('Oppretter hero_slides...');
+                await firebaseService.db.collection('content').doc('hero_slides').set({
+                    slides: [
+                        {
+                            title: 'Velkommen til His Kingdom Ministry',
+                            subtitle: 'Et felleskap bygget på tro, håp og kjærlighet.',
+                            imageUrl: 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=1600&h=900&fit=crop&q=80',
+                            btnText: 'Se arrangementer',
+                            btnLink: 'arrangementer.html'
+                        }
+                    ]
+                }, { merge: true });
+                log('✅ hero_slides opprettet!', 'success');
+
+                // 3. collection_events
+                log('Sjekker collection_events...');
+                const eventsDoc = await firebaseService.db.collection('content').doc('collection_events').get();
+                if (!eventsDoc.exists) {
+                    await firebaseService.db.collection('content').doc('collection_events').set({
+                        items: []
+                    });
+                    log('✅ collection_events (tom) opprettet!', 'success');
+                } else {
+                    log('ℹ️ collection_events eksisterer allerede.', 'success');
+                }
+
+                // 4. collection_causes
+                log('Sjekker collection_causes...');
+                const causesDoc = await firebaseService.db.collection('content').doc('collection_causes').get();
+                if (!causesDoc.exists) {
+                    await firebaseService.db.collection('content').doc('collection_causes').set({
+                        items: []
+                    });
+                    log('✅ collection_causes (tom) opprettet!', 'success');
+                } else {
+                    log('ℹ️ collection_causes eksisterer allerede.', 'success');
+                }
+
+                log('\n--- SUCCESS ---');
+                log('Gå tilbake til forsiden og oppdater (F5). 404-feilene bør nå være borte.');
+
+            } catch (err) {
+                log(`FEIL: ${err.message}`, 'error');
+                console.error(err);
+            } finally {
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -140,7 +140,7 @@ body.builder-active {
 .recipients-drawer .sidebar-header {
     height: 72px;
     /* Match workspace header */
-    padding: 0 40px;
+    padding: 0 var(--admin-page-gutter);
     display: flex;
     align-items: center;
     gap: 16px;
@@ -538,7 +538,7 @@ body.builder-active {
 .canvas-container {
     flex: 1;
     overflow-y: auto;
-    padding: 40px;
+    padding: var(--admin-page-gutter);
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -621,7 +621,7 @@ body.builder-active {
 /* Block Styling in Canvas */
 .newsletter-block {
     position: relative;
-    padding: 24px 40px;
+    padding: 24px var(--admin-page-gutter);
     border: 2px solid transparent;
     transition: all 0.2s;
     cursor: pointer;
@@ -946,13 +946,13 @@ body.builder-active {
 
 .drawer-inner-content {
     width: 100%;
-    padding: 40px;
+    padding: var(--admin-page-gutter);
     height: 100%;
     overflow-y: auto;
 }
 
 .recipient-page-header {
-    margin-bottom: 40px;
+    margin-bottom: var(--admin-page-gutter);
 }
 
 .recipient-page-header h1 {

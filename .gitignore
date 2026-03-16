@@ -7,3 +7,8 @@ node_modules/
 dist/
 .firebase/
 firebase-debug.log
+
+# AI and logs
+.agents/
+firepit-log.txt
+material-symbols-outlined>group<

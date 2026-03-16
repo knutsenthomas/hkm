@@ -86,89 +86,113 @@
     </header>
 
         <!-- Full-screen Mega Menu Overlay -->
-        <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-            id="mega-menu">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
-                <!-- Menu Top Controls (Search & Mobile Lang) -->
-                <div class="flex flex-col gap-6">
-                    <div class="relative w-full">
-                        <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                        <input type="text" placeholder="Search..."
-                            class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
-                    </div>
-
-                    <!-- Mobile Language Selector (Pill Style) -->
-                    <div class="flex md:hidden">
-                        <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-100">
-                            <i class="fas fa-globe text-gray-400"></i>
-                            <div class="flex gap-4 items-center">
-                                <a href="../blogg-post.html"
-                                    class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
-                                <div class="w-px h-3 bg-gray-300"></div>
-                                <a href="blog-post.html" class="text-sm font-bold text-primary-orange">EN</a>
-                                <div class="w-px h-3 bg-gray-300"></div>
-                                <a href="../es/blog-post.html"
-                                    class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
-                            </div>
-                        </div>
-                    </div>
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
-                <div class="mega-menu-body">
-                    <!-- Menu Content Grid -->
-                    <div class="mega-menu-grid">
-                        <!-- Column 1: Get Involved -->
-                        <div class="menu-col">
-                            <h3 class="menu-section-title">Get Involved</h3>
-                            <ul class="mega-nav-list">
-                                <li><a href="donations.html">Support our work</a></li>
-                                <li><a href="regular-donors.html">Become a regular donor</a></li>
-                                <li><a href="for-churches.html">For churches</a></li>
-                                <li><a href="for-businesses.html">For businesses</a></li>
-                                <li><a href="bnn.html">Business Network</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Column 2: Get to Know Us -->
-                        <div class="menu-col">
-                            <h3 class="menu-section-title">Get to Know Us</h3>
-                            <ul class="mega-nav-list">
-                                <li><a href="about.html">About the foundation</a></li>
-                                <li><a href="about.html#history">Our history</a></li>
-                                <li><a href="contact.html">Where we work</a></li>
-                                <li><a href="contact.html">Contact us</a></li>
-                            </ul>
-                        </div>
-
-                        <!-- Column 3: Resources & Media -->
-                        <div class="menu-col">
-                            <h3 class="menu-section-title">Resources</h3>
-                            <ul class="mega-nav-list">
-                                <li><a href="events.html">Events</a></li>
-                                <li><a href="media.html">Media & Podcast</a></li>
-                                <li><a href="blog.html">News & Blog</a></li>
-                                <li><a href="../minside/index.html">My Page</a></li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Menu Footer -->
-                    <div class="mega-menu-footer">
-                        <a href="donations.html" class="btn btn-primary btn-large btn-block">Support now <i
-                                class="fas fa-heart"></i></a>
-                        <div class="menu-footer-links">
-                            <a href="donations.html#tax-deduction">Tax Deduction</a>
-                            <a href="about.html">About us</a>
-                            <a href="privacy.html">Privacy Policy</a>
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="index.html" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="en/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="es/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
+                <div class="mega-menu-grid">
+                    <!-- Column 1: Engasjer deg -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="donasjoner.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a></li>
+                            <li><a href="bli-fast-giver.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a></li>
+                            <li><a href="for-menigheter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For menigheter</a></li>
+                            <li><a href="for-bedrifter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a></li>
+                            <li><a href="bnn.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 2: Bli kjent med oss -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="om-oss.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Om oss</a></li>
+                            <li><a href="kontakt.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Kontakt oss</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- Column 3: Ressurser & Media -->
+                    <div class="menu-col">
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</h3>
+                        <ul class="mega-nav-list">
+                            <li><a href="butikk.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Butikk</a></li>
+                            <li><a href="arrangementer.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Arrangementer</a></li>
+                            <li><a href="media.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="blogg.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
+                            <li><a href="kurs.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Kurs</a></li>
+                            <li><a href="minside/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Min Side</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="butikk.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="donasjoner.html#skattefradrag" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="om-oss.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="personvern.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                    </div>
+                </div>
+            </div>
         </div>
+    </div>
 
-
-        <!-- Blog Post Hero -->
-        <section class="page-hero" data-content-key="hero.backgroundImage" id="blog-hero"
+    <section class="page-hero" data-content-key="hero.backgroundImage" id="blog-hero"
             style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); padding-top: 160px;">
             <div class="container">
                 <h1 class="page-hero-title" id="single-post-title">Blog Post</h1>

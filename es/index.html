@@ -9,12 +9,12 @@
         content="His Kingdom Ministry - Una organización sin fines de lucro dedicada al crecimiento espiritual a través de la enseñanza, el podcast y los viajes misioneros.">
 
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="../styles.css?v=11">
+    <link rel="stylesheet" href="../styles.css?v=2026.03.02.13">
     <link rel="stylesheet" href="../css/cookie-consent.css">
 
     <!-- Tailwind CSS Play CDN -->
@@ -37,7 +37,7 @@
     <script type="module" src="../js/error-logger.js"></script>
 </head>
 
-<body class="cms-loading">
+<body class="page-index cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
@@ -87,13 +87,14 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
+        id="mega-menu" aria-hidden="true">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
                 <div class="relative w-full">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="¿Qué estás buscando?"
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
@@ -102,13 +103,16 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../index.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="index.html" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../en/index.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <a href="en/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="index.html" class="text-sm font-bold text-primary-orange">ES</a>
+                            <a href="es/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
@@ -117,49 +121,71 @@
             <div class="mega-menu-body">
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1: Participa -->
+                    <!-- Column 1: Engasjer deg -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Participa</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="donaciones.html">Apoya nuestro trabajo</a></li>
-                            <li><a href="donantes-regulares.html">Hazte donante regular</a></li>
-                            <li><a href="para-iglesias.html">Para iglesias</a></li>
-                            <li><a href="para-empresas.html">Para empresas</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li><a href="donasjoner.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a></li>
+                            <li><a href="bli-fast-giver.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a></li>
+                            <li><a href="for-menigheter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For menigheter</a></li>
+                            <li><a href="for-bedrifter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a></li>
+                            <li><a href="bnn.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 2: Conócenos -->
+                    <!-- Column 2: Bli kjent med oss -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Conócenos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="sobre-nosotros.html">Sobre la fundación</a></li>
-                            <li><a href="sobre-nosotros.html#historia">Nuestra historia</a></li>
-                            <li><a href="contacto.html">Dónde trabajamos</a></li>
-                            <li><a href="contacto.html">Contáctanos</a></li>
+                            <li><a href="om-oss.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Om oss</a></li>
+                            <li><a href="kontakt.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Kontakt oss</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Recursos & Media -->
+                    <!-- Column 3: Ressurser & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Recursos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="eventos.html">Eventos</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blog.html">Noticias & Blog</a></li>
-                            <li><a href="../minside/index.html">Mi Página</a></li>
+                            <li><a href="butikk.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Butikk</a></li>
+                            <li><a href="arrangementer.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Arrangementer</a></li>
+                            <li><a href="media.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="blogg.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
+                            <li><a href="kurs.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Kurs</a></li>
+                            <li><a href="minside/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Min Side</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donaciones.html" class="btn btn-primary btn-large btn-block">Apoya ahora <i
-                            class="fas fa-heart"></i></a>
+                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donaciones.html#deduccion-fiscal">Deducción Fiscal</a>
-                        <a href="sobre-nosotros.html">Sobre nosotros</a>
-                        <a href="privacidad.html">Política de Privacidad</a>
+                        <a href="butikk.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="donasjoner.html#skattefradrag" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="om-oss.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="personvern.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
                     </div>
                 </div>
             </div>
@@ -235,37 +261,58 @@
     <!-- Feature Boxes -->
     <section class="features">
         <div class="container">
+            <div class="section-header features-section-header">
+                <span class="section-label" data-content-key="features.header.label">Siguiente paso</span>
+                <h2 class="section-title" data-content-key="features.header.title">Involúcrate</h2>
+                <p class="section-description" data-content-key="features.header.description">Hay varias maneras naturales de sumarte al trabajo. Elige la que mejor encaje contigo ahora mismo.</p>
+            </div>
+
             <div class="features-grid">
                 <div class="feature-box">
-                    <div class="feature-icon blue">
-                        <i class="fas fa-book-open"></i>
+                    <div class="feature-media">
+                        <img src="/img/get-involved-teaching.svg"
+                            data-content-key="features.teaching.image" data-content-attr="src"
+                            data-fallback-src="/img/get-involved-teaching.svg"
+                            alt="Personas reunidas en enseñanza">
                     </div>
-                    <h3 class="feature-title" data-content-key="features.teaching.title">Enseñanza</h3>
-                    <p class="feature-text" data-content-key="features.teaching.text">Escuelas bíblicas, seminarios y
-                        enseñanza profunda de la palabra de Dios para el crecimiento espiritual.</p>
-                    <a href="media.html" class="feature-link">Leer más <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.teaching.title">Enseñanza</h3>
+                        <p class="feature-text" data-content-key="features.teaching.text">Escuelas bíblicas, seminarios y
+                            enseñanza profunda de la palabra de Dios para el crecimiento espiritual.</p>
+                        <a href="media.html" class="feature-link">Leer más <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
 
                 <div class="feature-box">
-                    <div class="feature-icon yellow">
-                        <i class="fas fa-podcast"></i>
+                    <div class="feature-media">
+                        <img src="/img/get-involved-podcast.svg"
+                            data-content-key="features.podcast.image" data-content-attr="src"
+                            data-fallback-src="/img/get-involved-podcast.svg"
+                            alt="Persona escuchando y compartiendo">
                     </div>
-                    <h3 class="feature-title" data-content-key="features.podcast.title">Podcast</h3>
-                    <p class="feature-text" data-content-key="features.podcast.text">Escucha nuestras conversaciones
-                        sobre
-                        la fe, la vida y el crecimiento espiritual en cualquier lugar.</p>
-                    <a href="podcast.html" class="feature-link">Escucha ahora <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.podcast.title">Podcast</h3>
+                        <p class="feature-text" data-content-key="features.podcast.text">Escucha nuestras conversaciones
+                            sobre
+                            la fe, la vida y el crecimiento espiritual en cualquier lugar.</p>
+                        <a href="podcast.html" class="feature-link">Escucha ahora <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
 
                 <div class="feature-box">
-                    <div class="feature-icon red">
-                        <i class="fas fa-globe-americas"></i>
+                    <div class="feature-media">
+                        <img src="/img/get-involved-travel.svg"
+                            data-content-key="features.travel.image" data-content-attr="src"
+                            data-fallback-src="/img/get-involved-travel.svg"
+                            alt="Personas sirviendo juntas">
                     </div>
-                    <h3 class="feature-title" data-content-key="features.travel.title">Misiones</h3>
-                    <p class="feature-text" data-content-key="features.travel.text">Predicación y conferencias por todo
-                        el
-                        mundo para difundir el evangelio.</p>
-                    <a href="misiones.html" class="feature-link">Descubre más <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.travel.title">Misiones</h3>
+                        <p class="feature-text" data-content-key="features.travel.text">Predicación y conferencias por todo
+                            el
+                            mundo para difundir el evangelio.</p>
+                        <a href="misiones.html" class="feature-link">Descubre más <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -330,7 +377,14 @@
     <!-- Fun Facts / Statistics -->
     <section class="funfacts">
         <div class="container">
-            <div class="funfacts-grid">
+            <div class="section-header impact-section-header">
+                <span class="section-label" data-content-key="impact.label">Impacto</span>
+                <h2 class="section-title" data-content-key="impact.title">Impacto en números</h2>
+                <p class="section-description" data-content-key="impact.description">Algunas cifras clave que muestran hasta dónde está llegando el trabajo.</p>
+            </div>
+
+            <div class="impact-panel">
+                <div class="funfacts-grid">
                 <div class="funfact">
                     <div class="funfact-icon red">
                         <i class="fab fa-youtube"></i>
@@ -369,6 +423,7 @@
                         <span class="funfact-number" data-target="8">0</span>
                         <span class="funfact-label">Países Visitados</span>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -622,7 +677,7 @@
     <!-- App Scripts -->
     <script type="module" src="../js/i18n.js"></script>
     <script type="module" src="../script.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../js/content-manager.js?v=1730"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
 </body>
 

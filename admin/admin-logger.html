@@ -18,7 +18,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=design_ui_v3">
 
     <style>
         .logs-container {
@@ -180,7 +180,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="css/admin-unified.css">
+    <link rel="stylesheet" href="css/admin-unified.css?v=design_ui_v3">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -212,8 +212,9 @@
                             <span>Oversikt</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="nettsted">
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="nettsted">
                         <a href="index.html#content" class="nav-link" data-section="content">
                             <span class="material-symbols-outlined">description</span>
                             <span>Sideinnhold</span>
@@ -249,8 +250,9 @@
                             <span>Design & Logo</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="kommunikasjon">
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
                         <a href="index.html#events" class="nav-link" data-section="events">
                             <span class="material-symbols-outlined">event</span>
                             <span>Arrangementer</span>
@@ -280,8 +282,10 @@
                             <span>Nyhetsbrev</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="administrasjon"><span>Administrasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="administrasjon">
+                    <li class="nav-category-header" data-target-category="administrasjon">
+                        <span>Administrasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="administrasjon">
                         <a href="index.html#causes" class="nav-link" data-section="causes">
                             <span class="material-symbols-outlined">volunteer_activism</span>
                             <span>Gaver</span>
@@ -342,40 +346,43 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Header -->
-        <header class="main-header">
-            <div class="header-left">
-                <a href="index.html" class="btn-back">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </a>
-                <div class="welcome-banner">
-                    <h1 class="welcome-title">Systemlogger</h1>
-                    <p class="welcome-subtitle">Oversikt over systemhendelser og feilmeldinger.</p>
+        <div id="logger-main-header" class="main-header">
+            <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                <div class="section-header-icon">
+                    <span class="material-symbols-outlined">assignment</span>
+                </div>
+                <div class="section-header-content">
+                    <div class="section-header-titles">
+                        <h2 class="section-title">Systemlogger</h2>
+                        <p class="section-subtitle">Oversikt over systemhendelser og feilmeldinger.</p>
+                    </div>
+                    <div class="section-header-actions">
+                        <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
+                            <span class="material-symbols-outlined">search</span>
+                        </button>
+                        <button class="notification-btn">
+                            <span class="material-symbols-outlined">notifications</span>
+                        </button>
+
+                        <a href="#" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">Laster...</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar"
+                                style="width: 38px; height: 38px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
+                                ?</div>
+                        </a>
+
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="header-right">
-                <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
-                    <button class="notification-btn">
-                    <span class="material-symbols-outlined">notifications</span>
-                </button>
-
-                <a href="#" class="user-profile-link" id="admin-profile-trigger">
-                    <div class="user-info-text">
-                        <span id="admin-name" class="user-name">Laster...</span>
-                        <span class="user-role">Administrator</span>
-                    </div>
-                    <div id="admin-avatar" class="user-avatar">?</div>
-                </a>
-
-                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </header>
-
-        <div class="content-wrapper" style="padding: 40px;">
+        <div class="content-wrapper">
             <div class="logs-container">
                 <div class="logs-header">
                     <div class="logs-filters">
@@ -485,6 +492,7 @@
         });
     </script>
 
+    <script src="../js/admin-utils.js"></script>
     <script type="module" src="js/admin-header.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', async () => {

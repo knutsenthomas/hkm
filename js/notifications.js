@@ -6,6 +6,9 @@
 class HKMNotifications {
     constructor() {
         this.toastContainer = null;
+        this.activeToastsByKey = new Map();
+        this.lastToastShownAt = new Map();
+        this.dedupeWindowMs = 6000;
         this.init();
     }
 
@@ -21,28 +24,53 @@ class HKMNotifications {
 
     show(message, type = 'success', duration = 5000) {
         if (!this.toastContainer) this.init();
+        const safeType = ['success', 'error', 'warning', 'info'].includes(type) ? type : 'info';
+        const safeMessage = String(message ?? '').trim();
+        if (!safeMessage) return;
+
+        const toastKey = `${safeType}:${safeMessage}`;
+        const now = Date.now();
+        const activeToast = this.activeToastsByKey.get(toastKey);
+        if (activeToast && activeToast.parentElement) {
+            return;
+        }
+
+        const lastShownAt = this.lastToastShownAt.get(toastKey) || 0;
+        if (now - lastShownAt < Math.max(1500, Math.min(duration, this.dedupeWindowMs))) {
+            return;
+        }
 
         const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
+        toast.className = `toast ${safeType}`;
+        toast.setAttribute('role', 'status');
+        toast.setAttribute('aria-live', safeType === 'error' ? 'assertive' : 'polite');
+        toast.dataset.toastKey = toastKey;
 
-        const icon = type === 'success' ? 'check_circle' :
-            type === 'error' ? 'error' :
-                type === 'warning' ? 'warning' : 'info';
+        const icon = safeType === 'success' ? 'check_circle' :
+            safeType === 'error' ? 'error' :
+                safeType === 'warning' ? 'warning' : 'info';
 
         toast.innerHTML = `
             <span class="material-symbols-outlined toast-icon">${icon}</span>
             <div class="toast-content">
-                <p class="toast-message">${message}</p>
+                <p class="toast-message"></p>
             </div>
-            <button class="toast-close">
-                <i class="fas fa-times"></i>
+            <button class="toast-close" aria-label="Lukk melding">
+                <span class="material-symbols-outlined" style="font-size:18px;">close</span>
             </button>
             <div class="toast-progress">
                 <div class="toast-progress-bar" style="animation-duration: ${duration}ms"></div>
             </div>
         `;
 
+        const messageEl = toast.querySelector('.toast-message');
+        if (messageEl) {
+            messageEl.textContent = safeMessage;
+        }
+
         this.toastContainer.appendChild(toast);
+        this.activeToastsByKey.set(toastKey, toast);
+        this.lastToastShownAt.set(toastKey, now);
 
         // Auto remove
         const timer = setTimeout(() => {
@@ -68,9 +96,18 @@ class HKMNotifications {
             toast.classList.add('removing');
             setTimeout(() => {
                 if (toast.parentElement) {
+                    const toastKey = toast.dataset && toast.dataset.toastKey ? toast.dataset.toastKey : '';
+                    if (toastKey && this.activeToastsByKey.get(toastKey) === toast) {
+                        this.activeToastsByKey.delete(toastKey);
+                    }
                     this.toastContainer.removeChild(toast);
                 }
             }, 300);
+        } else {
+            const toastKey = toast && toast.dataset && toast.dataset.toastKey ? toast.dataset.toastKey : '';
+            if (toastKey && this.activeToastsByKey.get(toastKey) === toast) {
+                this.activeToastsByKey.delete(toastKey);
+            }
         }
     }
 }

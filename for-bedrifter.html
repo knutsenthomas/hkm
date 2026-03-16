@@ -35,7 +35,7 @@
     </script>
 </head>
 
-<body class="cms-loading">
+<body class="cms-loading" data-content-doc="for-bedrifter">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
@@ -84,13 +84,14 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
+        id="mega-menu" aria-hidden="true">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
                 <div class="relative w-full">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Søk..."
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
@@ -99,13 +100,16 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="for-bedrifter.html" class="text-sm font-bold text-primary-orange">NO</a>
+                            <a href="index.html" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="en/for-businesses.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <a href="en/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="es/para-empresas.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                            <a href="es/index.html"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
@@ -116,43 +120,69 @@
                 <div class="mega-menu-grid">
                     <!-- Column 1: Engasjer deg -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Engasjer deg</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="donasjoner.html">Støtt arbeidet</a></li>
-                            <li><a href="bli-fast-giver.html">Bli fast giver</a></li>
-                            <li><a href="for-menigheter.html">For menigheter</a></li>
-                            <li><a href="for-bedrifter.html">For bedrifter</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li><a href="donasjoner.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a></li>
+                            <li><a href="bli-fast-giver.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a></li>
+                            <li><a href="for-menigheter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For menigheter</a></li>
+                            <li><a href="for-bedrifter.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a></li>
+                            <li><a href="bnn.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Bli kjent med oss -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Bli kjent med oss</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="om-oss.html">Om oss</a></li>
-                            <li><a href="kontakt.html">Kontakt oss</a></li>
+                            <li><a href="om-oss.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Om oss</a></li>
+                            <li><a href="kontakt.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Kontakt oss</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 3: Ressurser & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Ressurser</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="arrangementer.html">Arrangementer</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blogg.html">Nyheter & Blogg</a></li>
-                            <li><a href="minside/index.html">Min Side</a></li>
+                            <li><a href="butikk.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Butikk</a></li>
+                            <li><a href="arrangementer.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Arrangementer</a></li>
+                            <li><a href="media.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="blogg.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
+                            <li><a href="kurs.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Kurs</a></li>
+                            <li><a href="minside/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Min Side</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                        <a href="donasjoner.html" class="btn btn-primary btn-large btn-block flex items-center justify-center">Støtt nå<i class="fas fa-heart"></i></a> <div class="menu-footer-links">
-                        <a href="donasjoner.html#skattefradrag">Skattefradrag</a>
-                        <a href="om-oss.html">Om oss</a>
-                        <a href="personvern.html">Personvern</a>
+                    <a href="donasjoner.html" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="butikk.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="donasjoner.html#skattefradrag" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="om-oss.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="personvern.html" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
                     </div>
                 </div>
             </div>
@@ -163,9 +193,12 @@
         <!-- Page Hero -->
         <section class="page-hero" data-content-key="hero.bg"
             style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); display: flex; align-items: center; min-height: 350px;">
-            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
-                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">For Bedrifter</h1>
-                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Bli en samarbeidspartner og vær med på å finansiere viktig arbeid som forandrer liv.</p>
+            <div class="container flex flex-col items-center justify-center text-center py-16"
+                style="min-height: 300px;">
+                <h1 class="page-hero-title" data-content-key="hero.title" style="margin-bottom: 1rem;">For Bedrifter
+                </h1>
+                <p class="page-hero-subtitle" data-content-key="hero.subtitle">Bli en samarbeidspartner og vær med på å
+                    finansiere viktig arbeid som forandrer liv.</p>
             </div>
         </section>
 
@@ -181,20 +214,26 @@
                     <div class="about-content flex-1">
                         <span class="section-label" data-content-key="intro.label">Samarbeidspartner</span>
                         <h2 class="section-title" data-content-key="intro.title">Bedrifter med et hjerte for misjon</h2>
-                        <p class="section-text" data-content-key="intro.text">Vi inviterer bedrifter til å stå sammen med oss i vårt oppdrag. Gjennom bedriftsgaver bidrar dere direkte til åndelig vekst og hjelp til mennesker som trenger det.</p>
+                        <p class="section-text" data-content-key="intro.text">Vi inviterer bedrifter til å stå sammen
+                            med oss i vårt oppdrag. Gjennom bedriftsgaver bidrar dere direkte til åndelig vekst og hjelp
+                            til mennesker som trenger det.</p>
                         <div class="my-8 grid gap-5">
                             <div class="flex gap-4 items-start">
-                                <div class="flex-shrink-0 text-primary-orange"><i class="fas fa-chart-line fa-2x"></i></div>
+                                <div class="flex-shrink-0 text-primary-orange"><i class="fas fa-chart-line fa-2x"></i>
+                                </div>
                                 <div>
-                                    <h4 class="mb-1">Målbare resultater</h4>
-                                    <p class="text-sm text-gray-500">Vi sender regelmessige oppdateringer på hvordan deres støtte blir brukt.</p>
+                                    <h4 class="mb-1" data-content-key="features.f1.title">Målbare resultater</h4>
+                                    <p class="text-sm text-gray-500" data-content-key="features.f1.text">Vi sender
+                                        regelmessige oppdateringer på hvordan deres støtte blir brukt.</p>
                                 </div>
                             </div>
                             <div class="flex gap-4 items-start">
-                                <div class="flex-shrink-0 text-primary-orange"><i class="fas fa-handshake fa-2x"></i></div>
+                                <div class="flex-shrink-0 text-primary-orange"><i class="fas fa-handshake fa-2x"></i>
+                                </div>
                                 <div>
-                                    <h4 class="mb-1">Verdibasert samarbeid</h4>
-                                    <p class="text-sm text-gray-500">Vi deler verdier som integritet, omsorg og nestekjærlighet.</p>
+                                    <h4 class="mb-1" data-content-key="features.f2.title">Verdibasert samarbeid</h4>
+                                    <p class="text-sm text-gray-500" data-content-key="features.f2.text">Vi deler
+                                        verdier som integritet, omsorg og nestekjærlighet.</p>
                                 </div>
                             </div>
                         </div>
@@ -208,10 +247,15 @@
         <section class="cta-section"
             style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
             <div class="container flex flex-col items-center justify-center text-center py-16 md:py-20">
-                <h2 class="mb-7 text-3xl md:text-4xl font-bold md:font-extrabold leading-tight" style="color: white; margin-bottom: 2rem;">Ønsker dere et bedriftssamarbeid?</h2>
-                <p class="mb-8 text-lg opacity-90">Vi tar gjerne en uforpliktende prat om hvordan din bedrift kan bidra.</p>
-                <a href="kontakt.html" class="btn btn-primary rounded-full px-6 py-3 font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform shadow-md">Kontakt oss i dag</a>
-            </main>
+                <h2 class="mb-7 text-3xl md:text-4xl font-bold md:font-extrabold leading-tight"
+                    data-content-key="cta.title" style="color: white; margin-bottom: 2rem;">Ønsker dere et
+                    bedriftssamarbeid?</h2>
+                <p class="mb-8 text-lg opacity-90" data-content-key="cta.text">Vi tar gjerne en uforpliktende prat om
+                    hvordan din bedrift kan bidra.</p>
+                <a href="kontakt.html"
+                    class="btn btn-primary rounded-full px-6 py-3 font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform shadow-md"
+                    data-content-key="cta.btnText">Kontakt oss i dag</a>
+            </div>
 
             </div>
         </section>
@@ -230,14 +274,16 @@
                                 </div>
                                 <span class="logo-text">His Kingdom Ministry</span>
                             </a>
-                            <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til
+                            <p class="brand-description" data-content-doc="settings_global"
+                                data-content-key="footer.description">His Kingdom Ministry er en non-profit organisasjon
+                                dedikert til
                                 åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
                         </div>
 
                         <!-- Links Grid -->
                         <div class="footer-nav-grid">
                             <div class="nav-col">
-                                <h4>Om oss</h4>
+                                <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
                                 <ul>
                                     <li><a href="index.html#hjem">Hjem</a></li>
                                     <li><a href="om-oss.html">Om oss</a></li>
@@ -247,7 +293,8 @@
                             </div>
 
                             <div class="nav-col">
-                                <h4>Ressurser</h4>
+                                <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">
+                                    Ressurser</h4>
                                 <ul>
                                     <li><a href="media.html#teaching-section">Undervisning</a></li>
                                     <li><a href="arrangementer.html">E-kurs</a></li>
@@ -257,7 +304,7 @@
                             </div>
 
                             <div class="nav-col">
-                                <h4>Media</h4>
+                                <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
                                 <ul>
                                     <li><a href="media.html#podcast-section">Podcast</a></li>
                                     <li><a href="media.html">Videoer</a></li>
@@ -268,7 +315,8 @@
                             </div>
 
                             <div class="nav-col">
-                                <h4>Involvering</h4>
+                                <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                    Involvering</h4>
                                 <ul>
                                     <li><a href="arrangementer.html">Kalender</a></li>
                                     <li><a href="donasjoner.html">Gi en gave</a></li>
@@ -283,7 +331,7 @@
                     <div class="footer-right">
                         <!-- Follow Us Card -->
                         <div class="footer-card">
-                            <h3>Følg oss</h3>
+                            <h3 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h3>
                             <div class="footer-social-icons">
                                 <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
                                         class="fab fa-facebook-f"></i></a>
@@ -296,7 +344,8 @@
 
                         <!-- Contact Us Card -->
                         <div class="footer-card contact-card">
-                            <h3>Kontakt oss</h3>
+                            <h3 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss
+                            </h3>
                             <a href="kontakt.html" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
 
                             <div class="contact-details">

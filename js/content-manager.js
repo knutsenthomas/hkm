@@ -7,6 +7,8 @@ class ContentManager {
     constructor() {
         this.pageId = this.detectPageId();
         this.currentDate = new Date();
+        this._renderHtmlSignatures = new Map();
+        this._errorNoticeTimestamps = new Map();
 
         // Tag body with page-specific class (e.g. page-index, page-om-oss)
         const body = document.body;
@@ -25,6 +27,7 @@ class ContentManager {
         if (path.includes('kalender.html')) return 'kalender';
         if (path.includes('arrangement-detaljer.html') || path.includes('event-details.html') || path.includes('detalles-evento.html')) return 'arrangement-detaljer';
         if (path.includes('blogg.html') || path.includes('blog.html')) return 'blogg';
+        if (path.includes('butikk.html') || path.includes('shop.html')) return 'butikk';
         if (path.includes('blogg-post.html') || path.includes('blog-post.html')) return 'blogg-post';
         if (path.includes('undervisningsserier.html') || path.includes('teaching.html')) return 'undervisningsserier';
         if (path.includes('media.html')) return 'media';
@@ -91,21 +94,148 @@ class ContentManager {
         }
     }
 
+    notifyUser(message, type = 'warning', duration = 5000) {
+        if (!message) return;
+        if (typeof window.showToast === 'function') {
+            window.showToast(message, type, duration);
+        }
+    }
+
+    reportError(scope, error, { notifyUser = false, userMessage = '' } = {}) {
+        const err = error instanceof Error ? error : new Error(String(error || 'Unknown error'));
+        const scopeKey = `${scope}:${err.message}`;
+        const now = Date.now();
+        const lastAt = this._errorNoticeTimestamps.get(scopeKey) || 0;
+
+        console.error(`[ContentManager] ${scope}:`, err);
+        if (window.hkmLogger) {
+            window.hkmLogger.error(`[ContentManager:${scope}] ${err.message}`);
+        }
+
+        if (notifyUser && now - lastAt > 12000) {
+            this._errorNoticeTimestamps.set(scopeKey, now);
+            this.notifyUser(userMessage || 'Noe innhold kunne ikke lastes akkurat nå.', 'warning', 5000);
+        }
+    }
+
+    async getContentDoc(pageId, { silent = false } = {}) {
+        const service = window.firebaseService;
+        if (!service || !service.isInitialized) {
+            if (!silent) {
+                this.reportError('firebase-unavailable', new Error(`Firebase not initialized for ${pageId}`), {
+                    notifyUser: true,
+                    userMessage: 'Tilkobling til innholdstjenesten er ikke klar ennå.'
+                });
+            }
+            return null;
+        }
+
+        try {
+            return await service.getPageContent(pageId, { silent });
+        } catch (error) {
+            if (!silent) {
+                this.reportError(`getContentDoc:${pageId}`, error, {
+                    notifyUser: true,
+                    userMessage: 'Kunne ikke hente oppdatert innhold. Viser lagret innhold hvis tilgjengelig.'
+                });
+            }
+            return null;
+        }
+    }
+
+    async getContentDocs(pageIds, { silent = false } = {}) {
+        const service = window.firebaseService;
+        if (!service || !service.isInitialized) return {};
+
+        try {
+            if (typeof service.getManyPageContents === 'function') {
+                return await service.getManyPageContents(pageIds, { silent });
+            }
+
+            const pairs = await Promise.all(
+                (pageIds || []).map(async (id) => [id, await this.getContentDoc(id, { silent })])
+            );
+            return Object.fromEntries(pairs);
+        } catch (error) {
+            if (!silent) {
+                this.reportError('getContentDocs', error, {
+                    notifyUser: true,
+                    userMessage: 'Noe innhold kunne ikke lastes akkurat nå.'
+                });
+            }
+            return {};
+        }
+    }
+
+    cacheLocalJson(key, value) {
+        if (!key) return;
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            console.warn(`[ContentManager] Failed local cache write for ${key}`, error);
+        }
+    }
+
+    setHTMLIfChanged(container, html, signatureKey) {
+        if (!container) return false;
+        const signature = `${signatureKey}:${html}`;
+        if (this._renderHtmlSignatures.get(signatureKey) === signature) {
+            return false;
+        }
+        this._renderHtmlSignatures.set(signatureKey, signature);
+        if (container.innerHTML !== html) {
+            container.innerHTML = html;
+        }
+        return true;
+    }
+
     async init() {
+        let pageContentHydrated = false;
+        const revealIfHydrated = () => {
+            if (!pageContentHydrated) return;
+            this.setLoading(false);
+        };
+
         // 1. Try to apply cached global settings INSTANTLY (pre-Firebase)
         try {
             const cachedDesign = localStorage.getItem('hkm_cache_settings_design');
             if (cachedDesign) {
-                this.applyGlobalSettings(JSON.parse(cachedDesign));
+                const parsedDesign = JSON.parse(cachedDesign);
+                if (parsedDesign && typeof parsedDesign === 'object') {
+                    this.applyGlobalSettings(parsedDesign);
+                }
             }
             const cachedSEO = localStorage.getItem('hkm_cache_settings_seo');
             if (cachedSEO) {
-                this.handleSEO(JSON.parse(cachedSEO));
+                const parsedSeo = JSON.parse(cachedSEO);
+                if (parsedSeo && typeof parsedSeo === 'object') {
+                    this.handleSEO(parsedSeo);
+                }
             }
             // Also try to update some DOM for current page if cached
+            const cachedGlobalContent = localStorage.getItem('hkm_cache_settings_global');
+            if (cachedGlobalContent) {
+                const parsedGlobalContent = JSON.parse(cachedGlobalContent);
+                if (parsedGlobalContent && typeof parsedGlobalContent === 'object') {
+                    this.updateDOM(parsedGlobalContent, { docId: 'settings_global' });
+                }
+            }
+            if (this.pageId === 'index') {
+                const cachedFacebookFeed = localStorage.getItem('hkm_cache_settings_facebook_feed');
+                if (cachedFacebookFeed) {
+                    const parsedFacebookFeed = JSON.parse(cachedFacebookFeed);
+                    if (parsedFacebookFeed && typeof parsedFacebookFeed === 'object') {
+                        this.updateDOM(parsedFacebookFeed, { docId: 'settings_facebook_feed' });
+                    }
+                }
+            }
             const cachedPage = localStorage.getItem(`hkm_cache_page_${this.pageId}`);
             if (cachedPage) {
-                this.updateDOM(JSON.parse(cachedPage));
+                const parsedPage = JSON.parse(cachedPage);
+                if (parsedPage && typeof parsedPage === 'object') {
+                    this.updateDOM(parsedPage, { docId: this.pageId });
+                    pageContentHydrated = true;
+                }
             }
 
             const cachedHero = localStorage.getItem('hkm_cache_hero_slides');
@@ -113,6 +243,8 @@ class ContentManager {
                 const heroData = JSON.parse(cachedHero);
                 if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
             }
+
+            revealIfHydrated();
         } catch (e) {
             console.warn("[ContentManager] Early cache read failed", e);
         }
@@ -134,18 +266,38 @@ class ContentManager {
             }
 
             // 1. Parallel Initial Load (Firestore defaults to cache if enabled)
-            const [content, globalSettings, seoSettings] = await Promise.all([
-                service ? service.getPageContent(this.pageId) : null,
-                service ? service.getPageContent('settings_design') : null,
-                service ? service.getPageContent('settings_seo') : null
-            ]);
+            const docIds = [this.pageId, 'settings_design', 'settings_seo', 'settings_global'];
+            if (this.pageId === 'index') {
+                docIds.push('settings_facebook_feed');
+            }
+            const docs = service && service.isInitialized
+                ? await this.getContentDocs(docIds)
+                : {};
+            const content = docs[this.pageId] ?? null;
+            const globalSettings = docs.settings_design ?? null;
+            const seoSettings = docs.settings_seo ?? null;
+            const globalContent = docs.settings_global ?? null;
+            const facebookFeedSettings = docs.settings_facebook_feed ?? null;
 
-            localStorage.setItem(`hkm_cache_page_${this.pageId}`, JSON.stringify(content));
-            localStorage.setItem('hkm_cache_settings_design', JSON.stringify(globalSettings));
-            localStorage.setItem('hkm_cache_settings_seo', JSON.stringify(seoSettings));
+            this.cacheLocalJson(`hkm_cache_page_${this.pageId}`, content);
+            this.cacheLocalJson('hkm_cache_settings_design', globalSettings);
+            this.cacheLocalJson('hkm_cache_settings_seo', seoSettings);
+            this.cacheLocalJson('hkm_cache_settings_global', globalContent);
+            if (this.pageId === 'index') {
+                this.cacheLocalJson('hkm_cache_settings_facebook_feed', facebookFeedSettings);
+            }
 
             if (globalSettings) this.applyGlobalSettings(globalSettings);
-            if (content) this.updateDOM(content);
+            if (globalContent) this.updateDOM(globalContent, { docId: 'settings_global' }); // Apply global text (footer, etc)
+            if (content) {
+                this.updateDOM(content, { docId: this.pageId });
+                pageContentHydrated = true;
+            }
+            if (facebookFeedSettings) {
+                this.updateDOM(facebookFeedSettings, { docId: 'settings_facebook_feed' });
+            }
+
+            revealIfHydrated();
 
             // 2. SEO & Meta (Non-blocking)
             if (seoSettings) this.handleSEO(seoSettings);
@@ -154,7 +306,10 @@ class ContentManager {
             await this.loadSpecializedContent();
 
         } catch (error) {
-            console.error("[ContentManager] Init error:", error);
+            this.reportError('init', error, {
+                notifyUser: true,
+                userMessage: 'Noe innhold kunne ikke lastes. Siden kan være delvis oppdatert.'
+            });
         } finally {
             this.setLoading(false);
             window.dispatchEvent(new CustomEvent('cmsContentLoaded'));
@@ -167,8 +322,10 @@ class ContentManager {
         const itemId = urlParams.get('id');
 
         if (itemId) {
-            const blogData = await firebaseService.getPageContent('collection_blog');
-            const teachingData = await firebaseService.getPageContent('collection_teaching');
+            const [blogData, teachingData] = await Promise.all([
+                this.getContentDoc('collection_blog', { silent: true }),
+                this.getContentDoc('collection_teaching', { silent: true })
+            ]);
             const allItems = [
                 ...(Array.isArray(blogData) ? blogData : (blogData?.items || [])),
                 ...(Array.isArray(teachingData) ? teachingData : (teachingData?.items || []))
@@ -187,20 +344,37 @@ class ContentManager {
 
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
-            const heroData = await firebaseService.getPageContent('hero_slides');
+            const [heroData, events, blogData, teachingData, causes] = await Promise.all([
+                this.getContentDoc('hero_slides', { silent: true }),
+                this.loadEvents(),
+                this.getContentDoc('collection_blog', { silent: true }),
+                this.getContentDoc('collection_teaching', { silent: true }),
+                this.loadCauses()
+            ]);
+
             if (heroData && heroData.slides) {
-                localStorage.setItem('hkm_cache_hero_slides', JSON.stringify(heroData));
+                this.cacheLocalJson('hkm_cache_hero_slides', heroData);
                 this.renderHeroSlides(heroData.slides);
             }
 
-            const events = await this.loadEvents();
             this.renderEvents(events || []);
 
-            const blogData = await firebaseService.getPageContent('collection_blog');
+            try {
+                await this.loadFacebookFeed();
+            } catch (error) {
+                this.reportError('loadFacebookFeed:index', error, {
+                    notifyUser: false
+                });
+            }
+
+            // 4. Testimonials
+            const testimonialsData = await this.getContentDoc('collection_testimonials', { silent: true });
+            const testimonials = Array.isArray(testimonialsData) ? testimonialsData : (testimonialsData?.items || []);
+            this.renderTestimonials(testimonials);
+
             const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
             if (blogItems.length > 0) this.renderBlogPosts(blogItems.slice(0, 3), '#blogg .blog-grid');
 
-            const teachingData = await firebaseService.getPageContent('collection_teaching');
             const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
             const frontTeachingContainer = document.getElementById('siste-undervisning');
             if (teachingItems.length > 0 && frontTeachingContainer) {
@@ -209,7 +383,6 @@ class ContentManager {
                 this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
             }
 
-            const causes = await this.loadCauses();
             this.renderCauses(causes);
 
             this.enableHeroAnimations();
@@ -260,7 +433,7 @@ class ContentManager {
                     const p = lang === 'en' ? 'Please check our events in the list above.' : (lang === 'es' ? 'Consulte nuestros eventos en la lista de arriba.' : 'Vennligst sjekk våre arrangementer i listen over.');
                     const btn = lang === 'en' ? 'See events' : (lang === 'es' ? 'Ver eventos' : 'Se arrangementer');
 
-                    container.innerHTML = `<div class="container" style="padding: 100px 20px; text-align: center;"><h2>${title}</h2><p>${p}</p><a href="${eventsLink}" class="btn btn-primary" style="margin-top: 20px;">${btn}</a></div>`;
+                    container.innerHTML = `<div class="container cms-calendar-disabled-state"><h2>${title}</h2><p>${p}</p><a href="${eventsLink}" class="btn btn-primary cms-calendar-disabled-cta">${btn}</a></div>`;
                 }
             }
         }
@@ -283,7 +456,7 @@ class ContentManager {
                 } else {
                     console.warn("[ContentManager] No blog posts found in 'collection_blog'.");
                     const container = document.querySelector('.blog-page .blog-grid');
-                    if (container) container.innerHTML = '<p style="text-align:center; padding: 20px;">Ingen blogginnlegg funnet. Kjør seed-scriptet.</p>';
+                    if (container) container.innerHTML = '<p class="cms-empty-copy">Ingen blogginnlegg funnet. Kjør seed-scriptet.</p>';
                 }
             } catch (err) {
                 console.error("[ContentManager] Error loading blog posts:", err);
@@ -300,10 +473,10 @@ class ContentManager {
 
     async loadCauses() {
         try {
-            const data = await firebaseService.getPageContent('collection_causes');
+            const data = await this.getContentDoc('collection_causes');
             return Array.isArray(data) ? data : (data?.items || []);
         } catch (e) {
-            console.warn('[ContentManager] Failed to load causes:', e);
+            this.reportError('loadCauses', e);
             return [];
         }
     }
@@ -321,32 +494,48 @@ class ContentManager {
 
         section.style.display = 'block';
 
-        container.innerHTML = causes.map(cause => `
+        const pageContent = (window.HKM_PAGE_CONTENT && this.pageId && window.HKM_PAGE_CONTENT[this.pageId]) || {};
+        const fallbackTitle = this.getValueByPath(pageContent, 'causes.card.defaultTitle') || 'Innsamlingsaksjon';
+        const collectedLabel = this.getValueByPath(pageContent, 'causes.card.collectedLabel') || 'samlet inn';
+        const goalLabel = this.getValueByPath(pageContent, 'causes.card.goalLabel') || 'Mål';
+        const ctaText = this.getValueByPath(pageContent, 'causes.card.cta') || 'Støtt prosjektet';
+
+        container.innerHTML = causes.map(cause => {
+            const imageUrl = cause.imageUrl || cause.image || 'img/placeholder-event.jpg';
+            const title = cause.title || fallbackTitle;
+            const description = cause.description || '';
+            const raised = Number(cause.raised ?? cause.collected ?? 0) || 0;
+            const goal = Number(cause.goal ?? 0) || 0;
+            const progress = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
+            const link = cause.link || this.getLocalizedLink('donasjoner.html');
+
+            return `
             <div class="cause-card">
                 <div class="cause-image">
-                    <img src="${cause.imageUrl || 'img/placeholder.jpg'}" alt="${cause.title}">
+                    <img src="${imageUrl}" alt="${title}">
                     ${cause.tag ? `<span class="cause-tag">${cause.tag}</span>` : ''}
                 </div>
                 <div class="cause-content">
-                    <h3 class="cause-title">${cause.title}</h3>
-                    <p class="cause-description">${cause.description}</p>
+                    <h3 class="cause-title">${title}</h3>
+                    <p class="cause-description">${description}</p>
                     
-                    ${cause.goal ? `
+                    ${goal ? `
                     <div class="cause-progress">
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${Math.min((cause.raised / cause.goal) * 100, 100)}%"></div>
+                            <div class="progress-fill" style="width: ${progress}%"></div>
                         </div>
                         <div class="progress-stats">
-                            <span>${cause.raised ? cause.raised.toLocaleString() : '0'} kr samlet inn</span>
-                            <span>Mål: ${cause.goal.toLocaleString()} kr</span>
+                            <span>${raised.toLocaleString('no-NO')} kr ${collectedLabel}</span>
+                            <span>${goalLabel}: ${goal.toLocaleString('no-NO')} kr</span>
                         </div>
                     </div>
                     ` : ''}
                     
-                    <a href="${cause.link || '#gi-gave'}" class="btn btn-primary btn-block">Støtt prosjektet</a>
+                    <a href="${link}" class="btn btn-primary btn-block">${ctaText}</a>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 
     async renderSingleBlogPost() {
@@ -487,10 +676,10 @@ class ContentManager {
         if (backBtn) {
             if (isTeaching) {
                 backBtn.href = 'media.html#teaching-section';
-                backBtn.innerHTML = '<i class="fas fa-arrow-left" style="margin-right:8px;"></i> Tilbake til undervisning';
+                backBtn.innerHTML = '<i class="fas fa-arrow-left cms-inline-icon-gap"></i> Tilbake til undervisning';
             } else {
                 backBtn.href = 'blogg.html';
-                backBtn.innerHTML = '<i class="fas fa-arrow-left" style="margin-right:8px;"></i> Tilbake til blogg';
+                backBtn.innerHTML = '<i class="fas fa-arrow-left cms-inline-icon-gap"></i> Tilbake til blogg';
             }
         }
 
@@ -503,12 +692,12 @@ class ContentManager {
                 authorBox.style.background = '#f8fafc';
                 authorBox.style.padding = '20px';
 
-                const tagsHtml = `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                const tagsHtml = `<div class="cms-post-tags-wrap">
                     ${item.tags.map(t => `<span class="blog-tag">${t}</span>`).join('')}
                 </div>`;
 
                 authorBox.innerHTML = `
-                    <h4 style="margin: 0; font-size: 1rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Emner</h4>
+                    <h4 class="cms-post-tags-title">Emner</h4>
                     ${tagsHtml}
                 `;
             } else {
@@ -558,27 +747,27 @@ class ContentManager {
             if (relatedItems.length > 0) {
                 relatedContainer.style.display = 'block';
                 relatedContainer.innerHTML = `
-                    <h3 style="margin-bottom: 30px; font-size: 1.5rem; color: #334155; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+                    <h3 class="cms-related-heading">
                         ${heading}
                     </h3>
-                    <div class="blog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
+                    <div class="blog-grid cms-related-grid">
                         ${relatedItems.map(post => `
-                            <article class="blog-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #f1f5f9; transition: transform 0.2s ease;">
-                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" style="text-decoration: none; color: inherit; display: block;">
-                                    <div class="blog-image" style="height: 180px; overflow: hidden; position: relative;">
+                            <article class="blog-card cms-related-card">
+                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" class="cms-related-card-link">
+                                    <div class="blog-image cms-related-image">
                                         <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
                                              alt="${post.title}" 
-                                             style="width: 100%; height: 100%; object-fit: cover;">
-                                        ${post.category ? `<span style="position: absolute; bottom: 10px; right: 10px; background: var(--secondary-color, #ff6b2b); color: white; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;">${post.category}</span>` : ''}
+                                             class="cms-related-image-el">
+                                        ${post.category ? `<span class="cms-related-category">${post.category}</span>` : ''}
                                     </div>
-                                    <div class="blog-content" style="padding: 20px;">
-                                        <div class="blog-meta" style="font-size: 12px; color: #64748b; margin-bottom: 10px; display: flex; gap: 15px;">
+                                    <div class="blog-content cms-related-content">
+                                        <div class="blog-meta cms-related-meta">
                                             <span><i class="far fa-calendar"></i> ${post.date ? this.formatDate(post.date) : ''}</span>
                                             ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : ''}
                                         </div>
-                                        <h4 style="font-size: 1.1rem; margin-bottom: 15px; line-height: 1.4; font-weight: 700; color: #1e293b;">${post.title}</h4>
-                                        <span style="color: var(--primary-color, #ff6b2b); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 5px;">
-                                           ${ctaLabel} <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+                                        <h4 class="cms-related-title">${post.title}</h4>
+                                        <span class="cms-related-cta">
+                                           ${ctaLabel} <i class="fas fa-arrow-right cms-related-cta-icon"></i>
                                         </span>
                                     </div>
                                 </a>
@@ -595,10 +784,11 @@ class ContentManager {
     async loadEvents(forceRefresh = false) {
         try {
             const { startIso, endIso } = this.getMonthRangeIso(this.currentDate);
-            const cacheKey = `hkm_events_${startIso}_${endIso}`;
+            const cacheKey = `hkm_events_v2_${startIso}_${endIso}`;
+            const isLocalDev = ['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase());
 
             // 1. Check Cache (Use localStorage for better persistence)
-            if (!forceRefresh) {
+            if (!forceRefresh && !isLocalDev) {
                 try {
                     const cached = localStorage.getItem(cacheKey);
                     if (cached) {
@@ -629,9 +819,17 @@ class ContentManager {
             const integrations = await firebaseService.getPageContent('settings_integrations');
             const gcal = integrations?.googleCalendar || {};
             const apiKey = gcal.apiKey || '';
-            const calendarList = Array.isArray(integrations?.googleCalendars)
+            const calendarListRaw = Array.isArray(integrations?.googleCalendars)
                 ? integrations.googleCalendars
                 : [];
+            const calendarList = calendarListRaw
+                .filter((item) => item && typeof item === 'object')
+                .map((item) => ({
+                    id: item.id || item.calendarId || '',
+                    label: item.label || item.name || ''
+                }))
+                .filter((item) => item.id);
+
             const calendars = calendarList.length > 0
                 ? calendarList
                 : (gcal.calendarId ? [{ id: gcal.calendarId, label: gcal.label || 'Arrangementer' }] : []);
@@ -679,20 +877,52 @@ class ContentManager {
                 finalEvents = [...taggedFirebase, ...monthHolidays];
             }
 
+            if (isLocalDev) {
+                try {
+                    console.info('[ContentManager] loadEvents debug', {
+                        forceRefresh: Boolean(forceRefresh),
+                        apiKeyConfigured: Boolean(apiKey),
+                        calendarsConfigured: calendars.length,
+                        gcalEvents: gcalEvents.length,
+                        firebaseManualEvents: taggedFirebase.length,
+                        holidays: monthHolidays.length,
+                        finalEvents: finalEvents.length,
+                        nonHolidayEvents: finalEvents.filter(e => !e?.isHoliday).length,
+                        firstNonHoliday: finalEvents.find(e => !e?.isHoliday) || null
+                    });
+                } catch (debugErr) {
+                    // noop
+                }
+            }
+
+            // If we only ended up with holidays while event sources are configured, a stale/partial state
+            // may have slipped through. Retry once without cache before giving up.
+            const nonHolidayCount = finalEvents.filter(e => !e?.isHoliday).length;
+            const hasEventSourcesConfigured = Boolean((apiKey && calendars.length > 0) || taggedFirebase.length > 0);
+            if (!forceRefresh && hasEventSourcesConfigured && nonHolidayCount === 0) {
+                console.warn('[ContentManager] loadEvents returned only holidays/empty. Retrying once with forceRefresh...');
+                return this.loadEvents(true);
+            }
+
             // Save to Cache
-            try {
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    timestamp: Date.now(),
-                    events: finalEvents
-                }));
-            } catch (e) {
-                console.warn('[ContentManager] Failed to cache events', e);
+            if (!isLocalDev) {
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify({
+                        timestamp: Date.now(),
+                        events: finalEvents
+                    }));
+                } catch (e) {
+                    console.warn('[ContentManager] Failed to cache events', e);
+                }
             }
 
             return finalEvents;
 
         } catch (err) {
-            console.error('[ContentManager] loadEvents critical error:', err);
+            this.reportError('loadEvents', err, {
+                notifyUser: true,
+                userMessage: 'Kunne ikke laste arrangementer akkurat nå.'
+            });
             return [];
         }
     }
@@ -915,8 +1145,13 @@ class ContentManager {
             cellEvents.forEach(e => {
                 const tag = document.createElement('div');
                 tag.className = 'cal-event-tag';
+
+                // Add past event class if applicable
+                if (this.isEventPast(e)) {
+                    tag.classList.add('cms-past-event-tag');
+                }
+
                 tag.innerText = e.title;
-                const startValue = e.start || e.date;
                 const eventTime = this.parseEventDate(startValue);
                 const hasTime = this.eventHasTime(startValue);
                 const timeLabel = eventTime && hasTime
@@ -1014,20 +1249,36 @@ class ContentManager {
             this.setEventCache(events);
 
             if (!events || events.length === 0) {
-                container.innerHTML = '<div class="events-empty-state" style="grid-column: 1/-1; display: block; width: 100%; padding: 40px; text-align: center; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; color: var(--text-dark);"><h3 style="margin-bottom: 10px;">Ingen kommende arrangementer</h3><p>Vi har foreløpig ingen planlagte arrangementer i kalenderen.</p></div>';
+                container.innerHTML = `
+                    <div class="events-empty-state cms-events-empty-state">
+                        <h3 class="cms-events-empty-title">Ingen kommende arrangementer</h3>
+                        <p>Vi har foreløpig ingen planlagte arrangementer i kalenderen.</p>
+                    </div>
+                `;
                 return;
             }
 
-            // DEBUG: Log first event
-            if (window.cmsLog && events.length > 0) {
-                try {
-                    console.log('[CMS] First event:', events[0]);
-                } catch (e) { }
+            // Filter out holidays from the "boxes" (cards) view
+            // AND filter out past events from boxes correctly
+            const now = new Date();
+            const filteredEvents = (events || []).filter(e => {
+                if (e.isHoliday) return false;
+
+                // For "boxes", we only want future events (or events currently happening)
+                return !this.isEventPast(e);
+            });
+
+            const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
+
+            if (['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase())) {
+                console.info('[ContentManager] renderEvents debug', {
+                    pageId: this.pageId,
+                    inputEvents: Array.isArray(events) ? events.length : 0,
+                    nonHolidayEvents: filteredEvents.length,
+                    displayEvents: displayEvents.length
+                });
             }
 
-            // Filter out holidays from the "boxes" (cards) view
-            const filteredEvents = (events || []).filter(e => !e.isHoliday);
-            const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
             const html = displayEvents.map(event => {
                 try {
                     const eventKey = this.getEventKey(event);
@@ -1140,8 +1391,12 @@ class ContentManager {
             const timeLabel = timeStr ? timeStr : 'Tid ikke satt';
             const location = event.location || 'Sted ikke satt';
 
+            // Check if event is in the past for graying out
+            const isPast = this.isEventPast(event);
+            const pastClass = isPast ? 'cms-past-event-agenda' : '';
+
             return `
-                < li class="calendar-agenda-item" >
+                <li class="calendar-agenda-item ${pastClass}">
                     <div class="agenda-date-col">
                         <span class="agenda-day">${dayNum}</span>
                         <span class="agenda-month">${monthStr}</span>
@@ -1156,7 +1411,7 @@ class ContentManager {
                         <span class="agenda-meta">${location}</span>
                     </div>
                     <button type="button" class="agenda-link event-modal-trigger" data-event-key="${eventKey}">Detaljer</button>
-                </li >
+                </li>
                 `;
         }).join('');
 
@@ -1198,6 +1453,250 @@ class ContentManager {
     getEventKey(event) {
         if (!event) return '';
         return event.id || `${event.title || 'event'}| ${event.start || event.date || ''} `;
+    }
+
+    /**
+     * Dynamically render Testimonials or fallback to empty
+     */
+    renderTestimonials(testimonials) {
+        const container = document.querySelector('.testimonial-track');
+        const section = document.querySelector('.testimonials');
+        if (!container) return;
+
+        if (!testimonials || testimonials.length === 0) {
+            container.innerHTML = '';
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        if (section) section.style.display = 'block';
+
+        const testimonialsMarkup = testimonials.map((t, idx) => `
+            <div class="testimonial-card ${idx === 0 ? 'active' : ''}">
+                <div class="testimonial-image">
+                    <img src="${t.imageUrl || 'https://via.placeholder.com/150'}" alt="${t.name}">
+                </div>
+                <p class="testimonial-text">"${t.text || ''}"</p>
+                <h4 class="testimonial-name">${t.name || ''}</h4>
+                <span class="testimonial-role">${t.role || 'Deltaker'}</span>
+            </div>
+        `).join('');
+
+        this.setHTMLIfChanged(container, testimonialsMarkup, '__testimonials-html');
+
+        // Re-initialize Testimonial Slider
+        if (window.testimonialSlider) {
+            window.testimonialSlider.init();
+        }
+    }
+
+    extractFacebookPageIdentifier(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        if (!trimmed) return '';
+
+        if (!/^https?:\/\//i.test(trimmed)) {
+            if (/facebook\.com\//i.test(trimmed)) {
+                return this.extractFacebookPageIdentifier(`https://${trimmed.replace(/^\/+/, '')}`);
+            }
+            return trimmed.replace(/^@+/, '').trim();
+        }
+
+        try {
+            const parsed = new URL(trimmed);
+            const queryId = parsed.searchParams.get('id');
+            if (queryId && queryId.trim()) {
+                return queryId.trim();
+            }
+
+            const ignoredSegments = new Set([
+                'pages',
+                'pg',
+                'profile.php',
+                'posts',
+                'events',
+                'watch',
+                'photos',
+                'videos',
+                'reel',
+                'share'
+            ]);
+            const segments = parsed.pathname
+                .split('/')
+                .map((segment) => segment.trim())
+                .filter(Boolean);
+
+            for (const segment of segments) {
+                if (!ignoredSegments.has(segment.toLowerCase())) {
+                    return segment.replace(/^@+/, '').trim();
+                }
+            }
+        } catch (error) {
+            return trimmed
+                .replace(/^https?:\/\//i, '')
+                .replace(/^www\./i, '')
+                .replace(/^facebook\.com\//i, '')
+                .split(/[/?#]/)[0]
+                .replace(/^@+/, '')
+                .trim();
+        }
+
+        return '';
+    }
+
+    getFacebookFeedConfig() {
+        const section = document.getElementById('facebook-feed');
+        const pageContent = (window.HKM_PAGE_CONTENT && this.pageId && window.HKM_PAGE_CONTENT[this.pageId]) || {};
+        const feedDoc = (window.HKM_CONTENT_DOCS && window.HKM_CONTENT_DOCS.settings_facebook_feed) || null;
+        const sectionLink = section ? section.querySelector('.facebook-feed-cta') : null;
+        const feedContent = this.getValueByPath(feedDoc || {}, 'facebookFeed')
+            || this.getValueByPath(pageContent, 'facebookFeed')
+            || {};
+        const cardCount = section ? section.querySelectorAll('.facebook-post-card').length : 3;
+        let livePostCount = Number(feedContent.livePostCount);
+
+        if (!Number.isFinite(livePostCount)) {
+            livePostCount = cardCount || 3;
+        }
+
+        livePostCount = Math.min(Math.max(Math.round(livePostCount), 1), Math.max(cardCount, 1));
+
+        return {
+            section,
+            enabled: feedContent.enabled !== false,
+            useLiveFeed: feedContent.useLiveFeed !== false,
+            livePostCount,
+            pageId: (typeof feedContent.pageId === 'string' ? feedContent.pageId.trim() : '')
+                || this.extractFacebookPageIdentifier(typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl : '')
+                || this.extractFacebookPageIdentifier(sectionLink?.getAttribute('href') || ''),
+            pageUrl: (typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl.trim() : '')
+                || (sectionLink?.getAttribute('href') || '').trim()
+        };
+    }
+
+    getFacebookFeedUrls(limit = 3, { pageId = '', pageUrl = '' } = {}) {
+        const params = new URLSearchParams({ limit: String(limit) });
+        if (pageId) params.set('pageId', pageId);
+        if (pageUrl) params.set('pageUrl', pageUrl);
+        const projectId = (window.firebaseConfig && window.firebaseConfig.projectId) || 'his-kingdom-ministry';
+        const urls = [`/api/facebook-feed?${params.toString()}`];
+        const cloudFunctionUrl = `https://us-central1-${projectId}.cloudfunctions.net/facebookFeed?${params.toString()}`;
+
+        if (!urls.includes(cloudFunctionUrl)) {
+            urls.push(cloudFunctionUrl);
+        }
+
+        return urls;
+    }
+
+    async loadFacebookFeed() {
+        const config = this.getFacebookFeedConfig();
+        const { section } = config;
+        if (!section) return;
+
+        if (!config.enabled) {
+            section.style.display = 'none';
+            return;
+        }
+
+        section.style.display = '';
+
+        if (!config.useLiveFeed) {
+            return;
+        }
+
+        let lastError = null;
+
+        for (const url of this.getFacebookFeedUrls(config.livePostCount, {
+            pageId: config.pageId,
+            pageUrl: config.pageUrl
+        })) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    lastError = new Error(`Facebook feed request failed with ${response.status}`);
+                    continue;
+                }
+
+                const payload = await response.json();
+                const items = Array.isArray(payload?.items) ? payload.items : [];
+
+                if (!items.length) {
+                    continue;
+                }
+
+                this.renderFacebookFeed(items, payload.pageUrl || config.pageUrl || '');
+                return;
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        if (lastError) {
+            console.warn('[ContentManager] Could not load live Facebook feed. Falling back to configured cards.', lastError);
+        }
+    }
+
+    renderFacebookFeed(posts, pageUrl = '') {
+        const section = document.getElementById('facebook-feed');
+        if (!section) return;
+
+        const cards = Array.from(section.querySelectorAll('.facebook-post-card'));
+        const pageLink = section.querySelector('.facebook-feed-cta');
+        const normalizedPosts = Array.isArray(posts) ? posts.slice(0, cards.length) : [];
+
+        if (!normalizedPosts.length) return;
+
+        if (pageLink && pageUrl) {
+            pageLink.href = pageUrl;
+        }
+
+        cards.forEach((card, index) => {
+            const post = normalizedPosts[index];
+            if (!post) {
+                card.style.display = 'none';
+                return;
+            }
+
+            card.style.display = '';
+
+            if (post.link) {
+                card.href = post.link;
+            }
+
+            const dateEl = card.querySelector('[data-content-key$=".date"]');
+            const titleEl = card.querySelector('[data-content-key$=".title"]');
+            const excerptEl = card.querySelector('[data-content-key$=".excerpt"]');
+            const ctaEl = card.querySelector('[data-content-key$=".cta"]');
+            const imageEl = card.querySelector('.facebook-post-image');
+            const imageWrap = card.querySelector('.facebook-post-image-wrap');
+
+            if (dateEl && post.date) dateEl.textContent = post.date;
+            if (titleEl && post.title) titleEl.textContent = post.title;
+            if (excerptEl && post.excerpt) excerptEl.textContent = post.excerpt;
+            if (ctaEl && post.cta) ctaEl.textContent = post.cta;
+
+            if (imageEl) {
+                const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
+                const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
+                const effectiveImage = liveImage || fallbackSrc;
+
+                if (effectiveImage) {
+                    if (imageEl.getAttribute('src') !== effectiveImage) {
+                        imageEl.setAttribute('src', effectiveImage);
+                    }
+                    imageWrap?.classList.remove('is-empty');
+                } else {
+                    imageEl.removeAttribute('src');
+                    imageWrap?.classList.add('is-empty');
+                }
+            }
+        });
     }
 
     bindEventModalTriggers(root) {
@@ -1263,16 +1762,22 @@ class ContentManager {
         const imageSrc = this._getEventImage(event);
         imageEl.src = imageSrc;
         imageEl.alt = event.title || 'Arrangement';
-        imageWrap.style.display = 'block';
+        imageWrap.classList.remove('cms-hidden');
 
         const videoLink = this.extractVideoLink(event);
         const videoLinkEl = modal.querySelector('.event-modal-video-link');
 
         if (videoLink && videoLinkEl) {
-            videoLinkEl.innerHTML = `< a href = "${videoLink}" target = "_blank" rel = "noopener noreferrer" class="btn btn-primary" style = "display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;" > <i class="fas fa-video"></i> Bli med på nettmøtet</a > `;
-            videoLinkEl.style.display = 'block';
+            videoLinkEl.innerHTML = `
+                <a href="${videoLink}" target="_blank" rel="noopener noreferrer" class="btn btn-primary event-modal-video-cta">
+                    <i class="fas fa-video"></i>
+                    Bli med på nettmøtet
+                </a>
+            `;
+            videoLinkEl.classList.remove('cms-hidden');
         } else if (videoLinkEl) {
-            videoLinkEl.style.display = 'none';
+            videoLinkEl.innerHTML = '';
+            videoLinkEl.classList.add('cms-hidden');
         }
 
         modal.classList.add('active');
@@ -1284,8 +1789,8 @@ class ContentManager {
             overlay = document.createElement('div');
             overlay.className = 'event-modal-overlay';
             overlay.innerHTML = `
-                < div class="event-modal" >
-                    <div class="event-modal-image-wrap" style="display: none;">
+                <div class="event-modal">
+                    <div class="event-modal-image-wrap cms-hidden">
                         <img class="event-modal-image" alt="">
                     </div>
                     <div class="event-modal-header">
@@ -1299,15 +1804,15 @@ class ContentManager {
                                 <span class="event-modal-time"></span>
                                 <span class="event-modal-location"></span>
                             </div>
-                            <div class="event-modal-video-link" style="display: none;"></div>
+                            <div class="event-modal-video-link cms-hidden"></div>
                         </div>
                         <div class="event-modal-right">
                             <h4 class="event-modal-section-title">Mer om arrangement</h4>
                             <p class="event-modal-description"></p>
                         </div>
                     </div>
-                </div >
-                `;
+                </div>
+            `;
             document.body.appendChild(overlay);
 
             overlay.addEventListener('click', (e) => {
@@ -1325,14 +1830,14 @@ class ContentManager {
         const body = overlay.querySelector('.event-modal-body');
         if (body && !body.querySelector('.event-modal-left')) {
             body.innerHTML = `
-                < div class="event-modal-left" >
+                <div class="event-modal-left">
                     <div class="event-modal-meta">
                         <span class="event-modal-date"></span>
                         <span class="event-modal-time"></span>
                         <span class="event-modal-location"></span>
                     </div>
-                    <div class="event-modal-video-link" style="display: none;"></div>
-                </div >
+                    <div class="event-modal-video-link cms-hidden"></div>
+                </div>
                 <div class="event-modal-right">
                     <h4 class="event-modal-section-title">Mer om arrangement</h4>
                     <p class="event-modal-description"></p>
@@ -1368,6 +1873,17 @@ class ContentManager {
 
     parseEventDate(value) {
         if (!value) return null;
+
+        // Handle Firebase Timestamp objects
+        if (value && typeof value === 'object' && typeof value.toDate === 'function') {
+            return value.toDate();
+        }
+
+        // Handle Firestore-like timestamp objects {seconds, nanoseconds}
+        if (value && typeof value === 'object' && typeof value.seconds === 'number') {
+            return new Date(value.seconds * 1000);
+        }
+
         if (value instanceof Date) {
             return Number.isNaN(value.getTime()) ? null : value;
         }
@@ -1375,8 +1891,8 @@ class ContentManager {
         if (typeof value === 'string') {
             const trimmed = value.trim();
 
-            // Handle dd.mm.yyyy or dd/mm/yyyy (with optional time)
-            const dmY = trimmed.match(/^(\d{2})[./](\d{2})[./](\d{4})(?:\s+(\d{2}):(\d{2}))?$/);
+            // Handle d.m.yyyy or dd.mm.yyyy (with optional time) - more flexible regex
+            const dmY = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})(?:\s+(\d{1,2}):(\d{1,2}))?$/);
             if (dmY) {
                 const day = Number(dmY[1]);
                 const month = Number(dmY[2]) - 1;
@@ -1402,6 +1918,24 @@ class ContentManager {
 
         const parsed = new Date(value);
         return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    isEventPast(event) {
+        const startValue = event.end || event.start || event.date;
+        const endDate = this.parseEventDate(startValue);
+        if (!endDate) return false;
+
+        const now = new Date();
+
+        // If it's a date-only string (no time set), treat it as an all-day event
+        // and only count it as "past" once the day is completely over.
+        if (!this.eventHasTime(startValue)) {
+            const endOfDay = new Date(endDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            return endOfDay < now;
+        }
+
+        return endDate < now;
     }
 
     eventHasTime(value) {
@@ -1515,8 +2049,25 @@ class ContentManager {
      * Update DOM elements based on Firestore data
      * @param {object} data 
      */
-    updateDOM(data) {
+    updateDOM(data, { docId = this.pageId } = {}) {
         if (!data) return;
+
+        if (docId) {
+            window.HKM_CONTENT_DOCS = window.HKM_CONTENT_DOCS || {};
+            window.HKM_CONTENT_DOCS[docId] = data;
+        }
+        if (docId === this.pageId && this.pageId) {
+            window.HKM_PAGE_CONTENT = window.HKM_PAGE_CONTENT || {};
+            window.HKM_PAGE_CONTENT[this.pageId] = data;
+        }
+        if (docId === this.pageId && this.pageId === 'butikk') {
+            window.HKM_STORE_CONTENT = data;
+        }
+        try {
+            document.dispatchEvent(new CustomEvent('hkm:page-content-updated', {
+                detail: { pageId: this.pageId, docId, data }
+            }));
+        } catch (_) { }
 
         // Skip updateDOM for translated pages (EN/ES) to preserve HTML translations
         const lang = document.documentElement.lang || 'no';
@@ -1529,14 +2080,67 @@ class ContentManager {
         const elements = document.querySelectorAll("[data-content-key]");
 
         elements.forEach(el => {
+            const targetDoc = el.getAttribute('data-content-doc');
+            if (targetDoc && targetDoc !== docId) return;
+
             const key = el.getAttribute("data-content-key");
             const value = this.getValueByPath(data, key);
             if (value === undefined) return;
+
+            const contentAttr = el.getAttribute('data-content-attr');
+            if (contentAttr) {
+                const visibilityTargetSelector = el.getAttribute('data-visibility-target');
+                const visibilityTarget = visibilityTargetSelector ? el.closest(visibilityTargetSelector) : null;
+                const fallbackSrc = el.getAttribute('data-fallback-src') || '';
+                contentAttr
+                    .split(',')
+                    .map(attr => attr.trim())
+                    .filter(Boolean)
+                    .forEach(attr => {
+                        if (attr === 'src' && el.tagName === 'IMG') {
+                            const imageValue = typeof value === 'string' ? value.trim() : '';
+                            const effectiveImage = imageValue || fallbackSrc;
+                            el.onerror = () => {
+                                const currentFallback = el.getAttribute('data-fallback-src') || '';
+                                const currentSrc = el.getAttribute('src') || '';
+                                if (currentFallback && currentSrc !== currentFallback) {
+                                    el.setAttribute('src', currentFallback);
+                                    if (visibilityTarget) visibilityTarget.classList.remove('is-empty');
+                                    return;
+                                }
+                                el.removeAttribute('src');
+                                if (visibilityTarget) visibilityTarget.classList.add('is-empty');
+                            };
+                            if (!effectiveImage) {
+                                el.removeAttribute('src');
+                                if (visibilityTarget) visibilityTarget.classList.add('is-empty');
+                                return;
+                            }
+                            if (el.getAttribute('src') !== effectiveImage) {
+                                el.setAttribute('src', effectiveImage);
+                            }
+                            if (visibilityTarget) visibilityTarget.classList.remove('is-empty');
+                            return;
+                        }
+                        el.setAttribute(attr, String(value));
+                    });
+                return;
+            }
 
             // Images kan trygt oppdateres direkte
             if (el.tagName === "IMG") {
                 if (el.src !== value) {
                     el.src = value;
+                }
+                return;
+            }
+
+            // Inputs/textareaer brukes enkelte steder for placeholder-tekster
+            if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+                if (el.hasAttribute("placeholder")) {
+                    el.placeholder = String(value);
+                } else if (typeof el.value === "string") {
+                    el.value = String(value);
                 }
                 return;
             }
@@ -1625,6 +2229,28 @@ class ContentManager {
      * Apply global branding and typography
      */
     applyGlobalSettings(data) {
+        if (!data || typeof data !== 'object') return;
+
+        const normalizeHex = (value) => {
+            if (typeof value !== 'string') return '';
+            let raw = value.trim();
+            if (!raw) return '';
+            if (!raw.startsWith('#')) raw = `#${raw}`;
+            if (/^#([0-9a-f]{3})$/i.test(raw)) {
+                const short = raw.slice(1);
+                return `#${short.split('').map((c) => c + c).join('').toUpperCase()}`;
+            }
+            if (/^#([0-9a-f]{6})$/i.test(raw)) return raw.toUpperCase();
+            return '';
+        };
+
+        const setColorVar = (cssVar, value) => {
+            const safeHex = normalizeHex(value);
+            if (safeHex) {
+                document.documentElement.style.setProperty(cssVar, safeHex);
+            }
+        };
+
         if (data.logoUrl) {
             const logos = document.querySelectorAll('.logo img');
             logos.forEach(img => img.src = data.logoUrl);
@@ -1675,9 +2301,13 @@ class ContentManager {
         if (data.fontSizeH2Mobile) {
             document.documentElement.style.setProperty('--fs-h2-mobile', `${data.fontSizeH2Mobile}px`);
         }
-        if (data.primaryColor) {
-            document.documentElement.style.setProperty('--primary-color', data.primaryColor);
-        }
+        setColorVar('--primary-color', data.primaryColor);
+        setColorVar('--secondary-color', data.secondaryColor);
+        setColorVar('--bg-light', data.backgroundColor || data.bgLightColor || data.bgLight);
+        setColorVar('--bg-white', data.surfaceColor || data.bgWhiteColor || data.bgWhite);
+        setColorVar('--text-dark', data.textColor || data.textDarkColor || data.textDark);
+        setColorVar('--text-light', data.textLightColor || data.accentColor || data.textMutedColor || data.textLight);
+        setColorVar('--accent-color', data.accentColor || data.textLightColor);
     }
 
     /**
@@ -1748,6 +2378,18 @@ class ContentManager {
         if (!sliderContainer) return;
 
         if (slides && slides.length > 0) {
+            const normalizedIncomingSlides = slides.map(slide => ({
+                title: (slide.title || '').trim(),
+                subtitle: (slide.subtitle || '').trim(),
+                imageUrl: (slide.imageUrl || '').trim(),
+                btnText: (slide.btnText || '').trim(),
+                btnLink: (slide.btnLink || '').trim()
+            }));
+            const incomingSignature = JSON.stringify(normalizedIncomingSlides);
+            if (this._renderHtmlSignatures.get('__hero-slides-data') === incomingSignature) {
+                return;
+            }
+
             // Extract current data from DOM for comparison to avoid flicker if same
             const currentSlides = Array.from(sliderContainer.querySelectorAll('.hero-slide')).map(s => ({
                 title: s.querySelector('.hero-title')?.textContent?.trim() || '',
@@ -1783,7 +2425,7 @@ class ContentManager {
                 console.log("[ContentManager] Hero content changed or updated from dashboard, re-rendering...");
                 document.body.classList.remove('hero-animate');
 
-                sliderContainer.innerHTML = slides.map((slide, index) => `
+                const heroMarkup = slides.map((slide, index) => `
                     <div class="hero-slide ${index === 0 ? 'active' : ''}">
                         <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
                         <div class="container hero-container">
@@ -1800,6 +2442,9 @@ class ContentManager {
                     </div>
                 `).join('');
 
+                this.setHTMLIfChanged(sliderContainer, heroMarkup, '__hero-slides-html');
+                this._renderHtmlSignatures.set('__hero-slides-data', incomingSignature);
+
                 // Re-init HeroSlider from script.js
                 if (window.heroSlider) {
                     window.heroSlider.stopAutoPlay();
@@ -1810,6 +2455,7 @@ class ContentManager {
 
                 this.enableHeroAnimations();
             } else {
+                this._renderHtmlSignatures.set('__hero-slides-data', incomingSignature);
                 console.log("[ContentManager] Hero content matches DOM, skipping re-render to prevent flicker.");
             }
         }
@@ -1828,28 +2474,30 @@ class ContentManager {
         if (!container) return;
 
         if (posts.length > 0) {
-            container.innerHTML = posts.map(post => `
+            const html = posts.map(post => `
                 <article class="blog-card">
                     <div class="blog-image">
                         <img src="${post.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${post.title}">
-                        ${post.category ? `<span class="blog-category" style="position: absolute; top: 15px; left: 15px; background: var(--secondary-color, #ff6b2b); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${post.category}</span>` : ''}
+                        ${post.category ? `<span class="blog-category cms-blog-category-badge">${post.category}</span>` : ''}
                     </div>
-                    <div class="blog-content" style="padding: 25px;">
-                        <div class="blog-meta" style="display: flex; gap: 15px; font-size: 13px; color: #6c757d; margin-bottom: 10px;">
+                    <div class="blog-content cms-blog-content">
+                        <div class="blog-meta cms-blog-meta">
                             ${post.date ? `<span><i class="fas fa-calendar-alt"></i> ${this.formatDate(post.date)}</span>` : ''}
                             ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : '<span><i class="fas fa-user"></i> Admin</span>'}
                         </div>
                         ${post.tags && Array.isArray(post.tags) && post.tags.length > 0 ? `
-                        <div class="blog-tags" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
-                            ${post.tags.map(tag => `<span style="font-size: 11px; background: #fff0ea; color: #ff6b2b; padding: 2px 8px; border-radius: 12px; font-weight: 600;">#${tag}</span>`).join('')}
+                        <div class="blog-tags cms-blog-tags">
+                            ${post.tags.map(tag => `<span class="cms-blog-tag-pill">#${tag}</span>`).join('')}
                         </div>
                         ` : ''}
-                        <h3 class="blog-title" style="margin-bottom: 12px; font-size: 1.25rem;">${post.title}</h3>
-                        <p class="blog-excerpt" style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">${this.generateExcerpt(post.content, post.title)}...</p>
-                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" class="blog-link" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">${this.getTranslation('read_more')} <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></a>
+                        <h3 class="blog-title cms-blog-title">${post.title}</h3>
+                        <p class="blog-excerpt cms-blog-excerpt">${this.generateExcerpt(post.content, post.title)}...</p>
+                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" class="blog-link cms-blog-link">${this.getTranslation('read_more')} <i class="fas fa-arrow-right cms-blog-link-icon"></i></a>
                     </div>
                 </article>
             `).join('');
+
+            this.setHTMLIfChanged(container, html, `blog:${selector}`);
         }
     }
 
@@ -1861,25 +2509,27 @@ class ContentManager {
         if (!container) return;
 
         if (series.length > 0) {
-            container.innerHTML = series.map(item => `
-                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card" style="text-decoration: none; color: inherit; display: block;">
+            const html = series.map(item => `
+                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card cms-media-card-link">
                     <div class="media-thumbnail">
                         <img src="${item.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${item.title}">
                         <div class="media-play-button">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
-                        ${item.category ? `<span class="media-duration" style="background: var(--primary-color); left: 10px; right: auto; padding: 3px 10px; border-radius: 4px;">${item.category}</span>` : ''}
+                        ${item.category ? `<span class="media-duration cms-media-duration-badge">${item.category}</span>` : ''}
                     </div>
                     <div class="media-content">
                         <h3 class="media-title">${item.title}</h3>
                         <p class="media-description">${this.generateExcerpt(item.content, item.title)}...</p>
-                        <div class="media-meta" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #6c757d;"><i class="fas fa-user"></i> ${item.author || 'His Kingdom'}</span>
-                            <span style="font-size: 12px; color: #6c757d;"><i class="fas fa-calendar"></i> ${item.date ? this.formatDate(item.date) : ''}</span>
+                        <div class="media-meta cms-media-meta">
+                            <span class="cms-media-meta-item"><i class="fas fa-user"></i> ${item.author || 'His Kingdom'}</span>
+                            <span class="cms-media-meta-item"><i class="fas fa-calendar"></i> ${item.date ? this.formatDate(item.date) : ''}</span>
                         </div>
                     </div>
                 </a>
             `).join('');
+
+            this.setHTMLIfChanged(container, html, `teaching:${selector}`);
         }
     }
 
@@ -2279,14 +2929,14 @@ class ContentManager {
                         const ytId = ytMatch ? ytMatch[1] : null;
                         if (!ytId) return '';
                         return `
-                            <div class="block-embed-wrapper" style="margin: 28px 0;">
-                                <div class="block-embed" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; box-shadow: 0 4px 24px rgba(0,0,0,0.10);">
+                            <div class="block-embed-wrapper cms-yt-embed-wrapper">
+                                <div class="block-embed cms-yt-embed">
                                     <iframe
                                         src="https://www.youtube.com/embed/${ytId}"
                                         frameborder="0"
                                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                         allowfullscreen
-                                        style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px;">
+                                        class="cms-yt-embed-frame">
                                     </iframe>
                                 </div>
                             </div>

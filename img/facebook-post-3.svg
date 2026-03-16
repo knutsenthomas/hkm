@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-labelledby="title desc">
+  <title id="title">Facebook post fallback 3</title>
+  <desc id="desc">Abstract cool background with stacked panels and soft gradients.</desc>
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="50%" stop-color="#EDE9FE"/>
+      <stop offset="100%" stop-color="#DBEAFE"/>
+    </linearGradient>
+    <linearGradient id="panel3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#EEF2FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#bg3)"/>
+  <rect x="95" y="85" width="1010" height="505" rx="34" fill="#FFFFFF" opacity=".96"/>
+  <rect x="145" y="135" width="300" height="380" rx="28" fill="url(#panel3)"/>
+  <rect x="495" y="135" width="560" height="110" rx="28" fill="#FFFFFF"/>
+  <rect x="545" y="170" width="280" height="22" rx="11" fill="#DBEAFE"/>
+  <rect x="545" y="206" width="420" height="18" rx="9" fill="#E2E8F0"/>
+  <rect x="495" y="275" width="560" height="240" rx="28" fill="url(#panel3)"/>
+  <rect x="545" y="325" width="390" height="22" rx="11" fill="#E2E8F0"/>
+  <rect x="545" y="365" width="450" height="22" rx="11" fill="#E2E8F0"/>
+  <rect x="545" y="405" width="330" height="22" rx="11" fill="#E2E8F0"/>
+  <rect x="545" y="456" width="170" height="42" rx="21" fill="#F97316" opacity=".9"/>
+  <circle cx="295" cy="275" r="90" fill="#C4B5FD"/>
+  <circle cx="295" cy="275" r="42" fill="#8B5CF6" opacity=".22"/>
+  <path d="M190 420c54-42 109-63 165-63s111 21 165 63c-34 42-89 71-165 87-76-16-131-45-165-87z" fill="#BFDBFE"/>
+</svg>

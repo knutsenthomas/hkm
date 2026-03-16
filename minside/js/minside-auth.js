@@ -176,15 +176,23 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         let role = 'medlem';
+        let roleLookupFailed = false;
         try {
-            role = await service.getUserRole(user.uid);
+            role = await service.getUserRole(user.uid, { timeoutMs: 2500 });
         } catch (err) {
+            roleLookupFailed = true;
             console.warn('Kunne ikke hente rolle:', err);
         }
 
-        const canAccessAdmin = window.HKM_PERMISSIONS
-            && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-            && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+        if (roleLookupFailed) {
+            // Avoid misrouting admins to member area when Firestore is temporarily slow.
+            showMessage('Innlogging er gjennomført, men rolleverifisering er treg. Prøver medlemssiden først.', 'success');
+            window.location.href = 'index.html';
+            return;
+        }
+
+        const normalizedRole = String(role || '').trim().toLowerCase();
+        const canAccessAdmin = normalizedRole === 'admin' || normalizedRole === 'superadmin';
 
         window.location.href = canAccessAdmin ? '../admin/index.html' : 'index.html';
     }

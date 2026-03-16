@@ -8,25 +8,67 @@ const header = document.getElementById('header');
 const mobileToggle = document.getElementById('mobile-toggle');
 const nav = document.getElementById('nav');
 const navLinks = document.querySelectorAll('.nav-link');
-// headerActions is already declared at top of file
-const headerActionsContainer = document.querySelector('.header-actions');
+
+// Shared overlay scroll-lock state so menu/search overlays do not fight each other.
+const bodyScrollLocks = new Set();
+
+function lockBodyScroll(key) {
+    bodyScrollLocks.add(key);
+    document.body.classList.add('body-locked');
+    const scrollbarWidth = Math.max(0, window.innerWidth - document.documentElement.clientWidth);
+
+    if (!document.body.dataset.hkmScrollLockPaddingRight) {
+        document.body.dataset.hkmScrollLockPaddingRight = document.body.style.paddingRight || '';
+    }
+
+    document.documentElement.style.setProperty('--hkm-scrollbar-comp', `${scrollbarWidth}px`);
+    document.body.style.paddingRight = scrollbarWidth > 0 ? `${scrollbarWidth}px` : '';
+    document.body.style.overflow = 'hidden';
+}
+
+function unlockBodyScroll(key) {
+    bodyScrollLocks.delete(key);
+    if (bodyScrollLocks.size === 0) {
+        document.body.classList.remove('body-locked');
+        document.body.style.paddingRight = document.body.dataset.hkmScrollLockPaddingRight || '';
+        delete document.body.dataset.hkmScrollLockPaddingRight;
+        document.documentElement.style.removeProperty('--hkm-scrollbar-comp');
+        document.body.style.overflow = '';
+    }
+}
+
+function syncViewportLayoutVars() {
+    const root = document.documentElement;
+    const heroSlider = document.querySelector('.hero-slider');
+    const headerEl = document.getElementById('header');
+    const headerHeight = headerEl ? headerEl.offsetHeight : 80;
+    const snappedHeaderHeight = Math.max(56, Math.round(headerHeight / 4) * 4);
+    const isMobileish = window.innerWidth <= 1024;
+    const isLandscapeMobile = isMobileish
+        && window.matchMedia('(orientation: landscape)').matches
+        && window.innerHeight <= 560;
+
+    root.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+    root.style.setProperty('--hkm-vh', `${window.innerHeight * 0.01}px`);
+    root.style.setProperty('--hkm-header-height', `${snappedHeaderHeight}px`);
+    root.style.setProperty('--hkm-header-offset', `${snappedHeaderHeight + 16}px`);
+
+    document.body.classList.toggle('is-mobile-landscape', isLandscapeMobile);
+
+    if (heroSlider) {
+        if (isMobileish) {
+            heroSlider.style.setProperty('--hkm-hero-height', `${window.innerHeight}px`);
+        } else {
+            heroSlider.style.removeProperty('--hkm-hero-height');
+        }
+    }
+}
 
 // ===================================
 // Mobile Viewport Height Fix
 // ===================================
 function initMobileViewportHeight() {
-    // Only run on mobile
-    if (window.innerWidth > 1024) return;
-
-    // Set variable on load
-    const vh = window.innerHeight * 0.01;
-    document.documentElement.style.setProperty('--vh', `${vh}px`);
-
-    // Lock height for the hero slider specifically to prevent jumping
-    const heroSlider = document.querySelector('.hero-slider');
-    if (heroSlider) {
-        heroSlider.style.height = `${window.innerHeight}px`;
-    }
+    syncViewportLayoutVars();
 }
 
 // Run on load and orientation change
@@ -36,6 +78,9 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('load', initMobileViewportHeight);
+window.addEventListener('resize', () => {
+    window.requestAnimationFrame(initMobileViewportHeight);
+}, { passive: true });
 
 window.addEventListener('orientationchange', () => {
     setTimeout(initMobileViewportHeight, 300);
@@ -46,10 +91,15 @@ let scrollTicking = false;
 window.addEventListener('scroll', () => {
     if (!scrollTicking) {
         window.requestAnimationFrame(() => {
-            if (window.scrollY > 100) {
+            if (!header) {
+                scrollTicking = false;
+                return;
+            }
+            const scrollTrigger = document.body.classList.contains('page-index') ? 24 : 100;
+            if (window.scrollY > scrollTrigger) {
                 header.classList.add('scrolled');
             } else {
-                if (!document.body.classList.contains("header-always-scrolled")) header.classList.remove("scrolled");
+                if (!document.body.classList.contains('header-always-scrolled')) header.classList.remove('scrolled');
             }
             scrollTicking = false;
         });
@@ -58,50 +108,98 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ===================================
-// Mobile Menu Toggle
-// ===================================
-// ===================================
-// Mega Menu Toggle (Tailwind Refactored)
+// Mega Menu Toggle
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
     const header = document.getElementById('header');
     const menuToggle = document.getElementById('menu-toggle');
     const megaMenu = document.getElementById('mega-menu');
-    const body = document.body;
 
-    // Icon elements
     const openIcon = menuToggle?.querySelector('.open-icon');
     const closeIcon = menuToggle?.querySelector('.close-icon');
+    let injectedCloseBtn = null;
+
+    function isMenuOpen() {
+        return !!megaMenu && (megaMenu.classList.contains('opacity-100') || megaMenu.classList.contains('active'));
+    }
+
+    function ensureCloseButton() {
+        if (!megaMenu) return null;
+        // When the header toggle is visible, it also acts as the close button.
+        // Avoid rendering a second floating close button behind it.
+        if (menuToggle) {
+            const existing = megaMenu.querySelector('.mega-menu-close-btn');
+            if (existing) existing.remove();
+            return null;
+        }
+        const existing = megaMenu.querySelector('.mega-menu-close-btn');
+        if (existing) return existing;
+
+        const closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'mega-menu-close-btn';
+        closeBtn.setAttribute('aria-label', 'Lukk meny');
+        closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            closeMenu();
+        });
+        megaMenu.appendChild(closeBtn);
+        return closeBtn;
+    }
+
+    function setMenuState(open) {
+        if (!megaMenu || !header) return;
+        const headerActions = header.querySelector('.header-actions');
+        const headerActionsRightBefore = open && headerActions
+            ? headerActions.getBoundingClientRect().right
+            : null;
+
+        megaMenu.classList.toggle('invisible', !open);
+        megaMenu.classList.toggle('opacity-0', !open);
+        megaMenu.classList.toggle('visible', open);
+        megaMenu.classList.toggle('opacity-100', open);
+        megaMenu.classList.toggle('active', open);
+        megaMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+
+        header.classList.toggle('menu-open', open);
+        menuToggle?.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+        if (open) {
+            lockBodyScroll('mega-menu');
+        } else {
+            unlockBodyScroll('mega-menu');
+            if (!document.body.classList.contains('body-locked')) {
+                document.documentElement.style.removeProperty('--hkm-header-actions-lock-shift');
+            }
+        }
+
+        openIcon?.classList.toggle('hidden', open);
+        closeIcon?.classList.toggle('hidden', !open);
+
+        if (open && headerActions && Number.isFinite(headerActionsRightBefore)) {
+            const headerActionsRightAfter = headerActions.getBoundingClientRect().right;
+            const deltaX = headerActionsRightBefore - headerActionsRightAfter;
+            const safeDelta = Math.abs(deltaX) < 0.5 ? 0 : Math.round(deltaX * 100) / 100;
+            document.documentElement.style.setProperty('--hkm-header-actions-lock-shift', `${safeDelta}px`);
+        }
+
+        injectedCloseBtn = injectedCloseBtn || ensureCloseButton();
+        injectedCloseBtn?.classList.toggle('active', open);
+    }
 
     function openMenu() {
-        if (megaMenu && header) {
-            megaMenu.classList.remove('invisible', 'opacity-0');
-            megaMenu.classList.add('visible', 'opacity-100');
-            header.classList.add('menu-open');
-            body.style.overflow = 'hidden';
-
-            // Swap icons
-            openIcon?.classList.add('hidden');
-            closeIcon?.classList.remove('hidden');
-        }
+        setMenuState(true);
+        document.dispatchEvent(new CustomEvent('hkm:mega-menu-change', { detail: { open: true } }));
     }
 
     function closeMenu() {
-        if (megaMenu && header) {
-            megaMenu.classList.add('invisible', 'opacity-0');
-            megaMenu.classList.remove('visible', 'opacity-100');
-            header.classList.remove('menu-open');
-            body.style.overflow = '';
-
-            // Swap icons
-            openIcon?.classList.remove('hidden');
-            closeIcon?.classList.add('hidden');
-        }
+        setMenuState(false);
+        document.dispatchEvent(new CustomEvent('hkm:mega-menu-change', { detail: { open: false } }));
     }
 
     function toggleMenu() {
-        const isOpen = megaMenu?.classList.contains('opacity-100');
-        if (isOpen) {
+        if (isMenuOpen()) {
             closeMenu();
         } else {
             openMenu();
@@ -109,20 +207,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (menuToggle) {
-        menuToggle.addEventListener('click', toggleMenu);
+        menuToggle.setAttribute('aria-expanded', 'false');
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleMenu();
+        });
     }
 
-    // Close on Escape key
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && megaMenu && megaMenu.classList.contains('opacity-100')) {
+    if (megaMenu) {
+        megaMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    injectedCloseBtn = ensureCloseButton();
+
+    // Close menu on link click and on backdrop click
+    megaMenu?.addEventListener('click', (e) => {
+        if (e.target === megaMenu) {
+            closeMenu();
+            return;
+        }
+
+        if (e.target.closest('a')) {
             closeMenu();
         }
     });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && isMenuOpen()) {
+            closeMenu();
+        }
+    });
+
+    window.HKM_UI = {
+        ...(window.HKM_UI || {}),
+        openMegaMenu: openMenu,
+        closeMegaMenu: closeMenu,
+        isMegaMenuOpen: isMenuOpen
+    };
 });
 
-// ===================================
-// Global Site Search (magnifying glass in header)
-// ===================================
 // ===================================
 // Global Site Search (magnifying glass in header)
 // ===================================
@@ -131,6 +254,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Only initialize if header actions exist
     if (headerActions) {
+        // Check if search button already exists to avoid duplicates
+        if (headerActions.querySelector('.header-search-btn')) return;
+
         // Create search toggle button
         const searchBtn = document.createElement('button');
         searchBtn.type = 'button';
@@ -171,8 +297,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const searchClose = document.getElementById('site-search-close');
 
         function openSearch() {
+            if (window.HKM_UI?.isMegaMenuOpen?.()) {
+                window.HKM_UI.closeMegaMenu();
+            }
             overlay.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            lockBodyScroll('site-search');
             if (searchInput) {
                 searchInput.value = '';
                 searchResults.innerHTML = '<p class="site-search-helper">Skriv inn et søkeord og trykk Enter.</p>';
@@ -182,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function closeSearch() {
             overlay.classList.remove('active');
-            document.body.style.overflow = '';
+            unlockBodyScroll('site-search');
         }
 
         searchBtn.addEventListener('click', openSearch);
@@ -190,6 +319,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (searchClose) {
             searchClose.addEventListener('click', closeSearch);
         }
+
+        // Handle search on input
+        searchInput?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value;
+                performSiteSearch(query, searchResults);
+            }
+        });
 
         // Close on escape
         document.addEventListener('keydown', (e) => {
@@ -205,7 +342,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-
+        // Also handle the search input that's already in the mega-menu HTML
+        const megaMenuSearchInput = document.querySelector('#mega-menu input[type="text"]');
+        if (megaMenuSearchInput) {
+            megaMenuSearchInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const query = megaMenuSearchInput.value;
+                    if (query.trim()) {
+                        openSearch();
+                        if (searchInput) {
+                            searchInput.value = query;
+                            performSiteSearch(query, searchResults);
+                        }
+                    }
+                }
+            });
+        }
     }
 });
 
@@ -268,11 +420,13 @@ class HeroSlider {
     }
 
     startAutoPlay() {
+        this.stopAutoPlay();
         this.interval = setInterval(() => this.next(), 4000); // 4 seconds per slide (reduced from 6s)
     }
 
     stopAutoPlay() {
         if (this.interval) clearInterval(this.interval);
+        this.interval = null;
     }
 }
 
@@ -834,18 +988,28 @@ new ProgressBarAnimation();
 // ===================================
 class TestimonialSlider {
     constructor() {
-        this.testimonials = document.querySelectorAll('.testimonial-card');
+        this.testimonials = [];
         this.currentTestimonial = 0;
         this.testimonialInterval = null;
-
-        if (this.testimonials.length > 0) {
-            this.init();
-        }
+        this.init();
     }
 
     init() {
-        this.setupNavigation();
-        this.startAutoPlay();
+        this.stopAutoPlay();
+        this.testimonials = document.querySelectorAll('.testimonial-card');
+        this.currentTestimonial = 0;
+
+        if (this.testimonials.length > 0) {
+            this.setupNavigation();
+            this.startAutoPlay();
+        }
+    }
+
+    stopAutoPlay() {
+        if (this.testimonialInterval) {
+            clearInterval(this.testimonialInterval);
+            this.testimonialInterval = null;
+        }
     }
 
     setupNavigation() {
@@ -853,40 +1017,52 @@ class TestimonialSlider {
         const nextBtn = document.querySelector('.testimonial-next');
 
         if (prevBtn && nextBtn) {
-            prevBtn.addEventListener('click', () => this.prevTestimonial());
-            nextBtn.addEventListener('click', () => this.nextTestimonial());
+            // Remove existing listeners to avoid duplicates if re-init
+            const newPrev = prevBtn.cloneNode(true);
+            const newNext = nextBtn.cloneNode(true);
+            prevBtn.parentNode.replaceChild(newPrev, prevBtn);
+            nextBtn.parentNode.replaceChild(newNext, nextBtn);
+
+            newPrev.addEventListener('click', () => this.prevTestimonial());
+            newNext.addEventListener('click', () => this.nextTestimonial());
         }
     }
 
     goToTestimonial(index) {
+        if (!this.testimonials || !this.testimonials[this.currentTestimonial]) return;
         this.testimonials[this.currentTestimonial].classList.remove('active');
         this.currentTestimonial = index;
-        this.testimonials[this.currentTestimonial].classList.add('active');
+        if (this.testimonials[this.currentTestimonial]) {
+            this.testimonials[this.currentTestimonial].classList.add('active');
+        }
         this.resetAutoPlay();
     }
 
     nextTestimonial() {
+        if (this.testimonials.length === 0) return;
         const next = (this.currentTestimonial + 1) % this.testimonials.length;
         this.goToTestimonial(next);
     }
 
     prevTestimonial() {
+        if (this.testimonials.length === 0) return;
         const prev = (this.currentTestimonial - 1 + this.testimonials.length) % this.testimonials.length;
         this.goToTestimonial(prev);
     }
 
     startAutoPlay() {
+        if (this.testimonials.length <= 1) return;
+        this.stopAutoPlay();
         this.testimonialInterval = setInterval(() => this.nextTestimonial(), 6000);
     }
 
     resetAutoPlay() {
-        clearInterval(this.testimonialInterval);
         this.startAutoPlay();
     }
 }
 
-// Initialize Testimonial Slider
-new TestimonialSlider();
+// Initialize and expose to window for CMS re-init
+window.testimonialSlider = new TestimonialSlider();
 
 // ===================================
 // Newsletter Form
@@ -1070,16 +1246,20 @@ document.querySelectorAll('a[href="#gi-gave"]').forEach(btn => {
 // ===================================
 document.addEventListener('keydown', (e) => {
     // ESC to close mobile menu
-    if (e.key === 'Escape' && nav.classList.contains('active')) {
-        nav.classList.remove('active');
-        mobileToggle.classList.remove('active');
+    if (e.key === 'Escape') {
+        if (nav && nav.classList.contains('active')) {
+            nav.classList.remove('active');
+            if (mobileToggle) mobileToggle.classList.remove('active');
+        }
     }
 
     // Arrow keys for slider navigation
-    if (e.key === 'ArrowLeft') {
-        heroSlider.prevSlide();
-    } else if (e.key === 'ArrowRight') {
-        heroSlider.nextSlide();
+    if (window.heroSlider) {
+        if (e.key === 'ArrowLeft') {
+            window.heroSlider.prev();
+        } else if (e.key === 'ArrowRight') {
+            window.heroSlider.next();
+        }
     }
 });
 
@@ -1252,13 +1432,22 @@ document.addEventListener('DOMContentLoaded', () => {
     updateCopyrightYear();
 });
 
-// Reveal site after all initializations
-window.addEventListener('load', () => {
+let publicUiRevealDone = false;
+
+function revealPublicUI(reason = 'unknown') {
+    if (publicUiRevealDone || !document.body) return;
+    publicUiRevealDone = true;
     document.body.classList.remove('cms-loading');
-    console.log("Public UI revealed (cms-loading removed)");
+    console.log(`Public UI revealed (${reason})`);
+}
+
+window.addEventListener('cmsContentLoaded', () => {
+    revealPublicUI('cms-content-loaded');
 });
 
-// Fallback if load takes too long
-setTimeout(() => {
-    document.body.classList.remove('cms-loading');
-}, 2000);
+// Safety fallback if CMS bootstrapping stalls.
+window.addEventListener('load', () => {
+    window.setTimeout(() => {
+        revealPublicUI('post-load-fallback');
+    }, 7000);
+});

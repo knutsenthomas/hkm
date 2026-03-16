@@ -158,6 +158,30 @@
             }
         }
     </script>
+    <script>
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+            const hostname = window.location.hostname;
+            const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1';
+            if (!isLocalDev) return;
+
+            window.addEventListener('load', async () => {
+                try {
+                    const regs = await navigator.serviceWorker.getRegistrations();
+                    await Promise.allSettled(regs.map((reg) => reg.unregister()));
+                    if (window.caches && typeof caches.keys === 'function') {
+                        const keys = await caches.keys();
+                        await Promise.allSettled(
+                            keys.filter((key) => key.startsWith('hkm-admin-')).map((key) => caches.delete(key))
+                        );
+                    }
+                    console.info('[HKM] Local admin service workers/caches cleared');
+                } catch (err) {
+                    console.warn('[HKM] Could not clear local admin service worker cache:', err);
+                }
+            });
+        })();
+    </script>
 </head>
 
 <body>
@@ -194,6 +218,7 @@
     </div>
 
     <script src="../js/notifications.js"></script>
+    <script src="../js/admin-utils.js"></script>
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -219,15 +244,31 @@
                     }
 
                     let role = 'medlem';
+                    let roleLookupFailed = false;
                     try {
-                        role = await service.getUserRole(user.uid);
+                        role = await service.getUserRole(user.uid, { timeoutMs: 2500 });
                     } catch (err) {
+                        roleLookupFailed = true;
                         console.warn('Kunne ikke hente rolle:', err);
+                        if (typeof showToast === 'function') {
+                            showToast('Innlogging er OK, men rolleverifisering er treg. Åpner admin og prøver igjen der.', 'warning', 4500);
+                        }
                     }
 
-                    const canAccessAdmin = window.HKM_PERMISSIONS
-                        && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-                        && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+                    if (roleLookupFailed) {
+                        // Let admin dashboard perform the final RBAC check to avoid false "medlem" redirects on slow Firestore.
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    const adminUtils = window.HKMAdminUtils || {};
+                    const canAccessAdmin = typeof adminUtils.isElevatedAdminRole === 'function'
+                        ? adminUtils.isElevatedAdminRole(role)
+                        : ['admin', 'superadmin'].includes(String(role || '').toLowerCase());
+
+                    if (!canAccessAdmin && typeof adminUtils.pushFlashNotice === 'function') {
+                        adminUtils.pushFlashNotice('Access Denied: Du har ikke administratorrettigheter til adminpanelet.', 'error', 6000);
+                    }
 
                     window.location.href = canAccessAdmin ? 'index.html' : '../minside/index.html';
                 }
@@ -278,17 +319,37 @@
                 const googleBtn = document.getElementById('google-login');
                 if (googleBtn) {
                     googleBtn.addEventListener('click', async () => {
+                        const adminUtils = window.HKMAdminUtils || {};
                         const service = window.firebaseService;
                         if (!service || !service.isInitialized) {
                             showToast("⚠️ Tjenesten er ikke klar!", "error");
                             return;
                         }
 
-                        try {
-                            await service.loginWithGoogle();
-                            await routeByRole();
-                        } catch (err) {
-                            console.error("[HKM] Google login error:", err);
+                        const loginFlow = async () => {
+                            try {
+                                await service.loginWithGoogle();
+                                await routeByRole();
+                            } catch (err) {
+                                console.error("[HKM] Google login error:", err);
+                                if (typeof showToast === 'function') {
+                                    showToast('Kunne ikke logge inn med Google. Prøv igjen.', 'error', 5000);
+                                }
+                            }
+                        };
+
+                        if (typeof adminUtils.withButtonLoading === 'function') {
+                            await adminUtils.withButtonLoading(googleBtn, loginFlow, { loadingText: 'Logger inn...' });
+                        } else {
+                            const originalText = googleBtn.innerHTML;
+                            googleBtn.disabled = true;
+                            googleBtn.innerHTML = 'Logger inn...';
+                            try {
+                                await loginFlow();
+                            } finally {
+                                googleBtn.disabled = false;
+                                googleBtn.innerHTML = originalText;
+                            }
                         }
                     });
                 }

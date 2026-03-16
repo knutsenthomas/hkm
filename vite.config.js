@@ -21,6 +21,15 @@ function getHtmlEntries(dir, entries = {}) {
 }
 
 export default defineConfig({
+    server: {
+        proxy: {
+            '/api': {
+                target: 'https://us-central1-his-kingdom-ministry.cloudfunctions.net/wixProducts',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api/, '')
+            }
+        }
+    },
     build: {
         rollupOptions: {
             input: getHtmlEntries(__dirname)

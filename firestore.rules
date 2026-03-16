@@ -1,0 +1,264 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasKey(data, key) {
+      return data.keys().hasAny([key]);
+    }
+
+    function isNumberValue(v) {
+      return v is int || v is float;
+    }
+
+    function currentUserRole() {
+      return signedIn() &&
+          exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : '';
+    }
+
+    function isBootstrapAdminEmail() {
+      return signedIn() &&
+        request.auth.token.email is string &&
+        request.auth.token.email == 'thomas@hiskingdomministry.no';
+    }
+
+    function isAdmin() {
+      let role = currentUserRole();
+      return signedIn() &&
+        (isBootstrapAdminEmail() || role == 'admin' || role == 'superadmin');
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function selfEmailAligned() {
+      return !hasKey(request.resource.data, 'email') ||
+        (request.auth.token.email is string &&
+         request.resource.data.email == request.auth.token.email);
+    }
+
+    function selfRoleSafeOnCreate() {
+      return !hasKey(request.resource.data, 'role') ||
+        request.resource.data.role == 'medlem';
+    }
+
+    function selfRoleUnchanged() {
+      let beforeHasRole = hasKey(resource.data, 'role');
+      let afterHasRole = hasKey(request.resource.data, 'role');
+      return beforeHasRole == afterHasRole &&
+        (!beforeHasRole || request.resource.data.role == resource.data.role);
+    }
+
+    function selfUidFieldAligned(uid) {
+      return !hasKey(request.resource.data, 'uid') ||
+        request.resource.data.uid == uid;
+    }
+
+    function validPublicNewsletterSubscription() {
+      let d = request.resource.data;
+      return d is map &&
+        hasKey(d, 'email') &&
+        d.email is string &&
+        d.email.size() > 3 &&
+        d.email.size() <= 254 &&
+        (!hasKey(d, 'source') || d.source is string);
+    }
+
+    function validPublicContactMessage() {
+      let d = request.resource.data;
+      return d is map &&
+        d.keys().hasAny(['email', 'message', 'name']) &&
+        (!hasKey(d, 'email') || (d.email is string && d.email.size() <= 254)) &&
+        (!hasKey(d, 'name') || (d.name is string && d.name.size() <= 200)) &&
+        (!hasKey(d, 'subject') || (d.subject is string && d.subject.size() <= 300)) &&
+        (!hasKey(d, 'message') || (d.message is string && d.message.size() <= 10000));
+    }
+
+    function validDonationCreate(donationId) {
+      let d = request.resource.data;
+      return d is map &&
+        hasKey(d, 'paymentIntentId') &&
+        d.paymentIntentId is string &&
+        d.paymentIntentId == donationId &&
+        hasKey(d, 'amount') &&
+        isNumberValue(d.amount) &&
+        (!hasKey(d, 'currency') || d.currency is string) &&
+        (!hasKey(d, 'status') || d.status is string) &&
+        (!hasKey(d, 'email') || d.email == null || d.email is string) &&
+        (!hasKey(d, 'uid') || d.uid == null || d.uid is string) &&
+        (!hasKey(d, 'userId') || d.userId == null || d.userId is string);
+    }
+
+    function validSelfAdminNotificationCreate() {
+      let d = request.resource.data;
+      return signedIn() &&
+        d is map &&
+        hasKey(d, 'type') &&
+        d.type == 'NEW_USER_REGISTRATION' &&
+        hasKey(d, 'userId') &&
+        d.userId == request.auth.uid &&
+        hasKey(d, 'read') &&
+        d.read == false &&
+        (!hasKey(d, 'userEmail') || d.userEmail == null ||
+          (request.auth.token.email is string && d.userEmail == request.auth.token.email));
+    }
+
+    function canReadOwnDonation() {
+      return signedIn() &&
+        ((hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid) ||
+         (hasKey(resource.data, 'uid') && resource.data.uid == request.auth.uid));
+    }
+
+    // Public CMS content (website pages + collections)
+    match /content/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Public site content storage (e.g. courses)
+    match /siteContent/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Legacy/public teaching collection used by Min Side
+    match /teaching/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // User profiles / roles
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+
+      allow create: if isAdmin() ||
+        (isSelf(userId) &&
+         selfEmailAligned() &&
+         selfRoleSafeOnCreate() &&
+         selfUidFieldAligned(userId));
+
+      allow update: if isAdmin() ||
+        (isSelf(userId) &&
+         selfEmailAligned() &&
+         selfRoleUnchanged() &&
+         selfUidFieldAligned(userId));
+
+      allow delete: if isAdmin() || isSelf(userId);
+    }
+
+    // Contact form messages (public submit, admin process)
+    match /contactMessages/{messageId} {
+      allow create: if validPublicContactMessage();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Newsletter signup from website footer/forms
+    match /newsletter_subscriptions/{subId} {
+      allow create: if validPublicNewsletterSubscription();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Cookie consent logs (anonymous allowed)
+    match /consent_logs/{logId} {
+      allow create: if request.resource.data is map;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Donations recorded client-side after successful Stripe confirmation.
+    // Note: this is create-only for public clients; consider moving fully to webhook-only writes.
+    match /donations/{donationId} {
+      allow create: if validDonationCreate(donationId);
+      allow read: if isAdmin() || canReadOwnDonation();
+      allow update, delete: if isAdmin();
+    }
+
+    // In-app notifications targeted to users
+    match /user_notifications/{notificationId} {
+      allow create, delete: if isAdmin();
+      allow read: if isAdmin() ||
+        (signedIn() && hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid);
+
+      allow update: if isAdmin() || (
+        signedIn() &&
+        hasKey(resource.data, 'userId') &&
+        resource.data.userId == request.auth.uid &&
+        hasKey(request.resource.data, 'userId') &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['read']) &&
+        hasKey(request.resource.data, 'read') &&
+        request.resource.data.read is bool
+      );
+    }
+
+    // Notes written by the user for themselves
+    match /personal_notes/{noteId} {
+      allow create: if signedIn() &&
+        hasKey(request.resource.data, 'userId') &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow read, delete: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid);
+
+      allow update: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid &&
+         hasKey(request.resource.data, 'userId') &&
+         request.resource.data.userId == request.auth.uid);
+    }
+
+    // Shared/user notes (typically admin-authored, user-readable)
+    match /user_notes/{noteId} {
+      allow read: if isAdmin() ||
+        (signedIn() && hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // Admin activity and internal notifications
+    match /admin_notifications/{notifId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isAdmin() || validSelfAdminNotificationCreate();
+    }
+
+    // Admin-only communication / CRM / templates / logs
+    match /email_templates/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /email_logs/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /push_log/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /segments/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /newsletter_templates/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /newsletter_campaigns/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /system_logs/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
