@@ -95,7 +95,7 @@ window.addEventListener('scroll', () => {
                 scrollTicking = false;
                 return;
             }
-            const scrollTrigger = document.body.classList.contains('page-index') ? 24 : 100;
+            const scrollTrigger = document.body.classList.contains('page-index') ? 80 : 100;
             if (window.scrollY > scrollTrigger) {
                 header.classList.add('scrolled');
             } else {
