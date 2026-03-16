@@ -918,4 +918,7 @@ class FirebaseService {
 }
 
 // Global instance
-window.firebaseService = new FirebaseService();
+export const firebaseService = new FirebaseService();
+window.firebaseService = firebaseService;
+
+export { FirebaseService };
