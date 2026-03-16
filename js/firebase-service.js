@@ -919,3 +919,6 @@ class FirebaseService {
 
 // Global instance
 window.firebaseService = new FirebaseService();
+
+// ESM Export for Vite/Rollup bundling support
+export const firebaseService = window.firebaseService;
