@@ -8,47 +8,44 @@
     <meta name="description"
         content="His Kingdom Ministry - En non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.">
 
-    <!-- Google Fonts: Inter for hele siden -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="css/notifications.css">
-    <link rel="stylesheet" href="css/cookie-consent.css">
+    <!-- VERSION CHECK: 2026.02.23.17.47 -->
 
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
-                    }
-                }
-            }
-        }
-    </script>
+
 
     <!-- Error Logger -->
-    <script type="module" src="js/error-logger.js"></script>
+  <script type="module" crossorigin src="/assets/index-Ddn3woap.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/content-manager-Vhz0gjvR.js">
+  <link rel="modulepreload" crossorigin href="/assets/error-logger-DVkGMsfx.js">
+  <link rel="modulepreload" crossorigin href="/assets/firebase-config-BNsh33Gw.js">
+  <link rel="modulepreload" crossorigin href="/assets/notifications-BZLMy0iP.js">
+  <link rel="modulepreload" crossorigin href="/assets/user-roles-D0mdCVLS.js">
+  <link rel="modulepreload" crossorigin href="/assets/i18n-CkTTiwon.js">
+  <link rel="modulepreload" crossorigin href="/assets/cookie-consent-DUwA3p5Q.js">
+  <link rel="stylesheet" crossorigin href="/assets/blogg-post-Chm4m6Lf.css">
+  <link rel="stylesheet" crossorigin href="/assets/notifications-DQiJY5Sp.css">
+  <link rel="stylesheet" crossorigin href="/assets/cookie-consent-_nwlpFTp.css">
 </head>
 
-<body class="cms-loading">
+<body class="page-index cms-loading">
     <!-- Header -->
-    <header class="header" id="header">
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="header-content" id="header-container">
             <!-- Logo -->
             <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                    <img src="/assets/logo-hkm-B4n9sAJj.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover"
+                        data-content-doc="settings_global" data-content-key="brand.logoAlt" data-content-attr="alt">
                 </div>
-                <span class="text-xl">His Kingdom Ministry</span>
+                <span class="text-xl" data-content-doc="settings_global" data-content-key="brand.name">His Kingdom
+                    Ministry</span>
             </a>
 
             <!-- Right Actions: Donate + Language + Hamburger -->
@@ -56,27 +53,34 @@
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                        <i class="fas fa-globe text-lg"></i> <span data-content-doc="settings_global"
+                            data-content-key="header.currentLanguage">NO</span>
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
                         <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="no">🇳🇴 Norsk</a>
+                            data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
+                            Norsk</a>
                         <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="en">🇺🇸 English</a>
+                            data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
+                            English</a>
                         <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
-                            data-lang="es">🇪🇸 Español</a>
+                            data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
+                            Español</a>
                     </div>
                 </div>
                 <a href="donasjoner.html"
                     class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Gi gave <i class="fas fa-heart heart text-sm" style="vertical-align: middle;"></i>
+                    <span data-content-doc="settings_global" data-content-key="header.donateLabel">Gi gave</span> <i
+                        class="fas fa-heart heart text-sm btn-heart-icon"></i>
                 </a>
 
                 <!-- Unified Toggle Button -->
                 <button
                     class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny">
+                    id="menu-toggle" aria-label="Toggle meny" aria-controls="mega-menu" aria-expanded="false"
+                    data-content-doc="settings_global" data-content-key="header.menuToggleLabel"
+                    data-content-attr="aria-label">
                     <i class="fas fa-bars text-lg open-icon"></i>
                     <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
@@ -196,16 +200,18 @@
         <div class="slider-container">
             <!-- Slide 1 -->
             <div class="hero-slide active">
-                <div class="hero-bg"
+                <div class="hero-bg" data-content-key="hero.bg"
                     style="background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=1920&h=1080&fit=crop')">
                 </div>
                 <div class="container hero-container">
                     <div class="hero-content">
-                        <h1 class="hero-title">Vekst gjennom fellesskap</h1>
-                        <p class="hero-subtitle">Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli
+                        <h1 class="hero-title" data-content-key="hero.title">Vekst gjennom fellesskap</h1>
+                        <p class="hero-subtitle" data-content-key="hero.subtitle">Uansett hvor du er på din vandring,
+                            ønsker vi å gå sammen med deg. Bli
                             med i et fellesskap som utforsker Guds ord og styrker troen.</p>
                         <div class="slide-buttons">
-                            <a href="om-oss.html" class="btn btn-primary">Les mer</a>
+                            <a href="om-oss.html" class="btn btn-primary"><span data-content-key="hero.btnText">Les
+                                    mer</span></a>
                         </div>
                     </div>
                 </div>
@@ -217,39 +223,129 @@
         <button class="hero-nav next"><i class="fas fa-chevron-right"></i></button>
     </section>
 
+    <!-- Shop Promo (Homepage) -->
+    <section class="shop-home-promo" id="butikk-promo">
+        <div class="container">
+            <div class="shop-home-promo-card">
+                <div class="shop-home-promo-content">
+                    <span class="shop-home-promo-pill">
+                        <i class="fas fa-store"></i>
+                        <span data-content-key="shopPromo.badge">His Kingdom Designs</span>
+                    </span>
+                    <h2 class="shop-home-promo-title" data-content-key="shopPromo.title">Designprodukter og gavekort i
+                        én butikk</h2>
+                    <p class="shop-home-promo-text" data-content-key="shopPromo.description">
+                        Utforsk klær, kopper, klistermerker og digitale gavekort med kristne design. Vi har også
+                        månedlige abonnement for deg som vil få nye produkter jevnlig.
+                    </p>
+
+                    <div class="shop-home-promo-actions">
+                        <a href="butikk.html" class="btn btn-primary" data-content-key="shopPromo.ctaPrimary">Besøk
+                            butikken</a>
+                        <a href="butikk.html" class="shop-home-promo-link">
+                            <span data-content-key="shopPromo.ctaSecondary">Se produkter</span> <i
+                                class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="shop-home-promo-panel" aria-label="Butikk-kategorier">
+                    <div class="shop-home-promo-chip-grid">
+                        <a href="butikk.html" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title"
+                                data-content-key="shopPromo.cards.clothesTitle">Klær</span>
+                            <span class="shop-home-promo-chip-meta"
+                                data-content-key="shopPromo.cards.clothesMeta">T-skjorter og mer</span>
+                        </a>
+                        <a href="butikk.html" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title"
+                                data-content-key="shopPromo.cards.mugsTitle">Kopper</span>
+                            <span class="shop-home-promo-chip-meta" data-content-key="shopPromo.cards.mugsMeta">Gaver
+                                til hjemmet</span>
+                        </a>
+                        <a href="butikk.html" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title"
+                                data-content-key="shopPromo.cards.stickersTitle">Klistermerker</span>
+                            <span class="shop-home-promo-chip-meta" data-content-key="shopPromo.cards.stickersMeta">Små
+                                produkter, stor mening</span>
+                        </a>
+                        <a href="butikk.html" class="shop-home-promo-chip">
+                            <span class="shop-home-promo-chip-title"
+                                data-content-key="shopPromo.cards.giftCardsTitle">Gavekort</span>
+                            <span class="shop-home-promo-chip-meta"
+                                data-content-key="shopPromo.cards.giftCardsMeta">Digital gave med valgfritt beløp</span>
+                        </a>
+                    </div>
+
+                    <div class="shop-home-promo-note">
+                        <i class="fas fa-gift"></i>
+                        <span data-content-key="shopPromo.note">Enkel filtrering, mange produkter og rask oversikt i den
+                            nye butikksiden.</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Feature Boxes -->
     <section class="features">
         <div class="container">
+            <div class="section-header features-section-header">
+                <span class="section-label" data-content-key="features.header.label">Neste steg</span>
+                <h2 class="section-title" data-content-key="features.header.title">Bli involvert</h2>
+                <p class="section-description" data-content-key="features.header.description">Det finnes flere naturlige måter å bli med i arbeidet på. Velg det som passer deg best akkurat nå.</p>
+            </div>
+
             <div class="features-grid">
                 <div class="feature-box">
-                    <div class="feature-icon blue">
-                        <i class="fas fa-book-open"></i>
+                    <div class="feature-media">
+                        <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20800%201000'%20role='img'%20aria-labelledby='title%20desc'%3e%3ctitle%20id='title'%3eUndervisning%3c/title%3e%3cdesc%20id='desc'%3eIllustrasjon%20av%20undervisning%20med%20notater,%20bok%20og%20mennesker%20i%20samling.%3c/desc%3e%3cdefs%3e%3clinearGradient%20id='bg'%20x1='0'%20x2='1'%20y1='0'%20y2='1'%3e%3cstop%20offset='0%25'%20stop-color='%23101417'/%3e%3cstop%20offset='100%25'%20stop-color='%231b252d'/%3e%3c/linearGradient%3e%3clinearGradient%20id='card'%20x1='0'%20x2='1'%20y1='0'%20y2='1'%3e%3cstop%20offset='0%25'%20stop-color='%23fff7ed'/%3e%3cstop%20offset='100%25'%20stop-color='%23ffe2c2'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect%20width='800'%20height='1000'%20fill='url(%23bg)'/%3e%3ccircle%20cx='650'%20cy='180'%20r='140'%20fill='%23d17d39'%20opacity='0.12'/%3e%3ccircle%20cx='130'%20cy='860'%20r='180'%20fill='%23d17d39'%20opacity='0.08'/%3e%3cg%20opacity='0.9'%3e%3ccircle%20cx='150'%20cy='250'%20r='56'%20fill='%2331414d'/%3e%3ccircle%20cx='290'%20cy='220'%20r='62'%20fill='%23445563'/%3e%3ccircle%20cx='455'%20cy='245'%20r='60'%20fill='%232b3944'/%3e%3ccircle%20cx='615'%20cy='230'%20r='58'%20fill='%233b4c59'/%3e%3crect%20x='90'%20y='305'%20width='120'%20height='230'%20rx='48'%20fill='%2331414d'/%3e%3crect%20x='225'%20y='288'%20width='130'%20height='250'%20rx='54'%20fill='%23445563'/%3e%3crect%20x='390'%20y='312'%20width='130'%20height='242'%20rx='52'%20fill='%232b3944'/%3e%3crect%20x='555'%20y='298'%20width='122'%20height='246'%20rx='50'%20fill='%233b4c59'/%3e%3c/g%3e%3cg%20transform='rotate(-8%20390%20650)'%3e%3crect%20x='150'%20y='560'%20width='430'%20height='260'%20rx='28'%20fill='%23f6f7fb'/%3e%3crect%20x='170'%20y='585'%20width='180'%20height='18'%20rx='9'%20fill='%23d17d39'%20opacity='0.9'/%3e%3crect%20x='170'%20y='620'%20width='360'%20height='14'%20rx='7'%20fill='%23c8d0d9'/%3e%3crect%20x='170'%20y='650'%20width='330'%20height='14'%20rx='7'%20fill='%23c8d0d9'/%3e%3crect%20x='170'%20y='680'%20width='295'%20height='14'%20rx='7'%20fill='%23c8d0d9'/%3e%3crect%20x='170'%20y='715'%20width='205'%20height='48'%20rx='24'%20fill='%23d17d39'/%3e%3cpath%20d='M585%20575h80c28%200%2050%2022%2050%2050v135c0%2028-22%2050-50%2050h-80z'%20fill='%23eceff5'/%3e%3cpath%20d='M600%20600h38c12%200%2022%2010%2022%2022v108c0%2012-10%2022-22%2022h-38z'%20fill='%23cfd8e3'/%3e%3c/g%3e%3cg%20transform='translate(470%20710)'%3e%3crect%20x='0'%20y='0'%20width='170'%20height='120'%20rx='26'%20fill='url(%23card)'/%3e%3cpath%20d='M38%2038h52c20%200%2038%2012%2050%2030l18%2028-42%2028-25-19c-9-7-22-9-33-5L26%20111%200%2083l18-26c5-12%2011-19%2020-19z'%20fill='%23d17d39'/%3e%3c/g%3e%3c/svg%3e"
+                            data-content-key="features.teaching.image" data-content-attr="src"
+                            data-fallback-src="/img/get-involved-teaching.svg"
+                            alt="Mennesker samlet i undervisning">
                     </div>
-                    <h3 class="feature-title" data-content-key="features.teaching.title">Undervisning</h3>
-                    <p class="feature-text" data-content-key="features.teaching.text">Bibelskoler, seminarer og
-                        dyptgående undervisning.</p>
-                    <a href="media.html" class="feature-link">Les mer <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.teaching.title">Undervisning</h3>
+                        <p class="feature-text" data-content-key="features.teaching.text">Bibelskoler, seminarer og
+                            dyptgående undervisning.</p>
+                        <a href="media.html" class="feature-link"><span
+                                data-content-key="features.teaching.btnText">Les mer</span> <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
 
                 <div class="feature-box">
-                    <div class="feature-icon yellow">
-                        <i class="fas fa-podcast"></i>
+                    <div class="feature-media">
+                        <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20800%201000'%20role='img'%20aria-labelledby='title%20desc'%3e%3ctitle%20id='title'%3ePodcast%3c/title%3e%3cdesc%20id='desc'%3eIllustrasjon%20av%20podcast%20med%20mikrofon,%20lydbolger%20og%20samtale.%3c/desc%3e%3cdefs%3e%3clinearGradient%20id='bg'%20x1='0'%20x2='1'%20y1='0'%20y2='1'%3e%3cstop%20offset='0%25'%20stop-color='%23101417'/%3e%3cstop%20offset='100%25'%20stop-color='%2318222a'/%3e%3c/linearGradient%3e%3clinearGradient%20id='panel'%20x1='0'%20x2='1'%20y1='0'%20y2='1'%3e%3cstop%20offset='0%25'%20stop-color='%23f8fafc'/%3e%3cstop%20offset='100%25'%20stop-color='%23e7edf4'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect%20width='800'%20height='1000'%20fill='url(%23bg)'/%3e%3ccircle%20cx='185'%20cy='185'%20r='120'%20fill='%23d17d39'%20opacity='0.12'/%3e%3ccircle%20cx='645'%20cy='820'%20r='150'%20fill='%23d17d39'%20opacity='0.08'/%3e%3crect%20x='100'%20y='135'%20width='600'%20height='730'%20rx='44'%20fill='%23162028'%20stroke='%232b3a45'%20stroke-width='2'/%3e%3crect%20x='145'%20y='188'%20width='510'%20height='624'%20rx='34'%20fill='url(%23panel)'/%3e%3cg%3e%3crect%20x='340'%20y='300'%20width='120'%20height='210'%20rx='60'%20fill='%23d17d39'/%3e%3crect%20x='380'%20y='495'%20width='40'%20height='120'%20rx='20'%20fill='%231b252d'/%3e%3crect%20x='320'%20y='615'%20width='160'%20height='26'%20rx='13'%20fill='%231b252d'/%3e%3cpath%20d='M278%20402c0%2066%2054%20120%20122%20120s122-54%20122-120'%20fill='none'%20stroke='%231b252d'%20stroke-linecap='round'%20stroke-width='22'/%3e%3cpath%20d='M235%20402c0%2090%2074%20164%20165%20164s165-74%20165-164'%20fill='none'%20stroke='%23d17d39'%20stroke-linecap='round'%20stroke-width='14'%20opacity='0.8'/%3e%3cpath%20d='M195%20402c0%20112%2092%20204%20205%20204s205-92%20205-204'%20fill='none'%20stroke='%23ced7e2'%20stroke-linecap='round'%20stroke-width='10'/%3e%3c/g%3e%3cg%20fill='%23c3ced9'%3e%3crect%20x='210'%20y='700'%20width='70'%20height='58'%20rx='16'/%3e%3crect%20x='300'%20y='676'%20width='70'%20height='82'%20rx='16'/%3e%3crect%20x='390'%20y='642'%20width='70'%20height='116'%20rx='16'/%3e%3crect%20x='480'%20y='688'%20width='70'%20height='70'%20rx='16'/%3e%3crect%20x='570'%20y='718'%20width='40'%20height='40'%20rx='12'/%3e%3c/g%3e%3cg%3e%3crect%20x='205'%20y='225'%20width='176'%20height='18'%20rx='9'%20fill='%23d17d39'%20opacity='0.9'/%3e%3crect%20x='205'%20y='254'%20width='290'%20height='14'%20rx='7'%20fill='%23c8d0d9'/%3e%3crect%20x='205'%20y='278'%20width='245'%20height='14'%20rx='7'%20fill='%23c8d0d9'/%3e%3c/g%3e%3c/svg%3e"
+                            data-content-key="features.podcast.image" data-content-attr="src"
+                            data-fallback-src="/img/get-involved-podcast.svg"
+                            alt="Person som lytter og deler">
                     </div>
-                    <h3 class="feature-title" data-content-key="features.podcast.title">Podcast</h3>
-                    <p class="feature-text" data-content-key="features.podcast.text">Lytt til våre samtaler om tro, liv
-                        og åndelig vekst.</p>
-                    <a href="podcast.html" class="feature-link">Lytt nå <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.podcast.title">Podcast</h3>
+                        <p class="feature-text" data-content-key="features.podcast.text">Lytt til våre samtaler om tro, liv
+                            og åndelig vekst.</p>
+                        <a href="podcast.html" class="feature-link"><span
+                                data-content-key="features.podcast.btnText">Lytt nå</span> <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
 
                 <div class="feature-box">
-                    <div class="feature-icon red">
-                        <i class="fas fa-globe-americas"></i>
+                    <div class="feature-media">
+                        <img src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20800%201000'%20role='img'%20aria-labelledby='title%20desc'%3e%3ctitle%20id='title'%3eReisevirksomhet%3c/title%3e%3cdesc%20id='desc'%3eIllustrasjon%20av%20reisevirksomhet%20med%20globus,%20rute%20og%20mennesker%20på%20vei.%3c/desc%3e%3cdefs%3e%3clinearGradient%20id='bg'%20x1='0'%20x2='1'%20y1='0'%20y2='1'%3e%3cstop%20offset='0%25'%20stop-color='%23101417'/%3e%3cstop%20offset='100%25'%20stop-color='%2318222a'/%3e%3c/linearGradient%3e%3clinearGradient%20id='sky'%20x1='0'%20x2='0'%20y1='0'%20y2='1'%3e%3cstop%20offset='0%25'%20stop-color='%2322313a'/%3e%3cstop%20offset='100%25'%20stop-color='%23101417'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect%20width='800'%20height='1000'%20fill='url(%23bg)'/%3e%3crect%20x='70'%20y='110'%20width='660'%20height='780'%20rx='42'%20fill='url(%23sky)'/%3e%3ccircle%20cx='535'%20cy='315'%20r='165'%20fill='%23d17d39'%20opacity='0.2'/%3e%3ccircle%20cx='535'%20cy='315'%20r='128'%20fill='%231c2830'/%3e%3cellipse%20cx='535'%20cy='315'%20rx='96'%20ry='128'%20fill='none'%20stroke='%23d17d39'%20stroke-width='8'%20opacity='0.9'/%3e%3cellipse%20cx='535'%20cy='315'%20rx='128'%20ry='54'%20fill='none'%20stroke='%23d17d39'%20stroke-width='8'%20opacity='0.9'/%3e%3cpath%20d='M407%20315h256M535%20187v256'%20stroke='%23d17d39'%20stroke-width='8'%20opacity='0.9'/%3e%3cpath%20d='M170%20655c70-110%20165-156%20286-136%2091%2016%20166%205%20235-34'%20fill='none'%20stroke='%23fff7ed'%20stroke-dasharray='12%2014'%20stroke-linecap='round'%20stroke-width='10'/%3e%3cpath%20d='M612%20452l92%2026-56%2058-16-30-31-12z'%20fill='%23fff7ed'/%3e%3cg%3e%3ccircle%20cx='195'%20cy='650'%20r='18'%20fill='%23d17d39'/%3e%3ccircle%20cx='680'%20cy='485'%20r='18'%20fill='%23d17d39'/%3e%3c/g%3e%3cg%20opacity='0.96'%3e%3ccircle%20cx='220'%20cy='785'%20r='38'%20fill='%23e8edf4'/%3e%3crect%20x='188'%20y='824'%20width='64'%20height='110'%20rx='28'%20fill='%23d4dce6'/%3e%3ccircle%20cx='350'%20cy='760'%20r='34'%20fill='%23dce3ec'/%3e%3crect%20x='320'%20y='796'%20width='60'%20height='138'%20rx='26'%20fill='%23c7d0db'/%3e%3ccircle%20cx='470'%20cy='795'%20r='36'%20fill='%23e8edf4'/%3e%3crect%20x='438'%20y='834'%20width='64'%20height='102'%20rx='28'%20fill='%23d4dce6'/%3e%3ccircle%20cx='595'%20cy='772'%20r='34'%20fill='%23dce3ec'/%3e%3crect%20x='565'%20y='808'%20width='60'%20height='126'%20rx='26'%20fill='%23c7d0db'/%3e%3c/g%3e%3crect%20x='125'%20y='165'%20width='200'%20height='18'%20rx='9'%20fill='%23d17d39'%20opacity='0.9'/%3e%3crect%20x='125'%20y='196'%20width='250'%20height='14'%20rx='7'%20fill='%2398a8b7'/%3e%3crect%20x='125'%20y='222'%20width='210'%20height='14'%20rx='7'%20fill='%2398a8b7'/%3e%3c/svg%3e"
+                            data-content-key="features.travel.image" data-content-attr="src"
+                            data-fallback-src="/img/get-involved-travel.svg"
+                            alt="Mennesker på reise og i tjeneste">
                     </div>
-                    <h3 class="feature-title" data-content-key="features.travel.title">Reisevirksomhet</h3>
-                    <p class="feature-text" data-content-key="features.travel.text">Forkynnelse og konferanser rundt om
-                        i verden.</p>
-                    <a href="reisevirksomhet.html" class="feature-link">Oppdag mer <i
-                            class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.travel.title">Reisevirksomhet</h3>
+                        <p class="feature-text" data-content-key="features.travel.text">Forkynnelse og konferanser rundt om
+                            i verden.</p>
+                        <a href="reisevirksomhet.html" class="feature-link"><span
+                                data-content-key="features.travel.btnText">Oppdag mer</span> <i
+                                class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -262,7 +358,7 @@
                 <div class="about-image">
                     <div class="circular-image">
                         <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&h=600&fit=crop"
-                            alt="Felleskap">
+                            alt="Felleskap" data-content-key="intro.imageAlt" data-content-attr="alt">
                         <div class="play-button">
                             <i class="fas fa-play"></i>
                         </div>
@@ -270,40 +366,39 @@
                 </div>
 
                 <div class="about-content">
-                    <span class="section-label" data-content-key="about.label">Velkommen til Fellesskapet</span>
-                    <h2 class="section-title" data-content-key="about.title">Vi er en Non-Profit Organisasjon</h2>
-                    <p class="section-text" data-content-key="about.description">His Kingdom Ministry driver med åndelig
-                        samlinger som bønnemøter,
-                        undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der
-                        mennesker kan vokse i sin tro og relasjon til Jesus.</p>
+                    <span class="section-label" data-content-key="intro.label">Velkommen til fellesskapet</span>
+                    <h2 class="section-title" data-content-key="intro.title">Vi er en Non-profit organisasjon</h2>
+                    <p class="section-text" data-content-key="intro.text">His Kingdom Ministry driver med åndelig
+                        samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å
+                        være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.</p>
 
                     <div class="about-features">
                         <div class="about-feature">
                             <div class="about-feature-icon">
-                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-check"></i>
                             </div>
                             <div class="about-feature-content">
-                                <h4 data-content-key="about.features.mission.title">Vårt Oppdrag</h4>
+                                <h4 data-content-key="about.features.mission.title">Vårt oppdrag</h4>
                                 <p data-content-key="about.features.mission.text">Å utruste og inspirere mennesker til
-                                    et dypere liv med Gud gjennom undervisning,
-                                    fellesskap og bønn.</p>
+                                    et dypere liv med Gud gjennom undervisning, fellesskap og bønn.</p>
                             </div>
                         </div>
 
                         <div class="about-feature">
                             <div class="about-feature-icon">
-                                <i class="fas fa-check-circle"></i>
+                                <i class="fas fa-check"></i>
                             </div>
                             <div class="about-feature-content">
-                                <h4 data-content-key="about.features.story.title">Vår Historie</h4>
+                                <h4 data-content-key="about.features.story.title">Vår historie</h4>
                                 <p data-content-key="about.features.story.text">Startet med en visjon om å samle
-                                    mennesker i åndelig vekst, har vi vokst til et
-                                    levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.</p>
+                                    mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med
+                                    bønnemøter, undervisning og reisevirksomhet.</p>
                             </div>
                         </div>
                     </div>
 
-                    <a href="om-oss.html" class="btn btn-primary">Oppdag mer</a>
+                    <a href="om-oss.html" class="btn btn-primary"><span data-content-key="about.btnText">Oppdag
+                            mer</span></a>
                 </div>
             </div>
         </div>
@@ -312,7 +407,14 @@
     <!-- Fun Facts / Statistics -->
     <section class="funfacts">
         <div class="container">
-            <div class="funfacts-grid">
+            <div class="section-header impact-section-header">
+                <span class="section-label" data-content-key="impact.label">Impact</span>
+                <h2 class="section-title" data-content-key="impact.title">Resultater i tall</h2>
+                <p class="section-description" data-content-key="impact.description">Noen nøkkeltall som viser hvor langt arbeidet vårt rekker.</p>
+            </div>
+
+            <div class="impact-panel">
+                <div class="funfacts-grid">
                 <div class="funfact">
                     <div class="funfact-icon red">
                         <i class="fab fa-youtube"></i>
@@ -320,7 +422,7 @@
                     <div class="funfact-content">
                         <span class="funfact-number" id="yt-video-count" data-target="0"
                             data-content-key="stats.youtube_videos">0</span>
-                        <span class="funfact-label">YouTube-videoer</span>
+                        <span class="funfact-label" data-content-key="stats.youtube_videos_label">YouTube-videoer</span>
                     </div>
                 </div>
 
@@ -331,7 +433,7 @@
                     <div class="funfact-content">
                         <span class="funfact-number" id="yt-view-count" data-target="0"
                             data-content-key="stats.youtube_views">0</span>
-                        <span class="funfact-label">YouTube-visninger</span>
+                        <span class="funfact-label" data-content-key="stats.youtube_views_label">YouTube-visninger</span>
                     </div>
                 </div>
 
@@ -342,7 +444,8 @@
                     <div class="funfact-content">
                         <span class="funfact-number" id="podcast-episode-count" data-target="45"
                             data-content-key="stats.podcast_episodes">0</span>
-                        <span class="funfact-label">Podcast-episoder</span>
+                        <span class="funfact-label"
+                            data-content-key="stats.podcast_episodes_label">Podcast-episoder</span>
                     </div>
                 </div>
 
@@ -352,8 +455,9 @@
                     </div>
                     <div class="funfact-content">
                         <span class="funfact-number" data-target="9" data-content-key="stats.countries_visited">0</span>
-                        <span class="funfact-label">Land besøkt</span>
+                        <span class="funfact-label" data-content-key="stats.countries_visited_label">Land besøkt</span>
                     </div>
+                </div>
                 </div>
             </div>
         </div>
@@ -363,9 +467,10 @@
     <section class="causes" id="innsamling" style="display: none;">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Støtt vårt arbeid</span>
-                <h2 class="section-title">Aktive innsamlingsaksjoner</h2>
-                <p class="section-description">Din gave gjør en forskjell. Se hvordan du kan bidra til vårt arbeid.</p>
+                <span class="section-label" data-content-key="causes.label">Støtt vårt arbeid</span>
+                <h2 class="section-title" data-content-key="causes.title">Aktive innsamlingsaksjoner</h2>
+                <p class="section-description" data-content-key="causes.description">Din gave gjør en forskjell. Se
+                    hvordan du kan bidra til vårt arbeid.</p>
             </div>
 
             <div class="causes-grid">
@@ -373,7 +478,8 @@
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="donasjoner.html" class="btn btn-outline">Se alle innsamlinger</a>
+                <a href="donasjoner.html" class="btn btn-outline" data-content-key="causes.btnText">Se alle
+                    innsamlinger</a>
             </div>
         </div>
     </section>
@@ -382,9 +488,10 @@
     <section class="events" id="arrangementer">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Kommende arrangementer</span>
-                <h2 class="section-title">Bli med oss</h2>
-                <p class="section-description">Se våre kommende arrangementer og meld deg på.</p>
+                <span class="section-label" data-content-key="events.label">Kommende arrangementer</span>
+                <h2 class="section-title" data-content-key="events.title">Bli med oss</h2>
+                <p class="section-description" data-content-key="events.description">Se våre kommende arrangementer og
+                    meld deg på.</p>
             </div>
 
             <div class="events-grid">
@@ -392,7 +499,8 @@
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="arrangementer.html" class="btn btn-outline">Se alle arrangementer</a>
+                <a href="arrangementer.html" class="btn btn-outline" data-content-key="events.btnText">Se alle
+                    arrangementer</a>
             </div>
         </div>
     </section>
@@ -402,9 +510,10 @@
         style="display: none; padding: 100px 0 50px 0; background-color: #f8fafc;">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Aktuelt</span>
-                <h2 class="section-title">Siste undervisning</h2>
-                <p class="section-description">Lytt og lær fra våre nyeste ressurser, seminarer og bibelstudier.</p>
+                <span class="section-label" data-content-key="teaching.label">Aktuelt</span>
+                <h2 class="section-title" data-content-key="teaching.title">Siste undervisning</h2>
+                <p class="section-description" data-content-key="teaching.description">Lytt og lær fra våre nyeste
+                    ressurser, seminarer og bibelstudier.</p>
             </div>
 
             <div class="media-grid" id="front-teaching-grid">
@@ -412,7 +521,7 @@
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="media.html" class="btn btn-outline">Se alle ressurser</a>
+                <a href="media.html" class="btn btn-outline" data-content-key="teaching.btnText">Se alle ressurser</a>
             </div>
         </div>
     </section>
@@ -421,69 +530,18 @@
     <section class="blog" id="blogg">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Siste nytt</span>
-                <h2 class="section-title">Nyheter og blogg</h2>
-                <p class="section-description">Les våre siste artikler og oppdateringer.</p>
+                <span class="section-label" data-content-key="blog.label">Siste nytt</span>
+                <h2 class="section-title" data-content-key="blog.title">Nyheter og blogg</h2>
+                <p class="section-description" data-content-key="blog.description">Les våre siste artikler og
+                    oppdateringer.</p>
             </div>
 
             <div class="blog-grid">
-                <article class="blog-card">
-                    <div class="blog-image">
-                        <img src="https://images.unsplash.com/photo-1507692049790-de58290a4334?w=600&h=400&fit=crop"
-                            alt="Blogginnlegg">
-                        <span class="blog-category">Undervisning</span>
-                    </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span><i class="fas fa-calendar"></i> 5. februar 2026</span>
-                            <span><i class="fas fa-user"></i> Admin</span>
-                        </div>
-                        <h3 class="blog-title">Åndelig vekst i hverdagen</h3>
-                        <p class="blog-excerpt">Hvordan kan vi vokse åndeligt midt i en travel hverdag? Les våre tips og
-                            refleksjoner...</p>
-                        <a href="#blogg" class="blog-link">Les mer <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </article>
-
-                <article class="blog-card">
-                    <div class="blog-image">
-                        <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=600&h=400&fit=crop"
-                            alt="Blogginnlegg">
-                        <span class="blog-category">Vitnesbyrd</span>
-                    </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span><i class="fas fa-calendar"></i> 28. januar 2026</span>
-                            <span><i class="fas fa-user"></i> Admin</span>
-                        </div>
-                        <h3 class="blog-title">Guds trofasthet</h3>
-                        <p class="blog-excerpt">Et vitnesbyrd om hvordan Gud har vært trofast gjennom utfordringer og
-                            prøvelser...</p>
-                        <a href="#blogg" class="blog-link">Les mer <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </article>
-
-                <article class="blog-card">
-                    <div class="blog-image">
-                        <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&h=400&fit=crop"
-                            alt="Blogginnlegg">
-                        <span class="blog-category">Podcast</span>
-                    </div>
-                    <div class="blog-content">
-                        <div class="blog-meta">
-                            <span><i class="fas fa-calendar"></i> 15. januar 2026</span>
-                            <span><i class="fas fa-user"></i> Admin</span>
-                        </div>
-                        <h3 class="blog-title">Ny podcast-episode</h3>
-                        <p class="blog-excerpt">Lytt til vår nyeste episode hvor vi diskuterer tro, tvil og åndelig
-                            vekst...</p>
-                        <a href="blogg.html" class="blog-link">Les mer <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </article>
+                <!-- Blog posts loaded dynamically -->
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="blogg.html" class="btn btn-outline">Se alle nyheter</a>
+                <a href="blogg.html" class="btn btn-outline" data-content-key="blog.btnText">Se alle nyheter</a>
             </div>
         </div>
     </section>
@@ -492,44 +550,13 @@
     <section class="testimonials">
         <div class="container">
             <div class="section-header">
-                <span class="section-label">Vitnesbyrd</span>
-                <h2 class="section-title">Hva folk sier</h2>
+                <span class="section-label" data-content-key="testimonials.label">Vitnesbyrd</span>
+                <h2 class="section-title" data-content-key="testimonials.title">Hva folk sier</h2>
             </div>
 
             <div class="testimonial-slider">
                 <div class="testimonial-track">
-                    <div class="testimonial-card active">
-                        <div class="testimonial-image">
-                            <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop"
-                                alt="Person">
-                        </div>
-                        <p class="testimonial-text">"His Kingdom Ministry har vært en velsignelse i mitt liv.
-                            Undervisningen er dyp og relevant, og fellesskapet er varmt og støttende."</p>
-                        <h4 class="testimonial-name">Maria Hansen</h4>
-                        <span class="testimonial-role">Deltaker</span>
-                    </div>
-
-                    <div class="testimonial-card">
-                        <div class="testimonial-image">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop"
-                                alt="Person">
-                        </div>
-                        <p class="testimonial-text">"Gjennom HKM har jeg vokst enormt i min tro. Podcasten er fantastisk
-                            og arrangementene er alltid inspirerende."</p>
-                        <h4 class="testimonial-name">Erik Johansen</h4>
-                        <span class="testimonial-role">Deltaker</span>
-                    </div>
-
-                    <div class="testimonial-card">
-                        <div class="testimonial-image">
-                            <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&h=200&fit=crop"
-                                alt="Person">
-                        </div>
-                        <p class="testimonial-text">"Jeg er så takknemlig for dette fellesskapet. Her kan jeg være meg
-                            selv og vokse i troen sammen med andre."</p>
-                        <h4 class="testimonial-name">Sofie Berg</h4>
-                        <span class="testimonial-role">Deltaker</span>
-                    </div>
+                    <!-- Testimonials loaded dynamically -->
                 </div>
 
                 <div class="testimonial-nav">
@@ -540,17 +567,124 @@
         </div>
     </section>
 
+    <!-- Facebook Feed -->
+    <section class="facebook-feed-section" id="facebook-feed">
+        <div class="container">
+            <div class="facebook-feed-shell">
+                <div class="facebook-feed-header">
+                    <div class="facebook-feed-copy">
+                        <span class="section-label" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.label">Følg oss på Facebook</span>
+                        <h2 class="section-title" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.title">Siste fra Facebook-siden vår
+                        </h2>
+                        <p class="section-description" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.description">Se oppdateringer,
+                            kunngjøringer og glimt fra arbeidet vårt direkte fra Facebook.</p>
+                    </div>
+
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"
+                        rel="noopener noreferrer" class="btn btn-outline facebook-feed-cta"
+                        data-content-doc="settings_facebook_feed" data-content-key="facebookFeed.pageUrl"
+                        data-content-attr="href"><span data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.pageCta">Åpne Facebook-siden</span></a>
+                </div>
+
+                <div class="facebook-feed-grid">
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"
+                        rel="noopener noreferrer" class="facebook-post-card" data-content-doc="settings_facebook_feed"
+                        data-content-key="facebookFeed.posts.first.link"
+                        data-content-attr="href">
+                        <div class="facebook-post-image-wrap">
+                            <img class="facebook-post-image" alt="Facebook innlegg"
+                                src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20675'%20role='img'%20aria-labelledby='title%20desc'%3e%3ctitle%20id='title'%3eFacebook%20post%20fallback%201%3c/title%3e%3cdesc%20id='desc'%3eAbstract%20blue%20and%20orange%20background%20with%20simple%20content%20cards.%3c/desc%3e%3cdefs%3e%3clinearGradient%20id='bg'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3e%3cstop%20offset='0%25'%20stop-color='%23EFF6FF'/%3e%3cstop%20offset='55%25'%20stop-color='%23DBEAFE'/%3e%3cstop%20offset='100%25'%20stop-color='%23FED7AA'/%3e%3c/linearGradient%3e%3clinearGradient%20id='accent'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='0%25'%3e%3cstop%20offset='0%25'%20stop-color='%232563EB'/%3e%3cstop%20offset='100%25'%20stop-color='%23F97316'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect%20width='1200'%20height='675'%20fill='url(%23bg)'/%3e%3ccircle%20cx='1040'%20cy='120'%20r='130'%20fill='%23BFDBFE'%20opacity='.7'/%3e%3ccircle%20cx='150'%20cy='560'%20r='170'%20fill='%23FDBA74'%20opacity='.55'/%3e%3crect%20x='110'%20y='90'%20width='980'%20height='495'%20rx='34'%20fill='%23FFFFFF'%20opacity='.96'/%3e%3crect%20x='170'%20y='150'%20width='230'%20height='28'%20rx='14'%20fill='%23DBEAFE'/%3e%3crect%20x='170'%20y='205'%20width='600'%20height='60'%20rx='20'%20fill='%23E2E8F0'/%3e%3crect%20x='170'%20y='290'%20width='520'%20height='24'%20rx='12'%20fill='%23E2E8F0'/%3e%3crect%20x='170'%20y='330'%20width='470'%20height='24'%20rx='12'%20fill='%23E2E8F0'/%3e%3crect%20x='170'%20y='370'%20width='390'%20height='24'%20rx='12'%20fill='%23E2E8F0'/%3e%3crect%20x='170'%20y='445'%20width='220'%20height='54'%20rx='27'%20fill='url(%23accent)'/%3e%3crect%20x='790'%20y='190'%20width='220'%20height='220'%20rx='26'%20fill='%23DBEAFE'/%3e%3cpath%20d='M852%20266h96v96h-96z'%20fill='%232563EB'%20opacity='.18'/%3e%3cpath%20d='M830%20430c38-52%2088-78%20150-78%2018%200%2036%202%2054%207-20%2043-64%2082-125%20111-25-11-51-24-79-40z'%20fill='%23F97316'%20opacity='.35'/%3e%3c/svg%3e"
+                                data-fallback-src="img/facebook-post-1.svg"
+                                data-content-doc="settings_facebook_feed"
+                                data-content-key="facebookFeed.posts.first.image" data-content-attr="src"
+                                data-visibility-target=".facebook-post-image-wrap">
+                        </div>
+                        <div class="facebook-post-meta">
+                            <span class="facebook-post-badge"><i class="fab fa-facebook-f"></i> Facebook</span>
+                            <span data-content-doc="settings_facebook_feed"
+                                data-content-key="facebookFeed.posts.first.date">Denne uken</span>
+                        </div>
+                        <h3 class="facebook-post-title" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.first.title">Nye glimt fra tjenesten</h3>
+                        <p class="facebook-post-excerpt" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.first.excerpt">Følg med på
+                            oppdateringer, bilder og korte refleksjoner fra arbeidet vårt.</p>
+                        <span class="facebook-post-link" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.first.cta">Les på Facebook</span>
+                    </a>
+
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"
+                        rel="noopener noreferrer" class="facebook-post-card" data-content-doc="settings_facebook_feed"
+                        data-content-key="facebookFeed.posts.second.link"
+                        data-content-attr="href">
+                        <div class="facebook-post-image-wrap">
+                            <img class="facebook-post-image" alt="Facebook innlegg"
+                                src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20675'%20role='img'%20aria-labelledby='title%20desc'%3e%3ctitle%20id='title'%3eFacebook%20post%20fallback%202%3c/title%3e%3cdesc%20id='desc'%3eAbstract%20warm%20background%20with%20layered%20cards%20and%20wave%20accents.%3c/desc%3e%3cdefs%3e%3clinearGradient%20id='bg2'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3e%3cstop%20offset='0%25'%20stop-color='%23FFF7ED'/%3e%3cstop%20offset='45%25'%20stop-color='%23FDE68A'/%3e%3cstop%20offset='100%25'%20stop-color='%23E0F2FE'/%3e%3c/linearGradient%3e%3clinearGradient%20id='card2'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3e%3cstop%20offset='0%25'%20stop-color='%23FFFFFF'/%3e%3cstop%20offset='100%25'%20stop-color='%23F8FAFC'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect%20width='1200'%20height='675'%20fill='url(%23bg2)'/%3e%3cpath%20d='M0%20500c120-60%20240-90%20360-90%20175%200%20301%2075%20454%2075%20143%200%20272-44%20386-132v322H0z'%20fill='%23BAE6FD'%20opacity='.75'/%3e%3crect%20x='120'%20y='100'%20width='960'%20height='455'%20rx='34'%20fill='url(%23card2)'%20opacity='.97'/%3e%3crect%20x='175'%20y='150'%20width='150'%20height='150'%20rx='24'%20fill='%23F97316'%20opacity='.18'/%3e%3crect%20x='350'%20y='155'%20width='250'%20height='26'%20rx='13'%20fill='%23FED7AA'/%3e%3crect%20x='350'%20y='205'%20width='520'%20height='62'%20rx='20'%20fill='%23E2E8F0'/%3e%3crect%20x='175'%20y='345'%20width='845'%20height='20'%20rx='10'%20fill='%23E2E8F0'/%3e%3crect%20x='175'%20y='383'%20width='790'%20height='20'%20rx='10'%20fill='%23E2E8F0'/%3e%3crect%20x='175'%20y='421'%20width='640'%20height='20'%20rx='10'%20fill='%23E2E8F0'/%3e%3crect%20x='175'%20y='475'%20width='190'%20height='46'%20rx='23'%20fill='%232563EB'%20opacity='.88'/%3e%3ccircle%20cx='980'%20cy='190'%20r='56'%20fill='%23DBEAFE'/%3e%3ccircle%20cx='980'%20cy='190'%20r='26'%20fill='%232563EB'%20opacity='.22'/%3e%3c/svg%3e" data-fallback-src="img/facebook-post-2.svg"
+                                data-content-doc="settings_facebook_feed"
+                                data-content-key="facebookFeed.posts.second.image" data-content-attr="src"
+                                data-visibility-target=".facebook-post-image-wrap">
+                        </div>
+                        <div class="facebook-post-meta">
+                            <span class="facebook-post-badge"><i class="fab fa-facebook-f"></i> Facebook</span>
+                            <span data-content-doc="settings_facebook_feed"
+                                data-content-key="facebookFeed.posts.second.date">Siste oppdatering</span>
+                        </div>
+                        <h3 class="facebook-post-title" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.second.title">Kunngjøringer og invitasjoner</h3>
+                        <p class="facebook-post-excerpt" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.second.excerpt">Her kan du
+                            raskt se nye invitasjoner, arrangementer og meldinger vi deler.</p>
+                        <span class="facebook-post-link" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.second.cta">Se innlegget</span>
+                    </a>
+
+                    <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"
+                        rel="noopener noreferrer" class="facebook-post-card" data-content-doc="settings_facebook_feed"
+                        data-content-key="facebookFeed.posts.third.link"
+                        data-content-attr="href">
+                        <div class="facebook-post-image-wrap">
+                            <img class="facebook-post-image" alt="Facebook innlegg"
+                                src="data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20675'%20role='img'%20aria-labelledby='title%20desc'%3e%3ctitle%20id='title'%3eFacebook%20post%20fallback%203%3c/title%3e%3cdesc%20id='desc'%3eAbstract%20cool%20background%20with%20stacked%20panels%20and%20soft%20gradients.%3c/desc%3e%3cdefs%3e%3clinearGradient%20id='bg3'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3e%3cstop%20offset='0%25'%20stop-color='%23F8FAFC'/%3e%3cstop%20offset='50%25'%20stop-color='%23EDE9FE'/%3e%3cstop%20offset='100%25'%20stop-color='%23DBEAFE'/%3e%3c/linearGradient%3e%3clinearGradient%20id='panel3'%20x1='0%25'%20y1='0%25'%20x2='100%25'%20y2='100%25'%3e%3cstop%20offset='0%25'%20stop-color='%23FFFFFF'/%3e%3cstop%20offset='100%25'%20stop-color='%23EEF2FF'/%3e%3c/linearGradient%3e%3c/defs%3e%3crect%20width='1200'%20height='675'%20fill='url(%23bg3)'/%3e%3crect%20x='95'%20y='85'%20width='1010'%20height='505'%20rx='34'%20fill='%23FFFFFF'%20opacity='.96'/%3e%3crect%20x='145'%20y='135'%20width='300'%20height='380'%20rx='28'%20fill='url(%23panel3)'/%3e%3crect%20x='495'%20y='135'%20width='560'%20height='110'%20rx='28'%20fill='%23FFFFFF'/%3e%3crect%20x='545'%20y='170'%20width='280'%20height='22'%20rx='11'%20fill='%23DBEAFE'/%3e%3crect%20x='545'%20y='206'%20width='420'%20height='18'%20rx='9'%20fill='%23E2E8F0'/%3e%3crect%20x='495'%20y='275'%20width='560'%20height='240'%20rx='28'%20fill='url(%23panel3)'/%3e%3crect%20x='545'%20y='325'%20width='390'%20height='22'%20rx='11'%20fill='%23E2E8F0'/%3e%3crect%20x='545'%20y='365'%20width='450'%20height='22'%20rx='11'%20fill='%23E2E8F0'/%3e%3crect%20x='545'%20y='405'%20width='330'%20height='22'%20rx='11'%20fill='%23E2E8F0'/%3e%3crect%20x='545'%20y='456'%20width='170'%20height='42'%20rx='21'%20fill='%23F97316'%20opacity='.9'/%3e%3ccircle%20cx='295'%20cy='275'%20r='90'%20fill='%23C4B5FD'/%3e%3ccircle%20cx='295'%20cy='275'%20r='42'%20fill='%238B5CF6'%20opacity='.22'/%3e%3cpath%20d='M190%20420c54-42%20109-63%20165-63s111%2021%20165%2063c-34%2042-89%2071-165%2087-76-16-131-45-165-87z'%20fill='%23BFDBFE'/%3e%3c/svg%3e"
+                                data-fallback-src="img/facebook-post-3.svg"
+                                data-content-doc="settings_facebook_feed"
+                                data-content-key="facebookFeed.posts.third.image" data-content-attr="src"
+                                data-visibility-target=".facebook-post-image-wrap">
+                        </div>
+                        <div class="facebook-post-meta">
+                            <span class="facebook-post-badge"><i class="fab fa-facebook-f"></i> Facebook</span>
+                            <span data-content-doc="settings_facebook_feed"
+                                data-content-key="facebookFeed.posts.third.date">Fra fellesskapet</span>
+                        </div>
+                        <h3 class="facebook-post-title" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.third.title">Vitnesbyrd og hverdagsøyeblikk</h3>
+                        <p class="facebook-post-excerpt" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.third.excerpt">Vi deler
+                            små øyeblikk, takknemlighet og ting som skjer i og rundt fellesskapet.</p>
+                        <span class="facebook-post-link" data-content-doc="settings_facebook_feed"
+                            data-content-key="facebookFeed.posts.third.cta">Gå til Facebook</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Newsletter -->
     <section class="newsletter">
         <div class="container">
             <div class="newsletter-content">
-                <h2 class="newsletter-title">Hold deg oppdatert</h2>
-                <p class="newsletter-text">Meld deg på vårt nyhetsbrev og få de siste oppdateringene om arrangementer,
+                <h2 class="newsletter-title" data-content-key="newsletter.title">Hold deg oppdatert</h2>
+                <p class="newsletter-text" data-content-key="newsletter.text">Meld deg på vårt nyhetsbrev og få de siste
+                    oppdateringene om arrangementer,
                     podcast og undervisning.</p>
 
                 <form class="newsletter-form" id="newsletter-form">
-                    <input type="email" class="newsletter-input" placeholder="Din e-postadresse" required>
-                    <button type="submit" class="btn btn-primary">Abonner</button>
+                    <input type="email" class="newsletter-input" placeholder="Din e-postadresse" required
+                        data-content-key="newsletter.placeholder">
+                    <button type="submit" class="btn btn-primary" data-content-key="newsletter.btnText">Abonner</button>
                 </form>
             </div>
         </div>
@@ -566,55 +700,83 @@
                     <div class="footer-brand">
                         <a href="index.html" class="logo">
                             <div class="logo-icon">
-                                <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/assets/logo-hkm-B4n9sAJj.png" alt="His Kingdom Ministry Logo"
+                                    data-content-doc="settings_global" data-content-key="brand.logoAlt"
+                                    data-content-attr="alt">
                             </div>
-                            <span class="logo-text">His Kingdom Ministry</span>
+                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
+                                Kingdom Ministry</span>
                         </a>
-                        <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til
+                        <p class="brand-description" data-content-doc="settings_global"
+                            data-content-key="footer.description">His Kingdom Ministry er en
+                            non-profit organisasjon dedikert til
                             åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
                     </div>
 
                     <!-- Links Grid -->
                     <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4>Om oss</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
                             <ul>
-                                <li><a href="index.html#hjem">Hjem</a></li>
-                                <li><a href="om-oss.html">Om oss</a></li>
-                                <li><a href="om-oss.html#visjon">Vår visjon</a></li>
-                                <li><a href="kontakt.html">Kontakt oss</a></li>
+                                <li><a href="index.html#hjem" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.home">Hjem</a></li>
+                                <li><a href="om-oss.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.about">Om oss</a></li>
+                                <li><a href="om-oss.html#visjon" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.vision">Vår visjon</a></li>
+                                <li><a href="kontakt.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.contact">Kontakt oss</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Ressurser</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
+                            </h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Undervisning</a></li>
-                                <li><a href="arrangementer.html">E-kurs</a></li>
-                                <li><a href="blogg.html">Bøker & Blogg</a></li>
-                                <li><a href="minside/index.html" target="_blank">Min Side</a></li>
+                                <li><a href="media.html#teaching-section" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.teaching">Undervisning</a></li>
+                                <li><a href="arrangementer.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.courses">E-kurs</a></li>
+                                <li><a href="blogg.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.blog">Bøker & Blogg</a></li>
+                                <li><a href="butikk.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.store">Butikk</a></li>
+                                <li><a href="minside/index.html" target="_blank" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.myPage">Min Side</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Media</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videoer</a></li>
-                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                <li><a href="media.html#podcast-section" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.podcast">Podcast</a></li>
+                                <li><a href="media.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.videos">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.youtube">YouTube</a>
                                 </li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Involvering</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                Involvering</h4>
                             <ul>
-                                <li><a href="arrangementer.html">Kalender</a></li>
-                                <li><a href="donasjoner.html">Gi en gave</a></li>
-                                <li><a href="personvern.html">Personvern</a></li>
-                                <li><a href="tilgjengelighet.html">Tilgjengelighet</a></li>
+                                <li><a href="arrangementer.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.calendar">Kalender</a></li>
+                                <li><a href="donasjoner.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.donate">Gi en gave</a></li>
+                                <li><a href="personvern.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.privacy">Personvern</a></li>
+                                <li><a href="tilgjengelighet.html" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
+                                </li>
                                 <li><a href="#"
-                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
                                 </li>
                             </ul>
                         </div>
@@ -625,7 +787,7 @@
                 <div class="footer-right">
                     <!-- Follow Us Card -->
                     <div class="footer-card">
-                        <h3>Følg oss</h3>
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h3>
                         <div class="footer-social-icons">
                             <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
                                     class="fab fa-facebook-f"></i></a>
@@ -638,25 +800,33 @@
 
                     <!-- Contact Us Card -->
                     <div class="footer-card contact-card">
-                        <h3>Kontakt oss</h3>
-                        <a href="kontakt.html" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss</h3>
+                        <a href="kontakt.html" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global"
+                            data-content-key="footer.contactButton">Kontaktskjema</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
-                                <strong>E-post:</strong>
-                                <p>post@hiskingdomministry.no</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.emailLabel">E-post:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.email">
+                                    post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
-                                <strong>Telefon:</strong>
-                                <p>+47 930 94 615</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.phoneLabel">Telefon:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
+                                    615</p>
                             </div>
                             <div class="detail-item">
-                                <strong>Vipps:</strong>
-                                <p>938361</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.vippsLabel">Vipps:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
                             </div>
                             <div class="detail-item">
-                                <strong>Konto nr.:</strong>
-                                <p>3000.66.08759</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -664,8 +834,10 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
-                <a href="admin/login.html" class="admin-link" id="admin-link">Admin</a>
+                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
+                        data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
+                <a href="admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                    data-content-key="footer.adminLink">Admin</a>
             </div>
         </div>
     </footer>
@@ -678,47 +850,39 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
 
     <!-- Firebase Config & Service -->
-    <script type="module" src="js/firebase-config.js"></script>
-    <script type="module" src="js/firebase-service.js"></script>
-    <script type="module" src="js/user-roles.js"></script>
-
+    
     <!-- App Scripts -->
-    <script src="js/notifications.js"></script>
-    <script type="module" src="js/i18n.js"></script>
-    <script type="module" src="script.js"></script>
-    <script type="module" src="js/content-manager.js?v=1719"></script>
-    <script type="module" src="js/cookie-consent.js"></script>
-    <script type="module">
-            (async function () {
-                // Wait for firebaseService to be available and initialized
-                let count = 0;
-                while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
-                    await new Promise(r => setTimeout(r, 50));
-                    count++;
+    <script>
+        (async function () {
+            // Wait for firebaseService to be available and initialized
+            let count = 0;
+            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
+                await new Promise(r => setTimeout(r, 50));
+                count++;
+            }
+
+            const adminLink = document.getElementById('admin-link');
+            const firebaseService = window.firebaseService;
+
+            if (!adminLink || !firebaseService || !firebaseService.isInitialized) return;
+
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) return;
+
+                let role = 'medlem';
+                try {
+                    role = await firebaseService.getUserRole(user.uid);
+                } catch (err) {
+                    console.warn('Kunne ikke hente rolle for admin-lenke:', err);
                 }
 
-                const adminLink = document.getElementById('admin-link');
-                const firebaseService = window.firebaseService;
+                const canAccessAdmin = window.HKM_PERMISSIONS
+                    && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
+                    && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
 
-                if (!adminLink || !firebaseService || !firebaseService.isInitialized) return;
-
-                firebase.auth().onAuthStateChanged(async (user) => {
-                    if (!user) return;
-
-                    let role = 'medlem';
-                    try {
-                        role = await firebaseService.getUserRole(user.uid);
-                    } catch (err) {
-                        console.warn('Kunne ikke hente rolle for admin-lenke:', err);
-                    }
-
-                    const canAccessAdmin = window.HKM_PERMISSIONS
-                        && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-                        && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
-
-                    adminLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
-                });
-            })();
+                adminLink.href = canAccessAdmin ? 'admin/index.html' : 'minside/index.html';
+            });
+        })();
         // Dynamisk profil-lenke i header
         (async function () {
             let count = 0;
@@ -745,84 +909,6 @@
         })();
     </script>
 
-    <script type="module">
-        // Load and manage Causes section
-        (async function () {
-            // Wait for firebaseService to be available and initialized
-            let count = 0;
-            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 100) {
-                await new Promise(r => setTimeout(r, 50));
-                count++;
-            }
-
-            const firebaseService = window.firebaseService;
-            if (!firebaseService || !firebaseService.isInitialized) return;
-
-            async function loadCausesSection() {
-                try {
-                    const causesData = await firebaseService.getPageContent('collection_causes');
-                    const causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
-                    const innsamlingSection = document.getElementById('innsamling');
-
-                    if (!innsamlingSection) return;
-
-                    if (causes.length === 0) {
-                        // Hide section if no causes
-                        innsamlingSection.style.display = 'none';
-                        return;
-                    }
-
-                    // Show section
-                    innsamlingSection.style.display = 'block';
-
-                    // Update causes grid
-                    const causesGrid = innsamlingSection.querySelector('.causes-grid');
-                    if (!causesGrid) return;
-
-                    causesGrid.innerHTML = causes.map(cause => {
-                        const progress = cause.goal > 0 ? Math.round((cause.collected / cause.goal) * 100) : 0;
-                        return `
-                            <div class="cause-card">
-                                <div class="cause-image">
-                                    <img src="${cause.image || 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=600&h=400&fit=crop'}" alt="${cause.title}" style="width: 100%; height: 100%; object-fit: cover;">
-                                </div>
-                                <div class="cause-content">
-                                    <h3 class="cause-title">${cause.title || 'Innsamlingsaksjon'}</h3>
-                                    <p class="cause-text">${cause.description || ''}</p>
-
-                                    <div class="cause-progress">
-                                        <div class="progress-bar">
-                                            <div class="progress-fill" data-progress="${progress}" style="width: ${progress}%;"></div>
-                                        </div>
-                                        <div class="progress-stats">
-                                            <span><strong>${(cause.collected || 0).toLocaleString('no-NO')} kr</strong> samlet inn</span>
-                                            <span><strong>${(cause.goal || 0).toLocaleString('no-NO')} kr</strong> mål</span>
-                                        </div>
-                                    </div>
-
-                                    <a href="donasjoner.html" class="btn btn-primary btn-block">Donér nå</a>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-
-                } catch (error) {
-                    console.error('Error loading causes:', error);
-                    const innsamlingSection = document.getElementById('innsamling');
-                    if (innsamlingSection) {
-                        innsamlingSection.style.display = 'none';
-                    }
-                }
-            }
-
-            // Load on page load
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', loadCausesSection);
-            } else {
-                loadCausesSection();
-            }
-        })();
-    </script>
 </body>
 
 </html>

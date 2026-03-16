@@ -24,12 +24,13 @@
     <!-- Core Firebase Logic -->
     <script defer src="../js/firebase-config.js"></script>
     <script defer src="../js/firebase-service.js"></script>
-  <script type="module" crossorigin src="/assets/admin_admin-nyhetsbrev-BpN8Jcjh.js"></script>
+  <script type="module" crossorigin src="/assets/admin_admin-nyhetsbrev-BphzQPc4.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/assets/admin-header-61a71NKR.js">
-  <link rel="stylesheet" crossorigin href="/assets/admin_admin-nyhetsbrev-yNIufHt8.css">
-  <link rel="stylesheet" crossorigin href="/assets/admin-unified-8d7WYiep.css">
+  <link rel="modulepreload" crossorigin href="/assets/admin-header-CNsGCLdB.js">
+  <link rel="stylesheet" crossorigin href="/assets/admin-header-D7baUKhW.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin_admin-nyhetsbrev-CQKoiPYI.css">
   <link rel="stylesheet" crossorigin href="/assets/notifications-DQiJY5Sp.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin-unified-B6xqicA-.css">
 </head>
 
 <body class="builder-active">
@@ -362,36 +363,42 @@
 
         <!-- Main Workspace: Canvas -->
         <main class="builder-workspace">
-            <!-- Unified Header -->
-            <header class="main-header">
-                <div class="header-left">
-                    <div class="welcome-banner">
-                        <h1 class="welcome-title">His Kingdom Ministry</h1>
-                        <p class="welcome-subtitle">Nyhetsbrevbygger</p>
+            <!-- Header -->
+            <div id="newsletter-main-header" class="main-header">
+                <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">campaign</span>
+                    </div>
+                    <div class="section-header-content">
+                        <div class="section-header-titles">
+                            <h2 class="section-title">His Kingdom Ministry</h2>
+                            <p class="section-subtitle">Nyhetsbrevbygger</p>
+                        </div>
+
+                        <div class="section-header-actions">
+                            <button id="global-search-opener" class="notification-btn" aria-label="Søk"
+                                title="Søk på siden">
+                                <span class="material-symbols-outlined">search</span>
+                            </button>
+                            <button class="notification-btn">
+                                <span class="material-symbols-outlined">notifications</span>
+                            </button>
+
+                            <a href="#" class="user-profile-link" id="admin-profile-trigger">
+                                <div class="user-info-text">
+                                    <span id="admin-name" class="user-name">Laster...</span>
+                                    <span class="user-role">Administrator</span>
+                                </div>
+                                <div id="admin-avatar" class="user-avatar">?</div>
+                            </a>
+
+                            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                                <span class="material-symbols-outlined">menu</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <div class="header-right">
-                    <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
-                    <button class="notification-btn">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-
-                    <a href="#" class="user-profile-link" id="admin-profile-trigger">
-                        <div class="user-info-text">
-                            <span id="admin-name" class="user-name">Laster...</span>
-                            <span class="user-role">Administrator</span>
-                        </div>
-                        <div id="admin-avatar" class="user-avatar">?</div>
-                    </a>
-
-                    <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-                </div>
-            </header>
+            </div>
 
             <header class="workspace-header">
                 <div class="header-left">
@@ -665,6 +672,7 @@
     </div>
 
     <!-- App Scripts -->
+    <script src="../js/admin-utils.js"></script>
 </body>
 
 </html>

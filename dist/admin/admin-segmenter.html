@@ -25,10 +25,11 @@
     <script defer src="../js/firebase-config.js"></script>
     <script defer src="../js/firebase-service.js"></script>
   <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
-  <script type="module" crossorigin src="/assets/admin-header-61a71NKR.js"></script>
+  <script type="module" crossorigin src="/assets/admin-header-CNsGCLdB.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/admin-header-D7baUKhW.css">
   <link rel="stylesheet" crossorigin href="/assets/admin_admin-segmenter-tn0RQdqM.css">
-  <link rel="stylesheet" crossorigin href="/assets/admin-unified-8d7WYiep.css">
-  <link rel="stylesheet" crossorigin href="/assets/crm-CborDY1O.css">
+  <link rel="stylesheet" crossorigin href="/assets/crm-huDzbrTJ.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin-unified-B6xqicA-.css">
 </head>
 
 <body class="crm-body">
@@ -91,7 +92,8 @@
                         </li>
                         <li class="nav-category-header" data-target-category="kommunikasjon">
                             <span>Kommunikasjon</span><span
-                                class="material-symbols-outlined expand-icon">expand_more</span></li>
+                                class="material-symbols-outlined expand-icon">expand_more</span>
+                        </li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
                             <a href="index.html#events" class="nav-link" data-section="events">
                                 <span class="material-symbols-outlined">event</span>
@@ -105,6 +107,18 @@
                             </a>
                         </li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
+                            <a href="admin-segmenter.html" class="nav-link active">
+                                <span class="material-symbols-outlined">segment</span>
+                                <span>Segmenter</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                            <a href="index.html#messages" class="nav-link" data-section="messages">
+                                <span class="material-symbols-outlined">mail</span>
+                                <span>Meldinger</span>
+                            </a>
+                        </li>
+                        <li class="nav-item visible" data-nav-category="kommunikasjon">
                             <a href="admin-nyhetsbrev.html" class="nav-link">
                                 <span class="material-symbols-outlined">mail_outline</span>
                                 <span>Nyhetsbrev</span>
@@ -112,7 +126,8 @@
                         </li>
                         <li class="nav-category-header" data-target-category="administrasjon">
                             <span>Administrasjon</span><span
-                                class="material-symbols-outlined expand-icon">expand_more</span></li>
+                                class="material-symbols-outlined expand-icon">expand_more</span>
+                        </li>
                         <li class="nav-item" data-nav-category="administrasjon">
                             <a href="index.html#causes" class="nav-link" data-section="causes">
                                 <span class="material-symbols-outlined">volunteer_activism</span>
@@ -172,56 +187,66 @@
         </aside>
         <!-- Main Content -->
         <main class="crm-main">
-            <!-- Unified Header -->
-            <header class="main-header">
-                <div class="header-left">
-                    <div class="welcome-banner">
-                        <h1 class="welcome-title">His Kingdom Ministry</h1>
-                        <p class="welcome-subtitle">Admin Dashboard</p>
-                    </div>
-                </div>
-
-                <div class="header-right">
-                    <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
-                    <button class="notification-btn">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-
-                    <a href="#" class="user-profile-link" id="admin-profile-trigger">
-                        <div class="user-info-text">
-                            <span id="admin-name" class="user-name">Laster...</span>
-                            <span class="user-role">Administrator</span>
-                        </div>
-                        <div id="admin-avatar" class="user-avatar">?</div>
-                    </a>
-
-                    <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-                </div>
-            </header>
-
             <!-- Page Header -->
-            <header class="crm-header">
-                <div class="header-left">
-                    <a href="admin-kommunikasjon.html" class="btn-back">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </a>
-                    <div class="header-titles">
-                        <h1>Segmenter</h1>
-                        <p>Organiser kontaktene dine i grupper for målrettet kommunikasjon.</p>
+            <div id="segment-main-header" class="main-header">
+                <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">segment</span>
+                    </div>
+                    <div class="section-header-content">
+                        <div class="section-header-titles">
+                            <h2 class="section-title">Segmenter</h2>
+                            <p class="section-subtitle">Organiser kontaktene dine i grupper for målrettet kommunikasjon.
+                            </p>
+                        </div>
+                        <div class="section-header-actions">
+                            <button id="global-search-opener" class="notification-btn" aria-label="Søk"
+                                title="Søk på siden">
+                                <span class="material-symbols-outlined">search</span>
+                            </button>
+                            <button class="notification-btn">
+                                <span class="material-symbols-outlined">notifications</span>
+                            </button>
+
+                            <a href="#" class="user-profile-link" id="admin-profile-trigger">
+                                <div class="user-info-text">
+                                    <span id="admin-name" class="user-name">Laster...</span>
+                                    <span class="user-role">Administrator</span>
+                                </div>
+                                <div id="admin-avatar" class="user-avatar">?</div>
+                            </a>
+
+                            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                                <span class="material-symbols-outlined">menu</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="header-actions">
-                    <button class="btn btn-primary" id="create-segment-btn">
-                        <span class="material-symbols-outlined">add</span>
-                        Opprett segment
-                    </button>
+            <div class="section-content" style="padding: 0;">
+                <div class="section-header design-ui-header">
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">segment</span>
+                    </div>
+                    <div class="section-header-content">
+                        <div class="section-header-titles">
+                            <h2 class="section-title">Segmenter</h2>
+                            <p class="section-subtitle">Organiser kontaktene dine i grupper for målrettet kommunikasjon.
+                            </p>
+                        </div>
+                        <div class="section-header-actions">
+                            <a href="admin-kommunikasjon.html" class="btn btn-outline" title="Tilbake til kontakter">
+                                <span class="material-symbols-outlined">arrow_back</span> Tilbake
+                            </a>
+                            <button class="btn btn-primary" id="create-segment-btn">
+                                <span class="material-symbols-outlined">add</span>
+                                Opprett segment
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </header>
+            </div>
 
 
 
@@ -359,6 +384,7 @@
         });
     </script>
 
+    <script src="../js/admin-utils.js"></script>
     <script defer src="js/crm-segmenter.js"></script>
 </body>
 

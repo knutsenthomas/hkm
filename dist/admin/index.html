@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Admin Dashboard | His Kingdom Ministry</title>
 
     <!-- Preconnect for performance -->
@@ -15,19 +15,66 @@
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" as="style">
 
     <!-- Google Fonts & Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@700;800&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
 
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1e293b">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/assets/logo_circular-DnkZljIb.png">
+
     <!-- Error Logger (Deferred by default as module) -->
-  <script type="module" crossorigin src="/assets/admin_index-BxEo1Hnt.js"></script>
+
+    <script>
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+
+            const hostname = window.location.hostname;
+            const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1';
+
+            async function clearAdminCaches() {
+                if (!window.caches || typeof caches.keys !== 'function') return;
+                const keys = await caches.keys();
+                await Promise.allSettled(
+                    keys.filter((key) => key.startsWith('hkm-admin-')).map((key) => caches.delete(key))
+                );
+            }
+
+            window.addEventListener('load', async () => {
+                try {
+                    if (isLocalDev) {
+                        const regs = await navigator.serviceWorker.getRegistrations();
+                        await Promise.allSettled(regs.map((reg) => reg.unregister()));
+                        await clearAdminCaches();
+                        console.info('[HKM] Lokal admin service worker deaktivert for stabil utvikling');
+                        return;
+                    }
+
+                    const reg = await navigator.serviceWorker.register('/sw.js');
+                    if (typeof reg.update === 'function') {
+                        reg.update().catch(() => { });
+                    }
+                    console.log('Service Worker registrert!', reg);
+                } catch (err) {
+                    console.log('Service Worker feilet:', err);
+                }
+            });
+        })();
+    </script>
+  <script type="module" crossorigin src="/assets/admin_index-DbrTAIey.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/admin-header-CNsGCLdB.js">
   <link rel="modulepreload" crossorigin href="/assets/error-logger-DVkGMsfx.js">
-  <link rel="modulepreload" crossorigin href="/assets/admin-header-61a71NKR.js">
   <link rel="modulepreload" crossorigin href="/assets/firebase-config-BNsh33Gw.js">
   <link rel="modulepreload" crossorigin href="/assets/user-roles-D0mdCVLS.js">
-  <link rel="stylesheet" crossorigin href="/assets/admin-unified-8d7WYiep.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin-header-D7baUKhW.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin-unified-B6xqicA-.css">
   <link rel="stylesheet" crossorigin href="/assets/notifications-DQiJY5Sp.css">
 </head>
 
@@ -127,9 +174,9 @@
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="kommunikasjon">
-                        <a href="admin-nyhetsbrev.html" class="nav-link">
-                            <span class="material-symbols-outlined">mail_outline</span>
-                            <span>Nyhetsbrev</span>
+                        <a href="admin-segmenter.html" class="nav-link">
+                            <span class="material-symbols-outlined">segment</span>
+                            <span>Segmenter</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="kommunikasjon">
@@ -139,8 +186,15 @@
                             <span id="messages-badge" class="nav-badge" style="display: none;">0</span>
                         </a>
                     </li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="admin-nyhetsbrev.html" class="nav-link">
+                            <span class="material-symbols-outlined">mail_outline</span>
+                            <span>Nyhetsbrev</span>
+                        </a>
+                    </li>
                     <!-- Hidden anchor for FAB push-notification action -->
-                    <li class="nav-item" data-nav-category="kommunikasjon" style="display:none">
+                    <li class="nav-item nav-helper-hidden" data-nav-category="kommunikasjon" style="display:none"
+                        aria-hidden="true">
                         <a href="#" class="nav-link" data-section="kommunikasjon" id="nav-kommunikasjon-hidden">
                             <span>Push</span>
                         </a>
@@ -216,38 +270,45 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Header -->
-        <header class="main-header">
-            <div class="header-left">
-                <div class="welcome-banner">
-                    <h1 class="welcome-title">Velkommen tilbake!</h1>
-                    <p class="welcome-subtitle">Oversikt over nettstedets aktivitet.</p>
+        <div id="dashboard-main-header" class="main-header">
+            <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                <div class="section-header-icon">
+                    <span id="dashboard-main-header-icon" class="material-symbols-outlined">grid_view</span>
+                </div>
+                <div class="section-header-content">
+                    <div class="section-header-titles">
+                        <h2 id="dashboard-main-header-title" class="section-title">Oversikt</h2>
+                        <p id="dashboard-main-header-subtitle" class="section-subtitle">HKM Studio administrasjonspanel
+                        </p>
+                    </div>
+
+                    <div class="section-header-actions">
+                        <button id="global-search-opener" class="notification-btn" aria-label="Søk"
+                            title="Søk på siden">
+                            <span class="material-symbols-outlined">search</span>
+                        </button>
+
+                        <button id="messages-bell" class="notification-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
+                        </button>
+
+                        <a href="#" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">Laster...</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar">
+                                ?</div>
+                        </a>
+
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
                 </div>
             </div>
-
-            <div class="header-right">
-                <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
-                    <span class="material-symbols-outlined">search</span>
-                </button>
-                <img src="/assets/logo_circular-DnkZljIb.png" alt="HKM" class="mobile-logo-header" style="display: none;">
-
-                <button id="messages-bell" class="notification-btn">
-                    <span id="notification-icon" class="material-symbols-outlined">notifications</span>
-                    <span id="notification-dot" class="notification-dot"></span>
-                </button>
-
-                <a href="#" class="user-profile-link" id="admin-profile-trigger">
-                    <div class="user-info-text">
-                        <span id="admin-name" class="user-name">Laster...</span>
-                        <span class="user-role">Administrator</span>
-                    </div>
-                    <div id="admin-avatar" class="user-avatar">?</div>
-                </a>
-
-                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </header>
+        </div>
 
         <!-- Global Search Modal -->
         <div id="search-modal" class="search-overlay">
@@ -273,7 +334,7 @@
                 <button id="close-profile-modal"
                     style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#888;">&times;</button>
                 <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
-                    <div id="modal-admin-avatar" class="user-avatar" style="width:64px; height:64px; font-size:28px;">
+                    <div id="modal-admin-avatar" class="user-avatar">
                     </div>
                     <div>
                         <div id="modal-admin-name" class="user-name" style="font-size:20px; font-weight:700;">
@@ -390,6 +451,24 @@
         <section id="content-area" class="section-container">
             <!-- Default Overview Section -->
             <div id="overview-section" class="section-content active">
+                <div class="overview-hero-card">
+                    <div class="overview-hero-content">
+                        <div class="overview-hero-eyebrow">HKM Studio</div>
+                        <h2 class="overview-hero-title">Velkommen tilbake!</h2>
+                        <p class="overview-hero-text">
+                            Her har du rask oversikt over innhold, meldinger og aktivitet. Bruk menyen til venstre for
+                            å redigere nettsiden og følge opp kommunikasjonen.
+                        </p>
+                        <button type="button" class="overview-hero-action"
+                            onclick="document.querySelector('.nav-link[data-section=&quot;messages&quot;]')?.click()">
+                            Gå til meldinger
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">mail</span>
+                    </div>
+                </div>
                 <div class="section-header-row"
                     style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
                     <h2 style="font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0;">Analyseoversikt
@@ -459,7 +538,7 @@
                     </div>
 
                     <div class="stat-card modern">
-                        <div class="stat-icon-wrap megaphone">
+                        <div class="section-header-icon">
                             <span class="material-symbols-outlined">campaign</span>
                         </div>
                         <div class="stat-content">
@@ -806,80 +885,114 @@
             </div>
 
             <div id="kommunikasjon-section" class="section-content">
-                <div class="section-header">
-                    <h2 class="section-title">Push-varslinger</h2>
-                    <p class="section-subtitle">Send push-varslinger direkte til brukerne.</p>
-                </div>
-
-                <!-- Push form -->
-                <div class="card modern">
-                    <div class="card-body">
-                        <div class="promo-icon blue">
-                            <span class="material-symbols-outlined">campaign</span>
-                        </div>
-                        <h3 class="card-title">Send Push-varsling</h3>
-                        <p>Send korte varsler direkte til brukernes telefoner og Min Side-appen.</p>
-                        <form id="push-notification-form" class="mt-4">
-                            <div class="form-group">
-                                <label for="push-target-role">Målgruppe</label>
-                                <select id="push-target-role" name="targetRole" class="form-control">
-                                    <option value="all">Alle Brukere</option>
-                                    <option value="medlem">Bare Medlemmer</option>
-                                    <option value="selected">Valgte brukere</option>
-                                </select>
-                            </div>
-                            <div id="push-user-selection" class="user-selection-container" style="display: none;">
-                                <!-- User list will be injected here -->
-                            </div>
-                            <div class="form-group">
-                                <label for="push-title">Tittel</label>
-                                <input type="text" id="push-title" name="title" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="push-body">Melding</label>
-                                <textarea id="push-body" name="body" class="form-control" rows="3" required></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="push-click-action">Link (valgfri)</label>
-                                <input type="text" id="push-click-action" name="click_action" class="form-control"
-                                    placeholder="https://his-kingdom-ministry.web.app/arrangementer">
-                            </div>
-                            <button type="submit" class="btn-primary">
-                                <span class="material-symbols-outlined"
-                                    style="font-size:18px; vertical-align:middle;">send</span>
-                                Send Push-varsling
-                            </button>
-                            <div id="push-status" class="status-message" style="margin-top: 15px;"></div>
-                        </form>
+                <div class="section-header design-ui-header">
+                    <div>
+                        <h2 class="section-title">Push-varslinger & Logg</h2>
+                        <p class="section-subtitle">Send push-varslinger direkte til brukerne og se aktivitetslogg.</p>
                     </div>
                 </div>
 
-                <!-- Unified Activity Log -->
-                <div class="card modern mt-4">
-                    <div class="card-body">
-                        <div
-                            style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:12px;">
-                            <h3 class="card-title" style="margin:0;">Aktivitetslogg</h3>
-                            <div id="log-filters" style="display:flex; gap:8px; flex-wrap:wrap;">
-                                <button class="log-filter-btn active" data-filter="all">
-                                    <span class="material-symbols-outlined" style="font-size:15px;">list</span> Alle
-                                </button>
-                                <button class="log-filter-btn" data-filter="push">
-                                    <span class="material-symbols-outlined" style="font-size:15px;">campaign</span>
-                                    Push-varslinger
-                                </button>
-                                <button class="log-filter-btn" data-filter="message">
-                                    <span class="material-symbols-outlined" style="font-size:15px;">mail</span>
-                                    Meldinger
-                                </button>
-                                <button class="log-filter-btn" data-filter="new_user">
-                                    <span class="material-symbols-outlined" style="font-size:15px;">person_add</span>
-                                    Nye brukere
-                                </button>
+                <div class="design-ui-shell">
+                    <div class="design-ui-workspace">
+                        <div class="design-ui-top-grid">
+                            <!-- Push Notification Panel -->
+                            <div class="design-ui-main-column">
+                                <div class="design-ui-panel">
+                                    <div class="design-ui-panel-header">
+                                        <div class="design-ui-panel-header-icon"
+                                            style="background: #e0e7ff; color: #4338ca;">
+                                            <span class="material-symbols-outlined">campaign</span>
+                                        </div>
+                                        <div>
+                                            <h3 class="design-ui-panel-title">Send Push-varsling</h3>
+                                            <p class="design-ui-panel-subtitle">Send korte varsler direkte til brukernes
+                                                telefoner og Min Side-appen.</p>
+                                        </div>
+                                    </div>
+                                    <div class="design-ui-panel-body">
+                                        <form id="push-notification-form">
+                                            <div class="form-group">
+                                                <label for="push-target-role">Målgruppe</label>
+                                                <select id="push-target-role" name="targetRole" class="form-control">
+                                                    <option value="all">Alle Brukere</option>
+                                                    <option value="medlem">Bare Medlemmer</option>
+                                                    <option value="selected">Valgte brukere</option>
+                                                </select>
+                                            </div>
+                                            <div id="push-user-selection" class="user-selection-container"
+                                                style="display: none; max-height: 200px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+                                                <!-- User list will be injected here -->
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="push-title">Tittel</label>
+                                                <input type="text" id="push-title" name="title" class="form-control"
+                                                    required placeholder="F.eks. Nytt arrangement!">
+                                            </div>
+                                            <div class="form-group">
+                                                <label for="push-body">Melding</label>
+                                                <textarea id="push-body" name="body" class="form-control" rows="3"
+                                                    required placeholder="Skriv meldingen din her..."></textarea>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom: 24px;">
+                                                <label for="push-click-action">Link (valgfri)</label>
+                                                <input type="text" id="push-click-action" name="click_action"
+                                                    class="form-control"
+                                                    placeholder="https://his-kingdom-ministry.web.app/arrangementer">
+                                            </div>
+                                            <button type="submit" class="btn btn-primary" style="width: 100%;">
+                                                <span class="material-symbols-outlined">send</span>
+                                                Send Push-varsling
+                                            </button>
+                                            <div id="push-status" class="status-message" style="margin-top: 15px;">
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div id="activity-log-list">
-                            <div class="loader">Laster aktiviteter...</div>
+
+                            <!-- Activity Log Panel -->
+                            <aside class="design-ui-side-column">
+                                <div class="design-ui-panel" style="height: 100%;">
+                                    <div class="design-ui-panel-header design-ui-panel-header--compact">
+                                        <div class="design-ui-panel-header-icon"
+                                            style="background: #f1f5f9; color: #475569;">
+                                            <span class="material-symbols-outlined">history</span>
+                                        </div>
+                                        <div style="flex: 1;">
+                                            <h3 class="design-ui-panel-title">Aktivitetslogg</h3>
+                                        </div>
+                                    </div>
+                                    <div class="design-ui-panel-body" style="padding-top: 0; padding-bottom: 0;">
+                                        <div id="log-filters"
+                                            style="display:flex; gap:8px; flex-wrap:wrap; padding: 12px 0; border-bottom: 1px solid var(--border-color); position: sticky; top: 0; background: #fff; z-index: 10;">
+                                            <button class="log-filter-btn active" data-filter="all"
+                                                style="padding: 4px 12px; border-radius: 20px; border: 1px solid #e2e8f0; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;">Alle</button>
+                                            <button class="log-filter-btn" data-filter="push"
+                                                style="padding: 4px 12px; border-radius: 20px; border: 1px solid #e2e8f0; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;">Push</button>
+                                            <button class="log-filter-btn" data-filter="message"
+                                                style="padding: 4px 12px; border-radius: 20px; border: 1px solid #e2e8f0; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;">Meldinger</button>
+                                            <button class="log-filter-btn" data-filter="new_user"
+                                                style="padding: 4px 12px; border-radius: 20px; border: 1px solid #e2e8f0; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; font-family: 'DM Sans', sans-serif;">Brukere</button>
+                                            <style>
+                                                .log-filter-btn.active {
+                                                    background: var(--primary-color);
+                                                    color: white;
+                                                    border-color: var(--primary-color);
+                                                }
+
+                                                .log-filter-btn:hover:not(.active) {
+                                                    background: #f8fafc;
+                                                }
+                                            </style>
+                                        </div>
+                                        <div id="activity-log-list"
+                                            style="max-height: 500px; overflow-y: auto; margin: 0 -20px; padding: 0 20px;">
+                                            <div class="loader" style="padding: 24px; text-align: center;">Laster
+                                                aktiviteter...</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </aside>
                         </div>
                     </div>
                 </div>
@@ -944,11 +1057,53 @@
     </div>
 
     <!-- App Scripts -->
+    <script src="../js/admin-utils.js"></script>
     <!-- Core Dashboard Logic (Non-Module for compatibility) -->
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.querySelector('.sidebar');
             const mobileToggle = document.getElementById('mobile-nav-toggle');
+            const topbarTitle = document.getElementById('dashboard-main-header-title');
+            const topbarIcon = document.getElementById('dashboard-main-header-icon');
+            const topbarSubtitle = document.getElementById('dashboard-main-header-subtitle');
+            const ADMIN_LAST_DASHBOARD_SECTION_KEY = 'hkm_admin_last_dashboard_section';
+
+            const topbarSectionOverrides = {
+                overview: { icon: 'grid_view', title: 'Oversikt' }
+            };
+
+            function getNavLabelFromLink(link) {
+                if (!link) return '';
+                const textSpan = Array.from(link.querySelectorAll('span'))
+                    .find(span => !span.classList.contains('material-symbols-outlined') && !span.classList.contains('nav-badge'));
+                return (textSpan?.textContent || '').trim();
+            }
+
+            function getSectionMeta(sectionId, sourceLink) {
+                const sectionEl = sectionId ? document.getElementById(`${sectionId}-section`) : null;
+                const sectionHeaderTitle = sectionEl?.querySelector('.section-header .section-title, .design-ui-header .section-title, .section-header h2, .section-header h3');
+                const sectionHeaderSubtitle = sectionEl?.querySelector('.section-header .section-subtitle, .design-ui-header .section-subtitle');
+                const sectionHeaderIcon = sectionEl?.querySelector('.section-header-icon .material-symbols-outlined');
+                const navIcon = sourceLink?.querySelector('.material-symbols-outlined');
+                const navTitle = getNavLabelFromLink(sourceLink);
+                const override = topbarSectionOverrides[sectionId] || {};
+
+                return {
+                    title: override.title || navTitle || sectionHeaderTitle?.textContent?.trim() || 'Oversikt',
+                    icon: override.icon || navIcon?.textContent?.trim() || sectionHeaderIcon?.textContent?.trim() || 'grid_view',
+                    subtitle: sectionHeaderSubtitle?.textContent?.trim() || 'HKM Studio administrasjonspanel'
+                };
+            }
+
+            function syncTopbarForSection(sectionId, sourceLink) {
+                if (!topbarTitle || !topbarIcon) return;
+                const meta = getSectionMeta(sectionId, sourceLink);
+                topbarTitle.textContent = meta.title;
+                topbarIcon.textContent = meta.icon;
+                if (topbarSubtitle) {
+                    topbarSubtitle.textContent = meta.subtitle;
+                }
+            }
 
             // All hamburger/overlay logic is now handled by admin-header.js
 
@@ -974,6 +1129,12 @@
                     if (!targetSectionId) return;
 
                     e.preventDefault();
+                    sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, targetSectionId);
+                    try {
+                        history.replaceState(null, '', `#${targetSectionId}`);
+                    } catch (_) {
+                        // noop
+                    }
 
                     // Close sidebar on mobile
                     sidebar.classList.remove('active');
@@ -1006,6 +1167,8 @@
                             section.classList.add('active');
                         }
                     });
+
+                    syncTopbarForSection(targetSectionId, link);
                 });
             });
 
@@ -1055,8 +1218,10 @@
             });
 
             const hash = window.location.hash.substring(1);
-            if (hash) {
-                const targetLink = document.querySelector(`.nav-link[data-section="${hash}"]`);
+            const rememberedSection = sessionStorage.getItem(ADMIN_LAST_DASHBOARD_SECTION_KEY);
+            const initialSection = hash || rememberedSection || '';
+            if (initialSection) {
+                const targetLink = document.querySelector(`.nav-link[data-section="${initialSection}"]`);
                 if (targetLink) {
                     setTimeout(() => targetLink.click(), 100); // Small delay to ensure render
                 }
@@ -1077,7 +1242,11 @@
                 }
             } else {
                 const overviewLink = document.querySelector('.nav-link[data-section="overview"]');
-                if (overviewLink) overviewLink.classList.add('active');
+                if (overviewLink) {
+                    overviewLink.classList.add('active');
+                    sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, 'overview');
+                    syncTopbarForSection('overview', overviewLink);
+                }
             }
 
             // FAB Menu Logic
@@ -1123,11 +1292,11 @@
         });
     </script>
 
-    <!-- Firebase SDK (Compat) - Deferred to reduce render blocking -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js" defer></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js" defer></script>
+    <!-- Firebase SDK (Compat) - Removed defer to ensure global 'firebase' is available immediately -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <!-- Firebase Config & Service -->
 

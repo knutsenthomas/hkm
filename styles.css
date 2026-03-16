@@ -3914,6 +3914,7 @@ th {
     max-width: 1600px !important;
     padding-left: 5% !important;
     padding-right: 5% !important;
+    height: 100px !important
 }
 
 @media (max-width:1600px) {
@@ -5040,6 +5041,8 @@ section {
 
 .header.scrolled {
     box-shadow: var(--shadow);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important
 }
 
 .header-content {
@@ -8746,7 +8749,7 @@ ol.block-list {
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: all .2s ease-in-out;
     display: flex;
     flex-direction: column;
     overflow-y: auto
@@ -8825,7 +8828,7 @@ ol.block-list {
     border-radius: 50%;
     font-size: 2rem;
     cursor: pointer;
-    transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1), color 0.4s ease;
+    transition: transform .3s ease, color .3s ease;
     z-index: 10002
 }
 
@@ -8877,13 +8880,13 @@ ol.block-list {
     font-weight: 500;
     color: var(--text-dark);
     text-decoration: none;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    transition: color .2s;
     display: inline-block
 }
 
 .mega-nav-list a:hover {
     color: var(--primary-orange);
-    transform: translateX(8px)
+    transform: translateX(5px)
 }
 
 .mega-menu-footer {

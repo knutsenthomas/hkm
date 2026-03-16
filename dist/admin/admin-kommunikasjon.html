@@ -25,9 +25,10 @@
     <script defer src="../js/firebase-config.js"></script>
     <script defer src="../js/firebase-service.js"></script>
   <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
-  <script type="module" crossorigin src="/assets/admin-header-61a71NKR.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/admin-unified-8d7WYiep.css">
-  <link rel="stylesheet" crossorigin href="/assets/crm-CborDY1O.css">
+  <script type="module" crossorigin src="/assets/admin-header-CNsGCLdB.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/admin-header-D7baUKhW.css">
+  <link rel="stylesheet" crossorigin href="/assets/crm-huDzbrTJ.css">
+  <link rel="stylesheet" crossorigin href="/assets/admin-unified-B6xqicA-.css">
 </head>
 
 <body class="crm-body">
@@ -90,7 +91,8 @@
                         </li>
                         <li class="nav-category-header" data-target-category="kommunikasjon">
                             <span>Kommunikasjon</span><span
-                                class="material-symbols-outlined expand-icon">expand_more</span></li>
+                                class="material-symbols-outlined expand-icon">expand_more</span>
+                        </li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
                             <a href="index.html#events" class="nav-link" data-section="events">
                                 <span class="material-symbols-outlined">event</span>
@@ -104,6 +106,18 @@
                             </a>
                         </li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
+                            <a href="admin-segmenter.html" class="nav-link">
+                                <span class="material-symbols-outlined">segment</span>
+                                <span>Segmenter</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                            <a href="index.html#messages" class="nav-link" data-section="messages">
+                                <span class="material-symbols-outlined">mail</span>
+                                <span>Meldinger</span>
+                            </a>
+                        </li>
+                        <li class="nav-item visible" data-nav-category="kommunikasjon">
                             <a href="admin-nyhetsbrev.html" class="nav-link">
                                 <span class="material-symbols-outlined">mail_outline</span>
                                 <span>Nyhetsbrev</span>
@@ -111,7 +125,8 @@
                         </li>
                         <li class="nav-category-header" data-target-category="administrasjon">
                             <span>Administrasjon</span><span
-                                class="material-symbols-outlined expand-icon">expand_more</span></li>
+                                class="material-symbols-outlined expand-icon">expand_more</span>
+                        </li>
                         <li class="nav-item" data-nav-category="administrasjon">
                             <a href="index.html#causes" class="nav-link" data-section="causes">
                                 <span class="material-symbols-outlined">volunteer_activism</span>
@@ -171,65 +186,63 @@
         </aside>
         <!-- Main Content -->
         <main class="crm-main">
-            <!-- Unified Header -->
-            <header class="main-header">
-                <div class="header-left">
-                    <div class="welcome-banner">
-                        <h1 class="welcome-title">His Kingdom Ministry</h1>
-                        <p class="welcome-subtitle">Admin Dashboard</p>
-                    </div>
-                </div>
-
-                <div class="header-right">
-                    <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
-                    <button class="notification-btn">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-
-                    <a href="#" class="user-profile-link" id="admin-profile-trigger">
-                        <div class="user-info-text">
-                            <span id="admin-name" class="user-name">Laster...</span>
-                            <span class="user-role">Administrator</span>
-                        </div>
-                        <div id="admin-avatar" class="user-avatar">?</div>
-                    </a>
-
-                    <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-                </div>
-            </header>
-
             <!-- Page Header -->
-            <header class="crm-header">
-                <div class="header-left">
-                    <div class="header-titles">
-                        <h1>Kontakter</h1>
-                        <p>Administrer og følg opp kunder, leads og medlemmer på nettstedet.</p>
+            <div id="crm-main-header" class="main-header">
+                <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">group</span>
+                    </div>
+                    <div class="section-header-content">
+                        <div class="section-header-titles">
+                            <h2 class="section-title">Kontakter</h2>
+                            <p class="section-subtitle">Administrer og følg opp kunder, leads og medlemmer på
+                                nettstedet.</p>
+                        </div>
+
+                        <div class="section-header-actions">
+                            <button id="global-search-opener" class="notification-btn" aria-label="Søk"
+                                title="Søk på siden">
+                                <span class="material-symbols-outlined">search</span>
+                            </button>
+                            <button class="notification-btn">
+                                <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            </button>
+
+                            <a href="#" class="user-profile-link" id="admin-profile-trigger">
+                                <div class="user-info-text">
+                                    <span id="admin-name" class="user-name">Laster...</span>
+                                    <span class="user-role">Administrator</span>
+                                </div>
+                                <div id="admin-avatar" class="user-avatar">?</div>
+                            </a>
+
+                            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                                <span class="material-symbols-outlined">menu</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="header-actions">
-                    <a href="admin-segmenter.html" class="btn btn-secondary">Administrer segmenter</a>
-                    <button class="btn btn-primary" id="add-contact-btn">
-                        Opprett ny
-                    </button>
-                </div>
-            </header>
+            <!-- Content Hero Banner -->
+            <div class="section-content" style="padding: 0;">
+                <div class="section-header design-ui-header">
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">group</span>
+                    </div>
+                    <div class="section-header-content">
+                        <div class="section-header-titles">
+                            <h2 class="section-title">Kontakter</h2>
+                            <p class="section-subtitle">Administrer og følg opp kunder, leads og medlemmer på
+                                nettstedet.</p>
+                        </div>
 
-            <div class="content-header">
-                <div class="tabs-container">
-
-
-                    <div class="header-search">
-                        <span class="material-symbols-outlined">search</span>
-                        <input type="text" id="contact-search" placeholder="Søk i kontakter..." aria-label="Søk">
+                        <div class="section-header-actions">
+                            <a href="admin-segmenter.html" class="btn btn-secondary">Administrer segmenter</a>
+                            <button class="btn btn-primary" id="add-contact-btn">Opprett ny</button>
+                        </div>
                     </div>
                 </div>
-
-
             </div>
 
             <div class="crm-content">
@@ -265,14 +278,14 @@
                                 <option>Nye kontakter</option>
                                 <option>Givere</option>
                             </select>
-                            <button class="btn-text">Administrer visning</button>
+                            <button class="btn-text" id="manage-view-btn" type="button">Administrer visning</button>
                         </div>
                         <div class="header-right-actions" id="contacts-tools">
                             <div class="search-box">
                                 <span class="material-symbols-outlined">search</span>
                                 <input type="text" id="contact-search" placeholder="Søk...">
                             </div>
-                            <button class="btn btn-outline">
+                            <button class="btn btn-outline" id="filter-contacts-btn" type="button">
                                 <span class="material-symbols-outlined">filter_list</span>
                                 Filtrer
                             </button>
@@ -298,8 +311,7 @@
                                 <!-- Dynamic rows -->
                                 <tr>
                                     <td colspan="8" style="text-align: center; padding: 40px;">
-                                        <div class="loader"></div>
-                                        <p>Laster kontakter...</p>
+                                        <div class="loader" role="status" aria-label="Laster kontakter"></div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -330,6 +342,7 @@
     </nav>
 
     <!-- Modals -->
+    <input type="file" id="contacts-import-file" accept=".csv,text/csv" style="display:none;">
     <div id="contact-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -383,6 +396,27 @@
             </form>
         </div>
     </div>
+
+    <div id="crm-tool-modal" class="modal" aria-hidden="true">
+        <div class="modal-content crm-tool-modal-content" role="dialog" aria-modal="true"
+            aria-labelledby="crm-tool-modal-title">
+            <div class="modal-header">
+                <div>
+                    <h2 id="crm-tool-modal-title">Verktøy</h2>
+                    <p id="crm-tool-modal-subtitle" class="crm-tool-modal-subtitle"></p>
+                </div>
+                <button class="close-modal" type="button" data-crm-tool-close aria-label="Lukk dialog">&times;</button>
+            </div>
+            <div class="crm-tool-modal-body">
+                <div id="crm-tool-modal-content"></div>
+            </div>
+            <div class="modal-footer crm-tool-modal-footer">
+                <button type="button" class="btn btn-secondary" data-crm-tool-close>Avbryt</button>
+                <button type="button" class="btn btn-primary" id="crm-tool-modal-confirm">Bruk valg</button>
+            </div>
+        </div>
+    </div>
+
     <!-- FAB Menu -->
     <div class="fab-menu-container">
         <div class="fab-menu" id="fab-menu">
@@ -441,7 +475,8 @@
         });
     </script>
 
-    <script defer src="js/crm.js"></script>
+    <script src="../js/admin-utils.js"></script>
+    <script defer src="js/crm.js?v=crm_actions_v3"></script>
 </body>
 
 </html>
