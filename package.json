@@ -6,7 +6,7 @@
     "scripts": {
         "dev": "npm run watch:css & npm run dev:vite",
         "dev:vite": "vite",
-        "build": "npm run build:css && vite build",
+        "build": "npm run build:css && vite build && cp -r js dist/ && cp -r css dist/ && cp -r img dist/ && cp script.js dist/ && cp media.js dist/ && cp firebase-messaging-sw.js dist/",
         "build:css": "tailwindcss -i ./input.css -o ./styles.css --minify",
         "watch:css": "tailwindcss -i ./input.css -o ./styles.css --watch",
         "preview": "vite preview",
