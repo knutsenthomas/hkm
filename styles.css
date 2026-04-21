@@ -187,3 +187,8 @@ body:not(.page-index) .header:not(.scrolled) .header-search-btn {
 .header.menu-open .lang-btn span {
     color: #0f172a !important;
 }
+
+/* Final Z-index Fix */
+.mega-menu {
+    z-index: 19000 !important;
+}
