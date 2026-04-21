@@ -28,6 +28,16 @@ class HKMNotifications {
         const safeMessage = String(message ?? '').trim();
         if (!safeMessage) return;
 
+        // Global Suppression for expected local environment connectivity warnings
+        const isLocal = window.location.protocol === 'file:' || 
+                       window.location.hostname === 'localhost' || 
+                       window.location.hostname === '127.0.0.1';
+        
+        if (isLocal && safeMessage.includes('Kunne ikke laste arrangementer')) {
+            console.info('[HKMNotifications] Suppressing event loading warning in local environment.');
+            return;
+        }
+
         const toastKey = `${safeType}:${safeMessage}`;
         const now = Date.now();
         const activeToast = this.activeToastsByKey.get(toastKey);
