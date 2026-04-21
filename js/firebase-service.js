@@ -384,6 +384,7 @@ class FirebaseService {
         }
     }
 
+    _notifyContentFetchFailure(pageId, error) {
         const isLocalFile = window.location.protocol === 'file:';
         if (isLocalFile && !this._isAdminLikeRoute()) {
             console.info(`[FirebaseService] Silencing notification for ${pageId} fetch failure (local file protocol).`);
