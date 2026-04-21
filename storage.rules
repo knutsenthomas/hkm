@@ -1,0 +1,77 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDocPath() {
+      return /databases/(default)/documents/users/$(request.auth.uid);
+    }
+
+    function hasUserDoc() {
+      return isSignedIn() && firestore.exists(userDocPath());
+    }
+
+    function currentUserRole() {
+      return hasUserDoc()
+        ? firestore.get(userDocPath()).data.role
+        : null;
+    }
+
+    function isPrivilegedUser() {
+      return isSignedIn()
+        && (
+          currentUserRole() == 'editor'
+          || currentUserRole() == 'admin'
+          || currentUserRole() == 'superadmin'
+        );
+    }
+
+    function isOwnProfile(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isImageUpload() {
+      return request.resource != null
+        && request.resource.size < 10 * 1024 * 1024
+        && request.resource.contentType != null
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    match /profiles/{userId}/{allPaths=**} {
+      allow read: if isOwnProfile(userId) || isPrivilegedUser();
+      allow write: if isImageUpload() && (isOwnProfile(userId) || isPrivilegedUser());
+    }
+
+    match /editor/{allPaths=**} {
+      allow read: if true;
+      allow write: if isImageUpload() && isPrivilegedUser();
+    }
+
+    match /covers/{allPaths=**} {
+      allow read: if true;
+      allow write: if isImageUpload() && isPrivilegedUser();
+    }
+
+    match /hero/{allPaths=**} {
+      allow read: if true;
+      allow write: if isImageUpload() && isPrivilegedUser();
+    }
+
+    match /seo/{allPaths=**} {
+      allow read: if true;
+      allow write: if isImageUpload() && isPrivilegedUser();
+    }
+
+    match /newsletter/images/{allPaths=**} {
+      allow read: if true;
+      allow write: if isImageUpload() && isPrivilegedUser();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

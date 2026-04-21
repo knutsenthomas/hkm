@@ -29,6 +29,20 @@
   <link rel="stylesheet" crossorigin href="/assets/admin-header-D7baUKhW.css">
   <link rel="stylesheet" crossorigin href="/assets/crm-huDzbrTJ.css">
   <link rel="stylesheet" crossorigin href="/assets/admin-unified-B6xqicA-.css">
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
 </head>
 
 <body class="crm-body">
