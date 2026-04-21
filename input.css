@@ -1297,10 +1297,21 @@ body:not(.page-index) .header:not(.scrolled) .header-search-btn {
     /* Prevent wrapping */
 }
 
+.header.scrolled,
+.header.menu-open {
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(10px);
+}
+
 .header.scrolled .logo,
 .header.scrolled .nav-link,
 .header.scrolled .lang-btn,
-.header.scrolled .header-search-btn {
+.header.scrolled .header-search-btn,
+.header.menu-open .logo,
+.header.menu-open .nav-link,
+.header.menu-open .lang-btn,
+.header.menu-open .header-search-btn {
     color: var(--text-dark) !important;
 }
 

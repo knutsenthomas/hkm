@@ -170,3 +170,20 @@ body:not(.page-index) .header:not(.scrolled) .header-search-btn {
 .header.scrolled .lang-btn span {
     color: #0f172a !important;
 }
+
+/* Header visibility when menu is open */
+.header.menu-open {
+    background: white !important;
+}
+
+.header.menu-open .logo,
+.header.menu-open .nav-link,
+.header.menu-open .lang-btn,
+.header.menu-open .header-search-btn {
+    color: #0f172a !important;
+}
+
+.header.menu-open .logo span,
+.header.menu-open .lang-btn span {
+    color: #0f172a !important;
+}
