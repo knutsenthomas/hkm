@@ -238,10 +238,9 @@ class FirebaseService {
         const response = responseRes.value;
         if (!response) return undefined;
 
-        if (response.status === 404) {
-            return null;
-        }
-
+        if (!response.ok) {
+            if (response.status === 404) return null;
+            const errorText = await response.text().catch(() => '');
             throw new Error(`REST fetch failed for ${safeCollectionId}/${safeDocId}: ${response.status}${errorText ? ` ${errorText}` : ''}`);
         }
 
