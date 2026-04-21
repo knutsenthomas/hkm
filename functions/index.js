@@ -600,7 +600,7 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
   });
 });
 
-exports.wixProducts = onRequest({ invoker: "public" }, (req, res) => {
+exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) => {
   return cors(req, res, async () => {
     if (req.method === "OPTIONS") {
       return res.status(204).send("");
