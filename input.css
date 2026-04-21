@@ -1185,15 +1185,32 @@ section {
     transform: translateZ(0);
 }
 
-/* Secondary pages header fallback (solid if not on index with hero) */
-body:not(.page-index) .header:not(.scrolled) {
+/* Header visibility system based on page background */
+
+/* 1. Pages that start DARK (index, butikk, media) - Header is transparent with white text by default */
+.header-dark-start .header:not(.scrolled):not(.menu-open) {
+    background: transparent;
+}
+
+.header-dark-start .header:not(.scrolled):not(.menu-open) .logo,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .logo span,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .nav-link,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .lang-btn,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .header-search-btn {
+    color: white !important;
+}
+
+/* 2. Pages that start LIGHT (om-oss, kontakt, etc) - Header is white with dark text by default */
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) {
     background: white;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-body:not(.page-index) .header:not(.scrolled) .nav-link,
-body:not(.page-index) .header:not(.scrolled) .logo,
-body:not(.page-index) .header:not(.scrolled) .header-search-btn {
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .logo,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .logo span,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .nav-link,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .lang-btn,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-search-btn {
     color: var(--text-dark) !important;
 }
 

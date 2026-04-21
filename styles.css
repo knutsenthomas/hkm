@@ -192,3 +192,29 @@ body:not(.page-index) .header:not(.scrolled) .header-search-btn {
 .mega-menu {
     z-index: 19000 !important;
 }
+
+/* Header Coloring System (Refined) */
+.header-dark-start .header:not(.scrolled):not(.menu-open) {
+    background: transparent !important;
+}
+
+.header-dark-start .header:not(.scrolled):not(.menu-open) .logo,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .logo span,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .nav-link,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .lang-btn,
+.header-dark-start .header:not(.scrolled):not(.menu-open) .header-search-btn {
+    color: white !important;
+}
+
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) {
+    background: white !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+}
+
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .logo,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .logo span,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .nav-link,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .lang-btn,
+body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-search-btn {
+    color: #0f172a !important;
+}

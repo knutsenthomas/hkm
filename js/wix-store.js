@@ -327,7 +327,7 @@ function renderHeroFallback(reason = 'ERROR') {
                            class="w-full md:w-auto px-8 py-4 rounded-full bg-primary text-white font-black hover:brightness-110 transition-all shadow-xl">
                             ${escapeHtml(externalCta)}
                         </a>
-                        <button type="button" onclick="window.location.reload()"
+                        <button type="button" onclick="sessionStorage.removeItem('hkm_store_catalog_cache'); window.location.reload();"
                                 class="w-full md:w-auto px-8 py-4 rounded-full border border-white/20 bg-white/10 text-white font-bold hover:bg-white/15 transition-all">
                             ${escapeHtml(retryCta)}
                         </button>
@@ -718,6 +718,7 @@ async function loadProducts() {
 
         for (const baseUrl of uniqueBaseUrls) {
             try {
+                console.log(`[HKM SHOP] Attempting fetch from: ${baseUrl}`);
                 data = await fetchAllProductsFromEndpoint(baseUrl, {
                     onBatch: ({ items, total, isFirst }) => {
                         // Keep our global allProducts in sync with latest items
@@ -747,10 +748,11 @@ async function loadProducts() {
                         }
                     }
                 });
+                console.log(`[HKM SHOP] Successfully loaded products from: ${baseUrl}`);
                 break;
             } catch (err) {
                 lastError = err;
-                console.warn('[HKM SHOP] Proxy request failed:', baseUrl, err);
+                console.error(`[HKM SHOP] Request failed for ${baseUrl}:`, err);
             }
         }
 
