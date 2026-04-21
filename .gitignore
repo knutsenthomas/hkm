@@ -22,3 +22,5 @@ material-symbols-outlined>group<
 *.py
 test-reply*.txt
 build_*.txt
+
+dist/
