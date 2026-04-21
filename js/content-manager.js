@@ -919,8 +919,9 @@ class ContentManager {
             return finalEvents;
 
         } catch (err) {
+            const isLocalFile = window.location.protocol === 'file:';
             this.reportError('loadEvents', err, {
-                notifyUser: true,
+                notifyUser: !isLocalFile, // Only notify if NOT a local file
                 userMessage: 'Kunne ikke laste arrangementer akkurat nå.'
             });
             return [];
@@ -1638,7 +1639,8 @@ class ContentManager {
         }
 
         if (lastError) {
-            console.warn('[ContentManager] Could not load live Facebook feed. Falling back to configured cards.', lastError);
+            console.warn('[ContentManager] Could not load live Facebook feed. Hiding section.', lastError);
+            section.style.display = 'none'; // Hide if live feed fails and we have no fallback content
         }
     }
 

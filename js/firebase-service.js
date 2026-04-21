@@ -242,15 +242,10 @@ class FirebaseService {
             return null;
         }
 
-        if (!response.ok) {
-            let errorText = '';
-            try {
-                errorText = await response.text();
-            } catch (e) {
-                errorText = '';
-            }
             throw new Error(`REST fetch failed for ${safeCollectionId}/${safeDocId}: ${response.status}${errorText ? ` ${errorText}` : ''}`);
         }
+
+        if (response.status === 204) return null; // No content
 
         const payload = await response.json();
         if (!payload || typeof payload !== 'object') return null;
@@ -389,11 +384,11 @@ class FirebaseService {
         }
     }
 
-    _notifyContentFetchFailure(pageId, error) {
-        const now = Date.now();
-        const lastAt = this._fetchErrorNoticeTimestamps.get(pageId) || 0;
-        if (now - lastAt < 15000) return;
-        this._fetchErrorNoticeTimestamps.set(pageId, now);
+        const isLocalFile = window.location.protocol === 'file:';
+        if (isLocalFile && !this._isAdminLikeRoute()) {
+            console.info(`[FirebaseService] Silencing notification for ${pageId} fetch failure (local file protocol).`);
+            return;
+        }
 
         const detail = {
             pageId,
