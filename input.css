@@ -1910,6 +1910,17 @@ body.hero-animate .slide-buttons {
     color: var(--primary-orange);
 }
 
+/* Keep travel CTA legible on hover when the button background turns orange */
+.feature-box.travel .feature-link:hover,
+.feature-box.travel .feature-link:focus-visible {
+    color: #fff !important;
+}
+
+.feature-box.travel .feature-link:hover i,
+.feature-box.travel .feature-link:focus-visible i {
+    color: #fff !important;
+}
+
 /* About Section */
 .about-grid {
     display: grid;
