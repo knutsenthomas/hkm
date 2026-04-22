@@ -5157,6 +5157,17 @@ ol.block-list {
     text-decoration: none;
 }
 
+/* Temporarily disable all tax-deduction UI until approval is granted */
+[data-content-key="menu.footer.taxDeduction"],
+a[href*="#skattefradrag"],
+a[href*="#tax-deduction"],
+a[href*="#deduccion-fiscal"],
+#skattefradrag,
+#tax-deduction,
+#deduccion-fiscal {
+    display: none !important;
+}
+
 /* Mobile Adjustments */
 @media (max-width: 768px) {
     .header .container-fluid {

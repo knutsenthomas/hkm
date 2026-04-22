@@ -478,7 +478,7 @@ class MinSideManager {
                 <div class="ms-overview-actions-grid">
                     ${[
                 { view: 'profile', icon: 'person', label: 'Min profil', sub: 'Kontakt & personlig info' },
-                { view: 'giving', icon: 'volunteer_activism', label: 'Gaver', sub: 'Gavehistorikk & skattefradrag' },
+                { view: 'giving', icon: 'volunteer_activism', label: 'Gaver', sub: 'Gavehistorikk' },
                 { view: 'courses', icon: 'school', label: 'Kurs', sub: 'Undervisning fra HKM' },
                 { view: 'notifications', icon: 'notifications', label: 'Varslinger', sub: 'Meldinger fra HKM' },
             ].map(a => `
@@ -740,10 +740,6 @@ class MinSideManager {
                             <label>Fødselsdato</label>
                             <input type="date" name="birthday" value="${p.birthday || ''}">
                         </div>
-                        <div class="form-group">
-                            <label>Personnummer (kryptert)</label>
-                            <input type="password" name="ssn" placeholder="Bare for skattefradrag" value="${p.ssn || ''}">
-                        </div>
                         <div class="edit-form-actions">
                             <button class="btn btn-ghost btn-sm" id="cancel-personal-edit">Avbryt</button>
                             <button class="btn btn-primary btn-sm" id="save-personal-btn">
@@ -863,7 +859,7 @@ class MinSideManager {
             personalForm?.classList.add('is-hidden');
         });
         document.getElementById('save-personal-btn')?.addEventListener('click', async () => {
-            await this._saveProfileFields(personalForm, ['gender', 'maritalStatus', 'birthday', 'ssn']);
+            await this._saveProfileFields(personalForm, ['gender', 'maritalStatus', 'birthday']);
             this.loadView('profile');
         });
 
@@ -1165,22 +1161,6 @@ class MinSideManager {
                 `}
             </div>
 
-            ${yearTotal >= 500 ? `
-            <div class="info-card ms-info-card-top-gap">
-                <div class="info-card-header">
-                    <h3>Skattefradrag</h3>
-                </div>
-                <div class="info-row">
-                    <span class="material-symbols-outlined info-row-icon">receipt_long</span>
-                    <div class="info-row-content">
-                        <div class="info-row-label">Fradragsberettiget ${currentYear}</div>
-                        <span class="info-row-value">kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</span>
-                    </div>
-                </div>
-                <div class="ms-muted-note-pad">
-                    Gaver over kr 500 er skattefradragsberettiget. Kontakt HKM for bekreftelse.
-                </div>
-            </div>` : ''}
         </div>`;
     }
 
