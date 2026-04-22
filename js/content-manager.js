@@ -1581,7 +1581,7 @@ class ContentManager {
         if (pageUrl) params.set('pageUrl', pageUrl);
         const projectId = (window.firebaseConfig && window.firebaseConfig.projectId) || 'his-kingdom-ministry';
         const urls = [`/api/facebook-feed?${params.toString()}`];
-        const cloudFunctionUrl = `https://us-central1-${projectId}.cloudfunctions.net/facebookFeed?${params.toString()}`;
+        const cloudFunctionUrl = `https://us-central1-his-kingdom-ministry.cloudfunctions.net/facebookFeed?${params.toString()}`;
 
         if (!urls.includes(cloudFunctionUrl)) {
             urls.push(cloudFunctionUrl);

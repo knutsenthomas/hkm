@@ -345,10 +345,16 @@
                                 await service.loginWithGoogle();
                                 await routeByRole();
                             } catch (err) {
-                                console.error("[HKM] Google login error:", err);
-                                if (typeof showToast === 'function') {
-                                    showToast('Kunne ikke logge inn med Google. Prøv igjen.', 'error', 5000);
-                                }
+                                 console.error("[HKM] Google login error:", err);
+                                 if (typeof showToast === 'function') {
+                                     let msg = 'Kunne ikke logge inn med Google. Prøv igjen.';
+                                     if (err.code === 'auth/unauthorized-domain') {
+                                         msg = 'Denne domenen (vercel.app) er ikke lagt til i "Authorized Domains" i Firebase Console. Kontakt administrator.';
+                                     } else if (err.code === 'auth/popup-closed-by-user') {
+                                         msg = 'Innloggingsvinduet ble lukket før fullføring.';
+                                     }
+                                     showToast(msg, 'error', 7000);
+                                 }
                             }
                         };
 

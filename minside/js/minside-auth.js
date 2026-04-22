@@ -146,7 +146,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             await routeByRole();
         } catch (error) {
             console.error(error);
-            showMessage(getErrorMessage(error), 'error');
+            let msg = getErrorMessage(error);
+            if (error.code === 'auth/unauthorized-domain') {
+                msg = 'Domenet "' + window.location.hostname + '" er ikke godkjent i Firebase (Authorized Domains). Legg det til i Firebase Console.';
+            }
+            showMessage(msg, 'error');
         }
     });
 

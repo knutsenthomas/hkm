@@ -936,17 +936,20 @@ function initPodcastStats() {
     const podcastEl = document.getElementById('podcast-episode-count');
     if (!podcastEl) return;
 
-    const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
-    const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+    // Using custom proxy that doesn't limit to 10 items like rss2json free version does
+    const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
 
     fetch(proxyUrl)
         .then(response => response.json())
         .then(data => {
-            const items = data?.items;
+            const channel = Array.isArray(data?.rss?.channel) ? data.rss.channel[0] : data?.rss?.channel;
+            const items = channel?.item;
             if (!items) return;
 
             const count = Array.isArray(items) ? items.length : 1;
             podcastEl.setAttribute('data-target', String(count));
+            
+            // If already animated or showing 0/NaN, update text immediately
             if (podcastEl.dataset.animated === 'true' || podcastEl.textContent === 'NaN' || podcastEl.textContent === '0') {
                 podcastEl.textContent = count;
             }

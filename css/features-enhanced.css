@@ -1,0 +1,124 @@
+/* --- Refined Feature Boxes with Simple Icons --- */
+
+.features {
+    padding: 100px 0;
+    background-color: #fcfcfc;
+}
+
+.feature-box {
+    position: relative;
+    padding: 50px 35px;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 20px;
+    text-align: center;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1) !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 400px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+}
+
+/* Media/Icon Container - Refined to look like a soft tile */
+.feature-media {
+    margin-bottom: 35px;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border-radius: 24px;
+    border: 1px solid rgba(0, 0, 0, 0.02);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+    transition: all 0.4s ease;
+}
+
+/* Icon Styling */
+.feature-media i {
+    font-size: 42px;
+    transition: transform 0.4s ease;
+}
+
+/* Accent Colors for Icons */
+.feature-box.teaching .feature-media i { color: #1B4965; }
+.feature-box.podcast .feature-media i { color: #d17d39; }
+.feature-box.travel .feature-media i { color: #21543d; }
+
+/* Typography */
+.feature-title {
+    font-size: 1.6rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 15px;
+    letter-spacing: -0.02em;
+}
+
+.feature-text {
+    font-size: 1.05rem;
+    line-height: 1.7;
+    color: #666666;
+    max-width: 260px;
+}
+
+/* Hover States */
+.feature-box:hover {
+    transform: translateY(-8px) !important;
+    box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.08) !important;
+    border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* Subtle Tint on Hover */
+.feature-box.teaching:hover { background-color: rgba(27, 73, 101, 0.02); }
+.feature-box.podcast:hover { background-color: rgba(209, 125, 57, 0.02); }
+.feature-box.travel:hover { background-color: rgba(33, 84, 61, 0.02); }
+
+.feature-box:hover .feature-media {
+    transform: scale(1.05);
+    background: #ffffff;
+    box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1);
+    border-color: rgba(0, 0, 0, 0.05);
+}
+
+.feature-box:hover .feature-media i {
+    transform: scale(1.1);
+}
+
+.feature-link {
+    margin-top: auto;
+    padding-top: 30px;
+    font-weight: 600;
+    color: #1B4965;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: gap 0.3s ease;
+}
+
+.feature-link:hover {
+    gap: 12px;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 768px) {
+    .features {
+        padding: 60px 0;
+    }
+    
+    .feature-box {
+        padding: 40px 25px;
+        min-height: auto;
+    }
+    
+    .feature-media {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .feature-media i {
+        font-size: 32px;
+    }
+}

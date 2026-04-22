@@ -1172,7 +1172,7 @@ class AdminManager {
                         payload.selectedUserIds = selectedUserIds;
                     }
 
-                    const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendBulkEmail', {
+                    const response = await fetch('https://sendbulkemail-42bhgdjkcq-uc.a.run.app', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                         body: JSON.stringify(payload)
@@ -1279,7 +1279,7 @@ class AdminManager {
 
                     // 2. Attempt Cloud Function push (FCM)
                     try {
-                        const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendPushNotification', {
+                        const response = await fetch('https://sendpushnotification-42bhgdjkcq-uc.a.run.app', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                             body: JSON.stringify(payload)
@@ -7985,7 +7985,7 @@ class AdminManager {
 
         const projectId = (window.firebaseConfig && window.firebaseConfig.projectId) || 'his-kingdom-ministry';
         const urls = [`/api/facebook-feed?${params.toString()}`];
-        const cloudFunctionUrl = `https://us-central1-${projectId}.cloudfunctions.net/facebookFeed?${params.toString()}`;
+        const cloudFunctionUrl = `https://us-central1-his-kingdom-ministry.cloudfunctions.net/facebookFeed?${params.toString()}`;
 
         if (!urls.includes(cloudFunctionUrl)) {
             urls.push(cloudFunctionUrl);

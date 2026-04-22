@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Seed Wix Products to Firestore</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script type="module" src="js/firebase-config.js"></script>
+    <style>
+        body { font-family: sans-serif; padding: 40px; background: #f4f4f5; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 600px; margin: 0 auto; }
+        button { background: #1B4965; color: white; border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        #log { margin-top: 20px; font-family: monospace; white-space: pre-wrap; background: #1e293b; color: #38bdf8; padding: 15px; border-radius: 6px; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <h1>Oppdater Butikk (Wix) Manuelt</h1>
+        <p>Du trenger IKKE å logge inn for å gjøre dette lenger.</p>
+        <button id="runBtn">🚀 Last opp produkter til database</button>
+        <div id="log">Venter på handling...</div>
+    </div>
+    <script type="module">
+        const runBtn = document.getElementById('runBtn');
+        const logEl = document.getElementById('log');
+
+        function log(msg) {
+            console.log(msg);
+            logEl.innerHTML += `\n${msg}`;
+        }
+
+        runBtn.addEventListener('click', async () => {
+            runBtn.disabled = true;
+            log('Starter opplasting...');
+
+            try {
+                // Wait for Firebase scripts to load and Config to be ready
+                let waitCount = 0;
+                while ((!window.firebase || !window.firebaseConfig) && waitCount < 40) {
+                    await new Promise(r => setTimeout(r, 100));
+                    waitCount++;
+                }
+
+                if (!window.firebase || !window.firebaseConfig) {
+                    throw new Error('Firebase eller konfigurasjon mangler.');
+                }
+
+                // Initialize Firebase if not already initialized
+                if (window.firebase.apps.length === 0) {
+                    window.firebase.initializeApp(window.firebaseConfig);
+                    log('Firebase initialisert!');
+                }
+                
+                const db = window.firebase.firestore();
+                
+                // Fetch the JSON file created by our node script
+                const response = await fetch('wix_products.json');
+                if (!response.ok) throw new Error('Fant ikke wix_products.json lokalt.');
+                const wixData = await response.json();
+
+                log(`Laster opp ${wixData.count} produkter til Firestore (content/wix_products)...`);
+                
+                await db.collection('content').doc('wix_products').set(wixData);
+                
+                log('✅ Suksess! Produktene ligger nå i databasen.');
+                log('Du kan nå gå tilbake til Butikk-siden, og alt skal fungere umiddelbart.');
+            } catch (error) {
+                log(`❌ Feil: ${error.message}`);
+                console.error(error);
+            } finally {
+                runBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

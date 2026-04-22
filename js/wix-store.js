@@ -278,8 +278,8 @@ function createSliderSlide(product) {
                     <h2 class="text-3xl md:text-4xl lg:text-5xl font-black leading-tight tracking-tighter drop-shadow-2xl">
                         ${escapeHtml(product.name)}
                     </h2>
-                    <p class="text-base md:text-xl text-slate-200 leading-relaxed max-w-lg drop-shadow-md">
-                        ${escapeHtml(sliderDescription)}
+                    <p class="text-base md:text-xl text-slate-200 leading-relaxed max-w-lg drop-shadow-md line-clamp-3">
+                        ${escapeHtml(product.description || sliderDescription)}
                     </p>
                     <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-4 md:pt-6">
                         <a href="${escapeHtml(product.productUrl)}" target="_blank" 

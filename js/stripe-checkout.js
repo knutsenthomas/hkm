@@ -11,7 +11,7 @@ async function initializeStripe(amount, customerDetails = {}) {
 
     try {
         // Call your backend to create the PaymentIntent
-        const response = await fetch("https://us-central1-his-kingdom-ministry.cloudfunctions.net/createPaymentIntent", {
+        const response = await fetch("https://createpaymentintent-42bhgdjkcq-uc.a.run.app", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({

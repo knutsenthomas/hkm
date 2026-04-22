@@ -6,7 +6,7 @@
 (function () {
     const PREFETCH_KEY = 'hkm_store_catalog_cache';
     const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes cache duration
-    const PROXY_BASE_URL = 'https://us-central1-his-kingdom-ministry.cloudfunctions.net/wixProducts';
+    const PROXY_BASE_URL = 'https://wixproducts-42bhgdjkcq-uc.a.run.app';
     const MAX_PREFETCH_ITEMS = 5000;
     const BATCH_SIZE = 100;
 

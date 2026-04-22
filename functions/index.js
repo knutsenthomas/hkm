@@ -1,6 +1,7 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 const admin = require("firebase-admin");
@@ -647,15 +648,6 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
   return cacheData;
 }
 
-exports.syncWixProductsScheduled = onSchedule("0 */5 * * *", async (event) => {
-  console.log("Starting scheduled Wix products sync...");
-  try {
-    await fetchAndCacheWixProducts();
-    console.log("Wix products successfully cached.");
-  } catch (error) {
-    console.error("Failed to sync Wix products on schedule:", error);
-  }
-});
 
 exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) => {
   return cors(req, res, async () => {
@@ -704,6 +696,20 @@ exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) =>
       });
     }
   });
+});
+
+/**
+ * Automatisert synkronisering av Wix-produkter.
+ * Kjører hver 5. time for å holde butikken oppdatert.
+ */
+exports.scheduledWixSync = onSchedule("0 */5 * * *", async (event) => {
+  console.log("Starting scheduled Wix product synchronization...");
+  try {
+    const cacheData = await fetchAndCacheWixProducts({ query: {} });
+    console.log(`Successfully synced ${cacheData.count} products via scheduler.`);
+  } catch (error) {
+    console.error("Scheduled Wix sync failed:", error);
+  }
 });
 
 /**
