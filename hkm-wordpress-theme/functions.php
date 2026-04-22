@@ -80,6 +80,7 @@ function hkm_theme_scripts()
 
     // Main App Script
     wp_enqueue_script('hkm-script', get_template_directory_uri() . '/js/script.js', array('jquery'), '1.0.0', true); // Copied script.js to js/ folder for consistency or root
+    wp_enqueue_script('hkm-i18n', get_template_directory_uri() . '/js/i18n.js', array(), '1.0.1', true);
 
     // There was a root script.js in the source. I should make sure I copied it or check where it is.
     // The previous run_command copied 'js' folder. The 'script.js' was in the root. 
