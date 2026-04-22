@@ -1,7 +1,7 @@
 // ===================================
 // Public Content Manager (Global version)
 // ===================================
-const firebaseService = window.firebaseService;
+
 
 class ContentManager {
     constructor() {
@@ -393,7 +393,7 @@ class ContentManager {
         }
 
         if (this.pageId === 'arrangementer') {
-            const settings = await firebaseService.getPageContent('settings_integrations') || {};
+            const settings = await window.firebaseService.getPageContent('settings_integrations') || {};
             const events = await this.loadEvents();
 
             // 1. Month View
@@ -418,7 +418,7 @@ class ContentManager {
         }
 
         if (this.pageId === 'kalender') {
-            const settings = await firebaseService.getPageContent('settings_integrations') || {};
+            const settings = await window.firebaseService.getPageContent('settings_integrations') || {};
             if (settings.showMonthView !== false) {
                 const events = await this.loadEvents();
                 this.setupCalendarNavigation();
@@ -445,7 +445,7 @@ class ContentManager {
         if (this.pageId === 'blogg') {
             console.log("[ContentManager] Loading content for 'blogg' page...");
             try {
-                const blogData = await firebaseService.getPageContent('collection_blog');
+                const blogData = await window.firebaseService.getPageContent('collection_blog');
                 console.log("[ContentManager] Blog data received:", blogData);
 
                 const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
@@ -556,8 +556,8 @@ class ContentManager {
             return;
         }
 
-        const blogData = await firebaseService.getPageContent('collection_blog');
-        const teachingData = await firebaseService.getPageContent('collection_teaching');
+        const blogData = await window.firebaseService.getPageContent('collection_blog');
+        const teachingData = await window.firebaseService.getPageContent('collection_teaching');
         const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
         const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
         const blogItem = blogItems.find(i => i.title === itemId || i.id === itemId);
@@ -816,7 +816,7 @@ class ContentManager {
             let finalEvents = [];
 
             // 2. Prefer direct GCal fetch when configured
-            const integrations = await firebaseService.getPageContent('settings_integrations');
+            const integrations = await window.firebaseService.getPageContent('settings_integrations');
             const gcal = integrations?.googleCalendar || {};
             const apiKey = gcal.apiKey || '';
             const calendarListRaw = Array.isArray(integrations?.googleCalendars)
@@ -850,7 +850,7 @@ class ContentManager {
             }
 
             // 3. Fetch Firestore events (always, to allow overrides or manual events)
-            const eventData = await firebaseService.getPageContent('collection_events');
+            const eventData = await window.firebaseService.getPageContent('collection_events');
             const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
             const taggedFirebase = firebaseItems.map(event => ({
                 ...event,
@@ -2574,7 +2574,7 @@ class ContentManager {
 
         // 3. Background Sync for specific event (Google Calendar direct)
         // This ensures the page is always up to date even if cache is stale or event range is outside standard load
-        const integrations = await firebaseService.getPageContent('settings_integrations');
+        const integrations = await window.firebaseService.getPageContent('settings_integrations');
         const gcal = integrations?.googleCalendar || {};
         const apiKey = gcal.apiKey;
         if (apiKey) {
@@ -2588,7 +2588,7 @@ class ContentManager {
                     const freshEvent = await this.fetchSingleGoogleCalendarEvent(apiKey, calendar.id, eventKey);
                     if (freshEvent) {
                         // Load Firestore items to ensure overrides (images and text from dashboard) are applied
-                        const eventData = await firebaseService.getPageContent('collection_events');
+                        const eventData = await window.firebaseService.getPageContent('collection_events');
                         const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
                         event = this._mergeEventWithFirestore(freshEvent, firebaseItems);
                         this.populateEventDetailsDOM(event);
