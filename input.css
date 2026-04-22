@@ -3263,15 +3263,15 @@ body {
 }
 
 .page-hero .btn-outline {
-    background: white;
-    color: var(--primary-orange);
-    border-color: white;
+    background: white !important;
+    color: var(--primary-orange) !important;
+    border-color: white !important;
 }
 
 .page-hero .btn-outline:hover {
-    background: transparent;
-    color: white;
-    border-color: white;
+    background: transparent !important;
+    color: white !important;
+    border-color: white !important;
 }
 
 /* Legal Page Specific Styles */

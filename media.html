@@ -516,9 +516,20 @@
 
                 // Count items by category and update display
                 for (const [key, meta] of Object.entries(categories)) {
-                    const count = teachingData.items.filter(item =>
-                        item.category && item.category.trim().toLowerCase() === meta.name.trim().toLowerCase()
-                    ).length;
+                    const count = teachingData.items.filter(item => {
+                        const itemCat = String(item.category || item.teachingType || '').trim().toLowerCase();
+                        const targetCat = meta.name.trim().toLowerCase();
+                        
+                        if (!itemCat) return false;
+                        if (itemCat === targetCat) return true;
+                        
+                        if (targetCat.includes('bibelstudie') && itemCat.includes('bibelstudie')) return true;
+                        if (targetCat.includes('seminar') && itemCat.includes('seminar')) return true;
+                        if (targetCat.includes('undervisningsserie') && itemCat.includes('undervisningsserie')) return true;
+                        if (targetCat.includes('kurs') && itemCat.includes('kurs')) return true;
+                        
+                        return false;
+                    }).length;
 
                     const countSpan = document.querySelector(`[data-count="${key}"]`);
                     if (countSpan) {
