@@ -2896,6 +2896,26 @@ body.hero-animate .slide-buttons {
     .footer-nav-grid {
         grid-template-columns: 1fr;
     }
+
+    .footer-brand .logo {
+        gap: 10px;
+        flex-wrap: nowrap;
+    }
+
+    .footer-brand .logo-text {
+        font-size: clamp(1.45rem, 5.3vw, 1.7rem);
+        line-height: 1.1;
+        white-space: nowrap;
+        hyphens: none;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
+
+    .brand-description {
+        hyphens: none;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
 }
 
 .footer-logo {
@@ -5146,6 +5166,21 @@ ol.block-list {
         grid-template-columns: 1fr !important;
         gap: 32px !important;
         margin-top: 20px !important;
+    }
+
+    .menu-footer-links {
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .menu-footer-links a {
+        font-size: 0.82rem;
+        white-space: nowrap;
+        overflow-wrap: normal;
+        word-break: normal;
+        hyphens: none;
+        flex: 0 0 auto;
     }
 
     .mega-menu-header {
