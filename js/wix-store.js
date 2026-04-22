@@ -690,69 +690,87 @@ async function loadProducts() {
     if (els.error) els.error.classList.add('hidden');
 
     try {
-        const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
-        const candidateBaseUrls = [];
-
-        if (isLocalHost) {
-            if (config.localProxyUrl) {
-                candidateBaseUrls.push(config.localProxyUrl);
-            }
-        } else {
-            if (config.remoteProxyUrl) {
-                candidateBaseUrls.push(config.remoteProxyUrl);
-            }
-        }
-
-        // As a fallback, add any other configured URLs.
-        if (config.proxyUrl && !candidateBaseUrls.includes(config.proxyUrl)) {
-            candidateBaseUrls.push(config.proxyUrl);
-        }
-        if (config.remoteProxyUrl && !candidateBaseUrls.includes(config.remoteProxyUrl)) {
-            candidateBaseUrls.push(config.remoteProxyUrl);
-        }
-
-        const uniqueBaseUrls = [...new Set(candidateBaseUrls.filter(Boolean))];
         let data = null;
         let lastError = null;
-        let previewRendered = false;
 
-        for (const baseUrl of uniqueBaseUrls) {
+        // Try Firestore Cache First
+        if (window.firebaseService && window.firebaseService.isInitialized) {
+            console.log('[HKM SHOP] Attempting fetch from Firestore cache (wix_products)...');
             try {
-                console.log(`[HKM SHOP] Attempting fetch from: ${baseUrl}`);
-                data = await fetchAllProductsFromEndpoint(baseUrl, {
-                    onBatch: ({ items, total, isFirst }) => {
-                        // Keep our global allProducts in sync with latest items
-                        allProducts = items;
+                const cachedContent = await window.firebaseService.getPageContent('wix_products');
+                if (cachedContent && cachedContent.items && cachedContent.items.length > 0) {
+                    data = cachedContent;
+                    console.log('[HKM SHOP] Successfully loaded from Firestore cache.');
+                }
+            } catch(e) {
+                console.warn('[HKM SHOP] Firestore cache fetch failed, falling back to proxy...', e);
+            }
+        }
 
-                        if (isFirst && !previewRendered) {
-                            previewRendered = true;
-                            renderHeroSlidesFromProducts(allProducts);
-                            renderFilters();
-                            showProductsGrid();
-                            bindProductUiEvents();
+        // Fallback to HTTP API
+        if (!data) {
+            const isLocalHost = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+            const candidateBaseUrls = [];
+
+            if (isLocalHost) {
+                if (config.localProxyUrl) {
+                    candidateBaseUrls.push(config.localProxyUrl);
+                }
+            } else {
+                if (config.remoteProxyUrl) {
+                    candidateBaseUrls.push(config.remoteProxyUrl);
+                }
+            }
+
+            // As a fallback, add any other configured URLs.
+            if (config.proxyUrl && !candidateBaseUrls.includes(config.proxyUrl)) {
+                candidateBaseUrls.push(config.proxyUrl);
+            }
+            if (config.remoteProxyUrl && !candidateBaseUrls.includes(config.remoteProxyUrl)) {
+                candidateBaseUrls.push(config.remoteProxyUrl);
+            }
+
+            const uniqueBaseUrls = [...new Set(candidateBaseUrls.filter(Boolean))];
+            let previewRendered = false;
+
+            for (const baseUrl of uniqueBaseUrls) {
+                try {
+                    console.log(`[HKM SHOP] Attempting fetch from HTTP proxy: ${baseUrl}`);
+                    data = await fetchAllProductsFromEndpoint(baseUrl, {
+                        onBatch: ({ items, total, isFirst }) => {
+                            // Keep our global allProducts in sync with latest items
+                            allProducts = items;
+
+                            if (isFirst && !previewRendered) {
+                                previewRendered = true;
+                                renderHeroSlidesFromProducts(allProducts);
+                                renderFilters();
+                                showProductsGrid();
+                                bindProductUiEvents();
+                            }
+
+                            // Always render the current list of products to the grid
+                            renderGrid(allProducts);
+
+                            // If still loading more, show a progress message instead of the final count
+                            if (els.count && total && total > items.length) {
+                                const loadingTemplate = getStoreText(
+                                    'ui.loadingProgressTemplate',
+                                    'Laster produkter... ({loaded}/{total})'
+                                );
+                                els.count.textContent = formatStoreTemplate(loadingTemplate, {
+                                    loaded: items.length,
+                                    total: total
+                                });
+                            }
                         }
-
-                        // Always render the current list of products to the grid
-                        renderGrid(allProducts);
-
-                        // If still loading more, show a progress message instead of the final count
-                        if (els.count && total && total > items.length) {
-                            const loadingTemplate = getStoreText(
-                                'ui.loadingProgressTemplate',
-                                'Laster produkter... ({loaded}/{total})'
-                            );
-                            els.count.textContent = formatStoreTemplate(loadingTemplate, {
-                                loaded: items.length,
-                                total: total
-                            });
-                        }
-                    }
-                });
-                console.log(`[HKM SHOP] Successfully loaded products from: ${baseUrl}`);
-                break;
-            } catch (err) {
-                lastError = err;
-                console.error(`[HKM SHOP] Request failed for ${baseUrl}:`, err);
+                    });
+                    console.log(`[HKM SHOP] Successfully loaded products from HTTP proxy: ${baseUrl}`);
+                    break;
+                } catch (err) {
+                    lastError = err;
+                    console.error(`[HKM SHOP] Request failed for ${baseUrl}:`, err);
+                }
             }
         }
 

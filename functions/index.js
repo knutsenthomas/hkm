@@ -1,5 +1,6 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 const admin = require("firebase-admin");
@@ -600,48 +601,99 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
   });
 });
 
+async function fetchAndCacheWixProducts(req = { query: {} }) {
+  const wixClient = getWixClient();
+  let authMode = (process.env.WIX_API_KEY && process.env.WIX_SITE_ID) ? "api-key" : "oauth";
+
+  if (authMode === "oauth" && wixClient.auth && typeof wixClient.auth.generateVisitorTokens === "function") {
+    try {
+      await wixClient.auth.generateVisitorTokens();
+    } catch (authError) {
+      console.warn("Wix visitor token generation failed:", authError && authError.message ? authError.message : authError);
+    }
+  }
+
+  let allItems = [];
+  let skip = 0;
+  const limit = 100;
+  let totalCount = 0;
+
+  while (true) {
+    const result = await wixClient.products.queryProducts()
+      .limit(limit)
+      .skip(skip)
+      .descending("_createdDate")
+      .find();
+
+    const rawItems = Array.isArray(result.items) ? result.items : [];
+    const items = rawItems.map((item) => normalizeWixProduct(item, req)).filter((item) => item.name);
+    allItems.push(...items);
+    totalCount = typeof result.totalCount === "number" ? result.totalCount : allItems.length;
+
+    if (rawItems.length < limit) break;
+    skip += limit;
+  }
+
+  const cacheData = {
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    count: allItems.length,
+    total: totalCount,
+    items: allItems,
+    authMode,
+    source: "wix-sdk-cached"
+  };
+
+  await db.collection("content").doc("wix_products").set(cacheData);
+  return cacheData;
+}
+
+exports.syncWixProductsScheduled = onSchedule("0 */5 * * *", async (event) => {
+  console.log("Starting scheduled Wix products sync...");
+  try {
+    await fetchAndCacheWixProducts();
+    console.log("Wix products successfully cached.");
+  } catch (error) {
+    console.error("Failed to sync Wix products on schedule:", error);
+  }
+});
+
 exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) => {
   return cors(req, res, async () => {
     if (req.method === "OPTIONS") {
       return res.status(204).send("");
     }
 
-    if (req.method !== "GET") {
-      return res.status(405).json({ error: "Method not allowed. Use GET." });
+    if (req.method !== "GET" && req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed. Use GET or POST." });
     }
 
     try {
-      const limit = Math.min(Math.max(Number(req.query.limit) || 100, 1), 100);
-      const skip = Math.max(Number(req.query.offset || req.query.skip) || 0, 0);
-
-      const wixClient = getWixClient();
-      let authMode = (process.env.WIX_API_KEY && process.env.WIX_SITE_ID) ? "api-key" : "oauth";
-
-      if (authMode === "oauth" && wixClient.auth && typeof wixClient.auth.generateVisitorTokens === "function") {
-        try {
-          await wixClient.auth.generateVisitorTokens();
-        } catch (authError) {
-          console.warn("Wix visitor token generation failed:", authError && authError.message ? authError.message : authError);
-        }
+      // Allow manual sync via POST or ?force=true
+      if (req.method === "POST" || req.query.force === "true") {
+        console.log("Manual Wix sync triggered.");
+        const cacheData = await fetchAndCacheWixProducts(req);
+        return res.status(200).json({ ok: true, ...cacheData, manuallySynced: true });
       }
 
-      const result = await wixClient.products.queryProducts()
-        .limit(limit)
-        .skip(skip)
-        .descending("_createdDate")
-        .find();
+      // Serve from cache
+      const doc = await db.collection("content").doc("wix_products").get();
+      if (doc.exists && doc.data().items && doc.data().items.length > 0) {
+        const data = doc.data();
+        return res.status(200).json({
+          ok: true,
+          source: "firestore-cache",
+          count: data.count,
+          total: data.total,
+          items: data.items,
+          updatedAt: data.updatedAt
+        });
+      }
 
-      const rawItems = Array.isArray(result.items) ? result.items : [];
-      const items = rawItems.map((item) => normalizeWixProduct(item, req)).filter((item) => item.name);
+      // If cache doesn't exist, fetch and build it
+      console.log("Cache missing, fetching from Wix...");
+      const cacheData = await fetchAndCacheWixProducts(req);
+      return res.status(200).json({ ok: true, ...cacheData, newlyCached: true });
 
-      return res.status(200).json({
-        ok: true,
-        source: "wix-sdk",
-        authMode,
-        total: typeof result.totalCount === "number" ? result.totalCount : items.length,
-        count: items.length,
-        items,
-      });
     } catch (error) {
       console.error("Error fetching Wix products:", error);
       return res.status(500).json({
@@ -649,7 +701,6 @@ exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) =>
         error: "Could not load products from Wix.",
         details: error && error.message ? error.message : String(error),
         fallbackUrl: "https://www.hiskingdomministry.no/butikk",
-        hint: "Set WIX_CLIENT_ID (OAuth) or preferably WIX_API_KEY + (WIX_SITE_ID or WIX_ACCOUNT_ID) in Firebase Functions env. Some Wix stores need site-scoped auth.",
       });
     }
   });
