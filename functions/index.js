@@ -8,6 +8,7 @@ const { parseStringPromise } = require("xml2js");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const path = require("path");
+const crypto = require("crypto");
 require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
 require("dotenv").config({ path: path.join(__dirname, ".env.local"), override: true, quiet: true });
 const { createClient, OAuthStrategy, ApiKeyStrategy } = require("@wix/sdk");
@@ -19,20 +20,38 @@ const db = admin.firestore();
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
 const stripeSecretKeyParam = defineSecret("STRIPE_SECRET_KEY");
+const vippsClientIdParam = defineSecret("VIPPS_CLIENT_ID");
+const vippsClientSecretParam = defineSecret("VIPPS_CLIENT_SECRET");
+const vippsSubscriptionKeyParam = defineSecret("VIPPS_SUBSCRIPTION_KEY");
+const vippsMsnParam = defineSecret("VIPPS_MSN");
 
-function getStripeSecretKey() {
+function getSecretOrEnv(secretParam, envKeys = []) {
   const candidates = [];
+
   try {
-    candidates.push(stripeSecretKeyParam.value());
+    candidates.push(secretParam.value());
   } catch (error) {
     // Secret may be unavailable in local/emulator contexts.
   }
-  candidates.push(
-      process.env.STRIPE_SECRET_KEY,
-      process.env.STRIPE_KEY,
-      process.env.STRIPE_API_KEY,
-  );
+
+  envKeys.forEach((key) => {
+    if (typeof key === "string" && key) {
+      candidates.push(process.env[key]);
+    }
+  });
+
   return candidates.find((value) => typeof value === "string" && value.trim()) || "";
+}
+
+function getStripeSecretKey() {
+  return getSecretOrEnv(
+      stripeSecretKeyParam,
+      [
+        "STRIPE_SECRET_KEY",
+        "STRIPE_KEY",
+        "STRIPE_API_KEY",
+      ],
+  );
 }
 
 function parseWixApiKeyMetadata(apiKey) {
@@ -730,6 +749,198 @@ exports.scheduledWixSync = onSchedule("0 */5 * * *", async (event) => {
   }
 });
 
+function getVippsConfig() {
+  const normalizedEnvironment = typeof process.env.VIPPS_ENV === "string" ?
+    process.env.VIPPS_ENV.toLowerCase().trim() : "production";
+  const isTestEnvironment = normalizedEnvironment === "test" || normalizedEnvironment === "sandbox";
+
+  const config = {
+    baseUrl: isTestEnvironment ? "https://apitest.vipps.no" : "https://api.vipps.no",
+    clientId: getSecretOrEnv(vippsClientIdParam, ["VIPPS_CLIENT_ID"]),
+    clientSecret: getSecretOrEnv(vippsClientSecretParam, ["VIPPS_CLIENT_SECRET"]),
+    subscriptionKey: getSecretOrEnv(
+        vippsSubscriptionKeyParam,
+        ["VIPPS_SUBSCRIPTION_KEY", "VIPPS_OCP_APIM_SUBSCRIPTION_KEY"],
+    ),
+    merchantSerialNumber: getSecretOrEnv(
+        vippsMsnParam,
+        ["VIPPS_MSN", "VIPPS_MERCHANT_SERIAL_NUMBER"],
+    ),
+    systemName: process.env.VIPPS_SYSTEM_NAME || "hiskingdomministry",
+    systemVersion: process.env.VIPPS_SYSTEM_VERSION || "1.0.0",
+    systemPluginName: process.env.VIPPS_SYSTEM_PLUGIN_NAME || "hkm-website",
+    systemPluginVersion: process.env.VIPPS_SYSTEM_PLUGIN_VERSION || "1.0.0",
+  };
+
+  const missing = [];
+  if (!config.clientId) missing.push("VIPPS_CLIENT_ID");
+  if (!config.clientSecret) missing.push("VIPPS_CLIENT_SECRET");
+  if (!config.subscriptionKey) missing.push("VIPPS_SUBSCRIPTION_KEY");
+  if (!config.merchantSerialNumber) missing.push("VIPPS_MSN");
+
+  return {
+    ...config,
+    isValid: missing.length === 0,
+    missing,
+  };
+}
+
+function normalizeVippsPhoneNumber(phone) {
+  if (!phone || typeof phone !== "string") return "";
+
+  let digitsOnly = phone.replace(/\D/g, "");
+  if (!digitsOnly) return "";
+
+  if (digitsOnly.startsWith("00")) {
+    digitsOnly = digitsOnly.slice(2);
+  }
+
+  if (digitsOnly.length === 8) {
+    digitsOnly = `47${digitsOnly}`;
+  }
+
+  if (/^47\d{8}$/.test(digitsOnly)) return digitsOnly;
+  if (/^\d{8,15}$/.test(digitsOnly)) return digitsOnly;
+
+  return "";
+}
+
+function buildVippsReference() {
+  const timestampPart = Date.now().toString(36);
+  const randomPart = crypto.randomBytes(5).toString("hex");
+  return `hkm-${timestampPart}-${randomPart}`;
+}
+
+function buildVippsReturnUrl(returnUrl, reference) {
+  const defaultUrl = "https://www.hiskingdomministry.no/donasjoner.html";
+  let parsedUrl;
+
+  try {
+    parsedUrl = new URL(returnUrl || defaultUrl);
+  } catch (error) {
+    parsedUrl = new URL(defaultUrl);
+  }
+
+  if (!/^https?:$/.test(parsedUrl.protocol)) {
+    parsedUrl = new URL(defaultUrl);
+  }
+
+  parsedUrl.searchParams.set("vipps_reference", reference);
+  parsedUrl.searchParams.set("vipps_return", "1");
+  return parsedUrl.toString();
+}
+
+async function parseJsonResponse(response) {
+  const bodyText = await response.text();
+  if (!bodyText) return {};
+
+  try {
+    return JSON.parse(bodyText);
+  } catch (error) {
+    return { raw: bodyText };
+  }
+}
+
+async function getVippsAccessToken(config) {
+  const tokenResponse = await fetch(`${config.baseUrl}/accesstoken/get`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "client_id": config.clientId,
+      "client_secret": config.clientSecret,
+      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+      "Merchant-Serial-Number": config.merchantSerialNumber,
+    },
+    body: "",
+  });
+
+  const tokenPayload = await parseJsonResponse(tokenResponse);
+
+  if (!tokenResponse.ok || !tokenPayload.access_token) {
+    const errorDetail = tokenPayload.error_description ||
+      tokenPayload.message ||
+      tokenPayload.error ||
+      `Token request failed (${tokenResponse.status})`;
+    throw new Error(`Vipps token error: ${errorDetail}`);
+  }
+
+  return tokenPayload.access_token;
+}
+
+function getVippsSystemHeaders(config) {
+  return {
+    "Vipps-System-Name": config.systemName,
+    "Vipps-System-Version": config.systemVersion,
+    "Vipps-System-Plugin-Name": config.systemPluginName,
+    "Vipps-System-Plugin-Version": config.systemPluginVersion,
+  };
+}
+
+async function getVippsPayment(config, accessToken, reference) {
+  const paymentResponse = await fetch(
+      `${config.baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+          "Merchant-Serial-Number": config.merchantSerialNumber,
+          ...getVippsSystemHeaders(config),
+        },
+      },
+  );
+
+  const paymentPayload = await parseJsonResponse(paymentResponse);
+  if (!paymentResponse.ok) {
+    const errorDetail = paymentPayload.detail ||
+      paymentPayload.message ||
+      paymentPayload.error ||
+      `Get payment failed (${paymentResponse.status})`;
+    throw new Error(`Vipps get payment error: ${errorDetail}`);
+  }
+
+  return paymentPayload;
+}
+
+async function captureVippsPayment(config, accessToken, reference, amount) {
+  const idempotencyKey = crypto.randomUUID ?
+    crypto.randomUUID() :
+    `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+  const captureResponse = await fetch(
+      `${config.baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}/capture`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+          "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+          "Merchant-Serial-Number": config.merchantSerialNumber,
+          "Idempotency-Key": idempotencyKey,
+          ...getVippsSystemHeaders(config),
+        },
+        body: JSON.stringify({
+          modificationAmount: {
+            currency: amount && amount.currency ? amount.currency : "NOK",
+            value: amount && Number.isFinite(amount.value) ? amount.value : 0,
+          },
+        }),
+      },
+  );
+
+  const capturePayload = await parseJsonResponse(captureResponse);
+  if (!captureResponse.ok) {
+    const errorDetail = capturePayload.detail ||
+      capturePayload.message ||
+      capturePayload.error ||
+      `Capture failed (${captureResponse.status})`;
+    throw new Error(`Vipps capture error: ${errorDetail}`);
+  }
+
+  return capturePayload;
+}
+
 /**
  * Oppretter en PaymentIntent for Stripe.
  * Tar imot: amount (NOK), currency (optional, default NOK).
@@ -831,6 +1042,196 @@ exports.createPaymentIntent = onRequest({
     }
 
     res.status(500).send({ error: stripeMessage });
+  }
+});
+
+exports.createVippsPayment = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [
+    vippsClientIdParam,
+    vippsClientSecretParam,
+    vippsSubscriptionKeyParam,
+    vippsMsnParam,
+  ],
+}, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send({ error: "Method not allowed" });
+    return;
+  }
+
+  try {
+    const {
+      amount,
+      currency = "NOK",
+      customerDetails = {},
+      returnUrl = "",
+    } = req.body || {};
+
+    const parsedAmount = Number(amount);
+    const normalizedCurrency = typeof currency === "string" ? currency.toUpperCase() : "NOK";
+
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      res.status(400).send({ error: "Missing or invalid amount" });
+      return;
+    }
+
+    if (normalizedCurrency !== "NOK") {
+      res.status(400).send({ error: "Vipps støtter kun NOK for denne betalingen." });
+      return;
+    }
+
+    const config = getVippsConfig();
+    if (!config.isValid) {
+      console.error("Vipps configuration missing:", config.missing);
+      res.status(500).send({
+        error: "Server configuration error: Missing Vipps credentials.",
+        missing: config.missing,
+      });
+      return;
+    }
+
+    const accessToken = await getVippsAccessToken(config);
+    const reference = buildVippsReference();
+    const paymentReturnUrl = buildVippsReturnUrl(returnUrl, reference);
+    const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
+
+    const paymentRequest = {
+      amount: {
+        currency: "NOK",
+        value: Math.round(parsedAmount * 100),
+      },
+      paymentMethod: {
+        type: "WALLET",
+      },
+      reference,
+      returnUrl: paymentReturnUrl,
+      userFlow: "WEB_REDIRECT",
+      paymentDescription: "Donasjon til His Kingdom Ministry",
+      metadata: {
+        donorName: customerDetails.name || "",
+        donorEmail: customerDetails.email || "",
+        donorMessage: customerDetails.message || "",
+      },
+    };
+
+    if (phoneNumber) {
+      paymentRequest.customer = { phoneNumber };
+    }
+
+    const idempotencyKey = crypto.randomUUID ?
+      crypto.randomUUID() :
+      `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+    const paymentResponse = await fetch(`${config.baseUrl}/epayment/v1/payments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "Idempotency-Key": idempotencyKey,
+        "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+        "Merchant-Serial-Number": config.merchantSerialNumber,
+        ...getVippsSystemHeaders(config),
+      },
+      body: JSON.stringify(paymentRequest),
+    });
+
+    const paymentPayload = await parseJsonResponse(paymentResponse);
+    if (!paymentResponse.ok) {
+      const errorDetail = paymentPayload.detail ||
+        paymentPayload.message ||
+        paymentPayload.error ||
+        `Create payment failed (${paymentResponse.status})`;
+      throw new Error(`Vipps create payment error: ${errorDetail}`);
+    }
+
+    if (!paymentPayload.redirectUrl) {
+      throw new Error("Vipps did not return redirectUrl");
+    }
+
+    res.status(200).send({
+      redirectUrl: paymentPayload.redirectUrl,
+      reference,
+      state: paymentPayload.state || null,
+    });
+  } catch (error) {
+    console.error("Vipps create payment failed:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown Vipps error" });
+  }
+});
+
+exports.finalizeVippsPayment = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [
+    vippsClientIdParam,
+    vippsClientSecretParam,
+    vippsSubscriptionKeyParam,
+    vippsMsnParam,
+  ],
+}, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send({ error: "Method not allowed" });
+    return;
+  }
+
+  try {
+    const { reference } = req.body || {};
+    const normalizedReference = typeof reference === "string" ? reference.trim() : "";
+
+    if (!/^[a-zA-Z0-9-]{8,64}$/.test(normalizedReference)) {
+      res.status(400).send({ error: "Missing or invalid reference" });
+      return;
+    }
+
+    const config = getVippsConfig();
+    if (!config.isValid) {
+      console.error("Vipps configuration missing:", config.missing);
+      res.status(500).send({
+        error: "Server configuration error: Missing Vipps credentials.",
+        missing: config.missing,
+      });
+      return;
+    }
+
+    const accessToken = await getVippsAccessToken(config);
+    let payment = await getVippsPayment(config, accessToken, normalizedReference);
+
+    if (payment.state === "AUTHORIZED") {
+      try {
+        await captureVippsPayment(config, accessToken, normalizedReference, payment.amount);
+      } catch (captureError) {
+        console.warn("Vipps capture attempt failed, re-checking status:", captureError.message);
+      }
+
+      payment = await getVippsPayment(config, accessToken, normalizedReference);
+    }
+
+    res.status(200).send({
+      reference: normalizedReference,
+      state: payment.state || null,
+      amount: payment.amount || null,
+      pspReference: payment.pspReference || null,
+    });
+  } catch (error) {
+    console.error("Vipps finalize payment failed:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown Vipps error" });
   }
 });
 

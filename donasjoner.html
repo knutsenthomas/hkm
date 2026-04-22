@@ -595,7 +595,17 @@
                                 message: getValue('donor-message')
                             };
 
-                            // Initialize Stripe with amount, details and method preference
+                            if (selectedPaymentMethod.value === 'vipps') {
+                                if (typeof startVippsPayment !== 'function') {
+                                    alert("Vipps-betaling er ikke tilgjengelig akkurat nå. Prøv igjen om litt.");
+                                    return;
+                                }
+
+                                startVippsPayment(amount, customerDetails);
+                                return;
+                            }
+
+                            // For kort og bank bruker vi Stripe-flyten
                             initializeStripe(amount, customerDetails, selectedPaymentMethod.value);
                         } else {
                             alert("Vennligst velg eller skriv inn et beløp.");

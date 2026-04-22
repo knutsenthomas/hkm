@@ -1,9 +1,41 @@
 // Replace with your public key
 // TODO: User needs to replace this placeholder or configure environment variables
 const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
+const STRIPE_PAYMENT_INTENT_URL = "https://us-central1-his-kingdom-ministry.cloudfunctions.net/createPaymentIntent";
+const VIPPS_CREATE_PAYMENT_URL = "https://us-central1-his-kingdom-ministry.cloudfunctions.net/createVippsPayment";
+const VIPPS_FINALIZE_PAYMENT_URL = "https://us-central1-his-kingdom-ministry.cloudfunctions.net/finalizeVippsPayment";
 
 let elements;
 let emailAddress = '';
+
+function getVippsStateMessage(state) {
+    const normalizedState = typeof state === "string" ? state.toUpperCase() : "";
+
+    switch (normalizedState) {
+        case "CAPTURED":
+            return "Vipps-betalingen er fullført. Tusen takk for gaven.";
+        case "AUTHORIZED":
+            return "Vipps-betalingen er godkjent og blir ferdigstilt nå.";
+        case "ABORTED":
+            return "Vipps-betalingen ble avbrutt.";
+        case "EXPIRED":
+            return "Vipps-betalingen utløp før den ble godkjent.";
+        case "CANCELLED":
+            return "Vipps-betalingen ble kansellert.";
+        case "TERMINATED":
+            return "Vipps-betalingen ble avsluttet.";
+        default:
+            return "Vi mottok svar fra Vipps, men klarte ikke å fastslå betalingsstatus.";
+    }
+}
+
+async function parseJsonOrThrow(response) {
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) {
+        throw new Error(data.error || `Server error: ${response.status}`);
+    }
+    return data;
+}
 
 async function initializeStripe(amount, customerDetails = {}, paymentMethodPreference = "auto") {
     // Show spinner
@@ -11,7 +43,7 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
 
     try {
         // Call your backend to create the PaymentIntent
-        const response = await fetch("https://us-central1-his-kingdom-ministry.cloudfunctions.net/createPaymentIntent", {
+        const response = await fetch(STRIPE_PAYMENT_INTENT_URL, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -22,12 +54,7 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
             }),
         });
 
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.error || `Server error: ${response.status}`);
-        }
-
-        const { clientSecret } = await response.json();
+        const { clientSecret } = await parseJsonOrThrow(response);
 
         const appearance = {
             theme: 'stripe',
@@ -76,6 +103,90 @@ async function initializeStripe(amount, customerDetails = {}, paymentMethodPrefe
         if (window.hkmLogger) window.hkmLogger.error(`Payment Init Failed: ${message}`);
     } finally {
         setLoading(false);
+    }
+}
+
+async function startVippsPayment(amount, customerDetails = {}) {
+    const parsedAmount = Number(amount);
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+        alert("Vennligst velg eller skriv inn et gyldig beløp.");
+        return;
+    }
+
+    const submitButton = document.querySelector(".donation-form-content button[type='submit']");
+    const originalButtonContent = submitButton ? submitButton.innerHTML : "";
+
+    if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.innerHTML = "<i class='fas fa-spinner fa-spin' style='margin-right: 10px;'></i>Starter Vipps...";
+    }
+
+    try {
+        const response = await fetch(VIPPS_CREATE_PAYMENT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                amount: parsedAmount,
+                currency: "NOK",
+                customerDetails,
+                returnUrl: window.location.href.split("?")[0],
+            }),
+        });
+
+        const data = await parseJsonOrThrow(response);
+        if (!data.redirectUrl) {
+            throw new Error("Vipps returnerte ikke redirectUrl.");
+        }
+
+        window.location.href = data.redirectUrl;
+    } catch (error) {
+        console.error("Vipps initialization failed:", error);
+        const message = (error && error.message) ? error.message : "Ukjent Vipps-feil";
+        alert("Kunne ikke starte Vipps-betalingen: " + message);
+
+        if (window.hkmLogger) {
+            window.hkmLogger.error(`Vipps Init Failed: ${message}`);
+        }
+
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonContent;
+        }
+    }
+}
+
+async function finalizeVippsReturn() {
+    const searchParams = new URLSearchParams(window.location.search);
+    const reference = searchParams.get("vipps_reference");
+    const isVippsReturn = searchParams.get("vipps_return") === "1";
+
+    if (!reference || !isVippsReturn) {
+        return;
+    }
+
+    try {
+        const response = await fetch(VIPPS_FINALIZE_PAYMENT_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reference }),
+        });
+
+        const data = await parseJsonOrThrow(response);
+        showMessage(getVippsStateMessage(data.state));
+
+        if (data.state === "CAPTURED") {
+            alert("Vipps-betalingen er fullført. Takk for gaven.");
+        }
+    } catch (error) {
+        console.error("Vipps finalize failed:", error);
+        const message = (error && error.message) ? error.message : "Ukjent Vipps-feil";
+        alert("Vi klarte ikke å bekrefte Vipps-betalingen automatisk: " + message);
+    } finally {
+        const cleanedParams = new URLSearchParams(window.location.search);
+        cleanedParams.delete("vipps_reference");
+        cleanedParams.delete("vipps_return");
+        const cleanedUrl = `${window.location.pathname}${cleanedParams.toString() ? `?${cleanedParams.toString()}` : ""}${window.location.hash}`;
+        window.history.replaceState({}, document.title, cleanedUrl);
     }
 }
 
@@ -186,6 +297,9 @@ async function recordDonation(paymentIntent) {
 // UI Helpers
 function showMessage(messageText) {
     const messageContainer = document.querySelector("#payment-message");
+    if (!messageContainer) {
+        return;
+    }
     messageContainer.classList.remove("hidden");
     messageContainer.textContent = messageText;
 
@@ -196,22 +310,34 @@ function showMessage(messageText) {
 }
 
 function setLoading(isLoading) {
+    const submitButton = document.querySelector("#submit-payment");
+    const spinner = document.querySelector("#spinner");
+    const buttonText = document.querySelector("#button-text");
+
+    if (!submitButton || !spinner || !buttonText) {
+        return;
+    }
+
     if (isLoading) {
         // Disable the button and show a spinner
-        document.querySelector("#submit-payment").disabled = true;
-        document.querySelector("#spinner").classList.remove("hidden");
-        document.querySelector("#button-text").classList.add("hidden");
+        submitButton.disabled = true;
+        spinner.classList.remove("hidden");
+        buttonText.classList.add("hidden");
     } else {
-        document.querySelector("#submit-payment").disabled = false;
-        document.querySelector("#spinner").classList.add("hidden");
-        document.querySelector("#button-text").classList.remove("hidden");
+        submitButton.disabled = false;
+        spinner.classList.add("hidden");
+        buttonText.classList.remove("hidden");
     }
 }
 
 // Expose functions to global scope
 window.initializeStripe = initializeStripe;
+window.startVippsPayment = startVippsPayment;
 window.checkStatus = checkStatus;
 window.handleStripeSubmit = handleSubmit;
 
 // Auto-check status on load
-document.addEventListener("DOMContentLoaded", checkStatus);
+document.addEventListener("DOMContentLoaded", async () => {
+    await finalizeVippsReturn();
+    await checkStatus();
+});

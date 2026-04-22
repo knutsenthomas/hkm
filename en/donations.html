@@ -589,6 +589,16 @@
                                 message: getValue('donor-message')
                             };
 
+                            if (selectedPaymentMethod.value === 'vipps') {
+                                if (typeof startVippsPayment !== 'function') {
+                                    alert("Vipps payment is not available right now. Please try again shortly.");
+                                    return;
+                                }
+
+                                startVippsPayment(amount, customerDetails);
+                                return;
+                            }
+
                             initializeStripe(amount, customerDetails, selectedPaymentMethod.value);
                         } else {
                             alert("Please select or enter an amount.");
