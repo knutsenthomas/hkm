@@ -4844,3 +4844,43 @@ ol.block-list {
         display: none !important;
     }
 }
+
+/* Unified subpage hero sizing and centering */
+.page-hero {
+    min-height: 420px;
+    padding: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+}
+
+.page-hero .container,
+.page-hero-content {
+    width: 100%;
+    text-align: center;
+}
+
+.page-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-hero-title,
+.page-hero-subtitle,
+.page-hero .page-title,
+.page-hero .breadcrumbs {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .page-hero {
+        min-height: 300px;
+    }
+}

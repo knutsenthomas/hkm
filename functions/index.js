@@ -850,6 +850,26 @@ async function parseJsonResponse(response) {
   }
 }
 
+function resolveVippsErrorDetail(payload, fallback) {
+  if (!payload || typeof payload !== "object") return fallback;
+
+  const preferred = payload.detail ||
+    payload.message ||
+    payload.error_description ||
+    payload.error;
+
+  if (preferred) return preferred;
+
+  try {
+    const serialized = JSON.stringify(payload);
+    if (serialized && serialized !== "{}") return serialized;
+  } catch (error) {
+    // Ignore serialization issues and use fallback.
+  }
+
+  return fallback;
+}
+
 function shouldRetryVippsTokenOnAlternateEnvironment(errorDetail) {
   const normalized = typeof errorDetail === "string" ? errorDetail.toLowerCase() : "";
   if (!normalized) return false;
@@ -886,10 +906,10 @@ async function getVippsAccessToken(config) {
       };
     }
 
-    const errorDetail = tokenPayload.error_description ||
-      tokenPayload.message ||
-      tokenPayload.error ||
-      `Token request failed (${tokenResponse.status})`;
+    const errorDetail = resolveVippsErrorDetail(
+        tokenPayload,
+        `Token request failed (${tokenResponse.status})`,
+    );
 
     attempts.push({
       baseUrl,
@@ -944,10 +964,10 @@ async function getVippsPayment(config, baseUrl, accessToken, reference) {
 
   const paymentPayload = await parseJsonResponse(paymentResponse);
   if (!paymentResponse.ok) {
-    const errorDetail = paymentPayload.detail ||
-      paymentPayload.message ||
-      paymentPayload.error ||
-      `Get payment failed (${paymentResponse.status})`;
+    const errorDetail = resolveVippsErrorDetail(
+        paymentPayload,
+        `Get payment failed (${paymentResponse.status})`,
+    );
     throw new Error(`Vipps get payment error: ${errorDetail}`);
   }
 
@@ -982,10 +1002,10 @@ async function captureVippsPayment(config, baseUrl, accessToken, reference, amou
 
   const capturePayload = await parseJsonResponse(captureResponse);
   if (!captureResponse.ok) {
-    const errorDetail = capturePayload.detail ||
-      capturePayload.message ||
-      capturePayload.error ||
-      `Capture failed (${captureResponse.status})`;
+    const errorDetail = resolveVippsErrorDetail(
+        capturePayload,
+        `Capture failed (${captureResponse.status})`,
+    );
     throw new Error(`Vipps capture error: ${errorDetail}`);
   }
 
@@ -1198,10 +1218,10 @@ exports.createVippsPayment = onRequest({
 
     const paymentPayload = await parseJsonResponse(paymentResponse);
     if (!paymentResponse.ok) {
-      const errorDetail = paymentPayload.detail ||
-        paymentPayload.message ||
-        paymentPayload.error ||
-        `Create payment failed (${paymentResponse.status})`;
+      const errorDetail = resolveVippsErrorDetail(
+          paymentPayload,
+          `Create payment failed (${paymentResponse.status})`,
+      );
       throw new Error(`Vipps create payment error: ${errorDetail}`);
     }
 
