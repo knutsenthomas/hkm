@@ -251,9 +251,9 @@ class ContentManager {
 
         let service = window.firebaseService;
         if (!service || !service.isInitialized) {
-            // Wait for firebase module (reduced timeout and check frequency)
+            // Wait for firebase module (reduced timeout to 1s total)
             let count = 0;
-            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 40) {
+            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 20) {
                 await new Promise(r => setTimeout(r, 50));
                 count++;
             }
@@ -302,8 +302,12 @@ class ContentManager {
             // 2. SEO & Meta (Non-blocking)
             if (seoSettings) this.handleSEO(seoSettings);
 
-            // 3. Specialized Loaders
-            await this.loadSpecializedContent();
+            // 3. Specialized Loaders (Non-blocking if we already hydrated from cache)
+            if (pageContentHydrated) {
+                this.loadSpecializedContent().catch(e => this.reportError('loadSpecializedContent:async', e));
+            } else {
+                await this.loadSpecializedContent();
+            }
 
         } catch (error) {
             this.reportError('init', error, {
