@@ -98,9 +98,10 @@
 
     <!-- Config & Services -->
     <script src="js/firebase-config.js"></script>
+    <script src="js/firebase-service.js"></script>
 
     <script type="module">
-        import { firebaseService } from './js/firebase-service.js';
+        const firebaseService = window.firebaseService;
 
         const logEl = document.getElementById('log');
         const runBtn = document.getElementById('runBtn');
