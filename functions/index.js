@@ -1,6 +1,7 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
+const { defineSecret } = require("firebase-functions/params");
 
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
@@ -17,6 +18,22 @@ const db = admin.firestore();
 
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
+const stripeSecretKeyParam = defineSecret("STRIPE_SECRET_KEY");
+
+function getStripeSecretKey() {
+  const candidates = [];
+  try {
+    candidates.push(stripeSecretKeyParam.value());
+  } catch (error) {
+    // Secret may be unavailable in local/emulator contexts.
+  }
+  candidates.push(
+      process.env.STRIPE_SECRET_KEY,
+      process.env.STRIPE_KEY,
+      process.env.STRIPE_API_KEY,
+  );
+  return candidates.find((value) => typeof value === "string" && value.trim()) || "";
+}
 
 function parseWixApiKeyMetadata(apiKey) {
   if (!apiKey || typeof apiKey !== "string") return {};
@@ -717,7 +734,11 @@ exports.scheduledWixSync = onSchedule("0 */5 * * *", async (event) => {
  * Oppretter en PaymentIntent for Stripe.
  * Tar imot: amount (NOK), currency (optional, default NOK).
  */
-exports.createPaymentIntent = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
+exports.createPaymentIntent = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [stripeSecretKeyParam],
+}, async (req, res) => {
   // Håndter preflight requests (CORS)
   if (req.method === 'OPTIONS') {
     res.set('Access-Control-Allow-Origin', '*');
@@ -736,7 +757,7 @@ exports.createPaymentIntent = onRequest({ cors: true, invoker: "public" }, async
     }
 
     // Initialize Stripe lazily
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    const stripeKey = getStripeSecretKey();
     if (!stripeKey) {
       console.error("Stripe Secret Key is missing!");
       res.status(500).send({ error: "Server configuration error: Missing Stripe Key." });
