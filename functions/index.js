@@ -751,11 +751,20 @@ exports.scheduledWixSync = onSchedule("0 */5 * * *", async (event) => {
 
 function getVippsConfig() {
   const normalizedEnvironment = typeof process.env.VIPPS_ENV === "string" ?
-    process.env.VIPPS_ENV.toLowerCase().trim() : "production";
+    process.env.VIPPS_ENV.toLowerCase().trim() : "auto";
   const isTestEnvironment = normalizedEnvironment === "test" || normalizedEnvironment === "sandbox";
+  const isProductionEnvironment = normalizedEnvironment === "production" ||
+    normalizedEnvironment === "prod" ||
+    normalizedEnvironment === "live";
+  const baseUrls = isTestEnvironment ?
+    ["https://apitest.vipps.no"] :
+    isProductionEnvironment ?
+      ["https://api.vipps.no"] :
+      ["https://api.vipps.no", "https://apitest.vipps.no"];
 
   const config = {
-    baseUrl: isTestEnvironment ? "https://apitest.vipps.no" : "https://api.vipps.no",
+    environment: normalizedEnvironment,
+    baseUrls,
     clientId: getSecretOrEnv(vippsClientIdParam, ["VIPPS_CLIENT_ID"]),
     clientSecret: getSecretOrEnv(vippsClientSecretParam, ["VIPPS_CLIENT_SECRET"]),
     subscriptionKey: getSecretOrEnv(
@@ -841,30 +850,72 @@ async function parseJsonResponse(response) {
   }
 }
 
+function shouldRetryVippsTokenOnAlternateEnvironment(errorDetail) {
+  const normalized = typeof errorDetail === "string" ? errorDetail.toLowerCase() : "";
+  if (!normalized) return false;
+
+  return normalized.includes("aadsts700016") ||
+    normalized.includes("application with identifier") ||
+    normalized.includes("not found in the directory") ||
+    normalized.includes("wrong tenant");
+}
+
 async function getVippsAccessToken(config) {
-  const tokenResponse = await fetch(`${config.baseUrl}/accesstoken/get`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "client_id": config.clientId,
-      "client_secret": config.clientSecret,
-      "Ocp-Apim-Subscription-Key": config.subscriptionKey,
-      "Merchant-Serial-Number": config.merchantSerialNumber,
-    },
-    body: "",
-  });
+  const attempts = [];
 
-  const tokenPayload = await parseJsonResponse(tokenResponse);
+  for (let index = 0; index < config.baseUrls.length; index += 1) {
+    const baseUrl = config.baseUrls[index];
+    const tokenResponse = await fetch(`${baseUrl}/accesstoken/get`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "client_id": config.clientId,
+        "client_secret": config.clientSecret,
+        "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+        "Merchant-Serial-Number": config.merchantSerialNumber,
+      },
+      body: "",
+    });
 
-  if (!tokenResponse.ok || !tokenPayload.access_token) {
+    const tokenPayload = await parseJsonResponse(tokenResponse);
+
+    if (tokenResponse.ok && tokenPayload.access_token) {
+      return {
+        accessToken: tokenPayload.access_token,
+        baseUrl,
+      };
+    }
+
     const errorDetail = tokenPayload.error_description ||
       tokenPayload.message ||
       tokenPayload.error ||
       `Token request failed (${tokenResponse.status})`;
-    throw new Error(`Vipps token error: ${errorDetail}`);
+
+    attempts.push({
+      baseUrl,
+      status: tokenResponse.status,
+      errorDetail,
+    });
+
+    const hasFallback = index < config.baseUrls.length - 1;
+    const shouldTryFallback = hasFallback &&
+      shouldRetryVippsTokenOnAlternateEnvironment(errorDetail);
+
+    if (!shouldTryFallback) {
+      break;
+    }
   }
 
-  return tokenPayload.access_token;
+  const summary = attempts
+    .map((attempt) => `${attempt.baseUrl}: ${attempt.errorDetail}`)
+    .join(" | ");
+
+  throw new Error(
+      "Vipps token error: " +
+      `${summary}. ` +
+      "Sjekk at Vipps-nøklene tilhører samme miljø. " +
+      "Hvis du bruker testnøkler, sett VIPPS_ENV=test.",
+  );
 }
 
 function getVippsSystemHeaders(config) {
@@ -876,9 +927,9 @@ function getVippsSystemHeaders(config) {
   };
 }
 
-async function getVippsPayment(config, accessToken, reference) {
+async function getVippsPayment(config, baseUrl, accessToken, reference) {
   const paymentResponse = await fetch(
-      `${config.baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}`,
+      `${baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}`,
       {
         method: "GET",
         headers: {
@@ -903,13 +954,13 @@ async function getVippsPayment(config, accessToken, reference) {
   return paymentPayload;
 }
 
-async function captureVippsPayment(config, accessToken, reference, amount) {
+async function captureVippsPayment(config, baseUrl, accessToken, reference, amount) {
   const idempotencyKey = crypto.randomUUID ?
     crypto.randomUUID() :
     `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
   const captureResponse = await fetch(
-      `${config.baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}/capture`,
+      `${baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}/capture`,
       {
         method: "POST",
         headers: {
@@ -1099,7 +1150,8 @@ exports.createVippsPayment = onRequest({
       return;
     }
 
-    const accessToken = await getVippsAccessToken(config);
+    const vippsAuth = await getVippsAccessToken(config);
+    const { accessToken, baseUrl } = vippsAuth;
     const reference = buildVippsReference();
     const paymentReturnUrl = buildVippsReturnUrl(returnUrl, reference);
     const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
@@ -1131,7 +1183,7 @@ exports.createVippsPayment = onRequest({
       crypto.randomUUID() :
       `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-    const paymentResponse = await fetch(`${config.baseUrl}/epayment/v1/payments`, {
+    const paymentResponse = await fetch(`${baseUrl}/epayment/v1/payments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -1210,17 +1262,18 @@ exports.finalizeVippsPayment = onRequest({
       return;
     }
 
-    const accessToken = await getVippsAccessToken(config);
-    let payment = await getVippsPayment(config, accessToken, normalizedReference);
+    const vippsAuth = await getVippsAccessToken(config);
+    const { accessToken, baseUrl } = vippsAuth;
+    let payment = await getVippsPayment(config, baseUrl, accessToken, normalizedReference);
 
     if (payment.state === "AUTHORIZED") {
       try {
-        await captureVippsPayment(config, accessToken, normalizedReference, payment.amount);
+        await captureVippsPayment(config, baseUrl, accessToken, normalizedReference, payment.amount);
       } catch (captureError) {
         console.warn("Vipps capture attempt failed, re-checking status:", captureError.message);
       }
 
-      payment = await getVippsPayment(config, accessToken, normalizedReference);
+      payment = await getVippsPayment(config, baseUrl, accessToken, normalizedReference);
     }
 
     res.status(200).send({
