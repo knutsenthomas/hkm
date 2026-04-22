@@ -218,6 +218,7 @@ function normalizeWixProduct(item, req) {
     collectionIds: item.collectionIds || [],
     productOptions: item.productOptions || [],
     variants: item.variants || [],
+    description: item.description || "",
   };
 }
 
