@@ -545,6 +545,13 @@
                     initDonationForm();
                 }
 
+                // Default to Vipps if no method is selected yet
+                const defaultPaymentMethod = document.querySelector('input[name="payment-method"][value="vipps"]');
+                if (defaultPaymentMethod && !document.querySelector('input[name="payment-method"]:checked')) {
+                    defaultPaymentMethod.checked = true;
+                    defaultPaymentMethod.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
                 const donationForm = document.querySelector('.donation-form-content');
                 if (donationForm) {
                     donationForm.addEventListener('submit', function (e) {
@@ -561,6 +568,12 @@
                         }
 
                         if (amount > 0) {
+                            const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
+                            if (!selectedPaymentMethod) {
+                                alert("Please choose a payment method.");
+                                return;
+                            }
+
                             const getValue = (id) => {
                                 const el = document.getElementById(id);
                                 return el ? el.value : '';
@@ -576,7 +589,7 @@
                                 message: getValue('donor-message')
                             };
 
-                            initializeStripe(amount, customerDetails);
+                            initializeStripe(amount, customerDetails, selectedPaymentMethod.value);
                         } else {
                             alert("Please select or enter an amount.");
                         }

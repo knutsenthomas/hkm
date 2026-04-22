@@ -548,6 +548,13 @@
                     initDonationForm();
                 }
 
+                // Default to Vipps if no method is selected yet
+                const defaultPaymentMethod = document.querySelector('input[name="payment-method"][value="vipps"]');
+                if (defaultPaymentMethod && !document.querySelector('input[name="payment-method"]:checked')) {
+                    defaultPaymentMethod.checked = true;
+                    defaultPaymentMethod.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+
                 // Attach event listener to the donation form submit
                 const donationForm = document.querySelector('.donation-form-content');
                 if (donationForm) {
@@ -566,6 +573,12 @@
                         }
 
                         if (amount > 0) {
+                            const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
+                            if (!selectedPaymentMethod) {
+                                alert("Vennligst velg betalingsmetode.");
+                                return;
+                            }
+
                             // Helper to safely get value or empty string
                             const getValue = (id) => {
                                 const el = document.getElementById(id);
@@ -582,8 +595,8 @@
                                 message: getValue('donor-message')
                             };
 
-                            // Initialize Stripe with the amount and details
-                            initializeStripe(amount, customerDetails);
+                            // Initialize Stripe with amount, details and method preference
+                            initializeStripe(amount, customerDetails, selectedPaymentMethod.value);
                         } else {
                             alert("Vennligst velg eller skriv inn et beløp.");
                         }

@@ -749,10 +749,21 @@ exports.createPaymentIntent = onRequest({
   }
 
   try {
-    const { amount, currency = "nok", customerDetails = {} } = req.body;
+    const {
+      amount,
+      currency = "nok",
+      customerDetails = {},
+      paymentMethodPreference = "auto",
+    } = req.body;
 
-    if (!amount) {
-      res.status(400).send({ error: "Missing amount" });
+    const parsedAmount = Number(amount);
+    const normalizedCurrency = typeof currency === "string" ?
+      currency.toLowerCase() : "nok";
+    const normalizedPaymentPreference = typeof paymentMethodPreference === "string" ?
+      paymentMethodPreference.toLowerCase().trim() : "auto";
+
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      res.status(400).send({ error: "Missing or invalid amount" });
       return;
     }
 
@@ -765,15 +776,11 @@ exports.createPaymentIntent = onRequest({
     }
     const stripe = stripeInit(stripeKey);
 
-    // Opprett PaymentIntent
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: amount * 100, // Stripe bruker øre (cents)
-      currency: currency,
-      automatic_payment_methods: {
-        enabled: true,
-      },
+    const paymentIntentPayload = {
+      amount: Math.round(parsedAmount * 100), // Stripe bruker ore (cents)
+      currency: normalizedCurrency,
       receipt_email: customerDetails.email || undefined,
-      description: `Donasjon fra ${customerDetails.name || 'Ukjent'}`,
+      description: `Donasjon fra ${customerDetails.name || "Ukjent"}`,
       metadata: {
         customer_name: customerDetails.name,
         customer_email: customerDetails.email,
@@ -789,10 +796,22 @@ exports.createPaymentIntent = onRequest({
           line1: customerDetails.address,
           city: customerDetails.city,
           postal_code: customerDetails.zip,
-          country: 'NO', // Default to Norway
+          country: "NO", // Default to Norway
         },
       } : undefined,
-    });
+    };
+
+    // Let donor choose method preference from the form.
+    if (normalizedPaymentPreference === "vipps") {
+      paymentIntentPayload.payment_method_types = ["vipps", "card"];
+    } else if (normalizedPaymentPreference === "card") {
+      paymentIntentPayload.payment_method_types = ["card"];
+    } else {
+      paymentIntentPayload.automatic_payment_methods = { enabled: true };
+    }
+
+    // Opprett PaymentIntent
+    const paymentIntent = await stripe.paymentIntents.create(paymentIntentPayload);
 
     // Returner clientSecret til frontend
     res.status(200).send({
@@ -801,7 +820,17 @@ exports.createPaymentIntent = onRequest({
 
   } catch (error) {
     console.error("Stripe error:", error);
-    res.status(500).send({ error: error.message });
+    const stripeMessage = (error && error.message) ? error.message : "Unknown Stripe error";
+
+    if (stripeMessage.toLowerCase().includes("vipps")) {
+      res.status(400).send({
+        error: "Vipps er ikke aktivert eller tilgjengelig i Stripe-oppsettet. " +
+          "Aktiver Vipps i Stripe Dashboard under Payment methods.",
+      });
+      return;
+    }
+
+    res.status(500).send({ error: stripeMessage });
   }
 });
 

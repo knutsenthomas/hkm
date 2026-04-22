@@ -5,7 +5,7 @@ const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZF
 let elements;
 let emailAddress = '';
 
-async function initializeStripe(amount, customerDetails = {}) {
+async function initializeStripe(amount, customerDetails = {}, paymentMethodPreference = "auto") {
     // Show spinner
     setLoading(true);
 
@@ -17,7 +17,8 @@ async function initializeStripe(amount, customerDetails = {}) {
             body: JSON.stringify({
                 amount: amount,
                 currency: "nok",
-                customerDetails: customerDetails
+                customerDetails: customerDetails,
+                paymentMethodPreference: paymentMethodPreference
             }),
         });
 
@@ -50,6 +51,7 @@ async function initializeStripe(amount, customerDetails = {}) {
 
         const paymentElementOptions = {
             layout: "tabs",
+            paymentMethodOrder: ["vipps", "card"],
         };
 
         const paymentElement = elements.create("payment", paymentElementOptions);
@@ -63,10 +65,15 @@ async function initializeStripe(amount, customerDetails = {}) {
 
     } catch (error) {
         console.error("Stripe initialization failed:", error);
-        alert("Kunne ikke starte betalingen: " + error.message + ". Vennligst prøv igjen senere.");
+        const message = (error && error.message) ? error.message : "Ukjent feil";
+        if (message.toLowerCase().includes("vipps")) {
+            alert("Vipps er ikke tilgjengelig akkurat nå. Sjekk at Vipps er aktivert i Stripe-kontoen, eller velg kort.");
+        } else {
+            alert("Kunne ikke starte betalingen: " + message + ". Vennligst prøv igjen senere.");
+        }
 
         // Log to system logger if available
-        if (window.hkmLogger) window.hkmLogger.error(`Payment Init Failed: ${error.message}`);
+        if (window.hkmLogger) window.hkmLogger.error(`Payment Init Failed: ${message}`);
     } finally {
         setLoading(false);
     }
