@@ -35,7 +35,7 @@
     <!-- Error Logger (Deferred by default as module) -->
     <script type="module" src="../js/error-logger.js"></script>
 
-    <script>
+    <script type="module">
         (function () {
             if (!('serviceWorker' in navigator)) return;
 
@@ -72,7 +72,7 @@
         })();
     </script>
     <!-- Loader Safety Net -->
-    <script>
+    <script type="module">
         (function() {
             // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
             setTimeout(function() {
@@ -1358,9 +1358,9 @@
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 
     <!-- Admin Logic -->
-    <script src="../js/notifications.js"></script>
+    <script type="module" src="../js/notifications.js"></script>
     <script type="module" src="js/admin.js"></script>
-    <script>
+    <script type="module">
         window.addEventListener('load', () => {
             if (!window.adminManager) {
                 window.adminManager = new AdminManager();

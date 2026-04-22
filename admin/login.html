@@ -158,7 +158,7 @@
             }
         }
     </script>
-    <script>
+    <script type="module">
         (function () {
             if (!('serviceWorker' in navigator)) return;
             const hostname = window.location.hostname;
@@ -183,7 +183,7 @@
         })();
     </script>
     <!-- Loader Safety Net -->
-    <script>
+    <script type="module">
         (function() {
             // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
             setTimeout(function() {
@@ -231,8 +231,8 @@
         <a href="../index.html" class="back-link">Tilbake til nettsiden</a>
     </div>
 
-    <script src="../js/notifications.js"></script>
-    <script src="../js/admin-utils.js"></script>
+    <script type="module" src="../js/notifications.js"></script>
+    <script type="module" src="../js/admin-utils.js"></script>
     <!-- Firebase SDK (Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>

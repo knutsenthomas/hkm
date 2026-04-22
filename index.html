@@ -25,7 +25,7 @@
     <!-- Error Logger -->
     <script type="module" src="js/error-logger.js"></script>
     <!-- Loader Safety Net -->
-    <script>
+    <script type="module">
         (function() {
             // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
             setTimeout(function() {
@@ -859,7 +859,7 @@
     <script type="module" src="js/content-manager.js"></script>
     <script type="module" src="js/cookie-consent.js"></script>
     <script type="module" src="js/store-prefetch.js"></script>
-    <script>
+    <script type="module">
         (async function () {
             // Wait for firebaseService to be available and initialized
             let count = 0;
