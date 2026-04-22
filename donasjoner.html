@@ -548,8 +548,8 @@
                     initDonationForm();
                 }
 
-                // Default to Vipps if no method is selected yet
-                const defaultPaymentMethod = document.querySelector('input[name="payment-method"][value="vipps"]');
+                // Default to card if no method is selected yet
+                const defaultPaymentMethod = document.querySelector('input[name="payment-method"][value="card"]');
                 if (defaultPaymentMethod && !document.querySelector('input[name="payment-method"]:checked')) {
                     defaultPaymentMethod.checked = true;
                     defaultPaymentMethod.dispatchEvent(new Event('change', { bubbles: true }));
