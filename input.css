@@ -1893,31 +1893,32 @@ body.hero-animate .slide-buttons {
 
 .feature-link {
     color: var(--text-dark);
+    background: #f3f4f6;
+    padding: 14px 36px;
+    border-radius: 999px;
     font-weight: 700;
     display: inline-flex;
     align-items: center;
-    gap: 5px;
+    justify-content: center;
+    gap: 8px;
     text-decoration: none;
-    transition: var(--transition);
+    transition: background-color 0.25s ease, color 0.25s ease, gap 0.25s ease, transform 0.25s ease;
 }
 
 .feature-link i {
     color: var(--primary-orange);
+    transition: color 0.25s ease;
 }
 
-.feature-link:hover {
-    gap: 10px;
-    color: var(--primary-orange);
-}
-
-/* Keep travel CTA legible on hover when the button background turns orange */
-.feature-box.travel .feature-link:hover,
-.feature-box.travel .feature-link:focus-visible {
+.feature-link:hover,
+.feature-link:focus-visible {
+    gap: 12px;
+    background: var(--primary-orange);
     color: #fff !important;
 }
 
-.feature-box.travel .feature-link:hover i,
-.feature-box.travel .feature-link:focus-visible i {
+.feature-link:hover i,
+.feature-link:focus-visible i {
     color: #fff !important;
 }
 
