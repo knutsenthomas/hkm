@@ -2595,12 +2595,12 @@ class AdminManager {
 
     async fetchPodcastStats() {
         // Use the same proxy/RSS as media.js
-        const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app'; // Specific proxy for HKM
+        const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
         try {
             const response = await fetch(proxyUrl);
             const data = await response.json();
-            const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
-            const items = channel?.item;
+            const items = data?.items;
             if (items) {
                 return Array.isArray(items) ? items.length : 1;
             }
@@ -2977,11 +2977,11 @@ class AdminManager {
 
             // 2. Fetch episodes from RSS (via proxy)
             const settings = await firebaseService.getPageContent('settings_media');
-            const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+            const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+            const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
             const response = await fetch(proxyUrl);
             const data = await response.json();
-            const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
-            const items = channel?.item;
+            const items = data?.items;
 
             if (items) {
                 const episodes = Array.isArray(items) ? items : [items];

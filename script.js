@@ -597,15 +597,16 @@ async function performSiteSearch(query, resultsEl) {
         let podcastEpisodes = window._siteSearchPodcasts;
         if (!podcastEpisodes) {
             try {
-                const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+                const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
                 const resp = await fetch(proxyUrl);
                 const data = await resp.json();
-                const items = data?.rss?.channel?.item;
+                const items = data?.items;
                 if (items) {
                     const episodes = Array.isArray(items) ? items : [items];
                     podcastEpisodes = episodes.map(ep => ({
                         title: ep.title,
-                        description: typeof ep.description === 'string' ? ep.description : (ep.description?._ || ''),
+                        description: typeof ep.description === 'string' ? ep.description : (ep.content || ''),
                         pubDate: ep.pubDate,
                         link: ep.link
                     }));
@@ -935,13 +936,13 @@ function initPodcastStats() {
     const podcastEl = document.getElementById('podcast-episode-count');
     if (!podcastEl) return;
 
-    const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+    const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+    const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
 
     fetch(proxyUrl)
         .then(response => response.json())
         .then(data => {
-            const channel = Array.isArray(data?.rss?.channel) ? data.rss.channel[0] : data?.rss?.channel;
-            const items = channel?.item;
+            const items = data?.items;
             if (!items) return;
 
             const count = Array.isArray(items) ? items.length : 1;

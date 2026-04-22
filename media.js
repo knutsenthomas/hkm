@@ -566,25 +566,27 @@ async function initPodcastRSS() {
             }
         }
 
-        const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
+        const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
         const response = await fetch(proxyUrl);
         const data = await response.json();
-        const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
-        const items = channel?.item;
-
-        if (items) {
-            const episodes = Array.isArray(items) ? items : [items];
+        
+        if (data.status === 'ok' && data.items) {
+            const episodes = data.items;
 
             allPodcastEpisodes = episodes.map((episode, index) => {
-                const pubDateText = asText(episode.pubDate);
+                const pubDateText = episode.pubDate;
+                // Handle different date formats safely
+                const safeDateStr = pubDateText ? pubDateText.replace(/-/g, '/') : new Date().toISOString();
+                
                 return {
-                    title: asText(episode.title),
-                    pubDate: pubDateText,
-                    dateObj: new Date(pubDateText),
-                    link: asText(episode.link),
-                    description: asText(episode.description) || asText(episode["itunes:summary"]),
-                    thumbnail: getChannelImage(channel) || getItunesImage(episode),
-                    audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
+                    title: episode.title || '',
+                    pubDate: pubDateText || '',
+                    dateObj: new Date(safeDateStr),
+                    link: episode.link || '',
+                    description: episode.description || episode.content || '',
+                    thumbnail: episode.thumbnail || (data.feed && data.feed.image) || '',
+                    audioUrl: episode.enclosure?.link || '',
                     episodeNumber: episodes.length - index,
                     category: getEpisodeCategory(episode)
                 };
@@ -592,6 +594,8 @@ async function initPodcastRSS() {
 
             initPodcastControls();
             renderPodcastEpisodes();
+        } else {
+             throw new Error('Failed to fetch podcast or no items found.');
         }
     } catch (error) {
         console.error('[Podcast] Feil ved henting:', error);
