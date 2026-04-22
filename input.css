@@ -5718,12 +5718,32 @@ body:not(.cms-loading) {
 }
 
 @media (max-width: 600px) {
+    .shop-home-promo .container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    .shop-home-promo-card {
+        margin: 0;
+        padding: 30px 24px;
+        gap: 30px;
+    }
+
     .shop-home-promo-chip-grid {
         grid-template-columns: 1fr;
     }
     
     .shop-home-promo-title {
         font-size: 32px !important;
+        hyphens: none;
+        word-break: normal;
+        overflow-wrap: normal;
+    }
+
+    .shop-home-promo-text {
+        hyphens: none;
+        word-break: normal;
+        overflow-wrap: normal;
     }
 
     .shop-home-promo-actions {
