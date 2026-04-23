@@ -189,6 +189,316 @@ class AdminManager {
         }
     }
 
+    _hashString(value) {
+        const text = String(value || '');
+        let hash = 0;
+        for (let i = 0; i < text.length; i++) {
+            hash = ((hash << 5) - hash) + text.charCodeAt(i);
+            hash |= 0;
+        }
+        return String(hash);
+    }
+
+    _buildBlogTranslationSourceHash(post) {
+        if (!post || typeof post !== 'object') return this._hashString('');
+        const payload = {
+            title: post.title || '',
+            category: post.category || '',
+            content: post.content || '',
+            seoTitle: post.seoTitle || '',
+            seoDescription: post.seoDescription || '',
+            tags: Array.isArray(post.tags) ? post.tags : []
+        };
+        return this._hashString(JSON.stringify(payload));
+    }
+
+    _isLikelyNonTranslatableToken(value) {
+        const str = String(value || '').trim();
+        if (!str) return true;
+        if (/^(https?:\/\/|www\.)/i.test(str)) return true;
+        if (/^[\w.-]+@[\w.-]+\.[A-Za-z]{2,}$/.test(str)) return true;
+        if (/^[\d\s.,:/-]+$/.test(str)) return true;
+        if (/^[a-f0-9-]{16,}$/i.test(str)) return true;
+        return false;
+    }
+
+    _splitTextForTranslation(value, maxChunkLength = 450) {
+        const raw = String(value || '');
+        if (!raw.trim()) return [];
+        if (raw.length <= maxChunkLength) return [raw];
+
+        const chunks = [];
+        const paragraphs = raw.split('\n');
+        paragraphs.forEach((paragraph) => {
+            if (!paragraph) {
+                chunks.push('\n');
+                return;
+            }
+
+            if (paragraph.length <= maxChunkLength) {
+                chunks.push(paragraph);
+                return;
+            }
+
+            const sentences = paragraph.split(/(?<=[.!?])\s+/);
+            let current = '';
+            sentences.forEach((sentence) => {
+                if (!sentence) return;
+                const candidate = current ? `${current} ${sentence}` : sentence;
+                if (candidate.length > maxChunkLength) {
+                    if (current) chunks.push(current);
+                    if (sentence.length <= maxChunkLength) {
+                        current = sentence;
+                    } else {
+                        const words = sentence.split(/\s+/);
+                        let longCurrent = '';
+                        words.forEach((word) => {
+                            const longCandidate = longCurrent ? `${longCurrent} ${word}` : word;
+                            if (longCandidate.length > maxChunkLength) {
+                                if (longCurrent) chunks.push(longCurrent);
+                                longCurrent = word;
+                            } else {
+                                longCurrent = longCandidate;
+                            }
+                        });
+                        if (longCurrent) chunks.push(longCurrent);
+                        current = '';
+                    }
+                } else {
+                    current = candidate;
+                }
+            });
+            if (current) chunks.push(current);
+        });
+
+        return chunks;
+    }
+
+    async _translateTextChunk(text, targetLang, sourceLang = 'no') {
+        const raw = String(text || '');
+        if (!raw.trim()) return raw;
+        if (this._isLikelyNonTranslatableToken(raw)) return raw;
+
+        const cacheKey = `${sourceLang}:${targetLang}:${raw}`;
+        this._translationCache = this._translationCache || new Map();
+        if (this._translationCache.has(cacheKey)) {
+            return this._translationCache.get(cacheKey);
+        }
+
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=${encodeURIComponent(sourceLang)}|${encodeURIComponent(targetLang)}`;
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            const translated = data?.responseData?.translatedText;
+            const finalText = (typeof translated === 'string' && translated.trim())
+                ? translated
+                : raw;
+            this._translationCache.set(cacheKey, finalText);
+            return finalText;
+        } catch (error) {
+            console.warn(`[AdminManager] Translation failed (${targetLang})`, error);
+            return raw;
+        }
+    }
+
+    async _translateRichText(value, targetLang, sourceLang = 'no') {
+        const raw = String(value || '');
+        if (!raw.trim()) return raw;
+
+        // Preserve HTML tags by translating text segments only.
+        const segments = raw.split(/(<[^>]+>)/g);
+        const translatedParts = [];
+        for (const segment of segments) {
+            if (!segment) continue;
+            if (segment.startsWith('<') && segment.endsWith('>')) {
+                translatedParts.push(segment);
+                continue;
+            }
+
+            const chunks = this._splitTextForTranslation(segment);
+            if (!chunks.length) {
+                translatedParts.push(segment);
+                continue;
+            }
+
+            const translatedChunks = [];
+            for (const chunk of chunks) {
+                if (chunk === '\n') {
+                    translatedChunks.push('\n');
+                    continue;
+                }
+                const translated = await this._translateTextChunk(chunk, targetLang, sourceLang);
+                translatedChunks.push(translated);
+            }
+            translatedParts.push(translatedChunks.join(''));
+        }
+        return translatedParts.join('');
+    }
+
+    async _translateEditorBlock(block, targetLang, sourceLang = 'no') {
+        if (!block || typeof block !== 'object') return block;
+        const cloned = JSON.parse(JSON.stringify(block));
+        const data = cloned.data || {};
+
+        const translateField = async (field) => {
+            if (typeof data[field] === 'string') {
+                data[field] = await this._translateRichText(data[field], targetLang, sourceLang);
+            }
+        };
+
+        switch (cloned.type) {
+            case 'header':
+            case 'paragraph':
+            case 'quote':
+            case 'embed':
+            case 'video':
+            case 'youtubeVideo':
+                await translateField('text');
+                await translateField('caption');
+                break;
+            case 'list':
+                if (Array.isArray(data.items)) {
+                    const translatedItems = [];
+                    for (const item of data.items) {
+                        translatedItems.push(await this._translateRichText(item, targetLang, sourceLang));
+                    }
+                    data.items = translatedItems;
+                }
+                break;
+            case 'image':
+                await translateField('caption');
+                break;
+            default:
+                // Fallback: translate common text fields if present
+                await translateField('text');
+                await translateField('caption');
+                await translateField('title');
+                break;
+        }
+
+        cloned.data = data;
+        return cloned;
+    }
+
+    async _translateBlogContent(content, targetLang, sourceLang = 'no') {
+        if (!content) return content;
+
+        if (typeof content === 'string') {
+            return this._translateRichText(content, targetLang, sourceLang);
+        }
+
+        if (typeof content === 'object' && Array.isArray(content.blocks)) {
+            const translated = {
+                ...content,
+                blocks: []
+            };
+            for (const block of content.blocks) {
+                translated.blocks.push(await this._translateEditorBlock(block, targetLang, sourceLang));
+            }
+            return translated;
+        }
+
+        return content;
+    }
+
+    async _buildBlogTranslation(post, targetLang) {
+        const translation = {};
+        if (typeof post.title === 'string') {
+            translation.title = await this._translateRichText(post.title, targetLang, 'no');
+        }
+        if (typeof post.category === 'string') {
+            translation.category = await this._translateRichText(post.category, targetLang, 'no');
+        }
+        if (typeof post.seoTitle === 'string') {
+            translation.seoTitle = await this._translateRichText(post.seoTitle, targetLang, 'no');
+        }
+        if (typeof post.seoDescription === 'string') {
+            translation.seoDescription = await this._translateRichText(post.seoDescription, targetLang, 'no');
+        }
+        if (Array.isArray(post.tags)) {
+            const translatedTags = [];
+            for (const tag of post.tags) {
+                translatedTags.push(await this._translateRichText(tag, targetLang, 'no'));
+            }
+            translation.tags = translatedTags;
+        }
+        if (typeof post.content !== 'undefined') {
+            translation.content = await this._translateBlogContent(post.content, targetLang, 'no');
+        }
+        return translation;
+    }
+
+    async ensureBlogPostTranslations(post, { force = false } = {}) {
+        if (!post || typeof post !== 'object') return post;
+
+        const updatedPost = { ...post };
+        const sourceHash = this._buildBlogTranslationSourceHash(updatedPost);
+        const existingTranslations = (updatedPost.translations && typeof updatedPost.translations === 'object')
+            ? { ...updatedPost.translations }
+            : {};
+
+        for (const lang of ['en', 'es']) {
+            const existing = (existingTranslations[lang] && typeof existingTranslations[lang] === 'object')
+                ? existingTranslations[lang]
+                : null;
+            const isUpToDate = !!existing && existing._sourceHash === sourceHash && existing.title && existing.content;
+            if (!force && isUpToDate) continue;
+
+            const translated = await this._buildBlogTranslation(updatedPost, lang);
+            existingTranslations[lang] = {
+                ...(existing || {}),
+                ...translated,
+                _sourceHash: sourceHash,
+                _updatedAt: new Date().toISOString()
+            };
+        }
+
+        updatedPost.translations = existingTranslations;
+        updatedPost.translationSourceHash = sourceHash;
+        updatedPost.sourceLanguage = 'no';
+        return updatedPost;
+    }
+
+    async translateAllExistingBlogPosts({ force = false, silent = false } = {}) {
+        if (this._blogTranslationBackfillRunning) return;
+        this._blogTranslationBackfillRunning = true;
+        try {
+            const blogData = await firebaseService.getPageContent('collection_blog');
+            const items = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+            if (!items.length) {
+                return;
+            }
+
+            const translatedItems = [];
+            let changed = false;
+            for (let i = 0; i < items.length; i++) {
+                const post = items[i];
+                const translatedPost = await this.ensureBlogPostTranslations(post, { force });
+                translatedItems.push(translatedPost);
+                if (JSON.stringify(translatedPost) !== JSON.stringify(post)) {
+                    changed = true;
+                }
+            }
+
+            if (changed) {
+                await firebaseService.savePageContent('collection_blog', { items: translatedItems });
+                await this.loadCollection('blog');
+                if (!silent) {
+                    this.showToast('✅ Blogginnlegg er oversatt til engelsk og spansk.', 'success', 5000);
+                }
+            } else if (!silent) {
+                this.showToast('Blogginnlegg er allerede oppdatert på engelsk og spansk.', 'success', 3500);
+            }
+        } catch (error) {
+            console.error('[AdminManager] Failed to translate existing blog posts', error);
+            if (!silent) {
+                this.showToast('Kunne ikke oversette alle blogginnlegg nå.', 'error', 5000);
+            }
+        } finally {
+            this._blogTranslationBackfillRunning = false;
+        }
+    }
+
     _scheduleOverviewRefresh(reason = 'unknown') {
         if (this.currentSection !== 'overview') return;
         if (this._overviewRefreshTimer) clearTimeout(this._overviewRefreshTimer);
@@ -2533,6 +2843,11 @@ class AdminManager {
         // Add event listeners for new content buttons
         document.getElementById('new-blog-post').addEventListener('click', () => this.openContentModal('blog'));
         document.getElementById('new-teaching-series').addEventListener('click', () => this.openContentModal('teaching'));
+
+        // Keep existing posts translated in background without adding an extra manual button.
+        this.translateAllExistingBlogPosts({ force: false, silent: true }).catch((error) => {
+            console.warn('[AdminManager] Background blog translation backfill failed', error);
+        });
     }
 
     async checkSystemHealth() {
@@ -4135,11 +4450,15 @@ class AdminManager {
                                 return;
                             }
 
-                            const safeItem = normalizedItem.value;
+                            let safeItem = normalizedItem.value;
 
                             try {
                                 const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                                 const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+
+                                if (collectionId === 'blog') {
+                                    safeItem = await this.ensureBlogPostTranslations(safeItem, { force: false });
+                                }
 
                                 // Use ID-based matching if available (most reliable)
                                 let existingIdx = -1;

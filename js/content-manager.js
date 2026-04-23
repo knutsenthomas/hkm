@@ -84,6 +84,67 @@ class ContentManager {
         return (mappings[lang] && mappings[lang][noFile]) || noFile;
     }
 
+    getCurrentLanguage() {
+        let lang = document.documentElement.lang || 'no';
+        if (lang.includes('-')) lang = lang.split('-')[0];
+        if (!['no', 'en', 'es'].includes(lang)) return 'no';
+        return lang;
+    }
+
+    getContentItemStableId(item) {
+        if (!item || typeof item !== 'object') return '';
+        return item.id || item.slug || item.title || '';
+    }
+
+    getLocalizedContentItem(item, lang = this.getCurrentLanguage()) {
+        if (!item || typeof item !== 'object') return item;
+        if (lang === 'no') {
+            return {
+                ...item,
+                __stableId: this.getContentItemStableId(item)
+            };
+        }
+
+        const translations = (item.translations && typeof item.translations === 'object')
+            ? item.translations
+            : {};
+        const localized = (translations[lang] && typeof translations[lang] === 'object')
+            ? translations[lang]
+            : null;
+
+        if (!localized) {
+            return {
+                ...item,
+                __stableId: this.getContentItemStableId(item)
+            };
+        }
+
+        return {
+            ...item,
+            title: typeof localized.title === 'string' && localized.title.trim() ? localized.title : item.title,
+            content: typeof localized.content !== 'undefined' ? localized.content : item.content,
+            category: typeof localized.category === 'string' && localized.category.trim() ? localized.category : item.category,
+            seoTitle: typeof localized.seoTitle === 'string' && localized.seoTitle.trim() ? localized.seoTitle : item.seoTitle,
+            seoDescription: typeof localized.seoDescription === 'string' && localized.seoDescription.trim() ? localized.seoDescription : item.seoDescription,
+            tags: Array.isArray(localized.tags) && localized.tags.length ? localized.tags : item.tags,
+            __stableId: this.getContentItemStableId(item)
+        };
+    }
+
+    localizeBlogItems(items) {
+        const lang = this.getCurrentLanguage();
+        return (Array.isArray(items) ? items : []).map((item) => this.getLocalizedContentItem(item, lang));
+    }
+
+    findContentItemById(items, itemId) {
+        if (!Array.isArray(items) || !itemId) return null;
+        const target = String(itemId);
+        return items.find((item) => {
+            const stableId = this.getContentItemStableId(item);
+            return stableId === target || encodeURIComponent(stableId) === target;
+        }) || null;
+    }
+
     setLoading(isLoading) {
         const body = document.body;
         if (!body) return;
@@ -326,12 +387,13 @@ class ContentManager {
                 ...(Array.isArray(blogData) ? blogData : (blogData?.items || [])),
                 ...(Array.isArray(teachingData) ? teachingData : (teachingData?.items || []))
             ];
-            const item = allItems.find(i => i.title === itemId || i.id === itemId);
-            if (item && (item.seoTitle || item.seoDescription || item.geoPosition)) {
+            const item = this.findContentItemById(allItems, itemId);
+            const localizedItem = item ? this.getLocalizedContentItem(item) : null;
+            if (localizedItem && (localizedItem.seoTitle || localizedItem.seoDescription || localizedItem.geoPosition)) {
                 itemSEO = {
-                    title: item.seoTitle,
-                    description: item.seoDescription,
-                    geoPosition: item.geoPosition
+                    title: localizedItem.seoTitle,
+                    description: localizedItem.seoDescription,
+                    geoPosition: localizedItem.geoPosition
                 };
             }
         }
@@ -369,7 +431,8 @@ class ContentManager {
             this.renderTestimonials(testimonials);
 
             const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
-            if (blogItems.length > 0) this.renderBlogPosts(blogItems.slice(0, 3), '#blogg .blog-grid');
+            const localizedBlogItems = this.localizeBlogItems(blogItems);
+            if (localizedBlogItems.length > 0) this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid');
 
             const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
             const frontTeachingContainer = document.getElementById('siste-undervisning');
@@ -445,10 +508,11 @@ class ContentManager {
                 console.log("[ContentManager] Blog data received:", blogData);
 
                 const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+                const localizedBlogItems = this.localizeBlogItems(blogItems);
                 console.log("[ContentManager] Parsed blog items:", blogItems);
 
-                if (blogItems.length > 0) {
-                    this.renderBlogPosts(blogItems, '.blog-page .blog-grid');
+                if (localizedBlogItems.length > 0) {
+                    this.renderBlogPosts(localizedBlogItems, '.blog-page .blog-grid');
                 } else {
                     console.warn("[ContentManager] No blog posts found in 'collection_blog'.");
                     const container = document.querySelector('.blog-page .blog-grid');
@@ -556,9 +620,10 @@ class ContentManager {
         const teachingData = await window.firebaseService.getPageContent('collection_teaching');
         const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
         const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
-        const blogItem = blogItems.find(i => i.title === itemId || i.id === itemId);
-        const teachingItem = teachingItems.find(i => i.title === itemId || i.id === itemId);
-        const item = blogItem || teachingItem;
+        const blogItem = this.findContentItemById(blogItems, itemId);
+        const teachingItem = this.findContentItemById(teachingItems, itemId);
+        const sourceItem = blogItem || teachingItem;
+        const item = sourceItem ? this.getLocalizedContentItem(sourceItem) : null;
         const isTeaching = !!teachingItem;
 
         if (!item) {
@@ -605,7 +670,7 @@ class ContentManager {
         }
 
         // --- View Counter ---
-        const postId = item.id || item.title;
+        const postId = this.getContentItemStableId(sourceItem || item);
         let viewCount = 1;
 
         if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
@@ -712,16 +777,16 @@ class ContentManager {
             if (isTeaching) {
                 heading = 'Relatert undervisning';
                 ctaLabel = 'Les undervisning';
-                const seriesIds = Array.isArray(item.seriesItems) ? item.seriesItems : [];
+                const seriesIds = Array.isArray(sourceItem?.seriesItems) ? sourceItem.seriesItems : [];
                 if (seriesIds.length > 0) {
                     relatedItems = teachingItems.filter(i =>
                         (seriesIds.includes(i.id) || seriesIds.includes(i.title)) &&
-                        (i.id || i.title) !== postId
+                        this.getContentItemStableId(i) !== postId
                     );
                 } else {
-                    const teachingType = item.teachingType || item.category;
+                    const teachingType = sourceItem?.teachingType || sourceItem?.category || item.teachingType || item.category;
                     relatedItems = teachingItems
-                        .filter(i => (i.id || i.title) !== postId)
+                        .filter(i => this.getContentItemStableId(i) !== postId)
                         .filter(i => {
                             if (!teachingType) return true;
                             return (i.teachingType || i.category) === teachingType;
@@ -729,27 +794,31 @@ class ContentManager {
                         .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
                         .slice(0, 3);
                 }
-            } else if (item.relatedPosts && Array.isArray(item.relatedPosts) && item.relatedPosts.length > 0) {
+            } else if (sourceItem?.relatedPosts && Array.isArray(sourceItem.relatedPosts) && sourceItem.relatedPosts.length > 0) {
                 // Fetch manually selected ones
-                relatedItems = blogItems.filter(i => (item.relatedPosts.includes(i.id) || item.relatedPosts.includes(i.title)) && (i.id || i.title) !== postId);
+                relatedItems = blogItems.filter(i =>
+                    (sourceItem.relatedPosts.includes(i.id) || sourceItem.relatedPosts.includes(i.title)) &&
+                    this.getContentItemStableId(i) !== postId
+                );
             } else {
                 // Fallback: 3 most recent posts excluding current one
                 relatedItems = blogItems
-                    .filter(i => (i.id || i.title) !== postId)
+                    .filter(i => this.getContentItemStableId(i) !== postId)
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
                     .slice(0, 3);
             }
 
             if (relatedItems.length > 0) {
+                const localizedRelatedItems = this.localizeBlogItems(relatedItems);
                 relatedContainer.style.display = 'block';
                 relatedContainer.innerHTML = `
                     <h3 class="cms-related-heading">
                         ${heading}
                     </h3>
                     <div class="blog-grid cms-related-grid">
-                        ${relatedItems.map(post => `
+                        ${localizedRelatedItems.map(post => `
                             <article class="blog-card cms-related-card">
-                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" class="cms-related-card-link">
+                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.__stableId || this.getContentItemStableId(post))}" class="cms-related-card-link">
                                     <div class="blog-image cms-related-image">
                                         <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
                                              alt="${post.title}" 
@@ -2468,8 +2537,11 @@ class ContentManager {
         const container = document.querySelector(selector);
         if (!container) return;
 
-        if (posts.length > 0) {
-            const html = posts.map(post => `
+        const localizedPosts = this.localizeBlogItems(posts);
+        if (localizedPosts.length > 0) {
+            const html = localizedPosts.map(post => {
+                const stableId = post.__stableId || this.getContentItemStableId(post);
+                return `
                 <article class="blog-card">
                     <div class="blog-image">
                         <img src="${post.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${post.title}">
@@ -2487,10 +2559,11 @@ class ContentManager {
                         ` : ''}
                         <h3 class="blog-title cms-blog-title">${post.title}</h3>
                         <p class="blog-excerpt cms-blog-excerpt">${this.generateExcerpt(post.content, post.title)}...</p>
-                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" class="blog-link cms-blog-link">${this.getTranslation('read_more')} <i class="fas fa-arrow-right cms-blog-link-icon"></i></a>
+                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link cms-blog-link">${this.getTranslation('read_more')} <i class="fas fa-arrow-right cms-blog-link-icon"></i></a>
                     </div>
                 </article>
-            `).join('');
+            `;
+            }).join('');
 
             this.setHTMLIfChanged(container, html, `blog:${selector}`);
         }
