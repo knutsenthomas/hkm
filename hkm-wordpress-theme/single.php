@@ -6,7 +6,7 @@
 
         <!-- Blog Post Hero -->
         <section class="page-hero relative" id="blog-hero"
-            style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('<?php echo has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'full') : 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'; ?>'); padding-top: 180px; margin-top: 0;">
+            style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('<?php echo has_post_thumbnail() ? get_the_post_thumbnail_url(null, 'full') : 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'; ?>'); margin-top: 0;">
             <div class="container">
                 <h1 class="page-hero-title">
                     <?php the_title(); ?>

@@ -4868,6 +4868,15 @@ ol.block-list {
     overflow: hidden;
 }
 
+/* Explicit lock for key pages requested by user */
+body.page-template-page-bli-fast-giver-php .page-hero,
+body.page-template-page-donasjoner-php .page-hero,
+body.page-template-page-bnn-php .page-hero {
+    height: var(--subpage-hero-height-desktop) !important;
+    min-height: var(--subpage-hero-height-desktop) !important;
+    max-height: var(--subpage-hero-height-desktop) !important;
+}
+
 .page-hero .container,
 .page-hero-content {
     width: 100%;
@@ -4901,6 +4910,14 @@ ol.block-list {
     .page-hero,
     .page-hero.subpage-hero,
     #blog-hero {
+        height: var(--subpage-hero-height-mobile) !important;
+        min-height: var(--subpage-hero-height-mobile) !important;
+        max-height: var(--subpage-hero-height-mobile) !important;
+    }
+
+    body.page-template-page-bli-fast-giver-php .page-hero,
+    body.page-template-page-donasjoner-php .page-hero,
+    body.page-template-page-bnn-php .page-hero {
         height: var(--subpage-hero-height-mobile) !important;
         min-height: var(--subpage-hero-height-mobile) !important;
         max-height: var(--subpage-hero-height-mobile) !important;

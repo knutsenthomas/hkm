@@ -10,8 +10,8 @@ get_header(); ?>
         the_post(); ?>
         <!-- Page Hero -->
         <section class="page-hero"
-            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('<?php echo get_the_post_thumbnail_url(null, 'full') ?: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'; ?>'); display: flex; align-items: center; min-height: 350px;">
-            <div class="container flex flex-col items-center justify-center text-center py-16" style="min-height: 300px;">
+            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('<?php echo get_the_post_thumbnail_url(null, 'full') ?: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'; ?>');">
+            <div class="container text-center">
                 <h1 class="page-hero-title" style="margin-bottom: 1rem;">
                     <?php the_title(); ?>
                 </h1>
