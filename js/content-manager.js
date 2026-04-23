@@ -94,6 +94,16 @@ class ContentManager {
         }
     }
 
+    setContentReady(isReady) {
+        const body = document.body;
+        if (!body) return;
+        if (isReady) {
+            body.classList.add('cms-content-ready');
+        } else {
+            body.classList.remove('cms-content-ready');
+        }
+    }
+
     notifyUser(message, type = 'warning', duration = 5000) {
         if (!message) return;
         if (typeof window.showToast === 'function') {
@@ -193,8 +203,11 @@ class ContentManager {
         let pageContentHydrated = false;
         const revealIfHydrated = () => {
             if (!pageContentHydrated) return;
+            this.setContentReady(true);
             this.setLoading(false);
         };
+
+        this.setContentReady(false);
 
         // 1. Try to apply cached global settings INSTANTLY (pre-Firebase)
         try {
@@ -315,6 +328,9 @@ class ContentManager {
                 userMessage: 'Noe innhold kunne ikke lastes. Siden kan være delvis oppdatert.'
             });
         } finally {
+            if (pageContentHydrated) {
+                this.setContentReady(true);
+            }
             this.setLoading(false);
             window.dispatchEvent(new CustomEvent('cmsContentLoaded'));
         }
@@ -2199,10 +2215,7 @@ class ContentManager {
             }
             // Strict: Only set hero subtitle as text
             if (isHeroSubtitle) {
-                el.textContent = value || {
-                    'bnn': 'Et nettverk for kristne ledere og næringsdrivende som ønsker å bruke sine ressurser for Guds rike.',
-                    'om-oss': 'Lær mer om vår visjon, oppdrag og historie'
-                }[this.pageId] || '';
+                el.textContent = value || '';
                 return;
             }
 
