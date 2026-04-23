@@ -744,6 +744,22 @@ class AdminManager {
                 await this.syncUserProfile(user, role);
                 await this.updateUserInfo(user);
                 this.applyRoleRestrictions(role);
+
+                // Ensure existing Norwegian blog posts are fully translated to EN/ES.
+                // Run once per browser/day to avoid unnecessary repeated writes.
+                try {
+                    const todayKey = new Date().toISOString().slice(0, 10);
+                    const backfillKey = 'hkm_blog_translation_backfill_last_run';
+                    const lastRun = localStorage.getItem(backfillKey);
+                    if (lastRun !== todayKey) {
+                        this.translateAllExistingBlogPosts({ force: true, silent: true })
+                            .then(() => localStorage.setItem(backfillKey, todayKey))
+                            .catch((err) => console.warn('[AdminManager] Forced blog translation backfill failed', err));
+                    }
+                } catch (error) {
+                    console.warn('[AdminManager] Could not schedule forced blog translation backfill', error);
+                }
+
                 console.log("[AdminManager] Admin access verified, removing cloak.");
                 this.removeSplashScreen();
             } catch (error) {
@@ -2845,7 +2861,7 @@ class AdminManager {
         document.getElementById('new-teaching-series').addEventListener('click', () => this.openContentModal('teaching'));
 
         // Keep existing posts translated in background without adding an extra manual button.
-        this.translateAllExistingBlogPosts({ force: false, silent: true }).catch((error) => {
+        this.translateAllExistingBlogPosts({ force: true, silent: true }).catch((error) => {
             console.warn('[AdminManager] Background blog translation backfill failed', error);
         });
     }
