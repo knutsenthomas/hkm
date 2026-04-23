@@ -4846,11 +4846,19 @@ ol.block-list {
 }
 
 /* Unified subpage hero sizing and centering */
-.page-hero {
-    height: 420px;
-    min-height: 420px;
-    max-height: 420px;
-    padding: 0 !important;
+:root {
+    --subpage-hero-height-desktop: 540px;
+    --subpage-hero-height-mobile: 320px;
+}
+
+.page-hero,
+.page-hero.subpage-hero,
+#blog-hero {
+    height: var(--subpage-hero-height-desktop) !important;
+    min-height: var(--subpage-hero-height-desktop) !important;
+    max-height: var(--subpage-hero-height-desktop) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4890,9 +4898,11 @@ ol.block-list {
 }
 
 @media (max-width: 768px) {
-    .page-hero {
-        height: 300px;
-        min-height: 300px;
-        max-height: 300px;
+    .page-hero,
+    .page-hero.subpage-hero,
+    #blog-hero {
+        height: var(--subpage-hero-height-mobile) !important;
+        min-height: var(--subpage-hero-height-mobile) !important;
+        max-height: var(--subpage-hero-height-mobile) !important;
     }
 }
