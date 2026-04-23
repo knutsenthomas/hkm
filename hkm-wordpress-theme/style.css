@@ -4847,7 +4847,9 @@ ol.block-list {
 
 /* Unified subpage hero sizing and centering */
 .page-hero {
+    height: 420px;
     min-height: 420px;
+    max-height: 420px;
     padding: 0 !important;
     display: flex;
     align-items: center;
@@ -4855,17 +4857,25 @@ ol.block-list {
     text-align: center;
     background-size: cover;
     background-position: center;
+    overflow: hidden;
 }
 
 .page-hero .container,
 .page-hero-content {
     width: 100%;
     text-align: center;
+    height: 100%;
 }
 
 .page-hero-content {
     display: flex;
     flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-hero .container {
+    display: flex;
     align-items: center;
     justify-content: center;
 }
@@ -4881,6 +4891,8 @@ ol.block-list {
 
 @media (max-width: 768px) {
     .page-hero {
+        height: 300px;
         min-height: 300px;
+        max-height: 300px;
     }
 }
