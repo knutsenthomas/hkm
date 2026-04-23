@@ -65,7 +65,17 @@ class ContentManager {
                 'bnn.html': 'bnn.html',
                 'arrangement-detaljer.html': 'event-details.html',
                 'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html'
+                'blogg-post.html': 'blog-post.html',
+                'kalender.html': 'calendar.html',
+                'undervisningsserier.html': 'teaching.html',
+                'undervisning.html': 'teaching.html',
+                'bibelstudier.html': 'teaching.html',
+                'seminarer.html': 'teaching.html',
+                'kurs.html': 'teaching.html',
+                'reisevirksomhet.html': 'events.html',
+                'bli-fast-giver.html': 'regular-donors.html',
+                'personvern.html': 'privacy.html',
+                'tilgjengelighet.html': 'accessibility.html'
             },
             'es': {
                 'index.html': 'index.html',
@@ -78,7 +88,17 @@ class ContentManager {
                 'bnn.html': 'bnn.html',
                 'arrangement-detaljer.html': 'detalles-evento.html',
                 'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html'
+                'blogg-post.html': 'blog-post.html',
+                'kalender.html': 'calendario.html',
+                'undervisningsserier.html': 'ensenanza.html',
+                'undervisning.html': 'ensenanza.html',
+                'bibelstudier.html': 'ensenanza.html',
+                'seminarer.html': 'ensenanza.html',
+                'kurs.html': 'ensenanza.html',
+                'reisevirksomhet.html': 'eventos.html',
+                'bli-fast-giver.html': 'donantes-regulares.html',
+                'personvern.html': 'privacidad.html',
+                'tilgjengelighet.html': 'accesibilidad.html'
             }
         };
         return (mappings[lang] && mappings[lang][noFile]) || noFile;

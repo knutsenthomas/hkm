@@ -7,6 +7,25 @@ const i18nManager = {
     languages: ['no', 'en', 'es'],
     defaultLang: 'no',
     storageKey: 'hkm_preferred_lang',
+    knownFiles: {
+        en: new Set([
+            'about.html', 'accessibility.html', 'blog-post-1.html', 'blog-post-2.html',
+            'blog-post-3.html', 'blog-post-4.html', 'blog-post-5.html', 'blog-post.html',
+            'blog.html', 'bnn.html', 'calendar.html', 'contact.html', 'donations.html',
+            'event-details.html', 'events.html', 'for-businesses.html', 'for-churches.html',
+            'index.html', 'media.html', 'podcast.html', 'privacy.html',
+            'regular-donors.html', 'teaching.html', 'youtube.html'
+        ]),
+        es: new Set([
+            'accesibilidad.html', 'blog-post-1.html', 'blog-post-2.html',
+            'blog-post-3.html', 'blog-post-4.html', 'blog-post-5.html', 'blog-post.html',
+            'blog.html', 'bnn.html', 'calendario.html', 'contacto.html',
+            'detalles-evento.html', 'donaciones.html', 'donantes-regulares.html',
+            'ensenanza.html', 'eventos.html', 'index.html', 'media.html',
+            'para-empresas.html', 'para-iglesias.html', 'podcast.html',
+            'privacidad.html', 'sobre-nosotros.html', 'youtube.html'
+        ])
+    },
 
     init() {
         this.detectLanguage();
@@ -49,33 +68,16 @@ const i18nManager = {
     redirectToLanguage(lang) {
         const currentPath = window.location.pathname;
         const currentFile = currentPath.split('/').pop() || 'index.html';
-
+        const mappedFile = this.mapFileName(currentFile, lang);
+        const insideLangFolder = currentPath.includes('/en/') || currentPath.includes('/es/');
         let newPath = '';
 
-        // Remove existing lang folders from path
-        let cleanPath = currentFile;
-        // If we are deep in a subdirectory, this logic might need adjustment, 
-        // but for HKM, most files are at root or one level deep.
-
         if (lang === 'no') {
-            newPath = `../${currentFile}`; // Moving up from /en/ or /es/
-            // If already at root, just currentFile
-            if (!currentPath.includes('/en/') && !currentPath.includes('/es/')) {
-                newPath = currentFile;
-            }
+            newPath = insideLangFolder ? `../${mappedFile}` : mappedFile;
         } else {
-            // Targetting EN or ES
-            if (currentPath.includes('/en/') || currentPath.includes('/es/')) {
-                // Switching between EN/ES
-                newPath = `../${lang}/${currentFile}`;
-            } else {
-                // Moving from root to lang folder
-                newPath = `${lang}/${currentFile}`;
-            }
+            const safeTargetFile = this.knownFiles[lang].has(mappedFile) ? mappedFile : 'index.html';
+            newPath = insideLangFolder ? `../${lang}/${safeTargetFile}` : `${lang}/${safeTargetFile}`;
         }
-
-        // Special mappings (e.g., om-oss.html -> about.html)
-        newPath = this.mapFileName(newPath, lang);
 
         window.location.href = newPath;
     },
@@ -100,8 +102,16 @@ const i18nManager = {
                 'media.html': 'media.html',
                 'kalender.html': 'calendar.html',
                 'undervisningsserier.html': 'teaching.html',
+                'undervisning.html': 'teaching.html',
+                'bibelstudier.html': 'teaching.html',
+                'seminarer.html': 'teaching.html',
+                'kurs.html': 'teaching.html',
+                'reisevirksomhet.html': 'events.html',
+                'bli-fast-giver.html': 'regular-donors.html',
                 'personvern.html': 'privacy.html',
                 'tilgjengelighet.html': 'accessibility.html',
+                'podcast.html': 'podcast.html',
+                'youtube.html': 'youtube.html',
                 'blogg-post-1.html': 'blog-post-1.html',
                 'blogg-post-2.html': 'blog-post-2.html',
                 'blogg-post-3.html': 'blog-post-3.html',
@@ -123,8 +133,16 @@ const i18nManager = {
                 'media.html': 'media.html',
                 'kalender.html': 'calendario.html',
                 'undervisningsserier.html': 'ensenanza.html',
+                'undervisning.html': 'ensenanza.html',
+                'bibelstudier.html': 'ensenanza.html',
+                'seminarer.html': 'ensenanza.html',
+                'kurs.html': 'ensenanza.html',
+                'reisevirksomhet.html': 'eventos.html',
+                'bli-fast-giver.html': 'donantes-regulares.html',
                 'personvern.html': 'privacidad.html',
                 'tilgjengelighet.html': 'accesibilidad.html',
+                'podcast.html': 'podcast.html',
+                'youtube.html': 'youtube.html',
                 'blogg-post-1.html': 'blog-post-1.html',
                 'blogg-post-2.html': 'blog-post-2.html',
                 'blogg-post-3.html': 'blog-post-3.html',
@@ -136,8 +154,8 @@ const i18nManager = {
         let result = path;
         if (mappings[targetLang]) {
             for (const [no, translated] of Object.entries(mappings[targetLang])) {
-                if (path.endsWith(no)) {
-                    result = path.replace(no, translated);
+                if (String(path).endsWith(no)) {
+                    result = String(path).replace(no, translated);
                     break;
                 }
             }
@@ -145,8 +163,8 @@ const i18nManager = {
             // Reverse mapping
             const allMappings = { ...mappings.en, ...mappings.es };
             for (const [no, translated] of Object.entries(allMappings)) {
-                if (path.endsWith(translated)) {
-                    result = path.replace(translated, no);
+                if (String(path).endsWith(translated)) {
+                    result = String(path).replace(translated, no);
                     break;
                 }
             }
