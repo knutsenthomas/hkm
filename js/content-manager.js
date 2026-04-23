@@ -91,6 +91,14 @@ class ContentManager {
         return lang;
     }
 
+    getCollectionItems(data) {
+        if (Array.isArray(data)) return data;
+        if (!data || typeof data !== 'object') return [];
+        if (Array.isArray(data.items)) return data.items;
+        if (data.items && typeof data.items === 'object') return Object.values(data.items);
+        return [];
+    }
+
     getContentItemStableId(item) {
         if (!item || typeof item !== 'object') return '';
         return item.id || item.slug || item.title || '';
@@ -133,7 +141,13 @@ class ContentManager {
 
     localizeBlogItems(items) {
         const lang = this.getCurrentLanguage();
-        return (Array.isArray(items) ? items : []).map((item) => this.getLocalizedContentItem(item, lang));
+        try {
+            const list = Array.isArray(items) ? items : [];
+            return list.map((item) => this.getLocalizedContentItem(item, lang));
+        } catch (error) {
+            console.warn('[ContentManager] localizeBlogItems fallback to source language', error);
+            return Array.isArray(items) ? items : [];
+        }
     }
 
     findContentItemById(items, itemId) {
@@ -384,8 +398,8 @@ class ContentManager {
                 this.getContentDoc('collection_teaching', { silent: true })
             ]);
             const allItems = [
-                ...(Array.isArray(blogData) ? blogData : (blogData?.items || [])),
-                ...(Array.isArray(teachingData) ? teachingData : (teachingData?.items || []))
+                ...this.getCollectionItems(blogData),
+                ...this.getCollectionItems(teachingData)
             ];
             const item = this.findContentItemById(allItems, itemId);
             const localizedItem = item ? this.getLocalizedContentItem(item) : null;
@@ -427,14 +441,14 @@ class ContentManager {
 
             // 4. Testimonials
             const testimonialsData = await this.getContentDoc('collection_testimonials', { silent: true });
-            const testimonials = Array.isArray(testimonialsData) ? testimonialsData : (testimonialsData?.items || []);
+            const testimonials = this.getCollectionItems(testimonialsData);
             this.renderTestimonials(testimonials);
 
-            const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+            const blogItems = this.getCollectionItems(blogData);
             const localizedBlogItems = this.localizeBlogItems(blogItems);
             if (localizedBlogItems.length > 0) this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid');
 
-            const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
+            const teachingItems = this.getCollectionItems(teachingData);
             const frontTeachingContainer = document.getElementById('siste-undervisning');
             if (teachingItems.length > 0 && frontTeachingContainer) {
                 // Show up to 3 most recent teachings
@@ -507,12 +521,13 @@ class ContentManager {
                 const blogData = await window.firebaseService.getPageContent('collection_blog');
                 console.log("[ContentManager] Blog data received:", blogData);
 
-                const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+                const blogItems = this.getCollectionItems(blogData);
                 const localizedBlogItems = this.localizeBlogItems(blogItems);
                 console.log("[ContentManager] Parsed blog items:", blogItems);
+                const postsToRender = localizedBlogItems.length > 0 ? localizedBlogItems : blogItems;
 
-                if (localizedBlogItems.length > 0) {
-                    this.renderBlogPosts(localizedBlogItems, '.blog-page .blog-grid');
+                if (postsToRender.length > 0) {
+                    this.renderBlogPosts(postsToRender, '.blog-page .blog-grid');
                 } else {
                     console.warn("[ContentManager] No blog posts found in 'collection_blog'.");
                     const container = document.querySelector('.blog-page .blog-grid');
@@ -534,7 +549,7 @@ class ContentManager {
     async loadCauses() {
         try {
             const data = await this.getContentDoc('collection_causes');
-            return Array.isArray(data) ? data : (data?.items || []);
+            return this.getCollectionItems(data);
         } catch (e) {
             this.reportError('loadCauses', e);
             return [];
@@ -618,8 +633,8 @@ class ContentManager {
 
         const blogData = await window.firebaseService.getPageContent('collection_blog');
         const teachingData = await window.firebaseService.getPageContent('collection_teaching');
-        const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
-        const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
+        const blogItems = this.getCollectionItems(blogData);
+        const teachingItems = this.getCollectionItems(teachingData);
         const blogItem = this.findContentItemById(blogItems, itemId);
         const teachingItem = this.findContentItemById(teachingItems, itemId);
         const sourceItem = blogItem || teachingItem;
@@ -2538,8 +2553,9 @@ class ContentManager {
         if (!container) return;
 
         const localizedPosts = this.localizeBlogItems(posts);
-        if (localizedPosts.length > 0) {
-            const html = localizedPosts.map(post => {
+        const renderPosts = localizedPosts.length > 0 ? localizedPosts : (Array.isArray(posts) ? posts : []);
+        if (renderPosts.length > 0) {
+            const html = renderPosts.map(post => {
                 const stableId = post.__stableId || this.getContentItemStableId(post);
                 return `
                 <article class="blog-card">
