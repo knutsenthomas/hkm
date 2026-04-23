@@ -446,7 +446,10 @@ class ContentManager {
 
             const blogItems = this.getCollectionItems(blogData);
             const localizedBlogItems = this.localizeBlogItems(blogItems);
-            if (localizedBlogItems.length > 0) this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid');
+            if (localizedBlogItems.length > 0) {
+                // NO uses #blogg, EN/ES use #blog
+                this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
+            }
 
             const teachingItems = this.getCollectionItems(teachingData);
             const frontTeachingContainer = document.getElementById('siste-undervisning');
