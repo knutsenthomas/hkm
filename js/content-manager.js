@@ -225,31 +225,8 @@ class ContentManager {
                     this.handleSEO(parsedSeo);
                 }
             }
-            // Also try to update some DOM for current page if cached
-            const cachedGlobalContent = localStorage.getItem('hkm_cache_settings_global');
-            if (cachedGlobalContent) {
-                const parsedGlobalContent = JSON.parse(cachedGlobalContent);
-                if (parsedGlobalContent && typeof parsedGlobalContent === 'object') {
-                    this.updateDOM(parsedGlobalContent, { docId: 'settings_global' });
-                }
-            }
-            if (this.pageId === 'index') {
-                const cachedFacebookFeed = localStorage.getItem('hkm_cache_settings_facebook_feed');
-                if (cachedFacebookFeed) {
-                    const parsedFacebookFeed = JSON.parse(cachedFacebookFeed);
-                    if (parsedFacebookFeed && typeof parsedFacebookFeed === 'object') {
-                        this.updateDOM(parsedFacebookFeed, { docId: 'settings_facebook_feed' });
-                    }
-                }
-            }
-            const cachedPage = localStorage.getItem(`hkm_cache_page_${this.pageId}`);
-            if (cachedPage) {
-                const parsedPage = JSON.parse(cachedPage);
-                if (parsedPage && typeof parsedPage === 'object') {
-                    this.updateDOM(parsedPage, { docId: this.pageId });
-                    pageContentHydrated = true;
-                }
-            }
+            // Do not hydrate text content from cache to avoid visible text switching.
+            // We only apply fresh Firestore content below.
 
             const cachedHero = localStorage.getItem('hkm_cache_hero_slides');
             if (cachedHero) {
@@ -257,7 +234,6 @@ class ContentManager {
                 if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
             }
 
-            revealIfHydrated();
         } catch (e) {
             console.warn("[ContentManager] Early cache read failed", e);
         }
