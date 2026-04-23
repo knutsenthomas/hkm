@@ -6,3 +6,20 @@ body:not(.cms-content-ready) [data-content-key] {
 body.cms-content-ready [data-content-key] {
   visibility: visible;
 }
+
+/* Calmer hero entrance: keep subtle fade, remove jumpy movement */
+body.hero-animate .hero-title,
+body.hero-animate .hero-subtitle,
+body.hero-animate .slide-buttons {
+  animation: hkm-hero-fade-in 0.35s ease-out forwards !important;
+  transform: none !important;
+}
+
+@keyframes hkm-hero-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
