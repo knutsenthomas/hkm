@@ -916,7 +916,9 @@ class FirebaseService {
      */
     async toggleLike(postId, userId) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        const safePostId = (typeof postId === 'string' ? postId : String(postId || ''))
+            .trim()
+            .replace(/\//g, '_'); // Replace slashes to avoid path confusion
         const safeUserId = typeof userId === 'string' ? userId.trim() : '';
         if (!safePostId || !safeUserId) throw new Error("Invalid parameters");
 
@@ -955,7 +957,9 @@ class FirebaseService {
 
     subscribeToLikes(postId, callback) {
         if (!this.isInitialized) return null;
-        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        const safePostId = (typeof postId === 'string' ? postId : String(postId || ''))
+            .trim()
+            .replace(/\//g, '_');
         if (!safePostId || typeof callback !== 'function') return null;
 
         return this.db.collection('interactions').doc(safePostId).onSnapshot((doc) => {
@@ -969,7 +973,9 @@ class FirebaseService {
 
     async addComment(postId, commentData) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        const safePostId = (typeof postId === 'string' ? postId : String(postId || ''))
+            .trim()
+            .replace(/\//g, '_');
         if (!safePostId || !commentData) throw new Error("Invalid parameters");
 
         const commentsRef = this.db.collection('interactions').doc(safePostId).collection('comments');
@@ -984,7 +990,9 @@ class FirebaseService {
 
     subscribeToComments(postId, callback) {
         if (!this.isInitialized) return null;
-        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        const safePostId = (typeof postId === 'string' ? postId : String(postId || ''))
+            .trim()
+            .replace(/\//g, '_');
         if (!safePostId || typeof callback !== 'function') return null;
 
         const commentsRef = this.db.collection('interactions').doc(safePostId).collection('comments').orderBy('timestamp', 'desc');

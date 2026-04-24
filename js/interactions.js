@@ -67,10 +67,10 @@ export class InteractionsManager {
                 <!-- Likes -->
                 <div class="likes-section">
                     <button id="interaction-like-btn" class="like-btn" aria-label="Liker">
-                        <i class="far fa-heart"></i>
+                        <i class="fa-regular fa-heart"></i>
                         <span>Liker</span>
                     </button>
-                    <span id="interaction-likes-count" class="likes-count-text">0 likerker dette</span>
+                    <span id="interaction-likes-count" class="likes-count-text">Henter likes...</span>
                 </div>
                 
                 <!-- Comments -->
@@ -114,7 +114,10 @@ export class InteractionsManager {
     bindEvents() {
         const likeBtn = document.getElementById('interaction-like-btn');
         if (likeBtn) {
-            likeBtn.addEventListener('click', () => this.handleLikeToggle());
+            likeBtn.onclick = (e) => {
+                e.preventDefault();
+                this.handleLikeToggle();
+            };
         }
         
         const form = document.getElementById('interaction-comment-form');
@@ -124,24 +127,38 @@ export class InteractionsManager {
     }
     
     async handleLikeToggle() {
-        // Optimistic UI update
         const btn = document.getElementById('interaction-like-btn');
-        const icon = btn.querySelector('i');
+        if (!btn || btn.disabled) return;
         
+        console.log(`[Interactions] Toggling like for post: ${this.postId}`);
+        
+        // Optimistic UI update
         this.isLiked = !this.isLiked;
         this.likesCount += this.isLiked ? 1 : -1;
         this.likesCount = Math.max(0, this.likesCount);
         this.updateLikesUI();
         
         try {
+            btn.disabled = true;
+            btn.style.opacity = '0.7';
             await firebaseService.toggleLike(this.postId, this.userId);
-            // The real-time subscription will sync the exact count shortly
+            console.log(`[Interactions] Successfully toggled like for ${this.postId}`);
         } catch (error) {
             console.error('[Interactions] Failed to toggle like:', error);
             // Revert optimistic update
             this.isLiked = !this.isLiked;
             this.likesCount += this.isLiked ? 1 : -1;
+            this.likesCount = Math.max(0, this.likesCount);
             this.updateLikesUI();
+            
+            if (error.message.includes('permission-denied')) {
+                alert('Du har ikke tilgang til å like dette innlegget for øyeblikket.');
+            }
+        } finally {
+            if (btn) {
+                btn.disabled = false;
+                btn.style.opacity = '1';
+            }
         }
     }
     
@@ -190,12 +207,12 @@ export class InteractionsManager {
         
         if (this.isLiked) {
             btn.classList.add('liked');
-            icon.classList.remove('far');
-            icon.classList.add('fas');
+            icon.classList.remove('fa-regular');
+            icon.classList.add('fa-solid');
         } else {
             btn.classList.remove('liked');
-            icon.classList.remove('fas');
-            icon.classList.add('far');
+            icon.classList.remove('fa-solid');
+            icon.classList.add('fa-regular');
         }
         
         if (this.likesCount === 0) {
