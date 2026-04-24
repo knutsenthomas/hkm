@@ -28,9 +28,9 @@ body.hero-animate .slide-buttons {
   position: absolute !important;
   top: 50% !important;
   bottom: auto !important;
-  right: auto !important;
   transform: translateY(-50%) !important;
   z-index: 25 !important;
+  right: auto !important;
 }
 
 .hero-slider .hero-nav.prev {
