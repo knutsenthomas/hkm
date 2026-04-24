@@ -1962,13 +1962,6 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
   const text = clampText(msgData.text || "", 1200);
   if (!text) return;
 
-  const webhookUrl = getGoogleChatWebhookUrl();
-  console.log(`[GoogleChatSync] Forsoker a bruke URL: ${webhookUrl ? webhookUrl.substring(0, 20) + "..." : "TOM"}`);
-  if (!webhookUrl) {
-    console.warn("GOOGLE_CHAT_WEBHOOK_URL mangler i secrets eller env.");
-    return;
-  }
-
   const chatId = event.params && event.params.chatId ? event.params.chatId : "ukjent";
   const chatRef = db.collection("visitorChats").doc(chatId);
   const chatDoc = await chatRef.get();
@@ -1979,34 +1972,90 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
   const sourcePage = clampText(chatData.lastPagePath || chatData.sourcePage || msgData.pagePath || "", 220);
 
   const payloadLines = [
-    "Ny melding fra nettside-chat",
+    "Ny chatmelding fra nettsiden",
     `Chat-ID: ${chatId}`,
     `Fra: ${visitorName}${visitorEmail ? ` (${visitorEmail})` : ""}`,
     sourcePage ? `Side: ${sourcePage}` : "",
+    `Sporsmal: ${text}`,
     "",
-    text,
-    "",
-    "Svar i Google Chat med:",
-    `reply ${chatId} <din melding>`,
+    "Svar med:",
+    `reply ${chatId} Hei!`,
   ].filter(Boolean);
 
-  try {
-    const response = await fetch(webhookUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json; charset=UTF-8",
-      },
-      body: JSON.stringify({
-        text: payloadLines.join("\n"),
-      }),
-    });
+  // 1) Send til Google Chat (hvis webhook er konfigurert)
+  const webhookUrl = getGoogleChatWebhookUrl();
+  console.log(`[GoogleChatSync] Forsoker a bruke URL: ${webhookUrl ? webhookUrl.substring(0, 20) + "..." : "TOM"}`);
+  if (webhookUrl) {
+    try {
+      const response = await fetch(webhookUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json; charset=UTF-8",
+        },
+        body: JSON.stringify({
+          text: payloadLines.join("\n"),
+        }),
+      });
 
-    if (!response.ok) {
-      const errText = await response.text().catch(() => "");
-      throw new Error(`Google Chat webhook feilet (${response.status}): ${errText}`);
+      if (!response.ok) {
+        const errText = await response.text().catch(() => "");
+        throw new Error(`Google Chat webhook feilet (${response.status}): ${errText}`);
+      }
+    } catch (error) {
+      console.error("Kunne ikke sende visitor chat til Google Chat:", error);
     }
+  } else {
+    console.warn("GOOGLE_CHAT_WEBHOOK_URL mangler i secrets eller env.");
+  }
+
+  // 2) Send intern e-postvarsling (uavhengig av Google Chat)
+  const emailAlertRecipient = (
+    process.env.CHAT_ALERT_EMAIL ||
+    process.env.ADMIN_EMAIL ||
+    process.env.EMAIL_USER ||
+    ""
+  ).trim();
+
+  if (!emailAlertRecipient) {
+    console.warn("Ingen e-postmottaker satt for chatvarsler (CHAT_ALERT_EMAIL/ADMIN_EMAIL/EMAIL_USER).");
+    return;
+  }
+
+  const emailSubject = `Ny nettside-chat (${chatId})`;
+  const emailText = [
+    "Ny chatmelding fra nettsiden",
+    `Chat-ID: ${chatId}`,
+    `Fra: ${visitorName}${visitorEmail ? ` (${visitorEmail})` : ""}`,
+    sourcePage ? `Side: ${sourcePage}` : "",
+    `Sporsmal: ${text}`,
+    "",
+    "Svar i Google Chat med:",
+    `reply ${chatId} Hei!`,
+  ].filter(Boolean).join("\n");
+
+  const emailHtml = `
+    <div style="font-family: Arial, sans-serif; max-width: 680px;">
+      <h2 style="margin-bottom: 10px;">Ny chatmelding fra nettsiden</h2>
+      <p><strong>Chat-ID:</strong> ${chatId}</p>
+      <p><strong>Fra:</strong> ${visitorName}${visitorEmail ? ` (${visitorEmail})` : ""}</p>
+      ${sourcePage ? `<p><strong>Side:</strong> ${sourcePage}</p>` : ""}
+      <p><strong>Sporsmal:</strong></p>
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;white-space:pre-wrap;">${text}</div>
+      <p style="margin-top:14px;"><strong>Svar i Google Chat med:</strong><br><code>reply ${chatId} Hei!</code></p>
+    </div>
+  `;
+
+  try {
+    await sendEmail({
+      to: emailAlertRecipient,
+      subject: emailSubject,
+      html: emailHtml,
+      text: emailText,
+      fromName: "HKM Chatbot",
+      type: "chat_alert",
+    });
   } catch (error) {
-    console.error("Kunne ikke sende visitor chat til Google Chat:", error);
+    console.error("Kunne ikke sende chat-varsel pa e-post:", error);
   }
 });
 
