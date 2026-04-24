@@ -910,6 +910,92 @@ class FirebaseService {
             return null;
         }
     }
+
+    /**
+     * Interactions (Likes & Comments)
+     */
+    async toggleLike(postId, userId) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        const safeUserId = typeof userId === 'string' ? userId.trim() : '';
+        if (!safePostId || !safeUserId) throw new Error("Invalid parameters");
+
+        const docRef = this.db.collection('interactions').doc(safePostId);
+        
+        try {
+            return await this.db.runTransaction(async (transaction) => {
+                const doc = await transaction.get(docRef);
+                if (!doc.exists) {
+                    transaction.set(docRef, { likes_count: 1, liked_by: [safeUserId] });
+                    return { liked: true, likes_count: 1 };
+                }
+                
+                const data = doc.data();
+                const likedBy = data.liked_by || [];
+                let newCount = data.likes_count || 0;
+                let liked = false;
+                
+                if (likedBy.includes(safeUserId)) {
+                    likedBy.splice(likedBy.indexOf(safeUserId), 1);
+                    newCount = Math.max(0, newCount - 1);
+                } else {
+                    likedBy.push(safeUserId);
+                    newCount++;
+                    liked = true;
+                }
+                
+                transaction.update(docRef, { likes_count: newCount, liked_by: likedBy });
+                return { liked, likes_count: newCount };
+            });
+        } catch (error) {
+            console.error(`❌ Failed to toggle like for ${postId}:`, error);
+            throw error;
+        }
+    }
+
+    subscribeToLikes(postId, callback) {
+        if (!this.isInitialized) return null;
+        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        if (!safePostId || typeof callback !== 'function') return null;
+
+        return this.db.collection('interactions').doc(safePostId).onSnapshot((doc) => {
+            if (doc.exists) {
+                callback(doc.data());
+            } else {
+                callback({ likes_count: 0, liked_by: [] });
+            }
+        });
+    }
+
+    async addComment(postId, commentData) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        if (!safePostId || !commentData) throw new Error("Invalid parameters");
+
+        const commentsRef = this.db.collection('interactions').doc(safePostId).collection('comments');
+        return commentsRef.add({
+            author_name: commentData.author_name || 'Anonym',
+            text: commentData.text || '',
+            user_id: commentData.user_id || 'anonymous',
+            timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+            status: 'approved'
+        });
+    }
+
+    subscribeToComments(postId, callback) {
+        if (!this.isInitialized) return null;
+        const safePostId = typeof postId === 'string' ? postId.trim() : '';
+        if (!safePostId || typeof callback !== 'function') return null;
+
+        const commentsRef = this.db.collection('interactions').doc(safePostId).collection('comments').orderBy('timestamp', 'desc');
+        return commentsRef.onSnapshot((snapshot) => {
+            const comments = [];
+            snapshot.forEach((doc) => {
+                comments.push({ id: doc.id, ...doc.data() });
+            });
+            callback(comments);
+        });
+    }
 }
 
 // Global instance

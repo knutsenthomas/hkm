@@ -2,6 +2,8 @@
 // Public Content Manager (Global version)
 // ===================================
 
+import { InteractionsManager } from './interactions.js';
+
 
 class ContentManager {
     constructor() {
@@ -881,6 +883,14 @@ class ContentManager {
             } else {
                 relatedContainer.style.display = 'none';
             }
+        }
+
+        // --- Interactions (Likes & Comments) ---
+        if (postId) {
+            if (this._currentInteractionsManager) {
+                this._currentInteractionsManager.cleanup();
+            }
+            this._currentInteractionsManager = new InteractionsManager('blog-interactions', postId);
         }
     }
 
