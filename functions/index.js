@@ -204,6 +204,18 @@ function makeGoogleChatMappingId(spaceName, threadName) {
       .digest("hex");
 }
 
+function extractGoogleChatSpaceNameFromWebhookUrl(webhookUrl) {
+  if (typeof webhookUrl !== "string" || !webhookUrl.trim()) return "";
+  try {
+    const parsed = new URL(webhookUrl.trim());
+    const match = parsed.pathname.match(/\/v1\/spaces\/([^/]+)\/messages$/);
+    if (match && match[1]) return `spaces/${match[1]}`;
+  } catch (error) {
+    return "";
+  }
+  return "";
+}
+
 async function saveGoogleChatThreadMapping({ spaceName, threadName, chatId }) {
   if (!spaceName || !threadName || !chatId) return;
 
@@ -2081,6 +2093,7 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
   console.log(`[GoogleChatSync] targetMode=${normalizedTargetMode || "legacy_default"}, webhook=${webhookUrl ? "ja" : "nei"}`);
   if (shouldSendGoogleChat && webhookUrl) {
     try {
+      const fallbackSpaceName = extractGoogleChatSpaceNameFromWebhookUrl(webhookUrl);
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
@@ -2108,17 +2121,26 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
           (webhookPayload && webhookPayload.thread && webhookPayload.thread.name) || "",
           255,
       );
+      const resolvedSpaceName = responseSpaceName || fallbackSpaceName;
 
       await saveGoogleChatSpaceFallback({
-        spaceName: responseSpaceName,
+        spaceName: resolvedSpaceName,
         chatId,
       });
 
-      await saveGoogleChatThreadMapping({
-        spaceName: responseSpaceName,
-        threadName: responseThreadName,
+      if (resolvedSpaceName && responseThreadName) {
+        await saveGoogleChatThreadMapping({
+          spaceName: resolvedSpaceName,
+          threadName: responseThreadName,
+          chatId,
+        });
+      }
+
+      console.log("[GoogleChatSync] Mapping updated", JSON.stringify({
         chatId,
-      });
+        resolvedSpaceName,
+        responseThreadName,
+      }));
     } catch (error) {
       console.error("Kunne ikke sende visitor chat til Google Chat:", error);
     }
@@ -2227,6 +2249,16 @@ exports.googleChatBridge = onRequest({
     payload.text ||
     "";
 
+  console.log("[GoogleChatBridge] Incoming message", JSON.stringify({
+    type: payload.type || "",
+    userType: (payload.user && payload.user.type) || "",
+    hasArgumentText: Boolean(payload.message && payload.message.argumentText),
+    hasText: Boolean(payload.message && payload.message.text),
+    spaceName: (payload.space && payload.space.name) || "",
+    threadName: (payload.message && payload.message.thread && payload.message.thread.name) || "",
+    threadKey: (payload.message && payload.message.thread && payload.message.thread.threadKey) || "",
+  }));
+
   const parsedCommand = parseGoogleChatReplyCommand(rawText);
   const naturalText = clampText(cleanGoogleChatCommandText(rawText), 4000);
 
@@ -2240,6 +2272,12 @@ exports.googleChatBridge = onRequest({
     chatId = await inferChatIdFromGooglePayload(payload);
     replyText = naturalText;
   }
+
+  console.log("[GoogleChatBridge] Parsed routing", JSON.stringify({
+    parsedCommand: Boolean(parsedCommand),
+    resolvedChatId: chatId || "",
+    replyLen: replyText ? replyText.length : 0,
+  }));
 
   if (!replyText) {
     return res.status(200).json({
@@ -2278,6 +2316,8 @@ exports.googleChatBridge = onRequest({
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     lastAgentMessageAt: admin.firestore.FieldValue.serverTimestamp(),
   }, { merge: true });
+
+  console.log(`[GoogleChatBridge] Reply stored for chatId=${chatId}`);
 
   return res.status(200).json({
     text: `Svar sendt til besøkschat ${chatId}.`,
