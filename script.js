@@ -1462,6 +1462,7 @@ window.addEventListener('load', () => {
 (function initVisitorChatBootstrap() {
     const CHAT_LS_KEY = 'hkm_visitor_chat_id_v1';
     const CHAT_SESSION_KEY = 'hkm_visitor_chat_session_v1';
+    const CHAT_MODE_KEY = 'hkm_visitor_chat_mode_v1';
     const MAX_MESSAGE_LENGTH = 4000;
     let mounted = false;
 
@@ -1516,10 +1517,22 @@ window.addEventListener('load', () => {
                     </div>
                     <button type="button" class="hkm-chat-close" aria-label="Lukk chat">×</button>
                 </header>
+                <div class="hkm-chat-mode-switch" role="group" aria-label="Velg chatmodus">
+                    <button type="button" class="hkm-chat-mode-btn active" data-mode="ai">AI-assistent</button>
+                    <button type="button" class="hkm-chat-mode-btn" data-mode="google_chat">Google Chat-team</button>
+                    <button type="button" class="hkm-chat-mode-btn" data-mode="email">E-post</button>
+                </div>
                 <div class="hkm-chat-body"></div>
                 <div class="hkm-chat-human-bridge" style="display:none;">
                     <p>Ønsker du å snakke med en person?</p>
                     <button type="button" class="hkm-chat-request-human">Be om menneskelig hjelp</button>
+                </div>
+                <div class="hkm-chat-privacy">
+                    <label class="hkm-chat-privacy-label">
+                        <input type="checkbox" class="hkm-chat-privacy-checkbox" />
+                        <span>Jeg samtykker til behandling av chatmeldinger. <a href="/personvern" target="_blank" rel="noopener">Les personvern</a></span>
+                    </label>
+                    <p class="hkm-chat-privacy-note">Ikke del sensitive personopplysninger i chat.</p>
                 </div>
                 <form class="hkm-chat-form">
                     <div class="hkm-chat-input-wrapper">
@@ -1544,6 +1557,8 @@ window.addEventListener('load', () => {
         const statusEl = root.querySelector('.hkm-chat-status');
         const humanBridge = root.querySelector('.hkm-chat-human-bridge');
         const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
+        const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
+        const privacyCheckbox = root.querySelector('.hkm-chat-privacy-checkbox');
 
         const addSystemMessage = (text) => {
             const msg = document.createElement('div');
@@ -1554,7 +1569,66 @@ window.addEventListener('load', () => {
         };
 
         addSystemMessage('Hei! Jeg er HKM-assistenten. Hvordan kan jeg hjelpe deg i dag?');
-        addSystemMessage('Teamet er også varslet og kan svare deg her når de er tilgjengelige.');
+        addSystemMessage('Velg modus: AI-assistent eller Google Chat-team.');
+
+        const privacyConsentKey = `hkm_chat_privacy_consent_${chatId}`;
+        const savedConsent = localStorage.getItem(privacyConsentKey) === 'true';
+        privacyCheckbox.checked = savedConsent;
+        sendBtn.disabled = !savedConsent;
+        if (!savedConsent) {
+            setStatus('Du må samtykke til personvern for å sende melding.', 'muted');
+        }
+
+        let activeMode = localStorage.getItem(CHAT_MODE_KEY) || 'ai';
+        if (activeMode !== 'ai' && activeMode !== 'google_chat' && activeMode !== 'email') {
+            activeMode = 'ai';
+        }
+
+        const applyModeUI = () => {
+            modeButtons.forEach((btn) => {
+                const isActive = btn.dataset.mode === activeMode;
+                btn.classList.toggle('active', isActive);
+                btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+            });
+        };
+
+        const setActiveMode = async (mode) => {
+            if (mode !== 'ai' && mode !== 'google_chat' && mode !== 'email') return;
+            const changed = mode !== activeMode;
+            activeMode = mode;
+            localStorage.setItem(CHAT_MODE_KEY, activeMode);
+            applyModeUI();
+
+            if (activeMode === 'google_chat') {
+                humanBridge.style.display = 'none';
+                if (changed) {
+                    addSystemMessage('Google Chat-team valgt. Neste meldinger går direkte til teamet.');
+                }
+                try {
+                    await db.collection('visitorChats').doc(chatId).set({
+                        requestHuman: true,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                } catch (error) {
+                    console.warn('[VisitorChat] Could not set requestHuman on mode switch:', error);
+                }
+            } else if (activeMode === 'email') {
+                humanBridge.style.display = 'none';
+                if (changed) {
+                    addSystemMessage('E-post valgt. Neste meldinger sendes som e-postvarsel til teamet.');
+                }
+            } else if (changed) {
+                addSystemMessage('AI-assistent valgt. Neste meldinger besvares automatisk av assistenten.');
+            }
+        };
+
+        modeButtons.forEach((btn) => {
+            btn.addEventListener('click', () => {
+                setActiveMode(btn.dataset.mode);
+            });
+        });
+
+        applyModeUI();
 
         function setStatus(text, kind = 'muted') {
             statusEl.textContent = text || '';
@@ -1572,6 +1646,25 @@ window.addEventListener('load', () => {
 
         toggleBtn.addEventListener('click', () => setOpen(!root.classList.contains('open')));
         closeBtn.addEventListener('click', () => setOpen(false));
+        privacyCheckbox.addEventListener('change', async () => {
+            const hasConsent = !!privacyCheckbox.checked;
+            localStorage.setItem(privacyConsentKey, String(hasConsent));
+            sendBtn.disabled = !hasConsent;
+            if (!hasConsent) {
+                setStatus('Du må samtykke til personvern for å sende melding.', 'error');
+                return;
+            }
+            setStatus('');
+            try {
+                await db.collection('visitorChats').doc(chatId).set({
+                    privacyConsent: true,
+                    privacyConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+            } catch (error) {
+                console.warn('[VisitorChat] Could not save privacy consent:', error);
+            }
+        });
 
         if (!auth.currentUser) {
             try {
@@ -1664,8 +1757,10 @@ window.addEventListener('load', () => {
             bodyEl.scrollTop = bodyEl.scrollHeight;
 
             // Show human bridge if there are some messages
-            if (snapshot.size >= 2) {
+            if (snapshot.size >= 2 && activeMode === 'ai') {
                 humanBridge.style.display = 'block';
+            } else {
+                humanBridge.style.display = 'none';
             }
         }, (error) => {
             console.error('[VisitorChat] Snapshot error:', error);
@@ -1681,6 +1776,10 @@ window.addEventListener('load', () => {
                 setStatus(`Maks ${MAX_MESSAGE_LENGTH} tegn per melding.`, 'error');
                 return;
             }
+            if (!privacyCheckbox.checked) {
+                setStatus('Du må samtykke til personvern for å sende melding.', 'error');
+                return;
+            }
 
             sendBtn.disabled = true;
             setStatus('Sender melding...');
@@ -1691,6 +1790,7 @@ window.addEventListener('load', () => {
                     .add({
                         sender: 'visitor',
                         source: 'website',
+                        targetMode: activeMode,
                         pagePath: window.location.pathname,
                         text,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1699,30 +1799,33 @@ window.addEventListener('load', () => {
                 await db.collection('visitorChats').doc(chatId).set({
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastVisitorMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastTargetMode: activeMode,
+                    requestHuman: activeMode === 'google_chat' || activeMode === 'email',
+                    privacyConsent: true,
+                    privacyConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
                     lastPagePath: window.location.pathname
                 }, { merge: true });
 
                 input.value = '';
                 setStatus('');
                 
-                // Trigger typing indicator
-                isTyping = true;
-                // Force a small update to show typing even if snapshot hasn't arrived
-                const typingMsg = document.createElement('div');
-                typingMsg.className = 'hkm-chat-msg agent typing';
-                typingMsg.style.fontStyle = 'italic';
-                typingMsg.style.opacity = '0.7';
-                typingMsg.textContent = 'HKM Assistent skriver...';
-                bodyEl.appendChild(typingMsg);
-                bodyEl.scrollTop = bodyEl.scrollHeight;
+                if (activeMode === 'ai') {
+                    // Trigger typing indicator in AI mode only.
+                    isTyping = true;
+                    const typingMsg = document.createElement('div');
+                    typingMsg.className = 'hkm-chat-msg agent typing';
+                    typingMsg.style.fontStyle = 'italic';
+                    typingMsg.style.opacity = '0.7';
+                    typingMsg.textContent = 'HKM Assistent skriver...';
+                    bodyEl.appendChild(typingMsg);
+                    bodyEl.scrollTop = bodyEl.scrollHeight;
 
-                // Auto-hide typing if no response in 15s
-                setTimeout(() => { 
-                    if (isTyping) {
-                        isTyping = false;
-                        // The snapshot will clear it naturally
-                    }
-                }, 15000);
+                    setTimeout(() => {
+                        if (isTyping) {
+                            isTyping = false;
+                        }
+                    }, 15000);
+                }
             } catch (error) {
                 console.error('[VisitorChat] Send failed:', error);
                 setStatus('Kunne ikke sende meldingen. Prov igjen.', 'error');
@@ -1736,6 +1839,7 @@ window.addEventListener('load', () => {
             requestHumanBtn.textContent = 'Varsler teamet...';
             
             try {
+                await setActiveMode('google_chat');
                 await db.collection('visitorChats').doc(chatId).set({
                     requestHuman: true,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
@@ -1875,6 +1979,30 @@ window.addEventListener('load', () => {
                 flex-direction: column;
                 gap: 12px;
             }
+            .hkm-chat-mode-switch {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+                padding: 10px 12px;
+                border-bottom: 1px solid #E2E8F0;
+                background: #fff;
+            }
+            .hkm-chat-mode-btn {
+                border: 1px solid #CBD5E1;
+                background: #F8FAFC;
+                color: #334155;
+                border-radius: 999px;
+                padding: 7px 10px;
+                font-size: 12px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+            .hkm-chat-mode-btn.active {
+                background: #d17d39;
+                border-color: #d17d39;
+                color: #fff;
+            }
             .hkm-chat-msg {
                 padding: 12px 16px;
                 border-radius: 16px;
@@ -1935,6 +2063,34 @@ window.addEventListener('load', () => {
                 gap: 8px;
                 border-top: 1px solid #E2E8F0;
                 margin: 0 !important;
+            }
+            .hkm-chat-privacy {
+                border-top: 1px solid #E2E8F0;
+                padding: 8px 12px 6px;
+                background: #fff;
+            }
+            .hkm-chat-privacy-label {
+                display: flex;
+                align-items: flex-start;
+                gap: 8px;
+                font-size: 11px;
+                color: #334155;
+                line-height: 1.35;
+            }
+            .hkm-chat-privacy-label a {
+                color: #1D4ED8;
+                text-decoration: underline;
+            }
+            .hkm-chat-privacy-checkbox {
+                margin-top: 2px;
+                width: 14px;
+                height: 14px;
+                flex-shrink: 0;
+            }
+            .hkm-chat-privacy-note {
+                margin: 6px 0 0;
+                font-size: 10px;
+                color: #64748B;
             }
             .hkm-chat-input-wrapper {
                 flex: 1;

@@ -197,6 +197,76 @@ function parseGoogleChatReplyCommand(rawText) {
   };
 }
 
+function makeGoogleChatMappingId(spaceName, threadName) {
+  return crypto
+      .createHash("sha256")
+      .update(`${spaceName}|${threadName}`)
+      .digest("hex");
+}
+
+async function saveGoogleChatThreadMapping({ spaceName, threadName, chatId }) {
+  if (!spaceName || !threadName || !chatId) return;
+
+  const mappingId = makeGoogleChatMappingId(spaceName, threadName);
+  await db.collection("googleChatThreadMappings").doc(mappingId).set({
+    spaceName,
+    threadName,
+    chatId,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+async function saveGoogleChatSpaceFallback({ spaceName, chatId }) {
+  if (!spaceName || !chatId) return;
+
+  const mappingId = crypto
+      .createHash("sha256")
+      .update(spaceName)
+      .digest("hex");
+
+  await db.collection("googleChatSpaceFallback").doc(mappingId).set({
+    spaceName,
+    chatId,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+}
+
+async function inferChatIdFromGooglePayload(payload) {
+  const payloadMessage = payload && payload.message ? payload.message : {};
+  const spaceName = (
+    (payload && payload.space && payload.space.name) ||
+    (payloadMessage.space && payloadMessage.space.name) ||
+    ""
+  ).trim();
+  const threadName = (
+    (payloadMessage.thread && payloadMessage.thread.name) ||
+    ""
+  ).trim();
+
+  if (spaceName && threadName) {
+    const mappingId = makeGoogleChatMappingId(spaceName, threadName);
+    const mappingSnap = await db.collection("googleChatThreadMappings").doc(mappingId).get();
+    if (mappingSnap.exists) {
+      const data = mappingSnap.data() || {};
+      if (data.chatId) return String(data.chatId);
+    }
+  }
+
+  if (spaceName) {
+    const fallbackId = crypto
+        .createHash("sha256")
+        .update(spaceName)
+        .digest("hex");
+    const fallbackSnap = await db.collection("googleChatSpaceFallback").doc(fallbackId).get();
+    if (fallbackSnap.exists) {
+      const data = fallbackSnap.data() || {};
+      if (data.chatId) return String(data.chatId);
+    }
+  }
+
+  return "";
+}
+
 function chooseGeminiModel(modelNames = []) {
   const preferred = [
     "models/gemini-2.5-flash",
@@ -1958,6 +2028,13 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
 
   const msgData = snapshot.data() || {};
   if (msgData.sender !== "visitor") return;
+  const targetMode = typeof msgData.targetMode === "string" ?
+    msgData.targetMode.trim().toLowerCase() :
+    "";
+  const normalizedTargetMode = ["ai", "google_chat", "email"].includes(targetMode) ?
+    targetMode :
+    "";
+  if (normalizedTargetMode === "ai") return;
 
   const text = clampText(msgData.text || "", 1200);
   if (!text) return;
@@ -1981,13 +2058,17 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
     "*Sporsmal:*",
     shortText,
     "",
-    `Svar med: \`reply ${chatId} Hei! Hvordan kan vi hjelpe?\``,
+    "Svar i denne traden for a sende melding direkte til besokende.",
+    "(Reservekommando: reply <chatId> <melding>)",
   ].filter(Boolean).join("\n");
 
-  // 1) Send til Google Chat (hvis webhook er konfigurert)
+  const shouldSendGoogleChat = normalizedTargetMode === "google_chat" || !normalizedTargetMode;
+  const shouldSendEmail = normalizedTargetMode === "email" || !normalizedTargetMode;
+
+  // 1) Send til Google Chat (hvis valgt og webhook er konfigurert)
   const webhookUrl = getGoogleChatWebhookUrl();
-  console.log(`[GoogleChatSync] Webhook konfigurert: ${webhookUrl ? "ja" : "nei"}`);
-  if (webhookUrl) {
+  console.log(`[GoogleChatSync] targetMode=${normalizedTargetMode || "legacy_default"}, webhook=${webhookUrl ? "ja" : "nei"}`);
+  if (shouldSendGoogleChat && webhookUrl) {
     try {
       const response = await fetch(webhookUrl, {
         method: "POST",
@@ -1996,6 +2077,9 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
         },
         body: JSON.stringify({
           text: googleChatText,
+          thread: {
+            threadKey: `visitor_${chatId}`,
+          },
         }),
       });
 
@@ -2003,14 +2087,39 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
         const errText = await response.text().catch(() => "");
         throw new Error(`Google Chat webhook feilet (${response.status}): ${errText}`);
       }
+
+      const webhookPayload = await response.json().catch(() => ({}));
+      const responseSpaceName = clampText(
+          (webhookPayload && webhookPayload.space && webhookPayload.space.name) || "",
+          255,
+      );
+      const responseThreadName = clampText(
+          (webhookPayload && webhookPayload.thread && webhookPayload.thread.name) || "",
+          255,
+      );
+
+      await saveGoogleChatSpaceFallback({
+        spaceName: responseSpaceName,
+        chatId,
+      });
+
+      await saveGoogleChatThreadMapping({
+        spaceName: responseSpaceName,
+        threadName: responseThreadName,
+        chatId,
+      });
     } catch (error) {
       console.error("Kunne ikke sende visitor chat til Google Chat:", error);
     }
-  } else {
+  } else if (shouldSendGoogleChat) {
     console.warn("GOOGLE_CHAT_WEBHOOK_URL mangler i secrets eller env.");
   }
 
-  // 2) Send intern e-postvarsling (uavhengig av Google Chat)
+  // 2) Send intern e-postvarsling (kun i e-postmodus eller legacy default)
+  if (!shouldSendEmail) {
+    return;
+  }
+
   const emailAlertRecipient = (
     process.env.CHAT_ALERT_EMAIL ||
     process.env.ADMIN_EMAIL ||
@@ -2030,9 +2139,9 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
     `Fra: ${visitorName}${visitorEmail ? ` (${visitorEmail})` : ""}`,
     sourcePage ? `Side: ${sourcePage}` : "",
     `Sporsmal: ${text}`,
-    "",
-    "Svar i Google Chat med:",
-    `reply ${chatId} Hei!`,
+    shouldSendGoogleChat ? "" : "Mottatt i e-postmodus (ikke sendt til Google Chat).",
+    shouldSendGoogleChat ? "Svar i Google Chat med:" : "",
+    shouldSendGoogleChat ? `reply ${chatId} Hei!` : "",
   ].filter(Boolean).join("\n");
 
   const emailHtml = `
@@ -2043,7 +2152,7 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
       ${sourcePage ? `<p><strong>Side:</strong> ${sourcePage}</p>` : ""}
       <p><strong>Sporsmal:</strong></p>
       <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;white-space:pre-wrap;">${text}</div>
-      <p style="margin-top:14px;"><strong>Svar i Google Chat med:</strong><br><code>reply ${chatId} Hei!</code></p>
+      ${shouldSendGoogleChat ? `<p style="margin-top:14px;"><strong>Svar i Google Chat med:</strong><br><code>reply ${chatId} Hei!</code></p>` : `<p style="margin-top:14px;"><strong>Modus:</strong> E-post (ikke sendt til Google Chat).</p>`}
     </div>
   `;
 
@@ -2077,6 +2186,12 @@ exports.googleChatBridge = onRequest({
     return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
+  const payload = req.body || {};
+  const eventType = (payload.type || "").trim();
+  if (eventType && eventType !== "MESSAGE") {
+    return res.status(200).json({ text: "OK" });
+  }
+
   const expectedToken = getGoogleChatBridgeToken();
   if (expectedToken) {
     const providedToken = (
@@ -2090,7 +2205,11 @@ exports.googleChatBridge = onRequest({
     }
   }
 
-  const payload = req.body || {};
+  const userType = (payload.user && payload.user.type) || "";
+  if (userType === "BOT") {
+    return res.status(200).json({ text: "OK" });
+  }
+
   const rawText =
     (payload.message && payload.message.argumentText) ||
     (payload.message && payload.message.text) ||
@@ -2098,16 +2217,28 @@ exports.googleChatBridge = onRequest({
     "";
 
   const parsedCommand = parseGoogleChatReplyCommand(rawText);
-  if (!parsedCommand) {
+  const naturalText = clampText(cleanGoogleChatCommandText(rawText), 4000);
+
+  let chatId = "";
+  let replyText = "";
+
+  if (parsedCommand) {
+    chatId = parsedCommand.chatId;
+    replyText = parsedCommand.replyText;
+  } else {
+    chatId = await inferChatIdFromGooglePayload(payload);
+    replyText = naturalText;
+  }
+
+  if (!replyText) {
     return res.status(200).json({
-      text: "Bruk kommandoen: reply <chatId> <svartekst>",
+      text: "Tom melding. Skriv svaret ditt i traden.",
     });
   }
 
-  const { chatId, replyText } = parsedCommand;
-  if (!replyText) {
+  if (!chatId) {
     return res.status(200).json({
-      text: "Svartekst mangler. Bruk: reply <chatId> <svartekst>",
+      text: "Fant ikke hvilken nettside-chat dette gjelder. Bruk: reply <chatId> <svartekst>",
     });
   }
 
@@ -2156,6 +2287,10 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
   const msgData = snapshot.data() || {};
   // Svarer kun på meldinger fra besøkende (for å unngå loop)
   if (msgData.sender !== "visitor") return;
+  const targetMode = typeof msgData.targetMode === "string" ?
+    msgData.targetMode.trim().toLowerCase() :
+    "";
+  if (targetMode && targetMode !== "ai") return;
 
   const chatId = event.params.chatId;
   const geminiKey = getGeminiApiKey();
