@@ -1790,17 +1790,19 @@ window.addEventListener('load', () => {
             }
             .hkm-chat-panel {
                 position: absolute;
-                bottom: 70px;
+                bottom: 80px;
                 right: 0;
-                width: 350px;
-                max-width: calc(100vw - 48px);
+                width: 340px;
+                max-width: calc(100vw - 40px);
                 background: #fff;
-                border-radius: 16px;
-                box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.15);
                 display: none;
                 flex-direction: column;
                 overflow: hidden;
-                animation: slideUp 0.3s ease-out;
+                padding: 0 !important;
+                margin: 0 !important;
+                z-index: 10000;
             }
             @keyframes slideUp {
                 from { opacity: 0; transform: translateY(20px); }
@@ -1812,10 +1814,12 @@ window.addEventListener('load', () => {
             .hkm-chat-header {
                 background: linear-gradient(135deg, #d17d39, #bd4f2a);
                 color: #fff;
-                padding: 6px 12px;
+                padding: 10px 14px;
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
+                margin: 0 !important;
+                border: 0;
             }
             .hkm-chat-header-info {
                 display: flex;
@@ -1924,12 +1928,13 @@ window.addEventListener('load', () => {
             }
             .hkm-chat-request-human:hover { background: #1D4ED8; }
             .hkm-chat-form {
-                padding: 4px 12px;
+                padding: 8px 12px;
                 background: #fff;
                 display: flex;
-                align-items: flex-start;
+                align-items: center;
                 gap: 8px;
                 border-top: 1px solid #E2E8F0;
+                margin: 0 !important;
             }
             .hkm-chat-input-wrapper {
                 flex: 1;
@@ -1947,10 +1952,10 @@ window.addEventListener('load', () => {
             }
             .hkm-chat-status {
                 font-size: 10px;
-                margin: 2px 0 0;
-                padding: 0 4px;
+                margin: 0;
+                padding: 0;
                 color: #64748B;
-                min-height: 12px;
+                line-height: 1;
             }
             .hkm-chat-send {
                 background: #d17d39;
