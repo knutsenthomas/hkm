@@ -1946,8 +1946,9 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
   if (!text) return;
 
   const webhookUrl = getGoogleChatWebhookUrl();
+  console.log(`[GoogleChatSync] Forsoker a bruke URL: ${webhookUrl ? webhookUrl.substring(0, 20) + "..." : "TOM"}`);
   if (!webhookUrl) {
-    console.warn("GOOGLE_CHAT_WEBHOOK_URL mangler. Hopper over Google Chat sync.");
+    console.warn("GOOGLE_CHAT_WEBHOOK_URL mangler i secrets eller env.");
     return;
   }
 
@@ -2097,8 +2098,8 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
   try {
     const genAI = new GoogleGenerativeAI(geminiKey);
-    // Bruker gemini-pro for maksimal stabilitet i v1beta API-et
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    // Eksplisitt bruk av v1-versjonen av API-et for å unngå 404-feil i v1beta
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
 
     // 1. Hent litt kontekst om nettstedet
     const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
