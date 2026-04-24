@@ -184,6 +184,43 @@ function cleanGoogleChatCommandText(rawText) {
       .trim();
 }
 
+function parseGoogleChatEventPayload(req) {
+  if (req && req.body && typeof req.body === "object" && Object.keys(req.body).length > 0) {
+    return req.body;
+  }
+
+  let rawText = "";
+  if (req && typeof req.rawBody === "string") {
+    rawText = req.rawBody;
+  } else if (req && Buffer.isBuffer(req.rawBody)) {
+    rawText = req.rawBody.toString("utf8");
+  } else if (req && typeof req.body === "string") {
+    rawText = req.body;
+  }
+  rawText = (rawText || "").trim();
+  if (!rawText) return {};
+
+  try {
+    const parsed = JSON.parse(rawText);
+    if (parsed && typeof parsed === "object") return parsed;
+  } catch (error) {
+    // Fallback below handles payload=<json>.
+  }
+
+  try {
+    const form = new URLSearchParams(rawText);
+    const embedded = (form.get("payload") || "").trim();
+    if (embedded) {
+      const parsed = JSON.parse(embedded);
+      if (parsed && typeof parsed === "object") return parsed;
+    }
+  } catch (error) {
+    // Ignore and return empty payload.
+  }
+
+  return {};
+}
+
 function parseGoogleChatReplyCommand(rawText) {
   const text = cleanGoogleChatCommandText(rawText);
   if (!text) return null;
@@ -2219,7 +2256,7 @@ exports.googleChatBridge = onRequest({
     return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
-  const payload = req.body || {};
+  const payload = parseGoogleChatEventPayload(req);
   const eventType = (payload.type || "").trim();
   if (eventType && eventType !== "MESSAGE") {
     return res.status(200).json({ text: "OK" });
@@ -2250,6 +2287,9 @@ exports.googleChatBridge = onRequest({
     "";
 
   console.log("[GoogleChatBridge] Incoming message", JSON.stringify({
+    contentType: req.get("content-type") || "",
+    rawBodyBytes: req.rawBody && req.rawBody.length ? req.rawBody.length : 0,
+    payloadKeys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 12) : [],
     type: payload.type || "",
     userType: (payload.user && payload.user.type) || "",
     hasArgumentText: Boolean(payload.message && payload.message.argumentText),
