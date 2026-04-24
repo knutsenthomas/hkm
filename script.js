@@ -1,6 +1,6 @@
 // ===================================
 // Wishon Template - His Kingdom Ministry
-// JavaScript Functionality
+// JavaScript Functionality (v2.1.0)
 // ===================================
 
 // DOM Elements
