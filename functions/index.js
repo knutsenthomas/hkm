@@ -1971,20 +1971,22 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
   const visitorEmail = clampText(chatData.visitorEmail || "", 254);
   const sourcePage = clampText(chatData.lastPagePath || chatData.sourcePage || msgData.pagePath || "", 220);
 
-  const payloadLines = [
-    "Ny chatmelding fra nettsiden",
+  const shortText = text.length > 700 ? `${text.slice(0, 700)}...` : text;
+  const googleChatText = [
+    "*Ny melding fra nettside-chat*",
     `Chat-ID: ${chatId}`,
     `Fra: ${visitorName}${visitorEmail ? ` (${visitorEmail})` : ""}`,
     sourcePage ? `Side: ${sourcePage}` : "",
-    `Sporsmal: ${text}`,
     "",
-    "Svar med:",
-    `reply ${chatId} Hei!`,
-  ].filter(Boolean);
+    "*Sporsmal:*",
+    shortText,
+    "",
+    `Svar med: \`reply ${chatId} Hei! Hvordan kan vi hjelpe?\``,
+  ].filter(Boolean).join("\n");
 
   // 1) Send til Google Chat (hvis webhook er konfigurert)
   const webhookUrl = getGoogleChatWebhookUrl();
-  console.log(`[GoogleChatSync] Forsoker a bruke URL: ${webhookUrl ? webhookUrl.substring(0, 20) + "..." : "TOM"}`);
+  console.log(`[GoogleChatSync] Webhook konfigurert: ${webhookUrl ? "ja" : "nei"}`);
   if (webhookUrl) {
     try {
       const response = await fetch(webhookUrl, {
@@ -1993,7 +1995,7 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
           "Content-Type": "application/json; charset=UTF-8",
         },
         body: JSON.stringify({
-          text: payloadLines.join("\n"),
+          text: googleChatText,
         }),
       });
 
