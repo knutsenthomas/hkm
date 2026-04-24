@@ -23,3 +23,30 @@ body.hero-animate .slide-buttons {
     opacity: 1;
   }
 }
+/* Hero slider arrows: keep clear of chat widget on the right side */
+.hero-slider .hero-nav {
+  position: absolute !important;
+  top: 50% !important;
+  bottom: auto !important;
+  right: auto !important;
+  transform: translateY(-50%) !important;
+  z-index: 25 !important;
+}
+
+.hero-slider .hero-nav.prev {
+  left: 24px !important;
+}
+
+.hero-slider .hero-nav.next {
+  left: 104px !important;
+}
+
+@media (max-width: 768px) {
+  .hero-slider .hero-nav.prev {
+    left: 16px !important;
+  }
+
+  .hero-slider .hero-nav.next {
+    left: 88px !important;
+  }
+}

@@ -1571,13 +1571,7 @@ window.addEventListener('load', () => {
         addSystemMessage('Hei! Jeg er HKM-assistenten. Hvordan kan jeg hjelpe deg i dag?');
         addSystemMessage('Velg modus: AI-assistent eller Google Chat-team.');
 
-        const privacyConsentKey = `hkm_chat_privacy_consent_${chatId}`;
-        const savedConsent = localStorage.getItem(privacyConsentKey) === 'true';
-        privacyCheckbox.checked = savedConsent;
-        sendBtn.disabled = !savedConsent;
-        if (!savedConsent) {
-            setStatus('Du må samtykke til personvern for å sende melding.', 'muted');
-        }
+        let privacyConsentKey = '';
 
         let activeMode = localStorage.getItem(CHAT_MODE_KEY) || 'ai';
         if (activeMode !== 'ai' && activeMode !== 'google_chat' && activeMode !== 'email') {
@@ -1714,6 +1708,14 @@ window.addEventListener('load', () => {
             }
         } else {
             chatId = await createChatDoc();
+        }
+
+        privacyConsentKey = `hkm_chat_privacy_consent_${chatId}`;
+        const savedConsent = localStorage.getItem(privacyConsentKey) === 'true';
+        privacyCheckbox.checked = savedConsent;
+        sendBtn.disabled = !savedConsent;
+        if (!savedConsent) {
+            setStatus('Du må samtykke til personvern for å sende melding.', 'muted');
         }
 
         const messagesRef = db
