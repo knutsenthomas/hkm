@@ -1,7 +1,8 @@
-const { onRequest } = require("firebase-functions/v2/https");
+const { onRequest, onCall } = require("firebase-functions/v2/https");
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
@@ -2095,51 +2096,32 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
   }
 
   try {
-    // 1. Hent litt kontekst om nettstedet (valgfritt, men anbefalt for bedre svar)
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+    // 1. Hent litt kontekst om nettstedet
     const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
     const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
     
     // 2. Forbered Gemini-prompten
     const systemPrompt = `
       Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
-      Ditt mål er å svare på spørsmål om kirken, tjenestene deres, arrangementer og kristen tro på en vennlig, imøtekommende og spirituelt oppløftende måte.
+      Ditt mål er å svare på spørsmål om kirken, tjenestene deres og kristen tro på en varm og spirituelt oppløftende måte.
       
       Regler:
-      - Svar alltid på norsk.
-      - Vær kortfattet, men varm.
-      - Hvis du ikke vet svaret på et spesifikt spørsmål (f.eks. om tider for et arrangement som ikke er nevnt), 
-        si at teamet vil svare dem så snart de kan i denne chatten.
+      - Svar på norsk.
+      - Vær kortfattet, men vennlig.
+      - Hvis du ikke vet svaret, si at teamet vil svare dem snart i denne chatten.
       - Nevn ALDRI "TK-design".
-      - Hvis brukeren vil snakke med et menneske, bekreft at teamet er varslet.
+      - Hvis brukeren vil snakke med et menneske eller virker frustrert, si: "Jeg forstår. Jeg har varslet teamet vårt i Google Chat, og de vil svare deg her så snart de kan."
     `.trim();
 
     const userMessage = msgData.text || "";
     if (!userMessage) return;
 
-    // 3. Kall Gemini API (1.5 Flash for rask respons)
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
-    
-    const response = await fetch(geminiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [
-          { role: "user", parts: [{ text: `${systemPrompt}\n\nBesøkende sier: ${userMessage}` }] }
-        ],
-        generationConfig: {
-          temperature: 0.7,
-          maxOutputTokens: 500,
-        }
-      })
-    });
-
-    if (!response.ok) {
-      const errText = await response.text();
-      throw new Error(`Gemini API feilet (${response.status}): ${errText}`);
-    }
-
-    const result = await response.json();
-    const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    // 3. Generer svar
+    const result = await model.generateContent(`${systemPrompt}\n\nBesøkende: ${userMessage}`);
+    const aiText = result.response.text();
 
     if (aiText) {
       // 4. Lagre AI-svaret i Firestore
@@ -2159,6 +2141,6 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     }
 
   } catch (error) {
-    console.error("Feil i chatbot-AI logikk:", error);
+    console.error("Feil i chatbot-AI logikk (SDK):", error);
   }
 });
