@@ -4765,11 +4765,13 @@ ol.block-list {
 }
 
 .hero-nav.prev {
-    right: 100px;
+    left: 40px;
+    right: auto;
 }
 
 .hero-nav.next {
-    right: 40px;
+    left: 100px;
+    right: auto;
 }
 
 @media (max-width: 768px) {
@@ -4802,12 +4804,13 @@ ol.block-list {
     }
 
     .hero-nav.prev {
-        right: 74px;
-        left: auto;
+        left: 20px;
+        right: auto;
     }
 
     .hero-nav.next {
-        right: 20px;
+        left: 74px;
+        right: auto;
     }
 }
 

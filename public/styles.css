@@ -5520,3 +5520,26 @@ ol.block-list {
 body:not(.cms-loading) {
     opacity: 1;
 }
+
+/* Final override: keep hero arrows on LEFT side */
+.hero-slider .hero-nav.prev {
+    left: 40px !important;
+    right: auto !important;
+}
+
+.hero-slider .hero-nav.next {
+    left: 100px !important;
+    right: auto !important;
+}
+
+@media (max-width: 768px) {
+    .hero-slider .hero-nav.prev {
+        left: 20px !important;
+        right: auto !important;
+    }
+
+    .hero-slider .hero-nav.next {
+        left: 74px !important;
+        right: auto !important;
+    }
+}
