@@ -1518,9 +1518,18 @@ window.addEventListener('load', () => {
                     <button type="button" class="hkm-chat-close" aria-label="Lukk chat">×</button>
                 </header>
                 <div class="hkm-chat-mode-switch" role="group" aria-label="Velg chatmodus">
-                    <button type="button" class="hkm-chat-mode-btn active" data-mode="ai">AI-assistent</button>
-                    <button type="button" class="hkm-chat-mode-btn" data-mode="google_chat">Google Chat-team</button>
-                    <button type="button" class="hkm-chat-mode-btn" data-mode="email">E-post</button>
+                    <button type="button" class="hkm-chat-mode-btn active" data-mode="ai" aria-label="AI-assistent" title="AI-assistent">
+                        <span class="hkm-chat-mode-icon" aria-hidden="true">🤖</span>
+                        <span class="sr-only">AI-assistent</span>
+                    </button>
+                    <button type="button" class="hkm-chat-mode-btn" data-mode="google_chat" aria-label="Google Chat-team" title="Google Chat-team">
+                        <span class="hkm-chat-mode-icon" aria-hidden="true">💬</span>
+                        <span class="sr-only">Google Chat-team</span>
+                    </button>
+                    <button type="button" class="hkm-chat-mode-btn" data-mode="email" aria-label="E-post" title="E-post">
+                        <span class="hkm-chat-mode-icon" aria-hidden="true">✉️</span>
+                        <span class="sr-only">E-post</span>
+                    </button>
                 </div>
                 <div class="hkm-chat-body"></div>
                 <div class="hkm-chat-human-bridge" style="display:none;">
@@ -1994,16 +2003,24 @@ window.addEventListener('load', () => {
                 background: #F8FAFC;
                 color: #334155;
                 border-radius: 999px;
-                padding: 7px 10px;
+                padding: 9px 10px;
+                min-height: 40px;
                 font-size: 12px;
                 font-weight: 600;
                 cursor: pointer;
                 transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             .hkm-chat-mode-btn.active {
                 background: #d17d39;
                 border-color: #d17d39;
                 color: #fff;
+            }
+            .hkm-chat-mode-icon {
+                font-size: 18px;
+                line-height: 1;
             }
             .hkm-chat-msg {
                 padding: 12px 16px;
