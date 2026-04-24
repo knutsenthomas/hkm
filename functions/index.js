@@ -2097,8 +2097,8 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
   }
 
   try {
-    // Bruker direkte REST API for a unnga SDK-spesifikke 404-feil
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+    // Bruker v1 (produksjon) og gemini-pro for maksimal kompatibilitet
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${geminiKey}`;
     
     // 1. Hent litt kontekst om nettstedet
     const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
