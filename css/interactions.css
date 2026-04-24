@@ -128,7 +128,7 @@
 }
 
 .comment-submit-btn {
-    align-self: flex-end;
+    align-self: flex-start;
     background: #1B4965; /* Primærknapp: Mørkeblå */
     color: #ffffff;
     font-weight: 600;

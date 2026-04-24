@@ -88,14 +88,14 @@ export class InteractionsManager {
                         </div>
                         <button type="submit" class="comment-submit-btn" id="comment-submit-btn">
                             <span>Publiser kommentar</span>
-                            <i class="fas fa-paper-plane"></i>
+                            <i class="fa-solid fa-paper-plane"></i>
                         </button>
                     </form>
                     
                     <div id="interaction-comments-list" class="comments-list">
                         <!-- Loading or empty state -->
                         <div class="comments-empty">
-                            <i class="far fa-comments"></i>
+                            <i class="fa-regular fa-comments"></i>
                             <p>Ingen kommentarer enda. Bli den første til å kommentere!</p>
                         </div>
                     </div>
