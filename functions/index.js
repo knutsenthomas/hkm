@@ -2097,7 +2097,8 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
   try {
     const genAI = new GoogleGenerativeAI(geminiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    // Bruker gemini-pro for maksimal stabilitet i v1beta API-et
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     // 1. Hent litt kontekst om nettstedet
     const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
