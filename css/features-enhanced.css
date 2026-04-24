@@ -125,10 +125,29 @@
 }
 
 .feature-link:hover {
-    background: currentColor;
-    color: #fff;
     transform: translateY(-2px);
     box-shadow: 0 10px 20px -5px rgba(0,0,0,0.1);
+}
+
+/* Explicit hover colors avoid language/page-specific currentColor drift */
+.feature-box.teaching .feature-link:hover {
+    background: #1B4965;
+    color: #fff;
+}
+
+.feature-box.podcast .feature-link:hover {
+    background: #d17d39;
+    color: #fff;
+}
+
+.feature-box.travel .feature-link:hover {
+    background: #21543d;
+    color: #fff;
+}
+
+.feature-link:hover span,
+.feature-link:hover i {
+    color: #fff;
 }
 
 .feature-link i {
