@@ -233,6 +233,10 @@ async function saveGoogleChatSpaceFallback({ spaceName, chatId }) {
 
 async function inferChatIdFromGooglePayload(payload) {
   const payloadMessage = payload && payload.message ? payload.message : {};
+  const threadKey = (
+    (payloadMessage.thread && payloadMessage.thread.threadKey) ||
+    ""
+  ).trim();
   const spaceName = (
     (payload && payload.space && payload.space.name) ||
     (payloadMessage.space && payloadMessage.space.name) ||
@@ -242,6 +246,13 @@ async function inferChatIdFromGooglePayload(payload) {
     (payloadMessage.thread && payloadMessage.thread.name) ||
     ""
   ).trim();
+
+  // Fast path: if Google Chat returns our original threadKey (visitor_<chatId>),
+  // we can resolve without extra lookups.
+  const keyMatch = threadKey.match(/^visitor_([A-Za-z0-9_-]{6,})$/);
+  if (keyMatch && keyMatch[1]) {
+    return keyMatch[1];
+  }
 
   if (spaceName && threadName) {
     const mappingId = makeGoogleChatMappingId(spaceName, threadName);
