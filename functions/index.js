@@ -2097,33 +2097,39 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(geminiKey);
-    // Eksplisitt bruk av v1-versjonen av API-et for å unngå 404-feil i v1beta
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" }, { apiVersion: "v1" });
-
+    // Bruker direkte REST API for a unnga SDK-spesifikke 404-feil
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+    
     // 1. Hent litt kontekst om nettstedet
     const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
     const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
     
-    // 2. Forbered Gemini-prompten
     const systemPrompt = `
       Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
       Ditt mål er å svare på spørsmål om kirken, tjenestene deres og kristen tro på en varm og spirituelt oppløftende måte.
-      
-      Regler:
-      - Svar på norsk.
-      - Vær kortfattet, men vennlig.
-      - Hvis du ikke vet svaret, si at teamet vil svare dem snart i denne chatten.
-      - Nevn ALDRI "TK-design".
-      - Hvis brukeren vil snakke med et menneske eller virker frustrert, si: "Jeg forstår. Jeg har varslet teamet vårt i Google Chat, og de vil svare deg her så snart de kan."
+      Regler: Svar på norsk. Vær kortfattet. Hvis du ikke vet svaret, si at teamet vil svare snart. Nevn aldri TK-design.
     `.trim();
 
     const userMessage = msgData.text || "";
     if (!userMessage) return;
 
-    // 3. Generer svar
-    const result = await model.generateContent(`${systemPrompt}\n\nBesøkende: ${userMessage}`);
-    const aiText = result.response.text();
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{ text: `${systemPrompt}\n\nBesøkende: ${userMessage}` }]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      console.error("Gemini REST API feil:", JSON.stringify(data));
+      return;
+    }
+
+    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (aiText) {
       // 4. Lagre AI-svaret i Firestore
