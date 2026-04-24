@@ -110,7 +110,11 @@ service cloud.firestore {
         d.text.size() > 0 &&
         d.text.size() <= 4000 &&
         (!hasKey(d, 'source') || (d.source is string && d.source.size() <= 40)) &&
-        (!hasKey(d, 'pagePath') || (d.pagePath is string && d.pagePath.size() <= 300));
+        (!hasKey(d, 'pagePath') || (d.pagePath is string && d.pagePath.size() <= 300)) &&
+        (!hasKey(d, 'targetMode') || (
+          d.targetMode is string &&
+          d.targetMode in ['ai', 'google_chat', 'email']
+        ));
     }
 
     function validDonationCreate(donationId) {
@@ -203,14 +207,26 @@ service cloud.firestore {
           'lastVisitorMessageAt',
           'lastPagePath',
           'visitorName',
-          'visitorEmail'
+          'visitorEmail',
+          'lastTargetMode',
+          'requestHuman',
+          'privacyConsent',
+          'privacyConsentAt'
         ]) &&
         (!hasKey(request.resource.data, 'visitorName') ||
           (request.resource.data.visitorName is string && request.resource.data.visitorName.size() <= 120)) &&
         (!hasKey(request.resource.data, 'visitorEmail') ||
           (request.resource.data.visitorEmail is string && request.resource.data.visitorEmail.size() <= 254)) &&
         (!hasKey(request.resource.data, 'lastPagePath') ||
-          (request.resource.data.lastPagePath is string && request.resource.data.lastPagePath.size() <= 300))
+          (request.resource.data.lastPagePath is string && request.resource.data.lastPagePath.size() <= 300)) &&
+        (!hasKey(request.resource.data, 'lastTargetMode') || (
+          request.resource.data.lastTargetMode is string &&
+          request.resource.data.lastTargetMode in ['ai', 'google_chat', 'email']
+        )) &&
+        (!hasKey(request.resource.data, 'requestHuman') ||
+          request.resource.data.requestHuman is bool) &&
+        (!hasKey(request.resource.data, 'privacyConsent') ||
+          request.resource.data.privacyConsent is bool)
       );
       allow delete: if isAdmin();
 
