@@ -1519,15 +1519,30 @@ window.addEventListener('load', () => {
                 </header>
                 <div class="hkm-chat-mode-switch" role="group" aria-label="Velg chatmodus">
                     <button type="button" class="hkm-chat-mode-btn active" data-mode="ai" aria-label="AI-assistent" title="AI-assistent">
-                        <span class="hkm-chat-mode-icon" aria-hidden="true">🤖</span>
+                        <span class="hkm-chat-mode-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 3v4" />
+                                <rect x="6" y="7" width="12" height="10" rx="3" />
+                                <path d="M4 11h2M18 11h2M9 14h.01M15 14h.01" />
+                            </svg>
+                        </span>
                         <span class="sr-only">AI-assistent</span>
                     </button>
                     <button type="button" class="hkm-chat-mode-btn" data-mode="google_chat" aria-label="Google Chat-team" title="Google Chat-team">
-                        <span class="hkm-chat-mode-icon" aria-hidden="true">💬</span>
+                        <span class="hkm-chat-mode-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7A2.5 2.5 0 0 1 17.5 16H10l-4.5 4v-4A2.5 2.5 0 0 1 4 13.5z" />
+                            </svg>
+                        </span>
                         <span class="sr-only">Google Chat-team</span>
                     </button>
                     <button type="button" class="hkm-chat-mode-btn" data-mode="email" aria-label="E-post" title="E-post">
-                        <span class="hkm-chat-mode-icon" aria-hidden="true">✉️</span>
+                        <span class="hkm-chat-mode-icon" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="4" y="6" width="16" height="12" rx="2" />
+                                <path d="m5 7 7 6 7-6" />
+                            </svg>
+                        </span>
                         <span class="sr-only">E-post</span>
                     </button>
                 </div>
@@ -2019,8 +2034,17 @@ window.addEventListener('load', () => {
                 color: #fff;
             }
             .hkm-chat-mode-icon {
-                font-size: 18px;
+                width: 18px;
+                height: 18px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
                 line-height: 1;
+            }
+            .hkm-chat-mode-icon svg {
+                width: 18px;
+                height: 18px;
+                display: block;
             }
             .hkm-chat-msg {
                 padding: 12px 16px;
