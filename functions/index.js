@@ -2097,8 +2097,9 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
   }
 
   try {
-    // Bruker v1 (produksjon) og gemini-pro for maksimal kompatibilitet
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${geminiKey}`;
+    // Bruker v1beta og gemini-1.5-flash med ekstra sikkerhetsmarginer
+    const cleanKey = geminiKey.trim();
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
     
     // 1. Hent litt kontekst om nettstedet
     const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
