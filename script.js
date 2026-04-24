@@ -1766,11 +1766,11 @@ window.addEventListener('load', () => {
             .hkm-chat-toggle {
                 border: 0;
                 border-radius: 50px;
-                background: #1B4965;
+                background: linear-gradient(135deg, #d17d39, #bd4f2a);
                 color: #fff;
                 font-weight: 600;
                 padding: 14px 24px;
-                box-shadow: 0 8px 24px rgba(27, 73, 101, 0.3);
+                box-shadow: 0 8px 24px rgba(209, 125, 57, 0.3);
                 cursor: pointer;
                 display: flex;
                 align-items: center;
@@ -1779,7 +1779,7 @@ window.addEventListener('load', () => {
             }
             .hkm-chat-toggle:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 12px 30px rgba(27, 73, 101, 0.4);
+                box-shadow: 0 12px 30px rgba(209, 125, 57, 0.4);
             }
             .hkm-chat-dot {
                 width: 10px;
