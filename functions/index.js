@@ -221,6 +221,103 @@ function parseGoogleChatEventPayload(req) {
   return {};
 }
 
+function pickFirstNonEmptyString(values = []) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return "";
+}
+
+function extractGoogleChatEventFields(payload) {
+  const chat = payload && typeof payload.chat === "object" ? payload.chat : {};
+  const msgPayload = chat && typeof chat.messagePayload === "object" ? chat.messagePayload : {};
+  const msgInPayload = msgPayload && typeof msgPayload.message === "object" ? msgPayload.message : {};
+  const topMessage = payload && typeof payload.message === "object" ? payload.message : {};
+  const chatMessage = chat && typeof chat.message === "object" ? chat.message : {};
+
+  const rawText = pickFirstNonEmptyString([
+    topMessage.argumentText,
+    topMessage.text,
+    payload && payload.text,
+    chatMessage.argumentText,
+    chatMessage.text,
+    msgInPayload.argumentText,
+    msgInPayload.text,
+    msgPayload.argumentText,
+    msgPayload.text,
+  ]);
+
+  const eventType = pickFirstNonEmptyString([
+    payload && payload.type,
+    payload && payload.eventType,
+    chat && chat.type,
+    chat && chat.eventType,
+    msgPayload && msgPayload.type,
+  ]);
+
+  const userType = pickFirstNonEmptyString([
+    payload && payload.user && payload.user.type,
+    chat && chat.user && chat.user.type,
+    msgInPayload && msgInPayload.sender && msgInPayload.sender.type,
+  ]);
+
+  const userDisplayName = pickFirstNonEmptyString([
+    payload && payload.user && payload.user.displayName,
+    chat && chat.user && chat.user.displayName,
+    msgInPayload && msgInPayload.sender && msgInPayload.sender.displayName,
+  ]);
+
+  const spaceName = pickFirstNonEmptyString([
+    payload && payload.space && payload.space.name,
+    payload && payload.message && payload.message.space && payload.message.space.name,
+    chat && chat.space && chat.space.name,
+    chatMessage && chatMessage.space && chatMessage.space.name,
+    msgInPayload && msgInPayload.space && msgInPayload.space.name,
+  ]);
+
+  const threadName = pickFirstNonEmptyString([
+    payload && payload.message && payload.message.thread && payload.message.thread.name,
+    chatMessage && chatMessage.thread && chatMessage.thread.name,
+    msgInPayload && msgInPayload.thread && msgInPayload.thread.name,
+  ]);
+
+  const threadKey = pickFirstNonEmptyString([
+    payload && payload.message && payload.message.thread && payload.message.thread.threadKey,
+    chatMessage && chatMessage.thread && chatMessage.thread.threadKey,
+    msgInPayload && msgInPayload.thread && msgInPayload.thread.threadKey,
+  ]);
+
+  const normalizedPayload = {
+    type: eventType,
+    user: { type: userType, displayName: userDisplayName },
+    space: { name: spaceName },
+    message: {
+      argumentText: rawText,
+      text: rawText,
+      thread: {
+        name: threadName,
+        threadKey,
+      },
+    },
+  };
+
+  return {
+    eventType,
+    userType,
+    userDisplayName,
+    rawText,
+    spaceName,
+    threadName,
+    threadKey,
+    normalizedPayload,
+    payloadKeys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 12) : [],
+    chatKeys: chat && typeof chat === "object" ? Object.keys(chat).slice(0, 12) : [],
+    msgPayloadKeys: msgPayload && typeof msgPayload === "object" ? Object.keys(msgPayload).slice(0, 12) : [],
+  };
+}
+
 function parseGoogleChatReplyCommand(rawText) {
   const text = cleanGoogleChatCommandText(rawText);
   if (!text) return null;
@@ -2257,7 +2354,8 @@ exports.googleChatBridge = onRequest({
   }
 
   const payload = parseGoogleChatEventPayload(req);
-  const eventType = (payload.type || "").trim();
+  const extracted = extractGoogleChatEventFields(payload);
+  const eventType = extracted.eventType;
   if (eventType && eventType !== "MESSAGE") {
     return res.status(200).json({ text: "OK" });
   }
@@ -2275,28 +2373,25 @@ exports.googleChatBridge = onRequest({
     }
   }
 
-  const userType = (payload.user && payload.user.type) || "";
+  const userType = extracted.userType || "";
   if (userType === "BOT") {
     return res.status(200).json({ text: "OK" });
   }
 
-  const rawText =
-    (payload.message && payload.message.argumentText) ||
-    (payload.message && payload.message.text) ||
-    payload.text ||
-    "";
+  const rawText = extracted.rawText || "";
 
   console.log("[GoogleChatBridge] Incoming message", JSON.stringify({
     contentType: req.get("content-type") || "",
     rawBodyBytes: req.rawBody && req.rawBody.length ? req.rawBody.length : 0,
-    payloadKeys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 12) : [],
-    type: payload.type || "",
-    userType: (payload.user && payload.user.type) || "",
-    hasArgumentText: Boolean(payload.message && payload.message.argumentText),
-    hasText: Boolean(payload.message && payload.message.text),
-    spaceName: (payload.space && payload.space.name) || "",
-    threadName: (payload.message && payload.message.thread && payload.message.thread.name) || "",
-    threadKey: (payload.message && payload.message.thread && payload.message.thread.threadKey) || "",
+    payloadKeys: extracted.payloadKeys,
+    chatKeys: extracted.chatKeys,
+    msgPayloadKeys: extracted.msgPayloadKeys,
+    type: extracted.eventType,
+    userType: extracted.userType,
+    hasRawText: Boolean(rawText),
+    spaceName: extracted.spaceName,
+    threadName: extracted.threadName,
+    threadKey: extracted.threadKey,
   }));
 
   const parsedCommand = parseGoogleChatReplyCommand(rawText);
@@ -2309,7 +2404,7 @@ exports.googleChatBridge = onRequest({
     chatId = parsedCommand.chatId;
     replyText = parsedCommand.replyText;
   } else {
-    chatId = await inferChatIdFromGooglePayload(payload);
+    chatId = await inferChatIdFromGooglePayload(extracted.normalizedPayload);
     replyText = naturalText;
   }
 
@@ -2340,7 +2435,7 @@ exports.googleChatBridge = onRequest({
   }
 
   const fromName = clampText(
-      (payload.user && payload.user.displayName) || "HKM Team",
+      extracted.userDisplayName || "HKM Team",
       120,
   );
 
