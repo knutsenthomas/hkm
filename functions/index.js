@@ -24,6 +24,9 @@ const vippsClientIdParam = defineSecret("VIPPS_CLIENT_ID");
 const vippsClientSecretParam = defineSecret("VIPPS_CLIENT_SECRET");
 const vippsSubscriptionKeyParam = defineSecret("VIPPS_SUBSCRIPTION_KEY");
 const vippsMsnParam = defineSecret("VIPPS_MSN");
+const googleChatWebhookUrlParam = defineSecret("GOOGLE_CHAT_WEBHOOK_URL");
+const googleChatBridgeTokenParam = defineSecret("GOOGLE_CHAT_BRIDGE_TOKEN");
+const geminiApiKeyParam = defineSecret("GEMINI_API_KEY");
 
 function getSecretOrEnv(secretParam, envKeys = []) {
   const candidates = [];
@@ -50,6 +53,33 @@ function getStripeSecretKey() {
         "STRIPE_SECRET_KEY",
         "STRIPE_KEY",
         "STRIPE_API_KEY",
+      ],
+  );
+}
+
+function getGoogleChatWebhookUrl() {
+  return getSecretOrEnv(
+      googleChatWebhookUrlParam,
+      [
+        "GOOGLE_CHAT_WEBHOOK_URL",
+      ],
+  );
+}
+
+function getGoogleChatBridgeToken() {
+  return getSecretOrEnv(
+      googleChatBridgeTokenParam,
+      [
+        "GOOGLE_CHAT_BRIDGE_TOKEN",
+      ],
+  );
+}
+
+function getGeminiApiKey() {
+  return getSecretOrEnv(
+      geminiApiKeyParam,
+      [
+        "GEMINI_API_KEY",
       ],
   );
 }
@@ -135,6 +165,35 @@ function formatWixPrice(amount, currency = "NOK", locale = "no-NO") {
   } catch (error) {
     return `${amount} ${currency}`;
   }
+}
+
+function clampText(value, maxLen = 800) {
+  if (typeof value !== "string") return "";
+  const normalized = value.replace(/\s+/g, " ").trim();
+  if (!normalized) return "";
+  return normalized.length > maxLen ? `${normalized.slice(0, maxLen - 1)}…` : normalized;
+}
+
+function cleanGoogleChatCommandText(rawText) {
+  if (typeof rawText !== "string") return "";
+  return rawText
+      .replace(/<users\/[^>]+>/g, " ")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim();
+}
+
+function parseGoogleChatReplyCommand(rawText) {
+  const text = cleanGoogleChatCommandText(rawText);
+  if (!text) return null;
+
+  const match = text.match(/^(reply|svar)\s+([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/i);
+  if (!match) return null;
+
+  return {
+    chatId: match[2],
+    replyText: clampText(match[3], 4000),
+  };
 }
 
 /**
@@ -1866,5 +1925,240 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
     console.log(`Kontakt-bekreftelse sendt til ${email}`);
   } catch (error) {
     console.error("Feil ved sending av kontakt-bekreftelse:", error);
+  }
+});
+
+/**
+ * Sender nye besøksmeldinger til en Google Chat-kanal via incoming webhook.
+ */
+exports.onVisitorChatMessageCreated = onDocumentCreated({
+  document: "visitorChats/{chatId}/messages/{messageId}",
+  secrets: [googleChatWebhookUrlParam],
+}, async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+
+  const msgData = snapshot.data() || {};
+  if (msgData.sender !== "visitor") return;
+
+  const text = clampText(msgData.text || "", 1200);
+  if (!text) return;
+
+  const webhookUrl = getGoogleChatWebhookUrl();
+  if (!webhookUrl) {
+    console.warn("GOOGLE_CHAT_WEBHOOK_URL mangler. Hopper over Google Chat sync.");
+    return;
+  }
+
+  const chatId = event.params && event.params.chatId ? event.params.chatId : "ukjent";
+  const chatRef = db.collection("visitorChats").doc(chatId);
+  const chatDoc = await chatRef.get();
+  const chatData = chatDoc.exists ? (chatDoc.data() || {}) : {};
+
+  const visitorName = clampText(chatData.visitorName || "Anonym besokende", 120);
+  const visitorEmail = clampText(chatData.visitorEmail || "", 254);
+  const sourcePage = clampText(chatData.lastPagePath || chatData.sourcePage || msgData.pagePath || "", 220);
+
+  const payloadLines = [
+    "Ny melding fra nettside-chat",
+    `Chat-ID: ${chatId}`,
+    `Fra: ${visitorName}${visitorEmail ? ` (${visitorEmail})` : ""}`,
+    sourcePage ? `Side: ${sourcePage}` : "",
+    "",
+    text,
+    "",
+    "Svar i Google Chat med:",
+    `reply ${chatId} <din melding>`,
+  ].filter(Boolean);
+
+  try {
+    const response = await fetch(webhookUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=UTF-8",
+      },
+      body: JSON.stringify({
+        text: payloadLines.join("\n"),
+      }),
+    });
+
+    if (!response.ok) {
+      const errText = await response.text().catch(() => "");
+      throw new Error(`Google Chat webhook feilet (${response.status}): ${errText}`);
+    }
+  } catch (error) {
+    console.error("Kunne ikke sende visitor chat til Google Chat:", error);
+  }
+});
+
+/**
+ * Inbound endpoint for Google Chat app.
+ * Usage in Google Chat space: "reply <chatId> <svartekst>"
+ */
+exports.googleChatBridge = onRequest({
+  cors: true,
+  secrets: [googleChatBridgeTokenParam],
+}, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    return res.status(204).send("");
+  }
+
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed. Use POST." });
+  }
+
+  const expectedToken = getGoogleChatBridgeToken();
+  if (expectedToken) {
+    const providedToken = (
+      (typeof req.query.token === "string" && req.query.token) ||
+      req.get("x-hkm-chat-token") ||
+      ""
+    ).trim();
+
+    if (!providedToken || providedToken !== expectedToken) {
+      return res.status(401).json({ text: "Unauthorized." });
+    }
+  }
+
+  const payload = req.body || {};
+  const rawText =
+    (payload.message && payload.message.argumentText) ||
+    (payload.message && payload.message.text) ||
+    payload.text ||
+    "";
+
+  const parsedCommand = parseGoogleChatReplyCommand(rawText);
+  if (!parsedCommand) {
+    return res.status(200).json({
+      text: "Bruk kommandoen: reply <chatId> <svartekst>",
+    });
+  }
+
+  const { chatId, replyText } = parsedCommand;
+  if (!replyText) {
+    return res.status(200).json({
+      text: "Svartekst mangler. Bruk: reply <chatId> <svartekst>",
+    });
+  }
+
+  const chatRef = db.collection("visitorChats").doc(chatId);
+  const chatSnap = await chatRef.get();
+  if (!chatSnap.exists) {
+    return res.status(200).json({
+      text: `Fant ikke chat med ID ${chatId}.`,
+    });
+  }
+
+  const fromName = clampText(
+      (payload.user && payload.user.displayName) || "HKM Team",
+      120,
+  );
+
+  await chatRef.collection("messages").add({
+    sender: "agent",
+    source: "google_chat",
+    fromName,
+    text: replyText,
+    createdAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+
+  await chatRef.set({
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    lastAgentMessageAt: admin.firestore.FieldValue.serverTimestamp(),
+  }, { merge: true });
+
+  return res.status(200).json({
+    text: `Svar sendt til besøkschat ${chatId}.`,
+  });
+});
+
+/**
+ * AI-drevet chatbot for His Kingdom Ministry.
+ * Svarer automatisk på nye meldinger fra besøkende ved bruk av Gemini.
+ */
+exports.onVisitorChatMessageAI = onDocumentCreated({
+  document: "visitorChats/{chatId}/messages/{messageId}",
+  secrets: [geminiApiKeyParam],
+}, async (event) => {
+  const snapshot = event.data;
+  if (!snapshot) return;
+
+  const msgData = snapshot.data() || {};
+  // Svarer kun på meldinger fra besøkende (for å unngå loop)
+  if (msgData.sender !== "visitor") return;
+
+  const chatId = event.params.chatId;
+  const geminiKey = getGeminiApiKey();
+  if (!geminiKey) {
+    console.warn("GEMINI_API_KEY mangler. AI-svar deaktivert.");
+    return;
+  }
+
+  try {
+    // 1. Hent litt kontekst om nettstedet (valgfritt, men anbefalt for bedre svar)
+    const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
+    const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
+    
+    // 2. Forbered Gemini-prompten
+    const systemPrompt = `
+      Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
+      Ditt mål er å svare på spørsmål om kirken, tjenestene deres, arrangementer og kristen tro på en vennlig, imøtekommende og spirituelt oppløftende måte.
+      
+      Regler:
+      - Svar alltid på norsk.
+      - Vær kortfattet, men varm.
+      - Hvis du ikke vet svaret på et spesifikt spørsmål (f.eks. om tider for et arrangement som ikke er nevnt), 
+        si at teamet vil svare dem så snart de kan i denne chatten.
+      - Nevn ALDRI "TK-design".
+      - Hvis brukeren vil snakke med et menneske, bekreft at teamet er varslet.
+    `.trim();
+
+    const userMessage = msgData.text || "";
+    if (!userMessage) return;
+
+    // 3. Kall Gemini API (1.5 Flash for rask respons)
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiKey}`;
+    
+    const response = await fetch(geminiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          { role: "user", parts: [{ text: `${systemPrompt}\n\nBesøkende sier: ${userMessage}` }] }
+        ],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 500,
+        }
+      })
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`Gemini API feilet (${response.status}): ${errText}`);
+    }
+
+    const result = await response.json();
+    const aiText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+
+    if (aiText) {
+      // 4. Lagre AI-svaret i Firestore
+      const chatRef = db.collection("visitorChats").doc(chatId);
+      await chatRef.collection("messages").add({
+        sender: "agent",
+        source: "ai_gemini",
+        fromName: "HKM Assistent",
+        text: aiText.trim(),
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      // Oppdater sist aktiv tid
+      await chatRef.set({
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, { merge: true });
+    }
+
+  } catch (error) {
+    console.error("Feil i chatbot-AI logikk:", error);
   }
 });

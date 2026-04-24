@@ -1349,8 +1349,12 @@ class AdminManager {
         if (alreadyRendered) {
             if (sectionId === 'overview') {
                 this.renderOverview();
-            } else if (['blog', 'events', 'teaching'].includes(sectionId)) {
-                this.loadCollection(sectionId);
+            } else if (['blog', 'events', 'teaching', 'comments'].includes(sectionId)) {
+                if (sectionId === 'comments') {
+                    this.loadComments();
+                } else {
+                    this.loadCollection(sectionId);
+                }
             } else if (sectionId === 'courses') {
                 this._loadCoursesList();
             } else if (sectionId === 'users' && !this.currentUserDetailId) {
@@ -1412,6 +1416,9 @@ class AdminManager {
                     break;
                 case 'automation':
                     this.renderAutomationSection();
+                    break;
+                case 'comments':
+                    this.renderCommentsSection();
                     break;
                 case 'kommunikasjon':
                     this.renderKommunikasjonSection();
@@ -1820,6 +1827,127 @@ class AdminManager {
                 });
         } catch (err) {
             console.error('Kunne ikke starte melding-notifikasjoner:', err);
+        }
+    }
+
+    async renderCommentsSection() {
+        const section = document.getElementById('comments-section');
+        if (!section) return;
+
+        section.setAttribute('data-rendered', 'true');
+
+        section.innerHTML = `
+            ${this.renderSectionHeader('forum', 'Kommentarstyring', 'Her kan du moderere og slette kommentarer fra blogg og undervisning.', `
+                <button class="btn btn-primary" onclick="window.adminManager.renderCommentsSection()">
+                    Oppdater
+                </button>
+            `, '')}
+
+            <div class="design-ui-shell">
+                <div class="design-ui-workspace" style="padding: 0;">
+                    <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                        <div class="table-container">
+                            <table class="crm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Dato</th>
+                                        <th>Forfatter</th>
+                                        <th>Kommentar</th>
+                                        <th>Post ID</th>
+                                        <th class="col-actions" style="text-align:right; padding-right:20px;">Handlinger</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comments-list-body">
+                                    <tr><td colspan="5" style="text-align:center;"><div class="loader" style="margin:20px auto;"></div></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.loadComments();
+    }
+
+    async loadComments() {
+        const listBody = document.getElementById('comments-list-body');
+        if (!listBody) return;
+
+        try {
+            const interactionsSnap = await firebaseService.db.collection('interactions').get();
+            let allComments = [];
+
+            const fetchPromises = [];
+            interactionsSnap.forEach(postDoc => {
+                const postId = postDoc.id;
+                fetchPromises.push(
+                    postDoc.ref.collection('comments').get().then(snap => {
+                        snap.forEach(commentDoc => {
+                            allComments.push({
+                                id: commentDoc.id,
+                                postId: postId,
+                                data: commentDoc.data()
+                            });
+                        });
+                    })
+                );
+            });
+
+            await Promise.all(fetchPromises);
+
+            allComments.sort((a, b) => {
+                const tA = a.data.timestamp?.toDate?.() || new Date(0);
+                const tB = b.data.timestamp?.toDate?.() || new Date(0);
+                return tB - tA;
+            });
+
+            if (allComments.length === 0) {
+                listBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 40px; color:#64748b;">Ingen kommentarer funnet.</td></tr>';
+                return;
+            }
+
+            listBody.innerHTML = allComments.map(c => {
+                const d = c.data;
+                const date = d.timestamp?.toDate?.() 
+                    ? d.timestamp.toDate().toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+                    : 'Ukjent dato';
+                return `
+                    <tr data-comment-id="${c.id}" data-post-id="${c.postId}">
+                        <td style="white-space: nowrap; font-size: 13px; color:#64748b;">${date}</td>
+                        <td style="font-weight: 600;">${this.escapeHtml(d.author_name || 'Anonym')}</td>
+                        <td style="max-width: 400px; line-height: 1.5; padding: 12px 15px; overflow-wrap: break-word;">${this.escapeHtml(d.text || '')}</td>
+                        <td style="font-size: 11px; color: #94a3b8; font-family: monospace;">${this.escapeHtml(c.postId)}</td>
+                        <td class="col-actions" style="text-align:right; padding-right:15px;">
+                            <button class="btn btn-icon danger delete-comment-btn" data-comment-id="${c.id}" data-post-id="${c.postId}" title="Slett kommentar" 
+                                style="color: #ef4444; background: #fee2e2; border-radius: 6px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            listBody.querySelectorAll('.delete-comment-btn').forEach(btn => {
+                btn.onclick = async () => {
+                    if (confirm('Er du sikker på at du vil slette denne kommentaren?')) {
+                        const cid = btn.dataset.commentId;
+                        const pid = btn.dataset.postId;
+                        try {
+                            await firebaseService.deleteComment(pid, cid);
+                            this.showToast('✅ Kommentar slettet');
+                            this.loadComments();
+                        } catch (err) {
+                            console.error('Kunne ikke slette kommentar:', err);
+                            this.showToast('❌ Feil ved sletting', 'error');
+                        }
+                    }
+                };
+            });
+
+        } catch (err) {
+            console.error('Kunne ikke laste kommentarer:', err);
+            listBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red; padding: 20px;">Feil ved lasting av kommentarer.</td></tr>';
         }
     }
 

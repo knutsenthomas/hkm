@@ -1455,3 +1455,424 @@ window.addEventListener('load', () => {
         revealPublicUI('post-load-fallback');
     }, 7000);
 });
+
+// ===================================
+// Visitor Chat Widget (Google Chat bridge)
+// ===================================
+(function initVisitorChatBootstrap() {
+    const CHAT_LS_KEY = 'hkm_visitor_chat_id_v1';
+    const CHAT_SESSION_KEY = 'hkm_visitor_chat_session_v1';
+    const MAX_MESSAGE_LENGTH = 4000;
+    let mounted = false;
+
+    function makeSessionId() {
+        if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+            return window.crypto.randomUUID();
+        }
+        return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    }
+
+    function waitForFirebaseService(attempt = 0) {
+        if (mounted) return;
+        const firebaseReady = !!(window.firebaseService && window.firebaseService.isInitialized && typeof firebase !== 'undefined');
+        if (firebaseReady) {
+            mounted = true;
+            mountVisitorChatWidget().catch((error) => {
+                console.error('[VisitorChat] Could not mount widget:', error);
+            });
+            return;
+        }
+
+        if (attempt >= 80) return;
+        window.setTimeout(() => waitForFirebaseService(attempt + 1), 250);
+    }
+
+    async function mountVisitorChatWidget() {
+        const db = window.firebaseService.db;
+        const auth = firebase.auth();
+        if (!db || !auth) return;
+
+        if (document.getElementById('hkm-visitor-chat-widget')) return;
+        injectChatStyles();
+
+        const root = document.createElement('div');
+        root.id = 'hkm-visitor-chat-widget';
+        root.innerHTML = `
+            <button type="button" class="hkm-chat-toggle" aria-label="Apne chat">
+                <span class="hkm-chat-dot"></span>
+                Chat med oss
+            </button>
+            <section class="hkm-chat-panel" aria-hidden="true">
+                <header class="hkm-chat-header">
+                    <div>
+                        <h3>Sporsmal?</h3>
+                        <p>Send oss en melding. Vi svarer sa fort vi kan.</p>
+                    </div>
+                    <button type="button" class="hkm-chat-close" aria-label="Lukk chat">×</button>
+                </header>
+                <div class="hkm-chat-body"></div>
+                <form class="hkm-chat-form">
+                    <input type="text" class="hkm-chat-input" maxlength="${MAX_MESSAGE_LENGTH}" placeholder="Skriv meldingen din..." />
+                    <button type="submit" class="hkm-chat-send">Send</button>
+                </form>
+                <p class="hkm-chat-status" aria-live="polite"></p>
+            </section>
+        `;
+        document.body.appendChild(root);
+
+        const toggleBtn = root.querySelector('.hkm-chat-toggle');
+        const panel = root.querySelector('.hkm-chat-panel');
+        const closeBtn = root.querySelector('.hkm-chat-close');
+        const bodyEl = root.querySelector('.hkm-chat-body');
+        const form = root.querySelector('.hkm-chat-form');
+        const input = root.querySelector('.hkm-chat-input');
+        const sendBtn = root.querySelector('.hkm-chat-send');
+        const statusEl = root.querySelector('.hkm-chat-status');
+
+        const addSystemMessage = (text) => {
+            const msg = document.createElement('div');
+            msg.className = 'hkm-chat-msg system';
+            msg.textContent = text;
+            bodyEl.appendChild(msg);
+            bodyEl.scrollTop = bodyEl.scrollHeight;
+        };
+
+        addSystemMessage('Hei! Jeg er HKM-assistenten. Hvordan kan jeg hjelpe deg i dag?');
+        addSystemMessage('Teamet er også varslet og kan svare deg her når de er tilgjengelige.');
+
+        function setStatus(text, kind = 'muted') {
+            statusEl.textContent = text || '';
+            statusEl.dataset.kind = kind;
+        }
+
+        const setOpen = (open) => {
+            root.classList.toggle('open', open);
+            panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+            if (open) {
+                input.focus();
+                bodyEl.scrollTop = bodyEl.scrollHeight;
+            }
+        };
+
+        toggleBtn.addEventListener('click', () => setOpen(!root.classList.contains('open')));
+        closeBtn.addEventListener('click', () => setOpen(false));
+
+        if (!auth.currentUser) {
+            try {
+                await auth.signInAnonymously();
+            } catch (error) {
+                console.error('[VisitorChat] Anonymous auth failed:', error);
+                setStatus('Chat er midlertidig utilgjengelig. Prov igjen senere.', 'error');
+                form.style.display = 'none';
+                return;
+            }
+        }
+
+        const uid = auth.currentUser && auth.currentUser.uid;
+        if (!uid) {
+            setStatus('Chat kunne ikke starte.', 'error');
+            return;
+        }
+
+        let chatId = localStorage.getItem(CHAT_LS_KEY) || '';
+        const sessionId = localStorage.getItem(CHAT_SESSION_KEY) || makeSessionId();
+        localStorage.setItem(CHAT_SESSION_KEY, sessionId);
+
+        const createChatDoc = async () => {
+            const ref = db.collection('visitorChats').doc();
+            await ref.set({
+                visitorUid: uid,
+                sessionId,
+                status: 'open',
+                sourcePage: window.location.pathname,
+                lastPagePath: window.location.pathname,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            localStorage.setItem(CHAT_LS_KEY, ref.id);
+            return ref.id;
+        };
+
+        if (chatId) {
+            try {
+                const existing = await db.collection('visitorChats').doc(chatId).get();
+                if (!existing.exists || existing.data().visitorUid !== uid) {
+                    chatId = await createChatDoc();
+                }
+            } catch (error) {
+                console.warn('[VisitorChat] Existing chat check failed, creating new chat.', error);
+                chatId = await createChatDoc();
+            }
+        } else {
+            chatId = await createChatDoc();
+        }
+
+        const messagesRef = db
+            .collection('visitorChats')
+            .doc(chatId)
+            .collection('messages')
+            .orderBy('createdAt', 'asc')
+            .limit(100);
+
+        let isTyping = false;
+
+        messagesRef.onSnapshot((snapshot) => {
+            bodyEl.innerHTML = '';
+            
+            if (snapshot.empty) {
+                addSystemMessage('Ingen meldinger enda. Start samtalen nar du er klar.');
+                return;
+            }
+
+            snapshot.forEach((doc) => {
+                const data = doc.data() || {};
+                const msg = document.createElement('div');
+                const isVisitor = data.sender === 'visitor';
+                msg.className = `hkm-chat-msg ${isVisitor ? 'visitor' : 'agent'}`;
+                msg.textContent = typeof data.text === 'string' ? data.text : '';
+                bodyEl.appendChild(msg);
+
+                // If we got a message from agent, stop typing indicator
+                if (!isVisitor) isTyping = false;
+            });
+
+            if (isTyping) {
+                const typingMsg = document.createElement('div');
+                typingMsg.className = 'hkm-chat-msg agent typing';
+                typingMsg.style.fontStyle = 'italic';
+                typingMsg.style.opacity = '0.7';
+                typingMsg.textContent = 'HKM Assistent skriver...';
+                bodyEl.appendChild(typingMsg);
+            }
+
+            bodyEl.scrollTop = bodyEl.scrollHeight;
+        }, (error) => {
+            console.error('[VisitorChat] Snapshot error:', error);
+            setStatus('Mistet tilkoblingen til chatten.', 'error');
+        });
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const text = (input.value || '').trim();
+            if (!text) return;
+
+            if (text.length > MAX_MESSAGE_LENGTH) {
+                setStatus(`Maks ${MAX_MESSAGE_LENGTH} tegn per melding.`, 'error');
+                return;
+            }
+
+            sendBtn.disabled = true;
+            setStatus('Sender melding...');
+            try {
+                await db.collection('visitorChats')
+                    .doc(chatId)
+                    .collection('messages')
+                    .add({
+                        sender: 'visitor',
+                        source: 'website',
+                        pagePath: window.location.pathname,
+                        text,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                await db.collection('visitorChats').doc(chatId).set({
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastVisitorMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastPagePath: window.location.pathname
+                }, { merge: true });
+
+                input.value = '';
+                setStatus('');
+                
+                // Trigger typing indicator
+                isTyping = true;
+                // Force a small update to show typing even if snapshot hasn't arrived
+                const typingMsg = document.createElement('div');
+                typingMsg.className = 'hkm-chat-msg agent typing';
+                typingMsg.style.fontStyle = 'italic';
+                typingMsg.style.opacity = '0.7';
+                typingMsg.textContent = 'HKM Assistent skriver...';
+                bodyEl.appendChild(typingMsg);
+                bodyEl.scrollTop = bodyEl.scrollHeight;
+
+                // Auto-hide typing if no response in 15s
+                setTimeout(() => { 
+                    if (isTyping) {
+                        isTyping = false;
+                        // The snapshot will clear it naturally
+                    }
+                }, 15000);
+            } catch (error) {
+                console.error('[VisitorChat] Send failed:', error);
+                setStatus('Kunne ikke sende meldingen. Prov igjen.', 'error');
+            } finally {
+                sendBtn.disabled = false;
+            }
+        });
+    }
+
+    function injectChatStyles() {
+        if (document.getElementById('hkm-visitor-chat-styles')) return;
+        const style = document.createElement('style');
+        style.id = 'hkm-visitor-chat-styles';
+        style.textContent = `
+            #hkm-visitor-chat-widget {
+                position: fixed;
+                right: 18px;
+                bottom: 18px;
+                z-index: 10020;
+                font-family: "Inter", system-ui, -apple-system, sans-serif;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-toggle {
+                border: 0;
+                border-radius: 999px;
+                background: linear-gradient(130deg, #d17d39, #bd4f2a);
+                color: #fff;
+                font-weight: 700;
+                padding: 12px 18px;
+                box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+                background: #9ef2bb;
+                box-shadow: 0 0 0 4px rgba(158, 242, 187, 0.25);
+            }
+            #hkm-visitor-chat-widget .hkm-chat-panel {
+                width: min(360px, calc(100vw - 24px));
+                margin-top: 10px;
+                background: #fff;
+                border-radius: 16px;
+                border: 1px solid #e8edf2;
+                box-shadow: 0 22px 44px rgba(9, 22, 40, 0.22);
+                overflow: hidden;
+                display: none;
+            }
+            #hkm-visitor-chat-widget.open .hkm-chat-panel {
+                display: block;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-header {
+                padding: 14px 16px;
+                background: #f7fafc;
+                border-bottom: 1px solid #e8edf2;
+                display: flex;
+                justify-content: space-between;
+                gap: 12px;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-header h3 {
+                margin: 0;
+                font-size: 15px;
+                color: #0f172a;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-header p {
+                margin: 4px 0 0;
+                font-size: 12px;
+                color: #64748b;
+                line-height: 1.4;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-close {
+                border: 0;
+                background: transparent;
+                font-size: 24px;
+                line-height: 1;
+                color: #475569;
+                cursor: pointer;
+                align-self: flex-start;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-body {
+                max-height: 320px;
+                min-height: 180px;
+                overflow-y: auto;
+                padding: 12px;
+                background: linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+            }
+            #hkm-visitor-chat-widget .hkm-chat-msg {
+                margin-bottom: 8px;
+                padding: 10px 12px;
+                border-radius: 12px;
+                max-width: 90%;
+                line-height: 1.4;
+                white-space: pre-wrap;
+                word-break: break-word;
+                font-size: 14px;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-msg.system {
+                background: #fff8ef;
+                border: 1px solid #f2ddc8;
+                color: #6a3b12;
+                max-width: 100%;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-msg.visitor {
+                margin-left: auto;
+                background: #d17d39;
+                color: #fff;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-msg.agent {
+                margin-right: auto;
+                background: #eef2f7;
+                color: #111827;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-form {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                gap: 8px;
+                padding: 12px;
+                border-top: 1px solid #e8edf2;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-input {
+                border: 1px solid #cbd5e1;
+                border-radius: 10px;
+                min-width: 0;
+                padding: 10px 12px;
+                font-size: 14px;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-input:focus {
+                outline: none;
+                border-color: #d17d39;
+                box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.16);
+            }
+            #hkm-visitor-chat-widget .hkm-chat-send {
+                border: 0;
+                border-radius: 10px;
+                background: #1f2937;
+                color: #fff;
+                font-weight: 600;
+                padding: 10px 14px;
+                cursor: pointer;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-send:disabled {
+                opacity: 0.55;
+                cursor: not-allowed;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-status {
+                margin: 0;
+                padding: 0 12px 12px;
+                min-height: 18px;
+                font-size: 12px;
+                color: #64748b;
+            }
+            #hkm-visitor-chat-widget .hkm-chat-status[data-kind="error"] {
+                color: #b91c1c;
+            }
+            @media (max-width: 640px) {
+                #hkm-visitor-chat-widget {
+                    right: 10px;
+                    bottom: 10px;
+                }
+                #hkm-visitor-chat-widget .hkm-chat-panel {
+                    width: min(360px, calc(100vw - 20px));
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        waitForFirebaseService();
+    });
+})();

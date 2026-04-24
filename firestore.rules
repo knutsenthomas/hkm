@@ -79,6 +79,40 @@ service cloud.firestore {
         (!hasKey(d, 'message') || (d.message is string && d.message.size() <= 10000));
     }
 
+    function isVisitorChatOwner(chatId) {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/visitorChats/$(chatId)) &&
+        get(/databases/$(database)/documents/visitorChats/$(chatId)).data.visitorUid == request.auth.uid;
+    }
+
+    function validVisitorChatCreate(chatId) {
+      let d = request.resource.data;
+      return signedIn() &&
+        d is map &&
+        request.resource.id == chatId &&
+        hasKey(d, 'visitorUid') &&
+        d.visitorUid == request.auth.uid &&
+        hasKey(d, 'status') &&
+        d.status == 'open' &&
+        (!hasKey(d, 'visitorName') || (d.visitorName is string && d.visitorName.size() <= 120)) &&
+        (!hasKey(d, 'visitorEmail') || (d.visitorEmail is string && d.visitorEmail.size() <= 254)) &&
+        (!hasKey(d, 'sourcePage') || (d.sourcePage is string && d.sourcePage.size() <= 300));
+    }
+
+    function validVisitorMessageCreate() {
+      let d = request.resource.data;
+      return signedIn() &&
+        d is map &&
+        hasKey(d, 'sender') &&
+        d.sender == 'visitor' &&
+        hasKey(d, 'text') &&
+        d.text is string &&
+        d.text.size() > 0 &&
+        d.text.size() <= 4000 &&
+        (!hasKey(d, 'source') || (d.source is string && d.source.size() <= 40)) &&
+        (!hasKey(d, 'pagePath') || (d.pagePath is string && d.pagePath.size() <= 300));
+    }
+
     function validDonationCreate(donationId) {
       let d = request.resource.data;
       return d is map &&
@@ -155,6 +189,36 @@ service cloud.firestore {
     match /contactMessages/{messageId} {
       allow create: if validPublicContactMessage();
       allow read, update, delete: if isAdmin();
+    }
+
+    // Visitor chat: authenticated anonymously on the client and synced with Google Chat via Cloud Functions.
+    match /visitorChats/{chatId} {
+      allow create: if validVisitorChatCreate(chatId);
+      allow read: if isAdmin() || isVisitorChatOwner(chatId);
+      allow update: if isAdmin() || (
+        isVisitorChatOwner(chatId) &&
+        request.resource.data.visitorUid == resource.data.visitorUid &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'updatedAt',
+          'lastVisitorMessageAt',
+          'lastPagePath',
+          'visitorName',
+          'visitorEmail'
+        ]) &&
+        (!hasKey(request.resource.data, 'visitorName') ||
+          (request.resource.data.visitorName is string && request.resource.data.visitorName.size() <= 120)) &&
+        (!hasKey(request.resource.data, 'visitorEmail') ||
+          (request.resource.data.visitorEmail is string && request.resource.data.visitorEmail.size() <= 254)) &&
+        (!hasKey(request.resource.data, 'lastPagePath') ||
+          (request.resource.data.lastPagePath is string && request.resource.data.lastPagePath.size() <= 300))
+      );
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isAdmin() || isVisitorChatOwner(chatId);
+        allow create: if isAdmin() || (isVisitorChatOwner(chatId) && validVisitorMessageCreate());
+        allow update, delete: if isAdmin();
+      }
     }
 
     // Newsletter signup from website footer/forms

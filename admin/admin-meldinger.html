@@ -28,6 +28,40 @@
             margin-left: 6px;
             vertical-align: middle;
         }
+
+        .chat-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            border-radius: 999px;
+            padding: 4px 10px;
+            background: #fff4e8;
+            color: #9a3412;
+            border: 1px solid #fed7aa;
+        }
+
+        .chat-meta {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .chat-id {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 12px;
+            color: #0f172a;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
     </style>
 
     <!-- Firebase SDK (Compat) -->
@@ -273,6 +307,34 @@
             </div>
 
             <div class="crm-content">
+                <div class="card modern">
+                    <div class="table-header">
+                        <h3 class="card-title">Nettsidechat (Google Chat)</h3>
+                        <div class="header-right-actions">
+                            <span class="chat-pill">Aktive chatter: <span id="active-chat-count">0</span></span>
+                        </div>
+                    </div>
+                    <p style="margin: 0 0 12px; color: var(--text-muted); font-size: 13px;">
+                        Svar i Google Chat med kommando: <code>reply &lt;chatId&gt; &lt;svartekst&gt;</code>
+                    </p>
+                    <table class="crm-table">
+                        <thead>
+                            <tr>
+                                <th>Besøkende</th>
+                                <th>Siste melding</th>
+                                <th>Chat-ID</th>
+                                <th>Sist aktiv</th>
+                                <th class="col-actions"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitor-chats-body">
+                            <tr>
+                                <td colspan="5" style="text-align:center; padding: 26px; color: var(--text-muted);">Laster nettsidechatter...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <div class="card modern">
                     <div class="table-header">
                         <h3 class="card-title">Innboks</h3>

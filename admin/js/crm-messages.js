@@ -6,6 +6,7 @@
 class MessagesManager {
     constructor() {
         this.messages = [];
+        this.visitorChats = [];
         this.init();
     }
 
@@ -28,6 +29,7 @@ class MessagesManager {
         window.firebaseService.onAuthChange((user) => {
             if (user) {
                 this.loadMessages();
+                this.loadVisitorChats();
             } else {
                 window.location.href = 'login.html';
             }
@@ -60,6 +62,28 @@ class MessagesManager {
                 }
             });
         }
+
+        const visitorChatsBody = document.getElementById('visitor-chats-body');
+        if (visitorChatsBody) {
+            visitorChatsBody.addEventListener('click', async (e) => {
+                const copyBtn = e.target.closest('.copy-reply-command');
+                if (!copyBtn) return;
+
+                const command = copyBtn.getAttribute('data-command') || '';
+                if (!command) return;
+
+                try {
+                    await navigator.clipboard.writeText(command);
+                    copyBtn.textContent = 'Kopiert';
+                    window.setTimeout(() => {
+                        copyBtn.textContent = 'Kopier kommando';
+                    }, 1400);
+                } catch (error) {
+                    console.error('Could not copy command:', error);
+                    alert('Kunne ikke kopiere automatisk. Kommando: ' + command);
+                }
+            });
+        }
     }
 
     async loadMessages() {
@@ -82,6 +106,48 @@ class MessagesManager {
         } catch (error) {
             console.error("Error loading messages:", error);
             tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:red;">Feil ved lasting av meldinger.</td></tr>`;
+        }
+    }
+
+    async loadVisitorChats() {
+        const tableBody = document.getElementById('visitor-chats-body');
+        const countEl = document.getElementById('active-chat-count');
+        if (!tableBody) return;
+
+        try {
+            const chatsSnapshot = await window.firebaseService.db
+                .collection('visitorChats')
+                .orderBy('updatedAt', 'desc')
+                .limit(40)
+                .get();
+
+            const chatItems = await Promise.all(chatsSnapshot.docs.map(async (doc) => {
+                const chatData = doc.data() || {};
+                const lastMsgSnapshot = await window.firebaseService.db
+                    .collection('visitorChats')
+                    .doc(doc.id)
+                    .collection('messages')
+                    .orderBy('createdAt', 'desc')
+                    .limit(1)
+                    .get();
+
+                const lastMsgDoc = lastMsgSnapshot.docs[0];
+                const lastMessage = lastMsgDoc ? (lastMsgDoc.data() || {}) : null;
+
+                return {
+                    id: doc.id,
+                    ...chatData,
+                    lastMessage
+                };
+            }));
+
+            this.visitorChats = chatItems;
+            this.renderVisitorChats();
+            if (countEl) countEl.textContent = String(this.visitorChats.length);
+        } catch (error) {
+            console.error('Error loading visitor chats:', error);
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:red;">Feil ved lasting av nettsidechatter.</td></tr>';
+            if (countEl) countEl.textContent = '0';
         }
     }
 
@@ -134,6 +200,67 @@ class MessagesManager {
                 </tr>
             `;
         }).join('');
+    }
+
+    renderVisitorChats(data = this.visitorChats) {
+        const tableBody = document.getElementById('visitor-chats-body');
+        if (!tableBody) return;
+
+        if (!data.length) {
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 24px; color: var(--text-muted);">Ingen aktive nettsidechatter enda.</td></tr>';
+            return;
+        }
+
+        tableBody.innerHTML = data.map((chat) => {
+            const updatedDate = chat.updatedAt
+                ? (chat.updatedAt.toDate ? chat.updatedAt.toDate() : new Date(chat.updatedAt))
+                : null;
+            const updatedLabel = updatedDate ? updatedDate.toLocaleString('no-NO') : 'Ukjent';
+            const visitorName = chat.visitorName || 'Anonym besøkende';
+            const visitorEmail = chat.visitorEmail || '';
+
+            const lastMessageText = chat.lastMessage && typeof chat.lastMessage.text === 'string'
+                ? chat.lastMessage.text
+                : '(Ingen meldinger enda)';
+
+            let fromLabel = 'Sist fra besøkende';
+            if (chat.lastMessage && chat.lastMessage.sender === 'agent') {
+                fromLabel = chat.lastMessage.source === 'ai_gemini' ? 'Sist fra AI' : 'Sist fra team';
+            }
+
+            const command = `reply ${chat.id} `;
+            const safeMessage = this.escapeHtml(lastMessageText.length > 140 ? `${lastMessageText.slice(0, 139)}…` : lastMessageText);
+
+            return `
+                <tr>
+                    <td>
+                        <div style="font-weight: 600;">${this.escapeHtml(visitorName)}</div>
+                        <div class="chat-meta">
+                            <span>${this.escapeHtml(visitorEmail || 'Ingen e-post')}</span>
+                            <span>${this.escapeHtml(chat.lastPagePath || chat.sourcePage || '-')}</span>
+                        </div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 500; margin-bottom: 4px;">${fromLabel}</div>
+                        <div style="font-size: 13px; color: var(--text-muted);">${safeMessage}</div>
+                    </td>
+                    <td><span class="chat-id">${this.escapeHtml(chat.id)}</span></td>
+                    <td>${updatedLabel}</td>
+                    <td class="col-actions">
+                        <button class="btn btn-outline btn-sm copy-reply-command" data-command="${this.escapeHtml(command)}">Kopier kommando</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
     }
 
     async markAsRead(id) {

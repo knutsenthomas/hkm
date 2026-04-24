@@ -1004,6 +1004,16 @@ class FirebaseService {
             callback(comments);
         });
     }
+
+    async deleteComment(postId, commentId) {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        const safePostId = (typeof postId === 'string' ? postId : String(postId || ''))
+            .trim()
+            .replace(/\//g, '_');
+        if (!safePostId || !commentId) throw new Error("Invalid parameters");
+
+        return this.db.collection('interactions').doc(safePostId).collection('comments').doc(commentId).delete();
+    }
 }
 
 // Global instance
