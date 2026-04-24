@@ -129,15 +129,15 @@
 
 .comment-submit-btn {
     align-self: flex-start;
-    background: #1B4965; /* Primærknapp: Mørkeblå */
-    color: #ffffff;
+    background-color: #1B4965 !important;
+    color: #ffffff !important;
     font-weight: 600;
     padding: 12px 32px;
     border-radius: 999px;
     border: none;
     cursor: pointer;
     transition: all 0.3s ease;
-    display: flex;
+    display: flex !important;
     align-items: center;
     gap: 8px;
 }
