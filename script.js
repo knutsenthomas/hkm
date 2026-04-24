@@ -1728,6 +1728,25 @@ window.addEventListener('load', () => {
                 sendBtn.disabled = false;
             }
         });
+
+        requestHumanBtn.addEventListener('click', async () => {
+            requestHumanBtn.disabled = true;
+            requestHumanBtn.textContent = 'Varsler teamet...';
+            
+            try {
+                await db.collection('visitorChats').doc(chatId).set({
+                    requestHuman: true,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                
+                addSystemMessage('Teamet er nå varslet i Google Chat og vil svare deg her så snart de er ledige.');
+                humanBridge.style.display = 'none';
+            } catch (error) {
+                console.error('Error requesting human:', error);
+                requestHumanBtn.disabled = false;
+                requestHumanBtn.textContent = 'Be om menneskelig hjelp';
+            }
+        });
     }
 
     function injectChatStyles() {
