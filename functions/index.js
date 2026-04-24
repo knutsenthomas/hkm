@@ -197,6 +197,23 @@ function parseGoogleChatReplyCommand(rawText) {
   };
 }
 
+function chooseGeminiModel(modelNames = []) {
+  const preferred = [
+    "models/gemini-2.5-flash",
+    "models/gemini-2.0-flash",
+    "models/gemini-1.5-flash",
+    "models/gemini-pro",
+  ];
+
+  for (const target of preferred) {
+    const exact = modelNames.find((name) => name === target);
+    if (exact) return exact;
+  }
+
+  // Fallback: pick the first generateContent-capable model.
+  return modelNames[0] || "";
+}
+
 /**
  * Konverterer Wix' interne bildeformat (wix:image://v1/...) til en offentlig URL.
  */
@@ -2097,10 +2114,39 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
   }
 
   try {
-    // Bruker v1beta og gemini-1.5-flash med ekstra sikkerhetsmarginer
     const cleanKey = geminiKey.trim();
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
-    
+    const apiBase = "https://generativelanguage.googleapis.com/v1beta";
+
+    // Finn en modell som faktisk er tilgjengelig for dette prosjektet/API-nokkelen.
+    const modelsResponse = await fetch(`${apiBase}/models?key=${cleanKey}`, {
+      method: "GET",
+      headers: { "Accept": "application/json" },
+    });
+
+    const modelsPayload = await modelsResponse.json().catch(() => ({}));
+    if (!modelsResponse.ok) {
+      console.error("Gemini listModels-feil:", JSON.stringify(modelsPayload));
+      return;
+    }
+
+    const modelNames = Array.isArray(modelsPayload.models) ?
+      modelsPayload.models
+          .filter((model) =>
+            model &&
+            typeof model.name === "string" &&
+            Array.isArray(model.supportedGenerationMethods) &&
+            model.supportedGenerationMethods.includes("generateContent"))
+          .map((model) => model.name) :
+      [];
+
+    const selectedModel = chooseGeminiModel(modelNames);
+    if (!selectedModel) {
+      console.error("Fant ingen Gemini-modell med generateContent-stotte.");
+      return;
+    }
+
+    const url = `${apiBase}/${selectedModel}:generateContent?key=${cleanKey}`;
+
     // 1. Hent litt kontekst om nettstedet
     const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
     const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
