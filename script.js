@@ -2068,7 +2068,8 @@ window.addEventListener('load', () => {
                     name, email, phone, message,
                     source: 'chat_widget_email',
                     pagePath: window.location.pathname,
-                    chatId, sessionId,
+                    chatId: currentChatId,
+                    sessionId: currentSessionId,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
@@ -2090,7 +2091,7 @@ window.addEventListener('load', () => {
 
                 fetch('https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse', {
                     method: 'POST', mode: 'no-cors', body: formData
-                });
+                }).catch(() => {});
 
                 messageEl.value = '';
                 statusEl.style.color = '#16a34a';
@@ -2103,14 +2104,6 @@ window.addEventListener('load', () => {
                 submitBtn.disabled = false;
             }
         };
-
-        // Delegert klikk-håndtering som backup
-        root.addEventListener('click', (e) => {
-            if (e.target && (e.target.classList.contains('hkm-chat-email-submit') || e.target.closest('.hkm-chat-email-submit'))) {
-                // Hvis knappen ikke har onclick-attributt (f.eks. eldre versjon)
-                if (!e.target.onclick) window.hkmChatHandleEmailSubmit();
-            }
-        });
 
         requestHumanBtn.addEventListener('click', async () => {
             humanRequested = true;
