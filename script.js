@@ -1721,7 +1721,7 @@ window.addEventListener('load', () => {
                 msg.className = `hkm-chat-msg ${isVisitor ? 'visitor' : 'agent'}`;
                 
                 const rawText = typeof data.text === 'string' ? data.text : '';
-                // Enkel sikkerhets-escaping og bold-konvertering
+                // Enkel sikkerhets-escaping, bold-konvertering og bilde-rendering
                 const escaped = rawText
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
@@ -1729,7 +1729,14 @@ window.addEventListener('load', () => {
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#039;');
                 
-                msg.innerHTML = escaped.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+                let html = escaped
+                    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                    // Støtte for bilder: ![alt](url)
+                    .replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+                        return `<img src="${url}" alt="${alt}" class="hkm-chat-image" style="display: block; max-width: 100%; height: auto; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #eee;">`;
+                    });
+
+                msg.innerHTML = html;
                 bodyEl.appendChild(msg);
 
                 if (!isVisitor) isTyping = false;

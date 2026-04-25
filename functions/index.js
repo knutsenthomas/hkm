@@ -2771,10 +2771,13 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const url = `${apiBase}/${selectedModel}:generateContent?key=${cleanKey}`;
 
     // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold
-    const [settingsSnap, productsSnap, eventsSnap] = await Promise.all([
+    const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastRes] = await Promise.all([
       db.collection("siteContent").doc("settings_seo").get(),
       db.collection("content").doc("wix_products").get(),
-      db.collection("siteContent").doc("collection_events").get()
+      db.collection("siteContent").doc("collection_events").get(),
+      db.collection("siteContent").doc("collection_blog").get(),
+      db.collection("siteContent").doc("collection_teaching").get(),
+      fetch("https://anchor.fm/s/f7a13dec/podcast/rss").catch(() => null)
     ]);
 
     const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
@@ -2785,9 +2788,8 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       const pData = productsSnap.data();
       const items = pData.items || [];
       if (items.length > 0) {
-        // Vi tar med de 50 første produktene og inkluderer URL
-        productsContext = "\nBUTIKK-PRODUKTER (Navn, Pris, URL):\n" + 
-          items.slice(0, 50).map(p => `- ${p.name}: ${p.formattedPrice || p.price || ''} [Link: ${p.productUrl || ''}]`).join("\n");
+        productsContext = "\nBUTIKK-PRODUKTER:\n" + 
+          items.slice(0, 40).map(p => `- ${p.name}: ${p.formattedPrice || p.price || ''}\n  URL: ${p.productUrl || ''}\n  Bilde: ${p.imageUrl || ''}`).join("\n");
       }
     }
 
@@ -2798,28 +2800,70 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       const items = eData.items || [];
       if (items.length > 0) {
         eventsContext = "\nKOMMENDE ARRANGEMENTER:\n" + 
-          items.map(e => `- ${e.title} (${e.date || ''}): ${e.location || ''}`).join("\n");
+          items.slice(0, 10).map(e => `- ${e.title} (${e.date || ''}): ${e.location || ''}\n  URL: https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(e.id || e.title)}\n  Bilde: ${e.imageUrl || ''}`).join("\n");
+      }
+    }
+
+    // Forbered blogg-info
+    let blogContext = "";
+    if (blogSnap.exists) {
+      const bItems = blogSnap.data().items || [];
+      if (bItems.length > 0) {
+        blogContext = "\nBLOGGINNLEGG:\n" + 
+          bItems.slice(0, 10).map(b => `- ${b.title}\n  URL: https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(b.id || b.title)}\n  Bilde: ${b.imageUrl || ''}`).join("\n");
+      }
+    }
+
+    // Forbered undervisning-info
+    let teachingContext = "";
+    if (teachingSnap.exists) {
+      const tItems = teachingSnap.data().items || [];
+      if (tItems.length > 0) {
+        teachingContext = "\nUNDERVISNING:\n" + 
+          tItems.slice(0, 10).map(t => `- ${t.title}\n  URL: https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(t.id || t.title)}\n  Bilde: ${t.imageUrl || ''}`).join("\n");
+      }
+    }
+
+    // Forbered podcast-info
+    let podcastContext = "";
+    if (podcastRes && podcastRes.ok) {
+      try {
+        const pText = await podcastRes.text();
+        const pData = await parseStringPromise(pText);
+        const channel = pData.rss.channel[0];
+        const pItems = (channel.item || []).slice(0, 5).map(it => ({
+          title: it.title ? it.title[0] : "Ukjent episode",
+          link: it.link ? it.link[0] : "https://anchor.fm/s/f7a13dec/podcast/rss",
+          imageUrl: it['itunes:image'] ? it['itunes:image'][0].$.href : (channel.image ? channel.image[0].url[0] : "")
+        }));
+        podcastContext = "\nPODCAST (Siste episoder):\n" + 
+          pItems.map(it => `- ${it.title}\n  Link: ${it.link}\n  Bilde: ${it.imageUrl}`).join("\n");
+      } catch (err) {
+        console.warn("Feil ved parsing av podcast RSS:", err);
       }
     }
 
     const systemPrompt = `
       Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
       
-      KILDE BIBELEN: Bibelen er din absolutte hovedkilde for alle åndelige spørsmål. Du skal prioritere bibelsk visdom og sitere relevante vers når det passer. Du skal svare på spørsmål om tro, kristen livsstil og bibelske prinsipper med autoritet fra Guds ord.
+      KILDE BIBELEN: Bibelen er din absolutte hovedkilde for alle åndelige spørsmål. Du skal prioritere bibelsk visdom og sitere relevante vers når det passer.
       
-      HVA SKJER I HKM (ARRANGEMENTER): Du har tilgang til kommende arrangementer nedenfor. Bruk disse for å svare på spørsmål om hva som skjer, kurs, møter eller samlinger.
+      KONTEKST-INFORMASJON: Du har tilgang til følgende innhold fra nettsiden:
       ${eventsContext}
-      
-      BUTIKK OG PRODUKTER: Bruk informasjonen nedenfor for å hjelpe besøkende med å finne produkter i nettbutikken. 
-      VIKTIG: Når du anbefaler eller nevner et produkt, skal du ALLTID inkludere den tilhørende linken (URL) fra listen under slik at brukeren kan klikke seg direkte til produktet.
+      ${blogContext}
+      ${teachingContext}
+      ${podcastContext}
       ${productsContext}
 
-      REGLER: 
+      REGLER FOR SVAR:
       1. Svar alltid på norsk. 
       2. Vær varm, oppmuntrende og spirituelt veiledende.
-      3. Bruk god plassering med avsnitt (dobbel linjeskift) for å gjøre teksten lettlest. Bruk gjerne fet skrift (**tekst**) for å fremheve produktnavn eller viktige bibelsteder.
-      4. For spørsmål om lagerstatus, leveringstider eller spesifikke kundeservice-saker du ikke ser i listen, be kunden vennlig om å vente på svar fra teamet eller sende en e-post.
-      5. Aldri nevn tekniske systemer som Gemini, Firestore eller TK-design.
+      3. Når du anbefaler eller nevner noe (produkt, blogg, undervisning, arrangement eller podcast), skal du ALLTID inkludere:
+         - En direkte lenke (URL) kunden kan klikke på.
+         - Et bilde ved å bruke Markdown-formatet: ![Beskrivelse](Bilde-URL) hvis bilde-URL er tilgjengelig.
+      4. Bruk dobbel linjeskift mellom avsnitt for god lesbarhet. Bruk **fet skrift** for titler.
+      5. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
+      6. Aldri nevn tekniske detaljer om systemet.
     `.trim();
 
     const userMessage = msgData.text || "";
