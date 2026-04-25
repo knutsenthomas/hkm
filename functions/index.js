@@ -106,6 +106,74 @@ function parseWixApiKeyMetadata(apiKey) {
   }
 }
 
+const VISITOR_CHAT_RETENTION_DAYS = 7;
+
+async function deleteQuerySnapshotDocs(querySnapshot) {
+  if (!querySnapshot || querySnapshot.empty) return 0;
+
+  let deletedCount = 0;
+  let batch = db.batch();
+  let ops = 0;
+  const commits = [];
+
+  querySnapshot.docs.forEach((doc) => {
+    batch.delete(doc.ref);
+    ops += 1;
+    deletedCount += 1;
+
+    if (ops === 450) {
+      commits.push(batch.commit());
+      batch = db.batch();
+      ops = 0;
+    }
+  });
+
+  if (ops > 0) {
+    commits.push(batch.commit());
+  }
+
+  await Promise.all(commits);
+
+  return deletedCount;
+}
+
+async function deleteVisitorChatById(chatId) {
+  if (!chatId) return { messagesDeleted: 0, mappingsDeleted: 0 };
+
+  let messagesDeleted = 0;
+  let lastDoc = null;
+
+  do {
+    let query = db.collection("visitorChats")
+        .doc(chatId)
+        .collection("messages")
+        .orderBy(admin.firestore.FieldPath.documentId())
+        .limit(400);
+
+    if (lastDoc) {
+      query = query.startAfter(lastDoc);
+    }
+
+    const snapshot = await query.get();
+    if (snapshot.empty) break;
+
+    messagesDeleted += await deleteQuerySnapshotDocs(snapshot);
+    lastDoc = snapshot.docs[snapshot.docs.length - 1];
+  } while (lastDoc);
+
+  const threadMappingsSnap = await db.collection("googleChatThreadMappings")
+      .where("chatId", "==", chatId)
+      .get();
+  const mappingsDeleted = await deleteQuerySnapshotDocs(threadMappingsSnap);
+
+  await db.collection("visitorChats").doc(chatId).delete();
+
+  return {
+    messagesDeleted,
+    mappingsDeleted,
+  };
+}
+
 function getWixClient() {
   const clientId = process.env.WIX_CLIENT_ID;
   const apiKey = process.env.WIX_API_KEY;
@@ -240,6 +308,12 @@ function extractGoogleChatEventFields(payload) {
   const appCommandMessage = appCommandPayload && typeof appCommandPayload.message === "object" ?
     appCommandPayload.message :
     {};
+  const appCommandSpace = appCommandPayload && typeof appCommandPayload.space === "object" ?
+    appCommandPayload.space :
+    {};
+  const appCommandThread = appCommandPayload && typeof appCommandPayload.thread === "object" ?
+    appCommandPayload.thread :
+    {};
   const appCommandMetadata = appCommandPayload && typeof appCommandPayload.appCommandMetadata === "object" ?
     appCommandPayload.appCommandMetadata :
     {};
@@ -284,12 +358,16 @@ function extractGoogleChatEventFields(payload) {
     chat && chat.space && chat.space.name,
     chatMessage && chatMessage.space && chatMessage.space.name,
     msgInPayload && msgInPayload.space && msgInPayload.space.name,
+    appCommandMessage && appCommandMessage.space && appCommandMessage.space.name,
+    appCommandSpace && appCommandSpace.name,
   ]);
 
   const threadName = pickFirstNonEmptyString([
     payload && payload.message && payload.message.thread && payload.message.thread.name,
     chatMessage && chatMessage.thread && chatMessage.thread.name,
     msgInPayload && msgInPayload.thread && msgInPayload.thread.name,
+    appCommandMessage && appCommandMessage.thread && appCommandMessage.thread.name,
+    appCommandThread && appCommandThread.name,
   ]);
 
   const threadKey = pickFirstNonEmptyString([
@@ -297,6 +375,8 @@ function extractGoogleChatEventFields(payload) {
     chatMessage && chatMessage.thread && chatMessage.thread.threadKey,
     msgInPayload && msgInPayload.thread && msgInPayload.thread.threadKey,
     appCommandPayload && appCommandPayload.thread && appCommandPayload.thread.threadKey,
+    appCommandMessage && appCommandMessage.thread && appCommandMessage.thread.threadKey,
+    appCommandThread && appCommandThread.threadKey,
   ]);
 
   const appCommandId = pickFirstNonEmptyString([
@@ -379,6 +459,18 @@ function parseGoogleChatReplyArgs(rawText) {
     chatId: match[1],
     replyText: clampText(match[2], 4000),
   };
+}
+
+function stripGoogleChatReplyPrefix(rawText, knownChatId = "") {
+  const text = cleanGoogleChatCommandText(rawText);
+  if (!text) return "";
+
+  let stripped = text.replace(/^\/?(reply|svar)\s+/i, "").trim();
+  if (knownChatId) {
+    const escapedChatId = knownChatId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    stripped = stripped.replace(new RegExp(`^${escapedChatId}\\s+`), "").trim();
+  }
+  return clampText(stripped, 4000);
 }
 
 function makeGoogleChatMappingId(spaceName, threadName) {
@@ -1101,6 +1193,50 @@ exports.scheduledWixSync = onSchedule("0 */5 * * *", async (event) => {
   } catch (error) {
     console.error("Scheduled Wix sync failed:", error);
   }
+});
+
+/**
+ * Sletter gamle visitor chats for å begrense lagringstid av samtaler.
+ * Kjører hver natt og rydder chatter som har vært inaktive i 7 dager.
+ */
+exports.cleanupVisitorChats = onSchedule("15 3 * * *", async () => {
+  const cutoffDate = new Date(Date.now() - (VISITOR_CHAT_RETENTION_DAYS * 24 * 60 * 60 * 1000));
+  console.log(`[VisitorChatCleanup] Looking for chats older than ${cutoffDate.toISOString()}`);
+
+  let chatsDeleted = 0;
+  let messagesDeleted = 0;
+  let mappingsDeleted = 0;
+  let rounds = 0;
+
+  while (true) {
+    const staleChatsSnap = await db.collection("visitorChats")
+        .where("updatedAt", "<", cutoffDate)
+        .limit(100)
+        .get();
+
+    if (staleChatsSnap.empty) break;
+
+    rounds += 1;
+    for (const chatDoc of staleChatsSnap.docs) {
+      const cleanup = await deleteVisitorChatById(chatDoc.id);
+      chatsDeleted += 1;
+      messagesDeleted += cleanup.messagesDeleted;
+      mappingsDeleted += cleanup.mappingsDeleted;
+    }
+  }
+
+  if (!chatsDeleted) {
+    console.log("[VisitorChatCleanup] No stale chats found.");
+    return;
+  }
+
+  console.log("[VisitorChatCleanup] Cleanup complete", JSON.stringify({
+    retentionDays: VISITOR_CHAT_RETENTION_DAYS,
+    rounds,
+    chatsDeleted,
+    messagesDeleted,
+    mappingsDeleted,
+  }));
 });
 
 function getVippsConfig() {
@@ -2452,7 +2588,8 @@ exports.googleChatBridge = onRequest({
   }));
 
   let parsedCommand = parseGoogleChatReplyCommand(rawText);
-  if (!parsedCommand && (extracted.appCommandId || extracted.appCommandType === "SLASH_COMMAND")) {
+  const inferredChatId = await inferChatIdFromGooglePayload(extracted.normalizedPayload);
+  if (!parsedCommand && (extracted.appCommandId || extracted.appCommandType === "SLASH_COMMAND") && !inferredChatId) {
     parsedCommand = parseGoogleChatReplyArgs(rawText);
   }
   const naturalText = clampText(cleanGoogleChatCommandText(rawText), 4000);
@@ -2464,8 +2601,10 @@ exports.googleChatBridge = onRequest({
     chatId = parsedCommand.chatId;
     replyText = parsedCommand.replyText;
   } else {
-    chatId = await inferChatIdFromGooglePayload(extracted.normalizedPayload);
-    replyText = naturalText;
+    chatId = inferredChatId;
+    replyText = extracted.appCommandType === "SLASH_COMMAND" ?
+      (stripGoogleChatReplyPrefix(rawText, chatId) || naturalText) :
+      naturalText;
   }
 
   console.log("[GoogleChatBridge] Parsed routing", JSON.stringify({
