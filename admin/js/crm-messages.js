@@ -499,12 +499,89 @@ class MessagesManager {
         if (!ok) return;
         try {
             await window.firebaseService.db.collection('contactMessages').doc(id).delete();
-            this.messages = this.messages.filter(m => m.id !== id);
-            this.renderMessages();
-            this.updateBadges();
+            // Reload from server so UI always matches the real state.
+            await this.loadMessages();
         } catch (err) {
             console.error("Error deleting message:", err);
+            const code = err && err.code ? String(err.code) : '';
+            const msg = err && err.message ? String(err.message) : 'Ukjent feil';
+            let hint = '';
+            if (code.includes('permission-denied')) {
+                hint = '\n\nTips: Dette skjer ofte hvis du ikke er logget inn som en admin-bruker, eller hvis du er logget inn anonymt. Prøv å logge ut og inn igjen i admin.';
+            }
+            await this.showAlertModal({
+                title: 'Kunne ikke slette',
+                message: `Feil${code ? ` (${code})` : ''}: ${msg}${hint}`
+            });
         }
+    }
+
+    showAlertModal(options = {}) {
+        const title = options.title || 'Info';
+        const message = options.message || '';
+
+        const existing = document.getElementById('hkm-crm-alert-overlay');
+        if (existing) existing.remove();
+
+        const modalHtml = `
+            <div id="hkm-crm-alert-overlay" class="hkm-modal-overlay" aria-hidden="true">
+                <div class="hkm-modal-container" role="dialog" aria-modal="true" aria-labelledby="hkm-crm-alert-title">
+                    <div class="hkm-modal-icon" style="background:#eff6ff;color:#2563eb;">
+                        <span class="material-symbols-outlined">info</span>
+                    </div>
+                    <h3 class="hkm-modal-title" id="hkm-crm-alert-title">${this.escapeHtml(title)}</h3>
+                    <p class="hkm-modal-message" style="white-space: pre-wrap;">${this.escapeHtml(message)}</p>
+                    <div class="hkm-modal-actions">
+                        <button type="button" id="hkm-crm-alert-ok" class="hkm-modal-btn hkm-modal-btn-cancel">OK</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        const overlay = document.getElementById('hkm-crm-alert-overlay');
+        const okBtn = document.getElementById('hkm-crm-alert-ok');
+
+        const close = () => {
+            overlay.classList.remove('active');
+            overlay.setAttribute('aria-hidden', 'true');
+            window.setTimeout(() => overlay.remove(), 200);
+            document.removeEventListener('keydown', onKeyDown, true);
+        };
+
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape' || e.key === 'Enter') {
+                e.preventDefault();
+                close();
+                resolve();
+            }
+        };
+
+        let resolve = () => {};
+        const promise = new Promise((res) => { resolve = res; });
+
+        okBtn.onclick = () => {
+            close();
+            resolve();
+        };
+
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                close();
+                resolve();
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown, true);
+
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+            okBtn.focus();
+        });
+
+        return promise;
     }
 
     showConfirmModal(options = {}) {
