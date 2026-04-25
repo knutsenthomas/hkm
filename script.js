@@ -1630,10 +1630,13 @@ window.addEventListener('load', () => {
         const sendBtn = root.querySelector('.hkm-chat-send');
         const statusEl = root.querySelector('.hkm-chat-status');
         const humanBridge = root.querySelector('.hkm-chat-human-bridge');
-        const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
+	        const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
 	        const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
-	        const privacyContainer = root.querySelector('.hkm-chat-privacy');
+	        // Important: keep email form privacy separate from the main chat privacy (footer),
+	        // otherwise focusing fields can unexpectedly hide/move other UI.
+	        const privacyContainer = root.querySelector('#hkm-chat-privacy-footer');
 	        const privacyCheckboxFooter = root.querySelector('#hkm-chat-privacy-footer .hkm-chat-privacy-checkbox');
+	        const privacyCheckbox = privacyCheckboxFooter;
 	        let humanRequested = false;
 
 	        const emailPrivacyCheckbox = emailForm ? emailForm.querySelector('.hkm-chat-privacy-checkbox') : null;
@@ -2179,15 +2182,16 @@ window.addEventListener('load', () => {
         const style = document.createElement('style');
         style.id = 'hkm-visitor-chat-styles';
         style.textContent = `
-            #hkm-visitor-chat-widget {
-                all: initial;
-                position: fixed;
-                right: 24px;
-                bottom: 24px;
-                z-index: 9999999;
-                font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-                box-sizing: border-box;
-            }
+	            #hkm-visitor-chat-widget {
+	                all: initial;
+	                position: fixed;
+	                right: 24px;
+	                bottom: 24px;
+	                z-index: 9999999;
+	                font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+	                -webkit-text-size-adjust: 100% !important;
+	                box-sizing: border-box;
+	            }
             #hkm-visitor-chat-widget * {
                 box-sizing: border-box;
                 font-family: inherit;
@@ -2489,17 +2493,17 @@ window.addEventListener('load', () => {
                 flex: 1 !important;
                 position: relative !important;
             }
-            .hkm-chat-input {
-                width: 100% !important;
-                border: 1px solid #E2E8F0 !important;
-                border-radius: 14px !important;
-                padding: 12px 16px !important;
-                font-size: 14px !important;
-                background: #F8FAFC !important;
-                outline: none !important;
-                color: #1E293B !important;
-                transition: border-color 0.2s, background 0.2s !important;
-            }
+	            .hkm-chat-input {
+	                width: 100% !important;
+	                border: 1px solid #E2E8F0 !important;
+	                border-radius: 14px !important;
+	                padding: 12px 16px !important;
+	                font-size: 14px !important;
+	                background: #F8FAFC !important;
+	                outline: none !important;
+	                color: #1E293B !important;
+	                transition: border-color 0.2s, background 0.2s !important;
+	            }
             .hkm-chat-input:focus {
                 border-color: #FED7AA !important;
                 background: #fff !important;
@@ -2563,16 +2567,24 @@ window.addEventListener('load', () => {
                 margin: 0 !important;
                 cursor: pointer !important;
             }
-            .hkm-chat-field input, .hkm-chat-field textarea {
-                width: 100% !important;
-                border: 1px solid #E2E8F0 !important;
-                border-radius: 10px !important;
-                padding: 12px 14px !important;
-                font-size: 14px !important;
-                background: #F8FAFC !important;
-                color: #1E293B !important;
-                outline: none !important;
-            }
+	            .hkm-chat-field input, .hkm-chat-field textarea {
+	                width: 100% !important;
+	                border: 1px solid #E2E8F0 !important;
+	                border-radius: 10px !important;
+	                padding: 12px 14px !important;
+	                font-size: 14px !important;
+	                background: #F8FAFC !important;
+	                color: #1E293B !important;
+	                outline: none !important;
+	            }
+	            /* Prevent iOS "focus zoom" (which causes jumpy layout) by using >= 16px font-size on inputs. */
+	            @supports (-webkit-touch-callout: none) {
+	                .hkm-chat-input,
+	                .hkm-chat-field input,
+	                .hkm-chat-field textarea {
+	                    font-size: 16px !important;
+	                }
+	            }
             .hkm-chat-field input:focus, .hkm-chat-field textarea:focus {
                 border-color: #d17d39 !important;
                 background: #fff !important;
