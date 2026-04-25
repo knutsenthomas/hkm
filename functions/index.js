@@ -2770,14 +2770,56 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
     const url = `${apiBase}/${selectedModel}:generateContent?key=${cleanKey}`;
 
-    // 1. Hent litt kontekst om nettstedet
-    const settingsSnap = await db.collection("siteContent").doc("settings_seo").get();
+    // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold
+    const [settingsSnap, productsSnap, eventsSnap] = await Promise.all([
+      db.collection("siteContent").doc("settings_seo").get(),
+      db.collection("content").doc("wix_products").get(),
+      db.collection("siteContent").doc("collection_events").get()
+    ]);
+
     const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
     
+    // Forbered produkt-info
+    let productsContext = "";
+    if (productsSnap.exists) {
+      const pData = productsSnap.data();
+      const items = pData.items || [];
+      if (items.length > 0) {
+        // Vi tar med de 50 første produktene og inkluderer URL
+        productsContext = "\nBUTIKK-PRODUKTER (Navn, Pris, URL):\n" + 
+          items.slice(0, 50).map(p => `- ${p.name}: ${p.formattedPrice || p.price || ''} [Link: ${p.productUrl || ''}]`).join("\n");
+      }
+    }
+
+    // Forbered arrangement-info
+    let eventsContext = "";
+    if (eventsSnap.exists) {
+      const eData = eventsSnap.data();
+      const items = eData.items || [];
+      if (items.length > 0) {
+        eventsContext = "\nKOMMENDE ARRANGEMENTER:\n" + 
+          items.map(e => `- ${e.title} (${e.date || ''}): ${e.location || ''}`).join("\n");
+      }
+    }
+
     const systemPrompt = `
       Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
-      Ditt mål er å svare på spørsmål om kirken, tjenestene deres og kristen tro på en varm og spirituelt oppløftende måte.
-      Regler: Svar på norsk. Vær kortfattet. Hvis du ikke vet svaret, si at teamet vil svare snart. Nevn aldri TK-design.
+      
+      KILDE BIBELEN: Bibelen er din absolutte hovedkilde for alle åndelige spørsmål. Du skal prioritere bibelsk visdom og sitere relevante vers når det passer. Du skal svare på spørsmål om tro, kristen livsstil og bibelske prinsipper med autoritet fra Guds ord.
+      
+      HVA SKJER I HKM (ARRANGEMENTER): Du har tilgang til kommende arrangementer nedenfor. Bruk disse for å svare på spørsmål om hva som skjer, kurs, møter eller samlinger.
+      ${eventsContext}
+      
+      BUTIKK OG PRODUKTER: Bruk informasjonen nedenfor for å hjelpe besøkende med å finne produkter i nettbutikken. 
+      VIKTIG: Når du anbefaler eller nevner et produkt, skal du ALLTID inkludere den tilhørende linken (URL) fra listen under slik at brukeren kan klikke seg direkte til produktet.
+      ${productsContext}
+
+      REGLER: 
+      1. Svar alltid på norsk. 
+      2. Vær varm, oppmuntrende og spirituelt veiledende.
+      3. Bruk god plassering med avsnitt (dobbel linjeskift) for å gjøre teksten lettlest. Bruk gjerne fet skrift (**tekst**) for å fremheve produktnavn eller viktige bibelsteder.
+      4. For spørsmål om lagerstatus, leveringstider eller spesifikke kundeservice-saker du ikke ser i listen, be kunden vennlig om å vente på svar fra teamet eller sende en e-post.
+      5. Aldri nevn tekniske systemer som Gemini, Firestore eller TK-design.
     `.trim();
 
     const userMessage = msgData.text || "";

@@ -50,3 +50,15 @@ body.hero-animate .slide-buttons {
     left: 88px !important;
   }
 }
+
+/* Move back-to-top to the left side to avoid overlap with chat widget */
+.scroll-to-top {
+    right: auto !important;
+    left: 30px !important;
+}
+@media (max-width: 768px) {
+    .scroll-to-top {
+        right: auto !important;
+        left: 15px !important;
+    }
+}

@@ -1719,7 +1719,17 @@ window.addEventListener('load', () => {
                 const msg = document.createElement('div');
                 const isVisitor = data.sender === 'visitor';
                 msg.className = `hkm-chat-msg ${isVisitor ? 'visitor' : 'agent'}`;
-                msg.textContent = typeof data.text === 'string' ? data.text : '';
+                
+                const rawText = typeof data.text === 'string' ? data.text : '';
+                // Enkel sikkerhets-escaping og bold-konvertering
+                const escaped = rawText
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+                
+                msg.innerHTML = escaped.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
                 bodyEl.appendChild(msg);
 
                 if (!isVisitor) isTyping = false;
@@ -2265,6 +2275,7 @@ window.addEventListener('load', () => {
                 font-size: 14px !important;
                 line-height: 1.5 !important;
                 word-wrap: break-word !important;
+                white-space: pre-wrap !important;
             }
             .hkm-chat-msg.visitor {
                 background: #d17d39 !important;
