@@ -1580,7 +1580,7 @@ window.addEventListener('load', () => {
                                     <span>Jeg samtykker til <a href="/personvern" target="_blank" style="color: inherit; text-decoration: underline;">personvernreglene</a>. *</span>
                                 </label>
                             </div>
-                            <button type="button" class="hkm-chat-email-submit">Send e-post</button>
+                            <button type="button" class="hkm-chat-email-submit" onclick="window.hkmChatHandleEmailSubmit()">Send e-post</button>
                             <p class="hkm-chat-email-status" aria-live="polite"></p>
                         </form>
                     </div>
@@ -2021,10 +2021,13 @@ window.addEventListener('load', () => {
             }
         });
 
-        const handleEmailSubmit = async () => {
-            console.log('[VisitorChat] handleEmailSubmit triggered');
+        // Global funksjon for maksimal pålitelighet
+        window.hkmChatHandleEmailSubmit = async () => {
+            console.log('[VisitorChat] Global handleEmailSubmit triggered');
             
-            // Hent ferske referanser til alle feltene hver gang
+            const root = document.getElementById('hkm-visitor-chat-widget');
+            if (!root) return;
+
             const nameEl = root.querySelector('.hkm-chat-email-name');
             const emailEl = root.querySelector('.hkm-chat-email-email');
             const phoneEl = root.querySelector('.hkm-chat-email-phone');
@@ -2034,7 +2037,7 @@ window.addEventListener('load', () => {
             const privacyCb = root.querySelector('.hkm-chat-email-form .hkm-chat-privacy-checkbox');
 
             if (!nameEl || !emailEl || !messageEl || !statusEl || !submitBtn) {
-                console.warn('[VisitorChat] Missing elements in handleEmailSubmit');
+                console.error('[VisitorChat] Missing elements in global submit');
                 return;
             }
 
@@ -2048,7 +2051,6 @@ window.addEventListener('load', () => {
                 statusEl.textContent = 'Du må samtykke til personvern for å sende e-post.';
                 return;
             }
-            statusEl.textContent = '';
 
             if (!name || !email || !message) {
                 statusEl.style.color = '#e74c3c';
@@ -2061,7 +2063,7 @@ window.addEventListener('load', () => {
             statusEl.textContent = 'Sender e-post...';
 
             try {
-                // 1. Lagre i Firestore
+                // Lagre i Firestore
                 await db.collection('contactMessages').add({
                     name, email, phone, message,
                     source: 'chat_widget_email',
@@ -2070,14 +2072,7 @@ window.addEventListener('load', () => {
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // 2. Oppdater visitorChats
-                await db.collection('visitorChats').doc(chatId).set({
-                    visitorName: name, visitorEmail: email, visitorPhone: phone,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastTargetMode: 'email'
-                }, { merge: true });
-
-                // 3. Send via Google Form
+                // Google Form
                 const FIELD_MAP = {
                     name: 'entry.599509457',
                     phone: 'entry.1400512221',
@@ -2094,34 +2089,8 @@ window.addEventListener('load', () => {
                 formData.append(FIELD_MAP.message, message);
 
                 fetch('https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse', {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: formData
+                    method: 'POST', mode: 'no-cors', body: formData
                 });
-
-                // Iframe backup
-                const iframe = document.createElement('iframe');
-                iframe.name = 'hkm-form-target-bridge';
-                iframe.style.display = 'none';
-                document.body.appendChild(iframe);
-                const bridgeForm = document.createElement('form');
-                bridgeForm.target = 'hkm-form-target-bridge';
-                bridgeForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse';
-                bridgeForm.method = 'POST';
-                for (const [key, value] of Object.entries({
-                    [FIELD_MAP.name]: name, [FIELD_MAP.phone]: phone, [FIELD_MAP.email]: email,
-                    [FIELD_MAP.subject]: 'Henvendelse fra Chat Assistent', [FIELD_MAP.message]: message
-                })) {
-                    const hf = document.createElement('input');
-                    hf.type = 'hidden'; hf.name = key; hf.value = value;
-                    bridgeForm.appendChild(hf);
-                }
-                document.body.appendChild(bridgeForm);
-                bridgeForm.submit();
-                setTimeout(() => {
-                    if (document.body.contains(bridgeForm)) document.body.removeChild(bridgeForm);
-                    if (document.body.contains(iframe)) document.body.removeChild(iframe);
-                }, 2000);
 
                 messageEl.value = '';
                 statusEl.style.color = '#16a34a';
@@ -2135,10 +2104,11 @@ window.addEventListener('load', () => {
             }
         };
 
-        // Delegert klikk-håndtering for maksimal stabilitet
+        // Delegert klikk-håndtering som backup
         root.addEventListener('click', (e) => {
             if (e.target && (e.target.classList.contains('hkm-chat-email-submit') || e.target.closest('.hkm-chat-email-submit'))) {
-                handleEmailSubmit();
+                // Hvis knappen ikke har onclick-attributt (f.eks. eldre versjon)
+                if (!e.target.onclick) window.hkmChatHandleEmailSubmit();
             }
         });
 
