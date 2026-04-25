@@ -1489,8 +1489,24 @@ window.addEventListener('load', () => {
     }
 
     async function mountVisitorChatWidget() {
-        const db = window.firebaseService.db;
-        const auth = firebase.auth();
+        // IMPORTANT: Use a dedicated Firebase app instance for the visitor chat widget.
+        // This prevents anonymous chat auth from interfering with member/admin sessions
+        // on the main site (login/logout + admin link routing).
+        let chatApp = null;
+        try {
+            chatApp = firebase.app('hkmVisitorChat');
+        } catch (e) {
+            // ignore
+        }
+        if (!chatApp) {
+            const defaultApp = firebase.apps && firebase.apps.length ? firebase.app() : null;
+            const options = (defaultApp && defaultApp.options) ? defaultApp.options : window.firebaseConfig;
+            if (!options) return;
+            chatApp = firebase.initializeApp(options, 'hkmVisitorChat');
+        }
+
+        const db = chatApp.firestore();
+        const auth = chatApp.auth();
         if (!db || !auth) return;
 
         if (document.getElementById('hkm-visitor-chat-widget')) return;

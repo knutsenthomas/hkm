@@ -875,6 +875,9 @@
 
             firebase.auth().onAuthStateChanged(async (user) => {
                 if (!user) return;
+                // The visitor chat widget uses anonymous auth. Anonymous sessions should not
+                // rewrite the Admin link, otherwise the footer Admin link can become unusable.
+                if (user.isAnonymous) return;
 
                 let role = 'medlem';
                 try {
@@ -902,6 +905,7 @@
             if (!profileLink || !firebaseService || !firebaseService.isInitialized) return;
             firebase.auth().onAuthStateChanged(async (user) => {
                 if (!user) return;
+                if (user.isAnonymous) return;
                 let role = 'medlem';
                 try {
                     role = await firebaseService.getUserRole(user.uid);
