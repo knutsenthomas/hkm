@@ -1554,7 +1554,7 @@ window.addEventListener('load', () => {
                     <div class="hkm-chat-mode-intro"></div>
                     <div class="hkm-chat-body"></div>
                     <div class="hkm-chat-email-panel hkm-chat-hidden">
-                        <div class="hkm-chat-email-form">
+                        <form class="hkm-chat-email-form" onsubmit="return false;">
                             <div class="hkm-chat-email-grid">
                                 <div class="hkm-chat-field">
                                     <label for="hkm-chat-name">Navn *</label>
@@ -1582,7 +1582,7 @@ window.addEventListener('load', () => {
                             </div>
                             <button type="button" class="hkm-chat-email-submit">Send e-post</button>
                             <p class="hkm-chat-email-status" aria-live="polite"></p>
-                        </div>
+                        </form>
                     </div>
                     <div class="hkm-chat-human-bridge" style="display:none;">
                         <p>Ønsker du å snakke med en person?</p>
@@ -2069,7 +2069,7 @@ window.addEventListener('load', () => {
                     lastPagePath: window.location.pathname
                 }, { merge: true });
 
-                // 3. Send via Google Form (samme som på kontakt.html - mest pålitelig)
+                // 3. Send via Google Form (samme som på kontakt.html)
                 const FIELD_MAP = {
                     name: 'entry.599509457',
                     phone: 'entry.1400512221',
@@ -2078,6 +2078,24 @@ window.addEventListener('load', () => {
                     message: 'entry.900097937'
                 };
 
+                const formData = new URLSearchParams();
+                formData.append(FIELD_MAP.name, name);
+                formData.append(FIELD_MAP.phone, phone);
+                formData.append(FIELD_MAP.email, email);
+                formData.append(FIELD_MAP.subject, 'Henvendelse fra Chat Assistent');
+                formData.append(FIELD_MAP.message, message);
+
+                console.log('[VisitorChat] Sending to Google Form...');
+                
+                // Primærmetode: Fetch (no-cors)
+                fetch('https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse', {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: formData
+                }).then(() => console.log('[VisitorChat] Fetch sent successfully'))
+                  .catch(err => console.warn('[VisitorChat] Fetch failed, but it might still have worked:', err));
+
+                // Backupmetode: Iframe (for eldre nettlesere)
                 const iframe = document.createElement('iframe');
                 iframe.name = 'hkm-form-target';
                 iframe.style.display = 'none';
@@ -2088,15 +2106,13 @@ window.addEventListener('load', () => {
                 bridgeForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse';
                 bridgeForm.method = 'POST';
 
-                const fields = {
+                for (const [key, value] of Object.entries({
                     [FIELD_MAP.name]: name,
                     [FIELD_MAP.phone]: phone,
                     [FIELD_MAP.email]: email,
                     [FIELD_MAP.subject]: 'Henvendelse fra Chat Assistent',
                     [FIELD_MAP.message]: message
-                };
-
-                for (const [key, value] of Object.entries(fields)) {
+                })) {
                     const hiddenField = document.createElement('input');
                     hiddenField.type = 'hidden';
                     hiddenField.name = key;
