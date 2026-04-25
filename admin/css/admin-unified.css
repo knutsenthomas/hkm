@@ -1778,6 +1778,11 @@ body.admin-body .welcome-subtitle {
     border-radius: var(--admin-radius-lg, 16px) var(--admin-radius-lg, 16px) 0 0;
 }
 
+/* Ensure custom confirmation modals are always on top (mobile nav uses z-index 12000). */
+.hkm-modal-overlay {
+    z-index: 20000 !important;
+}
+
 .automation-tab {
     padding: 20px 24px;
     font-size: 14px;
