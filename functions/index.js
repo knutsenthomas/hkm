@@ -2355,7 +2355,10 @@ exports.onContactFormSubmit = onDocumentCreated({
 
   if (!email) return;
 
-  const adminEmail = "post@hiskingdomministry.no";
+  const defaultAdminEmails = [
+    "post@hiskingdomministry.no",
+    "thomas@hiskingdomministry.no",
+  ];
   const backupAdminEmail = (
     process.env.CHAT_ALERT_EMAIL ||
     process.env.ADMIN_EMAIL ||
@@ -2363,7 +2366,7 @@ exports.onContactFormSubmit = onDocumentCreated({
     ""
   ).trim();
 
-  if (adminEmail) {
+  if (defaultAdminEmails.length > 0) {
     const internalSubject = source === "chat_widget_email" ?
       `Ny e-post fra chatwidget (${name})` :
       `Ny kontaktmelding fra ${name}`;
@@ -2392,7 +2395,10 @@ exports.onContactFormSubmit = onDocumentCreated({
     `;
 
     try {
-      const recipients = [adminEmail, backupAdminEmail].filter((e, i, a) => e && a.indexOf(e) === i).join(", ");
+      const recipients = [...defaultAdminEmails, backupAdminEmail]
+        .map((e) => (typeof e === "string" ? e.trim() : ""))
+        .filter((e, i, a) => e && a.indexOf(e) === i)
+        .join(", ");
       console.log(`[ContactForm] Sender varsel til: ${recipients}`);
       const ok = await sendEmail({
         to: recipients,
