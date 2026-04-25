@@ -62,6 +62,158 @@
             padding: 4px 8px;
             border-radius: 8px;
         }
+
+        .visitor-chat-grid {
+            display: grid;
+            grid-template-columns: minmax(520px, 1fr) 420px;
+            gap: 16px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 980px) {
+            .visitor-chat-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .visitor-chat-thread {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            background: #fff;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 520px;
+        }
+
+        .visitor-chat-thread-header {
+            padding: 12px 14px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .visitor-chat-thread-title {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            min-width: 0;
+        }
+
+        .visitor-chat-thread-title strong {
+            font-size: 14px;
+            font-weight: 800;
+            color: #0f172a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .visitor-chat-thread-title span {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .visitor-chat-thread-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .visitor-chat-thread-body {
+            flex: 1;
+            padding: 12px;
+            overflow: auto;
+            background:
+                radial-gradient(900px 500px at 100% 0%, rgba(251, 146, 60, 0.10), transparent 60%),
+                radial-gradient(900px 500px at 0% 100%, rgba(14, 165, 233, 0.08), transparent 60%),
+                #ffffff;
+        }
+
+        .visitor-chat-empty {
+            height: 100%;
+            min-height: 320px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            text-align: center;
+            padding: 24px;
+            font-size: 13px;
+        }
+
+        .visitor-chat-bubble {
+            max-width: 88%;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            color: #0f172a;
+            font-size: 13px;
+            line-height: 1.35;
+            margin: 10px 0;
+            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .visitor-chat-bubble.is-agent {
+            margin-left: auto;
+            border-color: #fed7aa;
+            background: #fff7ed;
+        }
+
+        .visitor-chat-bubble-meta {
+            margin-top: 6px;
+            font-size: 11px;
+            color: rgba(15, 23, 42, 0.55);
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .visitor-chat-thread-footer {
+            padding: 12px;
+            border-top: 1px solid #e2e8f0;
+            background: #ffffff;
+        }
+
+        .visitor-chat-reply-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .visitor-chat-reply-row textarea {
+            flex: 1;
+            min-height: 42px;
+            max-height: 140px;
+            resize: vertical;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            padding: 10px 12px;
+            font: inherit;
+            font-size: 13px;
+            line-height: 1.3;
+            outline: none;
+        }
+
+        .visitor-chat-reply-row textarea:focus {
+            border-color: #fb923c;
+            box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.20);
+        }
+
+        .visitor-chat-row.is-selected {
+            outline: 2px solid rgba(251, 146, 60, 0.35);
+            outline-offset: -2px;
+            background: rgba(251, 146, 60, 0.06);
+        }
     </style>
 
     <!-- Firebase SDK (Compat) -->
@@ -315,24 +467,59 @@
                         </div>
                     </div>
                     <p style="margin: 0 0 12px; color: var(--text-muted); font-size: 13px;">
-                        Svar i Google Chat med kommando: <code>reply &lt;chatId&gt; &lt;svartekst&gt;</code>
+                        Klikk på en chat for å lese og svare her i admin. (Valgfritt: du kan fortsatt kopiere Google Chat-kommandoen.)
                     </p>
-                    <table class="crm-table">
-                        <thead>
-                            <tr>
-                                <th>Besøkende</th>
-                                <th>Siste melding</th>
-                                <th>Chat-ID</th>
-                                <th>Sist aktiv</th>
-                                <th class="col-actions"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="visitor-chats-body">
-                            <tr>
-                                <td colspan="5" style="text-align:center; padding: 26px; color: var(--text-muted);">Laster nettsidechatter...</td>
-                            </tr>
-                        </tbody>
-                    </table>
+
+                    <div class="visitor-chat-grid">
+                        <div>
+                            <table class="crm-table">
+                                <thead>
+                                    <tr>
+                                        <th>Besøkende</th>
+                                        <th>Siste melding</th>
+                                        <th>Chat-ID</th>
+                                        <th>Sist aktiv</th>
+                                        <th class="col-actions"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visitor-chats-body">
+                                    <tr>
+                                        <td colspan="5" style="text-align:center; padding: 26px; color: var(--text-muted);">Laster nettsidechatter...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <section class="visitor-chat-thread" aria-label="Valgt nettsidechat">
+                            <div class="visitor-chat-thread-header">
+                                <div class="visitor-chat-thread-title">
+                                    <strong id="visitor-chat-title">Velg en chat</strong>
+                                    <span id="visitor-chat-subtitle">Klikk en rad i listen for å åpne samtalen.</span>
+                                </div>
+                                <div class="visitor-chat-thread-actions">
+                                    <button id="visitor-chat-copy-id" class="btn btn-outline btn-sm" disabled title="Kopier chat-id">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div id="visitor-chat-body" class="visitor-chat-thread-body">
+                                <div id="visitor-chat-empty" class="visitor-chat-empty">
+                                    Ingen chat valgt enda.
+                                </div>
+                            </div>
+
+                            <div class="visitor-chat-thread-footer">
+                                <div class="visitor-chat-reply-row">
+                                    <textarea id="visitor-chat-reply" placeholder="Skriv et svar til besøkende..." disabled></textarea>
+                                    <button id="visitor-chat-send" class="btn btn-primary" disabled>
+                                        Send
+                                    </button>
+                                </div>
+                                <div id="visitor-chat-status" style="margin-top: 8px; font-size: 12px; color: var(--text-muted);"></div>
+                            </div>
+                        </section>
+                    </div>
                 </div>
 
                 <div class="card modern">

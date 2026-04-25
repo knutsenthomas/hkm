@@ -7,6 +7,9 @@ class MessagesManager {
     constructor() {
         this.messages = [];
         this.visitorChats = [];
+        this.activeVisitorChatId = null;
+        this.activeVisitorChatUnsub = null;
+        this.isSendingVisitorReply = false;
         this.init();
     }
 
@@ -67,20 +70,58 @@ class MessagesManager {
         if (visitorChatsBody) {
             visitorChatsBody.addEventListener('click', async (e) => {
                 const copyBtn = e.target.closest('.copy-reply-command');
-                if (!copyBtn) return;
+                if (copyBtn) {
+                    const command = copyBtn.getAttribute('data-command') || '';
+                    if (!command) return;
 
-                const command = copyBtn.getAttribute('data-command') || '';
-                if (!command) return;
+                    try {
+                        await navigator.clipboard.writeText(command);
+                        copyBtn.textContent = 'Kopiert';
+                        window.setTimeout(() => {
+                            copyBtn.textContent = 'Kopier kommando';
+                        }, 1400);
+                    } catch (error) {
+                        console.error('Could not copy command:', error);
+                        alert('Kunne ikke kopiere automatisk. Kommando: ' + command);
+                    }
+                    return;
+                }
 
+                const row = e.target.closest('tr[data-chat-id]');
+                if (!row) return;
+                const chatId = row.getAttribute('data-chat-id') || '';
+                if (!chatId) return;
+                this.openVisitorChat(chatId);
+            });
+        }
+
+        const sendBtn = document.getElementById('visitor-chat-send');
+        const replyEl = document.getElementById('visitor-chat-reply');
+        if (sendBtn && replyEl) {
+            sendBtn.addEventListener('click', () => this.sendVisitorChatReply());
+            replyEl.addEventListener('keydown', (e) => {
+                // Enter = send. Shift+Enter = newline.
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendVisitorChatReply();
+                }
+            });
+        }
+
+        const copyIdBtn = document.getElementById('visitor-chat-copy-id');
+        if (copyIdBtn) {
+            copyIdBtn.addEventListener('click', async () => {
+                const chatId = this.activeVisitorChatId || '';
+                if (!chatId) return;
                 try {
-                    await navigator.clipboard.writeText(command);
-                    copyBtn.textContent = 'Kopiert';
+                    await navigator.clipboard.writeText(chatId);
+                    const prev = copyIdBtn.innerHTML;
+                    copyIdBtn.textContent = 'Kopiert';
                     window.setTimeout(() => {
-                        copyBtn.textContent = 'Kopier kommando';
-                    }, 1400);
-                } catch (error) {
-                    console.error('Could not copy command:', error);
-                    alert('Kunne ikke kopiere automatisk. Kommando: ' + command);
+                        copyIdBtn.innerHTML = prev;
+                    }, 900);
+                } catch (err) {
+                    console.error('Could not copy chat id:', err);
                 }
             });
         }
@@ -232,7 +273,7 @@ class MessagesManager {
             const safeMessage = this.escapeHtml(lastMessageText.length > 140 ? `${lastMessageText.slice(0, 139)}…` : lastMessageText);
 
             return `
-                <tr>
+                <tr class="visitor-chat-row ${this.activeVisitorChatId === chat.id ? 'is-selected' : ''}" data-chat-id="${this.escapeHtml(chat.id)}">
                     <td>
                         <div style="font-weight: 600;">${this.escapeHtml(visitorName)}</div>
                         <div class="chat-meta">
@@ -252,6 +293,175 @@ class MessagesManager {
                 </tr>
             `;
         }).join('');
+    }
+
+    setVisitorChatStatus(text, kind = 'muted') {
+        const el = document.getElementById('visitor-chat-status');
+        if (!el) return;
+        el.textContent = text || '';
+        el.dataset.kind = kind;
+        el.style.color = kind === 'danger'
+            ? '#b91c1c'
+            : kind === 'success'
+                ? '#166534'
+                : 'var(--text-muted)';
+    }
+
+    openVisitorChat(chatId) {
+        if (!chatId) return;
+        if (this.activeVisitorChatId === chatId) return;
+
+        // Highlight selected row immediately
+        this.activeVisitorChatId = chatId;
+        this.renderVisitorChats();
+
+        const chatMeta = this.visitorChats.find(c => c.id === chatId) || {};
+        const titleEl = document.getElementById('visitor-chat-title');
+        const subtitleEl = document.getElementById('visitor-chat-subtitle');
+        const copyIdBtn = document.getElementById('visitor-chat-copy-id');
+        const replyEl = document.getElementById('visitor-chat-reply');
+        const sendBtn = document.getElementById('visitor-chat-send');
+        const emptyEl = document.getElementById('visitor-chat-empty');
+        const bodyEl = document.getElementById('visitor-chat-body');
+
+        if (titleEl) titleEl.textContent = chatMeta.visitorName || 'Anonym besøkende';
+        if (subtitleEl) {
+            const page = chatMeta.lastPagePath || chatMeta.sourcePage || '';
+            const email = chatMeta.visitorEmail || '';
+            subtitleEl.textContent = [
+                email ? email : null,
+                page ? `Side: ${page}` : null,
+                `Chat-ID: ${chatId}`
+            ].filter(Boolean).join(' · ');
+        }
+        if (copyIdBtn) copyIdBtn.disabled = false;
+        if (replyEl) replyEl.disabled = false;
+        if (sendBtn) sendBtn.disabled = false;
+        this.setVisitorChatStatus('Laster meldinger...', 'muted');
+
+        // Clear previous UI
+        if (bodyEl) {
+            bodyEl.innerHTML = '';
+            if (emptyEl) bodyEl.appendChild(emptyEl);
+            if (emptyEl) emptyEl.classList.remove('hkm-chat-hidden');
+        }
+
+        // Unsubscribe previous listener
+        if (typeof this.activeVisitorChatUnsub === 'function') {
+            try { this.activeVisitorChatUnsub(); } catch (e) {}
+        }
+
+        // Subscribe to messages in this chat
+        this.activeVisitorChatUnsub = window.firebaseService.db
+            .collection('visitorChats')
+            .doc(chatId)
+            .collection('messages')
+            .orderBy('createdAt', 'asc')
+            .limit(250)
+            .onSnapshot((snap) => {
+                const msgs = snap.docs.map(d => ({ id: d.id, ...(d.data() || {}) }));
+                this.renderVisitorChatThread(msgs);
+                this.setVisitorChatStatus('', 'muted');
+            }, (err) => {
+                console.error('Error subscribing to visitor chat messages:', err);
+                this.setVisitorChatStatus('Kunne ikke laste chatten. Sjekk tilgang og prøv igjen.', 'danger');
+            });
+    }
+
+    renderVisitorChatThread(messages = []) {
+        const bodyEl = document.getElementById('visitor-chat-body');
+        const emptyEl = document.getElementById('visitor-chat-empty');
+        if (!bodyEl) return;
+
+        bodyEl.innerHTML = '';
+
+        if (!messages.length) {
+            if (emptyEl) {
+                emptyEl.textContent = 'Ingen meldinger i denne chatten enda.';
+                bodyEl.appendChild(emptyEl);
+            } else {
+                bodyEl.textContent = 'Ingen meldinger i denne chatten enda.';
+            }
+            return;
+        }
+
+        messages.forEach((m) => {
+            const bubble = document.createElement('div');
+            const isAgent = m.sender === 'agent';
+            bubble.className = `visitor-chat-bubble ${isAgent ? 'is-agent' : ''}`;
+
+            const text = typeof m.text === 'string' ? m.text : '';
+            bubble.textContent = text;
+
+            const meta = document.createElement('div');
+            meta.className = 'visitor-chat-bubble-meta';
+            const createdAt = m.createdAt && typeof m.createdAt.toDate === 'function'
+                ? m.createdAt.toDate()
+                : (m.createdAt ? new Date(m.createdAt) : null);
+            const timeLabel = createdAt ? createdAt.toLocaleString('no-NO') : 'Nå';
+            const channelLabel = m.targetMode
+                ? `Kanal: ${m.targetMode}`
+                : (m.source ? `Kilde: ${m.source}` : '');
+            meta.textContent = [isAgent ? 'Team' : 'Besøkende', timeLabel, channelLabel].filter(Boolean).join(' · ');
+            bubble.appendChild(meta);
+
+            bodyEl.appendChild(bubble);
+        });
+
+        // Scroll to latest
+        bodyEl.scrollTop = bodyEl.scrollHeight;
+    }
+
+    async sendVisitorChatReply() {
+        if (this.isSendingVisitorReply) return;
+        const chatId = this.activeVisitorChatId || '';
+        if (!chatId) return;
+
+        const replyEl = document.getElementById('visitor-chat-reply');
+        const sendBtn = document.getElementById('visitor-chat-send');
+        if (!replyEl || !sendBtn) return;
+
+        const text = String(replyEl.value || '').trim();
+        if (!text) {
+            this.setVisitorChatStatus('Skriv en melding før du sender.', 'danger');
+            return;
+        }
+
+        this.isSendingVisitorReply = true;
+        sendBtn.disabled = true;
+        this.setVisitorChatStatus('Sender...', 'muted');
+
+        try {
+            await window.firebaseService.db
+                .collection('visitorChats')
+                .doc(chatId)
+                .collection('messages')
+                .add({
+                    sender: 'agent',
+                    source: 'google_chat', // Make it visible in the visitor widget's "Google Chat-team" mode.
+                    text,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    adminOrigin: 'admin_dashboard'
+                });
+
+            await window.firebaseService.db
+                .collection('visitorChats')
+                .doc(chatId)
+                .set({
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastAgentMessageAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+            replyEl.value = '';
+            this.setVisitorChatStatus('Sendt.', 'success');
+            window.setTimeout(() => this.setVisitorChatStatus('', 'muted'), 1200);
+        } catch (err) {
+            console.error('Error sending visitor chat reply:', err);
+            this.setVisitorChatStatus('Kunne ikke sende. Prøv igjen.', 'danger');
+        } finally {
+            sendBtn.disabled = false;
+            this.isSendingVisitorReply = false;
+        }
     }
 
     escapeHtml(value) {
