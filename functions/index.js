@@ -1827,10 +1827,16 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
     return false;
   }
 
+  // Default to Gmail SMTP, but allow overriding via env (non-secret).
+  // For Google Workspace you can also use smtp-relay.gmail.com, depending on your setup.
+  const smtpHost = (process.env.SMTP_HOST || "smtp.gmail.com").trim();
+  const smtpPort = Number(process.env.SMTP_PORT || 465);
+  const smtpSecure = (process.env.SMTP_SECURE || "true").trim().toLowerCase() !== "false";
+
   const transporter = nodemailer.createTransport({
-    host: "smtp.hostinger.com",
-    port: 465,
-    secure: true,
+    host: smtpHost,
+    port: Number.isFinite(smtpPort) ? smtpPort : 465,
+    secure: smtpSecure,
     auth: { user, pass },
   });
 
