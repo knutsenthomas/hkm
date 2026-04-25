@@ -2329,7 +2329,7 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
     process.env.CHAT_ALERT_EMAIL ||
     process.env.ADMIN_EMAIL ||
     process.env.EMAIL_USER ||
-    ""
+    "post@hiskingdomministry.no"
   ).trim();
 
   if (adminEmail) {
@@ -2771,13 +2771,14 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const url = `${apiBase}/${selectedModel}:generateContent?key=${cleanKey}`;
 
     // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold
-    const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastRes] = await Promise.all([
+    const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastRes, youtubeRes] = await Promise.all([
       db.collection("siteContent").doc("settings_seo").get(),
       db.collection("content").doc("wix_products").get(),
       db.collection("content").doc("collection_events").get(),
       db.collection("content").doc("collection_blog").get(),
       db.collection("content").doc("collection_teaching").get(),
-      fetch("https://anchor.fm/s/f7a13dec/podcast/rss").catch(() => null)
+      fetch("https://anchor.fm/s/f7a13dec/podcast/rss").catch(() => null),
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent("https://www.youtube.com/feeds/videos.xml?channel_id=UCFbX-Mf7NqDm2a07hk6hveg")).catch(() => null)
     ]);
 
     const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
@@ -2844,6 +2845,21 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       }
     }
 
+    // Forbered youtube-info
+    let youtubeContext = "";
+    if (youtubeRes && youtubeRes.ok) {
+      try {
+        const ytData = await youtubeRes.json();
+        const items = ytData.items || [];
+        if (items.length > 0) {
+          youtubeContext = "\nYOUTUBE-VIDEOER (Siste fra kanalen):\n" + 
+            items.slice(0, 10).map(v => `- Tittel: ${v.title}\n  URL: ${v.link}\n  Bilde: ${v.thumbnail}`).join("\n");
+        }
+      } catch (e) {
+        console.error("Feil ved parsing av YouTube RSS:", e);
+      }
+    }
+
     const systemPrompt = `
       Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
       
@@ -2857,6 +2873,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       ${teachingContext}
       ${podcastContext}
       ${productsContext}
+      ${youtubeContext}
 
       REGLER FOR SVAR:
       1. Svar alltid på norsk. 
@@ -2866,7 +2883,9 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
          - En direkte lenke (URL).
          - Et bilde ved å bruke Markdown-formatet: ![Beskrivelse](Bilde-URL) hvis bilde-URL er tilgjengelig.
       4. Bruk dobbel linjeskift mellom avsnitt for god lesbarhet. Bruk **fet skrift** for titler.
-      5. Hvis en bruker spør om bloggen eller undervisning, bruk informasjonen over for å gi dem et godt svar. Ikke si at du ikke har tilgang hvis informasjonen står i listen.
+      5. Linker til YouTube-videoer kan gå direkte til YouTube, eller du kan henvise til vår samleside: https://www.hiskingdomministry.no/youtube.html
+      6. YouTube-kanalen vår finner du her: https://www.youtube.com/@hiskingdomministry
+      7. Hvis en bruker spør om bloggen eller undervisning, bruk informasjonen over for å gi dem et godt svar. Ikke si at du ikke har tilgang hvis informasjonen står i listen.
       6. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
       7. Aldri nevn tekniske detaljer om systemet.
     `.trim();

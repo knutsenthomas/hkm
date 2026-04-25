@@ -1556,23 +1556,23 @@ window.addEventListener('load', () => {
                     <div class="hkm-chat-email-panel hkm-chat-hidden">
                         <form class="hkm-chat-email-form">
                             <div class="hkm-chat-email-grid">
-                                <label class="hkm-chat-field">
-                                    <span>Navn *</span>
-                                    <input type="text" name="name" autocomplete="name" class="hkm-chat-email-name" maxlength="120" required />
-                                </label>
-                                <label class="hkm-chat-field">
-                                    <span>E-post *</span>
-                                    <input type="email" name="email" autocomplete="email" class="hkm-chat-email-email" maxlength="254" required />
-                                </label>
-                                <label class="hkm-chat-field">
-                                    <span>Telefon</span>
-                                    <input type="tel" name="tel" autocomplete="tel" class="hkm-chat-email-phone" maxlength="40" />
-                                </label>
+                                <div class="hkm-chat-field">
+                                    <label for="hkm-chat-name">Navn *</label>
+                                    <input type="text" id="hkm-chat-name" name="name" autocomplete="name" class="hkm-chat-email-name" maxlength="120" required />
+                                </div>
+                                <div class="hkm-chat-field">
+                                    <label for="hkm-chat-email">E-post *</label>
+                                    <input type="email" id="hkm-chat-email" name="email" autocomplete="email" class="hkm-chat-email-email" maxlength="254" required />
+                                </div>
+                                <div class="hkm-chat-field">
+                                    <label for="hkm-chat-phone">Telefon</label>
+                                    <input type="tel" id="hkm-chat-phone" name="tel" autocomplete="tel" class="hkm-chat-email-phone" maxlength="40" />
+                                </div>
                             </div>
-                            <label class="hkm-chat-field">
-                                <span>Melding *</span>
-                                <textarea name="message" class="hkm-chat-email-message" rows="4" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
-                            </label>
+                            <div class="hkm-chat-field">
+                                <label for="hkm-chat-message">Melding *</label>
+                                <textarea id="hkm-chat-message" name="message" class="hkm-chat-email-message" rows="4" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
+                            </div>
                             <p class="hkm-chat-email-help">Vi svarer deg på e-post så snart vi kan.</p>
                             <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
                             <p class="hkm-chat-email-status" aria-live="polite"></p>
@@ -2448,11 +2448,12 @@ window.addEventListener('load', () => {
                 flex-direction: column !important;
                 gap: 8px !important;
             }
-            .hkm-chat-field span {
+            .hkm-chat-field label {
                 font-size: 13px !important;
                 font-weight: 700 !important;
                 color: #334155 !important;
                 margin: 0 !important;
+                cursor: pointer !important;
             }
             .hkm-chat-field input, .hkm-chat-field textarea {
                 width: 100% !important;
