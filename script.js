@@ -1591,7 +1591,7 @@ window.addEventListener('load', () => {
                 </div>
 
                 <footer class="hkm-chat-footer">
-                    <div class="hkm-chat-privacy hkm-chat-hidden" id="hkm-chat-privacy-footer">
+                    <div class="hkm-chat-privacy" id="hkm-chat-privacy-footer">
                         <label class="hkm-chat-privacy-label">
                             <input type="checkbox" class="hkm-chat-privacy-checkbox" />
                             <span>Jeg samtykker til behandling av data. <a href="/personvern" target="_blank" rel="noopener">Les personvern</a></span>
