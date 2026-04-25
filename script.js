@@ -1629,6 +1629,7 @@ window.addEventListener('load', () => {
         const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
         const privacyContainer = root.querySelector('.hkm-chat-privacy');
         const privacyCheckbox = root.querySelector('.hkm-chat-privacy-checkbox');
+        let humanRequested = false;
 
         const addSystemMessage = (text) => {
             const msg = document.createElement('div');
@@ -1743,13 +1744,13 @@ window.addEventListener('load', () => {
             localStorage.setItem(CHAT_MODE_KEY, activeMode);
             applyModeUI();
             renderMessages();
-            humanBridge.style.display = activeMode === 'ai' &&
-                cachedMessages.filter((item) => shouldDisplayMessageInMode(item, 'ai')).length >= 2 ?
-                'block' :
-                'none';
+            const showBridge = activeMode === 'ai' && !humanRequested &&
+                cachedMessages.filter((item) => shouldDisplayMessageInMode(item, 'ai')).length >= 2;
+            humanBridge.classList.toggle('hkm-chat-hidden', !showBridge);
 
             if (activeMode === 'google_chat') {
-                humanBridge.style.display = 'none';
+                humanRequested = true;
+                humanBridge.classList.add('hkm-chat-hidden');
                 try {
                     await db.collection('visitorChats').doc(chatId).set({
                         requestHuman: true,
@@ -1759,7 +1760,8 @@ window.addEventListener('load', () => {
                     console.warn('[VisitorChat] Could not set requestHuman on mode switch:', error);
                 }
             } else if (activeMode === 'email') {
-                humanBridge.style.display = 'none';
+                humanRequested = true;
+                humanBridge.classList.add('hkm-chat-hidden');
             }
         };
 
@@ -1889,11 +1891,9 @@ window.addEventListener('load', () => {
             renderMessages();
 
             // Show human bridge if there are some messages
-            if (cachedMessages.filter((item) => shouldDisplayMessageInMode(item, 'ai')).length >= 2 && activeMode === 'ai') {
-                humanBridge.style.display = 'block';
-            } else {
-                humanBridge.style.display = 'none';
-            }
+            const showBridge = activeMode === 'ai' && !humanRequested &&
+                cachedMessages.filter((item) => shouldDisplayMessageInMode(item, 'ai')).length >= 2;
+            humanBridge.classList.toggle('hkm-chat-hidden', !showBridge);
         }, (error) => {
             console.error('[VisitorChat] Snapshot error:', error);
             setStatus('Mistet tilkoblingen til chatten.', 'error');
@@ -2022,6 +2022,9 @@ window.addEventListener('load', () => {
         });
 
         requestHumanBtn.addEventListener('click', async () => {
+            humanRequested = true;
+            humanBridge.classList.add('hkm-chat-hidden');
+            
             requestHumanBtn.disabled = true;
             requestHumanBtn.textContent = 'Varsler teamet...';
             
@@ -2043,9 +2046,10 @@ window.addEventListener('load', () => {
                 });
                 
                 addSystemMessage('Teamet er nå varslet i Google Chat og vil svare deg her så snart de er ledige.');
-                humanBridge.style.display = 'none';
             } catch (error) {
                 console.error('Error requesting human:', error);
+                humanRequested = false;
+                humanBridge.classList.remove('hkm-chat-hidden');
                 requestHumanBtn.disabled = false;
                 requestHumanBtn.textContent = 'Be om menneskelig hjelp';
             }
