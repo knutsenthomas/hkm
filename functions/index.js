@@ -236,6 +236,13 @@ function extractGoogleChatEventFields(payload) {
   const msgInPayload = msgPayload && typeof msgPayload.message === "object" ? msgPayload.message : {};
   const topMessage = payload && typeof payload.message === "object" ? payload.message : {};
   const chatMessage = chat && typeof chat.message === "object" ? chat.message : {};
+  const appCommandPayload = chat && typeof chat.appCommandPayload === "object" ? chat.appCommandPayload : {};
+  const appCommandMessage = appCommandPayload && typeof appCommandPayload.message === "object" ?
+    appCommandPayload.message :
+    {};
+  const appCommandMetadata = appCommandPayload && typeof appCommandPayload.appCommandMetadata === "object" ?
+    appCommandPayload.appCommandMetadata :
+    {};
 
   const rawText = pickFirstNonEmptyString([
     topMessage.argumentText,
@@ -247,6 +254,8 @@ function extractGoogleChatEventFields(payload) {
     msgInPayload.text,
     msgPayload.argumentText,
     msgPayload.text,
+    appCommandMessage.argumentText,
+    appCommandMessage.text,
   ]);
 
   const eventType = pickFirstNonEmptyString([
@@ -287,6 +296,15 @@ function extractGoogleChatEventFields(payload) {
     payload && payload.message && payload.message.thread && payload.message.thread.threadKey,
     chatMessage && chatMessage.thread && chatMessage.thread.threadKey,
     msgInPayload && msgInPayload.thread && msgInPayload.thread.threadKey,
+    appCommandPayload && appCommandPayload.thread && appCommandPayload.thread.threadKey,
+  ]);
+
+  const appCommandId = pickFirstNonEmptyString([
+    appCommandMetadata && appCommandMetadata.appCommandId,
+  ]);
+
+  const appCommandType = pickFirstNonEmptyString([
+    appCommandMetadata && appCommandMetadata.appCommandType,
   ]);
 
   const normalizedPayload = {
@@ -311,10 +329,25 @@ function extractGoogleChatEventFields(payload) {
     spaceName,
     threadName,
     threadKey,
+    appCommandId,
+    appCommandType,
     normalizedPayload,
     payloadKeys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 12) : [],
     chatKeys: chat && typeof chat === "object" ? Object.keys(chat).slice(0, 12) : [],
     msgPayloadKeys: msgPayload && typeof msgPayload === "object" ? Object.keys(msgPayload).slice(0, 12) : [],
+  };
+}
+
+function makeGoogleChatResponse(message, isWorkspaceAddon = false) {
+  if (!isWorkspaceAddon) return message;
+  return {
+    hostAppDataAction: {
+      chatDataAction: {
+        createMessageAction: {
+          message,
+        },
+      },
+    },
   };
 }
 
@@ -328,6 +361,19 @@ function parseGoogleChatReplyCommand(rawText) {
   return {
     chatId: match[2],
     replyText: clampText(match[3], 4000),
+  };
+}
+
+function parseGoogleChatReplyArgs(rawText) {
+  const text = cleanGoogleChatCommandText(rawText);
+  if (!text) return null;
+
+  const match = text.match(/^([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/);
+  if (!match) return null;
+
+  return {
+    chatId: match[1],
+    replyText: clampText(match[2], 4000),
   };
 }
 
@@ -2345,6 +2391,8 @@ exports.googleChatBridge = onRequest({
   cors: true,
   secrets: [googleChatBridgeTokenParam],
 }, async (req, res) => {
+  const isWorkspaceAddon = Boolean(req.body && typeof req.body === "object" && req.body.chat);
+
   if (req.method === "OPTIONS") {
     return res.status(204).send("");
   }
@@ -2356,8 +2404,9 @@ exports.googleChatBridge = onRequest({
   const payload = parseGoogleChatEventPayload(req);
   const extracted = extractGoogleChatEventFields(payload);
   const eventType = extracted.eventType;
-  if (eventType && eventType !== "MESSAGE") {
-    return res.status(200).json({ text: "OK" });
+  const isCommandEvent = Boolean(extracted.appCommandId);
+  if (eventType && eventType !== "MESSAGE" && !isCommandEvent) {
+    return res.status(200).json(makeGoogleChatResponse({ text: "OK" }, isWorkspaceAddon));
   }
 
   const expectedToken = getGoogleChatBridgeToken();
@@ -2375,7 +2424,7 @@ exports.googleChatBridge = onRequest({
 
   const userType = extracted.userType || "";
   if (userType === "BOT") {
-    return res.status(200).json({ text: "OK" });
+    return res.status(200).json(makeGoogleChatResponse({ text: "OK" }, isWorkspaceAddon));
   }
 
   const rawText = extracted.rawText || "";
@@ -2388,13 +2437,18 @@ exports.googleChatBridge = onRequest({
     msgPayloadKeys: extracted.msgPayloadKeys,
     type: extracted.eventType,
     userType: extracted.userType,
+    appCommandId: extracted.appCommandId,
+    appCommandType: extracted.appCommandType,
     hasRawText: Boolean(rawText),
     spaceName: extracted.spaceName,
     threadName: extracted.threadName,
     threadKey: extracted.threadKey,
   }));
 
-  const parsedCommand = parseGoogleChatReplyCommand(rawText);
+  let parsedCommand = parseGoogleChatReplyCommand(rawText);
+  if (!parsedCommand && extracted.appCommandId) {
+    parsedCommand = parseGoogleChatReplyArgs(rawText);
+  }
   const naturalText = clampText(cleanGoogleChatCommandText(rawText), 4000);
 
   let chatId = "";
@@ -2415,23 +2469,23 @@ exports.googleChatBridge = onRequest({
   }));
 
   if (!replyText) {
-    return res.status(200).json({
+    return res.status(200).json(makeGoogleChatResponse({
       text: "Tom melding. Skriv svaret ditt i traden.",
-    });
+    }, isWorkspaceAddon));
   }
 
   if (!chatId) {
-    return res.status(200).json({
+    return res.status(200).json(makeGoogleChatResponse({
       text: "Fant ikke hvilken nettside-chat dette gjelder. Bruk: reply <chatId> <svartekst>",
-    });
+    }, isWorkspaceAddon));
   }
 
   const chatRef = db.collection("visitorChats").doc(chatId);
   const chatSnap = await chatRef.get();
   if (!chatSnap.exists) {
-    return res.status(200).json({
+    return res.status(200).json(makeGoogleChatResponse({
       text: `Fant ikke chat med ID ${chatId}.`,
-    });
+    }, isWorkspaceAddon));
   }
 
   const fromName = clampText(
@@ -2454,9 +2508,9 @@ exports.googleChatBridge = onRequest({
 
   console.log(`[GoogleChatBridge] Reply stored for chatId=${chatId}`);
 
-  return res.status(200).json({
+  return res.status(200).json(makeGoogleChatResponse({
     text: `Svar sendt til besøkschat ${chatId}.`,
-  });
+  }, isWorkspaceAddon));
 });
 
 /**
