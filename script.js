@@ -2081,10 +2081,10 @@ window.addEventListener('load', () => {
                 position: absolute;
                 bottom: 80px;
                 right: 0;
-                width: 360px;
-                height: 600px;
-                max-width: calc(100vw - 40px);
-                max-height: calc(100vh - 120px);
+                width: 380px;
+                height: 700px;
+                max-width: calc(100vw - 32px);
+                max-height: calc(100vh - 100px);
                 background: #fff !important;
                 border-radius: 16px !important;
                 box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
@@ -2104,6 +2104,7 @@ window.addEventListener('load', () => {
             }
             
             .hkm-chat-header {
+                margin: 0 !important;
                 flex-shrink: 0 !important;
                 background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
                 color: #fff !important;
@@ -2111,7 +2112,9 @@ window.addEventListener('load', () => {
                 display: flex !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                min-height: 64px !important;
+                min-height: 70px !important;
+                border-top-left-radius: 16px !important;
+                border-top-right-radius: 16px !important;
             }
             .hkm-chat-header-info {
                 display: flex !important;
@@ -2283,10 +2286,11 @@ window.addEventListener('load', () => {
             .hkm-chat-request-human:hover { background: #bd4f2a !important; }
             
             .hkm-chat-footer {
+                margin: 0 !important;
                 flex-shrink: 0 !important;
                 background: #fff !important;
                 border-top: 1px solid #E2E8F0 !important;
-                padding: 12px 16px 20px !important;
+                padding: 12px 16px 12px !important;
             }
             
             .hkm-chat-privacy {
