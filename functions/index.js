@@ -28,6 +28,8 @@ const vippsMsnParam = defineSecret("VIPPS_MSN");
 const googleChatWebhookUrlParam = defineSecret("GOOGLE_CHAT_WEBHOOK_URL");
 const googleChatBridgeTokenParam = defineSecret("GOOGLE_CHAT_BRIDGE_TOKEN");
 const geminiApiKeyParam = defineSecret("GEMINI_API_KEY");
+const emailUserParam = defineSecret("EMAIL_USER");
+const emailPassParam = defineSecret("EMAIL_PASS");
 
 function getSecretOrEnv(secretParam, envKeys = []) {
   const candidates = [];
@@ -1817,8 +1819,8 @@ async function getEmailTemplate(templateId, fallback) {
  * Helper-funksjon for å sende e-post.
  */
 async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated" }) {
-  const user = process.env.EMAIL_USER;
-  const pass = process.env.EMAIL_PASS;
+  const user = getSecretOrEnv(emailUserParam, ["EMAIL_USER"]);
+  const pass = getSecretOrEnv(emailPassParam, ["EMAIL_PASS"]);
 
   if (!user || !pass) {
     console.warn("E-postlegitimasjon mangler (EMAIL_USER / EMAIL_PASS). Kan ikke sende e-post.");
@@ -1873,7 +1875,10 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
 /**
  * Trigger som sender velkomst-e-post til nye brukere.
  */
-exports.onUserCreate = onDocumentCreated("users/{userId}", async (event) => {
+exports.onUserCreate = onDocumentCreated({
+  document: "users/{userId}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
   const snapshot = event.data;
   if (!snapshot) {
     console.log("No data associated with the event");
@@ -1910,13 +1915,17 @@ exports.onUserCreate = onDocumentCreated("users/{userId}", async (event) => {
   `;
 
   try {
-    await sendEmail({
+    const ok = await sendEmail({
       to: email,
       subject,
       html,
       text: `Velkommen til oss, ${name}!`
     });
-    console.log(`Velkomst-e-post sendt til ${email}`);
+    if (ok) {
+      console.log(`Velkomst-e-post sendt til ${email}`);
+    } else {
+      console.warn(`[onUserCreate] Kunne ikke sende velkomst-e-post til ${email}.`);
+    }
   } catch (error) {
     console.error("Feil ved sending av velkomst-e-post:", error);
   }
@@ -1926,7 +1935,10 @@ exports.onUserCreate = onDocumentCreated("users/{userId}", async (event) => {
 /**
  * Trigger som sender bekreftelse ved påmelding til nyhetsbrev.
  */
-exports.onNewsletterSubscribe = onDocumentCreated("newsletter_subscriptions/{id}", async (event) => {
+exports.onNewsletterSubscribe = onDocumentCreated({
+  document: "newsletter_subscriptions/{id}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
   const snapshot = event.data;
   if (!snapshot) return;
   const subData = snapshot.data();
@@ -1955,13 +1967,17 @@ exports.onNewsletterSubscribe = onDocumentCreated("newsletter_subscriptions/{id}
   `;
 
   try {
-    await sendEmail({
+    const ok = await sendEmail({
       to: email,
       subject,
       html,
       text: `Takk for at du meldte deg på nyhetsbrevet vårt!`
     });
-    console.log(`Nyhetsbrev-bekreftelse sendt til ${email}`);
+    if (ok) {
+      console.log(`Nyhetsbrev-bekreftelse sendt til ${email}`);
+    } else {
+      console.warn(`[onNewsletterSubscribe] Kunne ikke sende bekreftelse til ${email}.`);
+    }
   } catch (error) {
     console.error("Feil ved sending av nyhetsbrev-bekreftelse:", error);
   }
@@ -1970,7 +1986,7 @@ exports.onNewsletterSubscribe = onDocumentCreated("newsletter_subscriptions/{id}
 /**
  * Manuel utsendelse av e-post fra admin-panelet.
  */
-exports.sendManualEmail = onRequest({ cors: true }, async (req, res) => {
+exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
   await verifyAdmin(req, res, async () => {
     if (req.method === 'OPTIONS') {
       res.set('Access-Control-Allow-Origin', '*');
@@ -2071,7 +2087,7 @@ const verifyAdmin = async (req, res, next) => {
  * Utsendelse av e-post til en gruppe brukere.
  * Krever admin-autentisering.
  */
-exports.sendBulkEmail = onRequest({ cors: true }, async (req, res) => {
+exports.sendBulkEmail = onRequest({ cors: true, secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
   // Wrap the core logic in the verifyAdmin middleware
   await verifyAdmin(req, res, async () => {
     if (req.method === 'OPTIONS') {
@@ -2256,7 +2272,7 @@ exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
 /**
  * Logger systemfeil til Firestore og sender e-post ved kritiske feil.
  */
-exports.logSystemError = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
+exports.logSystemError = onRequest({ cors: true, invoker: "public", secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.set('Access-Control-Allow-Origin', '*');
     res.set('Access-Control-Allow-Methods', 'POST');
@@ -2281,7 +2297,7 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public" }, async (req
     });
 
     if (severity === "CRITICAL") {
-      const adminEmail = process.env.ADMIN_EMAIL || process.env.EMAIL_USER;
+      const adminEmail = (process.env.ADMIN_EMAIL || getSecretOrEnv(emailUserParam, ["EMAIL_USER"])).trim();
 
       const html = `
         <h2>🚨 Kritisk Systemfeil</h2>
@@ -2293,14 +2309,18 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public" }, async (req
         <p><a href="https://his-kingdom-ministry.web.app/admin">Gå til Dashboard</a></p>
       `;
 
-      await sendEmail({
+      const ok = await sendEmail({
         to: adminEmail,
         subject: `🚨 KRITISK FEIL: ${type}`,
         html,
         text: `En kritisk feil har oppstått: ${message}`,
         fromName: "System Alert"
       });
-      console.log("Kritisk varsel sendt på e-post.");
+      if (ok) {
+        console.log("Kritisk varsel sendt på e-post.");
+      } else {
+        console.warn("[logSystemError] Kunne ikke sende kritisk varsel på e-post.");
+      }
     }
 
     res.status(200).send({ success: true });
@@ -2313,7 +2333,10 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public" }, async (req
 /**
  * Trigger som sender bekreftelse ved innsending av kontaktskjema.
  */
-exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (event) => {
+exports.onContactFormSubmit = onDocumentCreated({
+  document: "contactMessages/{id}",
+  secrets: [emailUserParam, emailPassParam],
+}, async (event) => {
   const snapshot = event.data;
   if (!snapshot) return;
   console.log(`[ContactForm] Ny melding mottatt: ${event.params.id}`);
@@ -2365,7 +2388,7 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
     try {
       const recipients = [adminEmail, backupAdminEmail].filter((e, i, a) => e && a.indexOf(e) === i).join(", ");
       console.log(`[ContactForm] Sender varsel til: ${recipients}`);
-      await sendEmail({
+      const ok = await sendEmail({
         to: recipients,
         subject: internalSubject,
         html: internalHtml,
@@ -2373,6 +2396,9 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
         fromName: "HKM Nettside",
         type: "contact_alert",
       });
+      if (!ok) {
+        console.warn("[ContactForm] Varsel-e-post ble ikke sendt (mangler legitimasjon eller SMTP-feil).");
+      }
     } catch (error) {
       console.error("Feil ved sending av intern kontaktmelding:", error);
     }
@@ -2403,13 +2429,17 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
   `;
 
   try {
-    await sendEmail({
+    const ok = await sendEmail({
       to: email,
       subject,
       html,
       text: `Takk for at du tok kontakt! Vi har mottatt din melding.`
     });
-    console.log(`Kontakt-bekreftelse sendt til ${email}`);
+    if (ok) {
+      console.log(`Kontakt-bekreftelse sendt til ${email}`);
+    } else {
+      console.warn(`[ContactForm] Kunne ikke sende kontakt-bekreftelse til ${email}.`);
+    }
   } catch (error) {
     console.error("Feil ved sending av kontakt-bekreftelse:", error);
   }
@@ -2420,7 +2450,7 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
  */
 exports.onVisitorChatMessageCreated = onDocumentCreated({
   document: "visitorChats/{chatId}/messages/{messageId}",
-  secrets: [googleChatWebhookUrlParam],
+  secrets: [googleChatWebhookUrlParam, emailUserParam, emailPassParam],
 }, async (event) => {
   const snapshot = event.data;
   if (!snapshot) return;
