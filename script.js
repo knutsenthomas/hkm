@@ -1802,12 +1802,7 @@ window.addEventListener('load', () => {
                 return;
             }
             setStatus('');
-            // Hide the privacy container once confirmed
-            privacyContainer.style.transition = 'opacity 0.3s ease';
-            privacyContainer.style.opacity = '0';
-            setTimeout(() => {
-                privacyContainer.style.display = 'none';
-            }, 300);
+            privacyContainer.classList.add('hkm-chat-hidden');
             try {
                 await db.collection('visitorChats').doc(chatId).set({
                     privacyConsent: true,
@@ -1873,8 +1868,9 @@ window.addEventListener('load', () => {
         const savedConsent = localStorage.getItem(privacyConsentKey) === 'true';
         privacyCheckbox.checked = savedConsent;
         sendBtn.disabled = !savedConsent;
-        if (!savedConsent) {
-            setStatus('Du må samtykke til personvern for å sende melding.', 'muted');
+        if (savedConsent) {
+            privacyContainer.classList.add('hkm-chat-hidden');
+            setStatus('');
         }
 
         const messagesRef = db
