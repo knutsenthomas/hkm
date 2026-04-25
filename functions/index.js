@@ -2800,17 +2800,13 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       const items = eData.items || [];
       if (items.length > 0) {
         eventsContext = "\nKOMMENDE ARRANGEMENTER:\n" + 
-          items.slice(0, 10).map(e => `- ${e.title} (${e.date || ''}): ${e.location || ''}\n  URL: https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(e.id || e.title)}\n  Bilde: ${e.imageUrl || ''}`).join("\n");
-      }
-    }
-
-    // Forbered blogg-info
+          items.slice(0, 10).map(e => `- ${e.title} (${e.date || ''}): ${e.location || ''}\n  URL: https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(e.id || e.title)}    // Forbered blogg-info
     let blogContext = "";
     if (blogSnap.exists) {
       const bItems = blogSnap.data().items || [];
       if (bItems.length > 0) {
-        blogContext = "\nBLOGGINNLEGG:\n" + 
-          bItems.slice(0, 10).map(b => `- ${b.title}\n  URL: https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(b.id || b.title)}\n  Bilde: ${b.imageUrl || ''}`).join("\n");
+        blogContext = "\nBLOGGINNLEGG (Bruk dette for å svare på spørsmål om bloggen eller oppsummere innhold):\n" + 
+          bItems.slice(0, 8).map(b => `- Tittel: ${b.title}\n  Sammendrag: ${b.description || b.seoDescription || (b.content ? String(b.content).substring(0, 300) : '')}\n  URL: https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(b.id || b.title)}\n  Bilde: ${b.imageUrl || ''}`).join("\n");
       }
     }
 
@@ -2819,8 +2815,8 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     if (teachingSnap.exists) {
       const tItems = teachingSnap.data().items || [];
       if (tItems.length > 0) {
-        teachingContext = "\nUNDERVISNING:\n" + 
-          tItems.slice(0, 10).map(t => `- ${t.title}\n  URL: https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(t.id || t.title)}\n  Bilde: ${t.imageUrl || ''}`).join("\n");
+        teachingContext = "\nUNDERVISNING (Bruk dette for å svare på spørsmål om undervisning, kurs eller bibelstudier):\n" + 
+          tItems.slice(0, 8).map(t => `- Tittel: ${t.title}\n  Sammendrag: ${t.description || t.seoDescription || (t.content ? String(t.content).substring(0, 300) : '')}\n  URL: https://www.hiskingdomministry.no/blogg-post.html?id=${encodeURIComponent(t.id || t.title)}\n  Bilde: ${t.imageUrl || ''}`).join("\n");
       }
     }
 
@@ -2834,10 +2830,11 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
         const pItems = (channel.item || []).slice(0, 5).map(it => ({
           title: it.title ? it.title[0] : "Ukjent episode",
           link: it.link ? it.link[0] : "https://anchor.fm/s/f7a13dec/podcast/rss",
+          description: it.description ? it.description[0].replace(/<[^>]*>/g, '').substring(0, 200) : "",
           imageUrl: it['itunes:image'] ? it['itunes:image'][0].$.href : (channel.image ? channel.image[0].url[0] : "")
         }));
         podcastContext = "\nPODCAST (Siste episoder):\n" + 
-          pItems.map(it => `- ${it.title}\n  Link: ${it.link}\n  Bilde: ${it.imageUrl}`).join("\n");
+          pItems.map(it => `- Episode: ${it.title}\n  Om: ${it.description}\n  Link: ${it.link}\n  Bilde: ${it.imageUrl}`).join("\n");
       } catch (err) {
         console.warn("Feil ved parsing av podcast RSS:", err);
       }
@@ -2846,9 +2843,11 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const systemPrompt = `
       Du er en hjelpsom AI-assistent for ${siteTitle} (HKM). 
       
-      KILDE BIBELEN: Bibelen er din absolutte hovedkilde for alle åndelige spørsmål. Du skal prioritere bibelsk visdom og sitere relevante vers når det passer.
+      DIN HOVEDOPPGAVE: Hjelp besøkende med å finne innhold fra His Kingdom Ministry (HKM). Du har tilgang til blogginnlegg, undervisning, podcast-episoder, arrangementer og produkter nedenfor.
       
-      KONTEKST-INFORMASJON: Du har tilgang til følgende innhold fra nettsiden:
+      KILDE BIBELEN: Bibelen er din absolutte hovedkilde for alle åndelige spørsmål.
+      
+      KONTEKST-INFORMASJON (Dette er innholdet du har tilgang til - bruk det for å svare og oppsummere):
       ${eventsContext}
       ${blogContext}
       ${teachingContext}
@@ -2858,12 +2857,14 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       REGLER FOR SVAR:
       1. Svar alltid på norsk. 
       2. Vær varm, oppmuntrende og spirituelt veiledende.
-      3. Når du anbefaler eller nevner noe (produkt, blogg, undervisning, arrangement eller podcast), skal du ALLTID inkludere:
-         - En direkte lenke (URL) kunden kan klikke på.
+      3. Når du anbefaler eller nevner noe, skal du ALLTID inkludere:
+         - En kort oppsummering/beskrivelse basert på informasjonen over.
+         - En direkte lenke (URL).
          - Et bilde ved å bruke Markdown-formatet: ![Beskrivelse](Bilde-URL) hvis bilde-URL er tilgjengelig.
       4. Bruk dobbel linjeskift mellom avsnitt for god lesbarhet. Bruk **fet skrift** for titler.
-      5. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
-      6. Aldri nevn tekniske detaljer om systemet.
+      5. Hvis en bruker spør om bloggen eller undervisning, bruk informasjonen over for å gi dem et godt svar. Ikke si at du ikke har tilgang hvis informasjonen står i listen.
+      6. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
+      7. Aldri nevn tekniske detaljer om systemet.
     `.trim();
 
     const userMessage = msgData.text || "";

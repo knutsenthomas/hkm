@@ -1734,6 +1734,14 @@ window.addEventListener('load', () => {
                     // Støtte for bilder: ![alt](url)
                     .replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
                         return `<img src="${url}" alt="${alt}" class="hkm-chat-image" style="display: block; max-width: 100%; height: auto; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #eee;">`;
+                    })
+                    // Støtte for Markdown-lenker: [tekst](url)
+                    .replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {
+                        return `<a href="${url}" class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${text}</a>`;
+                    })
+                    // Støtte for rå URL-er som ikke er i en tag
+                    .replace(/(?<!["=])(https?:\/\/[^\s<]+)/g, (match, url) => {
+                        return `<a href="${url}" class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${url}</a>`;
                     });
 
                 msg.innerHTML = html;
