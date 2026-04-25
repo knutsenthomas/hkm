@@ -1554,7 +1554,7 @@ window.addEventListener('load', () => {
                     <div class="hkm-chat-mode-intro"></div>
                     <div class="hkm-chat-body"></div>
                     <div class="hkm-chat-email-panel hkm-chat-hidden">
-                        <form class="hkm-chat-email-form">
+                        <div class="hkm-chat-email-form">
                             <div class="hkm-chat-email-grid">
                                 <div class="hkm-chat-field">
                                     <label for="hkm-chat-name">Navn *</label>
@@ -1580,9 +1580,9 @@ window.addEventListener('load', () => {
                                     <span>Jeg samtykker til <a href="/personvern" target="_blank" style="color: inherit; text-decoration: underline;">personvernreglene</a>. *</span>
                                 </label>
                             </div>
-                            <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
+                            <button type="button" class="hkm-chat-email-submit">Send e-post</button>
                             <p class="hkm-chat-email-status" aria-live="polite"></p>
-                        </form>
+                        </div>
                     </div>
                     <div class="hkm-chat-human-bridge" style="display:none;">
                         <p>Ønsker du å snakke med en person?</p>
@@ -2021,8 +2021,7 @@ window.addEventListener('load', () => {
             }
         });
 
-        emailForm.addEventListener('submit', async (event) => {
-            event.preventDefault();
+        emailSubmitBtn.addEventListener('click', async () => {
 
             const name = (emailNameInput.value || '').trim();
             const email = (emailEmailInput.value || '').trim();
