@@ -2091,7 +2091,7 @@ window.addEventListener('load', () => {
                 bottom: 80px;
                 right: 0;
                 width: 380px;
-                height: 700px;
+                height: 600px;
                 max-width: calc(100vw - 32px);
                 max-height: calc(100vh - 100px);
                 padding: 0 !important;
@@ -2384,20 +2384,43 @@ window.addEventListener('load', () => {
             }
             
             .hkm-chat-email-panel {
-                padding: 16px 20px 0 !important;
+                padding: 20px !important;
                 flex: 1 !important;
-                display: flex !important;
-                flex-direction: column !important;
                 overflow-y: auto !important;
+                background: #fff !important;
             }
             .hkm-chat-email-form {
-                flex: 1 !important;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 16px !important;
             }
+            .hkm-chat-field {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 8px !important;
+            }
+            .hkm-chat-field span {
+                font-size: 13px !important;
+                font-weight: 700 !important;
+                color: #334155 !important;
+                margin: 0 !important;
+            }
+            .hkm-chat-field input, .hkm-chat-field textarea {
+                width: 100% !important;
+                border: 1px solid #E2E8F0 !important;
+                border-radius: 10px !important;
+                padding: 12px 14px !important;
+                font-size: 14px !important;
+                background: #F8FAFC !important;
+                color: #1E293B !important;
+                outline: none !important;
+            }
+            .hkm-chat-field input:focus, .hkm-chat-field textarea:focus {
+                border-color: #d17d39 !important;
+                background: #fff !important;
+            }
             .hkm-chat-email-submit {
-                margin: auto 0 20px 0 !important;
+                margin-top: 10px !important;
                 background: #d17d39 !important;
                 color: #fff !important;
                 border: none !important;
@@ -2406,11 +2429,16 @@ window.addEventListener('load', () => {
                 font-weight: 700 !important;
                 cursor: pointer !important;
                 font-size: 15px !important;
+                transition: background 0.2s !important;
+            }
+            .hkm-chat-email-submit:hover {
+                background: #bd4f2a !important;
             }
             .hkm-chat-email-help {
-                margin: 0 0 12px 0 !important;
+                margin: 8px 0 0 0 !important;
                 font-size: 13px !important;
                 color: #64748B !important;
+                text-align: center !important;
             }
             @media (max-width: 480px) {
                 #hkm-visitor-chat-widget {
