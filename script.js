@@ -1591,12 +1591,11 @@ window.addEventListener('load', () => {
                 </div>
 
                 <footer class="hkm-chat-footer">
-                    <div class="hkm-chat-privacy">
+                    <div class="hkm-chat-privacy hkm-chat-hidden" id="hkm-chat-privacy-footer">
                         <label class="hkm-chat-privacy-label">
                             <input type="checkbox" class="hkm-chat-privacy-checkbox" />
-                            <span>Jeg samtykker til behandling av chatmeldinger. <a href="/personvern" target="_blank" rel="noopener">Les personvern</a></span>
+                            <span>Jeg samtykker til behandling av data. <a href="/personvern" target="_blank" rel="noopener">Les personvern</a></span>
                         </label>
-                        <p class="hkm-chat-privacy-note">Ikke del sensitive personopplysninger i chat.</p>
                     </div>
                     <form class="hkm-chat-form">
                         <div class="hkm-chat-input-wrapper">
@@ -1634,7 +1633,7 @@ window.addEventListener('load', () => {
         const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
         const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
         const privacyContainer = root.querySelector('.hkm-chat-privacy');
-        const privacyCheckbox = root.querySelector('.hkm-chat-privacy-checkbox');
+        const privacyCheckboxFooter = root.querySelector('#hkm-chat-privacy-footer .hkm-chat-privacy-checkbox');
         let humanRequested = false;
 
         const addSystemMessage = (text) => {
@@ -1681,13 +1680,29 @@ window.addEventListener('load', () => {
             bodyEl.classList.toggle('hkm-chat-hidden', isEmailMode);
             footer.classList.toggle('hkm-chat-hidden', isEmailMode);
             emailPanel.classList.toggle('hkm-chat-hidden', !isEmailMode);
-            
-            // Auto-hide privacy if already consented
-            const hasExistingConsent = localStorage.getItem(privacyConsentKey) === 'true';
-            if (hasExistingConsent) {
-                privacyContainer.style.display = 'none';
-                privacyCheckbox.checked = true;
-                sendBtn.disabled = false;
+
+            // Samtykke-logikk (kun hvis key er klar)
+            if (privacyConsentKey) {
+                const isConsented = localStorage.getItem(privacyConsentKey) === 'true';
+                
+                // AI Chat Footer Privacy
+                const footerPrivacy = root.querySelector('#hkm-chat-privacy-footer');
+                if (footerPrivacy) {
+                    footerPrivacy.classList.toggle('hkm-chat-hidden', isConsented || isEmailMode);
+                }
+
+                // Email Panel Privacy
+                const emailPrivacy = emailForm.querySelector('.hkm-chat-privacy');
+                if (emailPrivacy) {
+                    emailPrivacy.classList.toggle('hkm-chat-hidden', isConsented);
+                }
+
+                if (isConsented) {
+                    if (privacyCheckboxFooter) privacyCheckboxFooter.checked = true;
+                    const emailPrivacyCheckbox = emailForm.querySelector('.hkm-chat-privacy-checkbox');
+                    if (emailPrivacyCheckbox) emailPrivacyCheckbox.checked = true;
+                    sendBtn.disabled = false;
+                }
             }
         };
 
@@ -1900,13 +1915,22 @@ window.addEventListener('load', () => {
         }
 
         privacyConsentKey = `hkm_chat_privacy_consent_${chatId}`;
+        applyModeUI();
+
         const savedConsent = localStorage.getItem(privacyConsentKey) === 'true';
-        privacyCheckbox.checked = savedConsent;
-        sendBtn.disabled = !savedConsent;
-        if (savedConsent) {
-            privacyContainer.classList.add('hkm-chat-hidden');
-            setStatus('');
+        if (privacyCheckboxFooter) {
+            privacyCheckboxFooter.checked = savedConsent;
+            privacyCheckboxFooter.addEventListener('change', () => {
+                const consented = privacyCheckboxFooter.checked;
+                localStorage.setItem(privacyConsentKey, consented);
+                sendBtn.disabled = !consented;
+                if (consented) {
+                    const footerPrivacy = root.querySelector('#hkm-chat-privacy-footer');
+                    if (footerPrivacy) footerPrivacy.classList.add('hkm-chat-hidden');
+                }
+            });
         }
+        sendBtn.disabled = !savedConsent;
 
         const messagesRef = db
             .collection('visitorChats')
@@ -2005,10 +2029,13 @@ window.addEventListener('load', () => {
             const phone = (emailPhoneInput.value || '').trim();
             const message = (emailMessageInput.value || '').trim();
 
-            if (!privacyCheckbox.checked) {
+            const currentPrivacyCheckbox = emailForm.querySelector('.hkm-chat-privacy-checkbox');
+            if (currentPrivacyCheckbox && !currentPrivacyCheckbox.checked) {
+                emailStatusEl.style.color = '#e74c3c';
                 emailStatusEl.textContent = 'Du må samtykke til personvern for å sende e-post.';
                 return;
             }
+            emailStatusEl.textContent = '';
 
             if (!name || !email || !message) {
                 emailStatusEl.textContent = 'Navn, e-post og melding er obligatorisk.';
