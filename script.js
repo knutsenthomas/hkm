@@ -2027,10 +2027,20 @@ window.addEventListener('load', () => {
             
             try {
                 await setActiveMode('google_chat');
+                
+                // Set metadata
                 await db.collection('visitorChats').doc(chatId).set({
                     requestHuman: true,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
+
+                // Add a message to trigger the backend Google Chat webhook
+                await db.collection('visitorChats').doc(chatId).collection('messages').add({
+                    sender: 'visitor',
+                    text: '⚠ Besøkende ber om menneskelig hjelp.',
+                    targetMode: 'google_chat',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
                 addSystemMessage('Teamet er nå varslet i Google Chat og vil svare deg her så snart de er ledige.');
                 humanBridge.style.display = 'none';
