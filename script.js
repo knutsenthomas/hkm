@@ -1668,10 +1668,10 @@ window.addEventListener('load', () => {
             const modeMeta = modeCopy[activeMode] || modeCopy.ai;
             const isEmailMode = activeMode === 'email';
             modeIntro.textContent = modeMeta.intro;
-            modeIntro.hidden = isEmailMode;
-            bodyEl.hidden = isEmailMode;
+            modeIntro.style.display = isEmailMode ? 'none' : 'block';
+            bodyEl.style.display = isEmailMode ? 'none' : 'flex';
             footer.style.display = isEmailMode ? 'none' : 'block';
-            emailPanel.hidden = !isEmailMode;
+            emailPanel.style.display = isEmailMode ? 'block' : 'none';
             
             // Auto-hide privacy if already consented
             const hasExistingConsent = localStorage.getItem(privacyConsentKey) === 'true';
@@ -2331,7 +2331,7 @@ window.addEventListener('load', () => {
                 align-items: flex-end !important;
                 gap: 10px !important;
             }
-            .hkm-chat-form[hidden] { display: none !important; }
+            .hkm-chat-form[hidden], [hidden] { display: none !important; }
             .hkm-chat-input-wrapper {
                 flex: 1 !important;
                 position: relative !important;
