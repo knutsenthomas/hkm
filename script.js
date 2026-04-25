@@ -2085,6 +2085,8 @@ window.addEventListener('load', () => {
                 height: 700px;
                 max-width: calc(100vw - 32px);
                 max-height: calc(100vh - 100px);
+                padding: 0 !important;
+                margin: 0 !important;
                 background: #fff !important;
                 border-radius: 16px !important;
                 box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
@@ -2113,8 +2115,7 @@ window.addEventListener('load', () => {
                 justify-content: space-between !important;
                 align-items: center !important;
                 min-height: 70px !important;
-                border-top-left-radius: 16px !important;
-                border-top-right-radius: 16px !important;
+                width: 100% !important;
             }
             .hkm-chat-header-info {
                 display: flex !important;
@@ -2290,7 +2291,8 @@ window.addEventListener('load', () => {
                 flex-shrink: 0 !important;
                 background: #fff !important;
                 border-top: 1px solid #E2E8F0 !important;
-                padding: 12px 16px 12px !important;
+                padding: 12px 16px 16px !important;
+                width: 100% !important;
             }
             
             .hkm-chat-privacy {
