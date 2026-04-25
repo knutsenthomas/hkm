@@ -1558,20 +1558,20 @@ window.addEventListener('load', () => {
                             <div class="hkm-chat-email-grid">
                                 <label class="hkm-chat-field">
                                     <span>Navn *</span>
-                                    <input type="text" class="hkm-chat-email-name" maxlength="120" required />
+                                    <input type="text" name="name" autocomplete="name" class="hkm-chat-email-name" maxlength="120" required />
                                 </label>
                                 <label class="hkm-chat-field">
                                     <span>E-post *</span>
-                                    <input type="email" class="hkm-chat-email-email" maxlength="254" required />
+                                    <input type="email" name="email" autocomplete="email" class="hkm-chat-email-email" maxlength="254" required />
                                 </label>
                                 <label class="hkm-chat-field">
                                     <span>Telefon</span>
-                                    <input type="tel" class="hkm-chat-email-phone" maxlength="40" />
+                                    <input type="tel" name="tel" autocomplete="tel" class="hkm-chat-email-phone" maxlength="40" />
                                 </label>
                             </div>
                             <label class="hkm-chat-field">
                                 <span>Melding *</span>
-                                <textarea class="hkm-chat-email-message" rows="4" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
+                                <textarea name="message" class="hkm-chat-email-message" rows="4" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
                             </label>
                             <p class="hkm-chat-email-help">Vi svarer deg på e-post så snart vi kan.</p>
                             <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
