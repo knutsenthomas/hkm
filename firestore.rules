@@ -72,11 +72,22 @@ service cloud.firestore {
     function validPublicContactMessage() {
       let d = request.resource.data;
       return d is map &&
-        d.keys().hasAny(['email', 'message', 'name']) &&
-        (!hasKey(d, 'email') || (d.email is string && d.email.size() <= 254)) &&
-        (!hasKey(d, 'name') || (d.name is string && d.name.size() <= 200)) &&
+        hasKey(d, 'email') &&
+        hasKey(d, 'message') &&
+        hasKey(d, 'name') &&
+        d.email is string &&
+        d.email.size() > 3 &&
+        d.email.size() <= 254 &&
+        d.name is string &&
+        d.name.size() > 0 &&
+        d.name.size() <= 200 &&
+        d.message is string &&
+        d.message.size() > 0 &&
+        d.message.size() <= 10000 &&
         (!hasKey(d, 'subject') || (d.subject is string && d.subject.size() <= 300)) &&
-        (!hasKey(d, 'message') || (d.message is string && d.message.size() <= 10000));
+        (!hasKey(d, 'phone') || (d.phone is string && d.phone.size() <= 40)) &&
+        (!hasKey(d, 'source') || (d.source is string && d.source.size() <= 80)) &&
+        (!hasKey(d, 'pagePath') || (d.pagePath is string && d.pagePath.size() <= 300));
     }
 
     function isVisitorChatOwner(chatId) {
@@ -96,6 +107,7 @@ service cloud.firestore {
         d.status == 'open' &&
         (!hasKey(d, 'visitorName') || (d.visitorName is string && d.visitorName.size() <= 120)) &&
         (!hasKey(d, 'visitorEmail') || (d.visitorEmail is string && d.visitorEmail.size() <= 254)) &&
+        (!hasKey(d, 'visitorPhone') || (d.visitorPhone is string && d.visitorPhone.size() <= 40)) &&
         (!hasKey(d, 'sourcePage') || (d.sourcePage is string && d.sourcePage.size() <= 300));
     }
 
@@ -208,6 +220,7 @@ service cloud.firestore {
           'lastPagePath',
           'visitorName',
           'visitorEmail',
+          'visitorPhone',
           'lastTargetMode',
           'requestHuman',
           'privacyConsent',
@@ -217,6 +230,8 @@ service cloud.firestore {
           (request.resource.data.visitorName is string && request.resource.data.visitorName.size() <= 120)) &&
         (!hasKey(request.resource.data, 'visitorEmail') ||
           (request.resource.data.visitorEmail is string && request.resource.data.visitorEmail.size() <= 254)) &&
+        (!hasKey(request.resource.data, 'visitorPhone') ||
+          (request.resource.data.visitorPhone is string && request.resource.data.visitorPhone.size() <= 40)) &&
         (!hasKey(request.resource.data, 'lastPagePath') ||
           (request.resource.data.lastPagePath is string && request.resource.data.lastPagePath.size() <= 300)) &&
         (!hasKey(request.resource.data, 'lastTargetMode') || (

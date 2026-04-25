@@ -2319,8 +2319,60 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
   const msgData = snapshot.data();
   const email = msgData.email;
   const name = msgData.name || "venn";
+  const phone = clampText(msgData.phone || "", 40);
+  const source = clampText(msgData.source || "", 80);
+  const pagePath = clampText(msgData.pagePath || "", 300);
 
   if (!email) return;
+
+  const adminEmail = (
+    process.env.CHAT_ALERT_EMAIL ||
+    process.env.ADMIN_EMAIL ||
+    process.env.EMAIL_USER ||
+    ""
+  ).trim();
+
+  if (adminEmail) {
+    const internalSubject = source === "chat_widget_email" ?
+      `Ny e-post fra chatwidget (${name})` :
+      `Ny kontaktmelding fra ${name}`;
+    const internalText = [
+      `Navn: ${name}`,
+      `E-post: ${email}`,
+      phone ? `Telefon: ${phone}` : "",
+      pagePath ? `Side: ${pagePath}` : "",
+      source ? `Kilde: ${source}` : "",
+      "",
+      "Melding:",
+      msgData.message || "",
+    ].filter(Boolean).join("\n");
+
+    const internalHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 680px;">
+        <h2>${internalSubject}</h2>
+        <p><strong>Navn:</strong> ${name}</p>
+        <p><strong>E-post:</strong> ${email}</p>
+        ${phone ? `<p><strong>Telefon:</strong> ${phone}</p>` : ""}
+        ${pagePath ? `<p><strong>Side:</strong> ${pagePath}</p>` : ""}
+        ${source ? `<p><strong>Kilde:</strong> ${source}</p>` : ""}
+        <p><strong>Melding:</strong></p>
+        <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;white-space:pre-wrap;">${msgData.message ? msgData.message.replace(/\n/g, "<br>") : ""}</div>
+      </div>
+    `;
+
+    try {
+      await sendEmail({
+        to: adminEmail,
+        subject: internalSubject,
+        html: internalHtml,
+        text: internalText,
+        fromName: "HKM Nettside",
+        type: "contact_alert",
+      });
+    } catch (error) {
+      console.error("Feil ved sending av intern kontaktmelding:", error);
+    }
+  }
 
   const fallback = {
     subject: "Takk for din melding: {{subject}}",

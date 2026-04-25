@@ -1546,7 +1546,33 @@ window.addEventListener('load', () => {
                         <span class="sr-only">E-post</span>
                     </button>
                 </div>
+                <div class="hkm-chat-mode-intro"></div>
                 <div class="hkm-chat-body"></div>
+                <div class="hkm-chat-email-panel" hidden>
+                    <form class="hkm-chat-email-form">
+                        <div class="hkm-chat-email-grid">
+                            <label class="hkm-chat-field">
+                                <span>Navn *</span>
+                                <input type="text" class="hkm-chat-email-name" maxlength="120" required />
+                            </label>
+                            <label class="hkm-chat-field">
+                                <span>E-post *</span>
+                                <input type="email" class="hkm-chat-email-email" maxlength="254" required />
+                            </label>
+                            <label class="hkm-chat-field">
+                                <span>Telefon</span>
+                                <input type="tel" class="hkm-chat-email-phone" maxlength="40" />
+                            </label>
+                        </div>
+                        <label class="hkm-chat-field">
+                            <span>Melding *</span>
+                            <textarea class="hkm-chat-email-message" rows="5" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
+                        </label>
+                        <p class="hkm-chat-email-help">Vi svarer deg på e-post så snart vi kan.</p>
+                        <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
+                        <p class="hkm-chat-email-status" aria-live="polite"></p>
+                    </form>
+                </div>
                 <div class="hkm-chat-human-bridge" style="display:none;">
                     <p>Ønsker du å snakke med en person?</p>
                     <button type="button" class="hkm-chat-request-human">Be om menneskelig hjelp</button>
@@ -1575,6 +1601,15 @@ window.addEventListener('load', () => {
         const panel = root.querySelector('.hkm-chat-panel');
         const closeBtn = root.querySelector('.hkm-chat-close');
         const bodyEl = root.querySelector('.hkm-chat-body');
+        const modeIntro = root.querySelector('.hkm-chat-mode-intro');
+        const emailPanel = root.querySelector('.hkm-chat-email-panel');
+        const emailForm = root.querySelector('.hkm-chat-email-form');
+        const emailNameInput = root.querySelector('.hkm-chat-email-name');
+        const emailEmailInput = root.querySelector('.hkm-chat-email-email');
+        const emailPhoneInput = root.querySelector('.hkm-chat-email-phone');
+        const emailMessageInput = root.querySelector('.hkm-chat-email-message');
+        const emailSubmitBtn = root.querySelector('.hkm-chat-email-submit');
+        const emailStatusEl = root.querySelector('.hkm-chat-email-status');
         const form = root.querySelector('.hkm-chat-form');
         const input = root.querySelector('.hkm-chat-input');
         const sendBtn = root.querySelector('.hkm-chat-send');
@@ -1591,11 +1626,23 @@ window.addEventListener('load', () => {
             bodyEl.appendChild(msg);
             bodyEl.scrollTop = bodyEl.scrollHeight;
         };
-
-        addSystemMessage('Hei! Jeg er HKM-assistenten. Hvordan kan jeg hjelpe deg i dag?');
-        addSystemMessage('Velg modus: AI-assistent eller Google Chat-team.');
+        const modeCopy = {
+            ai: {
+                intro: 'AI-chat: få raske svar fra HKM Assistent.',
+                empty: 'Still et spørsmål, så svarer AI-assistenten med en gang.'
+            },
+            google_chat: {
+                intro: 'Google Chat: skriv til teamet og få svar fra en person her i chatten.',
+                empty: 'Skriv til teamet, så kommer svaret tilbake i denne chatten.'
+            },
+            email: {
+                intro: 'E-post: fyll inn skjemaet, så sender vi meldingen videre til teamet.',
+                empty: ''
+            }
+        };
 
         let privacyConsentKey = '';
+        let cachedMessages = [];
 
         let activeMode = localStorage.getItem(CHAT_MODE_KEY) || 'ai';
         if (activeMode !== 'ai' && activeMode !== 'google_chat' && activeMode !== 'email') {
@@ -1608,6 +1655,65 @@ window.addEventListener('load', () => {
                 btn.classList.toggle('active', isActive);
                 btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
             });
+
+            const modeMeta = modeCopy[activeMode] || modeCopy.ai;
+            modeIntro.textContent = modeMeta.intro;
+            const isEmailMode = activeMode === 'email';
+            bodyEl.hidden = isEmailMode;
+            form.hidden = isEmailMode;
+            emailPanel.hidden = !isEmailMode;
+        };
+
+        const shouldDisplayMessageInMode = (data = {}, mode = activeMode) => {
+            const sender = data.sender || '';
+            const source = data.source || '';
+            const targetMode = data.targetMode || '';
+
+            if (mode === 'ai') {
+                return (sender === 'visitor' && targetMode === 'ai') || source === 'ai_gemini';
+            }
+
+            if (mode === 'google_chat') {
+                return (sender === 'visitor' && targetMode === 'google_chat') || source === 'google_chat';
+            }
+
+            return false;
+        };
+
+        const renderMessages = () => {
+            if (activeMode === 'email') {
+                bodyEl.innerHTML = '';
+                return;
+            }
+
+            bodyEl.innerHTML = '';
+            const visibleMessages = cachedMessages.filter((item) => shouldDisplayMessageInMode(item));
+
+            if (visibleMessages.length === 0) {
+                addSystemMessage((modeCopy[activeMode] && modeCopy[activeMode].empty) || 'Ingen meldinger enda.');
+                return;
+            }
+
+            visibleMessages.forEach((data) => {
+                const msg = document.createElement('div');
+                const isVisitor = data.sender === 'visitor';
+                msg.className = `hkm-chat-msg ${isVisitor ? 'visitor' : 'agent'}`;
+                msg.textContent = typeof data.text === 'string' ? data.text : '';
+                bodyEl.appendChild(msg);
+
+                if (!isVisitor) isTyping = false;
+            });
+
+            if (isTyping && activeMode === 'ai') {
+                const typingMsg = document.createElement('div');
+                typingMsg.className = 'hkm-chat-msg agent typing';
+                typingMsg.style.fontStyle = 'italic';
+                typingMsg.style.opacity = '0.7';
+                typingMsg.textContent = 'HKM Assistent skriver...';
+                bodyEl.appendChild(typingMsg);
+            }
+
+            bodyEl.scrollTop = bodyEl.scrollHeight;
         };
 
         const setActiveMode = async (mode) => {
@@ -1616,11 +1722,16 @@ window.addEventListener('load', () => {
             activeMode = mode;
             localStorage.setItem(CHAT_MODE_KEY, activeMode);
             applyModeUI();
+            renderMessages();
+            humanBridge.style.display = activeMode === 'ai' &&
+                cachedMessages.filter((item) => shouldDisplayMessageInMode(item, 'ai')).length >= 2 ?
+                'block' :
+                'none';
 
             if (activeMode === 'google_chat') {
                 humanBridge.style.display = 'none';
                 if (changed) {
-                    addSystemMessage('Google Chat-team valgt. Neste meldinger går direkte til teamet.');
+                    setStatus('Google Chat-team valgt.');
                 }
                 try {
                     await db.collection('visitorChats').doc(chatId).set({
@@ -1633,10 +1744,10 @@ window.addEventListener('load', () => {
             } else if (activeMode === 'email') {
                 humanBridge.style.display = 'none';
                 if (changed) {
-                    addSystemMessage('E-post valgt. Neste meldinger sendes som e-postvarsel til teamet.');
+                    setStatus('E-postmodus valgt.');
                 }
             } else if (changed) {
-                addSystemMessage('AI-assistent valgt. Neste meldinger besvares automatisk av assistenten.');
+                setStatus('AI-chat valgt.');
             }
         };
 
@@ -1657,7 +1768,11 @@ window.addEventListener('load', () => {
             root.classList.toggle('open', open);
             panel.setAttribute('aria-hidden', open ? 'false' : 'true');
             if (open) {
-                input.focus();
+                if (activeMode === 'email') {
+                    emailNameInput.focus();
+                } else {
+                    input.focus();
+                }
                 bodyEl.scrollTop = bodyEl.scrollHeight;
             }
         };
@@ -1752,38 +1867,11 @@ window.addEventListener('load', () => {
         let isTyping = false;
 
         messagesRef.onSnapshot((snapshot) => {
-            bodyEl.innerHTML = '';
-            
-            if (snapshot.empty) {
-                addSystemMessage('Ingen meldinger enda. Start samtalen nar du er klar.');
-                return;
-            }
-
-            snapshot.forEach((doc) => {
-                const data = doc.data() || {};
-                const msg = document.createElement('div');
-                const isVisitor = data.sender === 'visitor';
-                msg.className = `hkm-chat-msg ${isVisitor ? 'visitor' : 'agent'}`;
-                msg.textContent = typeof data.text === 'string' ? data.text : '';
-                bodyEl.appendChild(msg);
-
-                // If we got a message from agent, stop typing indicator
-                if (!isVisitor) isTyping = false;
-            });
-
-            if (isTyping) {
-                const typingMsg = document.createElement('div');
-                typingMsg.className = 'hkm-chat-msg agent typing';
-                typingMsg.style.fontStyle = 'italic';
-                typingMsg.style.opacity = '0.7';
-                typingMsg.textContent = 'HKM Assistent skriver...';
-                bodyEl.appendChild(typingMsg);
-            }
-
-            bodyEl.scrollTop = bodyEl.scrollHeight;
+            cachedMessages = snapshot.docs.map((doc) => doc.data() || {});
+            renderMessages();
 
             // Show human bridge if there are some messages
-            if (snapshot.size >= 2 && activeMode === 'ai') {
+            if (cachedMessages.filter((item) => shouldDisplayMessageInMode(item, 'ai')).length >= 2 && activeMode === 'ai') {
                 humanBridge.style.display = 'block';
             } else {
                 humanBridge.style.display = 'none';
@@ -1857,6 +1945,61 @@ window.addEventListener('load', () => {
                 setStatus('Kunne ikke sende meldingen. Prov igjen.', 'error');
             } finally {
                 sendBtn.disabled = false;
+            }
+        });
+
+        emailForm.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const name = (emailNameInput.value || '').trim();
+            const email = (emailEmailInput.value || '').trim();
+            const phone = (emailPhoneInput.value || '').trim();
+            const message = (emailMessageInput.value || '').trim();
+
+            if (!privacyCheckbox.checked) {
+                emailStatusEl.textContent = 'Du må samtykke til personvern for å sende e-post.';
+                return;
+            }
+
+            if (!name || !email || !message) {
+                emailStatusEl.textContent = 'Navn, e-post og melding er obligatorisk.';
+                return;
+            }
+
+            emailSubmitBtn.disabled = true;
+            emailStatusEl.textContent = 'Sender e-post...';
+
+            try {
+                await db.collection('contactMessages').add({
+                    name,
+                    email,
+                    phone,
+                    message,
+                    source: 'chat_widget_email',
+                    pagePath: window.location.pathname,
+                    chatId,
+                    sessionId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                await db.collection('visitorChats').doc(chatId).set({
+                    visitorName: name,
+                    visitorEmail: email,
+                    visitorPhone: phone,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastTargetMode: 'email',
+                    privacyConsent: true,
+                    privacyConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastPagePath: window.location.pathname
+                }, { merge: true });
+
+                emailMessageInput.value = '';
+                emailStatusEl.textContent = 'Takk! Meldingen er sendt på e-post til teamet.';
+            } catch (error) {
+                console.error('[VisitorChat] Email submit failed:', error);
+                emailStatusEl.textContent = 'Kunne ikke sende e-posten. Prøv igjen.';
+            } finally {
+                emailSubmitBtn.disabled = false;
             }
         });
 
@@ -2013,6 +2156,14 @@ window.addEventListener('load', () => {
                 border-bottom: 1px solid #E2E8F0;
                 background: #fff;
             }
+            .hkm-chat-mode-intro {
+                padding: 10px 14px;
+                font-size: 12px;
+                line-height: 1.45;
+                color: #475569;
+                background: #F8FAFC;
+                border-bottom: 1px solid #E2E8F0;
+            }
             .hkm-chat-mode-btn {
                 border: 1px solid #CBD5E1;
                 background: #F8FAFC;
@@ -2080,6 +2231,69 @@ window.addEventListener('load', () => {
                 background: #EFF6FF;
                 border-top: 1px solid #DBEAFE;
                 text-align: center;
+            }
+            .hkm-chat-email-panel {
+                padding: 14px 12px 16px;
+                background: #fff;
+                border-top: 1px solid #E2E8F0;
+            }
+            .hkm-chat-email-form {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+            }
+            .hkm-chat-email-grid {
+                display: grid;
+                gap: 10px;
+            }
+            .hkm-chat-field {
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+                font-size: 12px;
+                color: #334155;
+            }
+            .hkm-chat-field span {
+                font-weight: 600;
+            }
+            .hkm-chat-field input,
+            .hkm-chat-field textarea {
+                width: 100%;
+                border: 1px solid #E2E8F0;
+                border-radius: 12px;
+                padding: 10px 12px;
+                font-size: 14px;
+                outline: none;
+                resize: vertical;
+                font-family: inherit;
+            }
+            .hkm-chat-field textarea {
+                min-height: 110px;
+            }
+            .hkm-chat-email-help {
+                margin: -2px 0 0;
+                font-size: 11px;
+                color: #64748B;
+            }
+            .hkm-chat-email-submit {
+                border: none;
+                border-radius: 12px;
+                background: #d17d39;
+                color: #fff;
+                font-size: 14px;
+                font-weight: 700;
+                padding: 12px 14px;
+                cursor: pointer;
+            }
+            .hkm-chat-email-submit:disabled {
+                opacity: 0.6;
+                cursor: default;
+            }
+            .hkm-chat-email-status {
+                margin: 0;
+                min-height: 16px;
+                font-size: 11px;
+                color: #64748B;
             }
             .hkm-chat-human-bridge p {
                 margin: 0 0 8px;
@@ -2179,6 +2393,17 @@ window.addEventListener('load', () => {
                 .hkm-chat-panel {
                     width: calc(100vw - 32px);
                     bottom: 60px;
+                }
+                .hkm-chat-email-grid {
+                    grid-template-columns: 1fr;
+                }
+            }
+            @media (min-width: 481px) {
+                .hkm-chat-email-grid {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                }
+                .hkm-chat-email-grid .hkm-chat-field:last-child {
+                    grid-column: span 2;
                 }
             }
         `;
