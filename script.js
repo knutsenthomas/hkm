@@ -2386,10 +2386,11 @@ window.addEventListener('load', () => {
             
 	            .hkm-chat-body {
 	                flex: 1 !important;
-	                overflow-y: auto !important;
+	                /* Force a stable scrollbar gutter to prevent 1px layout jitter on focus/tab. */
+	                overflow-y: scroll !important;
 	                min-height: 0 !important;
 	                overscroll-behavior: contain !important;
-	                scrollbar-gutter: stable !important;
+	                scrollbar-gutter: stable both-edges !important;
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
 	                padding: 20px !important;
@@ -2546,10 +2547,11 @@ window.addEventListener('load', () => {
 	            .hkm-chat-email-panel {
 	                padding: 20px !important;
 	                flex: 1 !important;
-	                overflow-y: auto !important;
+	                /* Force a stable scrollbar gutter to prevent 1px layout jitter on focus/tab. */
+	                overflow-y: scroll !important;
 	                min-height: 0 !important;
 	                overscroll-behavior: contain !important;
-	                scrollbar-gutter: stable !important;
+	                scrollbar-gutter: stable both-edges !important;
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
 	                padding-bottom: 28px !important;
