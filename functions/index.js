@@ -2417,14 +2417,52 @@ exports.onContactFormSubmit = onDocumentCreated({
   }
 
   const fallback = {
-    subject: "Takk for din melding: {{subject}}",
-    body: `<h2>Takk for at du tok kontakt, {{name}}!</h2>
-      <p>Vi har mottatt din melding med emnet "{{subject}}".</p>
-      <p>Vi vil gå gjennom din henvendelse og svare deg så snart som mulig.</p>
-      <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;">
-        <strong>Din melding:</strong><br>
-        ${msgData.message ? msgData.message.replace(/\n/g, '<br>') : ''}
-      </div>`
+    subject: "Vi har mottatt meldingen din: {{subject}}",
+    body: `
+      <div style="margin: 0 0 14px 0;">
+        <p style="margin:0; font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color:#9a3412;">
+          His Kingdom Ministry
+        </p>
+      </div>
+
+      <h2 style="margin: 0 0 10px 0; font-size: 26px; line-height: 1.2;">
+        Takk for at du tok kontakt, {{name}}!
+      </h2>
+
+      <p style="margin: 0 0 10px 0; color:#334155;">
+        Vi har mottatt meldingen din om <strong style="color:#0f172a;">"{{subject}}"</strong>.
+      </p>
+
+      <div style="background: #fff7ed; border: 1px solid #fed7aa; padding: 14px; border-radius: 10px; margin: 16px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 700; color:#9a3412;">Hva skjer nå?</p>
+        <ul style="margin: 0; padding-left: 18px; color:#334155;">
+          <li>Vi leser gjennom henvendelsen og svarer deg så snart vi kan.</li>
+          <li>Hvis det haster, skriv gjerne en ny melding og merk den med "HASTER".</li>
+        </ul>
+      </div>
+
+      <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 14px; border-radius: 10px; margin: 16px 0;">
+        <p style="margin: 0 0 8px 0; font-weight: 700; color:#0f172a;">Din melding</p>
+        <div style="white-space: pre-wrap; color:#0f172a;">
+          ${msgData.message ? msgData.message.replace(/\n/g, "<br>") : ""}
+        </div>
+      </div>
+
+      <div style="margin-top: 18px;">
+        <p style="margin: 0 0 8px 0; font-weight: 700; color:#0f172a;">Mens du venter</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <a href="https://hiskingdomministry.no/kalender" style="display:inline-block; padding:10px 12px; border-radius: 10px; background:#d17d39; color:#fff; text-decoration:none; font-weight:700;">
+            Se kalender
+          </a>
+          <a href="https://hiskingdomministry.no/undervisning" style="display:inline-block; padding:10px 12px; border-radius: 10px; background:#0f172a; color:#fff; text-decoration:none; font-weight:700;">
+            Undervisning
+          </a>
+          <a href="https://hiskingdomministry.no/gi-gave" style="display:inline-block; padding:10px 12px; border-radius: 10px; background:#fff; color:#0f172a; text-decoration:none; font-weight:700; border:1px solid #e2e8f0;">
+            Gi en gave
+          </a>
+        </div>
+      </div>
+    `
   };
 
   const template = await getEmailTemplate("contact_form_confirmation", fallback);
