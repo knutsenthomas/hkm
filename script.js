@@ -1667,7 +1667,7 @@ window.addEventListener('load', () => {
             modeIntro.textContent = modeMeta.intro;
             const isEmailMode = activeMode === 'email';
             bodyEl.hidden = isEmailMode;
-            form.hidden = isEmailMode;
+            footer.style.display = isEmailMode ? 'none' : 'block';
             emailPanel.hidden = !isEmailMode;
             
             // Auto-hide privacy if already consented
@@ -2328,6 +2328,7 @@ window.addEventListener('load', () => {
                 align-items: flex-end !important;
                 gap: 10px !important;
             }
+            .hkm-chat-form[hidden] { display: none !important; }
             .hkm-chat-input-wrapper {
                 flex: 1 !important;
                 position: relative !important;
