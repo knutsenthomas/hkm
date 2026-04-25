@@ -2316,6 +2316,7 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public" }, async (req
 exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (event) => {
   const snapshot = event.data;
   if (!snapshot) return;
+  console.log(`[ContactForm] Ny melding mottatt: ${event.params.id}`);
   const msgData = snapshot.data();
   const email = msgData.email;
   const name = msgData.name || "venn";
@@ -2325,11 +2326,12 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
 
   if (!email) return;
 
-  const adminEmail = (
+  const adminEmail = "post@hiskingdomministry.no";
+  const backupAdminEmail = (
     process.env.CHAT_ALERT_EMAIL ||
     process.env.ADMIN_EMAIL ||
     process.env.EMAIL_USER ||
-    "post@hiskingdomministry.no"
+    ""
   ).trim();
 
   if (adminEmail) {
@@ -2361,8 +2363,10 @@ exports.onContactFormSubmit = onDocumentCreated("contactMessages/{id}", async (e
     `;
 
     try {
+      const recipients = [adminEmail, backupAdminEmail].filter((e, i, a) => e && a.indexOf(e) === i).join(", ");
+      console.log(`[ContactForm] Sender varsel til: ${recipients}`);
       await sendEmail({
-        to: adminEmail,
+        to: recipients,
         subject: internalSubject,
         html: internalHtml,
         text: internalText,

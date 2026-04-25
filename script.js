@@ -2011,8 +2011,8 @@ window.addEventListener('load', () => {
 
             emailSubmitBtn.disabled = true;
             emailStatusEl.textContent = 'Sender e-post...';
-
             try {
+                // 1. Lagre i Firestore som backup
                 await db.collection('contactMessages').add({
                     name,
                     email,
@@ -2025,22 +2025,38 @@ window.addEventListener('load', () => {
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                await db.collection('visitorChats').doc(chatId).set({
-                    visitorName: name,
-                    visitorEmail: email,
-                    visitorPhone: phone,
-                    updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastTargetMode: 'email',
-                    privacyConsent: true,
-                    privacyConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastPagePath: window.location.pathname
-                }, { merge: true });
+                // 2. Send via Google Form (samme som kontaktskjemaet på kontakt.html)
+                const FORM_ACTION = 'https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse';
+                const FIELD_MAP = {
+                    name: 'entry.599509457',
+                    phone: 'entry.1400512221',
+                    email: 'entry.933613981',
+                    subject: 'entry.737423993',
+                    message: 'entry.900097937'
+                };
 
+                const formData = new URLSearchParams();
+                formData.append(FIELD_MAP.name, name);
+                if (phone) formData.append(FIELD_MAP.phone, phone);
+                formData.append(FIELD_MAP.email, email);
+                formData.append(FIELD_MAP.subject, 'Henvendelse fra Chat Assistent');
+                formData.append(FIELD_MAP.message, message);
+
+                fetch(FORM_ACTION, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: formData.toString()
+                }).catch(e => console.warn('[VisitorChat] Google Form bridge failed:', e));
+
+                // 3. Oppdater UI
                 emailMessageInput.value = '';
-                emailStatusEl.textContent = 'Takk! Meldingen er sendt på e-post til teamet.';
+                emailStatusEl.style.color = '#16a34a';
+                emailStatusEl.textContent = 'Takk! Meldingen er sendt til teamet.';
             } catch (error) {
                 console.error('[VisitorChat] Email submit failed:', error);
-                emailStatusEl.textContent = 'Kunne ikke sende e-posten. Prøv igjen.';
+                emailStatusEl.style.color = '#e74c3c';
+                emailStatusEl.textContent = 'Kunne ikke sende meldingen. Prøv igjen.';
             } finally {
                 emailSubmitBtn.disabled = false;
             }
