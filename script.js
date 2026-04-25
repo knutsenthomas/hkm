@@ -2073,6 +2073,7 @@ window.addEventListener('load', () => {
                 cursor: pointer !important;
                 display: flex !important;
                 align-items: center !important;
+                gap: 12px !important;
                 transition: all 0.3s ease !important;
                 font-size: 14px !important;
             }
@@ -2086,6 +2087,7 @@ window.addEventListener('load', () => {
                 background: #4ADE80 !important;
                 border-radius: 50% !important;
                 box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.2) !important;
+                flex-shrink: 0 !important;
             }
             
             .hkm-chat-panel {
