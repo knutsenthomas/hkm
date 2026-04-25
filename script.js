@@ -1551,7 +1551,7 @@ window.addEventListener('load', () => {
                 <div class="hkm-chat-main">
                     <div class="hkm-chat-mode-intro"></div>
                     <div class="hkm-chat-body"></div>
-                    <div class="hkm-chat-email-panel" hidden>
+                    <div class="hkm-chat-email-panel hkm-chat-hidden">
                         <form class="hkm-chat-email-form">
                             <div class="hkm-chat-email-grid">
                                 <label class="hkm-chat-field">
@@ -1668,10 +1668,10 @@ window.addEventListener('load', () => {
             const modeMeta = modeCopy[activeMode] || modeCopy.ai;
             const isEmailMode = activeMode === 'email';
             modeIntro.textContent = modeMeta.intro;
-            modeIntro.style.display = isEmailMode ? 'none' : 'block';
-            bodyEl.style.display = isEmailMode ? 'none' : 'flex';
-            footer.style.display = isEmailMode ? 'none' : 'block';
-            emailPanel.style.display = isEmailMode ? 'block' : 'none';
+            modeIntro.classList.toggle('hkm-chat-hidden', isEmailMode);
+            bodyEl.classList.toggle('hkm-chat-hidden', isEmailMode);
+            footer.classList.toggle('hkm-chat-hidden', isEmailMode);
+            emailPanel.classList.toggle('hkm-chat-hidden', !isEmailMode);
             
             // Auto-hide privacy if already consented
             const hasExistingConsent = localStorage.getItem(privacyConsentKey) === 'true';
@@ -2331,6 +2331,7 @@ window.addEventListener('load', () => {
                 align-items: flex-end !important;
                 gap: 10px !important;
             }
+            .hkm-chat-hidden { display: none !important; }
             .hkm-chat-form[hidden] { display: none !important; }
             .hkm-chat-input-wrapper {
                 flex: 1 !important;
