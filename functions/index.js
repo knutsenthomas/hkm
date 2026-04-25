@@ -2774,9 +2774,9 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastRes] = await Promise.all([
       db.collection("siteContent").doc("settings_seo").get(),
       db.collection("content").doc("wix_products").get(),
-      db.collection("siteContent").doc("collection_events").get(),
-      db.collection("siteContent").doc("collection_blog").get(),
-      db.collection("siteContent").doc("collection_teaching").get(),
+      db.collection("content").doc("collection_events").get(),
+      db.collection("content").doc("collection_blog").get(),
+      db.collection("content").doc("collection_teaching").get(),
       fetch("https://anchor.fm/s/f7a13dec/podcast/rss").catch(() => null)
     ]);
 
@@ -2800,7 +2800,11 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       const items = eData.items || [];
       if (items.length > 0) {
         eventsContext = "\nKOMMENDE ARRANGEMENTER:\n" + 
-          items.slice(0, 10).map(e => `- ${e.title} (${e.date || ''}): ${e.location || ''}\n  URL: https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(e.id || e.title)}    // Forbered blogg-info
+          items.slice(0, 10).map(e => `- ${e.title} (${e.date || ''}): ${e.location || ''}\n  URL: https://www.hiskingdomministry.no/arrangement-detaljer.html?id=${encodeURIComponent(e.id || e.title)}\n  Bilde: ${e.imageUrl || ''}`).join("\n");
+      }
+    }
+
+    // Forbered blogg-info
     let blogContext = "";
     if (blogSnap.exists) {
       const bItems = blogSnap.data().items || [];

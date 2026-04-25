@@ -1737,11 +1737,15 @@ window.addEventListener('load', () => {
                     })
                     // Støtte for Markdown-lenker: [tekst](url)
                     .replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {
-                        return `<a href="${url}" class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${text}</a>`;
+                        const isExternal = (url.startsWith('http') || url.startsWith('//')) && !url.includes('hiskingdomministry.no');
+                        const target = isExternal ? 'target="_blank" rel="noopener noreferrer"' : '';
+                        return `<a href="${url}" ${target} class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${text}</a>`;
                     })
                     // Støtte for rå URL-er som ikke er i en tag
                     .replace(/(?<!["=])(https?:\/\/[^\s<]+)/g, (match, url) => {
-                        return `<a href="${url}" class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${url}</a>`;
+                        const isExternal = (url.startsWith('http') || url.startsWith('//')) && !url.includes('hiskingdomministry.no');
+                        const target = isExternal ? 'target="_blank" rel="noopener noreferrer"' : '';
+                        return `<a href="${url}" ${target} class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${url}</a>`;
                     });
 
                 msg.innerHTML = html;
@@ -2287,7 +2291,7 @@ window.addEventListener('load', () => {
                 padding: 12px 16px !important;
                 border-radius: 18px !important;
                 max-width: 85% !important;
-                font-size: 14px !important;
+                font-size: 13px !important;
                 line-height: 1.5 !important;
                 word-wrap: break-word !important;
                 white-space: pre-wrap !important;
@@ -2479,9 +2483,16 @@ window.addEventListener('load', () => {
             .hkm-chat-email-submit:hover {
                 background: #bd4f2a !important;
             }
+            .hkm-chat-email-status {
+                margin: 12px 0 0 0 !important;
+                font-size: 13px !important;
+                color: #d17d39 !important;
+                text-align: center !important;
+                font-weight: 500 !important;
+            }
             .hkm-chat-email-help {
                 margin: 8px 0 0 0 !important;
-                font-size: 13px !important;
+                font-size: 12px !important;
                 color: #64748B !important;
                 text-align: center !important;
             }
