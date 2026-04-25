@@ -2063,13 +2063,16 @@ window.addEventListener('load', () => {
             statusEl.textContent = 'Sender e-post...';
 
             try {
+                const finalChatId = localStorage.getItem('hkm_visitor_chat_id') || 'unknown';
+                const finalSessionId = localStorage.getItem('hkm_visitor_chat_session') || 'unknown';
+
                 // Lagre i Firestore
                 await db.collection('contactMessages').add({
                     name, email, phone, message,
                     source: 'chat_widget_email',
                     pagePath: window.location.pathname,
-                    chatId: currentChatId,
-                    sessionId: currentSessionId,
+                    chatId: finalChatId,
+                    sessionId: finalSessionId,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
