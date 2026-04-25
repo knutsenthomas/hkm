@@ -1574,6 +1574,12 @@ window.addEventListener('load', () => {
                                 <textarea id="hkm-chat-message" name="message" class="hkm-chat-email-message" rows="4" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
                             </div>
                             <p class="hkm-chat-email-help">Vi svarer deg på e-post så snart vi kan.</p>
+                            <div class="hkm-chat-privacy">
+                                <label class="hkm-chat-privacy-label">
+                                    <input type="checkbox" class="hkm-chat-privacy-checkbox" required>
+                                    <span>Jeg samtykker til <a href="/personvern" target="_blank" style="color: inherit; text-decoration: underline;">personvernreglene</a>. *</span>
+                                </label>
+                            </div>
                             <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
                             <p class="hkm-chat-email-status" aria-live="polite"></p>
                         </form>
@@ -2539,10 +2545,27 @@ window.addEventListener('load', () => {
                 font-weight: 500 !important;
             }
             .hkm-chat-email-help {
-                margin: 8px 0 0 0 !important;
+                margin: 4px 0 0 0 !important;
                 font-size: 12px !important;
                 color: #64748B !important;
                 text-align: center !important;
+            }
+            .hkm-chat-privacy {
+                margin: 8px 0 !important;
+                font-size: 12px !important;
+                color: #64748B !important;
+            }
+            .hkm-chat-privacy-label {
+                display: flex !important;
+                align-items: flex-start !important;
+                gap: 8px !important;
+                cursor: pointer !important;
+                line-height: 1.4 !important;
+            }
+            .hkm-chat-privacy-checkbox {
+                margin-top: 3px !important;
+                width: auto !important;
+                accent-color: #d17d39 !important;
             }
             @media (max-width: 480px) {
                 #hkm-visitor-chat-widget {
