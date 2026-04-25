@@ -2222,25 +2222,31 @@ window.addEventListener('load', () => {
                 flex-shrink: 0 !important;
             }
             
-            .hkm-chat-panel {
-                position: absolute;
-                bottom: 80px;
-                right: 0;
-                width: 380px;
-                height: 600px;
-                max-width: calc(100vw - 32px);
-                max-height: calc(100vh - 100px);
-                padding: 0 !important;
-                margin: 0 !important;
-                background: #fff !important;
-                border-radius: 16px !important;
+	            .hkm-chat-panel {
+	                position: absolute;
+	                bottom: 80px;
+	                right: 0;
+	                width: 380px;
+	                height: 600px;
+	                max-width: calc(100vw - 32px);
+	                /* Use dynamic viewport units/vars to avoid jumpy layouts when mobile browser UI or keyboard appears. */
+	                max-height: calc((var(--hkm-vh, 1vh) * 100) - 100px);
+	                padding: 0 !important;
+	                margin: 0 !important;
+	                background: #fff !important;
+	                border-radius: 16px !important;
                 box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
                 display: none;
                 flex-direction: column !important;
                 overflow: hidden !important;
                 z-index: 10000 !important;
-                border: 1px solid #E2E8F0 !important;
-            }
+	                border: 1px solid #E2E8F0 !important;
+	            }
+	            @supports (height: 100dvh) {
+	                .hkm-chat-panel {
+	                    max-height: calc(100dvh - 100px);
+	                }
+	            }
             #hkm-visitor-chat-widget.open .hkm-chat-panel {
                 display: flex !important;
                 animation: hkmSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -2352,13 +2358,15 @@ window.addEventListener('load', () => {
                 stroke: currentColor !important;
             }
             
-            .hkm-chat-main {
-                flex: 1 !important;
-                display: flex !important;
-                flex-direction: column !important;
-                overflow: hidden !important;
-                background: #fff !important;
-            }
+	            .hkm-chat-main {
+	                flex: 1 !important;
+	                display: flex !important;
+	                flex-direction: column !important;
+	                min-height: 0 !important;
+	                min-width: 0 !important;
+	                overflow: hidden !important;
+	                background: #fff !important;
+	            }
             
             .hkm-chat-mode-intro {
                 flex-shrink: 0 !important;
@@ -2371,14 +2379,17 @@ window.addEventListener('load', () => {
                 line-height: 1.5 !important;
             }
             
-            .hkm-chat-body {
-                flex: 1 !important;
-                overflow-y: auto !important;
-                padding: 20px !important;
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 16px !important;
-            }
+	            .hkm-chat-body {
+	                flex: 1 !important;
+	                overflow-y: auto !important;
+	                min-height: 0 !important;
+	                overscroll-behavior: contain !important;
+	                scrollbar-gutter: stable !important;
+	                padding: 20px !important;
+	                display: flex !important;
+	                flex-direction: column !important;
+	                gap: 16px !important;
+	            }
             
             .hkm-chat-msg {
                 padding: 12px 16px !important;
@@ -2525,12 +2536,16 @@ window.addEventListener('load', () => {
                 cursor: not-allowed !important;
             }
             
-            .hkm-chat-email-panel {
-                padding: 20px !important;
-                flex: 1 !important;
-                overflow-y: auto !important;
-                background: #fff !important;
-            }
+	            .hkm-chat-email-panel {
+	                padding: 20px !important;
+	                flex: 1 !important;
+	                overflow-y: auto !important;
+	                min-height: 0 !important;
+	                overscroll-behavior: contain !important;
+	                scrollbar-gutter: stable !important;
+	                padding-bottom: 28px !important;
+	                background: #fff !important;
+	            }
             .hkm-chat-email-form {
                 display: flex !important;
                 flex-direction: column !important;
