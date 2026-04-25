@@ -2021,7 +2021,8 @@ window.addEventListener('load', () => {
             }
         });
 
-        emailSubmitBtn.addEventListener('click', async () => {
+        emailSubmitBtn.onclick = async (e) => {
+            console.log('[VisitorChat] Email submit button clicked');
 
             const name = (emailNameInput.value || '').trim();
             const email = (emailEmailInput.value || '').trim();
