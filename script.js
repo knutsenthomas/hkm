@@ -2331,7 +2331,7 @@ window.addEventListener('load', () => {
                 align-items: flex-end !important;
                 gap: 10px !important;
             }
-            .hkm-chat-form[hidden], [hidden] { display: none !important; }
+            .hkm-chat-form[hidden] { display: none !important; }
             .hkm-chat-input-wrapper {
                 flex: 1 !important;
                 position: relative !important;
