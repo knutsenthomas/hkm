@@ -1506,7 +1506,9 @@ window.addEventListener('load', () => {
             <section class="hkm-chat-panel" aria-hidden="true">
                 <header class="hkm-chat-header">
                     <div class="hkm-chat-header-info">
-                        <div class="hkm-chat-header-avatar">HKM</div>
+                        <div class="hkm-chat-header-avatar">
+                            <img src="/img/logo-hkm.png" alt="HKM" />
+                        </div>
                         <div>
                             <h3>HKM Assistent</h3>
                             <div class="hkm-chat-online-status">
@@ -2134,13 +2136,17 @@ window.addEventListener('load', () => {
             .hkm-chat-header-avatar {
                 width: 36px !important;
                 height: 36px !important;
-                background: rgba(255,255,255,0.2) !important;
+                background: #fff !important;
                 border-radius: 50% !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                font-weight: 700 !important;
-                font-size: 13px !important;
+                overflow: hidden !important;
+            }
+            .hkm-chat-header-avatar img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: cover !important;
             }
             .hkm-chat-header h3 {
                 margin: 0 !important;
