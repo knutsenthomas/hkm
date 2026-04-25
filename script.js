@@ -1553,8 +1553,8 @@ window.addEventListener('load', () => {
                 <div class="hkm-chat-main">
                     <div class="hkm-chat-mode-intro"></div>
                     <div class="hkm-chat-body"></div>
-                    <div class="hkm-chat-email-panel hkm-chat-hidden">
-                        <form class="hkm-chat-email-form" onsubmit="return false;">
+	                    <div class="hkm-chat-email-panel hkm-chat-hidden">
+	                        <form class="hkm-chat-email-form">
                             <div class="hkm-chat-email-grid">
                                 <div class="hkm-chat-field">
                                     <label for="hkm-chat-name">Navn *</label>
@@ -1580,10 +1580,10 @@ window.addEventListener('load', () => {
                                     <span>Jeg samtykker til <a href="/personvern" target="_blank" style="color: inherit; text-decoration: underline;">personvernreglene</a>. *</span>
                                 </label>
                             </div>
-                            <button type="button" class="hkm-chat-email-submit" onclick="window.hkmChatHandleEmailSubmit()">Send e-post</button>
-                            <p class="hkm-chat-email-status" aria-live="polite"></p>
-                        </form>
-                    </div>
+	                            <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
+	                            <p class="hkm-chat-email-status" aria-live="polite"></p>
+	                        </form>
+	                    </div>
                     <div class="hkm-chat-human-bridge" style="display:none;">
                         <p>Ønsker du å snakke med en person?</p>
                         <button type="button" class="hkm-chat-request-human">Be om menneskelig hjelp</button>
@@ -1631,15 +1631,130 @@ window.addEventListener('load', () => {
         const statusEl = root.querySelector('.hkm-chat-status');
         const humanBridge = root.querySelector('.hkm-chat-human-bridge');
         const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
-        const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
-        const privacyContainer = root.querySelector('.hkm-chat-privacy');
-        const privacyCheckboxFooter = root.querySelector('#hkm-chat-privacy-footer .hkm-chat-privacy-checkbox');
-        let humanRequested = false;
+	        const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
+	        const privacyContainer = root.querySelector('.hkm-chat-privacy');
+	        const privacyCheckboxFooter = root.querySelector('#hkm-chat-privacy-footer .hkm-chat-privacy-checkbox');
+	        let humanRequested = false;
 
-        const addSystemMessage = (text) => {
-            const msg = document.createElement('div');
-            msg.className = 'hkm-chat-msg system';
-            msg.textContent = text;
+	        const emailPrivacyCheckbox = emailForm ? emailForm.querySelector('.hkm-chat-privacy-checkbox') : null;
+
+	        function setEmailStatus(text, kind = 'muted') {
+	            if (!emailStatusEl) return;
+	            emailStatusEl.textContent = text || '';
+	            emailStatusEl.dataset.kind = kind;
+	            emailStatusEl.style.color = kind === 'error' ? '#e74c3c'
+	                : kind === 'success' ? '#16a34a'
+	                : '#d17d39';
+	        }
+
+	        async function handleEmailSubmit(event) {
+	            if (event && typeof event.preventDefault === 'function') event.preventDefault();
+
+	            // Inline handlers kan bli blokkert av CSP, derfor bruker vi alltid event listeners.
+	            console.log('[VisitorChat] Email submit triggered');
+
+	            if (!db) {
+	                setEmailStatus('Tjenesten er ikke klar ennå. Prøv å laste siden på nytt.', 'error');
+	                return;
+	            }
+
+	            if (!emailForm || !emailNameInput || !emailEmailInput || !emailMessageInput || !emailSubmitBtn || !emailStatusEl) {
+	                console.error('[VisitorChat] Missing email elements');
+	                return;
+	            }
+
+	            // Bruk browser-validering (type="email", required) for tydelig feedback.
+	            if (!emailNameInput.checkValidity()) {
+	                emailNameInput.reportValidity();
+	                setEmailStatus('Navn er obligatorisk.', 'error');
+	                return;
+	            }
+	            if (!emailEmailInput.checkValidity()) {
+	                emailEmailInput.reportValidity();
+	                setEmailStatus('Skriv inn en gyldig e-postadresse.', 'error');
+	                return;
+	            }
+	            if (!emailMessageInput.checkValidity()) {
+	                emailMessageInput.reportValidity();
+	                setEmailStatus('Melding er obligatorisk.', 'error');
+	                return;
+	            }
+
+	            if (emailPrivacyCheckbox && !emailPrivacyCheckbox.checked) {
+	                setEmailStatus('Du må samtykke til personvern for å sende e-post.', 'error');
+	                return;
+	            }
+
+	            const name = (emailNameInput.value || '').trim();
+	            const email = (emailEmailInput.value || '').trim();
+	            const phone = (emailPhoneInput && emailPhoneInput.value ? emailPhoneInput.value : '').trim();
+	            const message = (emailMessageInput.value || '').trim();
+
+	            if (!name || !email || !message) {
+	                setEmailStatus('Navn, e-post og melding er obligatorisk.', 'error');
+	                return;
+	            }
+
+	            emailSubmitBtn.disabled = true;
+	            setEmailStatus('Sender e-post...', 'muted');
+
+	            try {
+	                const finalChatId = localStorage.getItem('hkm_visitor_chat_id') || 'unknown';
+	                const finalSessionId = localStorage.getItem('hkm_visitor_chat_session') || 'unknown';
+
+	                // Lagre i Firestore (trigger i Cloud Functions sender e-post til teamet + bekreftelse)
+	                await db.collection('contactMessages').add({
+	                    name,
+	                    email,
+	                    phone,
+	                    message,
+	                    source: 'chat_widget_email',
+	                    pagePath: window.location.pathname,
+	                    chatId: finalChatId,
+	                    sessionId: finalSessionId,
+	                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+	                });
+
+	                // Best-effort Google Form (backup log)
+	                const FIELD_MAP = {
+	                    name: 'entry.599509457',
+	                    phone: 'entry.1400512221',
+	                    email: 'entry.933613981',
+	                    subject: 'entry.737423993',
+	                    message: 'entry.900097937'
+	                };
+
+	                const formData = new URLSearchParams();
+	                formData.append(FIELD_MAP.name, name);
+	                formData.append(FIELD_MAP.phone, phone);
+	                formData.append(FIELD_MAP.email, email);
+	                formData.append(FIELD_MAP.subject, 'Henvendelse fra Chat Assistent');
+	                formData.append(FIELD_MAP.message, message);
+
+	                fetch('https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse', {
+	                    method: 'POST',
+	                    mode: 'no-cors',
+	                    body: formData
+	                }).catch(() => {});
+
+	                emailMessageInput.value = '';
+	                setEmailStatus('Takk! Meldingen er sendt til teamet.', 'success');
+	            } catch (error) {
+	                console.error('[VisitorChat] Email submit failed:', error);
+	                setEmailStatus('Kunne ikke sende meldingen. Prøv igjen.', 'error');
+	            } finally {
+	                emailSubmitBtn.disabled = false;
+	            }
+	        }
+
+	        if (emailForm) {
+	            emailForm.addEventListener('submit', handleEmailSubmit);
+	        }
+
+	        const addSystemMessage = (text) => {
+	            const msg = document.createElement('div');
+	            msg.className = 'hkm-chat-msg system';
+	            msg.textContent = text;
             bodyEl.appendChild(msg);
             bodyEl.scrollTop = bodyEl.scrollHeight;
         };
@@ -2021,92 +2136,8 @@ window.addEventListener('load', () => {
             }
         });
 
-        // Global funksjon for maksimal pålitelighet
-        window.hkmChatHandleEmailSubmit = async () => {
-            console.log('[VisitorChat] Global handleEmailSubmit triggered');
-            
-            const root = document.getElementById('hkm-visitor-chat-widget');
-            if (!root) return;
-
-            const nameEl = root.querySelector('.hkm-chat-email-name');
-            const emailEl = root.querySelector('.hkm-chat-email-email');
-            const phoneEl = root.querySelector('.hkm-chat-email-phone');
-            const messageEl = root.querySelector('.hkm-chat-email-message');
-            const statusEl = root.querySelector('.hkm-chat-email-status');
-            const submitBtn = root.querySelector('.hkm-chat-email-submit');
-            const privacyCb = root.querySelector('.hkm-chat-email-form .hkm-chat-privacy-checkbox');
-
-            if (!nameEl || !emailEl || !messageEl || !statusEl || !submitBtn) {
-                console.error('[VisitorChat] Missing elements in global submit');
-                return;
-            }
-
-            const name = (nameEl.value || '').trim();
-            const email = (emailEl.value || '').trim();
-            const phone = (phoneEl.value || '').trim();
-            const message = (messageEl.value || '').trim();
-
-            if (privacyCb && !privacyCb.checked) {
-                statusEl.style.color = '#e74c3c';
-                statusEl.textContent = 'Du må samtykke til personvern for å sende e-post.';
-                return;
-            }
-
-            if (!name || !email || !message) {
-                statusEl.style.color = '#e74c3c';
-                statusEl.textContent = 'Navn, e-post og melding er obligatorisk.';
-                return;
-            }
-
-            submitBtn.disabled = true;
-            statusEl.style.color = '#d17d39';
-            statusEl.textContent = 'Sender e-post...';
-
-            try {
-                const finalChatId = localStorage.getItem('hkm_visitor_chat_id') || 'unknown';
-                const finalSessionId = localStorage.getItem('hkm_visitor_chat_session') || 'unknown';
-
-                // Lagre i Firestore
-                await db.collection('contactMessages').add({
-                    name, email, phone, message,
-                    source: 'chat_widget_email',
-                    pagePath: window.location.pathname,
-                    chatId: finalChatId,
-                    sessionId: finalSessionId,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-
-                // Google Form
-                const FIELD_MAP = {
-                    name: 'entry.599509457',
-                    phone: 'entry.1400512221',
-                    email: 'entry.933613981',
-                    subject: 'entry.737423993',
-                    message: 'entry.900097937'
-                };
-
-                const formData = new URLSearchParams();
-                formData.append(FIELD_MAP.name, name);
-                formData.append(FIELD_MAP.phone, phone);
-                formData.append(FIELD_MAP.email, email);
-                formData.append(FIELD_MAP.subject, 'Henvendelse fra Chat Assistent');
-                formData.append(FIELD_MAP.message, message);
-
-                fetch('https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse', {
-                    method: 'POST', mode: 'no-cors', body: formData
-                }).catch(() => {});
-
-                messageEl.value = '';
-                statusEl.style.color = '#16a34a';
-                statusEl.textContent = 'Takk! Meldingen er sendt til teamet.';
-            } catch (error) {
-                console.error('[VisitorChat] Submit failed:', error);
-                statusEl.style.color = '#e74c3c';
-                statusEl.textContent = 'Kunne ikke sende meldingen. Prøv igjen.';
-            } finally {
-                submitBtn.disabled = false;
-            }
-        };
+	        // Eksponer for debugging (ikke avhengig av inline onclick)
+	        window.hkmChatHandleEmailSubmit = handleEmailSubmit;
 
         requestHumanBtn.addEventListener('click', async () => {
             humanRequested = true;
