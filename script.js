@@ -1666,8 +1666,9 @@ window.addEventListener('load', () => {
             });
 
             const modeMeta = modeCopy[activeMode] || modeCopy.ai;
-            modeIntro.textContent = modeMeta.intro;
             const isEmailMode = activeMode === 'email';
+            modeIntro.textContent = modeMeta.intro;
+            modeIntro.hidden = isEmailMode;
             bodyEl.hidden = isEmailMode;
             footer.style.display = isEmailMode ? 'none' : 'block';
             emailPanel.hidden = !isEmailMode;
@@ -2216,7 +2217,7 @@ window.addEventListener('load', () => {
                 display: flex !important;
                 flex-direction: column !important;
                 overflow: hidden !important;
-                background: #F8FAFC !important;
+                background: #fff !important;
             }
             
             .hkm-chat-mode-intro {
@@ -2383,39 +2384,33 @@ window.addEventListener('load', () => {
             }
             
             .hkm-chat-email-panel {
-                padding: 20px !important;
-                height: 100% !important;
+                padding: 16px 20px 0 !important;
+                flex: 1 !important;
+                display: flex !important;
+                flex-direction: column !important;
                 overflow-y: auto !important;
             }
             .hkm-chat-email-form {
+                flex: 1 !important;
                 display: flex !important;
                 flex-direction: column !important;
                 gap: 16px !important;
             }
-            .hkm-chat-field span {
-                font-size: 12px !important;
-                font-weight: 700 !important;
-                color: #475569 !important;
-                margin-bottom: 6px !important;
-                display: block !important;
-            }
-            .hkm-chat-field input, .hkm-chat-field textarea {
-                width: 100% !important;
-                border: 1px solid #E2E8F0 !important;
-                border-radius: 10px !important;
-                padding: 10px 14px !important;
-                font-size: 14px !important;
-                background: #fff !important;
-            }
             .hkm-chat-email-submit {
+                margin: auto 0 20px 0 !important;
                 background: #d17d39 !important;
                 color: #fff !important;
                 border: none !important;
-                padding: 12px !important;
+                padding: 14px !important;
                 border-radius: 12px !important;
                 font-weight: 700 !important;
                 cursor: pointer !important;
-                margin-top: 8px !important;
+                font-size: 15px !important;
+            }
+            .hkm-chat-email-help {
+                margin: 0 0 12px 0 !important;
+                font-size: 13px !important;
+                color: #64748B !important;
             }
             @media (max-width: 480px) {
                 #hkm-visitor-chat-widget {
