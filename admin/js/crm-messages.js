@@ -489,7 +489,14 @@ class MessagesManager {
     }
 
     async deleteMessage(id) {
-        if (!confirm("Er du sikker på at du vil slette denne meldingen?")) return;
+        const ok = await this.showConfirmModal({
+            title: 'Slette melding?',
+            message: 'Er du sikker på at du vil slette denne meldingen? Dette kan ikke angres.',
+            confirmText: 'Slett',
+            cancelText: 'Avbryt',
+            variant: 'danger'
+        });
+        if (!ok) return;
         try {
             await window.firebaseService.db.collection('contactMessages').doc(id).delete();
             this.messages = this.messages.filter(m => m.id !== id);
@@ -498,6 +505,90 @@ class MessagesManager {
         } catch (err) {
             console.error("Error deleting message:", err);
         }
+    }
+
+    showConfirmModal(options = {}) {
+        const title = options.title || 'Bekreft';
+        const message = options.message || 'Er du sikker?';
+        const confirmText = options.confirmText || 'OK';
+        const cancelText = options.cancelText || 'Avbryt';
+        const variant = options.variant || 'danger';
+
+        // Reuse the dashboard's custom modal styling (see admin/css/dashboard.css).
+        // Browser confirm() can be flaky in some environments; this stays stable.
+        const existing = document.getElementById('hkm-crm-confirm-overlay');
+        if (existing) existing.remove();
+
+        const danger = variant === 'danger';
+        const icon = danger ? 'warning' : 'help';
+        const confirmClass = danger ? 'hkm-modal-btn-delete' : 'hkm-modal-btn-cancel';
+
+        const modalHtml = `
+            <div id="hkm-crm-confirm-overlay" class="hkm-modal-overlay" aria-hidden="true">
+                <div class="hkm-modal-container" role="dialog" aria-modal="true" aria-labelledby="hkm-crm-confirm-title">
+                    <div class="hkm-modal-icon">
+                        <span class="material-symbols-outlined">${icon}</span>
+                    </div>
+                    <h3 class="hkm-modal-title" id="hkm-crm-confirm-title">${this.escapeHtml(title)}</h3>
+                    <p class="hkm-modal-message">${this.escapeHtml(message)}</p>
+                    <div class="hkm-modal-actions">
+                        <button type="button" id="hkm-crm-confirm-cancel" class="hkm-modal-btn hkm-modal-btn-cancel">${this.escapeHtml(cancelText)}</button>
+                        <button type="button" id="hkm-crm-confirm-ok" class="hkm-modal-btn ${confirmClass}">${this.escapeHtml(confirmText)}</button>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        const overlay = document.getElementById('hkm-crm-confirm-overlay');
+        const cancelBtn = document.getElementById('hkm-crm-confirm-cancel');
+        const okBtn = document.getElementById('hkm-crm-confirm-ok');
+
+        const close = () => {
+            overlay.classList.remove('active');
+            overlay.setAttribute('aria-hidden', 'true');
+            window.setTimeout(() => overlay.remove(), 200);
+            document.removeEventListener('keydown', onKeyDown, true);
+        };
+
+        const onKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                close();
+                resolve(false);
+            }
+        };
+
+        let resolve = () => {};
+        const promise = new Promise((res) => { resolve = res; });
+
+        cancelBtn.onclick = () => {
+            close();
+            resolve(false);
+        };
+
+        okBtn.onclick = () => {
+            close();
+            resolve(true);
+        };
+
+        overlay.onclick = (e) => {
+            if (e.target === overlay) {
+                close();
+                resolve(false);
+            }
+        };
+
+        document.addEventListener('keydown', onKeyDown, true);
+
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+            overlay.setAttribute('aria-hidden', 'false');
+            okBtn.focus();
+        });
+
+        return promise;
     }
 
     updateBadges() {
