@@ -2235,11 +2235,12 @@ window.addEventListener('load', () => {
 	                max-width: calc(100vw - 32px);
 	                /* Use dynamic viewport units/vars to avoid jumpy layouts when mobile browser UI or keyboard appears. */
 	                max-height: calc((var(--hkm-vh, 1vh) * 100) - 100px);
+	                contain: layout paint !important;
 	                padding: 0 !important;
 	                margin: 0 !important;
 	                background: #fff !important;
 	                border-radius: 16px !important;
-                box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
+	                box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
                 display: none;
                 flex-direction: column !important;
                 overflow: hidden !important;
@@ -2389,6 +2390,8 @@ window.addEventListener('load', () => {
 	                min-height: 0 !important;
 	                overscroll-behavior: contain !important;
 	                scrollbar-gutter: stable !important;
+	                overflow-anchor: none !important;
+	                scroll-behavior: auto !important;
 	                padding: 20px !important;
 	                display: flex !important;
 	                flex-direction: column !important;
@@ -2547,6 +2550,8 @@ window.addEventListener('load', () => {
 	                min-height: 0 !important;
 	                overscroll-behavior: contain !important;
 	                scrollbar-gutter: stable !important;
+	                overflow-anchor: none !important;
+	                scroll-behavior: auto !important;
 	                padding-bottom: 28px !important;
 	                background: #fff !important;
 	            }
