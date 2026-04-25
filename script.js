@@ -2021,9 +2021,8 @@ window.addEventListener('load', () => {
             }
         });
 
-        emailSubmitBtn.onclick = async (e) => {
-            console.log('[VisitorChat] Email submit button clicked');
-
+        const handleEmailSubmit = async () => {
+            console.log('[VisitorChat] handleEmailSubmit triggered');
             const name = (emailNameInput.value || '').trim();
             const email = (emailEmailInput.value || '').trim();
             const phone = (emailPhoneInput.value || '').trim();
@@ -2038,39 +2037,33 @@ window.addEventListener('load', () => {
             emailStatusEl.textContent = '';
 
             if (!name || !email || !message) {
+                emailStatusEl.style.color = '#e74c3c';
                 emailStatusEl.textContent = 'Navn, e-post og melding er obligatorisk.';
                 return;
             }
 
             emailSubmitBtn.disabled = true;
+            emailStatusEl.style.color = '#d17d39';
             emailStatusEl.textContent = 'Sender e-post...';
+
             try {
                 // 1. Lagre i Firestore som backup
                 await db.collection('contactMessages').add({
-                    name,
-                    email,
-                    phone,
-                    message,
+                    name, email, phone, message,
                     source: 'chat_widget_email',
                     pagePath: window.location.pathname,
-                    chatId,
-                    sessionId,
+                    chatId, sessionId,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
-                // 2. Oppdater visitorChats for AI-kontekst
+                // 2. Oppdater visitorChats
                 await db.collection('visitorChats').doc(chatId).set({
-                    visitorName: name,
-                    visitorEmail: email,
-                    visitorPhone: phone,
+                    visitorName: name, visitorEmail: email, visitorPhone: phone,
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastTargetMode: 'email',
-                    privacyConsent: true,
-                    privacyConsentAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastPagePath: window.location.pathname
+                    lastTargetMode: 'email'
                 }, { merge: true });
 
-                // 3. Send via Google Form (samme som på kontakt.html)
+                // 3. Send via Google Form
                 const FIELD_MAP = {
                     name: 'entry.599509457',
                     phone: 'entry.1400512221',
@@ -2086,50 +2079,36 @@ window.addEventListener('load', () => {
                 formData.append(FIELD_MAP.subject, 'Henvendelse fra Chat Assistent');
                 formData.append(FIELD_MAP.message, message);
 
-                console.log('[VisitorChat] Sending to Google Form...');
-                
-                // Primærmetode: Fetch (no-cors)
                 fetch('https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse', {
                     method: 'POST',
                     mode: 'no-cors',
                     body: formData
-                }).then(() => console.log('[VisitorChat] Fetch sent successfully'))
-                  .catch(err => console.warn('[VisitorChat] Fetch failed, but it might still have worked:', err));
+                });
 
-                // Backupmetode: Iframe (for eldre nettlesere)
+                // Iframe backup
                 const iframe = document.createElement('iframe');
                 iframe.name = 'hkm-form-target';
                 iframe.style.display = 'none';
                 document.body.appendChild(iframe);
-
                 const bridgeForm = document.createElement('form');
                 bridgeForm.target = 'hkm-form-target';
                 bridgeForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse';
                 bridgeForm.method = 'POST';
-
                 for (const [key, value] of Object.entries({
-                    [FIELD_MAP.name]: name,
-                    [FIELD_MAP.phone]: phone,
-                    [FIELD_MAP.email]: email,
-                    [FIELD_MAP.subject]: 'Henvendelse fra Chat Assistent',
-                    [FIELD_MAP.message]: message
+                    [FIELD_MAP.name]: name, [FIELD_MAP.phone]: phone, [FIELD_MAP.email]: email,
+                    [FIELD_MAP.subject]: 'Henvendelse fra Chat Assistent', [FIELD_MAP.message]: message
                 })) {
-                    const hiddenField = document.createElement('input');
-                    hiddenField.type = 'hidden';
-                    hiddenField.name = key;
-                    hiddenField.value = value;
-                    bridgeForm.appendChild(hiddenField);
+                    const hf = document.createElement('input');
+                    hf.type = 'hidden'; hf.name = key; hf.value = value;
+                    bridgeForm.appendChild(hf);
                 }
-
                 document.body.appendChild(bridgeForm);
                 bridgeForm.submit();
-
                 setTimeout(() => {
                     if (document.body.contains(bridgeForm)) document.body.removeChild(bridgeForm);
                     if (document.body.contains(iframe)) document.body.removeChild(iframe);
                 }, 2000);
 
-                // 4. Oppdater UI
                 emailMessageInput.value = '';
                 emailStatusEl.style.color = '#16a34a';
                 emailStatusEl.textContent = 'Takk! Meldingen er sendt til teamet.';
@@ -2141,6 +2120,13 @@ window.addEventListener('load', () => {
                 emailSubmitBtn.disabled = false;
             }
         };
+
+        // Delegert klikk-håndtering for maksimal stabilitet
+        root.addEventListener('click', (e) => {
+            if (e.target && (e.target.classList.contains('hkm-chat-email-submit') || e.target.closest('.hkm-chat-email-submit'))) {
+                handleEmailSubmit();
+            }
+        });
 
         requestHumanBtn.addEventListener('click', async () => {
             humanRequested = true;
