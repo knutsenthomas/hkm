@@ -326,6 +326,7 @@ function extractGoogleChatEventFields(payload) {
     userType,
     userDisplayName,
     rawText,
+    rawTextPreview: clampText(rawText, 200),
     spaceName,
     threadName,
     threadKey,
@@ -335,6 +336,9 @@ function extractGoogleChatEventFields(payload) {
     payloadKeys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 12) : [],
     chatKeys: chat && typeof chat === "object" ? Object.keys(chat).slice(0, 12) : [],
     msgPayloadKeys: msgPayload && typeof msgPayload === "object" ? Object.keys(msgPayload).slice(0, 12) : [],
+    appCommandKeys: appCommandPayload && typeof appCommandPayload === "object" ?
+      Object.keys(appCommandPayload).slice(0, 12) :
+      [],
   };
 }
 
@@ -355,7 +359,7 @@ function parseGoogleChatReplyCommand(rawText) {
   const text = cleanGoogleChatCommandText(rawText);
   if (!text) return null;
 
-  const match = text.match(/^(reply|svar)\s+([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/i);
+  const match = text.match(/^\/?(reply|svar)\s+([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/i);
   if (!match) return null;
 
   return {
@@ -2435,18 +2439,20 @@ exports.googleChatBridge = onRequest({
     payloadKeys: extracted.payloadKeys,
     chatKeys: extracted.chatKeys,
     msgPayloadKeys: extracted.msgPayloadKeys,
+    appCommandKeys: extracted.appCommandKeys,
     type: extracted.eventType,
     userType: extracted.userType,
     appCommandId: extracted.appCommandId,
     appCommandType: extracted.appCommandType,
     hasRawText: Boolean(rawText),
+    rawTextPreview: extracted.rawTextPreview,
     spaceName: extracted.spaceName,
     threadName: extracted.threadName,
     threadKey: extracted.threadKey,
   }));
 
   let parsedCommand = parseGoogleChatReplyCommand(rawText);
-  if (!parsedCommand && extracted.appCommandId) {
+  if (!parsedCommand && (extracted.appCommandId || extracted.appCommandType === "SLASH_COMMAND")) {
     parsedCommand = parseGoogleChatReplyArgs(rawText);
   }
   const naturalText = clampText(cleanGoogleChatCommandText(rawText), 4000);
