@@ -1669,6 +1669,14 @@ window.addEventListener('load', () => {
             bodyEl.hidden = isEmailMode;
             form.hidden = isEmailMode;
             emailPanel.hidden = !isEmailMode;
+            
+            // Auto-hide privacy if already consented
+            const hasExistingConsent = localStorage.getItem(privacyConsentKey) === 'true';
+            if (hasExistingConsent) {
+                privacyContainer.style.display = 'none';
+                privacyCheckbox.checked = true;
+                sendBtn.disabled = false;
+            }
         };
 
         const shouldDisplayMessageInMode = (data = {}, mode = activeMode) => {
@@ -1737,9 +1745,6 @@ window.addEventListener('load', () => {
 
             if (activeMode === 'google_chat') {
                 humanBridge.style.display = 'none';
-                if (changed) {
-                    setStatus('Google Chat-team valgt.');
-                }
                 try {
                     await db.collection('visitorChats').doc(chatId).set({
                         requestHuman: true,
@@ -1750,11 +1755,6 @@ window.addEventListener('load', () => {
                 }
             } else if (activeMode === 'email') {
                 humanBridge.style.display = 'none';
-                if (changed) {
-                    setStatus('E-postmodus valgt.');
-                }
-            } else if (changed) {
-                setStatus('AI-chat valgt.');
             }
         };
 
@@ -1795,6 +1795,12 @@ window.addEventListener('load', () => {
                 return;
             }
             setStatus('');
+            // Hide the privacy container once confirmed
+            privacyContainer.style.transition = 'opacity 0.3s ease';
+            privacyContainer.style.opacity = '0';
+            setTimeout(() => {
+                privacyContainer.style.display = 'none';
+            }, 300);
             try {
                 await db.collection('visitorChats').doc(chatId).set({
                     privacyConsent: true,
