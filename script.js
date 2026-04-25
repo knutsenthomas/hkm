@@ -1617,6 +1617,7 @@ window.addEventListener('load', () => {
         const emailMessageInput = root.querySelector('.hkm-chat-email-message');
         const emailSubmitBtn = root.querySelector('.hkm-chat-email-submit');
         const emailStatusEl = root.querySelector('.hkm-chat-email-status');
+        const footer = root.querySelector('.hkm-chat-footer');
         const form = root.querySelector('.hkm-chat-form');
         const input = root.querySelector('.hkm-chat-input');
         const sendBtn = root.querySelector('.hkm-chat-send');
@@ -1624,6 +1625,7 @@ window.addEventListener('load', () => {
         const humanBridge = root.querySelector('.hkm-chat-human-bridge');
         const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
         const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
+        const privacyContainer = root.querySelector('.hkm-chat-privacy');
         const privacyCheckbox = root.querySelector('.hkm-chat-privacy-checkbox');
 
         const addSystemMessage = (text) => {
