@@ -2023,31 +2023,45 @@ window.addEventListener('load', () => {
 
         const handleEmailSubmit = async () => {
             console.log('[VisitorChat] handleEmailSubmit triggered');
-            const name = (emailNameInput.value || '').trim();
-            const email = (emailEmailInput.value || '').trim();
-            const phone = (emailPhoneInput.value || '').trim();
-            const message = (emailMessageInput.value || '').trim();
+            
+            // Hent ferske referanser til alle feltene hver gang
+            const nameEl = root.querySelector('.hkm-chat-email-name');
+            const emailEl = root.querySelector('.hkm-chat-email-email');
+            const phoneEl = root.querySelector('.hkm-chat-email-phone');
+            const messageEl = root.querySelector('.hkm-chat-email-message');
+            const statusEl = root.querySelector('.hkm-chat-email-status');
+            const submitBtn = root.querySelector('.hkm-chat-email-submit');
+            const privacyCb = root.querySelector('.hkm-chat-email-form .hkm-chat-privacy-checkbox');
 
-            const currentPrivacyCheckbox = emailForm.querySelector('.hkm-chat-privacy-checkbox');
-            if (currentPrivacyCheckbox && !currentPrivacyCheckbox.checked) {
-                emailStatusEl.style.color = '#e74c3c';
-                emailStatusEl.textContent = 'Du må samtykke til personvern for å sende e-post.';
+            if (!nameEl || !emailEl || !messageEl || !statusEl || !submitBtn) {
+                console.warn('[VisitorChat] Missing elements in handleEmailSubmit');
                 return;
             }
-            emailStatusEl.textContent = '';
+
+            const name = (nameEl.value || '').trim();
+            const email = (emailEl.value || '').trim();
+            const phone = (phoneEl.value || '').trim();
+            const message = (messageEl.value || '').trim();
+
+            if (privacyCb && !privacyCb.checked) {
+                statusEl.style.color = '#e74c3c';
+                statusEl.textContent = 'Du må samtykke til personvern for å sende e-post.';
+                return;
+            }
+            statusEl.textContent = '';
 
             if (!name || !email || !message) {
-                emailStatusEl.style.color = '#e74c3c';
-                emailStatusEl.textContent = 'Navn, e-post og melding er obligatorisk.';
+                statusEl.style.color = '#e74c3c';
+                statusEl.textContent = 'Navn, e-post og melding er obligatorisk.';
                 return;
             }
 
-            emailSubmitBtn.disabled = true;
-            emailStatusEl.style.color = '#d17d39';
-            emailStatusEl.textContent = 'Sender e-post...';
+            submitBtn.disabled = true;
+            statusEl.style.color = '#d17d39';
+            statusEl.textContent = 'Sender e-post...';
 
             try {
-                // 1. Lagre i Firestore som backup
+                // 1. Lagre i Firestore
                 await db.collection('contactMessages').add({
                     name, email, phone, message,
                     source: 'chat_widget_email',
@@ -2087,11 +2101,11 @@ window.addEventListener('load', () => {
 
                 // Iframe backup
                 const iframe = document.createElement('iframe');
-                iframe.name = 'hkm-form-target';
+                iframe.name = 'hkm-form-target-bridge';
                 iframe.style.display = 'none';
                 document.body.appendChild(iframe);
                 const bridgeForm = document.createElement('form');
-                bridgeForm.target = 'hkm-form-target';
+                bridgeForm.target = 'hkm-form-target-bridge';
                 bridgeForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSevZ5t_-VRN5hN-YEdk06cDmOHA1vH6vAK2A9WJAwlmBfFYUQ/formResponse';
                 bridgeForm.method = 'POST';
                 for (const [key, value] of Object.entries({
@@ -2109,15 +2123,15 @@ window.addEventListener('load', () => {
                     if (document.body.contains(iframe)) document.body.removeChild(iframe);
                 }, 2000);
 
-                emailMessageInput.value = '';
-                emailStatusEl.style.color = '#16a34a';
-                emailStatusEl.textContent = 'Takk! Meldingen er sendt til teamet.';
+                messageEl.value = '';
+                statusEl.style.color = '#16a34a';
+                statusEl.textContent = 'Takk! Meldingen er sendt til teamet.';
             } catch (error) {
                 console.error('[VisitorChat] Submit failed:', error);
-                emailStatusEl.style.color = '#e74c3c';
-                emailStatusEl.textContent = 'Kunne ikke sende meldingen. Prøv igjen.';
+                statusEl.style.color = '#e74c3c';
+                statusEl.textContent = 'Kunne ikke sende meldingen. Prøv igjen.';
             } finally {
-                emailSubmitBtn.disabled = false;
+                submitBtn.disabled = false;
             }
         };
 
