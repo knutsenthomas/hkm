@@ -2140,7 +2140,7 @@ window.addEventListener('load', () => {
             } finally {
                 emailSubmitBtn.disabled = false;
             }
-        });
+        };
 
         requestHumanBtn.addEventListener('click', async () => {
             humanRequested = true;
