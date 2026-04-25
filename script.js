@@ -2074,7 +2074,10 @@ window.addEventListener('load', () => {
                 height: 10px !important;
                 background: #4ADE80 !important;
                 border-radius: 50% !important;
-                box-shadow: 0 0 0 4px rgba(74, 222, 1            .hkm-chat-panel {
+                box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.2) !important;
+            }
+            
+            .hkm-chat-panel {
                 position: absolute;
                 bottom: 80px;
                 right: 0;
