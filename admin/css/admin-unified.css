@@ -2009,6 +2009,34 @@ body.crm-body .crm-table td.col-actions {
     padding: 10px 14px !important;
 }
 
+/* Strong override: dashboard.css sets .btn-icon to 40x40 w/ !important min-width.
+   In CRM pages, keep icon buttons compact everywhere. */
+body.crm-body .btn-icon {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    padding: 0 !important;
+    border-radius: 10px !important;
+}
+
+body.crm-body .btn-icon .material-symbols-outlined {
+    font-size: 18px !important;
+    line-height: 1 !important;
+}
+
+/* Inbox list (admin frontpage "Innboks & Meldinger"): compact "mark read" buttons too. */
+body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    padding: 0;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
 /* Email Logs Status Badges */
 .status-pill {
     padding: 6px 12px;
