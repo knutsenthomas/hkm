@@ -235,8 +235,10 @@ class MessagesManager {
                     </td>
                     <td>${date}</td>
                     <td class="col-actions">
-                        ${!isRead ? `<button class="btn-icon message-mark-read" title="Marker som lest"><span class="material-symbols-outlined">check</span></button>` : ''}
-                        <button class="btn-icon btn-delete-message" title="Slett"><span class="material-symbols-outlined">delete</span></button>
+                        <div class="crm-actions">
+                            ${!isRead ? `<button class="btn-icon message-mark-read" title="Marker som lest"><span class="material-symbols-outlined">check</span></button>` : ''}
+                            <button class="btn-icon btn-delete-message" title="Slett"><span class="material-symbols-outlined">delete</span></button>
+                        </div>
                     </td>
                 </tr>
             `;

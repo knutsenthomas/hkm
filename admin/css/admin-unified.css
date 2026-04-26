@@ -419,11 +419,10 @@ button.btn {
     font-weight: 500;
 }
 
+/* Table action column: keep as a normal table-cell.
+   Layout of buttons inside the cell is handled via an inner flex wrapper. */
 .col-actions {
     text-align: right;
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
 }
 
 /* Shared table presentation */
@@ -2007,6 +2006,13 @@ body.crm-body .crm-table td.col-actions .btn-icon .material-symbols-outlined {
 
 body.crm-body .crm-table td.col-actions {
     padding: 10px 14px !important;
+}
+
+body.crm-body .crm-table td.col-actions .crm-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
 }
 
 /* Strong override: dashboard.css sets .btn-icon to 40x40 w/ !important min-width.
