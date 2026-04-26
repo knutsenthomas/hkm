@@ -2230,6 +2230,10 @@ window.addEventListener('load', () => {
                 pointer-events: none !important;
                 font-family: 'Inter', sans-serif !important;
                 display: block !important;
+                isolation: isolate !important;
+                backface-visibility: hidden !important;
+                -webkit-backface-visibility: hidden !important;
+                -webkit-font-smoothing: antialiased !important;
             }
             #hkm-visitor-chat-widget * {
                 box-sizing: border-box;
@@ -2288,12 +2292,14 @@ window.addEventListener('load', () => {
 	                border-radius: 20px !important;
 	                box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
 	                display: none;
+                    opacity: 0;
+                    visibility: hidden;
 	                flex-direction: column !important;
 	                overflow: hidden !important;
 	                z-index: 10000000 !important;
 	                border: 1px solid rgba(226, 232, 240, 0.8) !important;
 	                contain: paint !important;
-	                transform: translate3d(0,0,0);
+	                transform: none !important;
 	                overscroll-behavior: none !important;
 	            }
 	            @supports (height: 100dvh) {
@@ -2303,7 +2309,9 @@ window.addEventListener('load', () => {
 	            }
 	            #hkm-visitor-chat-widget.open .hkm-chat-panel {
 	                display: flex !important;
-	                animation: hkmSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                    opacity: 1 !important;
+                    visibility: visible !important;
+                    transform: none !important;
 	            }
 	            @keyframes hkmSlideUp {
 	                from { opacity: 0; transform: translateY(20px); }
