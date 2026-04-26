@@ -3157,7 +3157,7 @@ class AdminManager {
                 <button class="btn btn-primary" onclick="window.adminManager.renderMessagesSection()">
                     Oppdater
                 </button>
-            `, '')}
+            `, 'messages-section-subtitle')}
 
             <div class="design-ui-shell">
                 <div class="design-ui-workspace" style="padding: 0;">
@@ -3170,9 +3170,15 @@ class AdminManager {
             </div>
         `;
 
+        const subtitleEl = document.getElementById('messages-section-subtitle');
+        const setSubtitle = (text) => {
+            if (!subtitleEl) return;
+            subtitleEl.textContent = text || '';
+        };
 
         if (!firebaseService.isInitialized) {
             document.getElementById('messages-list').innerHTML = '<p class="inbox-empty">Firebase er ikke konfigurert.</p>';
+            setSubtitle('Firebase er ikke konfigurert.');
             return;
         }
 
@@ -3184,6 +3190,7 @@ class AdminManager {
 
             if (messages.length === 0) {
                 listEl.innerHTML = '<p class="inbox-empty">Ingen meldinger funnet.</p>';
+                setSubtitle('Ingen meldinger funnet.');
                 return;
             }
 
@@ -3371,10 +3378,21 @@ class AdminManager {
 
             attachRowListeners();
 
+            try {
+                const unreadCount = allMessages.filter(m => (m.data && m.data.status) !== 'lest').length;
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+                setSubtitle(`${allMessages.length} meldinger · ${unreadCount} ulest · Oppdatert ${timeStr}`);
+            } catch (e) {
+                setSubtitle(`${allMessages.length} meldinger`);
+            }
+
         } catch (err) {
             console.error('Kunne ikke hente kontaktmeldinger:', err);
             const listEl = document.getElementById('messages-list');
             if (listEl) listEl.innerHTML = '<p class="inbox-empty" style="color:#ef4444;">Feil ved henting av meldinger.</p>';
+            const code = err && err.code ? ` (${err.code})` : '';
+            setSubtitle(`Feil ved henting${code}`);
         }
     }
 
