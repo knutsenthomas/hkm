@@ -887,7 +887,9 @@ body.crm-body {
 }
 
 /* Responsive Adjustments */
-@media (max-width: 1024px) {
+/* Keep CRM "mobile" layout for actual small screens only.
+   1024px was too aggressive and made desktop/tablet layouts look broken (e.g. only action icons showing). */
+@media (max-width: 768px) {
 
     /* FORCE HIDE all standard dashboard elements that interfere */
     body.crm-body .content-header,
