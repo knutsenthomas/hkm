@@ -2020,11 +2020,20 @@ body.crm-body .btn-icon {
     border-radius: 999px !important;
     border: 1px solid rgba(203, 213, 225, 0.95) !important;
     background: #ffffff !important;
+    box-sizing: border-box !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    aspect-ratio: 1 / 1;
 }
 
 body.crm-body .btn-icon .material-symbols-outlined {
     font-size: 18px !important;
     line-height: 1 !important;
+    display: block;
+    width: 18px;
+    height: 18px;
+    min-width: 0;
+    min-height: 0;
 }
 
 /* Inbox list (admin frontpage "Innboks & Meldinger"): compact "mark read" buttons too. */
@@ -2039,6 +2048,7 @@ body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read {
     justify-content: center;
     border-color: rgba(226, 232, 240, 0.9);
     background: rgba(248, 250, 252, 0.9);
+    box-sizing: border-box;
 }
 
 body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read:hover {
@@ -3542,6 +3552,17 @@ body.crm-body .inbox-row-icon {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Same inbox icon style on admin dashboard pages too (admin index uses body.admin-body). */
+body.admin-body .inbox-row-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
 }
 
 body.crm-body .inbox-row-icon .material-symbols-outlined {
