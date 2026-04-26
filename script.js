@@ -1924,24 +1924,27 @@ window.addEventListener('load', () => {
                 bodyEl.appendChild(typingMsg);
             }
 
-            const messages = bodyEl.querySelectorAll('.hkm-chat-msg');
-            const lastMsg = messages[messages.length - 1];
-            if (lastMsg) {
-                if (lastMsg.classList.contains('visitor')) {
-                    bodyEl.scrollTop = bodyEl.scrollHeight;
-                } else {
-                    // Agent (AI) message: if it's tall, scroll to its top so the user can read from the start
-                    const msgTop = lastMsg.offsetTop;
-                    const containerHeight = bodyEl.offsetHeight;
-                    if (lastMsg.offsetHeight > containerHeight * 0.5) {
-                        bodyEl.scrollTop = msgTop - 10;
-                    } else {
+            // Use a small timeout to ensure DOM and layout are ready
+            setTimeout(() => {
+                const messages = bodyEl.querySelectorAll('.hkm-chat-msg');
+                const lastMsg = messages[messages.length - 1];
+                if (lastMsg) {
+                    if (lastMsg.classList.contains('visitor')) {
                         bodyEl.scrollTop = bodyEl.scrollHeight;
+                    } else {
+                        // Agent (AI) message: scroll to its top with a margin to avoid being hidden under the header
+                        const msgTop = lastMsg.offsetTop;
+                        const containerHeight = bodyEl.offsetHeight;
+                        if (lastMsg.offsetHeight > containerHeight * 0.4) {
+                            bodyEl.scrollTop = msgTop - 20; // Increased margin
+                        } else {
+                            bodyEl.scrollTop = bodyEl.scrollHeight;
+                        }
                     }
+                } else {
+                    bodyEl.scrollTop = bodyEl.scrollHeight;
                 }
-            } else {
-                bodyEl.scrollTop = bodyEl.scrollHeight;
-            }
+            }, 50);
         };
 
         const setActiveMode = async (mode) => {
