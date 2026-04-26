@@ -2012,29 +2012,57 @@ body.crm-body .crm-table td.col-actions {
 /* Strong override: dashboard.css sets .btn-icon to 40x40 w/ !important min-width.
    In CRM pages, keep icon buttons compact everywhere. */
 body.crm-body .btn-icon {
-    width: 32px !important;
-    height: 32px !important;
-    min-width: 32px !important;
-    min-height: 32px !important;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
     padding: 0 !important;
-    border-radius: 10px !important;
+    border-radius: 999px !important;
+    border: 1px solid rgba(226, 232, 240, 0.9) !important;
+    background: rgba(248, 250, 252, 0.9) !important;
 }
 
 body.crm-body .btn-icon .material-symbols-outlined {
-    font-size: 18px !important;
+    font-size: 17px !important;
     line-height: 1 !important;
 }
 
 /* Inbox list (admin frontpage "Innboks & Meldinger"): compact "mark read" buttons too. */
 body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
     padding: 0;
-    border-radius: 10px;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    border-color: rgba(226, 232, 240, 0.9);
+    background: rgba(248, 250, 252, 0.9);
+}
+
+body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read:hover {
+    border-color: rgba(34, 197, 94, 0.4);
+    background: rgba(220, 252, 231, 0.55);
+}
+
+/* Semantic coloring for CRM table action buttons */
+body.crm-body .crm-table .message-mark-read {
+    color: #16a34a !important;
+}
+
+body.crm-body .crm-table .message-mark-read:hover {
+    border-color: rgba(34, 197, 94, 0.4) !important;
+    background: rgba(220, 252, 231, 0.55) !important;
+}
+
+body.crm-body .crm-table .btn-delete-message {
+    color: #dc2626 !important;
+}
+
+body.crm-body .crm-table .btn-delete-message:hover {
+    border-color: rgba(220, 38, 38, 0.35) !important;
+    background: rgba(254, 226, 226, 0.55) !important;
 }
 
 /* Email Logs Status Badges */
