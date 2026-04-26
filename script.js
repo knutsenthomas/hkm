@@ -2240,9 +2240,9 @@ window.addEventListener('load', () => {
                 height: 60px !important;
                 border: 0 !important;
                 border-radius: 50% !important;
-                background: #1B4965 !important;
+                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
                 color: #fff !important;
-                box-shadow: 0 8px 32px rgba(27, 73, 101, 0.3) !important;
+                box-shadow: 0 8px 32px rgba(209, 125, 57, 0.3) !important;
                 cursor: pointer !important;
                 display: flex !important;
                 align-items: center !important;
@@ -2252,8 +2252,7 @@ window.addEventListener('load', () => {
             }
             .hkm-chat-toggle:hover {
                 transform: scale(1.05) translateY(-2px) !important;
-                background: #245d82 !important;
-                box-shadow: 0 12px 40px rgba(27, 73, 101, 0.4) !important;
+                box-shadow: 0 12px 40px rgba(209, 125, 57, 0.4) !important;
             }
             .hkm-chat-dot {
                 position: absolute !important;
@@ -2306,7 +2305,7 @@ window.addEventListener('load', () => {
             .hkm-chat-header {
                 margin: 0 !important;
                 flex-shrink: 0 !important;
-                background: #1B4965 !important;
+                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
                 color: #fff !important;
                 padding: 20px 24px !important;
                 display: flex !important;
@@ -2398,10 +2397,10 @@ window.addEventListener('load', () => {
                 transition: all 0.2s ease !important;
             }
             .hkm-chat-mode-btn.active {
-                background: #F0F9FF !important;
-                border-color: #1B4965 !important;
-                color: #1B4965 !important;
-                box-shadow: 0 2px 8px rgba(27, 73, 101, 0.1) !important;
+                background: #FFF7ED !important;
+                border-color: #FED7AA !important;
+                color: #C2410C !important;
+                box-shadow: 0 2px 8px rgba(194, 65, 12, 0.05) !important;
             }
             .hkm-chat-mode-icon svg {
                 width: 20px !important;
@@ -2453,11 +2452,11 @@ window.addEventListener('load', () => {
                 white-space: pre-wrap !important;
             }
             .hkm-chat-msg.visitor {
-                background: #1B4965 !important;
+                background: #d17d39 !important;
                 color: #fff !important;
                 align-self: flex-end !important;
                 border-bottom-right-radius: 4px !important;
-                box-shadow: 0 4px 12px rgba(27, 73, 101, 0.15) !important;
+                box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15) !important;
             }
             .hkm-chat-msg.agent {
                 background: #fff !important;
@@ -2487,7 +2486,7 @@ window.addEventListener('load', () => {
                 letter-spacing: 0.05em !important;
             }
             .hkm-chat-request-human {
-                background: #1B4965 !important;
+                background: #d17d39 !important;
                 color: #fff !important;
                 border: none !important;
                 padding: 10px 16px !important;
@@ -2498,7 +2497,7 @@ window.addEventListener('load', () => {
                 width: 100% !important;
                 transition: all 0.2s ease !important;
             }
-            .hkm-chat-request-human:hover { background: #245d82 !important; transform: translateY(-1px) !important; }
+            .hkm-chat-request-human:hover { background: #bd4f2a !important; transform: translateY(-1px) !important; }
             
             .hkm-chat-footer {
                 margin: 0 !important;
@@ -2554,7 +2553,7 @@ window.addEventListener('load', () => {
 	                transition: border-color 0.2s, background 0.2s !important;
 	            }
             .hkm-chat-input:focus {
-                border-color: #1B4965 !important;
+                border-color: #FED7AA !important;
                 background: #fff !important;
             }
             .hkm-chat-status {
@@ -2567,7 +2566,7 @@ window.addEventListener('load', () => {
                 white-space: nowrap !important;
             }
             .hkm-chat-send {
-                background: #1B4965 !important;
+                background: #d17d39 !important;
                 color: #fff !important;
                 border: none !important;
                 width: 44px !important;
@@ -2581,7 +2580,7 @@ window.addEventListener('load', () => {
                 transition: all 0.2s ease !important;
             }
             .hkm-chat-send:hover:not(:disabled) {
-                background: #245d82 !important;
+                background: #bd4f2a !important;
                 transform: scale(1.05) !important;
             }
             .hkm-chat-send:disabled {
@@ -2638,12 +2637,12 @@ window.addEventListener('load', () => {
 	                }
 	            }
             .hkm-chat-field input:focus, .hkm-chat-field textarea:focus {
-                border-color: #1B4965 !important;
+                border-color: #d17d39 !important;
                 background: #fff !important;
             }
             .hkm-chat-email-submit {
                 margin-top: 10px !important;
-                background: #1B4965 !important;
+                background: #d17d39 !important;
                 color: #fff !important;
                 border: none !important;
                 padding: 14px !important;
@@ -2654,12 +2653,12 @@ window.addEventListener('load', () => {
                 transition: background 0.2s !important;
             }
             .hkm-chat-email-submit:hover {
-                background: #245d82 !important;
+                background: #bd4f2a !important;
             }
             .hkm-chat-email-status {
                 margin: 12px 0 0 0 !important;
                 font-size: 13px !important;
-                color: #1B4965 !important;
+                color: #d17d39 !important;
                 text-align: center !important;
                 font-weight: 500 !important;
             }
@@ -2684,7 +2683,7 @@ window.addEventListener('load', () => {
             .hkm-chat-privacy-checkbox {
                 margin-top: 3px !important;
                 width: auto !important;
-                accent-color: #1B4965 !important;
+                accent-color: #d17d39 !important;
             }
             @media (max-width: 480px) {
                 #hkm-visitor-chat-widget {
