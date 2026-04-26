@@ -2018,10 +2018,16 @@ body.crm-body .crm-table td.col-actions .crm-actions {
 /* Strong override: dashboard.css sets .btn-icon to 40x40 w/ !important min-width.
    In CRM pages, keep icon buttons compact everywhere. */
 body.crm-body .btn-icon {
+    /* Force true square so border-radius:999px becomes a real circle (not a pill). */
+    inline-size: 32px !important;
+    block-size: 32px !important;
     width: 32px !important;
     height: 32px !important;
+    max-width: 32px !important;
+    max-height: 32px !important;
     min-width: 32px !important;
     min-height: 32px !important;
+    flex: 0 0 32px !important;
     padding: 0 !important;
     border-radius: 999px !important;
     border: 1px solid rgba(203, 213, 225, 0.95) !important;
@@ -2030,6 +2036,7 @@ body.crm-body .btn-icon {
     display: inline-grid !important;
     place-items: center !important;
     aspect-ratio: 1 / 1;
+    line-height: 0 !important;
 }
 
 body.crm-body .btn-icon .material-symbols-outlined {
