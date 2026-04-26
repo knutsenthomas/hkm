@@ -3536,9 +3536,12 @@ body.admin-body .nav-item.nav-helper-hidden {
 
 /* Inbox icons: make them smaller and round (dashboard.css uses rounded-square defaults). */
 body.crm-body .inbox-row-icon {
-    width: 32px;
-    height: 32px;
+    width: 34px;
+    height: 34px;
     border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 body.crm-body .inbox-row-icon .material-symbols-outlined {
