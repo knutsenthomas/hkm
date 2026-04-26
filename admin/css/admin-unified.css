@@ -2069,17 +2069,26 @@ body.crm-body .btn-icon .material-symbols-outlined {
 
 /* Inbox list (admin frontpage "Innboks & Meldinger"): compact "mark read" buttons too. */
 body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    padding: 0;
-    border-radius: 999px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    flex: 0 0 30px !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    box-sizing: border-box !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    line-height: 0 !important;
+    overflow: hidden;
     border-color: rgba(226, 232, 240, 0.9);
     background: rgba(248, 250, 252, 0.9);
     box-sizing: border-box;
+}
+
+body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read .material-symbols-outlined {
+    display: block;
+    line-height: 1;
 }
 
 body.admin-body .inbox-row-actions .btn.btn-outline.btn-sm.message-mark-read:hover {
