@@ -1987,13 +1987,13 @@ window.addEventListener('load', () => {
             root.classList.toggle('open', open);
             panel.setAttribute('aria-hidden', open ? 'false' : 'true');
             
-            // Prevent body scroll only if NOT on mobile (where users might need to scroll the page)
-            // or just lock it globally for maximum stability.
             if (open) {
                 document.body.style.overflow = 'hidden';
+                document.documentElement.style.overflow = 'hidden';
                 bodyEl.scrollTop = bodyEl.scrollHeight;
             } else {
                 document.body.style.overflow = '';
+                document.documentElement.style.overflow = '';
             }
         };
 
@@ -2294,7 +2294,6 @@ window.addEventListener('load', () => {
 	                border: 1px solid rgba(226, 232, 240, 0.8) !important;
 	                contain: paint !important;
 	                transform: translate3d(0,0,0);
-	                will-change: transform, opacity !important;
 	                overscroll-behavior: none !important;
 	            }
 	            @supports (height: 100dvh) {
@@ -2602,10 +2601,10 @@ window.addEventListener('load', () => {
 	                flex: 1 !important;
 	                overflow-y: auto !important;
 	                min-height: 0 !important;
-	                overscroll-behavior: none !important;
+	                overscroll-behavior: contain !important;
 	                padding-bottom: 80px !important;
 	                background: #fff !important;
-	                transform: translateZ(0) !important;
+	                transform: translate3d(0,0,0) !important;
 	            }
             .hkm-chat-email-form {
                 display: flex !important;
