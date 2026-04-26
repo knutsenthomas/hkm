@@ -3209,18 +3209,15 @@ class AdminManager {
                     ? createdAt.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + createdAt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
                     : '';
 
-                return `
-                    <div class="inbox-row ${isRead ? 'inbox-row--read' : 'inbox-row--unread'}" data-id="${id}">
-                        <div class="inbox-row-icon">
-                            <svg class="inbox-mail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <path d="M4.5 8.5A2.5 2.5 0 0 1 7 6h10a2.5 2.5 0 0 1 2.5 2.5v7A2.5 2.5 0 0 1 17 18H7a2.5 2.5 0 0 1-2.5-2.5v-7Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
-                                <path d="M6 8l6 4.9L18 8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            ${!isRead ? '<span class="inbox-unread-dot"></span>' : ''}
-                        </div>
-                        <div class="inbox-row-body">
-                            <div class="inbox-row-top">
-                                <span class="inbox-row-name">${this.escapeHtml(name)}</span>
+	                return `
+	                    <div class="inbox-row ${isRead ? 'inbox-row--read' : 'inbox-row--unread'}" data-id="${id}">
+	                        <div class="inbox-row-icon">
+	                            <span class="material-symbols-outlined inbox-mail-icon" aria-hidden="true">mail</span>
+	                            ${!isRead ? '<span class="inbox-unread-dot"></span>' : ''}
+	                        </div>
+	                        <div class="inbox-row-body">
+	                            <div class="inbox-row-top">
+	                                <span class="inbox-row-name">${this.escapeHtml(name)}</span>
                                 ${emailDomain ? `<span class="inbox-source-badge">${this.escapeHtml(emailDomain)}</span>` : ''}
                                 ${!isRead ? '<span class="inbox-new-dot"></span>' : ''}
                             </div>

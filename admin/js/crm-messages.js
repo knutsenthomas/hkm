@@ -13,6 +13,28 @@ class MessagesManager {
         this.init();
     }
 
+    iconSvg(name) {
+        // Inline SVG avoids font-metrics drift so icons are truly centered in circular buttons.
+        if (name === 'check') {
+            return `
+                <svg class="btn-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            `;
+        }
+        if (name === 'trash') {
+            return `
+                <svg class="btn-icon-svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M4 7h16" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+                    <path d="M10 11v6M14 11v6" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/>
+                    <path d="M6 7l1 14h10l1-14" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/>
+                    <path d="M9 7V4h6v3" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/>
+                </svg>
+            `;
+        }
+        return '';
+    }
+
     async init() {
         console.log("Messages Manager Initializing...");
 
@@ -236,8 +258,8 @@ class MessagesManager {
                     <td>${date}</td>
                     <td class="col-actions">
                         <div class="crm-actions">
-                            ${!isRead ? `<button class="btn-icon message-mark-read" title="Marker som lest"><span class="material-symbols-outlined">check</span></button>` : ''}
-                            <button class="btn-icon btn-delete-message" title="Slett"><span class="material-symbols-outlined">delete</span></button>
+                            ${!isRead ? `<button class="btn-icon message-mark-read" title="Marker som lest">${this.iconSvg('check')}</button>` : ''}
+                            <button class="btn-icon btn-delete-message" title="Slett">${this.iconSvg('trash')}</button>
                         </div>
                     </td>
                 </tr>
