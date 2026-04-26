@@ -1984,17 +1984,25 @@ body.admin-body .welcome-subtitle {
 }
 
 /* Compact action icon buttons inside CRM tables (avoid oversized icons/click targets in rows). */
-.crm-table td.col-actions .btn-icon {
-    width: 32px;
-    height: 32px;
+body.crm-body .crm-table td.col-actions .btn-icon,
+body.crm-body .crm-table td.col-actions button.btn-icon {
+    width: 32px !important;
+    height: 32px !important;
     min-width: 32px !important;
     min-height: 32px !important;
     border-radius: 10px !important;
 }
 
-.crm-table td.col-actions .btn-icon .material-symbols-outlined {
-    font-size: 18px;
-    line-height: 1;
+body.crm-body .crm-table td.col-actions .btn-icon .material-symbols-outlined {
+    font-size: 18px !important;
+    min-width: 18px;
+    min-height: 18px;
+    line-height: 1 !important;
+}
+
+body.crm-body .crm-table td.col-actions {
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 /* Email Logs Status Badges */
