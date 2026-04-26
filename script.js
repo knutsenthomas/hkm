@@ -1639,11 +1639,11 @@ window.addEventListener('load', () => {
         const emailPhoneInput = root.querySelector('.hkm-chat-email-phone');
         const emailMessageInput = root.querySelector('.hkm-chat-email-message');
         const emailSubmitBtn = root.querySelector('.hkm-chat-email-submit');
-        const emailStatusEl = root.querySelector('.hkm-chat-email-status');
-        const footer = root.querySelector('.hkm-chat-footer');
-        const form = root.querySelector('.hkm-chat-form');
-        const input = root.querySelector('.hkm-chat-input');
-        const sendBtn = root.querySelector('.hkm-chat-send');
+	        const emailStatusEl = root.querySelector('.hkm-chat-email-status');
+	        const footer = root.querySelector('.hkm-chat-footer');
+	        const form = root.querySelector('.hkm-chat-form');
+	        const input = root.querySelector('.hkm-chat-input');
+	        const sendBtn = root.querySelector('.hkm-chat-send');
         const statusEl = root.querySelector('.hkm-chat-status');
         const humanBridge = root.querySelector('.hkm-chat-human-bridge');
 	        const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
@@ -1656,6 +1656,40 @@ window.addEventListener('load', () => {
 	        let humanRequested = false;
 
 	        const emailPrivacyCheckbox = emailForm ? emailForm.querySelector('.hkm-chat-privacy-checkbox') : null;
+
+	        // Chrome kan gjøre en minimal scroll-justering (1-2px) ved tab/fokus selv når feltet er synlig.
+	        // Det ser ut som "dirring" i widgeten. Vi ruller tilbake mikrobevegelsen, men lar normal
+	        // scroll-into-view skje hvis feltet faktisk ikke er synlig.
+	        function preventMicroScrollOnFocus(scroller) {
+	            if (!scroller || typeof scroller.addEventListener !== 'function') return;
+	            scroller.addEventListener('focusin', (e) => {
+	                const target = e && e.target;
+	                if (!target || typeof target.getBoundingClientRect !== 'function') return;
+	                // Kun interaktive elementer
+	                if (!(target.matches && target.matches('input, textarea, select, button, [tabindex]'))) return;
+
+	                const before = scroller.scrollTop;
+	                const scrollerRect = scroller.getBoundingClientRect();
+	                const elRect = target.getBoundingClientRect();
+	                const padding = 6;
+	                const fullyVisible =
+	                    elRect.top >= scrollerRect.top + padding &&
+	                    elRect.bottom <= scrollerRect.bottom - padding;
+
+	                if (!fullyVisible) return;
+
+	                window.requestAnimationFrame(() => {
+	                    const after = scroller.scrollTop;
+	                    // Bare rull tilbake ved mikrobevegelse (typisk 1-2px).
+	                    if (Math.abs(after - before) <= 6) {
+	                        scroller.scrollTop = before;
+	                    }
+	                });
+	            }, true);
+	        }
+
+	        preventMicroScrollOnFocus(bodyEl);
+	        preventMicroScrollOnFocus(emailPanel);
 
 	        function setEmailStatus(text, kind = 'muted') {
 	            if (!emailStatusEl) return;
