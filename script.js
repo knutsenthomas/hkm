@@ -1569,8 +1569,8 @@ window.addEventListener('load', () => {
                 <div class="hkm-chat-main">
                     <div class="hkm-chat-mode-intro"></div>
                     <div class="hkm-chat-body"></div>
-	                    <div class="hkm-chat-email-panel hkm-chat-hidden">
-	                        <form class="hkm-chat-email-form">
+		                    <div class="hkm-chat-email-panel hkm-chat-hidden">
+		                        <form class="hkm-chat-email-form" novalidate>
                             <div class="hkm-chat-email-grid">
                                 <div class="hkm-chat-field">
                                     <label for="hkm-chat-name">Navn *</label>
@@ -1682,37 +1682,39 @@ window.addEventListener('load', () => {
 	                return;
 	            }
 
-	            // Bruk browser-validering (type="email", required) for tydelig feedback.
-	            if (!emailNameInput.checkValidity()) {
-	                emailNameInput.reportValidity();
-	                setEmailStatus('Navn er obligatorisk.', 'error');
-	                return;
-	            }
-	            if (!emailEmailInput.checkValidity()) {
-	                emailEmailInput.reportValidity();
-	                setEmailStatus('Skriv inn en gyldig e-postadresse.', 'error');
-	                return;
-	            }
-	            if (!emailMessageInput.checkValidity()) {
-	                emailMessageInput.reportValidity();
-	                setEmailStatus('Melding er obligatorisk.', 'error');
-	                return;
-	            }
+		            const name = (emailNameInput.value || '').trim();
+		            const email = (emailEmailInput.value || '').trim();
+		            const phone = (emailPhoneInput && emailPhoneInput.value ? emailPhoneInput.value : '').trim();
+		            const message = (emailMessageInput.value || '').trim();
 
-	            if (emailPrivacyCheckbox && !emailPrivacyCheckbox.checked) {
-	                setEmailStatus('Du må samtykke til personvern for å sende e-post.', 'error');
-	                return;
-	            }
-
-	            const name = (emailNameInput.value || '').trim();
-	            const email = (emailEmailInput.value || '').trim();
-	            const phone = (emailPhoneInput && emailPhoneInput.value ? emailPhoneInput.value : '').trim();
-	            const message = (emailMessageInput.value || '').trim();
-
-	            if (!name || !email || !message) {
-	                setEmailStatus('Navn, e-post og melding er obligatorisk.', 'error');
-	                return;
-	            }
+		            // Unnga native browser "reportValidity()" popups, som kan skape layout-jitter i chat-widgeten.
+		            // Vi viser i stedet en stabil statuslinje + flytter fokus til feltet som mangler.
+		            if (!name) {
+		                setEmailStatus('Navn er obligatorisk.', 'error');
+		                emailNameInput.focus();
+		                return;
+		            }
+		            if (!email) {
+		                setEmailStatus('E-post er obligatorisk.', 'error');
+		                emailEmailInput.focus();
+		                return;
+		            }
+		            // Bruk inputens innebygde e-postvalidering (uten popup).
+		            if (!emailEmailInput.checkValidity()) {
+		                setEmailStatus('Skriv inn en gyldig e-postadresse.', 'error');
+		                emailEmailInput.focus();
+		                return;
+		            }
+		            if (!message) {
+		                setEmailStatus('Melding er obligatorisk.', 'error');
+		                emailMessageInput.focus();
+		                return;
+		            }
+		            if (emailPrivacyCheckbox && !emailPrivacyCheckbox.checked) {
+		                setEmailStatus('Du må samtykke til personvern for å sende e-post.', 'error');
+		                emailPrivacyCheckbox.focus();
+		                return;
+		            }
 
 	            emailSubmitBtn.disabled = true;
 	            setEmailStatus('Sender e-post...', 'muted');

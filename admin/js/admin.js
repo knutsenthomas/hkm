@@ -3209,14 +3209,17 @@ class AdminManager {
                     ? createdAt.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + createdAt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
                     : '';
 
-	                return `
-	                    <div class="inbox-row ${isRead ? 'inbox-row--read' : 'inbox-row--unread'}" data-id="${id}">
-	                        <div class="inbox-row-icon">
-	                            <span class="material-symbols-outlined inbox-mail-icon" aria-hidden="true">mail</span>
-	                            ${!isRead ? '<span class="inbox-unread-dot"></span>' : ''}
-	                        </div>
-	                        <div class="inbox-row-body">
-	                            <div class="inbox-row-top">
+		                return `
+		                    <div class="inbox-row ${isRead ? 'inbox-row--read' : 'inbox-row--unread'}" data-id="${id}">
+		                        <div class="inbox-row-icon">
+		                            <svg class="inbox-mail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		                                <rect x="4" y="6.5" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
+		                                <path d="M5 7.5l7 6 7-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+		                            </svg>
+		                            ${!isRead ? '<span class="inbox-unread-dot"></span>' : ''}
+		                        </div>
+		                        <div class="inbox-row-body">
+		                            <div class="inbox-row-top">
 	                                <span class="inbox-row-name">${this.escapeHtml(name)}</span>
                                 ${emailDomain ? `<span class="inbox-source-badge">${this.escapeHtml(emailDomain)}</span>` : ''}
                                 ${!isRead ? '<span class="inbox-new-dot"></span>' : ''}
@@ -3225,15 +3228,15 @@ class AdminManager {
                             <div class="inbox-row-msg">${this.escapeHtml(msgPreview.substring(0, 100))}${msgPreview.length > 100 ? '…' : ''}</div>
                             ${dateStr ? `<div class="inbox-row-date"><span class="material-symbols-outlined">schedule</span> ${dateStr}</div>` : ''}
                         </div>
-	                        <div class="inbox-row-actions">
-	                            ${!isRead ? `<button class="btn btn-outline btn-sm message-mark-read" data-id="${id}" title="Marker som lest">
-	                                <svg class="inbox-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-	                                    <path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-	                                </svg>
-	                            </button>` : '<span class="inbox-read-check material-symbols-outlined" title="Lest">check_circle</span>'}
-	                        </div>
-	                    </div>
-	                `;
+		                        <div class="inbox-row-actions">
+		                            ${!isRead ? `<button class="btn btn-outline btn-sm message-mark-read" data-id="${id}" title="Marker som lest">
+		                                <svg class="inbox-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		                                    <path d="M20 6.5L9 17.5l-5-5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+		                                </svg>
+		                            </button>` : '<span class="inbox-read-check material-symbols-outlined" title="Lest">check_circle</span>'}
+		                        </div>
+		                    </div>
+		                `;
 	            }).join('');
         };
 
