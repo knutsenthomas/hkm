@@ -2001,8 +2001,7 @@ body.crm-body .crm-table td.col-actions .btn-icon .material-symbols-outlined {
 }
 
 body.crm-body .crm-table td.col-actions {
-    padding-top: 10px;
-    padding-bottom: 10px;
+    padding: 10px 14px !important;
 }
 
 /* Email Logs Status Badges */
