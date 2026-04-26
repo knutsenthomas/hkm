@@ -1924,7 +1924,24 @@ window.addEventListener('load', () => {
                 bodyEl.appendChild(typingMsg);
             }
 
-            bodyEl.scrollTop = bodyEl.scrollHeight;
+            const messages = bodyEl.querySelectorAll('.hkm-chat-msg');
+            const lastMsg = messages[messages.length - 1];
+            if (lastMsg) {
+                if (lastMsg.classList.contains('visitor')) {
+                    bodyEl.scrollTop = bodyEl.scrollHeight;
+                } else {
+                    // Agent (AI) message: if it's tall, scroll to its top so the user can read from the start
+                    const msgTop = lastMsg.offsetTop;
+                    const containerHeight = bodyEl.offsetHeight;
+                    if (lastMsg.offsetHeight > containerHeight * 0.5) {
+                        bodyEl.scrollTop = msgTop - 10;
+                    } else {
+                        bodyEl.scrollTop = bodyEl.scrollHeight;
+                    }
+                }
+            } else {
+                bodyEl.scrollTop = bodyEl.scrollHeight;
+            }
         };
 
         const setActiveMode = async (mode) => {
