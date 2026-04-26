@@ -2417,7 +2417,7 @@ window.addEventListener('load', () => {
 	                flex: 1 !important;
 	                overflow-y: auto !important;
 	                min-height: 0 !important;
-	                overscroll-behavior: contain !important;
+	                overscroll-behavior: none !important;
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
 	                padding: 20px !important;
@@ -2576,11 +2576,11 @@ window.addEventListener('load', () => {
 	                flex: 1 !important;
 	                overflow-y: auto !important;
 	                min-height: 0 !important;
-	                overscroll-behavior: contain !important;
+	                overscroll-behavior: none !important;
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
-	                scroll-padding: 30px !important;
-	                padding-bottom: 28px !important;
+	                scroll-padding: 40px !important;
+	                padding-bottom: 60px !important;
 	                background: #fff !important;
 	            }
             .hkm-chat-email-form {
