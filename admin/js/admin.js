@@ -3212,7 +3212,10 @@ class AdminManager {
                 return `
                     <div class="inbox-row ${isRead ? 'inbox-row--read' : 'inbox-row--unread'}" data-id="${id}">
                         <div class="inbox-row-icon">
-                            <span class="material-symbols-outlined">${isRead ? 'mail' : 'mark_email_unread'}</span>
+                            <svg class="inbox-mail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
+                                <path d="m5.5 7 6.5 5.2L18.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
                             ${!isRead ? '<span class="inbox-unread-dot"></span>' : ''}
                         </div>
                         <div class="inbox-row-body">
@@ -3333,8 +3336,7 @@ class AdminManager {
                                 if (dot) dot.remove();
                                 const newDot = row.querySelector('.inbox-new-dot');
                                 if (newDot) newDot.remove();
-                                const icon = row.querySelector('.inbox-row-icon .material-symbols-outlined');
-                                if (icon) icon.textContent = 'mail';
+                                // SVG icon stays the same; only colors/labels change via CSS classes.
                             }
                         } catch (err) {
                             showToast('Kunne ikke markere melding som lest.');
