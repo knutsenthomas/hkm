@@ -2271,17 +2271,18 @@ window.addEventListener('load', () => {
 	                max-height: calc(100vh - 140px) !important;
 	                padding: 0 !important;
 	                margin: 0 !important;
-	                background: #fff !important;
-	                border-radius: 24px !important;
+	                background: #ffffff !important;
+	                border-radius: 20px !important;
 	                box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
 	                display: none;
 	                flex-direction: column !important;
 	                overflow: hidden !important;
 	                z-index: 10000000 !important;
 	                border: 1px solid rgba(226, 232, 240, 0.8) !important;
-	                transform: none !important;
-                    backdrop-filter: blur(10px);
-                    -webkit-backdrop-filter: blur(10px);
+	                contain: paint !important;
+	                transform: translate3d(0,0,0);
+	                will-change: transform, opacity !important;
+	                overscroll-behavior: none !important;
 	            }
 	            @supports (height: 100dvh) {
 	                .hkm-chat-panel {
@@ -2589,11 +2590,9 @@ window.addEventListener('load', () => {
 	                overflow-y: auto !important;
 	                min-height: 0 !important;
 	                overscroll-behavior: none !important;
-	                overflow-anchor: none !important;
-	                scroll-behavior: auto !important;
-	                scroll-padding: 40px !important;
 	                padding-bottom: 80px !important;
 	                background: #fff !important;
+	                transform: translateZ(0) !important;
 	            }
             .hkm-chat-email-form {
                 display: flex !important;
@@ -2621,7 +2620,7 @@ window.addEventListener('load', () => {
 	                background: #F8FAFC !important;
 	                color: #1E293B !important;
 	                outline: none !important;
-	                scroll-margin: 100px 0 !important;
+	                transform: translateZ(0) !important;
 	            }
 	            /* Prevent iOS "focus zoom" (which causes jumpy layout) by using >= 16px font-size on inputs. */
 	            @supports (-webkit-touch-callout: none) {
