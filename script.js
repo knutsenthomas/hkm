@@ -2230,16 +2230,13 @@ window.addEventListener('load', () => {
                 pointer-events: none !important;
                 font-family: 'Inter', sans-serif !important;
                 display: block !important;
-                isolation: isolate !important;
-                backface-visibility: hidden !important;
-                -webkit-backface-visibility: hidden !important;
                 -webkit-font-smoothing: antialiased !important;
             }
             #hkm-visitor-chat-widget * {
-                box-sizing: border-box;
-                font-family: inherit;
+                box-sizing: border-box !important;
+                font-family: inherit !important;
+                backface-visibility: hidden !important;
             }
-            [hidden] { display: none !important; }
             
             .hkm-chat-toggle {
                 position: absolute !important;
@@ -2256,14 +2253,13 @@ window.addEventListener('load', () => {
                 align-items: center !important;
                 justify-content: center !important;
                 box-shadow: 0 8px 24px rgba(209, 125, 57, 0.3) !important;
-                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
                 z-index: 9999999 !important;
                 pointer-events: auto !important;
                 padding: 0 !important;
+                transition: transform 0.2s ease !important;
             }
             .hkm-chat-toggle:hover {
-                transform: scale(1.05) translateY(-2px) !important;
-                box-shadow: 0 12px 40px rgba(209, 125, 57, 0.4) !important;
+                transform: scale(1.05) !important;
             }
             .hkm-chat-dot {
                 position: absolute !important;
@@ -2274,55 +2270,31 @@ window.addEventListener('load', () => {
                 background: #4ADE80 !important;
                 border: 2px solid #fff !important;
                 border-radius: 50% !important;
-                box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.2) !important;
             }
             
-	            .hkm-chat-panel {
-	                position: absolute !important;
-	                bottom: 100px !important;
-	                right: 24px !important;
-	                width: 380px !important;
-	                height: 700px !important;
-	                pointer-events: auto !important;
-	                max-width: calc(100vw - 48px) !important;
-	                max-height: calc(100vh - 140px) !important;
-	                padding: 0 !important;
-	                margin: 0 !important;
-	                background: #ffffff !important;
-	                border-radius: 20px !important;
-	                box-shadow: 0 20px 50px rgba(0,0,0,0.15) !important;
-	                display: none;
-                    opacity: 0;
-                    visibility: hidden;
-	                flex-direction: column !important;
-	                overflow: hidden !important;
-	                z-index: 10000000 !important;
-	                border: 1px solid rgba(226, 232, 240, 0.8) !important;
-	                contain: paint !important;
-	                transform: none !important;
-	                overscroll-behavior: none !important;
-	            }
-	            @supports (height: 100dvh) {
-	                .hkm-chat-panel {
-	                    max-height: calc(100dvh - 160px) !important;
-	                }
-	            }
-	            #hkm-visitor-chat-widget.open .hkm-chat-panel {
-	                display: flex !important;
-                    opacity: 1 !important;
-                    visibility: visible !important;
-                    transform: none !important;
-	            }
-	            @keyframes hkmSlideUp {
-	                from { opacity: 0; transform: translateY(20px); }
-	                to { opacity: 1; transform: translateY(0); }
-	            }
+            .hkm-chat-panel {
+                position: absolute !important;
+                bottom: 100px !important;
+                right: 24px !important;
+                width: 380px !important;
+                height: 700px !important;
+                max-width: calc(100vw - 48px) !important;
+                max-height: calc(100vh - 140px) !important;
+                background: #fff !important;
+                border-radius: 16px !important;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
+                border: 1px solid #E2E8F0 !important;
+                display: none;
+                flex-direction: column !important;
+                overflow: hidden !important;
+                pointer-events: auto !important;
+                z-index: 10000000 !important;
+            }
+            #hkm-visitor-chat-widget.open .hkm-chat-panel {
+                display: flex !important;
+            }
             
             .hkm-chat-header {
-                margin: 0 !important;
-                flex-shrink: 0 !important;
-                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-                color: #fff !important;
                 padding: 20px 24px !important;
                 display: flex !important;
                 justify-content: space-between !important;
