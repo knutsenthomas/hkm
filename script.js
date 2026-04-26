@@ -2235,31 +2235,34 @@ window.addEventListener('load', () => {
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                transition: opacity 0.3s ease !important;
                 padding: 0 !important;
+                /* Hardware acceleration to prevent jitter */
+                transform: translateZ(0) !important;
+                backface-visibility: hidden !important;
             }
             .hkm-chat-toggle:hover {
-                transform: scale(1.05) !important;
                 box-shadow: 0 12px 30px rgba(209, 125, 57, 0.5) !important;
+                opacity: 0.9 !important;
             }
             .hkm-chat-toggle:active {
-                transform: scale(0.95) !important;
+                opacity: 0.8 !important;
             }
             .hkm-chat-icon-chat, .hkm-chat-icon-close {
                 position: absolute !important;
-                transition: all 0.3s ease !important;
+                transition: opacity 0.3s ease, transform 0.3s ease !important;
             }
             .hkm-chat-icon-close {
                 opacity: 0 !important;
-                transform: rotate(-90deg) scale(0.5) !important;
+                transform: rotate(-90deg) !important;
             }
             #hkm-visitor-chat-widget.open .hkm-chat-icon-chat {
                 opacity: 0 !important;
-                transform: rotate(90deg) scale(0.5) !important;
+                transform: rotate(90deg) !important;
             }
             #hkm-visitor-chat-widget.open .hkm-chat-icon-close {
                 opacity: 1 !important;
-                transform: rotate(0deg) scale(1) !important;
+                transform: rotate(0deg) !important;
             }
             .hkm-chat-dot {
                 position: absolute !important;
@@ -2275,16 +2278,6 @@ window.addEventListener('load', () => {
             }
             
 	            .hkm-chat-panel {
-	                position: absolute;
-	                bottom: 80px;
-	                right: 0;
-	                width: 380px;
-	                height: 600px;
-	                max-width: calc(100vw - 32px);
-	                /* Use dynamic viewport units/vars to avoid jumpy layouts when mobile browser UI or keyboard appears. */
-	                max-height: calc((var(--hkm-vh, 1vh) * 100) - 100px);
-	                contain: layout paint !important;
-	                padding: 0 !important;
 	                margin: 0 !important;
 	                background: #fff !important;
 	                border-radius: 16px !important;
