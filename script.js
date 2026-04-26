@@ -2271,9 +2271,9 @@ window.addEventListener('load', () => {
 	                bottom: 100px !important;
 	                right: 24px !important;
 	                width: 380px !important;
-	                height: 600px !important;
+	                height: 700px !important;
 	                max-width: calc(100vw - 48px) !important;
-	                max-height: calc(100vh - 120px) !important;
+	                max-height: calc(100vh - 140px) !important;
 	                padding: 0 !important;
 	                margin: 0 !important;
 	                background: #fff !important;
@@ -2290,7 +2290,7 @@ window.addEventListener('load', () => {
 	            }
 	            @supports (height: 100dvh) {
 	                .hkm-chat-panel {
-	                    max-height: calc(100dvh - 140px) !important;
+	                    max-height: calc(100dvh - 160px) !important;
 	                }
 	            }
 	            #hkm-visitor-chat-widget.open .hkm-chat-panel {
@@ -2597,7 +2597,7 @@ window.addEventListener('load', () => {
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
 	                scroll-padding: 40px !important;
-	                padding-bottom: 60px !important;
+	                padding-bottom: 80px !important;
 	                background: #fff !important;
 	            }
             .hkm-chat-email-form {
