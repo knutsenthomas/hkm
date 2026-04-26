@@ -1660,9 +1660,10 @@ window.addEventListener('load', () => {
 	        // Chrome kan gjøre en minimal scroll-justering (1-2px) ved tab/fokus selv når feltet er synlig.
 	        // Det ser ut som "dirring" i widgeten. Vi ruller tilbake mikrobevegelsen, men lar normal
 	        // scroll-into-view skje hvis feltet faktisk ikke er synlig.
-	        // Chrome on Mac often does a tiny "scroll-into-view" jump (1-2px) when tabbing between fields,
+	        // Chrome on Mac/Windows often does a tiny "scroll-into-view" jump (1-2px) when tabbing between fields,
 	        // even if they are already visible. This causes a jittery "shaking" effect.
-	        // We use scroll-padding in CSS as the primary defense, and this JS as a safety net.
+	        // We apply a nuclear fix: capture the scroll positions of both the container and the window
+	        // before focus, and snap them back immediately if they move by a small amount.
 	        function preventMicroScrollOnFocus(scroller) {
 	            if (!scroller || typeof scroller.addEventListener !== 'function') return;
 	            
@@ -1671,18 +1672,27 @@ window.addEventListener('load', () => {
 	                if (!target || typeof target.getBoundingClientRect !== 'function') return;
 	                if (!(target.matches && target.matches('input, textarea, select, button, [tabindex]'))) return;
 	
-	                const before = scroller.scrollTop;
+	                const scrollBefore = scroller.scrollTop;
+	                const winScrollBefore = window.pageYOffset || document.documentElement.scrollTop;
 	                
 	                const fix = () => {
-	                    const after = scroller.scrollTop;
-	                    // If it jumped a tiny bit (typical for Chrome jitter), snap it back
-	                    if (after !== before && Math.abs(after - before) < 10) {
-	                        scroller.scrollTop = before;
+	                    // 1. Fix the internal scroller jitter
+	                    const scrollAfter = scroller.scrollTop;
+	                    if (scrollAfter !== scrollBefore && Math.abs(scrollAfter - scrollBefore) < 20) {
+	                        scroller.scrollTop = scrollBefore;
+	                    }
+	                    // 2. Fix the body/window jitter (Chrome trying to scroll the page for fixed elements)
+	                    const winScrollAfter = window.pageYOffset || document.documentElement.scrollTop;
+	                    if (winScrollAfter !== winScrollBefore && Math.abs(winScrollAfter - winScrollBefore) < 50) {
+	                        window.scrollTo(window.pageXOffset, winScrollBefore);
 	                    }
 	                };
 	                
+	                // Run immediately and in next frames to kill all vibration
+	                fix();
 	                window.requestAnimationFrame(fix);
-	                window.setTimeout(fix, 10); // Double-tap for stubborn jitter
+	                window.setTimeout(fix, 1);
+	                window.setTimeout(fix, 15);
 	            }, true);
 	        }
 
@@ -2294,10 +2304,9 @@ window.addEventListener('load', () => {
 	                overflow: hidden !important;
 	                z-index: 10000 !important;
 	                border: 1px solid #E2E8F0 !important;
-	                /* HW Acceleration & Stability */
+	                /* Remove ALL transforms to prevent sub-pixel rendering jitter in Chrome */
+	                transform: none !important;
 	                backface-visibility: hidden !important;
-	                transform: translate3d(0,0,0) !important;
-	                -webkit-font-smoothing: antialiased !important;
 	            }
 	            @supports (height: 100dvh) {
 	                .hkm-chat-panel {
@@ -2306,11 +2315,11 @@ window.addEventListener('load', () => {
 	            }
 	            #hkm-visitor-chat-widget.open .hkm-chat-panel {
 	                display: flex !important;
-	                animation: hkmSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+	                animation: hkmFadeIn 0.25s ease-out forwards;
 	            }
-	            @keyframes hkmSlideUp {
-	                from { opacity: 0; transform: translate3d(0, 20px, 0); }
-	                to { opacity: 1; transform: translate3d(0, 0, 0); }
+	            @keyframes hkmFadeIn {
+	                from { opacity: 0; }
+	                to { opacity: 1; }
 	            }
             
             .hkm-chat-header {
@@ -2605,7 +2614,7 @@ window.addEventListener('load', () => {
 	                scrollbar-gutter: stable both-edges !important;
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
-	                scroll-padding: 20px !important;
+	                scroll-padding: 60px !important;
 	                padding-bottom: 28px !important;
 	                background: #fff !important;
 	            }
@@ -2635,7 +2644,7 @@ window.addEventListener('load', () => {
 	                background: #F8FAFC !important;
 	                color: #1E293B !important;
 	                outline: none !important;
-	                scroll-margin: 15px !important;
+	                scroll-margin: 100px 0 !important;
 	            }
 	            /* Prevent iOS "focus zoom" (which causes jumpy layout) by using >= 16px font-size on inputs. */
 	            @supports (-webkit-touch-callout: none) {
