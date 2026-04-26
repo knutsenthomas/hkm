@@ -3225,14 +3225,16 @@ class AdminManager {
                             <div class="inbox-row-msg">${this.escapeHtml(msgPreview.substring(0, 100))}${msgPreview.length > 100 ? '…' : ''}</div>
                             ${dateStr ? `<div class="inbox-row-date"><span class="material-symbols-outlined">schedule</span> ${dateStr}</div>` : ''}
                         </div>
-                        <div class="inbox-row-actions">
-                            ${!isRead ? `<button class="btn btn-outline btn-sm message-mark-read" data-id="${id}" title="Marker som lest">
-                                <span class="material-symbols-outlined" style="font-size:15px;">done</span>
-                            </button>` : '<span class="inbox-read-check material-symbols-outlined" title="Lest">check_circle</span>'}
-                        </div>
-                    </div>
-                `;
-            }).join('');
+	                        <div class="inbox-row-actions">
+	                            ${!isRead ? `<button class="btn btn-outline btn-sm message-mark-read" data-id="${id}" title="Marker som lest">
+	                                <svg class="inbox-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+	                                    <path d="M20 6L9 17l-5-5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+	                                </svg>
+	                            </button>` : '<span class="inbox-read-check material-symbols-outlined" title="Lest">check_circle</span>'}
+	                        </div>
+	                    </div>
+	                `;
+	            }).join('');
         };
 
         const updateUnreadLabel = () => {
