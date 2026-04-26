@@ -1987,11 +1987,6 @@ window.addEventListener('load', () => {
             root.classList.toggle('open', open);
             panel.setAttribute('aria-hidden', open ? 'false' : 'true');
             if (open) {
-                if (activeMode === 'email') {
-                    emailNameInput.focus();
-                } else {
-                    input.focus();
-                }
                 bodyEl.scrollTop = bodyEl.scrollHeight;
             }
         };
