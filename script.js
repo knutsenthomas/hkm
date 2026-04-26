@@ -1926,25 +1926,20 @@ window.addEventListener('load', () => {
 
             // Use a small timeout to ensure DOM and layout are ready
             setTimeout(() => {
-                const messages = bodyEl.querySelectorAll('.hkm-chat-msg');
-                const lastMsg = messages[messages.length - 1];
-                if (lastMsg) {
-                    if (lastMsg.classList.contains('visitor')) {
+                const messages = bodyEl.querySelectorAll('.hkm-chat-msg:not(.typing)');
+                const lastRealMsg = messages[messages.length - 1];
+                if (lastRealMsg) {
+                    if (lastRealMsg.classList.contains('visitor')) {
                         bodyEl.scrollTop = bodyEl.scrollHeight;
                     } else {
-                        // Agent (AI) message: scroll to its top with a margin to avoid being hidden under the header
-                        const msgTop = lastMsg.offsetTop;
-                        const containerHeight = bodyEl.offsetHeight;
-                        if (lastMsg.offsetHeight > containerHeight * 0.4) {
-                            bodyEl.scrollTop = msgTop - 20; // Increased margin
-                        } else {
-                            bodyEl.scrollTop = bodyEl.scrollHeight;
-                        }
+                        // Agent (AI) message: scroll to its top with a margin
+                        // Since bodyEl is now position:relative, offsetTop is accurate
+                        bodyEl.scrollTop = lastRealMsg.offsetTop - 10;
                     }
                 } else {
                     bodyEl.scrollTop = bodyEl.scrollHeight;
                 }
-            }, 50);
+            }, 100);
         };
 
         const setActiveMode = async (mode) => {
@@ -2451,6 +2446,7 @@ window.addEventListener('load', () => {
             }
             
 	            .hkm-chat-body {
+                    position: relative !important;
 	                flex: 1 !important;
 	                /* Force a stable scrollbar gutter to prevent 1px layout jitter on focus/tab. */
 	                overflow-y: scroll !important;
