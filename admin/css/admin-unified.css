@@ -3478,6 +3478,22 @@ body.admin-body .nav-item.nav-helper-hidden {
     background: #f8fafc;
 }
 
+/* Inbox icons: make them smaller and round (dashboard.css uses rounded-square defaults). */
+body.crm-body .inbox-row-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+}
+
+body.crm-body .inbox-row-icon .material-symbols-outlined {
+    font-size: 17px;
+}
+
+body.crm-body .inbox-unread-dot {
+    width: 9px;
+    height: 9px;
+}
+
 /* Shared detail modal for message/push preview */
 .admin-detail-modal {
     position: fixed;
