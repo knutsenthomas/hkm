@@ -1986,8 +1986,14 @@ window.addEventListener('load', () => {
         const setOpen = (open) => {
             root.classList.toggle('open', open);
             panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+            
+            // Prevent body scroll only if NOT on mobile (where users might need to scroll the page)
+            // or just lock it globally for maximum stability.
             if (open) {
+                document.body.style.overflow = 'hidden';
                 bodyEl.scrollTop = bodyEl.scrollHeight;
+            } else {
+                document.body.style.overflow = '';
             }
         };
 
@@ -2214,16 +2220,17 @@ window.addEventListener('load', () => {
         const style = document.createElement('style');
         style.id = 'hkm-visitor-chat-styles';
         style.textContent = `
-	            #hkm-visitor-chat-widget {
-	                all: initial;
-	                position: fixed;
-	                right: 24px;
-	                bottom: 24px;
-	                z-index: 9999999;
-	                font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
-	                -webkit-text-size-adjust: 100% !important;
-	                box-sizing: border-box;
-	            }
+            #hkm-visitor-chat-widget {
+                all: initial;
+                position: fixed !important;
+                inset: 0 !important;
+                width: 100vw !important;
+                height: 100dvh !important;
+                z-index: 9999999 !important;
+                pointer-events: none !important;
+                font-family: 'Inter', sans-serif !important;
+                display: block !important;
+            }
             #hkm-visitor-chat-widget * {
                 box-sizing: border-box;
                 font-family: inherit;
@@ -2231,19 +2238,24 @@ window.addEventListener('load', () => {
             [hidden] { display: none !important; }
             
             .hkm-chat-toggle {
+                position: absolute !important;
+                right: 24px !important;
+                bottom: 24px !important;
                 width: 60px !important;
                 height: 60px !important;
-                border: 0 !important;
                 border-radius: 50% !important;
-                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+                background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
                 color: #fff !important;
-                box-shadow: 0 8px 32px rgba(209, 125, 57, 0.3) !important;
+                border: none !important;
                 cursor: pointer !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: center !important;
-                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-                position: relative !important;
+                box-shadow: 0 8px 24px rgba(209, 125, 57, 0.3) !important;
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+                z-index: 9999999 !important;
+                pointer-events: auto !important;
+                padding: 0 !important;
             }
             .hkm-chat-toggle:hover {
                 transform: scale(1.05) translateY(-2px) !important;
@@ -2262,11 +2274,12 @@ window.addEventListener('load', () => {
             }
             
 	            .hkm-chat-panel {
-	                position: fixed !important;
+	                position: absolute !important;
 	                bottom: 100px !important;
 	                right: 24px !important;
 	                width: 380px !important;
 	                height: 700px !important;
+	                pointer-events: auto !important;
 	                max-width: calc(100vw - 48px) !important;
 	                max-height: calc(100vh - 140px) !important;
 	                padding: 0 !important;
