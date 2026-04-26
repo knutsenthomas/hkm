@@ -1983,17 +1983,26 @@ window.addEventListener('load', () => {
             statusEl.dataset.kind = kind;
         }
 
+        let scrollPosition = 0;
         const setOpen = (open) => {
             root.classList.toggle('open', open);
             panel.setAttribute('aria-hidden', open ? 'false' : 'true');
             
             if (open) {
+                scrollPosition = window.pageYOffset;
                 document.body.style.overflow = 'hidden';
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${scrollPosition}px`;
+                document.body.style.width = '100%';
                 document.documentElement.style.overflow = 'hidden';
                 bodyEl.scrollTop = bodyEl.scrollHeight;
             } else {
                 document.body.style.overflow = '';
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
                 document.documentElement.style.overflow = '';
+                window.scrollTo(0, scrollPosition);
             }
         };
 
@@ -2538,11 +2547,12 @@ window.addEventListener('load', () => {
 	                background: #F8FAFC !important;
 	                outline: none !important;
 	                color: #1E293B !important;
-	                transition: border-color 0.2s, background 0.2s !important;
+	                transition: none !important;
 	            }
             .hkm-chat-input:focus {
                 border-color: #FED7AA !important;
                 background: #fff !important;
+                box-shadow: none !important;
             }
             .hkm-chat-status {
                 position: absolute !important;
@@ -2565,11 +2575,10 @@ window.addEventListener('load', () => {
                 justify-content: center !important;
                 cursor: pointer !important;
                 flex-shrink: 0 !important;
-                transition: all 0.2s ease !important;
+                transition: none !important;
             }
             .hkm-chat-send:hover:not(:disabled) {
                 background: #bd4f2a !important;
-                transform: scale(1.05) !important;
             }
             .hkm-chat-send:disabled {
                 background: #E2E8F0 !important;
@@ -2577,15 +2586,19 @@ window.addEventListener('load', () => {
             }
             
 	            .hkm-chat-email-panel {
-	                padding: 20px !important;
-	                flex: 1 !important;
-	                overflow-y: auto !important;
-	                min-height: 0 !important;
-	                overscroll-behavior: contain !important;
-	                padding-bottom: 80px !important;
-	                background: #fff !important;
-	                transform: translate3d(0,0,0) !important;
-	            }
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                right: 0 !important;
+                bottom: 0 !important;
+                background: #fff !important;
+                padding: 24px !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch !important;
+                display: flex !important;
+                flex-direction: column !important;
+                transition: none !important;
+            }
             .hkm-chat-email-form {
                 display: flex !important;
                 flex-direction: column !important;
@@ -2604,16 +2617,16 @@ window.addEventListener('load', () => {
                 cursor: pointer !important;
             }
 	            .hkm-chat-field input, .hkm-chat-field textarea {
-	                width: 100% !important;
-	                border: 1px solid #E2E8F0 !important;
-	                border-radius: 10px !important;
-	                padding: 12px 14px !important;
-	                font-size: 14px !important;
-	                background: #F8FAFC !important;
-	                color: #1E293B !important;
-	                outline: none !important;
-	                transform: translateZ(0) !important;
-	            }
+                width: 100% !important;
+                padding: 12px 14px !important;
+                background: #F8FAFC !important;
+                border: 1px solid #E2E8F0 !important;
+                border-radius: 10px !important;
+                font-size: 15px !important;
+                color: #1E293B !important;
+                outline: none !important;
+                transition: none !important;
+            }
 	            /* Prevent iOS "focus zoom" (which causes jumpy layout) by using >= 16px font-size on inputs. */
 	            @supports (-webkit-touch-callout: none) {
 	                .hkm-chat-input,
@@ -2625,6 +2638,7 @@ window.addEventListener('load', () => {
             .hkm-chat-field input:focus, .hkm-chat-field textarea:focus {
                 border-color: #d17d39 !important;
                 background: #fff !important;
+                box-shadow: none !important;
             }
             .hkm-chat-email-submit {
                 margin-top: 10px !important;
