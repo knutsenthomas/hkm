@@ -1517,7 +1517,13 @@ window.addEventListener('load', () => {
         root.innerHTML = `
             <button type="button" class="hkm-chat-toggle" aria-label="Apne chat">
                 <div class="hkm-chat-dot"></div>
-                <span>Chat med oss</span>
+                <svg class="hkm-chat-icon-chat" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <svg class="hkm-chat-icon-close" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
             </button>
             <section class="hkm-chat-panel" aria-hidden="true">
                 <header class="hkm-chat-header">
@@ -2217,31 +2223,55 @@ window.addEventListener('load', () => {
             [hidden] { display: none !important; }
             
             .hkm-chat-toggle {
+                position: relative !important;
+                width: 60px !important;
+                height: 60px !important;
                 border: 0 !important;
-                border-radius: 50px !important;
+                border-radius: 50% !important;
                 background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
                 color: #fff !important;
-                font-weight: 600 !important;
-                padding: 12px 20px !important;
-                box-shadow: 0 8px 24px rgba(209, 125, 57, 0.3) !important;
+                box-shadow: 0 8px 24px rgba(209, 125, 57, 0.4) !important;
                 cursor: pointer !important;
                 display: flex !important;
                 align-items: center !important;
-                gap: 12px !important;
-                transition: all 0.3s ease !important;
-                font-size: 14px !important;
+                justify-content: center !important;
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                padding: 0 !important;
             }
             .hkm-chat-toggle:hover {
-                transform: translateY(-2px) !important;
-                box-shadow: 0 12px 30px rgba(209, 125, 57, 0.4) !important;
+                transform: scale(1.05) !important;
+                box-shadow: 0 12px 30px rgba(209, 125, 57, 0.5) !important;
+            }
+            .hkm-chat-toggle:active {
+                transform: scale(0.95) !important;
+            }
+            .hkm-chat-icon-chat, .hkm-chat-icon-close {
+                position: absolute !important;
+                transition: all 0.3s ease !important;
+            }
+            .hkm-chat-icon-close {
+                opacity: 0 !important;
+                transform: rotate(-90deg) scale(0.5) !important;
+            }
+            #hkm-visitor-chat-widget.open .hkm-chat-icon-chat {
+                opacity: 0 !important;
+                transform: rotate(90deg) scale(0.5) !important;
+            }
+            #hkm-visitor-chat-widget.open .hkm-chat-icon-close {
+                opacity: 1 !important;
+                transform: rotate(0deg) scale(1) !important;
             }
             .hkm-chat-dot {
-                width: 10px !important;
-                height: 10px !important;
-                background: #4ADE80 !important;
+                position: absolute !important;
+                top: 0 !important;
+                right: 0 !important;
+                width: 14px !important;
+                height: 14px !important;
+                background: #22C55E !important;
+                border: 2px solid #fff !important;
                 border-radius: 50% !important;
-                box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.2) !important;
-                flex-shrink: 0 !important;
+                z-index: 2 !important;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
             }
             
 	            .hkm-chat-panel {
