@@ -3571,6 +3571,15 @@ body.admin-body .inbox-row-icon {
     aspect-ratio: 1 / 1;
 }
 
+body.admin-body .inbox-row-icon .material-symbols-outlined,
+body.crm-body .inbox-row-icon .material-symbols-outlined {
+    display: block;
+    width: 18px;
+    height: 18px;
+    line-height: 18px;
+    text-align: center;
+}
+
 body.crm-body .inbox-row-icon .material-symbols-outlined {
     font-size: 17px;
 }
