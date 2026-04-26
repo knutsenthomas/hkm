@@ -2971,6 +2971,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       7. Hvis en bruker spør om bloggen eller undervisning, bruk informasjonen over for å gi dem et godt svar. Ikke si at du ikke har tilgang hvis informasjonen står i listen.
       6. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
       7. Aldri nevn tekniske detaljer om systemet.
+      8. ISRAEL-PRODUKTER: Fortell gjerne besøkende at vi har flotte, autentiske produkter fra Israel i butikken vår. Vi er stolte av å støtte Israel og tilby disse varene. Du kan henvise dem til: https://www.hiskingdomministry.no/category/israel for å se utvalget.
     `.trim();
 
     const userMessage = msgData.text || "";
