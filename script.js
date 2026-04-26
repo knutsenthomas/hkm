@@ -1660,40 +1660,10 @@ window.addEventListener('load', () => {
 	        // Chrome kan gjøre en minimal scroll-justering (1-2px) ved tab/fokus selv når feltet er synlig.
 	        // Det ser ut som "dirring" i widgeten. Vi ruller tilbake mikrobevegelsen, men lar normal
 	        // scroll-into-view skje hvis feltet faktisk ikke er synlig.
-	        // Chrome on Mac/Windows often does a tiny "scroll-into-view" jump (1-2px) when tabbing between fields,
-	        // even if they are already visible. This causes a jittery "shaking" effect.
-	        // We apply a nuclear fix: capture the scroll positions of both the container and the window
-	        // before focus, and snap them back immediately if they move by a small amount.
+	        // Previous JS-based scroll snapping was causing a vibration loop in Chrome.
+	        // We've removed it in favor of a more stable CSS-only approach using fixed positioning.
 	        function preventMicroScrollOnFocus(scroller) {
-	            if (!scroller || typeof scroller.addEventListener !== 'function') return;
-	            
-	            scroller.addEventListener('focusin', (e) => {
-	                const target = e && e.target;
-	                if (!target || typeof target.getBoundingClientRect !== 'function') return;
-	                if (!(target.matches && target.matches('input, textarea, select, button, [tabindex]'))) return;
-	
-	                const scrollBefore = scroller.scrollTop;
-	                const winScrollBefore = window.pageYOffset || document.documentElement.scrollTop;
-	                
-	                const fix = () => {
-	                    // 1. Fix the internal scroller jitter
-	                    const scrollAfter = scroller.scrollTop;
-	                    if (scrollAfter !== scrollBefore && Math.abs(scrollAfter - scrollBefore) < 20) {
-	                        scroller.scrollTop = scrollBefore;
-	                    }
-	                    // 2. Fix the body/window jitter (Chrome trying to scroll the page for fixed elements)
-	                    const winScrollAfter = window.pageYOffset || document.documentElement.scrollTop;
-	                    if (winScrollAfter !== winScrollBefore && Math.abs(winScrollAfter - winScrollBefore) < 50) {
-	                        window.scrollTo(window.pageXOffset, winScrollBefore);
-	                    }
-	                };
-	                
-	                // Run immediately and in next frames to kill all vibration
-	                fix();
-	                window.requestAnimationFrame(fix);
-	                window.setTimeout(fix, 1);
-	                window.setTimeout(fix, 15);
-	            }, true);
+	            // Logic removed to prevent fighting with browser native scroll-into-view.
 	        }
 
 	        preventMicroScrollOnFocus(bodyEl);
@@ -2287,13 +2257,13 @@ window.addEventListener('load', () => {
             }
             
 	            .hkm-chat-panel {
-	                position: absolute;
-	                bottom: 80px;
-	                right: 0;
-	                width: 380px;
-	                height: 600px;
-	                max-width: calc(100vw - 32px);
-	                max-height: calc((var(--hkm-vh, 1vh) * 100) - 100px);
+	                position: fixed !important;
+	                bottom: 104px !important;
+	                right: 24px !important;
+	                width: 380px !important;
+	                height: 600px !important;
+	                max-width: calc(100vw - 48px) !important;
+	                max-height: calc(100vh - 120px) !important;
 	                padding: 0 !important;
 	                margin: 0 !important;
 	                background: #fff !important;
@@ -2302,15 +2272,13 @@ window.addEventListener('load', () => {
 	                display: none;
 	                flex-direction: column !important;
 	                overflow: hidden !important;
-	                z-index: 10000 !important;
+	                z-index: 10000000 !important;
 	                border: 1px solid #E2E8F0 !important;
-	                /* Remove ALL transforms to prevent sub-pixel rendering jitter in Chrome */
 	                transform: none !important;
-	                backface-visibility: hidden !important;
 	            }
 	            @supports (height: 100dvh) {
 	                .hkm-chat-panel {
-	                    max-height: calc(100dvh - 100px);
+	                    max-height: calc(100dvh - 120px) !important;
 	                }
 	            }
 	            #hkm-visitor-chat-widget.open .hkm-chat-panel {
@@ -2447,11 +2415,9 @@ window.addEventListener('load', () => {
             
 	            .hkm-chat-body {
 	                flex: 1 !important;
-	                /* Force a stable scrollbar gutter to prevent 1px layout jitter on focus/tab. */
-	                overflow-y: scroll !important;
+	                overflow-y: auto !important;
 	                min-height: 0 !important;
 	                overscroll-behavior: contain !important;
-	                scrollbar-gutter: stable both-edges !important;
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
 	                padding: 20px !important;
@@ -2608,13 +2574,12 @@ window.addEventListener('load', () => {
 	            .hkm-chat-email-panel {
 	                padding: 20px !important;
 	                flex: 1 !important;
-	                overflow-y: scroll !important;
+	                overflow-y: auto !important;
 	                min-height: 0 !important;
 	                overscroll-behavior: contain !important;
-	                scrollbar-gutter: stable both-edges !important;
 	                overflow-anchor: none !important;
 	                scroll-behavior: auto !important;
-	                scroll-padding: 60px !important;
+	                scroll-padding: 30px !important;
 	                padding-bottom: 28px !important;
 	                background: #fff !important;
 	            }
