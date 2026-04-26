@@ -1920,7 +1920,7 @@ window.addEventListener('load', () => {
                 typingMsg.className = 'hkm-chat-msg agent typing';
                 typingMsg.style.fontStyle = 'italic';
                 typingMsg.style.opacity = '0.7';
-                typingMsg.textContent = 'HKM Assistent skriver...';
+                typingMsg.innerHTML = 'HKM Assistent skriver <span class="hkm-typing-dots"><span>.</span><span>.</span><span>.</span></span>';
                 bodyEl.appendChild(typingMsg);
             }
 
@@ -2158,7 +2158,7 @@ window.addEventListener('load', () => {
                     typingMsg.className = 'hkm-chat-msg agent typing';
                     typingMsg.style.fontStyle = 'italic';
                     typingMsg.style.opacity = '0.7';
-                    typingMsg.textContent = 'HKM Assistent skriver...';
+                    typingMsg.innerHTML = 'HKM Assistent skriver <span class="hkm-typing-dots"><span>.</span><span>.</span><span>.</span></span>';
                     bodyEl.appendChild(typingMsg);
                     bodyEl.scrollTop = bodyEl.scrollHeight;
 
@@ -2658,6 +2658,25 @@ window.addEventListener('load', () => {
             }
             .hkm-chat-email-submit:hover {
                 background: #bd4f2a !important;
+            }
+
+            .hkm-typing-dots {
+                display: inline-flex !important;
+                margin-left: 2px !important;
+                gap: 2px !important;
+            }
+            .hkm-typing-dots span {
+                animation: hkm-typing-bounce 1.4s infinite both !important;
+                font-size: 16px !important;
+                font-weight: 900 !important;
+                line-height: 1 !important;
+            }
+            .hkm-typing-dots span:nth-child(2) { animation-delay: 0.2s !important; }
+            .hkm-typing-dots span:nth-child(3) { animation-delay: 0.4s !important; }
+
+            @keyframes hkm-typing-bounce {
+                0%, 80%, 100% { transform: translateY(0); opacity: 0.3; }
+                40% { transform: translateY(-4px); opacity: 1; }
             }
             .hkm-chat-email-status {
                 margin: 12px 0 0 0 !important;
