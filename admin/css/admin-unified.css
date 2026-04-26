@@ -1983,6 +1983,20 @@ body.admin-body .welcome-subtitle {
     font-size: 13px;
 }
 
+/* Compact action icon buttons inside CRM tables (avoid oversized icons/click targets in rows). */
+.crm-table td.col-actions .btn-icon {
+    width: 32px;
+    height: 32px;
+    min-width: 32px !important;
+    min-height: 32px !important;
+    border-radius: 10px !important;
+}
+
+.crm-table td.col-actions .btn-icon .material-symbols-outlined {
+    font-size: 18px;
+    line-height: 1;
+}
+
 /* Email Logs Status Badges */
 .status-pill {
     padding: 6px 12px;
