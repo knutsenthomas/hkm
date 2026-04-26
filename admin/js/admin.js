@@ -3213,8 +3213,8 @@ class AdminManager {
                     <div class="inbox-row ${isRead ? 'inbox-row--read' : 'inbox-row--unread'}" data-id="${id}">
                         <div class="inbox-row-icon">
                             <svg class="inbox-mail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v11A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/>
-                                <path d="m5.5 7 6.5 5.2L18.5 7" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M4.5 8.5A2.5 2.5 0 0 1 7 6h10a2.5 2.5 0 0 1 2.5 2.5v7A2.5 2.5 0 0 1 17 18H7a2.5 2.5 0 0 1-2.5-2.5v-7Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/>
+                                <path d="M6 8l6 4.9L18 8" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
                             </svg>
                             ${!isRead ? '<span class="inbox-unread-dot"></span>' : ''}
                         </div>

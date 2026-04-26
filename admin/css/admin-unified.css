@@ -3562,13 +3562,16 @@ body.crm-body .inbox-row-icon {
 
 /* Same inbox icon style on admin dashboard pages too (admin index uses body.admin-body). */
 body.admin-body .inbox-row-icon {
-    width: 34px;
-    height: 34px;
+    width: 42px;
+    height: 42px;
     border-radius: 999px;
     display: flex;
     align-items: center;
     justify-content: center;
     aspect-ratio: 1 / 1;
+    background: #ffffff;
+    border: 2px solid #e2e8f0;
+    color: #334155;
 }
 
 body.admin-body .inbox-row-icon .inbox-mail-icon,
@@ -3576,6 +3579,12 @@ body.crm-body .inbox-row-icon .inbox-mail-icon {
     display: block;
     width: 18px;
     height: 18px;
+}
+
+body.admin-body .inbox-row--unread .inbox-row-icon {
+    border-color: #fed7aa;
+    background: #fff7ed;
+    color: #9a3412;
 }
 
 body.crm-body .inbox-row-icon .material-symbols-outlined {
