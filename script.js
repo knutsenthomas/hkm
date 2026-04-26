@@ -1575,37 +1575,35 @@ window.addEventListener('load', () => {
                 <div class="hkm-chat-main">
                     <div class="hkm-chat-mode-intro"></div>
                     <div class="hkm-chat-body"></div>
+		                    
 		                    <div class="hkm-chat-email-panel hkm-chat-hidden">
 		                        <form class="hkm-chat-email-form" novalidate>
-                            <div class="hkm-chat-email-grid">
-                                <div class="hkm-chat-field">
-                                    <label for="hkm-chat-name">Navn *</label>
-                                    <input type="text" id="hkm-chat-name" name="name" autocomplete="name" class="hkm-chat-email-name" maxlength="120" required />
-                                </div>
-                                <div class="hkm-chat-field">
-                                    <label for="hkm-chat-email">E-post *</label>
-                                    <input type="email" id="hkm-chat-email" name="email" autocomplete="email" class="hkm-chat-email-email" maxlength="254" required />
-                                </div>
-                                <div class="hkm-chat-field">
-                                    <label for="hkm-chat-phone">Telefon</label>
-                                    <input type="tel" id="hkm-chat-phone" name="tel" autocomplete="tel" class="hkm-chat-email-phone" maxlength="40" />
-                                </div>
+                            <div class="hkm-chat-field">
+                                <label for="hkm-chat-name">Navn *</label>
+                                <input type="text" id="hkm-chat-name" name="name" autocomplete="name" class="hkm-chat-email-name" maxlength="120" required />
+                            </div>
+                            <div class="hkm-chat-field">
+                                <label for="hkm-chat-email">E-post *</label>
+                                <input type="email" id="hkm-chat-email" name="email" autocomplete="email" class="hkm-chat-email-email" maxlength="254" required />
+                            </div>
+                            <div class="hkm-chat-field">
+                                <label for="hkm-chat-phone">Telefon</label>
+                                <input type="tel" id="hkm-chat-phone" name="tel" autocomplete="tel" class="hkm-chat-email-phone" maxlength="40" />
                             </div>
                             <div class="hkm-chat-field">
                                 <label for="hkm-chat-message">Melding *</label>
                                 <textarea id="hkm-chat-message" name="message" class="hkm-chat-email-message" rows="4" maxlength="${MAX_MESSAGE_LENGTH}" required></textarea>
                             </div>
-                            <p class="hkm-chat-email-help">Vi svarer deg på e-post så snart vi kan.</p>
                             <div class="hkm-chat-privacy">
                                 <label class="hkm-chat-privacy-label">
                                     <input type="checkbox" class="hkm-chat-privacy-checkbox" required>
                                     <span>Jeg samtykker til <a href="/personvern" target="_blank" style="color: inherit; text-decoration: underline;">personvernreglene</a>. *</span>
                                 </label>
                             </div>
-	                            <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
-	                            <p class="hkm-chat-email-status" aria-live="polite"></p>
-	                        </form>
-	                    </div>
+                            <button type="submit" class="hkm-chat-email-submit">Send e-post</button>
+                            <p class="hkm-chat-email-status" aria-live="polite"></p>
+                        </form>
+                    </div>
                     <div class="hkm-chat-human-bridge" style="display:none;">
                         <p>Ønsker du å snakke med en person?</p>
                         <button type="button" class="hkm-chat-request-human">Be om menneskelig hjelp</button>
@@ -2593,57 +2591,43 @@ window.addEventListener('load', () => {
             }
             
 	            .hkm-chat-email-panel {
-	                padding: 20px !important;
+	                padding: 24px !important;
 	                flex: 1 !important;
-	                /* Force a stable scrollbar gutter to prevent 1px layout jitter on focus/tab. */
-	                overflow-y: scroll !important;
+	                overflow-y: auto !important;
 	                min-height: 0 !important;
-	                overscroll-behavior: contain !important;
-	                scrollbar-gutter: stable both-edges !important;
-	                overflow-anchor: none !important;
-	                scroll-behavior: auto !important;
-	                padding-bottom: 28px !important;
 	                background: #fff !important;
+                    -webkit-overflow-scrolling: touch !important;
 	            }
-            .hkm-chat-email-form {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 16px !important;
-            }
-            .hkm-chat-field {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 8px !important;
-            }
-            .hkm-chat-field label {
-                font-size: 13px !important;
-                font-weight: 700 !important;
-                color: #334155 !important;
-                margin: 0 !important;
-                cursor: pointer !important;
-            }
-	            .hkm-chat-field input, .hkm-chat-field textarea {
-	                width: 100% !important;
-	                border: 1px solid #E2E8F0 !important;
-	                border-radius: 10px !important;
-	                padding: 12px 14px !important;
-	                font-size: 14px !important;
-	                background: #F8FAFC !important;
-	                color: #1E293B !important;
-	                outline: none !important;
-	            }
-	            /* Prevent iOS "focus zoom" (which causes jumpy layout) by using >= 16px font-size on inputs. */
-	            @supports (-webkit-touch-callout: none) {
-	                .hkm-chat-input,
-	                .hkm-chat-field input,
-	                .hkm-chat-field textarea {
-	                    font-size: 16px !important;
-	                }
-	            }
-            .hkm-chat-field input:focus, .hkm-chat-field textarea:focus {
-                border-color: #d17d39 !important;
-                background: #fff !important;
-            }
+                .hkm-chat-email-form {
+                    display: block !important;
+                }
+                .hkm-chat-field {
+                    display: block !important;
+                    margin-bottom: 16px !important;
+                }
+                .hkm-chat-field label {
+                    display: block !important;
+                    font-size: 13px !important;
+                    font-weight: 700 !important;
+                    color: #334155 !important;
+                    margin-bottom: 8px !important;
+                }
+                .hkm-chat-field input, .hkm-chat-field textarea {
+                    display: block !important;
+                    width: 100% !important;
+                    border: 1px solid #E2E8F0 !important;
+                    border-radius: 10px !important;
+                    padding: 12px 14px !important;
+                    font-size: 15px !important;
+                    background: #F8FAFC !important;
+                    color: #1E293B !important;
+                    outline: none !important;
+                    transform: translateZ(0) !important;
+                }
+                .hkm-chat-field input:focus, .hkm-chat-field textarea:focus {
+                    border-color: #d17d39 !important;
+                    background: #fff !important;
+                }
             .hkm-chat-email-submit {
                 margin-top: 10px !important;
                 background: #d17d39 !important;
