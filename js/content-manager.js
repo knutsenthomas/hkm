@@ -2603,11 +2603,6 @@ class ContentManager {
                             ${post.date ? `<span><i class="fas fa-calendar-alt"></i> ${this.formatDate(post.date)}</span>` : ''}
                             ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : '<span><i class="fas fa-user"></i> Admin</span>'}
                         </div>
-                        ${post.tags && Array.isArray(post.tags) && post.tags.length > 0 ? `
-                        <div class="blog-tags cms-blog-tags">
-                            ${post.tags.map(tag => `<span class="cms-blog-tag-pill">#${tag}</span>`).join('')}
-                        </div>
-                        ` : ''}
                         <h3 class="blog-title cms-blog-title">${post.title}</h3>
                         <p class="blog-excerpt cms-blog-excerpt">${this.generateExcerpt(post.content, post.title)}...</p>
                         <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link cms-blog-link">${this.getTranslation('read_more')} <i class="fas fa-arrow-right cms-blog-link-icon"></i></a>
