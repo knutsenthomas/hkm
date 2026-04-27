@@ -748,44 +748,15 @@ class FirebaseService {
     /**
      * Storage Methods
      */
-    async uploadImage(file, path, options = {}) {
-        if (!this.isInitialized) {
-            console.error("Firebase not initialized for upload");
-            throw new Error("Firebase er ikke initialisert.");
-        }
-
-        console.log(`[FirebaseService] Starter opplasting til: ${path} (${file.size} bytes)`);
-
+    async uploadImage(file, path) {
+        if (!this.isInitialized) throw new Error("Firebase er ikke initialisert.");
         try {
             const storageRef = this.storage.ref(path);
-            const uploadTask = storageRef.put(file);
-
-            return new Promise((resolve, reject) => {
-                uploadTask.on('state_changed',
-                    (snapshot) => {
-                        if (options.onProgress) {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            options.onProgress(progress);
-                        }
-                    },
-                    (error) => {
-                        console.error("[FirebaseService] Opplasting feilet:", error);
-                        reject(error);
-                    },
-                    async () => {
-                        try {
-                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                            console.log("[FirebaseService] Opplasting fullført:", downloadURL);
-                            resolve(downloadURL);
-                        } catch (e) {
-                            reject(e);
-                        }
-                    }
-                );
-            });
-        } catch (err) {
-            console.error("[FirebaseService] Kritisk feil ved start av opplasting:", err);
-            throw err;
+            const snapshot = await storageRef.put(file);
+            return await snapshot.ref.getDownloadURL();
+        } catch (error) {
+            console.error("[FirebaseService] Upload error:", error);
+            throw error;
         }
     }
 

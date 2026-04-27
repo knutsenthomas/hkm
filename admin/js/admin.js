@@ -6301,39 +6301,27 @@ class AdminManager {
             const file = e.target.files[0];
             if (!file) return;
 
-            let uploadFile = file;
-            if (file.size > 2 * 1024 * 1024) {
-                try {
-                    imgTrigger.innerHTML = '<div class="loader" style="min-height: auto; margin: 0;"><span class="material-symbols-outlined rotating" style="color: var(--accent-color);">sync</span></div><p style="font-size:10px; color:#64748b; margin-top:8px;">Behandler...</p>';
-                    uploadFile = await this.compressImage(file);
-                } catch (cErr) { console.warn("Compression skip", cErr); }
-            }
-
             imgTrigger.style.opacity = '0.5';
             imgTrigger.style.pointerEvents = 'none';
-            imgTrigger.innerHTML = '<div class="loader" style="min-height: auto; margin: 0;"><span class="material-symbols-outlined rotating" style="color: var(--accent-color);">sync</span></div>';
-
-            this.showToast('ℹ️ Starter opplasting...', 'info', 2000);
+            const originalHTML = imgTrigger.innerHTML;
+            imgTrigger.innerHTML = '<span class="loader-sm"></span>';
 
             try {
-                // Bruker den enkleste mulige metoden (samme som bloggen)
-                const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-                const storagePath = `covers/blog/${Date.now()}_${sanitizedName}`;
-                
-                const storageRef = firebase.storage().ref(storagePath);
-                
-                // Bruker standard Promise-basert put()
-                const snapshot = await storageRef.put(uploadFile);
-                const url = await snapshot.ref.getDownloadURL();
+                // Bruker nøyaktig samme kodesnutt og sti-logikk som bloggen
+                const path = `covers/blog/${Date.now()}_${file.name}`;
+                const url = await firebaseService.uploadImage(file, path);
                 
                 imgInput.value = url;
                 imgInput.dispatchEvent(new Event('input')); 
-                this.showToast('✅ Bilde lastet opp!', 'success');
+                this.showToast('Bilde lastet opp!', 'success');
             } catch (err) {
-                console.error("Kritisk opplastingsfeil:", err);
-                this.showToast('❌ Feil: ' + (err.message || 'Kunne ikke kontakte server'), 'error', 15000);
-                imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
+                console.error("Upload error:", err);
+                this.showToast('Kunne ikke laste opp bilde.', 'error');
+                imgTrigger.innerHTML = originalHTML;
             } finally {
+                imgTrigger.style.opacity = '1';
+                imgTrigger.style.pointerEvents = 'auto';
+            }
                 imgTrigger.style.opacity = '1';
                 imgTrigger.style.pointerEvents = 'auto';
             }
