@@ -6253,7 +6253,11 @@ class AdminManager {
                 const sanitizedName = file.name.split('.')[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
                 const storagePath = `hero/${Date.now()}_${sanitizedName}.${extension}`;
                 
-                const url = await firebaseService.uploadImage(file, storagePath);
+                const url = await firebaseService.uploadImage(file, storagePath, {
+                    onProgress: (p) => {
+                        uploadBtn.innerHTML = `<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> ${Math.round(p)}%`;
+                    }
+                });
                 imgInput.value = url;
                 this.showToast('✅ Bilde ble lastet opp! Husk å lagre sliden.', 'success', 5000);
                 console.log('Upload successful:', url);

@@ -750,8 +750,12 @@ class FirebaseService {
      */
     async uploadImage(file, path, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
+        if (!this.storage) throw new Error("Storage not available");
+        
+        console.log(`[FirebaseService] Starting upload to ${path} (${file.size} bytes)...`);
+
         const storageRef = this.storage.ref(path);
-        const timeoutMs = typeof options.timeoutMs === 'number' ? options.timeoutMs : 45000;
+        const timeoutMs = typeof options.timeoutMs === 'number' ? options.timeoutMs : 60000;
 
         return new Promise((resolve, reject) => {
             const uploadTask = storageRef.put(file);
@@ -759,23 +763,33 @@ class FirebaseService {
 
             const timeoutId = setTimeout(() => {
                 didTimeout = true;
-                uploadTask.cancel();
-                reject(new Error('Upload timeout'));
+                console.warn(`[FirebaseService] Upload timed out for ${path}`);
+                if (typeof uploadTask.cancel === 'function') uploadTask.cancel();
+                reject(new Error('Opplastingen tok for lang tid. Sjekk internettforbindelsen din.'));
             }, timeoutMs);
 
             uploadTask.on(
                 'state_changed',
-                null,
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    console.log(`[FirebaseService] Upload progress for ${path}: ${Math.round(progress)}%`);
+                    if (typeof options.onProgress === 'function') {
+                        options.onProgress(progress);
+                    }
+                },
                 (error) => {
                     clearTimeout(timeoutId);
+                    console.error(`[FirebaseService] Upload task failed for ${path}:`, error);
                     if (!didTimeout) reject(error);
                 },
                 async () => {
                     clearTimeout(timeoutId);
                     try {
                         const url = await storageRef.getDownloadURL();
+                        console.log(`[FirebaseService] Upload successful for ${path}:`, url);
                         resolve(url);
                     } catch (error) {
+                        console.error(`[FirebaseService] Failed to get download URL for ${path}:`, error);
                         reject(error);
                     }
                 }
