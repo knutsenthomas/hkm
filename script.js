@@ -1887,6 +1887,85 @@ window.addEventListener('load', () => {
             return false;
         };
 
+        const buildFollowUpQuestions = (userText = '', aiText = '') => {
+            const haystack = `${userText} ${aiText}`.toLowerCase();
+            const questions = [];
+            const seen = new Set();
+
+            const addQuestion = (text) => {
+                if (!text) return;
+                const key = text.trim().toLowerCase();
+                if (seen.has(key)) return;
+                seen.add(key);
+                questions.push(text);
+            };
+
+            if (/donasjon|gave|vipps|fast giver|støtt/.test(haystack)) {
+                addQuestion('Hvordan kan jeg bli fast giver?');
+                addQuestion('Hvilke prosjekter trenger mest støtte akkurat nå?');
+                addQuestion('Kan du forklare hvordan jeg gir via Vipps?');
+            }
+
+            if (/arrangement|kalender|event|seminar|kurs/.test(haystack)) {
+                addQuestion('Hvilke arrangementer skjer denne måneden?');
+                addQuestion('Hvordan melder jeg meg på et arrangement?');
+                addQuestion('Kan du anbefale et kurs som passer for nybegynnere?');
+            }
+
+            if (/bibel|tro|bønn|jesus|undervisning|podcast|youtube|media/.test(haystack)) {
+                addQuestion('Kan du anbefale en undervisningsserie om dette temaet?');
+                addQuestion('Har dere en podcast-episode som passer til dette?');
+                addQuestion('Kan du gi et kort bibelvers om dette?');
+            }
+
+            if (/kontakt|hjelp|snakke med|person|råd/.test(haystack)) {
+                addQuestion('Hvordan kan jeg kontakte teamet direkte?');
+                addQuestion('Kan dere følge meg opp på e-post?');
+                addQuestion('Kan jeg få snakke med en person i stedet for AI?');
+            }
+
+            // Always include useful generic follow-ups as fallback.
+            addQuestion('Kan du forklare dette enklere?');
+            addQuestion('Kan du gi et konkret eksempel?');
+            addQuestion('Hva er beste neste steg for meg nå?');
+
+            return questions.slice(0, 3);
+        };
+
+        const renderFollowUpSuggestions = (questions = []) => {
+            if (!Array.isArray(questions) || questions.length === 0) return;
+
+            const wrap = document.createElement('div');
+            wrap.className = 'hkm-chat-followups';
+
+            const label = document.createElement('p');
+            label.className = 'hkm-chat-followups-label';
+            label.textContent = 'Forslag til neste sporsmal:';
+            wrap.appendChild(label);
+
+            const list = document.createElement('div');
+            list.className = 'hkm-chat-followups-list';
+
+            questions.forEach((question) => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'hkm-chat-followup-btn';
+                btn.textContent = question;
+                btn.addEventListener('click', () => {
+                    input.value = question;
+                    if (typeof form.requestSubmit === 'function') {
+                        form.requestSubmit();
+                    } else {
+                        form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+                    }
+                });
+                list.appendChild(btn);
+            });
+
+            wrap.appendChild(list);
+            bodyEl.appendChild(wrap);
+        };
+
         const renderMessages = () => {
             if (activeMode === 'email') {
                 bodyEl.innerHTML = '';
@@ -1947,6 +2026,25 @@ window.addEventListener('load', () => {
                 typingMsg.style.opacity = '0.7';
                 typingMsg.innerHTML = 'HKM Assistent skriver <span class="hkm-typing-dots"><span>.</span><span>.</span><span>.</span></span>';
                 bodyEl.appendChild(typingMsg);
+            }
+
+            if (!isTyping && activeMode === 'ai') {
+                const lastVisible = visibleMessages[visibleMessages.length - 1] || null;
+                const hasLatestAiReply = lastVisible && lastVisible.source === 'ai_gemini';
+
+                if (hasLatestAiReply) {
+                    const lastVisitor = [...visibleMessages]
+                        .reverse()
+                        .find((item) => item && item.sender === 'visitor' && item.targetMode === 'ai' && typeof item.text === 'string' && item.text.trim());
+                    const lastAi = [...visibleMessages]
+                        .reverse()
+                        .find((item) => item && item.source === 'ai_gemini' && typeof item.text === 'string' && item.text.trim());
+
+                    if (lastVisitor && lastAi) {
+                        const suggestions = buildFollowUpQuestions(lastVisitor.text, lastAi.text);
+                        renderFollowUpSuggestions(suggestions);
+                    }
+                }
             }
 
             // Use a small timeout to ensure DOM and layout are ready
@@ -2514,6 +2612,41 @@ window.addEventListener('load', () => {
                 border-bottom-left-radius: 4px !important;
                 border: 1px solid #E2E8F0 !important;
                 box-shadow: 0 2px 8px rgba(0,0,0,0.02) !important;
+            }
+
+            .hkm-chat-followups {
+                align-self: stretch !important;
+                margin-top: 2px !important;
+            }
+            .hkm-chat-followups-label {
+                margin: 0 0 8px !important;
+                font-size: 11px !important;
+                font-weight: 700 !important;
+                color: #64748B !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.04em !important;
+            }
+            .hkm-chat-followups-list {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+            }
+            .hkm-chat-followup-btn {
+                border: 1px solid #E2E8F0 !important;
+                background: #fff !important;
+                color: #334155 !important;
+                border-radius: 999px !important;
+                padding: 8px 12px !important;
+                font-size: 12px !important;
+                line-height: 1.3 !important;
+                font-weight: 600 !important;
+                cursor: pointer !important;
+                transition: all 0.2s ease !important;
+            }
+            .hkm-chat-followup-btn:hover {
+                background: #FFF7ED !important;
+                border-color: #FED7AA !important;
+                color: #9A3412 !important;
             }
             
             .hkm-chat-human-bridge {
