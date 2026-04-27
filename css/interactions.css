@@ -249,7 +249,7 @@
 
 @media (max-width: 640px) {
     .likes-section {
-        align-items: flex-start;
+        align-items: center;
         gap: 12px;
         flex-wrap: wrap;
     }
@@ -270,6 +270,8 @@
     .likes-count-text {
         font-size: 14px;
         line-height: 1.5;
+        align-self: center;
+        margin: 0;
     }
 
     .comment-item {
