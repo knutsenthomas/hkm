@@ -1986,14 +1986,16 @@ window.addEventListener('load', () => {
             statusEl.dataset.kind = kind;
         }
 
-        const setOpen = (open) => {
+        const setOpen = (open, autoFocus = true) => {
             root.classList.toggle('open', open);
             panel.setAttribute('aria-hidden', open ? 'false' : 'true');
             if (open) {
-                if (activeMode === 'email') {
-                    emailNameInput.focus();
-                } else {
-                    input.focus();
+                if (autoFocus) {
+                    if (activeMode === 'email') {
+                        emailNameInput.focus();
+                    } else {
+                        input.focus();
+                    }
                 }
                 bodyEl.scrollTop = bodyEl.scrollHeight;
             }
@@ -2215,6 +2217,9 @@ window.addEventListener('load', () => {
                 requestHumanBtn.textContent = 'Be om menneskelig hjelp';
             }
         });
+
+        // Start open without autofocus
+        setTimeout(() => setOpen(true, false), 500);
     }
 
     function injectChatStyles() {
@@ -2716,9 +2721,30 @@ window.addEventListener('load', () => {
                     right: 16px;
                     bottom: 16px;
                 }
-                .hkm-chat-panel {
-                    width: calc(100vw - 32px);
-                    bottom: 60px;
+                #hkm-visitor-chat-widget.open {
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    height: 100dvh !important;
+                    z-index: 100000 !important;
+                }
+                #hkm-visitor-chat-widget.open .hkm-chat-panel {
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    right: 0 !important;
+                    bottom: 0 !important;
+                    width: 100vw !important;
+                    height: 100vh !important;
+                    height: 100dvh !important;
+                    max-width: 100vw !important;
+                    max-height: 100vh !important;
+                    max-height: 100dvh !important;
+                    border-radius: 0 !important;
+                    border: none !important;
+                    margin: 0 !important;
+                    z-index: 100000 !important;
                 }
             }
             @media (min-width: 481px) {
