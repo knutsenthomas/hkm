@@ -1549,7 +1549,6 @@ window.addEventListener('load', () => {
         const root = document.createElement('div');
         root.id = 'hkm-visitor-chat-widget';
         root.innerHTML = `
-            <div class="hkm-chat-closed-badge" aria-live="polite" aria-atomic="true"></div>
             <button type="button" class="hkm-chat-toggle" aria-label="Apne chat">
                 <div class="hkm-chat-dot"></div>
                 <svg class="hkm-chat-icon-chat" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1577,6 +1576,7 @@ window.addEventListener('load', () => {
                     <button type="button" class="hkm-chat-close" aria-label="Lukk chat">×</button>
                 </header>
                 
+                <div class="hkm-chat-closed-notice hkm-chat-hidden" aria-live="polite" aria-atomic="true"></div>
                 <nav class="hkm-chat-mode-switch" role="group" aria-label="Velg chatmodus">
                     <button type="button" class="hkm-chat-mode-btn active" data-mode="ai" aria-label="AI-assistent" title="AI-assistent">
                         <span class="hkm-chat-mode-icon" aria-hidden="true">
@@ -1824,7 +1824,7 @@ window.addEventListener('load', () => {
 	            return minuteOfDay >= opensAt && minuteOfDay < closesAt;
 	        }
 
-	        const closedBadge = root.querySelector('.hkm-chat-closed-badge');
+	        const closedNotice = root.querySelector('.hkm-chat-closed-notice');
 
 	        function applyAvailabilityIndicators() {
 	            const isOpen = isWithinNorwegianBusinessHours();
@@ -1835,14 +1835,14 @@ window.addEventListener('load', () => {
 	                headerStatusText.textContent = isOpen ? 'Online' : 'Stengt nå';
 	            }
 
-	            if (closedBadge) {
+	            if (closedNotice) {
 	                if (!isOpen) {
 	                    const nextInfo = getNextOpeningInfo();
-	                    closedBadge.textContent = `Åpner ${nextInfo}`;
-	                    closedBadge.classList.add('visible');
+	                    closedNotice.textContent = `Vi er stengt akkurat nå. Chatten åpner ${nextInfo}.`;
+	                    closedNotice.classList.remove('hkm-chat-hidden');
 	                } else {
-	                    closedBadge.textContent = '';
-	                    closedBadge.classList.remove('visible');
+	                    closedNotice.textContent = '';
+	                    closedNotice.classList.add('hkm-chat-hidden');
 	                }
 	            }
 	        }
@@ -2596,42 +2596,17 @@ window.addEventListener('load', () => {
             .hkm-chat-hidden-dot {
                 display: none !important;
             }
-            .hkm-chat-closed-badge {
-                position: absolute !important;
-                bottom: 70px !important;
-                right: 0 !important;
-                background: rgba(30, 30, 30, 0.88) !important;
-                color: #fff !important;
-                font-size: 12px !important;
-                font-weight: 500 !important;
-                line-height: 1.3 !important;
-                padding: 7px 12px !important;
+            .hkm-chat-closed-notice {
+                margin: 10px 14px 0 !important;
+                padding: 10px 14px !important;
+                background: #FFF7ED !important;
+                border: 1px solid #fed7aa !important;
                 border-radius: 10px !important;
-                white-space: nowrap !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: translateY(4px) !important;
-                transition: opacity 0.25s ease, transform 0.25s ease !important;
-                backdrop-filter: blur(4px) !important;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
-                z-index: 1 !important;
-            }
-            .hkm-chat-closed-badge::after {
-                content: '' !important;
-                position: absolute !important;
-                top: 100% !important;
-                right: 22px !important;
-                border: 6px solid transparent !important;
-                border-top-color: rgba(30, 30, 30, 0.88) !important;
-            }
-            .hkm-chat-closed-badge.visible {
-                opacity: 1 !important;
-                transform: translateY(0) !important;
-                pointer-events: auto !important;
-            }
-            #hkm-visitor-chat-widget.open .hkm-chat-closed-badge {
-                opacity: 0 !important;
-                pointer-events: none !important;
+                color: #92400e !important;
+                font-size: 13px !important;
+                font-weight: 500 !important;
+                line-height: 1.45 !important;
+                text-align: center !important;
             }
             
 	            .hkm-chat-panel {
