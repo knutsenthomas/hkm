@@ -399,6 +399,11 @@ ul {
     position: relative;
     padding-top: 140px;
     padding-bottom: 80px;
+    min-height: 350px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
     background-color: var(--primary-green);
     /* Fallback dark background */
     background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058df31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
