@@ -6314,8 +6314,10 @@ class AdminManager {
             imgTrigger.innerHTML = '<div class="loader" style="min-height: auto; margin: 0;"><span class="material-symbols-outlined rotating" style="color: var(--accent-color);">sync</span></div>';
 
             try {
-                // Use covers/ path as used in blog system
-                const storagePath = `covers/hero_slides/${Date.now()}_${file.name}`;
+                // TEST: Bruker nøyaktig samme sti-prefiks som bloggen (som vi vet fungerer)
+                const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
+                const storagePath = `covers/blog/hero_${Date.now()}_${sanitizedName}`;
+                
                 const url = await firebaseService.uploadImage(uploadFile, storagePath, {
                     onProgress: (p) => {
                         imgTrigger.innerHTML = `<div class="loader" style="min-height: auto; margin: 0;"><span style="color: var(--accent-color); font-weight: bold; font-size: 14px;">${Math.round(p)}%</span></div>`;
@@ -6323,11 +6325,11 @@ class AdminManager {
                 });
                 
                 imgInput.value = url;
-                imgInput.dispatchEvent(new Event('input')); // Sync preview
+                imgInput.dispatchEvent(new Event('input')); 
                 this.showToast('✅ Bilde lastet opp!', 'success');
             } catch (err) {
-                console.error("Upload error:", err);
-                this.showToast('❌ Kunne ikke laste opp bilde.', 'error');
+                console.error("Upload error detail:", err);
+                this.showToast('❌ Feil: ' + (err.message || 'Ukjent feil ved opplasting'), 'error', 10000);
                 imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
             } finally {
                 imgTrigger.style.opacity = '1';

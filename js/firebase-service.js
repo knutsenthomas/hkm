@@ -749,46 +749,44 @@ class FirebaseService {
      * Storage Methods
      */
     async uploadImage(file, path, options = {}) {
-        if (!this.isInitialized) throw new Error("Firebase not initialized");
-        if (!this.storage) this.storage = firebase.storage();
-        
-        const storageRef = this.storage.ref(path);
-        const timeoutMs = typeof options.timeoutMs === 'number' ? options.timeoutMs : 300000; // 5 min for large files
+        if (!this.isInitialized) {
+            console.error("Firebase not initialized for upload");
+            throw new Error("Firebase er ikke initialisert.");
+        }
 
-        console.log(`[FirebaseService] Uploading ${file.name} to ${path}...`);
+        console.log(`[FirebaseService] Starter opplasting til: ${path} (${file.size} bytes)`);
 
-        return new Promise((resolve, reject) => {
+        try {
+            const storageRef = this.storage.ref(path);
             const uploadTask = storageRef.put(file);
-            let didTimeout = false;
 
-            const timeoutId = setTimeout(() => {
-                didTimeout = true;
-                if (typeof uploadTask.cancel === 'function') uploadTask.cancel();
-                reject(new Error('Opplastingen tok for lang tid. Vennligst sjekk internettforbindelsen din.'));
-            }, timeoutMs);
-
-            uploadTask.on(
-                'state_changed',
-                (snapshot) => {
-                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    if (typeof options.onProgress === 'function') options.onProgress(progress);
-                },
-                (error) => {
-                    clearTimeout(timeoutId);
-                    console.error("[FirebaseService] Upload error:", error);
-                    if (!didTimeout) reject(error);
-                },
-                async () => {
-                    clearTimeout(timeoutId);
-                    try {
-                        const url = await storageRef.getDownloadURL();
-                        resolve(url);
-                    } catch (error) {
+            return new Promise((resolve, reject) => {
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        if (options.onProgress) {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            options.onProgress(progress);
+                        }
+                    },
+                    (error) => {
+                        console.error("[FirebaseService] Opplasting feilet:", error);
                         reject(error);
+                    },
+                    async () => {
+                        try {
+                            const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                            console.log("[FirebaseService] Opplasting fullført:", downloadURL);
+                            resolve(downloadURL);
+                        } catch (e) {
+                            reject(e);
+                        }
                     }
-                }
-            );
-        });
+                );
+            });
+        } catch (err) {
+            console.error("[FirebaseService] Kritisk feil ved start av opplasting:", err);
+            throw err;
+        }
     }
 
     async requestNotificationPermission() {
