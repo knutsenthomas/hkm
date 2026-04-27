@@ -6318,12 +6318,6 @@ class AdminManager {
                 console.error("Upload error:", err);
                 this.showToast('Kunne ikke laste opp bilde.', 'error');
                 imgTrigger.innerHTML = originalHTML;
-            } finally {
-                imgTrigger.style.opacity = '1';
-                imgTrigger.style.pointerEvents = 'auto';
-            }
-                imgTrigger.style.opacity = '1';
-                imgTrigger.style.pointerEvents = 'auto';
             }
         };
 
