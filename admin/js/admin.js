@@ -6197,34 +6197,37 @@ class AdminManager {
                                                     <div class="form-group">
                                                         <label>Bilde URL / Last opp</label>
                                                         <div style="display: flex; gap: 8px;">
-                                                            <input type="text" id="slide-img-url" class="form-control" value="${slide.imageUrl || ''}" style="flex: 1;">
-                                                                <button class="btn-primary" id="upload-slide-img" style="padding: 0 12px;"><span class="material-symbols-outlined">upload</span></button>
-                                                                <input type="file" id="slide-file-input" style="display: none;" accept="image/*">
-                                                                </div>
+                                                            <input type="text" id="slide-img-url" class="form-control" value="${slide.imageUrl || ''}" style="flex: 1;" placeholder="Bilde URL">
+                                                            <button class="btn-primary" id="upload-slide-img" style="padding: 0 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap;">
+                                                                <span class="material-symbols-outlined" style="font-size: 20px;">upload</span>
+                                                                Last opp
+                                                            </button>
+                                                            <input type="file" id="slide-file-input" style="display: none;" accept="image/*">
                                                         </div>
-                                                        <div class="form-group">
-                                                            <label>Overskrift</label>
-                                                            <input type="text" id="slide-title" class="form-control" value="${slide.title || ''}">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label>Undertekst</label>
-                                                            <textarea id="slide-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label>Knapptekst</label>
-                                                            <input type="text" id="slide-btn-text" class="form-control" value="${slide.btnText || ''}">
-                                                        </div>
-                                                        <div class="form-group">
-                                                            <label>Knapp-lenke</label>
-                                                            <input type="text" id="slide-btn-link" class="form-control" value="${slide.btnLink || ''}">
-                                                        </div>
-                                                        <div style="margin-top: 24px;">
-                                                            <button class="btn-primary" style="width: 100%;" id="save-slide-btn">Lagre slide</button>
-                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Overskrift</label>
+                                                        <input type="text" id="slide-title" class="form-control" value="${slide.title || ''}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Undertekst</label>
+                                                        <textarea id="slide-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Knapptekst</label>
+                                                        <input type="text" id="slide-btn-text" class="form-control" value="${slide.btnText || ''}">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label>Knapp-lenke</label>
+                                                        <input type="text" id="slide-btn-link" class="form-control" value="${slide.btnLink || ''}">
+                                                    </div>
+                                                    <div style="margin-top: 24px;">
+                                                        <button class="btn-primary" style="width: 100%;" id="save-slide-btn">Lagre slide</button>
                                                     </div>
                                                 </div>
                                             </div>
-                                            `;
+                                        </div>
+                                        `;
         document.body.appendChild(modal);
 
         const imgInput = document.getElementById('slide-img-url');
@@ -6234,16 +6237,29 @@ class AdminManager {
         uploadBtn.onclick = () => fileInput.click();
         fileInput.onchange = async () => {
             if (fileInput.files.length === 0) return;
+            const file = fileInput.files[0];
+            
+            console.log('Starting hero image upload:', file.name, file.size);
+            
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span>';
+            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Laster opp...';
+            
             try {
-                const url = await firebaseService.uploadImage(fileInput.files[0], `hero/${Date.now()}_${fileInput.files[0].name}`);
+                // Sanitize filename to avoid encoding issues
+                const extension = file.name.split('.').pop();
+                const sanitizedName = file.name.split('.')[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                const storagePath = `hero/${Date.now()}_${sanitizedName}.${extension}`;
+                
+                const url = await firebaseService.uploadImage(file, storagePath);
                 imgInput.value = url;
+                this.showToast('Bilde ble lastet opp!', 'success', 3000);
+                console.log('Upload successful:', url);
             } catch (err) {
-                this.showToast('Opplasting feilet: ' + err.message, 'error', 5000);
+                console.error('Upload failed:', err);
+                this.showToast('Opplasting feilet: ' + (err.message || 'Ukjent feil'), 'error', 6000);
             } finally {
                 uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Last opp nytt bilde';
+                uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp';
             }
         };
 
