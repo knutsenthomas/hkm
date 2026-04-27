@@ -1836,7 +1836,8 @@ window.addEventListener('load', () => {
 	            }
 
 	            if (closedNotice) {
-	                if (!isOpen) {
+	                const showNotice = !isOpen && activeMode === 'google_chat';
+	                if (showNotice) {
 	                    const nextInfo = getNextOpeningInfo();
 	                    closedNotice.textContent = `Vi er stengt akkurat nå. Chatten åpner ${nextInfo}.`;
 	                    closedNotice.classList.remove('hkm-chat-hidden');
@@ -2016,7 +2017,20 @@ window.addEventListener('load', () => {
             footer.classList.toggle('hkm-chat-hidden', isEmailMode);
             emailPanel.classList.toggle('hkm-chat-hidden', !isEmailMode);
 
-            // Samtykke-logikk (kun hvis key er klar)
+            // Closed notice: only visible in google_chat mode when outside business hours.
+            if (closedNotice) {
+                const isOpen = isWithinNorwegianBusinessHours();
+                const showNotice = !isOpen && activeMode === 'google_chat';
+                if (showNotice) {
+                    if (!closedNotice.textContent) {
+                        const nextInfo = getNextOpeningInfo();
+                        closedNotice.textContent = `Vi er stengt akkurat n\u00e5. Chatten \u00e5pner ${nextInfo}.`;
+                    }
+                    closedNotice.classList.remove('hkm-chat-hidden');
+                } else {
+                    closedNotice.classList.add('hkm-chat-hidden');
+                }
+            }
             if (privacyConsentKey) {
                 const isConsented = localStorage.getItem(privacyConsentKey) === 'true';
                 
