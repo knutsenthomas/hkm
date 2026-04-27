@@ -81,8 +81,8 @@
 
 /* === Global Font Size Variables === */
 :root {
-    --fs-h1-desktop: 48px !important;
-    --fs-h1-mobile: 32px !important;
+    --fs-h1-desktop: 38px !important;
+    --fs-h1-mobile: 28px !important;
     --fs-h2-desktop: 28px !important;
     --fs-h2-mobile: 20px !important;
     --fs-body: 16px !important;
@@ -430,7 +430,7 @@ ul {
 
 @media (max-width: 700px) {
     .page-hero-title {
-        font-size: var(--fs-h1-mobile, 8vw) !important;
+        font-size: var(--fs-h1-mobile, 7vw) !important;
         max-width: 90vw !important;
         word-break: break-word !important;
         overflow-wrap: break-word !important;
