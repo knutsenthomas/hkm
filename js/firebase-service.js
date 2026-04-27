@@ -748,11 +748,48 @@ class FirebaseService {
     /**
      * Storage Methods
      */
-    async uploadImage(file, path) {
+    async uploadImage(file, path, onProgress = null, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase er ikke initialisert.");
+        if (!this.storage) throw new Error("Firebase Storage er ikke initialisert.");
+        if (!file) throw new Error("Ingen bildefil valgt.");
+
+        const maxSizeBytes = options.maxSizeBytes || 10 * 1024 * 1024;
+        const timeoutMs = options.timeoutMs || 90000;
+        if (file.size > maxSizeBytes) {
+            throw new Error("Bildet er for stort. Maks størrelse er 10 MB.");
+        }
+        if (!file.type || !file.type.startsWith('image/')) {
+            throw new Error("Filen må være et bilde.");
+        }
+
         try {
             const storageRef = this.storage.ref(path);
-            const snapshot = await storageRef.put(file);
+            const uploadTask = storageRef.put(file);
+
+            const snapshot = await new Promise((resolve, reject) => {
+                const timeoutId = window.setTimeout(() => {
+                    uploadTask.cancel();
+                    reject(new Error("Opplastingen tok for lang tid. Prøv igjen med et mindre bilde."));
+                }, timeoutMs);
+
+                uploadTask.on(
+                    'state_changed',
+                    (snapshot) => {
+                        if (typeof onProgress === 'function' && snapshot.totalBytes > 0) {
+                            onProgress(Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100), snapshot);
+                        }
+                    },
+                    (error) => {
+                        window.clearTimeout(timeoutId);
+                        reject(error);
+                    },
+                    () => {
+                        window.clearTimeout(timeoutId);
+                        resolve(uploadTask.snapshot);
+                    }
+                );
+            });
+
             return await snapshot.ref.getDownloadURL();
         } catch (error) {
             console.error("[FirebaseService] Upload error:", error);

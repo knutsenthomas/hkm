@@ -6321,18 +6321,36 @@ class AdminManager {
             const file = e.target.files[0];
             if (!file) return;
 
+            if (!file.type || !file.type.startsWith('image/')) {
+                this.showToast('Velg en bildefil.', 'error', 4000);
+                fileInput.value = '';
+                return;
+            }
+            if (file.size > 10 * 1024 * 1024) {
+                this.showToast('Bildet er for stort. Maks størrelse er 10 MB.', 'error', 6000);
+                fileInput.value = '';
+                return;
+            }
+
             imgTrigger.style.opacity = '0.5';
             imgTrigger.style.pointerEvents = 'none';
             chooseImageBtn.disabled = true;
             chooseImageBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Laster opp...';
-            uploadStatus.textContent = file.name;
+            uploadStatus.textContent = `${file.name} - starter...`;
             const originalHTML = imgTrigger.innerHTML;
             imgTrigger.innerHTML = '<span class="loader-sm"></span>';
 
             try {
                 const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
                 const path = `hero/${Date.now()}_${safeFileName}`;
-                const url = await firebaseService.uploadImage(file, path);
+                const url = await firebaseService.uploadImage(
+                    file,
+                    path,
+                    (progress) => {
+                        uploadStatus.textContent = `${file.name} - ${progress}%`;
+                    },
+                    { timeoutMs: 90000, maxSizeBytes: 10 * 1024 * 1024 }
+                );
                 
                 imgInput.value = url;
                 imgInput.dispatchEvent(new Event('input')); 
