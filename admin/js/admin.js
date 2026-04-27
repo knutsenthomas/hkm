@@ -6226,144 +6226,128 @@ class AdminManager {
         const modal = document.createElement('div');
         modal.className = 'dashboard-modal';
         modal.innerHTML = `
-                                        <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
-                                            <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
-                                                <div class="card-header flex-between">
-                                                    <h3 class="card-title">${isNew ? 'Legg til ny slide' : 'Rediger slide'}</h3>
-                                                    <button class="icon-btn" id="close-modal"><span class="material-symbols-outlined">close</span></button>
-                                                </div>
-                                                <div class="card-body">
-                                                    <div class="form-group">
-                                                        <label>Bilde URL / Last opp</label>
-                                                        <div style="display: flex; gap: 8px;">
-                                                            <input type="text" id="slide-img-url" class="form-control" value="${slide.imageUrl || ''}" style="flex: 1;" placeholder="Bilde URL">
-                                                            <button class="btn-primary" id="upload-slide-img" style="padding: 0 16px; display: flex; align-items: center; gap: 8px; font-size: 13px; white-space: nowrap;">
-                                                                <span class="material-symbols-outlined" style="font-size: 20px;">upload</span>
-                                                                Last opp
-                                                            </button>
-                                                            <input type="file" id="slide-file-input" style="display: none;" accept="image/*">
-                                                        </div>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Overskrift</label>
-                                                        <input type="text" id="slide-title" class="form-control" value="${slide.title || ''}">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Undertekst</label>
-                                                        <textarea id="slide-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Knapptekst</label>
-                                                        <input type="text" id="slide-btn-text" class="form-control" value="${slide.btnText || ''}">
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Knapp-lenke</label>
-                                                        <input type="text" id="slide-btn-link" class="form-control" value="${slide.btnLink || ''}">
-                                                    </div>
-                                                    <div style="margin-top: 24px;">
-                                                        <button class="btn-primary" style="width: 100%;" id="save-slide-btn">Lagre slide</button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        `;
+            <div class="modal-backdrop" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; display: flex; align-items: center; justify-content: center; padding: 20px;">
+                <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
+                    <div class="card-header flex-between">
+                        <h3 class="card-title">${isNew ? 'Legg til ny slide' : 'Rediger slide'}</h3>
+                        <button class="icon-btn" id="close-modal"><span class="material-symbols-outlined">close</span></button>
+                    </div>
+                    <div class="card-body">
+                        <!-- Blog-style image upload area -->
+                        <div class="form-group">
+                            <label>Slide-bilde (Anbefalt: 1920x1080px)</label>
+                            <div class="sidebar-img-preview" id="slide-img-trigger" style="margin-bottom: 12px; position: relative; cursor: pointer; border: 2px dashed #e2e8f0; border-radius: 12px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">
+                                ${slide.imageUrl ? `<img src="${slide.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
+                                <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.7); color: #fff; font-size: 11px; padding: 6px; text-align: center; opacity: 0; transition: opacity 0.2s;">KLIKK FOR Å LAST OPP</div>
+                            </div>
+                            <input type="file" id="slide-file-input" style="display: none;" accept="image/*">
+                            <input type="text" id="slide-img-url" class="form-control" value="${slide.imageUrl || ''}" placeholder="Eller lim inn bilde-URL her">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Overskrift</label>
+                            <input type="text" id="slide-title" class="form-control" value="${slide.title || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Undertekst</label>
+                            <textarea id="slide-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Knapptekst</label>
+                            <input type="text" id="slide-btn-text" class="form-control" value="${slide.btnText || ''}">
+                        </div>
+                        <div class="form-group">
+                            <label>Knapp-lenke</label>
+                            <input type="text" id="slide-btn-link" class="form-control" value="${slide.btnLink || ''}">
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <button class="btn-primary" style="width: 100%;" id="save-slide-btn">Lagre slide</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
         document.body.appendChild(modal);
 
         const imgInput = document.getElementById('slide-img-url');
         const fileInput = document.getElementById('slide-file-input');
-        const uploadBtn = document.getElementById('upload-slide-img');
-
-        uploadBtn.onclick = () => {
-            fileInput.value = '';
-            fileInput.click();
-        };
-        
-        fileInput.onchange = async () => {
-            if (fileInput.files.length === 0) return;
-            let file = fileInput.files[0];
-            
-            // Sikkerhetssjekk for ekstreme filstørrelser
-            if (file.size > 20 * 1024 * 1024) {
-                this.showToast('❌ Filen er for stor (>20MB). Vennligst bruk et mindre bilde.', 'error', 8000);
-                return;
-            }
-
-            console.log('[Admin] Starter opplasting:', file.name, (file.size / 1024 / 1024).toFixed(2), 'MB');
-            
-            uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Behandler...';
-            
-            try {
-                // Automatisk komprimering for filer over 1MB
-                if (file.size > 1 * 1024 * 1024 && file.type.startsWith('image/')) {
-                    console.log('[Admin] Komprimerer stort bilde...');
-                    file = await this.compressImage(file);
-                    console.log('[Admin] Ny størrelse etter komprimering:', (file.size / 1024 / 1024).toFixed(2), 'MB');
-                }
-
-                const user = firebase.auth().currentUser;
-                if (!user) throw new Error('Du må være logget inn for å laste opp bilder.');
-
-                const extension = file.name.split('.').pop();
-                const sanitizedName = file.name.split('.')[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                const storagePath = `hero/${Date.now()}_${sanitizedName}.${extension}`;
-                
-                const storage = firebase.storage();
-                const storageRef = storage.ref(storagePath);
-                const uploadTask = storageRef.put(file);
-
-                await new Promise((resolve, reject) => {
-                    const timeout = setTimeout(() => {
-                        uploadTask.cancel();
-                        reject(new Error('Opplastingen tok for lang tid (over 5 minutter). Prøv en mindre fil.'));
-                    }, 300000); // 5 minutter timeout
-
-                    uploadTask.on('state_changed',
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            uploadBtn.innerHTML = `<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> ${Math.round(progress)}%`;
-                        },
-                        (error) => {
-                            clearTimeout(timeout);
-                            let msg = error.message;
-                            if (error.code === 'storage/unauthorized') msg = 'Ingen tilgang til lagring.';
-                            reject(new Error(msg));
-                        },
-                        async () => {
-                            clearTimeout(timeout);
-                            try {
-                                const url = await uploadTask.snapshot.ref.getDownloadURL();
-                                imgInput.value = url;
-                                this.showToast('✅ Bilde lastet opp og optimalisert!', 'success', 5000);
-                                resolve();
-                            } catch (e) {
-                                reject(e);
-                            }
-                        }
-                    );
-                });
-            } catch (err) {
-                console.error('[Admin] Opplasting feilet:', err);
-                this.showToast('❌ ' + err.message, 'error', 8000);
-            } finally {
-                uploadBtn.disabled = false;
-                uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp';
-            }
-        };
+        const imgTrigger = document.getElementById('slide-img-trigger');
 
         document.getElementById('close-modal').onclick = () => modal.remove();
+
+        // Match blog image trigger logic
+        imgTrigger.onclick = () => fileInput.click();
+        imgTrigger.onmouseenter = () => {
+            const overlay = imgTrigger.querySelector('.upload-overlay');
+            if (overlay) overlay.style.opacity = '1';
+        };
+        imgTrigger.onmouseleave = () => {
+            const overlay = imgTrigger.querySelector('.upload-overlay');
+            if (overlay) overlay.style.opacity = '0';
+        };
+
+        // Live Preview for URL input
+        imgInput.oninput = (e) => {
+            const url = e.target.value;
+            if (url && url.length > 10) {
+                imgTrigger.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
+            } else {
+                imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
+            }
+        };
+
+        // File Upload (Blog-style Solution)
+        fileInput.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            let uploadFile = file;
+            if (file.size > 2 * 1024 * 1024) {
+                try {
+                    imgTrigger.innerHTML = '<div class="loader" style="min-height: auto; margin: 0;"><span class="material-symbols-outlined rotating" style="color: var(--accent-color);">sync</span></div><p style="font-size:10px; color:#64748b; margin-top:8px;">Behandler...</p>';
+                    uploadFile = await this.compressImage(file);
+                } catch (cErr) { console.warn("Compression skip", cErr); }
+            }
+
+            imgTrigger.style.opacity = '0.5';
+            imgTrigger.style.pointerEvents = 'none';
+            imgTrigger.innerHTML = '<div class="loader" style="min-height: auto; margin: 0;"><span class="material-symbols-outlined rotating" style="color: var(--accent-color);">sync</span></div>';
+
+            try {
+                // Use covers/ path as used in blog system
+                const storagePath = `covers/hero_slides/${Date.now()}_${file.name}`;
+                const url = await firebaseService.uploadImage(uploadFile, storagePath, {
+                    onProgress: (p) => {
+                        imgTrigger.innerHTML = `<div class="loader" style="min-height: auto; margin: 0;"><span style="color: var(--accent-color); font-weight: bold; font-size: 14px;">${Math.round(p)}%</span></div>`;
+                    }
+                });
+                
+                imgInput.value = url;
+                imgInput.dispatchEvent(new Event('input')); // Sync preview
+                this.showToast('✅ Bilde lastet opp!', 'success');
+            } catch (err) {
+                console.error("Upload error:", err);
+                this.showToast('❌ Kunne ikke laste opp bilde.', 'error');
+                imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
+            } finally {
+                imgTrigger.style.opacity = '1';
+                imgTrigger.style.pointerEvents = 'auto';
+            }
+        };
+
+        // Save logic matching original pattern
         document.getElementById('save-slide-btn').onclick = async () => {
-            const btn = document.getElementById('save-slide-btn');
+            const saveBtn = document.getElementById('save-slide-btn');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Lagrer...';
+
             const updatedSlide = {
-                imageUrl: document.getElementById('slide-img-url').value,
+                imageUrl: imgInput.value,
                 title: document.getElementById('slide-title').value,
                 subtitle: document.getElementById('slide-subtitle').value,
                 btnText: document.getElementById('slide-btn-text').value,
                 btnLink: document.getElementById('slide-btn-link').value
             };
-
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
 
             if (isNew) {
                 this.heroSlides.push(updatedSlide);
@@ -6373,13 +6357,14 @@ class AdminManager {
 
             try {
                 await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
+                this.showToast('✅ Slide lagret!', 'success');
                 modal.remove();
                 this.renderHeroSlides(this.heroSlides);
-                this.showToast('✅ Slide lagret!', 'success');
             } catch (err) {
-                this.showToast('Feil ved lagring', 'error', 5000);
-                btn.textContent = 'Lagre slide';
-                btn.disabled = false;
+                console.error("Save error:", err);
+                this.showToast('❌ Kunne ikke lagre sliden.', 'error');
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Lagre slide';
             }
         };
     }

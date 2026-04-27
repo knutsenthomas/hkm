@@ -750,68 +750,40 @@ class FirebaseService {
      */
     async uploadImage(file, path, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
+        if (!this.storage) this.storage = firebase.storage();
         
-        // Ensure storage is available
-        if (!this.storage) {
-            try {
-                this.storage = firebase.storage();
-            } catch (e) {
-                throw new Error("Kunne ikke koble til lagringsserveren: " + e.message);
-            }
-        }
-        
-        const user = firebase.auth().currentUser;
-        console.log(`[FirebaseService] Upload attempt by user: ${user ? user.email : 'IKKE LOGGET INN'}`);
-        
-        if (!user) {
-            console.warn("[FirebaseService] Forsøker opplasting uten aktiv innlogging. Dette vil sannsynligvis feile.");
-        }
-
-        console.log(`[FirebaseService] Preparing upload: ${path} (${file.size} bytes)`);
-
         const storageRef = this.storage.ref(path);
-        
+        const timeoutMs = typeof options.timeoutMs === 'number' ? options.timeoutMs : 300000; // 5 min for large files
+
+        console.log(`[FirebaseService] Uploading ${file.name} to ${path}...`);
+
         return new Promise((resolve, reject) => {
             const uploadTask = storageRef.put(file);
             let didTimeout = false;
 
             const timeoutId = setTimeout(() => {
                 didTimeout = true;
-                console.warn(`[FirebaseService] Upload timed out for ${path}`);
                 if (typeof uploadTask.cancel === 'function') uploadTask.cancel();
-                reject(new Error('Opplastingen tok for lang tid (0% fremdrift). Dette skyldes ofte manglende rettigheter eller tregt nett.'));
-            }, options.timeoutMs || 60000);
+                reject(new Error('Opplastingen tok for lang tid. Vennligst sjekk internettforbindelsen din.'));
+            }, timeoutMs);
 
             uploadTask.on(
                 'state_changed',
                 (snapshot) => {
                     const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                    console.log(`[FirebaseService] Progress: ${Math.round(progress)}% (${snapshot.bytesTransferred}/${snapshot.totalBytes})`);
-                    if (typeof options.onProgress === 'function') {
-                        options.onProgress(progress);
-                    }
+                    if (typeof options.onProgress === 'function') options.onProgress(progress);
                 },
                 (error) => {
                     clearTimeout(timeoutId);
-                    console.error(`[FirebaseService] Upload error:`, error);
-                    
-                    let userFriendlyMsg = error.message;
-                    if (error.code === 'storage/unauthorized') {
-                        userFriendlyMsg = 'Du har ikke tilgang til å laste opp filer. Vennligst logg inn på nytt.';
-                    } else if (error.code === 'storage/canceled') {
-                        userFriendlyMsg = 'Opplastingen ble avbrutt.';
-                    }
-                    
-                    reject(new Error(userFriendlyMsg));
+                    console.error("[FirebaseService] Upload error:", error);
+                    if (!didTimeout) reject(error);
                 },
                 async () => {
                     clearTimeout(timeoutId);
                     try {
                         const url = await storageRef.getDownloadURL();
-                        console.log(`[FirebaseService] Success:`, url);
                         resolve(url);
                     } catch (error) {
-                        console.error(`[FirebaseService] URL error:`, error);
                         reject(error);
                     }
                 }
