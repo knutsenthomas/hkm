@@ -6316,42 +6316,15 @@ class AdminManager {
             this.showToast('ℹ️ Starter opplasting...', 'info', 2000);
 
             try {
-                // Bruker Firebase direkte for å utelukke feil i service-laget
+                // Bruker den enkleste mulige metoden (samme som bloggen)
                 const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
-                const storagePath = `covers/blog/hero_${Date.now()}_${sanitizedName}`;
+                const storagePath = `covers/blog/${Date.now()}_${sanitizedName}`;
                 
                 const storageRef = firebase.storage().ref(storagePath);
-                const uploadTask = storageRef.put(uploadFile);
-
-                const url = await new Promise((resolve, reject) => {
-                    uploadTask.on('state_changed',
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            imgTrigger.innerHTML = `<div class="loader" style="min-height: auto; margin: 0;"><span style="color: var(--accent-color); font-weight: bold; font-size: 14px;">${Math.round(progress)}%</span></div>`;
-                            console.log(`Opplasting: ${Math.round(progress)}%`);
-                        },
-                        (error) => {
-                            console.error("Storage Error:", error);
-                            reject(error);
-                        },
-                        async () => {
-                            try {
-                                const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
-                                resolve(downloadURL);
-                            } catch (e) {
-                                reject(e);
-                            }
-                        }
-                    );
-
-                    // Sikkerhetsnett: Timeout etter 60 sekunder hvis ingenting skjer (0%)
-                    setTimeout(() => {
-                        if (uploadTask.snapshot.bytesTransferred === 0 && uploadTask.snapshot.state === 'running') {
-                            uploadTask.cancel();
-                            reject(new Error("Opplastingen startet ikke (timeout). Sjekk internett eller prøv en annen fil."));
-                        }
-                    }, 60000);
-                });
+                
+                // Bruker standard Promise-basert put()
+                const snapshot = await storageRef.put(uploadFile);
+                const url = await snapshot.ref.getDownloadURL();
                 
                 imgInput.value = url;
                 imgInput.dispatchEvent(new Event('input')); 
