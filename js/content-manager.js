@@ -23,26 +23,28 @@ class ContentManager {
     }
 
     detectPageId() {
-        const path = window.location.pathname;
-        if (path === '/' || path.endsWith('/') || path.includes('index.html')) return 'index';
-        if (path.includes('arrangementer.html') || path.includes('events.html') || path.includes('eventos.html')) return 'arrangementer';
-        if (path.includes('kalender.html')) return 'kalender';
-        if (path.includes('arrangement-detaljer.html') || path.includes('event-details.html') || path.includes('detalles-evento.html')) return 'arrangement-detaljer';
-        if (path.includes('blogg.html') || path.includes('blog.html')) return 'blogg';
-        if (path.includes('butikk.html') || path.includes('shop.html')) return 'butikk';
-        if (path.includes('blogg-post.html') || path.includes('blog-post.html')) return 'blogg-post';
-        if (path.includes('undervisningsserier.html') || path.includes('teaching.html')) return 'undervisningsserier';
-        if (path.includes('media.html')) return 'media';
-        if (path.includes('om-oss.html') || path.includes('about.html') || path.includes('sobre-nosotros.html')) return 'om-oss';
-        if (path.includes('kontakt.html') || path.includes('contact.html') || path.includes('contacto.html')) return 'kontakt';
-        if (path.includes('donasjoner.html') || path.includes('donations.html') || path.includes('donaciones.html')) return 'donasjoner';
-        if (path.includes('for-menigheter.html') || path.includes('for-churches.html') || path.includes('para-iglesias.html')) return 'for-menigheter';
-        if (path.includes('for-bedrifter.html') || path.includes('for-businesses.html') || path.includes('para-empresas.html')) return 'for-bedrifter';
-        if (path.includes('bnn.html')) return 'bnn';
-        if (path.includes('youtube.html')) return 'youtube';
-        if (path.includes('podcast.html')) return 'podcast';
-        if (path.includes('undervisning.html')) return 'undervisning';
-        if (path.includes('seminarer.html')) return 'seminarer';
+        // Strip .html for cleanUrls support (Vercel/Firebase cleanUrls removes extension from pathname)
+        const path = window.location.pathname.replace(/\.html$/, '');
+        const p = (s) => new RegExp('(?:^|/)' + s + '$').test(path);
+        if (path === '/' || path.endsWith('/') || p('index')) return 'index';
+        if (p('arrangementer') || p('events') || p('eventos')) return 'arrangementer';
+        if (p('kalender') || p('calendar') || p('calendario')) return 'kalender';
+        if (p('arrangement-detaljer') || p('event-details') || p('detalles-evento')) return 'arrangement-detaljer';
+        if (p('blogg-post') || p('blog-post') || p('post-blog')) return 'blogg-post';
+        if (p('blogg') || p('blog')) return 'blogg';
+        if (p('butikk') || p('shop')) return 'butikk';
+        if (p('undervisningsserier') || p('teaching') || p('ensenanza')) return 'undervisningsserier';
+        if (p('media')) return 'media';
+        if (p('om-oss') || p('about') || p('sobre-nosotros')) return 'om-oss';
+        if (p('kontakt') || p('contact') || p('contacto')) return 'kontakt';
+        if (p('donasjoner') || p('donations') || p('donaciones')) return 'donasjoner';
+        if (p('for-menigheter') || p('for-churches') || p('para-iglesias')) return 'for-menigheter';
+        if (p('for-bedrifter') || p('for-businesses') || p('para-empresas')) return 'for-bedrifter';
+        if (p('bnn')) return 'bnn';
+        if (p('youtube')) return 'youtube';
+        if (p('podcast')) return 'podcast';
+        if (p('undervisning')) return 'undervisning';
+        if (p('seminarer')) return 'seminarer';
         return '';
     }
 
