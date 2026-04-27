@@ -397,7 +397,7 @@ ul {
 /* Page Hero - Default Styles */
 .page-hero {
     position: relative;
-    padding-top: 180px;
+    padding-top: 140px;
     padding-bottom: 80px;
     background-color: var(--primary-green);
     /* Fallback dark background */
