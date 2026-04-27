@@ -1734,20 +1734,23 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-sear
     z-index: 10;
 }
 
-/* Restoring Hero Animations */
+/* Hero Animations Disabled */
 body.hero-animate .hero-title {
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay: 0.1s;
+    opacity: 1;
+    transform: translateY(0);
+    animation: none;
 }
 
 body.hero-animate .hero-subtitle {
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay: 0.3s;
+    opacity: 1;
+    transform: translateY(0);
+    animation: none;
 }
 
 body.hero-animate .slide-buttons {
-    animation: fadeInUp 0.8s ease forwards;
-    animation-delay: 0.5s;
+    opacity: 1;
+    transform: translateY(0);
+    animation: none;
 }
 
 @keyframes fadeInUp {
@@ -4645,8 +4648,9 @@ ol.block-list {
     background-size: cover;
     background-position: center;
     /* Subtle zoom effect on active */
-    transform: scale(1);
-    transition: transform 6s ease-out;
+    /* No zoom animation */
+    transform: scale(1.05);
+    transition: none;
 }
 
 .hero-slide.active .hero-bg {
@@ -4705,12 +4709,10 @@ ol.block-list {
     letter-spacing: -0.02em;
     text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 
-    /* Animation */
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    transition-delay: 0.1s;
-    /* Reduced delay for snappier load */
+    /* Animation Removed */
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
 }
 
 .hero-subtitle {
@@ -4718,10 +4720,9 @@ ol.block-list {
     font-weight: 400;
     line-height: 1.45;
     margin-bottom: 48px;
-    opacity: 0;
-    transform: translateY(15px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    transition-delay: 0.2s;
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
     max-width: 650px;
 }
 
@@ -4731,11 +4732,10 @@ ol.block-list {
     gap: 20px;
     margin: 0 !important;
     width: 100%;
-    /* Animation base state */
-    opacity: 0;
-    transform: translateY(15px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-    transition-delay: 0.3s;
+    /* Animation base state removed */
+    opacity: 1;
+    transform: translateY(0);
+    transition: none;
 }
 
 .hero-slide.active .hero-title,
