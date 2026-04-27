@@ -2621,7 +2621,7 @@ window.addEventListener('load', () => {
 	                bottom: 80px;
 	                right: 0;
 	                width: 380px;
-	                height: 600px;
+	                height: 680px;
 	                max-width: calc(100vw - 32px);
 	                /* Use dynamic viewport units/vars to avoid jumpy layouts when mobile browser UI or keyboard appears. */
 	                max-height: calc((var(--hkm-vh, 1vh) * 100) - 100px);
