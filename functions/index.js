@@ -568,6 +568,40 @@ async function inferChatIdFromGooglePayload(payload) {
   return "";
 }
 
+// Cache the selected Gemini model name for the lifetime of the function instance.
+// Avoids a listModels roundtrip (~300ms) on every warm invocation.
+let _cachedGeminiModel = "";
+
+async function resolveGeminiModel(cleanKey) {
+  if (_cachedGeminiModel) return _cachedGeminiModel;
+
+  const apiBase = "https://generativelanguage.googleapis.com/v1beta";
+  const modelsResponse = await fetch(`${apiBase}/models?key=${cleanKey}`, {
+    method: "GET",
+    headers: { "Accept": "application/json" },
+  });
+
+  const modelsPayload = await modelsResponse.json().catch(() => ({}));
+  if (!modelsResponse.ok) {
+    console.error("Gemini listModels-feil:", JSON.stringify(modelsPayload));
+    return "";
+  }
+
+  const modelNames = Array.isArray(modelsPayload.models) ?
+    modelsPayload.models
+        .filter((m) =>
+          m &&
+          typeof m.name === "string" &&
+          Array.isArray(m.supportedGenerationMethods) &&
+          m.supportedGenerationMethods.includes("generateContent"))
+        .map((m) => m.name) :
+    [];
+
+  _cachedGeminiModel = chooseGeminiModel(modelNames);
+  console.log("[Gemini] Selected model:", _cachedGeminiModel);
+  return _cachedGeminiModel;
+}
+
 function chooseGeminiModel(modelNames = []) {
   // Dynamically pick the newest available Flash model, then fall back to Pro.
   // This handles future preview releases without needing code updates.
@@ -2831,29 +2865,8 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const cleanKey = geminiKey.trim();
     const apiBase = "https://generativelanguage.googleapis.com/v1beta";
 
-    // Finn en modell som faktisk er tilgjengelig for dette prosjektet/API-nokkelen.
-    const modelsResponse = await fetch(`${apiBase}/models?key=${cleanKey}`, {
-      method: "GET",
-      headers: { "Accept": "application/json" },
-    });
-
-    const modelsPayload = await modelsResponse.json().catch(() => ({}));
-    if (!modelsResponse.ok) {
-      console.error("Gemini listModels-feil:", JSON.stringify(modelsPayload));
-      return;
-    }
-
-    const modelNames = Array.isArray(modelsPayload.models) ?
-      modelsPayload.models
-          .filter((model) =>
-            model &&
-            typeof model.name === "string" &&
-            Array.isArray(model.supportedGenerationMethods) &&
-            model.supportedGenerationMethods.includes("generateContent"))
-          .map((model) => model.name) :
-      [];
-
-    const selectedModel = chooseGeminiModel(modelNames);
+    // Use cached model resolution to avoid a listModels roundtrip on every message.
+    const selectedModel = await resolveGeminiModel(cleanKey);
     if (!selectedModel) {
       console.error("Fant ingen Gemini-modell med generateContent-stotte.");
       return;
@@ -2861,15 +2874,26 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
     const url = `${apiBase}/${selectedModel}:generateContent?key=${cleanKey}`;
 
+    // Only fetch podcast/YouTube when the message is relevant — these are slow external calls.
+    const msgText = (msgData.text || "").toLowerCase();
+    const needsMedia = /podcast|episode|youtube|video|kanal|media/.test(msgText);
+
     // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold
-    const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastRes, youtubeRes] = await Promise.all([
+    const firestoreReads = [
       db.collection("siteContent").doc("settings_seo").get(),
       db.collection("content").doc("wix_products").get(),
       db.collection("content").doc("collection_events").get(),
       db.collection("content").doc("collection_blog").get(),
       db.collection("content").doc("collection_teaching").get(),
+    ];
+    const mediaReads = needsMedia ? [
       fetch("https://anchor.fm/s/f7a13dec/podcast/rss").catch(() => null),
-      fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent("https://www.youtube.com/feeds/videos.xml?channel_id=UCFbX-Mf7NqDm2a07hk6hveg")).catch(() => null)
+      fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent("https://www.youtube.com/feeds/videos.xml?channel_id=UCFbX-Mf7NqDm2a07hk6hveg")).catch(() => null),
+    ] : [Promise.resolve(null), Promise.resolve(null)];
+
+    const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastRes, youtubeRes] = await Promise.all([
+      ...firestoreReads,
+      ...mediaReads,
     ]);
 
     const siteTitle = settingsSnap.exists ? (settingsSnap.data().siteTitle || "His Kingdom Ministry") : "His Kingdom Ministry";
