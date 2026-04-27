@@ -10,26 +10,35 @@ const nav = document.getElementById('nav');
 const navLinks = document.querySelectorAll('.nav-link');
 
 // Keep front page hero behavior untouched, but center subpage hero text consistently.
-document.addEventListener('DOMContentLoaded', () => {
-    if (document.body.classList.contains('page-index')) return;
+function applySubpageHeroCentering() {
+    if (!document.body || document.body.classList.contains('page-index')) return;
 
     document.querySelectorAll('.page-hero').forEach((hero) => {
-        hero.style.textAlign = 'center';
+        hero.style.setProperty('text-align', 'center', 'important');
 
-        const container = hero.querySelector('.container');
-        if (container) {
-            container.style.textAlign = 'center';
-            container.style.marginLeft = 'auto';
-            container.style.marginRight = 'auto';
-        }
-
-        hero.querySelectorAll('.page-hero-title, .page-hero-subtitle').forEach((el) => {
-            el.style.textAlign = 'center';
-            el.style.marginLeft = 'auto';
-            el.style.marginRight = 'auto';
+        hero.querySelectorAll('.container, .page-hero-title, .page-hero-subtitle, .page-title, .breadcrumbs, .blog-meta, p, h1, h2, h3').forEach((el) => {
+            el.style.setProperty('text-align', 'center', 'important');
+            el.style.setProperty('margin-left', 'auto', 'important');
+            el.style.setProperty('margin-right', 'auto', 'important');
         });
     });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    applySubpageHeroCentering();
+
+    window.requestAnimationFrame(applySubpageHeroCentering);
+    window.setTimeout(applySubpageHeroCentering, 250);
+
+    if (document.body && !document.body.classList.contains('page-index')) {
+        document.querySelectorAll('.page-hero').forEach((hero) => {
+            const observer = new MutationObserver(() => applySubpageHeroCentering());
+            observer.observe(hero, { childList: true, subtree: true, attributes: true });
+        });
+    }
 });
+
+window.addEventListener('load', applySubpageHeroCentering);
 
 // Shared overlay scroll-lock state so menu/search overlays do not fight each other.
 const bodyScrollLocks = new Set();
