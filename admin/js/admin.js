@@ -6313,23 +6313,52 @@ class AdminManager {
             imgTrigger.style.pointerEvents = 'none';
             imgTrigger.innerHTML = '<div class="loader" style="min-height: auto; margin: 0;"><span class="material-symbols-outlined rotating" style="color: var(--accent-color);">sync</span></div>';
 
+            this.showToast('ℹ️ Starter opplasting...', 'info', 2000);
+
             try {
-                // TEST: Bruker nøyaktig samme sti-prefiks som bloggen (som vi vet fungerer)
+                // Bruker Firebase direkte for å utelukke feil i service-laget
                 const sanitizedName = file.name.replace(/[^a-z0-9.]/gi, '_').toLowerCase();
                 const storagePath = `covers/blog/hero_${Date.now()}_${sanitizedName}`;
                 
-                const url = await firebaseService.uploadImage(uploadFile, storagePath, {
-                    onProgress: (p) => {
-                        imgTrigger.innerHTML = `<div class="loader" style="min-height: auto; margin: 0;"><span style="color: var(--accent-color); font-weight: bold; font-size: 14px;">${Math.round(p)}%</span></div>`;
-                    }
+                const storageRef = firebase.storage().ref(storagePath);
+                const uploadTask = storageRef.put(uploadFile);
+
+                const url = await new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            imgTrigger.innerHTML = `<div class="loader" style="min-height: auto; margin: 0;"><span style="color: var(--accent-color); font-weight: bold; font-size: 14px;">${Math.round(progress)}%</span></div>`;
+                            console.log(`Opplasting: ${Math.round(progress)}%`);
+                        },
+                        (error) => {
+                            console.error("Storage Error:", error);
+                            reject(error);
+                        },
+                        async () => {
+                            try {
+                                const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+                                resolve(downloadURL);
+                            } catch (e) {
+                                reject(e);
+                            }
+                        }
+                    );
+
+                    // Sikkerhetsnett: Timeout etter 60 sekunder hvis ingenting skjer (0%)
+                    setTimeout(() => {
+                        if (uploadTask.snapshot.bytesTransferred === 0 && uploadTask.snapshot.state === 'running') {
+                            uploadTask.cancel();
+                            reject(new Error("Opplastingen startet ikke (timeout). Sjekk internett eller prøv en annen fil."));
+                        }
+                    }, 60000);
                 });
                 
                 imgInput.value = url;
                 imgInput.dispatchEvent(new Event('input')); 
                 this.showToast('✅ Bilde lastet opp!', 'success');
             } catch (err) {
-                console.error("Upload error detail:", err);
-                this.showToast('❌ Feil: ' + (err.message || 'Ukjent feil ved opplasting'), 'error', 10000);
+                console.error("Kritisk opplastingsfeil:", err);
+                this.showToast('❌ Feil: ' + (err.message || 'Kunne ikke kontakte server'), 'error', 15000);
                 imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
             } finally {
                 imgTrigger.style.opacity = '1';
