@@ -9,6 +9,28 @@ const mobileToggle = document.getElementById('mobile-toggle');
 const nav = document.getElementById('nav');
 const navLinks = document.querySelectorAll('.nav-link');
 
+// Keep front page hero behavior untouched, but center subpage hero text consistently.
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.body.classList.contains('page-index')) return;
+
+    document.querySelectorAll('.page-hero').forEach((hero) => {
+        hero.style.textAlign = 'center';
+
+        const container = hero.querySelector('.container');
+        if (container) {
+            container.style.textAlign = 'center';
+            container.style.marginLeft = 'auto';
+            container.style.marginRight = 'auto';
+        }
+
+        hero.querySelectorAll('.page-hero-title, .page-hero-subtitle').forEach((el) => {
+            el.style.textAlign = 'center';
+            el.style.marginLeft = 'auto';
+            el.style.marginRight = 'auto';
+        });
+    });
+});
+
 // Shared overlay scroll-lock state so menu/search overlays do not fight each other.
 const bodyScrollLocks = new Set();
 
