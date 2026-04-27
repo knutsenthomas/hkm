@@ -358,39 +358,50 @@
         <div class="container">
             <div class="about-grid">
                 <div class="about-image">
+                    <!-- Decorative element -->
+                    <div class="about-image-decoration"></div>
+                    
                     <div class="circular-image">
                         <img src="https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=600&h=600&fit=crop"
                             alt="Felleskap" data-content-key="intro.imageAlt" data-content-attr="alt">
-                        <div class="play-button">
+                        <div class="play-button" aria-label="Spill video">
                             <i class="fas fa-play"></i>
                         </div>
+                    </div>
+
+                    <!-- Secondary small image for depth -->
+                    <div class="circular-image-small">
+                        <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=300&h=300&fit=crop" 
+                             alt="Fellesskap detalj">
                     </div>
                 </div>
 
                 <div class="about-content">
-                    <span class="section-label" data-content-key="intro.label">Velkommen til fellesskapet</span>
+                    <div class="about-label-wrapper">
+                        <span class="section-label" data-content-key="intro.label">Velkommen til fellesskapet</span>
+                    </div>
                     <h2 class="section-title" data-content-key="intro.title">Vi er en Non-profit organisasjon</h2>
                     <p class="section-text" data-content-key="intro.text">His Kingdom Ministry driver med åndelig
                         samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å
                         være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.</p>
 
                     <div class="about-features">
-                        <div class="about-feature">
-                            <div class="about-feature-icon">
-                                <i class="fas fa-check"></i>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon-box">
+                                <i class="fas fa-bullseye"></i>
                             </div>
-                            <div class="about-feature-content">
+                            <div class="about-feature-text">
                                 <h4 data-content-key="about.features.mission.title">Vårt oppdrag</h4>
                                 <p data-content-key="about.features.mission.text">Å utruste og inspirere mennesker til
                                     et dypere liv med Gud gjennom undervisning, fellesskap og bønn.</p>
                             </div>
                         </div>
 
-                        <div class="about-feature">
-                            <div class="about-feature-icon">
-                                <i class="fas fa-check"></i>
+                        <div class="about-feature-item">
+                            <div class="about-feature-icon-box">
+                                <i class="fas fa-history"></i>
                             </div>
-                            <div class="about-feature-content">
+                            <div class="about-feature-text">
                                 <h4 data-content-key="about.features.story.title">Vår historie</h4>
                                 <p data-content-key="about.features.story.text">Startet med en visjon om å samle
                                     mennesker i åndelig vekst, har vi vokst til et levende felleskap som driver med
