@@ -3022,6 +3022,48 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     const data = await response.json();
     if (!response.ok) {
       console.error("Gemini REST API feil:", JSON.stringify(data));
+
+      // On 503 (overloaded/UNAVAILABLE), clear cache and retry with stable fallback model.
+      if (response.status === 503 || data?.error?.status === "UNAVAILABLE") {
+        _cachedGeminiModel = ""; // Force re-selection on next request
+        const fallbackUrl = `${apiBase}/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
+        try {
+          const fallbackResp = await fetch(fallbackUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: `${systemPrompt}\n\nBesøkende: ${userMessage}` }] }]
+            })
+          });
+          const fallbackData = await fallbackResp.json();
+          if (fallbackResp.ok) {
+            const fallbackText = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (fallbackText) {
+              const chatRef = db.collection("visitorChats").doc(chatId);
+              await chatRef.collection("messages").add({
+                sender: "agent",
+                source: "ai_gemini",
+                fromName: "HKM Assistent",
+                text: fallbackText.trim(),
+                createdAt: admin.firestore.FieldValue.serverTimestamp(),
+              });
+              await chatRef.set({ updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+              return;
+            }
+          }
+          console.error("Fallback Gemini feil:", JSON.stringify(fallbackData));
+        } catch (fallbackErr) {
+          console.error("Fallback Gemini unntak:", fallbackErr);
+        }
+        // Both primary and fallback failed — write user-visible error so user isn't left hanging.
+        await db.collection("visitorChats").doc(chatId).collection("messages").add({
+          sender: "agent",
+          source: "ai_gemini",
+          fromName: "HKM Assistent",
+          text: "AI-assistenten er midlertidig overbelastet. Vennligst prøv igjen om et øyeblikk, eller ta kontakt via e-post.",
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+        }).catch(() => {});
+      }
       return;
     }
 
