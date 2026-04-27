@@ -17,9 +17,9 @@
 
 /* Shared hero style for all subpages (not index) */
 .subpage-hero {
-    min-height: 350px !important;
-    padding-top: 140px !important;
-    padding-bottom: 80px !important;
+    min-height: 500px !important;
+    padding-top: 180px !important;
+    padding-bottom: 100px !important;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -60,9 +60,9 @@
   }
 
   .subpage-hero {
-    min-height: 300px !important;
-    padding-top: 130px !important;
-    padding-bottom: 60px !important;
+    min-height: 400px !important;
+    padding-top: 150px !important;
+    padding-bottom: 80px !important;
   }
 }
 
