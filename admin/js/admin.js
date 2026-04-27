@@ -6230,38 +6230,37 @@ class AdminManager {
                 <div class="card" style="width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto;">
                     <div class="card-header flex-between">
                         <h3 class="card-title">${isNew ? 'Legg til ny slide' : 'Rediger slide'}</h3>
-                        <button class="icon-btn" id="close-modal"><span class="material-symbols-outlined">close</span></button>
+                        <button class="icon-btn" id="hero-close-modal"><span class="material-symbols-outlined">close</span></button>
                     </div>
                     <div class="card-body">
-                        <!-- Blog-style image upload area -->
                         <div class="form-group">
                             <label>Slide-bilde (Anbefalt: 1920x1080px)</label>
-                            <div class="sidebar-img-preview" id="slide-img-trigger" style="margin-bottom: 12px; position: relative; cursor: pointer; border: 2px dashed #e2e8f0; border-radius: 12px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">
+                            <div id="hero-img-trigger" style="margin-bottom: 12px; position: relative; cursor: pointer; border: 2px dashed #e2e8f0; border-radius: 12px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">
                                 ${slide.imageUrl ? `<img src="${slide.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
                                 <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.7); color: #fff; font-size: 11px; padding: 6px; text-align: center; opacity: 0; transition: opacity 0.2s;">KLIKK FOR Å LAST OPP</div>
                             </div>
-                            <input type="file" id="slide-file-input" style="display: none;" accept="image/*">
-                            <input type="text" id="slide-img-url" class="form-control" value="${slide.imageUrl || ''}" placeholder="Eller lim inn bilde-URL her">
+                            <input type="file" id="hero-file-input" style="display: none;" accept="image/*">
+                            <input type="text" id="hero-img-url" class="form-control" value="${slide.imageUrl || ''}" placeholder="Eller lim inn bilde-URL her">
                         </div>
 
                         <div class="form-group">
                             <label>Overskrift</label>
-                            <input type="text" id="slide-title" class="form-control" value="${slide.title || ''}">
+                            <input type="text" id="hero-title" class="form-control" value="${slide.title || ''}">
                         </div>
                         <div class="form-group">
                             <label>Undertekst</label>
-                            <textarea id="slide-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
+                            <textarea id="hero-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Knapptekst</label>
-                            <input type="text" id="slide-btn-text" class="form-control" value="${slide.btnText || ''}">
+                            <input type="text" id="hero-btn-text" class="form-control" value="${slide.btnText || ''}">
                         </div>
                         <div class="form-group">
                             <label>Knapp-lenke</label>
-                            <input type="text" id="slide-btn-link" class="form-control" value="${slide.btnLink || ''}">
+                            <input type="text" id="hero-btn-link" class="form-control" value="${slide.btnLink || ''}">
                         </div>
                         <div style="margin-top: 24px;">
-                            <button class="btn-primary" style="width: 100%;" id="save-slide-btn">Lagre slide</button>
+                            <button class="btn-primary" style="width: 100%;" id="hero-save-btn">Lagre slide</button>
                         </div>
                     </div>
                 </div>
@@ -6269,13 +6268,16 @@ class AdminManager {
         `;
         document.body.appendChild(modal);
 
-        const imgInput = document.getElementById('slide-img-url');
-        const fileInput = document.getElementById('slide-file-input');
-        const imgTrigger = document.getElementById('slide-img-trigger');
+        // Scoped selection within the modal to avoid any ID conflicts
+        const imgInput = modal.querySelector('#hero-img-url');
+        const fileInput = modal.querySelector('#hero-file-input');
+        const imgTrigger = modal.querySelector('#hero-img-trigger');
+        const saveBtn = modal.querySelector('#hero-save-btn');
+        const closeBtn = modal.querySelector('#hero-close-modal');
 
-        document.getElementById('close-modal').onclick = () => modal.remove();
+        closeBtn.onclick = () => modal.remove();
 
-        // Image Trigger Logic (Blog-style)
+        // Image Trigger Logic
         imgTrigger.onclick = () => fileInput.click();
 
         imgTrigger.onmouseenter = () => {
@@ -6287,7 +6289,7 @@ class AdminManager {
             if (overlay) overlay.style.opacity = '0';
         };
 
-        // Live Preview for URL input
+        // Live Preview
         imgInput.oninput = (e) => {
             const url = e.target.value;
             if (url && url.length > 10) {
@@ -6297,7 +6299,7 @@ class AdminManager {
             }
         };
 
-        // File Upload Handling
+        // File Upload Handling (Blog-style)
         fileInput.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -6324,18 +6326,17 @@ class AdminManager {
             }
         };
 
-        // Save logic matching original pattern
-        document.getElementById('save-slide-btn').onclick = async () => {
-            const saveBtn = document.getElementById('save-slide-btn');
+        // Save Logic
+        saveBtn.onclick = async () => {
             saveBtn.disabled = true;
             saveBtn.textContent = 'Lagrer...';
 
             const updatedSlide = {
                 imageUrl: imgInput.value,
-                title: document.getElementById('slide-title').value,
-                subtitle: document.getElementById('slide-subtitle').value,
-                btnText: document.getElementById('slide-btn-text').value,
-                btnLink: document.getElementById('slide-btn-link').value
+                title: modal.querySelector('#hero-title').value,
+                subtitle: modal.querySelector('#hero-subtitle').value,
+                btnText: modal.querySelector('#hero-btn-text').value,
+                btnLink: modal.querySelector('#hero-btn-link').value
             };
 
             if (isNew) {
