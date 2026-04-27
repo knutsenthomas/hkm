@@ -1569,7 +1569,6 @@ window.addEventListener('load', () => {
                             <h3>HKM Assistent</h3>
                             <div class="hkm-chat-online-status">
                                 <span class="status-dot"></span>
-                                <span class="status-text">Online</span>
                             </div>
                         </div>
                     </div>
@@ -1831,13 +1830,18 @@ window.addEventListener('load', () => {
 	            toggleDot?.classList.toggle('hkm-chat-hidden-dot', !isOpen);
 	            headerStatusDot?.classList.toggle('hkm-chat-hidden-dot', !isOpen);
 
-	            if (headerStatusText) {
-	                headerStatusText.textContent = isOpen ? 'Online' : 'Stengt nå';
-	            }
+	            const isGoogleChatClosed = !isOpen && activeMode === 'google_chat';
+
+	            // Disable input and send button when google_chat is closed.
+	            if (input) input.disabled = isGoogleChatClosed;
+	            if (sendBtn) sendBtn.disabled = isGoogleChatClosed;
+	            if (input) input.placeholder = isGoogleChatClosed
+	                ? 'Chatåpner ikke i helger og helligdager — bruk AI eller e-post'
+	                : 'Skriv melding...';
+	            form?.classList.toggle('hkm-chat-form-disabled', isGoogleChatClosed);
 
 	            if (closedNotice) {
-	                const showNotice = !isOpen && activeMode === 'google_chat';
-	                if (showNotice) {
+	                if (isGoogleChatClosed) {
 	                    const nextInfo = getNextOpeningInfo();
 	                    closedNotice.textContent = `Vi er stengt akkurat nå. Chatten åpner ${nextInfo}.`;
 	                    closedNotice.classList.remove('hkm-chat-hidden');
@@ -2017,20 +2021,9 @@ window.addEventListener('load', () => {
             footer.classList.toggle('hkm-chat-hidden', isEmailMode);
             emailPanel.classList.toggle('hkm-chat-hidden', !isEmailMode);
 
-            // Closed notice: only visible in google_chat mode when outside business hours.
-            if (closedNotice) {
-                const isOpen = isWithinNorwegianBusinessHours();
-                const showNotice = !isOpen && activeMode === 'google_chat';
-                if (showNotice) {
-                    if (!closedNotice.textContent) {
-                        const nextInfo = getNextOpeningInfo();
-                        closedNotice.textContent = `Vi er stengt akkurat n\u00e5. Chatten \u00e5pner ${nextInfo}.`;
-                    }
-                    closedNotice.classList.remove('hkm-chat-hidden');
-                } else {
-                    closedNotice.classList.add('hkm-chat-hidden');
-                }
-            }
+            // Sync closed state for google_chat mode (notice + input disabled).
+            applyAvailabilityIndicators();
+
             if (privacyConsentKey) {
                 const isConsented = localStorage.getItem(privacyConsentKey) === 'true';
                 
@@ -2944,6 +2937,16 @@ window.addEventListener('load', () => {
             .hkm-chat-input:focus {
                 border-color: #FED7AA !important;
                 background: #fff !important;
+            }
+            .hkm-chat-form-disabled .hkm-chat-input {
+                background: #F1F5F9 !important;
+                color: #94A3B8 !important;
+                cursor: not-allowed !important;
+                border-color: #E2E8F0 !important;
+            }
+            .hkm-chat-form-disabled .hkm-chat-send {
+                opacity: 0.35 !important;
+                cursor: not-allowed !important;
             }
             .hkm-chat-status {
                 position: absolute !important;
