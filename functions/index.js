@@ -569,23 +569,27 @@ async function inferChatIdFromGooglePayload(payload) {
 }
 
 function chooseGeminiModel(modelNames = []) {
-  const preferred = [
-    "models/gemini-2.5-flash-preview-04-17",
-    "models/gemini-2.5-flash",
-    "models/gemini-2.0-flash",
-    "models/gemini-2.0-flash-lite",
-    "models/gemini-1.5-flash",
-    "models/gemini-1.5-pro",
-    "models/gemini-pro",
-  ];
+  // Dynamically pick the newest available Flash model, then fall back to Pro.
+  // This handles future preview releases without needing code updates.
+  const flashModels = modelNames.filter((n) => n.includes("flash"));
+  const proModels = modelNames.filter((n) => n.includes("gemini") && !n.includes("flash"));
 
-  for (const target of preferred) {
-    const exact = modelNames.find((name) => name === target);
-    if (exact) return exact;
+  function scoreModel(name) {
+    // Extract version numbers from model name, e.g. "models/gemini-2.5-flash-preview-04-17"
+    const versionMatch = name.match(/gemini-(\d+)\.(\d+)/);
+    const major = versionMatch ? Number(versionMatch[1]) : 0;
+    const minor = versionMatch ? Number(versionMatch[2]) : 0;
+    // Preview models rank slightly below stable releases of same version.
+    const isPreview = name.includes("preview") ? 0 : 1;
+    // Lite/exp models rank lower.
+    const isLite = (name.includes("lite") || name.includes("exp")) ? 0 : 1;
+    return major * 10000 + minor * 100 + isPreview * 10 + isLite;
   }
 
-  // Fallback: pick the first generateContent-capable model.
-  return modelNames[0] || "";
+  const sortedFlash = flashModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
+  const sortedPro = proModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
+
+  return sortedFlash[0] || sortedPro[0] || modelNames[0] || "";
 }
 
 /**
