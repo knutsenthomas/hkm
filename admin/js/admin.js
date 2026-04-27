@@ -6235,35 +6235,62 @@ class AdminManager {
         const uploadBtn = document.getElementById('upload-slide-img');
 
         uploadBtn.onclick = () => {
-            fileInput.value = ''; // Reset to allow re-selecting same file
+            fileInput.value = '';
             fileInput.click();
         };
+        
         fileInput.onchange = async () => {
             if (fileInput.files.length === 0) return;
             const file = fileInput.files[0];
             
-            console.log('Starting hero image upload:', file.name, file.size);
+            console.log('[Admin] Starter direkte opplasting:', file.name, file.size);
             
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Laster opp...';
+            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> 0%';
             
             try {
-                // Sanitize filename to avoid encoding issues
+                // Sjekk innlogging først
+                const user = firebase.auth().currentUser;
+                if (!user) {
+                    throw new Error('Du må være logget inn for å laste opp bilder.');
+                }
+
                 const extension = file.name.split('.').pop();
                 const sanitizedName = file.name.split('.')[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
                 const storagePath = `hero/${Date.now()}_${sanitizedName}.${extension}`;
                 
-                const url = await firebaseService.uploadImage(file, storagePath, {
-                    onProgress: (p) => {
-                        uploadBtn.innerHTML = `<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> ${Math.round(p)}%`;
-                    }
+                // Bruk SDK direkte for å utelukke wrapper-feil
+                const storage = firebase.storage();
+                const storageRef = storage.ref(storagePath);
+                const uploadTask = storageRef.put(file);
+
+                await new Promise((resolve, reject) => {
+                    uploadTask.on('state_changed',
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            uploadBtn.innerHTML = `<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> ${Math.round(progress)}%`;
+                        },
+                        (error) => {
+                            console.error('[Admin] SDK Opplasting feilet:', error);
+                            let msg = error.message;
+                            if (error.code === 'storage/unauthorized') msg = 'Ingen tilgang. Sjekk Firebase Storage Rules.';
+                            reject(new Error(msg));
+                        },
+                        async () => {
+                            try {
+                                const url = await uploadTask.snapshot.ref.getDownloadURL();
+                                imgInput.value = url;
+                                this.showToast('✅ Bilde lastet opp!', 'success', 5000);
+                                resolve();
+                            } catch (e) {
+                                reject(e);
+                            }
+                        }
+                    );
                 });
-                imgInput.value = url;
-                this.showToast('✅ Bilde ble lastet opp! Husk å lagre sliden.', 'success', 5000);
-                console.log('Upload successful:', url);
             } catch (err) {
-                console.error('Upload failed:', err);
-                this.showToast('❌ Opplasting feilet: ' + (err.message || 'Ukjent feil'), 'error', 7000);
+                console.error('[Admin] Opplasting krasjet:', err);
+                this.showToast('❌ Feil: ' + err.message, 'error', 8000);
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp';
