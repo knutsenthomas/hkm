@@ -151,6 +151,45 @@ class AdminManager {
         this.showToast(message, type, duration);
     }
 
+    /**
+     * Komprimerer bilde før opplasting
+     */
+    async compressImage(file, maxWidth = 1920, quality = 0.8) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = (maxWidth / width) * height;
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.toBlob((blob) => {
+                        if (!blob) {
+                            reject(new Error('Klarte ikke å komprimere bildet.'));
+                            return;
+                        }
+                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = () => reject(new Error('Kunne ikke laste bilde for komprimering.'));
+            };
+            reader.onerror = () => reject(new Error('Kunne ikke lese filen.'));
+        });
+    }
+
     renderOverviewLoadingState() {
         const section = document.getElementById('overview-section');
         if (!section) return;
@@ -6241,46 +6280,61 @@ class AdminManager {
         
         fileInput.onchange = async () => {
             if (fileInput.files.length === 0) return;
-            const file = fileInput.files[0];
+            let file = fileInput.files[0];
             
-            console.log('[Admin] Starter direkte opplasting:', file.name, file.size);
+            // Sikkerhetssjekk for ekstreme filstørrelser
+            if (file.size > 20 * 1024 * 1024) {
+                this.showToast('❌ Filen er for stor (>20MB). Vennligst bruk et mindre bilde.', 'error', 8000);
+                return;
+            }
+
+            console.log('[Admin] Starter opplasting:', file.name, (file.size / 1024 / 1024).toFixed(2), 'MB');
             
             uploadBtn.disabled = true;
-            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> 0%';
+            uploadBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Behandler...';
             
             try {
-                // Sjekk innlogging først
-                const user = firebase.auth().currentUser;
-                if (!user) {
-                    throw new Error('Du må være logget inn for å laste opp bilder.');
+                // Automatisk komprimering for filer over 1MB
+                if (file.size > 1 * 1024 * 1024 && file.type.startsWith('image/')) {
+                    console.log('[Admin] Komprimerer stort bilde...');
+                    file = await this.compressImage(file);
+                    console.log('[Admin] Ny størrelse etter komprimering:', (file.size / 1024 / 1024).toFixed(2), 'MB');
                 }
+
+                const user = firebase.auth().currentUser;
+                if (!user) throw new Error('Du må være logget inn for å laste opp bilder.');
 
                 const extension = file.name.split('.').pop();
                 const sanitizedName = file.name.split('.')[0].replace(/[^a-z0-9]/gi, '_').toLowerCase();
                 const storagePath = `hero/${Date.now()}_${sanitizedName}.${extension}`;
                 
-                // Bruk SDK direkte for å utelukke wrapper-feil
                 const storage = firebase.storage();
                 const storageRef = storage.ref(storagePath);
                 const uploadTask = storageRef.put(file);
 
                 await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(() => {
+                        uploadTask.cancel();
+                        reject(new Error('Opplastingen tok for lang tid (over 5 minutter). Prøv en mindre fil.'));
+                    }, 300000); // 5 minutter timeout
+
                     uploadTask.on('state_changed',
                         (snapshot) => {
                             const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                             uploadBtn.innerHTML = `<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> ${Math.round(progress)}%`;
                         },
                         (error) => {
-                            console.error('[Admin] SDK Opplasting feilet:', error);
+                            clearTimeout(timeout);
                             let msg = error.message;
-                            if (error.code === 'storage/unauthorized') msg = 'Ingen tilgang. Sjekk Firebase Storage Rules.';
+                            if (error.code === 'storage/unauthorized') msg = 'Ingen tilgang til lagring.';
                             reject(new Error(msg));
                         },
                         async () => {
+                            clearTimeout(timeout);
                             try {
                                 const url = await uploadTask.snapshot.ref.getDownloadURL();
                                 imgInput.value = url;
-                                this.showToast('✅ Bilde lastet opp!', 'success', 5000);
+                                this.showToast('✅ Bilde lastet opp og optimalisert!', 'success', 5000);
                                 resolve();
                             } catch (e) {
                                 reject(e);
@@ -6289,8 +6343,8 @@ class AdminManager {
                     );
                 });
             } catch (err) {
-                console.error('[Admin] Opplasting krasjet:', err);
-                this.showToast('❌ Feil: ' + err.message, 'error', 8000);
+                console.error('[Admin] Opplasting feilet:', err);
+                this.showToast('❌ ' + err.message, 'error', 8000);
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp';
