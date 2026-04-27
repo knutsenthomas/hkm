@@ -21,6 +21,37 @@
     <link rel="stylesheet" href="css/stripe-checkout.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
     <style>
+        .donations-page-view .payment-method-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .donations-page-view .payment-method-option {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: flex-start !important;
+            gap: 12px !important;
+            padding: 15px !important;
+            border: 2px solid #e0e0e0 !important;
+            border-radius: 8px !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+        }
+
+        .donations-page-view .payment-method-radio {
+            margin: 0 !important;
+            flex: 0 0 auto;
+        }
+
+        .donations-page-view .payment-method-label {
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.2;
+        }
+
         .donations-page-view .page-hero.subpage-hero,
         .donations-page-view .page-hero.subpage-hero .container {
             text-align: center !important;
@@ -35,6 +66,11 @@
         }
 
         @media (max-width: 768px) {
+            .donations-page-view .payment-method-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
             .donations-page .section-header .section-description,
             .regular-donor .section-header .section-description,
             .donation-form .section-header .section-description {
@@ -349,25 +385,21 @@
                         <div style="margin-bottom: 30px;">
                             <label
                                 style="display: block; font-weight: 600; margin-bottom: 15px; color: var(--text-dark);">Betalingsmetode</label>
-                            <div
-                                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px;">
-                                <label
-                                    style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                                    <input type="radio" name="payment-method" value="vipps" style="margin-right: 10px;">
-                                    <span style="font-weight: 600;"><i class="fas fa-mobile-alt"
-                                            style="margin-right: 8px; color: #FF5B24;"></i>Vipps</span>
+                            <div class="payment-method-grid">
+                                <label class="payment-method-option">
+                                    <input class="payment-method-radio" type="radio" name="payment-method" value="vipps">
+                                    <span class="payment-method-label"><i class="fas fa-mobile-alt"
+                                            style="color: #FF5B24;"></i>Vipps</span>
                                 </label>
-                                <label
-                                    style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                                    <input type="radio" name="payment-method" value="card" style="margin-right: 10px;">
-                                    <span style="font-weight: 600;"><i class="fas fa-credit-card"
-                                            style="margin-right: 8px; color: #4CAF50;"></i>Kort</span>
+                                <label class="payment-method-option">
+                                    <input class="payment-method-radio" type="radio" name="payment-method" value="card">
+                                    <span class="payment-method-label"><i class="fas fa-credit-card"
+                                            style="color: #4CAF50;"></i>Kort</span>
                                 </label>
-                                <label
-                                    style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
-                                    <input type="radio" name="payment-method" value="bank" style="margin-right: 10px;">
-                                    <span style="font-weight: 600;"><i class="fas fa-university"
-                                            style="margin-right: 8px; color: #2196F3;"></i>Bank</span>
+                                <label class="payment-method-option">
+                                    <input class="payment-method-radio" type="radio" name="payment-method" value="bank">
+                                    <span class="payment-method-label"><i class="fas fa-university"
+                                            style="color: #2196F3;"></i>Bank</span>
                                 </label>
                             </div>
                         </div>
