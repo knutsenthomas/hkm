@@ -326,7 +326,7 @@ class ContentManager {
             // We only apply fresh Firestore content below.
 
             const cachedHero = localStorage.getItem('hkm_cache_hero_slides');
-            if (cachedHero && this.pageId !== 'index') {
+            if (cachedHero) {
                 const heroData = JSON.parse(cachedHero);
                 if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
             }
@@ -446,7 +446,7 @@ class ContentManager {
                 this.loadCauses()
             ]);
 
-            if (heroData && heroData.slides && this.pageId !== 'index') {
+            if (heroData && heroData.slides) {
                 this.cacheLocalJson('hkm_cache_hero_slides', heroData);
                 this.renderHeroSlides(heroData.slides);
             }
