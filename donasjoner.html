@@ -21,6 +21,19 @@
     <link rel="stylesheet" href="css/stripe-checkout.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
     <style>
+        .donations-page-view .page-hero.subpage-hero,
+        .donations-page-view .page-hero.subpage-hero .container {
+            text-align: center !important;
+        }
+
+        .donations-page-view .page-hero.subpage-hero .page-hero-title,
+        .donations-page-view .page-hero.subpage-hero .page-hero-subtitle {
+            text-align: center !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            width: 100% !important;
+        }
+
         @media (max-width: 768px) {
             .donations-page .section-header .section-description,
             .regular-donor .section-header .section-description,
@@ -55,7 +68,7 @@
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
-<body class="cms-loading">
+<body class="cms-loading donations-page-view">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
