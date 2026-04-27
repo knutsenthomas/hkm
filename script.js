@@ -1836,7 +1836,7 @@ window.addEventListener('load', () => {
 	            if (input) input.disabled = isGoogleChatClosed;
 	            if (sendBtn) sendBtn.disabled = isGoogleChatClosed;
 	            if (input) input.placeholder = isGoogleChatClosed
-	                ? 'Chatåpner ikke i helger og helligdager — bruk AI eller e-post'
+	                ? 'Chat er stengt'
 	                : 'Skriv melding...';
 	            form?.classList.toggle('hkm-chat-form-disabled', isGoogleChatClosed);
 
