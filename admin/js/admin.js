@@ -6275,8 +6275,9 @@ class AdminManager {
 
         document.getElementById('close-modal').onclick = () => modal.remove();
 
-        // Match blog image trigger logic
+        // Image Trigger Logic (Blog-style)
         imgTrigger.onclick = () => fileInput.click();
+
         imgTrigger.onmouseenter = () => {
             const overlay = imgTrigger.querySelector('.upload-overlay');
             if (overlay) overlay.style.opacity = '1';
@@ -6296,9 +6297,7 @@ class AdminManager {
             }
         };
 
-        imgTrigger.onclick = () => fileInput.click();
-
-        // File Upload (Blog-style Solution)
+        // File Upload Handling
         fileInput.onchange = async (e) => {
             const file = e.target.files[0];
             if (!file) return;
@@ -6309,7 +6308,6 @@ class AdminManager {
             imgTrigger.innerHTML = '<span class="loader-sm"></span>';
 
             try {
-                // Bruker nøyaktig samme kodesnutt og sti-logikk som bloggen
                 const path = `covers/blog/${Date.now()}_${file.name}`;
                 const url = await firebaseService.uploadImage(file, path);
                 
@@ -6320,6 +6318,9 @@ class AdminManager {
                 console.error("Upload error:", err);
                 this.showToast('Kunne ikke laste opp bilde.', 'error');
                 imgTrigger.innerHTML = originalHTML;
+            } finally {
+                imgTrigger.style.opacity = '1';
+                imgTrigger.style.pointerEvents = 'auto';
             }
         };
 
