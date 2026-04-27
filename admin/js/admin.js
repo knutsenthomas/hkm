@@ -6294,6 +6294,8 @@ class AdminManager {
             } else {
                 imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
             }
+        };
+
         imgTrigger.onclick = () => fileInput.click();
 
         // File Upload (Blog-style Solution)
