@@ -1986,7 +1986,7 @@ window.addEventListener('load', () => {
             statusEl.dataset.kind = kind;
         }
 
-        const setOpen = (open, autoFocus = true) => {
+        const setOpen = (open, autoFocus = false) => {
             root.classList.toggle('open', open);
             panel.setAttribute('aria-hidden', open ? 'false' : 'true');
             if (open) {
@@ -2218,8 +2218,8 @@ window.addEventListener('load', () => {
             }
         });
 
-        // Start open without autofocus
-        setTimeout(() => setOpen(true, false), 500);
+        // Keep chat closed on first load.
+        setOpen(false, false);
     }
 
     function injectChatStyles() {
