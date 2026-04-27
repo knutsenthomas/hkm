@@ -6234,7 +6234,10 @@ class AdminManager {
         const fileInput = document.getElementById('slide-file-input');
         const uploadBtn = document.getElementById('upload-slide-img');
 
-        uploadBtn.onclick = () => fileInput.click();
+        uploadBtn.onclick = () => {
+            fileInput.value = ''; // Reset to allow re-selecting same file
+            fileInput.click();
+        };
         fileInput.onchange = async () => {
             if (fileInput.files.length === 0) return;
             const file = fileInput.files[0];
@@ -6252,11 +6255,11 @@ class AdminManager {
                 
                 const url = await firebaseService.uploadImage(file, storagePath);
                 imgInput.value = url;
-                this.showToast('Bilde ble lastet opp!', 'success', 3000);
+                this.showToast('✅ Bilde ble lastet opp! Husk å lagre sliden.', 'success', 5000);
                 console.log('Upload successful:', url);
             } catch (err) {
                 console.error('Upload failed:', err);
-                this.showToast('Opplasting feilet: ' + (err.message || 'Ukjent feil'), 'error', 6000);
+                this.showToast('❌ Opplasting feilet: ' + (err.message || 'Ukjent feil'), 'error', 7000);
             } finally {
                 uploadBtn.disabled = false;
                 uploadBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp';
