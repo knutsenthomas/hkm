@@ -44,6 +44,23 @@ class FirebaseService {
         return Boolean(apiKey && apiKey !== 'YOUR_API_KEY' && projectId && appId);
     }
 
+    _normalizeFirebaseConfig(config) {
+        if (!this._isValidFirebaseConfig(config)) return config;
+
+        const normalized = { ...config };
+        if (
+            normalized.projectId === 'his-kingdom-ministry'
+            && (
+                !normalized.storageBucket
+                || normalized.storageBucket === 'his-kingdom-ministry.appspot.com'
+            )
+        ) {
+            normalized.storageBucket = 'his-kingdom-ministry.firebasestorage.app';
+        }
+
+        return normalized;
+    }
+
     _isAdminLikeRoute() {
         const path = String(window?.location?.pathname || '').toLowerCase();
         return path.includes('/admin/') || path.includes('/minside/');
@@ -76,8 +93,8 @@ class FirebaseService {
         }
 
         const storedConfigRaw = this.getStoredConfig();
-        const storedConfig = this._isValidFirebaseConfig(storedConfigRaw) ? storedConfigRaw : null;
-        const bundledConfig = this._isValidFirebaseConfig(window.firebaseConfig) ? window.firebaseConfig : null;
+        const storedConfig = this._isValidFirebaseConfig(storedConfigRaw) ? this._normalizeFirebaseConfig(storedConfigRaw) : null;
+        const bundledConfig = this._isValidFirebaseConfig(window.firebaseConfig) ? this._normalizeFirebaseConfig(window.firebaseConfig) : null;
         const isAdminRoute = this._isAdminLikeRoute();
 
         // Public pages should prefer bundled config so a stale admin override in localStorage
