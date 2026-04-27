@@ -570,6 +570,10 @@ async function inferChatIdFromGooglePayload(payload) {
 
 function chooseGeminiModel(modelNames = []) {
   const preferred = [
+    "models/gemini-2.5-flash-preview-04-17",
+    "models/gemini-2.5-flash",
+    "models/gemini-2.0-flash",
+    "models/gemini-2.0-flash-lite",
     "models/gemini-1.5-flash",
     "models/gemini-1.5-pro",
     "models/gemini-pro",
