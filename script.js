@@ -1549,6 +1549,7 @@ window.addEventListener('load', () => {
         const root = document.createElement('div');
         root.id = 'hkm-visitor-chat-widget';
         root.innerHTML = `
+            <div class="hkm-chat-closed-badge" aria-live="polite" aria-atomic="true"></div>
             <button type="button" class="hkm-chat-toggle" aria-label="Apne chat">
                 <div class="hkm-chat-dot"></div>
                 <svg class="hkm-chat-icon-chat" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -1569,7 +1570,7 @@ window.addEventListener('load', () => {
                             <h3>HKM Assistent</h3>
                             <div class="hkm-chat-online-status">
                                 <span class="status-dot"></span>
-                                <span>Online</span>
+                                <span class="status-text">Online</span>
                             </div>
                         </div>
                     </div>
@@ -1686,6 +1687,166 @@ window.addEventListener('load', () => {
         const humanBridge = root.querySelector('.hkm-chat-human-bridge');
 	        const requestHumanBtn = root.querySelector('.hkm-chat-request-human');
 	        const modeButtons = Array.from(root.querySelectorAll('.hkm-chat-mode-btn'));
+	        const toggleDot = root.querySelector('.hkm-chat-dot');
+	        const headerStatusDot = root.querySelector('.status-dot');
+	        const headerStatusText = root.querySelector('.status-text');
+	        const OSLO_TZ = 'Europe/Oslo';
+
+	        function toMonthDayKey(month, day) {
+	            return `${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+	        }
+
+	        function addDaysToDateParts(year, month, day, daysToAdd) {
+	            const date = new Date(Date.UTC(year, month - 1, day));
+	            date.setUTCDate(date.getUTCDate() + daysToAdd);
+	            return {
+	                month: date.getUTCMonth() + 1,
+	                day: date.getUTCDate()
+	            };
+	        }
+
+	        // Anonymous Gregorian algorithm for Easter Sunday.
+	        function getEasterSunday(year) {
+	            const a = year % 19;
+	            const b = Math.floor(year / 100);
+	            const c = year % 100;
+	            const d = Math.floor(b / 4);
+	            const e = b % 4;
+	            const f = Math.floor((b + 8) / 25);
+	            const g = Math.floor((b - f + 1) / 3);
+	            const h = (19 * a + b - d - g + 15) % 30;
+	            const i = Math.floor(c / 4);
+	            const k = c % 4;
+	            const l = (32 + 2 * e + 2 * i - h - k) % 7;
+	            const m = Math.floor((a + 11 * h + 22 * l) / 451);
+	            const month = Math.floor((h + l - 7 * m + 114) / 31);
+	            const day = ((h + l - 7 * m + 114) % 31) + 1;
+	            return { month, day };
+	        }
+
+	        function getNorwegianHolidayKeys(year) {
+	            const holidays = new Set([
+	                '01-01',
+	                '05-01',
+	                '05-17',
+	                '12-25',
+	                '12-26'
+	            ]);
+
+	            const easter = getEasterSunday(year);
+	            const movableOffsets = [-3, -2, 1, 39, 50];
+	            movableOffsets.forEach((offset) => {
+	                const holiday = addDaysToDateParts(year, easter.month, easter.day, offset);
+	                holidays.add(toMonthDayKey(holiday.month, holiday.day));
+	            });
+
+	            return holidays;
+	        }
+
+	        function getOsloNowParts(now = new Date()) {
+	            const dateTimeParts = new Intl.DateTimeFormat('en-CA', {
+	                timeZone: OSLO_TZ,
+	                year: 'numeric',
+	                month: '2-digit',
+	                day: '2-digit',
+	                hour: '2-digit',
+	                minute: '2-digit',
+	                hour12: false
+	            }).formatToParts(now);
+
+	            const values = {};
+	            dateTimeParts.forEach((part) => {
+	                if (part.type !== 'literal') values[part.type] = part.value;
+	            });
+
+	            const weekdayLabel = new Intl.DateTimeFormat('en-US', {
+	                timeZone: OSLO_TZ,
+	                weekday: 'short'
+	            }).format(now);
+
+	            const weekdayMap = {
+	                Sun: 0,
+	                Mon: 1,
+	                Tue: 2,
+	                Wed: 3,
+	                Thu: 4,
+	                Fri: 5,
+	                Sat: 6
+	            };
+
+	            return {
+	                year: Number(values.year),
+	                month: Number(values.month),
+	                day: Number(values.day),
+	                hour: Number(values.hour),
+	                minute: Number(values.minute),
+	                weekday: weekdayMap[weekdayLabel]
+	            };
+	        }
+
+	        function isNorwegianHoliday(parts) {
+	            const holidays = getNorwegianHolidayKeys(parts.year);
+	            return holidays.has(toMonthDayKey(parts.month, parts.day));
+	        }
+
+	        function getNextOpeningInfo(now = new Date()) {
+	            const dayNames = ['s\u00f8ndag', 'mandag', 'tirsdag', 'onsdag', 'torsdag', 'fredag', 'l\u00f8rdag'];
+	            const todayParts = getOsloNowParts(now);
+
+	            for (let offset = 0; offset <= 10; offset++) {
+	                const candidate = new Date(Date.UTC(todayParts.year, todayParts.month - 1, todayParts.day));
+	                candidate.setUTCDate(candidate.getUTCDate() + offset);
+	                const cp = getOsloNowParts(candidate);
+
+	                const isWeekday = cp.weekday >= 1 && cp.weekday <= 5;
+	                if (!isWeekday || isNorwegianHoliday(cp)) continue;
+
+	                if (offset === 0) {
+	                    const minuteOfDay = (todayParts.hour * 60) + todayParts.minute;
+	                    if (minuteOfDay < 9 * 60) return 'i dag kl.\u00a009:00';
+	                    continue;
+	                }
+	                if (offset === 1) return 'i morgen kl.\u00a009:00';
+	                return `${dayNames[cp.weekday]} kl.\u00a009:00`;
+	            }
+	            return 'neste virkedag kl.\u00a009:00';
+	        }
+
+	        function isWithinNorwegianBusinessHours(now = new Date()) {
+	            const parts = getOsloNowParts(now);
+	            const isWeekday = parts.weekday >= 1 && parts.weekday <= 5;
+	            if (!isWeekday) return false;
+	            if (isNorwegianHoliday(parts)) return false;
+
+	            const minuteOfDay = (parts.hour * 60) + parts.minute;
+	            const opensAt = 9 * 60;
+	            const closesAt = 17 * 60;
+	            return minuteOfDay >= opensAt && minuteOfDay < closesAt;
+	        }
+
+	        const closedBadge = root.querySelector('.hkm-chat-closed-badge');
+
+	        function applyAvailabilityIndicators() {
+	            const isOpen = isWithinNorwegianBusinessHours();
+	            toggleDot?.classList.toggle('hkm-chat-hidden-dot', !isOpen);
+	            headerStatusDot?.classList.toggle('hkm-chat-hidden-dot', !isOpen);
+
+	            if (headerStatusText) {
+	                headerStatusText.textContent = isOpen ? 'Online' : 'Stengt nå';
+	            }
+
+	            if (closedBadge) {
+	                if (!isOpen) {
+	                    const nextInfo = getNextOpeningInfo();
+	                    closedBadge.textContent = `Åpner ${nextInfo}`;
+	                    closedBadge.classList.add('visible');
+	                } else {
+	                    closedBadge.textContent = '';
+	                    closedBadge.classList.remove('visible');
+	                }
+	            }
+	        }
+
 	        // Important: keep email form privacy separate from the main chat privacy (footer),
 	        // otherwise focusing fields can unexpectedly hide/move other UI.
 	        const privacyContainer = root.querySelector('#hkm-chat-privacy-footer');
@@ -2347,6 +2508,15 @@ window.addEventListener('load', () => {
             }
         });
 
+        applyAvailabilityIndicators();
+        const availabilityIntervalId = window.setInterval(applyAvailabilityIndicators, 60000);
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) applyAvailabilityIndicators();
+        });
+        window.addEventListener('beforeunload', () => {
+            window.clearInterval(availabilityIntervalId);
+        }, { once: true });
+
         // Keep chat closed on first load.
         setOpen(false, false);
     }
@@ -2422,6 +2592,46 @@ window.addEventListener('load', () => {
                 border-radius: 50% !important;
                 z-index: 2 !important;
                 box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+            }
+            .hkm-chat-hidden-dot {
+                display: none !important;
+            }
+            .hkm-chat-closed-badge {
+                position: absolute !important;
+                bottom: 70px !important;
+                right: 0 !important;
+                background: rgba(30, 30, 30, 0.88) !important;
+                color: #fff !important;
+                font-size: 12px !important;
+                font-weight: 500 !important;
+                line-height: 1.3 !important;
+                padding: 7px 12px !important;
+                border-radius: 10px !important;
+                white-space: nowrap !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(4px) !important;
+                transition: opacity 0.25s ease, transform 0.25s ease !important;
+                backdrop-filter: blur(4px) !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.25) !important;
+                z-index: 1 !important;
+            }
+            .hkm-chat-closed-badge::after {
+                content: '' !important;
+                position: absolute !important;
+                top: 100% !important;
+                right: 22px !important;
+                border: 6px solid transparent !important;
+                border-top-color: rgba(30, 30, 30, 0.88) !important;
+            }
+            .hkm-chat-closed-badge.visible {
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+                pointer-events: auto !important;
+            }
+            #hkm-visitor-chat-widget.open .hkm-chat-closed-badge {
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
             
 	            .hkm-chat-panel {
