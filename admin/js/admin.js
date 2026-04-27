@@ -1132,11 +1132,12 @@ class AdminManager {
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn && logoutBtn.dataset.hkmLogoutBound !== '1') {
             logoutBtn.dataset.hkmLogoutBound = '1';
-            logoutBtn.addEventListener('click', async () => {
-                if (confirm('Logg ut?')) {
-                    if (firebaseService.isInitialized) await firebaseService.logout();
-                    window.location.href = 'login.html';
-                }
+            logoutBtn.addEventListener('click', async (event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                logoutBtn.disabled = true;
+                if (firebaseService.isInitialized) await firebaseService.logout();
+                window.location.href = 'login.html';
             });
         }
 

@@ -213,8 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
             event.preventDefault();
             event.stopPropagation();
 
-            if (!confirm('Logg ut?')) return;
-
             const originalHtml = logoutBtn.innerHTML;
             logoutBtn.disabled = true;
             logoutBtn.innerHTML = '<span class="material-symbols-outlined">sync</span><span>Logger ut...</span>';
