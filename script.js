@@ -893,6 +893,9 @@ function initYouTubeStats() {
 // Scroll to Top Button
 // ===================================
 function initScrollToTop() {
+    // Fjern på mobil
+    if (window.innerWidth < 768) return;
+
     // Create button
     const btn = document.createElement('button');
     btn.className = 'scroll-to-top';
