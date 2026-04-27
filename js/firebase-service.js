@@ -642,7 +642,27 @@ class FirebaseService {
 
     async logout() {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
-        return this.auth.signOut();
+        try {
+            await this.auth.signOut();
+        } finally {
+            this._clearLocalAuthCaches();
+        }
+    }
+
+    async signOut() {
+        return this.logout();
+    }
+
+    _clearLocalAuthCaches() {
+        try {
+            localStorage.removeItem('hkm_admin_identity_cache');
+            localStorage.removeItem('hkm_user_data');
+            Object.keys(localStorage)
+                .filter((key) => key.startsWith(this._userRoleCacheKeyPrefix))
+                .forEach((key) => localStorage.removeItem(key));
+        } catch (e) {
+            // Ignore storage cleanup failures; Firebase signOut is the important part.
+        }
     }
 
     /**
@@ -769,6 +789,9 @@ class FirebaseService {
         if (!this.isInitialized) throw new Error("Firebase er ikke initialisert.");
         if (!this.storage) throw new Error("Firebase Storage er ikke initialisert.");
         if (!file) throw new Error("Ingen bildefil valgt.");
+        if (!this.auth || !this.auth.currentUser) {
+            throw new Error("Du er ikke logget inn. Logg inn på nytt før du laster opp bilder.");
+        }
 
         const maxSizeBytes = options.maxSizeBytes || 10 * 1024 * 1024;
         const timeoutMs = options.timeoutMs || 90000;
@@ -780,6 +803,7 @@ class FirebaseService {
         }
 
         try {
+            await this.auth.currentUser.getIdToken(true);
             const storageRef = this.storage.ref(path);
             const uploadTask = storageRef.put(file);
 

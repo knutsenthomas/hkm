@@ -204,8 +204,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const bindGlobalLogout = async () => {
+        const logoutBtn = document.getElementById('logout-btn');
+        if (!logoutBtn || logoutBtn.dataset.hkmLogoutBound === '1') return;
+        logoutBtn.dataset.hkmLogoutBound = '1';
+
+        logoutBtn.addEventListener('click', async (event) => {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (!confirm('Logg ut?')) return;
+
+            const originalHtml = logoutBtn.innerHTML;
+            logoutBtn.disabled = true;
+            logoutBtn.innerHTML = '<span class="material-symbols-outlined">sync</span><span>Logger ut...</span>';
+
+            try {
+                const firebaseService = await waitForFirebaseService(3000);
+                if (firebaseService && firebaseService.isInitialized && typeof firebaseService.logout === 'function') {
+                    await firebaseService.logout();
+                } else if (window.firebase && firebase.auth) {
+                    await firebase.auth().signOut();
+                }
+            } catch (error) {
+                console.error('[admin-header] Logout failed:', error);
+            } finally {
+                try {
+                    localStorage.removeItem(ADMIN_IDENTITY_CACHE_KEY);
+                    Object.keys(localStorage)
+                        .filter((key) => key.startsWith('hkm_user_role_cache:'))
+                        .forEach((key) => localStorage.removeItem(key));
+                } catch (e) { }
+                logoutBtn.innerHTML = originalHtml;
+                logoutBtn.disabled = false;
+                window.location.replace('login.html');
+            }
+        });
+    };
+
     (async () => {
         try {
+            await bindGlobalLogout();
             await bindHeaderAuth();
         } catch (e) {
             console.warn('[admin-header] Header auth init failed:', e);

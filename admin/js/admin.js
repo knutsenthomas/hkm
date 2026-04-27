@@ -1130,7 +1130,8 @@ class AdminManager {
 
     initDashboard() {
         const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) {
+        if (logoutBtn && logoutBtn.dataset.hkmLogoutBound !== '1') {
+            logoutBtn.dataset.hkmLogoutBound = '1';
             logoutBtn.addEventListener('click', async () => {
                 if (confirm('Logg ut?')) {
                     if (firebaseService.isInitialized) await firebaseService.logout();
@@ -1310,7 +1311,7 @@ class AdminManager {
 
     async logout() {
         try {
-            await firebaseService.signOut();
+            await firebaseService.logout();
             window.location.href = 'login.html';
         } catch (error) {
             console.error("Error signing out:", error);
