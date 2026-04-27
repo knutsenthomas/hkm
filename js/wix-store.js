@@ -261,7 +261,7 @@ function createSliderSlide(product) {
     const scrollIndicator = getStoreText('ui.sliderScrollIndicator', 'Bla ned');
 
     return `
-        <div class="swiper-slide shop-hero-slide relative flex items-center overflow-hidden">
+        <div class="swiper-slide relative h-screen flex items-center overflow-hidden">
             <!-- Background Image with Overlay -->
             <div class="absolute inset-0 z-0 h-full">
                 <div class="absolute inset-0 bg-gradient-to-r from-slate-950/80 via-slate-950/40 to-transparent z-10 hidden md:block"></div>
@@ -271,19 +271,19 @@ function createSliderSlide(product) {
             </div>
             
             <div class="container mx-auto px-6 md:px-12 relative z-20">
-                <div class="shop-hero-slide-content max-w-2xl space-y-4 md:space-y-6 text-white flex flex-col items-center md:items-start text-center md:text-left">
+                <div class="max-w-2xl space-y-4 md:space-y-6 text-white flex flex-col items-center md:items-start text-center md:text-left">
                     <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 backdrop-blur-md text-primary text-[10px] font-black uppercase tracking-[0.2em] border border-primary/30">
                         ${escapeHtml(badgeText)}
                     </span>
-                    <h2 class="shop-hero-slide-title text-3xl md:text-4xl lg:text-5xl font-black leading-tight tracking-tighter drop-shadow-2xl">
+                    <h2 class="text-3xl md:text-4xl lg:text-5xl font-black leading-tight tracking-tighter drop-shadow-2xl">
                         ${escapeHtml(product.name)}
                     </h2>
                     <div class="text-base md:text-xl text-slate-200 leading-relaxed max-w-lg drop-shadow-md line-clamp-3 prose-p:my-0">
                         ${product.description || sliderDescription}
                     </div>
-                    <div class="flex flex-wrap justify-center md:justify-start gap-3 md:gap-4 pt-3 md:pt-6 w-full md:w-auto">
+                    <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-4 md:pt-6">
                         <a href="${escapeHtml(product.productUrl)}" target="_blank" 
-                           class="w-full sm:w-auto px-6 md:px-10 py-3.5 md:py-5 rounded-full bg-white text-slate-900 font-black hover:bg-primary hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95 text-sm md:text-lg text-center">
+                           class="w-full md:w-auto px-8 md:px-10 py-4 md:py-5 rounded-full bg-white text-slate-900 font-black hover:bg-primary hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95 text-base md:text-lg">
                             ${escapeHtml(buyNowPrefix)} — ${escapeHtml(product.formattedPrice)}
                         </a>
                     </div>
@@ -315,10 +315,10 @@ function renderHeroFallback(reason = 'ERROR') {
     const retryCta = getStoreText('ui.heroFallbackRetryCta', 'Prøv igjen');
 
     els.sliderWrapper.innerHTML = `
-        <div class="swiper-slide shop-hero-slide relative flex items-center overflow-hidden bg-slate-950">
+        <div class="swiper-slide relative h-screen flex items-center overflow-hidden bg-slate-950">
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.2),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(59,130,246,0.14),transparent_35%),linear-gradient(135deg,#020617,#0f172a_60%,#111827)]"></div>
             <div class="container mx-auto px-6 md:px-12 relative z-20">
-                <div class="shop-hero-slide-content max-w-2xl space-y-5 text-white flex flex-col items-center md:items-start text-center md:text-left">
+                <div class="max-w-2xl space-y-5 text-white flex flex-col items-center md:items-start text-center md:text-left">
                     <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15 text-[10px] font-black uppercase tracking-[0.2em]">
                         ${escapeHtml(badgeText)}
                     </span>
@@ -381,7 +381,7 @@ function createProductCard(product) {
         <article class="group bg-white rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-orange-200 flex flex-col h-full overflow-hidden">
             <a href="${escapeHtml(product.productUrl)}" target="_blank" rel="noopener noreferrer" class="block relative aspect-[3/4] overflow-hidden bg-slate-50 group-hover:opacity-95 transition-opacity">
                 <!-- Wix Badge -->
-                <span class="shop-card-badge absolute top-3 left-3 z-10 px-2.5 py-1 bg-white/90 backdrop-blur rounded-full text-[9px] font-extrabold uppercase text-slate-900 shadow-sm border border-slate-100">
+                <span class="absolute top-4 left-4 z-10 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-extrabold uppercase tracking-tighter text-slate-900 shadow-sm border border-slate-100">
                     HK Designs
                 </span>
                 
@@ -393,18 +393,18 @@ function createProductCard(product) {
                 >
             </a>
 
-            <div class="p-3.5 md:p-4 flex flex-col flex-1">
-                <p class="shop-card-kicker font-bold uppercase text-slate-400 mb-2">${escapeHtml(category)}</p>
-                <h3 class="shop-card-title text-[15px] md:text-base font-bold text-slate-900 leading-snug mb-3 group-hover:text-primary transition-colors">
+            <div class="p-4 flex flex-col flex-1">
+                <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">${escapeHtml(category)}</p>
+                <h3 class="shop-card-title text-base font-bold text-slate-900 leading-snug mb-3 group-hover:text-primary transition-colors">
                     ${escapeHtml(product.name)}
                 </h3>
                 
-                <div class="mt-auto flex items-center justify-between gap-2 pt-3 border-t border-slate-50">
-                    <p class="text-base md:text-lg font-black text-slate-900 tracking-tight">
+                <div class="mt-auto flex items-center justify-between gap-3 pt-3 border-t border-slate-50">
+                    <p class="text-lg font-black text-slate-900 tracking-tight">
                         ${escapeHtml(product.formattedPrice)}
                     </p>
                     <a href="${escapeHtml(product.productUrl)}" target="_blank" rel="noopener noreferrer" 
-                       class="shop-card-cart-button inline-flex items-center justify-center rounded-full bg-slate-900 text-white hover:bg-primary transition-all shadow-md shrink-0">
+                       class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 text-white hover:bg-primary transition-all shadow-md">
                         <i class="fas fa-shopping-cart text-[10px]"></i>
                     </a>
                 </div>
@@ -938,13 +938,13 @@ function renderFilters() {
 
     const allOptionLabel = getStoreText('ui.allOptionLabel', 'Alle');
     container.innerHTML = `
-        <div class="shop-dynamic-filter-grid">
+        <div class="flex items-stretch gap-3 min-w-max">
             ${sortedEntries.map(([name, values]) => `
-                <label class="shop-dynamic-filter-item rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
+                <label class="min-w-[170px] max-w-[220px] rounded-xl border border-slate-200 bg-slate-50 px-3 py-2">
                     <span class="block text-[10px] font-black uppercase tracking-[0.14em] text-slate-500 mb-1.5">${escapeHtml(name)}</span>
                     <span class="relative block">
                         <select onchange="window.updateFilter('${escapeHtml(name)}', this.value)" 
-                                class="shop-dynamic-filter-select w-full h-10 pl-3 pr-8 bg-white border border-slate-200 rounded-lg text-sm font-semibold appearance-none focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-200 cursor-pointer text-slate-700">
+                                class="w-full h-9 pl-3 pr-8 bg-white border border-slate-200 rounded-lg text-sm font-semibold appearance-none focus:outline-none focus:ring-4 focus:ring-orange-500/10 focus:border-orange-200 cursor-pointer text-slate-700">
                             <option value="all">${escapeHtml(allOptionLabel)}</option>
                             ${Array.from(values.entries())
             .sort((a, b) => String(a[1]).localeCompare(String(b[1]), 'no'))

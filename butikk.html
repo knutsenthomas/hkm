@@ -184,115 +184,6 @@
             box-shadow: 0 8px 18px rgba(15, 23, 42, 0.18);
         }
 
-        .shop-hero-section,
-        .shop-hero-swiper,
-        .shop-hero-slide {
-            min-height: 100svh;
-        }
-
-        .shop-hero-slide-content {
-            max-width: 40rem;
-        }
-
-        .shop-hero-slide-title {
-            max-width: 11ch;
-        }
-
-        .shop-filter-card {
-            border-radius: 1.35rem;
-        }
-
-        .shop-card-badge,
-        .shop-card-kicker {
-            letter-spacing: 0.18em;
-        }
-
-        .shop-card-kicker {
-            font-size: 0.65rem;
-        }
-
-        .shop-card-cart-button {
-            width: 2.25rem;
-            height: 2.25rem;
-        }
-
-        .shop-filter-chip-row {
-            scroll-padding-inline: 0.25rem;
-        }
-
-        .shop-dynamic-filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 0.75rem;
-            min-width: 100%;
-        }
-
-        .shop-dynamic-filter-item {
-            min-width: 0;
-            max-width: none;
-        }
-
-        .shop-dynamic-filter-select {
-            min-width: 0;
-        }
-
-        @media (max-width: 768px) {
-            .shop-card-title {
-                min-height: 2.6rem;
-            }
-
-            .shop-hero-section,
-            .shop-hero-swiper,
-            .shop-hero-slide {
-                min-height: 86svh;
-                height: 86svh;
-            }
-
-            .shop-hero-slide {
-                align-items: flex-end;
-            }
-
-            .shop-hero-slide-content {
-                max-width: 100%;
-                padding-top: 7rem;
-                padding-bottom: 8.5rem;
-            }
-
-            .shop-hero-slide-title {
-                max-width: 11ch;
-            }
-
-            .shop-filter-card {
-                padding: 1rem;
-            }
-
-            .shop-filter-chip-row {
-                gap: 0.6rem;
-            }
-
-            .unified-category-btn {
-                padding: 0.7rem 0.95rem;
-                font-size: 0.8rem;
-                white-space: nowrap;
-            }
-
-            .shop-dynamic-filter-grid {
-                grid-template-columns: 1fr;
-                gap: 0.65rem;
-            }
-        }
-
-        @media (min-width: 769px) and (max-width: 1100px) {
-            .shop-dynamic-filter-grid {
-                grid-template-columns: repeat(2, minmax(0, 1fr));
-            }
-        }
-
-        @media (min-width: 769px) {
-            .shop-hero-slide-title {
-                max-width: none;
-            }
-        }
     </style>
     <!-- Loader Safety Net -->
     <script>
@@ -466,17 +357,17 @@
 
     <main class="relative !p-0 !m-0">
         <!-- Elegant Hero Slider (Full Screen) -->
-        <section class="shop-hero-section overflow-hidden !p-0 !m-0">
-            <div class="swiper product-hero-swiper shop-hero-swiper w-full overflow-hidden shadow-2xl">
+        <section class="h-screen overflow-hidden !p-0 !m-0">
+            <div class="swiper product-hero-swiper w-full h-screen overflow-hidden shadow-2xl">
                 <div class="swiper-wrapper" id="hero-slider-wrapper">
                     <!-- Default fallback slide (vises hvis JS/API ikke laster) -->
-                    <div class="swiper-slide shop-hero-slide bg-slate-950 flex items-center">
+                    <div class="swiper-slide bg-slate-950 h-screen flex items-center">
                         <div
                             class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.25),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(59,130,246,0.15),transparent_35%),linear-gradient(135deg,#020617,#0f172a_60%,#111827)]">
                         </div>
                         <div class="container mx-auto px-6 md:px-12 relative z-10">
                             <div
-                                class="shop-hero-slide-content max-w-2xl text-white space-y-5 flex flex-col items-center md:items-start text-center md:text-left">
+                                class="max-w-2xl text-white space-y-5 flex flex-col items-center md:items-start text-center md:text-left">
                                 <span
                                     class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-[10px] font-black uppercase tracking-[0.2em]">
                                     <span data-content-key="heroFallback.badge">HKM Butikk</span>
@@ -1019,15 +910,15 @@
                 <div class="w-14 h-1.5 bg-orange-500 mx-auto rounded-full mt-3"></div>
             </div>
 
-            <div class="shop-filter-card bg-white border border-slate-200 shadow-sm p-4 md:p-5 mb-10">
-                <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4 md:gap-5">
-                    <div class="flex items-start sm:items-center gap-3">
+            <div class="bg-white border border-slate-200 rounded-[1.6rem] shadow-sm p-4 md:p-5 mb-10">
+                <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                    <div class="flex items-center gap-3">
                         <span
                             class="inline-flex items-center justify-center w-10 h-10 rounded-2xl bg-slate-100 text-slate-700">
                             <i class="fas fa-sliders text-sm"></i>
                         </span>
                         <div id="butikk-count"
-                            class="text-[11px] md:text-sm font-black text-orange-600 uppercase tracking-[0.14em] leading-relaxed">
+                            class="text-xs md:text-sm font-black text-orange-600 uppercase tracking-[0.14em]">
                             Henter produkter...
                         </div>
                     </div>
@@ -1042,7 +933,7 @@
 
                 <div class="mt-4 border-t border-slate-100 pt-4">
                     <div class="filter-scroll overflow-x-auto pb-2 -mx-1 px-1">
-                        <div class="shop-filter-chip-row flex items-center gap-2 min-w-max">
+                        <div class="flex items-center gap-2 min-w-max">
                             <button
                                 class="category-btn unified-category-btn active px-4 py-2 rounded-full font-bold text-sm transition-all"
                                 data-category="all">Alle
@@ -1152,7 +1043,7 @@
                     </div>
                 </div>
 
-                <div class="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(240px,320px)_1fr] gap-3 md:gap-4 items-start">
+                <div class="mt-4 grid grid-cols-1 lg:grid-cols-[minmax(240px,320px)_1fr] gap-3 items-start">
                     <div class="rounded-xl border border-slate-200 bg-slate-50 p-3.5">
                         <div class="flex items-center justify-between gap-4 mb-2.5">
                             <p class="text-[11px] font-black uppercase tracking-[0.14em] text-slate-500"
@@ -1174,7 +1065,7 @@
                             <p class="text-[11px] font-black uppercase tracking-[0.14em] text-slate-500"
                                 data-content-key="productBrowser.moreFiltersLabel">Flere filtre</p>
                         </div>
-                        <div id="dynamic-filters" class="pb-2">
+                        <div id="dynamic-filters" class="filter-scroll overflow-x-auto pb-2">
                             <!-- Populated by window.renderFilters() in wix-store.js -->
                         </div>
                     </div>
