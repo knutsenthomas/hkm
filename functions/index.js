@@ -603,10 +603,19 @@ async function resolveGeminiModel(cleanKey) {
 }
 
 function chooseGeminiModel(modelNames = []) {
-  // Dynamically pick the newest available Flash model, then fall back to Pro.
-  // This handles future preview releases without needing code updates.
-  const flashModels = modelNames.filter((n) => n.includes("flash"));
-  const proModels = modelNames.filter((n) => n.includes("gemini") && !n.includes("flash"));
+  // Prefer text-capable Flash models. Exclude image/vision/live variants that may
+  // have separate quotas or non-chat behavior.
+  const isTextChatModel = (name) => {
+    const n = String(name || "").toLowerCase();
+    if (!n.includes("gemini")) return false;
+    if (n.includes("embedding") || n.includes("aqa")) return false;
+    if (n.includes("image") || n.includes("vision") || n.includes("live") || n.includes("tts")) return false;
+    return true;
+  };
+
+  const chatModels = modelNames.filter((n) => isTextChatModel(n));
+  const flashModels = chatModels.filter((n) => n.includes("flash"));
+  const proModels = chatModels.filter((n) => !n.includes("flash"));
 
   function scoreModel(name) {
     // Extract version numbers from model name, e.g. "models/gemini-2.5-flash-preview-04-17"
@@ -623,7 +632,7 @@ function chooseGeminiModel(modelNames = []) {
   const sortedFlash = flashModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
   const sortedPro = proModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
 
-  return sortedFlash[0] || sortedPro[0] || modelNames[0] || "";
+  return sortedFlash[0] || sortedPro[0] || chatModels[0] || modelNames[0] || "";
 }
 
 /**
@@ -3023,8 +3032,14 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     if (!response.ok) {
       console.error("Gemini REST API feil:", JSON.stringify(data));
 
-      // On 503 (overloaded/UNAVAILABLE), clear cache and retry with stable fallback model.
-      if (response.status === 503 || data?.error?.status === "UNAVAILABLE") {
+      // On overload/quota errors, clear cache and retry once with stable fallback model.
+      const isRetryableGeminiError =
+        response.status === 503 ||
+        response.status === 429 ||
+        data?.error?.status === "UNAVAILABLE" ||
+        data?.error?.status === "RESOURCE_EXHAUSTED";
+
+      if (isRetryableGeminiError) {
         _cachedGeminiModel = ""; // Force re-selection on next request
         const fallbackUrl = `${apiBase}/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
         try {
@@ -3060,7 +3075,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
           sender: "agent",
           source: "ai_gemini",
           fromName: "HKM Assistent",
-          text: "AI-assistenten er midlertidig overbelastet. Vennligst prøv igjen om et øyeblikk, eller ta kontakt via e-post.",
+          text: "AI-assistenten er midlertidig opptatt. Prøv igjen om et lite øyeblikk, eller bruk e-post-fanen så følger vi deg opp.",
           createdAt: admin.firestore.FieldValue.serverTimestamp(),
         }).catch(() => {});
       }
