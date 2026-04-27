@@ -291,9 +291,11 @@ function createSliderSlide(product) {
             </div>
             
             <!-- Scroll Indicator -->
-            <div class="absolute bottom-12 left-1/2 -translate-x-1/2 z-30 animate-bounce cursor-pointer flex flex-col items-center gap-2 group" onclick="document.getElementById('shop-content').scrollIntoView({behavior: 'smooth'})">
-                <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white transition-colors">${escapeHtml(scrollIndicator)}</span>
-                <i class="fas fa-chevron-down text-white/50 group-hover:text-white text-xl transition-colors"></i>
+            <div class="absolute inset-x-0 bottom-12 z-30 flex justify-center pointer-events-none">
+                <div class="animate-bounce cursor-pointer flex flex-col items-center gap-2 group pointer-events-auto" onclick="document.getElementById('shop-content').scrollIntoView({behavior: 'smooth'})">
+                    <span class="text-[10px] font-black uppercase tracking-[0.3em] text-white/40 group-hover:text-white transition-colors">${escapeHtml(scrollIndicator)}</span>
+                    <i class="fas fa-chevron-down text-white/50 group-hover:text-white text-xl transition-colors"></i>
+                </div>
             </div>
         </div>
     `;
