@@ -6222,6 +6222,11 @@ class AdminManager {
     async editHeroSlide(index = -1) {
         const isNew = index === -1;
         const slide = isNew ? { title: '', subtitle: '', imageUrl: '', btnText: '', btnLink: '' } : this.heroSlides[index];
+        const safeSlideImage = this.escapeHtml(slide.imageUrl || '');
+        const safeSlideTitle = this.escapeHtml(slide.title || '');
+        const safeSlideSubtitle = this.escapeHtml(slide.subtitle || '');
+        const safeSlideBtnText = this.escapeHtml(slide.btnText || '');
+        const safeSlideBtnLink = this.escapeHtml(slide.btnLink || '');
 
         const modal = document.createElement('div');
         modal.className = 'dashboard-modal';
@@ -6236,28 +6241,35 @@ class AdminManager {
                         <div class="form-group">
                             <label>Slide-bilde (Anbefalt: 1920x1080px)</label>
                             <div id="hero-img-trigger" style="margin-bottom: 12px; position: relative; cursor: pointer; border: 2px dashed #e2e8f0; border-radius: 12px; aspect-ratio: 16/9; display: flex; align-items: center; justify-content: center; background: #f8fafc; overflow: hidden;">
-                                ${slide.imageUrl ? `<img src="${slide.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
-                                <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.7); color: #fff; font-size: 11px; padding: 6px; text-align: center; opacity: 0; transition: opacity 0.2s;">KLIKK FOR Å LAST OPP</div>
+                                ${safeSlideImage ? `<img src="${safeSlideImage}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
+                                <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 11px; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg fil</div>
                             </div>
                             <input type="file" id="hero-file-input" style="display: none;" accept="image/*">
-                            <input type="text" id="hero-img-url" class="form-control" value="${slide.imageUrl || ''}" placeholder="Eller lim inn bilde-URL her">
+                            <div style="display:flex; gap:10px; align-items:center; margin-bottom:10px;">
+                                <button type="button" class="btn-secondary" id="hero-choose-image-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap;">
+                                    <span class="material-symbols-outlined">upload</span>
+                                    Velg bilde
+                                </button>
+                                <span id="hero-upload-status" style="font-size:13px; color:#64748b;">JPG, PNG eller WebP</span>
+                            </div>
+                            <input type="text" id="hero-img-url" class="form-control" value="${safeSlideImage}" placeholder="Eller lim inn bilde-URL her">
                         </div>
 
                         <div class="form-group">
                             <label>Overskrift</label>
-                            <input type="text" id="hero-title" class="form-control" value="${slide.title || ''}">
+                            <input type="text" id="hero-title" class="form-control" value="${safeSlideTitle}">
                         </div>
                         <div class="form-group">
                             <label>Undertekst</label>
-                            <textarea id="hero-subtitle" class="form-control" style="height: 80px;">${slide.subtitle || ''}</textarea>
+                            <textarea id="hero-subtitle" class="form-control" style="height: 80px;">${safeSlideSubtitle}</textarea>
                         </div>
                         <div class="form-group">
                             <label>Knapptekst</label>
-                            <input type="text" id="hero-btn-text" class="form-control" value="${slide.btnText || ''}">
+                            <input type="text" id="hero-btn-text" class="form-control" value="${safeSlideBtnText}">
                         </div>
                         <div class="form-group">
                             <label>Knapp-lenke</label>
-                            <input type="text" id="hero-btn-link" class="form-control" value="${slide.btnLink || ''}">
+                            <input type="text" id="hero-btn-link" class="form-control" value="${safeSlideBtnLink}">
                         </div>
                         <div style="margin-top: 24px;">
                             <button class="btn-primary" style="width: 100%;" id="hero-save-btn">Lagre slide</button>
@@ -6272,6 +6284,8 @@ class AdminManager {
         const imgInput = modal.querySelector('#hero-img-url');
         const fileInput = modal.querySelector('#hero-file-input');
         const imgTrigger = modal.querySelector('#hero-img-trigger');
+        const chooseImageBtn = modal.querySelector('#hero-choose-image-btn');
+        const uploadStatus = modal.querySelector('#hero-upload-status');
         const saveBtn = modal.querySelector('#hero-save-btn');
         const closeBtn = modal.querySelector('#hero-close-modal');
 
@@ -6279,6 +6293,7 @@ class AdminManager {
 
         // Image Trigger Logic
         imgTrigger.onclick = () => fileInput.click();
+        chooseImageBtn.onclick = () => fileInput.click();
 
         imgTrigger.onmouseenter = () => {
             const overlay = imgTrigger.querySelector('.upload-overlay');
@@ -6290,13 +6305,15 @@ class AdminManager {
         };
 
         // Live Preview
+        const renderImagePreview = (url) => {
+            const safeUrl = this.escapeHtml(url || '');
+            imgTrigger.innerHTML = safeUrl && safeUrl.length > 10
+                ? `<img src="${safeUrl}" style="width: 100%; height: 100%; object-fit: cover;"><div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 11px; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg ny fil</div>`
+                : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span><div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.78); color: #fff; font-size: 11px; padding: 8px; text-align: center; opacity: 1; transition: opacity 0.2s;">Klikk på bildet eller velg fil</div>';
+        };
+
         imgInput.oninput = (e) => {
-            const url = e.target.value;
-            if (url && url.length > 10) {
-                imgTrigger.innerHTML = `<img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            } else {
-                imgTrigger.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
-            }
+            renderImagePreview(e.target.value);
         };
 
         // File Upload Handling (Blog-style)
@@ -6306,23 +6323,32 @@ class AdminManager {
 
             imgTrigger.style.opacity = '0.5';
             imgTrigger.style.pointerEvents = 'none';
+            chooseImageBtn.disabled = true;
+            chooseImageBtn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Laster opp...';
+            uploadStatus.textContent = file.name;
             const originalHTML = imgTrigger.innerHTML;
             imgTrigger.innerHTML = '<span class="loader-sm"></span>';
 
             try {
-                const path = `covers/blog/${Date.now()}_${file.name}`;
+                const safeFileName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+                const path = `hero/${Date.now()}_${safeFileName}`;
                 const url = await firebaseService.uploadImage(file, path);
                 
                 imgInput.value = url;
                 imgInput.dispatchEvent(new Event('input')); 
                 this.showToast('Bilde lastet opp!', 'success');
+                uploadStatus.textContent = 'Opplasting fullført';
             } catch (err) {
                 console.error("Upload error:", err);
-                this.showToast('Kunne ikke laste opp bilde.', 'error');
+                this.showToast('Kunne ikke laste opp bilde: ' + (err.message || 'Ukjent feil'), 'error', 6000);
+                uploadStatus.textContent = 'Opplasting feilet';
                 imgTrigger.innerHTML = originalHTML;
             } finally {
                 imgTrigger.style.opacity = '1';
                 imgTrigger.style.pointerEvents = 'auto';
+                chooseImageBtn.disabled = false;
+                chooseImageBtn.innerHTML = '<span class="material-symbols-outlined">upload</span> Velg bilde';
+                fileInput.value = '';
             }
         };
 
