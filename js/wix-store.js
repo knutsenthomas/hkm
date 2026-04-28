@@ -271,7 +271,7 @@ function createSliderSlide(product) {
             </div>
             
             <div class="container mx-auto px-6 md:px-12 relative z-20">
-                <div class="max-w-2xl space-y-4 md:space-y-6 text-white flex flex-col items-center md:items-start text-center md:text-left">
+                <div class="max-w-2xl mx-auto space-y-4 md:space-y-6 text-white flex flex-col items-center text-center">
                     <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/20 backdrop-blur-md text-primary text-[10px] font-black uppercase tracking-[0.2em] border border-primary/30">
                         ${escapeHtml(badgeText)}
                     </span>
@@ -281,7 +281,7 @@ function createSliderSlide(product) {
                     <div class="text-base md:text-xl text-slate-200 leading-relaxed max-w-lg drop-shadow-md line-clamp-3 prose-p:my-0">
                         ${product.description || sliderDescription}
                     </div>
-                    <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-4 md:pt-6">
+                    <div class="flex flex-wrap justify-center gap-4 pt-4 md:pt-6">
                         <a href="${escapeHtml(product.productUrl)}" target="_blank" 
                            class="w-full md:w-auto px-8 md:px-10 py-4 md:py-5 rounded-full bg-white text-slate-900 font-black hover:bg-primary hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95 text-base md:text-lg">
                             ${escapeHtml(buyNowPrefix)} — ${escapeHtml(product.formattedPrice)}
@@ -318,13 +318,13 @@ function renderHeroFallback(reason = 'ERROR') {
         <div class="swiper-slide relative h-screen flex items-center overflow-hidden bg-slate-950">
             <div class="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(249,115,22,0.2),transparent_40%),radial-gradient(circle_at_80%_30%,rgba(59,130,246,0.14),transparent_35%),linear-gradient(135deg,#020617,#0f172a_60%,#111827)]"></div>
             <div class="container mx-auto px-6 md:px-12 relative z-20">
-                <div class="max-w-2xl space-y-5 text-white flex flex-col items-center md:items-start text-center md:text-left">
+                <div class="max-w-2xl mx-auto space-y-5 text-white flex flex-col items-center text-center">
                     <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur border border-white/15 text-[10px] font-black uppercase tracking-[0.2em]">
                         ${escapeHtml(badgeText)}
                     </span>
                     <h2 class="text-3xl md:text-5xl font-black leading-tight tracking-tight">${escapeHtml(title)}</h2>
                     <p class="text-base md:text-lg text-slate-200 leading-relaxed max-w-lg">${escapeHtml(message)}</p>
-                    <div class="flex flex-wrap justify-center md:justify-start gap-4 pt-2">
+                    <div class="flex flex-wrap justify-center gap-4 pt-2">
                         <a href="${escapeHtml(config.externalStoreBaseUrl)}" target="_blank" rel="noopener noreferrer"
                            class="w-full md:w-auto px-8 py-4 rounded-full bg-primary text-white font-black hover:brightness-110 transition-all shadow-xl">
                             ${escapeHtml(externalCta)}
