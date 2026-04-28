@@ -1,16 +1,22 @@
 /* Rich blog content rendering */
 .blog-post-content,
 #single-post-content {
-  color: #1f2937;
-  line-height: 1.8;
-  font-size: 1.06rem;
+  color: var(--text-dark);
+  font-family: inherit;
+  line-height: 1.6;
+  font-size: 1rem;
   word-break: break-word;
 }
 
 .blog-post-content p,
 #single-post-content p {
   display: block;
-  margin: 0 0 1.15em;
+  margin: 0;
+}
+
+.blog-post-content p + p,
+#single-post-content p + p {
+  margin-top: 0.9em;
 }
 
 .blog-post-content h1,
@@ -139,7 +145,7 @@
   .blog-post-content,
   #single-post-content {
     font-size: 1rem;
-    line-height: 1.75;
+    line-height: 1.6;
   }
 
   .blog-post-content .wix-gallery,
