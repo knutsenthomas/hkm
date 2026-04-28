@@ -848,9 +848,11 @@ class ContentManager {
             readingTimeEl.style.display = 'inline-block';
         }
 
-        // --- View Counter ---
+        // --- View Counter (Wix + local) ---
         const postId = this.getContentItemStableId(sourceItem || item);
-        let viewCount = 1;
+        const wixViewsRaw = Number(sourceItem?.views ?? item.views ?? 0);
+        const wixViews = Number.isFinite(wixViewsRaw) ? Math.max(0, Math.floor(wixViewsRaw)) : 0;
+        let localViewsAfterIncrement = 1;
 
         if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
             try {
@@ -861,7 +863,8 @@ class ContentManager {
                 // Read current stats (if exists) before incrementing, allows immediate update while updating remote.
                 const docSnap = await docRef.get();
                 if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
-                    viewCount = docSnap.data().views + 1;
+                    const existingLocalViews = Number(docSnap.data().views);
+                    localViewsAfterIncrement = Number.isFinite(existingLocalViews) ? Math.max(0, Math.floor(existingLocalViews)) + 1 : 1;
                 }
 
                 // Increment view asynchronously
@@ -874,6 +877,8 @@ class ContentManager {
                 console.warn('[ContentManager] Feil ved henting av visninger:', err);
             }
         }
+
+        const viewCount = wixViews + localViewsAfterIncrement;
 
         let viewsEl = document.getElementById('single-post-views');
         if (!viewsEl && document.querySelector('.blog-meta')) {
