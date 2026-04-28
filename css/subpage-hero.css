@@ -26,6 +26,9 @@
     text-align: center;
     position: relative;
     overflow: hidden;
+  background-size: cover !important;
+  background-position: center center !important;
+  background-repeat: no-repeat !important;
 }
 
 .page-hero-title,
@@ -63,6 +66,13 @@
     min-height: 400px !important;
     padding-top: 150px !important;
     padding-bottom: 80px !important;
+  }
+
+  #blog-hero {
+    min-height: 340px !important;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
   }
 }
 

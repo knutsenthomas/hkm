@@ -692,8 +692,12 @@ class ContentManager {
             categoryEl.innerHTML = cat ? `<i class="fas fa-tag"></i> ${cat}` : '';
         }
 
-        if (heroEl && item.imageUrl) {
-            heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${item.imageUrl}')`;
+        const heroImage = item.imageUrl || item.image || item.dashboardImage || sourceItem?.imageUrl || sourceItem?.image || sourceItem?.dashboardImage || '';
+        if (heroEl && heroImage) {
+            heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${heroImage}')`;
+            heroEl.style.backgroundSize = 'cover';
+            heroEl.style.backgroundPosition = 'center center';
+            heroEl.style.backgroundRepeat = 'no-repeat';
         }
 
         // --- Calculate Reading Time ---
