@@ -1280,6 +1280,36 @@ function clampHeadingLevel(value) {
   return Math.min(6, Math.max(1, Math.round(parsed)));
 }
 
+function renderInlineLink(href, innerHtml) {
+  if (!innerHtml) return "";
+  const safeHref = typeof href === "string" ? href.trim() : "";
+  if (!safeHref) return innerHtml;
+  return `<a href="${escapeHtml(safeHref)}" target="_blank" rel="noopener noreferrer">${innerHtml}</a>`;
+}
+
+function applyTextDecorations(html, decorations) {
+  if (!html || !Array.isArray(decorations) || !decorations.length) return html;
+
+  return decorations.reduce((acc, decoration) => {
+    if (!decoration || typeof decoration !== "object") return acc;
+
+    const type = typeof decoration.type === "string" ? decoration.type.toUpperCase() : "";
+    if (type === "BOLD") return `<strong>${acc}</strong>`;
+    if (type === "ITALIC") return `<em>${acc}</em>`;
+    if (type === "UNDERLINE") return `<u>${acc}</u>`;
+    if (type === "STRIKETHROUGH") return `<s>${acc}</s>`;
+
+    if (type === "LINK") {
+      const linkData = decoration.linkData && typeof decoration.linkData === "object" ? decoration.linkData : {};
+      const linkObj = linkData.link && typeof linkData.link === "object" ? linkData.link : {};
+      const href = wixPickFirstString(linkObj.url, linkObj.href, linkData.url, "");
+      return renderInlineLink(href, acc);
+    }
+
+    return acc;
+  }, html);
+}
+
 function renderRichInlineNodes(nodes) {
   if (!Array.isArray(nodes)) return "";
 
@@ -1287,12 +1317,29 @@ function renderRichInlineNodes(nodes) {
     if (!node || typeof node !== "object") return "";
 
     const type = typeof node.type === "string" ? node.type.toUpperCase() : "";
+    const childNodes = Array.isArray(node.nodes) ? node.nodes : [];
+
     if (type === "TEXT") {
-      const text = node.textData && typeof node.textData.text === "string" ? node.textData.text : "";
-      return escapeHtml(text).replace(/\n/g, "<br>");
+      const textData = node.textData && typeof node.textData === "object" ? node.textData : {};
+      const text = typeof textData.text === "string" ? textData.text : "";
+      const base = escapeHtml(text).replace(/\n/g, "<br>");
+      const decorations = Array.isArray(textData.decorations) ? textData.decorations : [];
+      return applyTextDecorations(base, decorations);
     }
 
-    return renderRichInlineNodes(Array.isArray(node.nodes) ? node.nodes : []);
+    if (type === "LINE_BREAK") {
+      return "<br>";
+    }
+
+    if (type === "LINK") {
+      const linkData = node.linkData && typeof node.linkData === "object" ? node.linkData : {};
+      const linkObj = linkData.link && typeof linkData.link === "object" ? linkData.link : {};
+      const href = wixPickFirstString(linkObj.url, linkObj.href, linkData.url, "");
+      const inner = renderRichInlineNodes(childNodes);
+      return renderInlineLink(href, inner);
+    }
+
+    return renderRichInlineNodes(childNodes);
   }).join("");
 }
 
@@ -1369,8 +1416,8 @@ function renderRichContentNodes(nodes, options = {}) {
       return `<h${level}>${inner}</h${level}>`;
     }
 
-    if (type === "BULLETED_LIST" || type === "ORDERED_LIST") {
-      const tag = type === "ORDERED_LIST" ? "ol" : "ul";
+    if (type === "BULLETED_LIST" || type === "ORDERED_LIST" || type === "NUMBERED_LIST") {
+      const tag = type === "BULLETED_LIST" ? "ul" : "ol";
       const items = childNodes.map((itemNode) => {
         const itemHtml = renderRichContentNodes([itemNode], { inListItem: true });
         const cleaned = stripOuterParagraphTag(itemHtml);
@@ -1525,6 +1572,18 @@ function renderRichContentToHtml(richContent) {
   return renderRichContentNodes(nodes).trim();
 }
 
+function isNoiseTextFragment(value) {
+  if (typeof value !== "string") return true;
+  const trimmed = value.trim();
+  if (!trimmed) return true;
+
+  if (/^rgba?\s*\([^)]*\)$/i.test(trimmed)) return true;
+  if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(trimmed)) return true;
+  if (/^\d+(\.\d+)?(px|em|rem|%)$/i.test(trimmed)) return true;
+
+  return false;
+}
+
 function extractTextFromRichContent(richContent) {
   if (!richContent || typeof richContent !== "object") return "";
 
@@ -1537,7 +1596,7 @@ function extractTextFromRichContent(richContent) {
 
     if (typeof value === "string") {
       const normalized = decodeHtmlEntities(stripHtmlTags(value));
-      if (!normalized || normalized.length < 2) return;
+      if (!normalized || normalized.length < 2 || isNoiseTextFragment(normalized)) return;
 
       if (preferredTextKeys.has(key)) {
         fragments.push(normalized);
@@ -1820,16 +1879,38 @@ function normalizeWixBlogRssItem(item, index = 0) {
     url: link || "",
     slug: slug || "",
     excerpt,
+    featured: false,
+    pinned: false,
+    commentingEnabled: true,
+    minutesToRead: 1,
+    likes: 0,
+    comments: 0,
+    views: 0,
+    categoryIds: [],
+    tagIds: [],
+    hashtags: [],
+    relatedPostIds: [],
+    pricingPlanIds: [],
+    memberId: "",
+    contactId: "",
+    language: "no",
   };
+}
+
+function hasStructuralHtmlMarkup(html) {
+  if (typeof html !== "string" || !html.trim()) return false;
+  return /<(h[1-6]|ul|ol|li|blockquote|figure|img|video|audio|iframe|hr)\b/i.test(html);
 }
 
 function normalizeWixBlogApiPost(post, index = 0) {
   if (!post || typeof post !== "object") return null;
 
   const title = typeof post.title === "string" ? post.title.trim() : "";
-  const url = typeof post.url === "string" ? post.url.trim() : "";
+  const url = (post.url && typeof post.url === "object" && typeof post.url.path === "string") 
+    ? post.url.path.trim() 
+    : (typeof post.url === "string" ? post.url.trim() : "");
   const slug = typeof post.slug === "string" ? post.slug.trim() : "";
-  const id = typeof post._id === "string" ? post._id.trim() : "";
+  const id = typeof post._id === "string" ? post._id.trim() : (typeof post.id === "string" ? post.id.trim() : "");
   const author = "HKM";
   const category = "Blogg";
   const date = parseDateIso(post.firstPublishedDate || post.lastPublishedDate || post._createdDate || post._updatedDate);
@@ -1839,13 +1920,21 @@ function normalizeWixBlogApiPost(post, index = 0) {
   const richContentText = extractTextFromRichContent(post.richContent);
   const contentText = directContentText.length >= richContentText.length ? directContentText : richContentText;
   const plainContentHtml = plainTextToHtml(contentText);
-  const contentHtml = richContentHtml.length >= plainContentHtml.length ? richContentHtml : plainContentHtml;
+
+  const richHasStructure = hasStructuralHtmlMarkup(richContentHtml);
+  const richLooksComplete = richContentHtml.length >= Math.max(240, Math.floor(plainContentHtml.length * 0.55));
+  const contentHtml = richContentHtml && (richHasStructure || richLooksComplete) ? richContentHtml : (plainContentHtml || richContentHtml);
+
   const excerptSource = typeof post.excerpt === "string" && post.excerpt.trim() ? post.excerpt : (stripHtmlTags(contentHtml) || contentText);
   const excerpt = clampText(decodeHtmlEntities(excerptSource || ""), 360);
 
   const media = post.media && typeof post.media === "object" ? post.media : {};
+  const heroImage = post.heroImage && typeof post.heroImage === "object" ? post.heroImage : {};
+  const heroImageUrl = (heroImage.image && typeof heroImage.image === "object") 
+    ? pickRichMediaUrl(heroImage.image) 
+    : null;
   const imageUrl = wixPickFirstString(
-    post.heroImage,
+    heroImageUrl,
     media.image,
     media.url,
     extractFirstImageFromRichContent(post.richContent),
@@ -1861,6 +1950,17 @@ function normalizeWixBlogApiPost(post, index = 0) {
   const finalHtml = contentHtml || `<p>${escapeHtml(excerpt || "")}</p>`;
   if (!title && !finalHtml) return null;
 
+  const metrics = post.metrics && typeof post.metrics === "object" ? post.metrics : {};
+  const likes = typeof metrics.likes === "number" ? Math.max(0, metrics.likes) : 0;
+  const comments = typeof metrics.comments === "number" ? Math.max(0, metrics.comments) : 0;
+  const views = typeof metrics.views === "number" ? Math.max(0, metrics.views) : 0;
+
+  const categoryIds = Array.isArray(post.categoryIds) ? post.categoryIds.filter(c => typeof c === "string") : [];
+  const tagIds = Array.isArray(post.tagIds) ? post.tagIds.filter(t => typeof t === "string") : [];
+  const hashtags = Array.isArray(post.hashtags) ? post.hashtags.filter(h => typeof h === "string") : [];
+  const relatedPostIds = Array.isArray(post.relatedPostIds) ? post.relatedPostIds.filter(r => typeof r === "string") : [];
+  const pricingPlanIds = Array.isArray(post.pricingPlanIds) ? post.pricingPlanIds.filter(p => typeof p === "string") : [];
+
   return {
     id: stableId,
     title: title || "Blogginnlegg",
@@ -1874,6 +1974,21 @@ function normalizeWixBlogApiPost(post, index = 0) {
     url,
     slug,
     excerpt,
+    featured: typeof post.featured === "boolean" ? post.featured : false,
+    pinned: typeof post.pinned === "boolean" ? post.pinned : false,
+    commentingEnabled: typeof post.commentingEnabled === "boolean" ? post.commentingEnabled : true,
+    minutesToRead: typeof post.minutesToRead === "number" ? Math.max(1, post.minutesToRead) : 1,
+    likes,
+    comments,
+    views,
+    categoryIds,
+    tagIds,
+    hashtags,
+    relatedPostIds,
+    pricingPlanIds,
+    memberId: typeof post.memberId === "string" ? post.memberId : "",
+    contactId: typeof post.contactId === "string" ? post.contactId : "",
+    language: typeof post.language === "string" ? post.language : "no",
   };
 }
 
@@ -1881,7 +1996,7 @@ async function fetchWixBlogItemsViaApi() {
   const wixClient = getWixClient();
   let offset = 0;
   const limit = 50;
-  const fieldsets = ["CONTENT_TEXT", "URL", "RICH_CONTENT"];
+  const fieldsets = ["CONTENT_TEXT", "URL", "RICH_CONTENT", "FEED"];
   const listPosts = [];
 
   while (true) {
@@ -1899,7 +2014,7 @@ async function fetchWixBlogItemsViaApi() {
 
   const detailedPosts = [];
   for (const post of listPosts) {
-    const postId = post && typeof post._id === "string" ? post._id : "";
+    const postId = post && typeof post._id === "string" ? post._id : (post && typeof post.id === "string" ? post.id : "");
     if (!postId) continue;
 
     try {
