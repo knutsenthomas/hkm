@@ -602,7 +602,7 @@ async function resolveGeminiModel(cleanKey) {
   return _cachedGeminiModel;
 }
 
-function chooseGeminiModel(modelNames = []) {
+function getOrderedGeminiChatModels(modelNames = []) {
   // Prefer text-capable Flash models. Exclude image/vision/live variants that may
   // have separate quotas or non-chat behavior.
   const isTextChatModel = (name) => {
@@ -632,7 +632,21 @@ function chooseGeminiModel(modelNames = []) {
   const sortedFlash = flashModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
   const sortedPro = proModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
 
-  return sortedFlash[0] || sortedPro[0] || chatModels[0] || modelNames[0] || "";
+  const prioritized = [...sortedFlash, ...sortedPro];
+  const seen = new Set(prioritized);
+  for (const modelName of chatModels) {
+    if (!seen.has(modelName)) {
+      prioritized.push(modelName);
+      seen.add(modelName);
+    }
+  }
+
+  return prioritized;
+}
+
+function chooseGeminiModel(modelNames = []) {
+  const orderedCandidates = getOrderedGeminiChatModels(modelNames);
+  return orderedCandidates[0] || modelNames[0] || "";
 }
 
 /**
@@ -3041,35 +3055,68 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
       if (isRetryableGeminiError) {
         _cachedGeminiModel = ""; // Force re-selection on next request
-        const fallbackUrl = `${apiBase}/models/gemini-1.5-flash:generateContent?key=${cleanKey}`;
+
+        const fallbackCandidates = [
+          "models/gemini-2.0-flash",
+          "models/gemini-2.0-flash-lite",
+        ];
+
+        // Enrich with currently available, text-capable models.
         try {
-          const fallbackResp = await fetch(fallbackUrl, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: `${systemPrompt}\n\nBesøkende: ${userMessage}` }] }]
-            })
-          });
-          const fallbackData = await fallbackResp.json();
-          if (fallbackResp.ok) {
-            const fallbackText = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (fallbackText) {
-              const chatRef = db.collection("visitorChats").doc(chatId);
-              await chatRef.collection("messages").add({
-                sender: "agent",
-                source: "ai_gemini",
-                fromName: "HKM Assistent",
-                text: fallbackText.trim(),
-                createdAt: admin.firestore.FieldValue.serverTimestamp(),
-              });
-              await chatRef.set({ updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-              return;
+          const modelsResp = await fetch(`${apiBase}/models?key=${cleanKey}`);
+          const modelsPayload = await modelsResp.json();
+          if (modelsResp.ok) {
+            const availableNames = (modelsPayload.models || [])
+              .filter((m) =>
+                m &&
+                typeof m.name === "string" &&
+                Array.isArray(m.supportedGenerationMethods) &&
+                m.supportedGenerationMethods.includes("generateContent"))
+              .map((m) => m.name);
+
+            const dynamicCandidates = getOrderedGeminiChatModels(availableNames)
+              .filter((name) => name !== selectedModel);
+
+            for (const candidate of dynamicCandidates) {
+              if (!fallbackCandidates.includes(candidate)) fallbackCandidates.push(candidate);
             }
           }
-          console.error("Fallback Gemini feil:", JSON.stringify(fallbackData));
-        } catch (fallbackErr) {
-          console.error("Fallback Gemini unntak:", fallbackErr);
+        } catch (listErr) {
+          console.warn("Kunne ikke hente fallback-modeller fra listModels:", listErr);
         }
+
+        for (const fallbackModel of fallbackCandidates) {
+          try {
+            const fallbackUrl = `${apiBase}/${fallbackModel}:generateContent?key=${cleanKey}`;
+            const fallbackResp = await fetch(fallbackUrl, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: `${systemPrompt}\n\nBesøkende: ${userMessage}` }] }]
+              })
+            });
+            const fallbackData = await fallbackResp.json();
+            if (fallbackResp.ok) {
+              const fallbackText = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text;
+              if (fallbackText) {
+                const chatRef = db.collection("visitorChats").doc(chatId);
+                await chatRef.collection("messages").add({
+                  sender: "agent",
+                  source: "ai_gemini",
+                  fromName: "HKM Assistent",
+                  text: fallbackText.trim(),
+                  createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                });
+                await chatRef.set({ updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
+                return;
+              }
+            }
+            console.error(`Fallback Gemini feil (${fallbackModel}):`, JSON.stringify(fallbackData));
+          } catch (fallbackErr) {
+            console.error(`Fallback Gemini unntak (${fallbackModel}):`, fallbackErr);
+          }
+        }
+
         // Both primary and fallback failed — write user-visible error so user isn't left hanging.
         await db.collection("visitorChats").doc(chatId).collection("messages").add({
           sender: "agent",
