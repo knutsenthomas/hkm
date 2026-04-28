@@ -3144,16 +3144,35 @@ class ContentManager {
         }
 
         const compact = raw.replace(/\s+/g, ' ').trim();
-        const splitMatch = compact.match(/^([^.!?:]{3,48}?[a-zæøå])([A-ZÆØÅ].{12,})$/);
 
-        if (splitMatch) {
-            const lead = splitMatch[1].trim();
-            const tail = splitMatch[2].trim();
-            const leadWordCount = lead.split(/\s+/).filter(Boolean).length;
+        const splitJoinedListItem = (value) => {
+            if (typeof value !== 'string' || value.length < 18) return null;
 
-            if (leadWordCount <= 6) {
-                return `<li><strong>${this.escapeHtml(lead)}</strong> ${this.escapeHtml(tail)}</li>`;
+            for (let i = 2; i < value.length - 12; i += 1) {
+                const prev = value[i - 1];
+                const curr = value[i];
+                if (!prev || !curr) continue;
+
+                const isLowerToUpper = /[a-zæøå]/.test(prev) && /[A-ZÆØÅ]/.test(curr);
+                if (!isLowerToUpper) continue;
+
+                const lead = value.slice(0, i).trim();
+                const tail = value.slice(i).trim();
+                const leadWordCount = lead.split(/\s+/).filter(Boolean).length;
+
+                if (lead.length < 4 || lead.length > 56) continue;
+                if (leadWordCount < 2 || leadWordCount > 7) continue;
+                if (tail.length < 12) continue;
+
+                return { lead, tail };
             }
+
+            return null;
+        };
+
+        const split = splitJoinedListItem(compact);
+        if (split) {
+            return `<li><strong>${this.escapeHtml(split.lead)}</strong> ${this.escapeHtml(split.tail)}</li>`;
         }
 
         return `<li>${this.escapeHtml(compact)}</li>`;
