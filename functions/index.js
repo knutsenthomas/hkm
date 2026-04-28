@@ -50,6 +50,112 @@ function getSecretOrEnv(secretParam, envKeys = []) {
   return candidates.find((value) => typeof value === "string" && value.trim()) || "";
 }
 
+function decodeCommonHtmlEntities(value) {
+  if (typeof value !== "string" || !value) return "";
+  return decodeHtmlEntities(
+    value
+      .replace(/&nbsp;/gi, " ")
+      .replace(/&#39;/gi, "'")
+      .replace(/&apos;/gi, "'")
+  );
+}
+
+function extractWixViewerBlocksAsHtml(pageHtml) {
+  if (typeof pageHtml !== "string" || !pageHtml) return "";
+
+  const blockRegex = /<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
+  const seen = new Set();
+  const parts = [];
+  let match;
+
+  while ((match = blockRegex.exec(pageHtml)) !== null) {
+    const tag = String(match[1] || "p").toLowerCase();
+    const rawInner = String(match[2] || "");
+    const text = decodeCommonHtmlEntities(
+      rawInner
+        .replace(/<br\s*\/?>/gi, "\n")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim()
+    );
+
+    if (text.length < 20) continue;
+
+    const dedupKey = `${tag}:${text.toLowerCase()}`;
+    if (seen.has(dedupKey)) continue;
+    seen.add(dedupKey);
+
+    if (tag === "li") {
+      parts.push(`<p>${escapeHtml(`- ${text}`)}</p>`);
+    } else if (/^h[1-6]$/.test(tag)) {
+      parts.push(`<${tag}>${escapeHtml(text)}</${tag}>`);
+    } else {
+      parts.push(`<p>${escapeHtml(text)}</p>`);
+    }
+  }
+
+  if (parts.length < 4) return "";
+  return parts.join("\n");
+}
+
+async function enrichWixItemsWithPublicPageContent(items = []) {
+  if (!Array.isArray(items) || !items.length) return items;
+
+  const candidates = items
+    .map((item, index) => ({ item, index }))
+    .filter(({ item }) => {
+      if (!item || typeof item !== "object") return false;
+      if (String(item.source || "").toLowerCase() !== "wix") return false;
+
+      const url = String(item.url || "").trim();
+      const contentLen = typeof item.content === "string" ? item.content.trim().length : 0;
+      const hasHtmlStructure = typeof item.content === "string" && /<\s*(h[1-6]|p|ul|ol|li|blockquote)\b/i.test(item.content);
+
+      if (!url || !/\/post\//i.test(url)) return false;
+      if (contentLen >= 700) return false;
+      if (hasHtmlStructure && contentLen >= 480) return false;
+      return true;
+    })
+    .slice(0, 6);
+
+  if (!candidates.length) return items;
+
+  const updates = new Map();
+
+  for (const candidate of candidates) {
+    const { item, index } = candidate;
+    const url = String(item.url || "").trim();
+
+    try {
+      const response = await fetch(url);
+      if (!response.ok) continue;
+
+      const html = await response.text();
+      const enrichedContent = extractWixViewerBlocksAsHtml(html);
+      if (!enrichedContent) continue;
+
+      const currentLen = typeof item.content === "string" ? item.content.trim().length : 0;
+      const enrichedLen = enrichedContent.trim().length;
+      if (enrichedLen <= currentLen + 220) continue;
+
+      const enrichedText = stripHtmlTags(enrichedContent);
+      const enrichedMinutesToRead = Math.max(1, Math.ceil((enrichedText.split(/\s+/).filter(Boolean).length || 0) / 225));
+
+      updates.set(index, {
+        ...item,
+        content: enrichedContent,
+        excerpt: clampText(decodeHtmlEntities(enrichedText), 360),
+        minutesToRead: Math.max(Number(item.minutesToRead) || 1, enrichedMinutesToRead),
+      });
+    } catch (error) {
+      console.warn("Wix public page enrichment failed:", error && error.message ? error.message : error);
+    }
+  }
+
+  if (!updates.size) return items;
+  return items.map((item, index) => updates.get(index) || item);
+}
+
 function getStripeSecretKey() {
   return getSecretOrEnv(
       stripeSecretKeyParam,
@@ -2061,11 +2167,23 @@ async function fetchWixBlogItemsViaRss(req = { query: {} }) {
 
 async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
   let wixItems = [];
+  let rssItems = [];
   let importSource = "wix-api";
   let feedUrl = "";
 
   try {
     wixItems = await fetchWixBlogItemsViaApi();
+    try {
+      const rssResult = await fetchWixBlogItemsViaRss(req);
+      rssItems = Array.isArray(rssResult && rssResult.items) ? rssResult.items : [];
+      feedUrl = rssResult && typeof rssResult.feedUrl === "string" ? rssResult.feedUrl : "";
+      if (rssItems.length > 0) {
+        importSource = "wix-api-rss-merged";
+      }
+    } catch (rssError) {
+      console.warn("Wix Blog RSS enrichment failed, continuing with API only:", rssError && rssError.message ? rssError.message : rssError);
+    }
+
   } catch (apiError) {
     console.warn("Wix Blog API sync failed, falling back to RSS:", apiError && apiError.message ? apiError.message : apiError);
     const rssResult = await fetchWixBlogItemsViaRss(req);
@@ -2073,6 +2191,8 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     feedUrl = rssResult.feedUrl;
     importSource = "wix-rss-fallback";
   }
+
+  wixItems = await enrichWixItemsWithPublicPageContent(wixItems);
 
   const existingSnap = await db.collection("content").doc("collection_blog").get();
   const existingData = existingSnap.exists ? existingSnap.data() : {};
@@ -2095,6 +2215,12 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     mergedMap.set(key, mergeBlogItemsPreferred(existing, item));
   });
 
+  rssItems.forEach((item, index) => {
+    const key = buildBlogItemDedupKey(item, nonWixItems.length + wixItems.length + index);
+    const existing = mergedMap.get(key);
+    mergedMap.set(key, mergeBlogItemsPreferred(existing, item));
+  });
+
   const mergedItems = Array.from(mergedMap.values()).sort((a, b) => {
     const dateA = new Date(a && a.date ? a.date : 0).getTime();
     const dateB = new Date(b && b.date ? b.date : 0).getTime();
@@ -2109,6 +2235,7 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
       source: importSource,
       syncedAt: admin.firestore.FieldValue.serverTimestamp(),
       wixItemCount: wixItems.length,
+      rssItemCount: rssItems.length,
       totalItemCount: mergedItems.length,
     },
   };
@@ -2120,6 +2247,7 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     feedUrl,
     source: importSource,
     wixItemCount: wixItems.length,
+    rssItemCount: rssItems.length,
     totalItemCount: mergedItems.length,
     items: mergedItems,
   };
