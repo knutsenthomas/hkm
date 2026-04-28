@@ -1274,6 +1274,257 @@ function plainTextToHtml(value) {
     .join("");
 }
 
+function clampHeadingLevel(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return 2;
+  return Math.min(6, Math.max(1, Math.round(parsed)));
+}
+
+function renderRichInlineNodes(nodes) {
+  if (!Array.isArray(nodes)) return "";
+
+  return nodes.map((node) => {
+    if (!node || typeof node !== "object") return "";
+
+    const type = typeof node.type === "string" ? node.type.toUpperCase() : "";
+    if (type === "TEXT") {
+      const text = node.textData && typeof node.textData.text === "string" ? node.textData.text : "";
+      return escapeHtml(text).replace(/\n/g, "<br>");
+    }
+
+    return renderRichInlineNodes(Array.isArray(node.nodes) ? node.nodes : []);
+  }).join("");
+}
+
+function stripOuterParagraphTag(value) {
+  if (typeof value !== "string") return "";
+  const trimmed = value.trim();
+  const match = trimmed.match(/^<p>([\s\S]*)<\/p>$/i);
+  return match ? match[1].trim() : trimmed;
+}
+
+function pickRichMediaUrl(media) {
+  if (!media || typeof media !== "object") return "";
+  const source = media.src && typeof media.src === "object" ? media.src : {};
+
+  return wixPickFirstString(
+    media.url,
+    source.url,
+    media.fileUrl,
+    media.imageUrl,
+  );
+}
+
+function renderMediaAnchor(url, label) {
+  if (!url) return "";
+  return `<p><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(label || "Åpne media")}</a></p>`;
+}
+
+function renderImageFigure(src, alt = "", caption = "") {
+  if (!src) return "";
+  const safeAlt = escapeHtml(alt || "");
+  const safeCaption = typeof caption === "string" && caption.trim() ? `<figcaption>${escapeHtml(caption.trim())}</figcaption>` : "";
+  return `<figure><img src="${escapeHtml(src)}" alt="${safeAlt}">${safeCaption}</figure>`;
+}
+
+function extractVideoLikeUrl(videoData) {
+  if (!videoData || typeof videoData !== "object") return "";
+
+  const primary = pickRichMediaUrl(videoData.video || {});
+  if (primary) return primary;
+
+  return wixPickFirstString(
+    videoData.url,
+    pickRichMediaUrl(videoData.thumbnail || {}),
+  );
+}
+
+function renderRichContentNodes(nodes, options = {}) {
+  if (!Array.isArray(nodes)) return "";
+  const { inListItem = false } = options;
+
+  return nodes.map((node) => {
+    if (!node || typeof node !== "object") return "";
+
+    const type = typeof node.type === "string" ? node.type.toUpperCase() : "";
+    const childNodes = Array.isArray(node.nodes) ? node.nodes : [];
+
+    if (type === "TEXT") {
+      const text = node.textData && typeof node.textData.text === "string" ? node.textData.text : "";
+      return escapeHtml(text).replace(/\n/g, "<br>");
+    }
+
+    if (type === "PARAGRAPH") {
+      const inner = renderRichInlineNodes(childNodes) || renderRichContentNodes(childNodes, { inListItem: true });
+      if (!inner.trim()) return "";
+      return inListItem ? inner : `<p>${inner}</p>`;
+    }
+
+    if (type === "HEADING") {
+      const level = clampHeadingLevel(
+        node.headingData && (node.headingData.renderedLevel || node.headingData.level),
+      );
+      const inner = renderRichInlineNodes(childNodes) || renderRichContentNodes(childNodes, { inListItem: true });
+      if (!inner.trim()) return "";
+      return `<h${level}>${inner}</h${level}>`;
+    }
+
+    if (type === "BULLETED_LIST" || type === "ORDERED_LIST") {
+      const tag = type === "ORDERED_LIST" ? "ol" : "ul";
+      const items = childNodes.map((itemNode) => {
+        const itemHtml = renderRichContentNodes([itemNode], { inListItem: true });
+        const cleaned = stripOuterParagraphTag(itemHtml);
+        return cleaned ? `<li>${cleaned}</li>` : "";
+      }).join("");
+      return items ? `<${tag}>${items}</${tag}>` : "";
+    }
+
+    if (type === "LIST_ITEM") {
+      return renderRichContentNodes(childNodes, { inListItem: true });
+    }
+
+    if (type === "BLOCKQUOTE") {
+      const inner = renderRichInlineNodes(childNodes) || renderRichContentNodes(childNodes, { inListItem: true });
+      return inner ? `<blockquote>${inner}</blockquote>` : "";
+    }
+
+    if (type === "IMAGE") {
+      const imageData = node.imageData && typeof node.imageData === "object" ? node.imageData : {};
+      const image = imageData.image && typeof imageData.image === "object" ? imageData.image : {};
+      const src = pickRichMediaUrl(image);
+      if (!src) return "";
+
+      const alt = wixPickFirstString(imageData.altText, "");
+      const caption = wixPickFirstString(imageData.caption, "");
+      return renderImageFigure(src, alt, caption);
+    }
+
+    if (type === "GALLERY") {
+      const galleryData = node.galleryData && typeof node.galleryData === "object" ? node.galleryData : {};
+      const items = Array.isArray(galleryData.items) ? galleryData.items : [];
+      const renderedItems = items.map((item) => {
+        if (!item || typeof item !== "object") return "";
+
+        const imageData = item.image && typeof item.image === "object" ? item.image : {};
+        const imageMedia = imageData.media && typeof imageData.media === "object" ? imageData.media : {};
+        const imageUrl = pickRichMediaUrl(imageMedia);
+        if (imageUrl) {
+          const alt = wixPickFirstString(item.altText, item.title, "");
+          return renderImageFigure(imageUrl, alt, item.title || "");
+        }
+
+        const videoData = item.video && typeof item.video === "object" ? item.video : {};
+        const videoMedia = videoData.media && typeof videoData.media === "object" ? videoData.media : {};
+        const videoUrl = pickRichMediaUrl(videoMedia);
+        if (videoUrl) {
+          if (/\.mp4($|\?)/i.test(videoUrl)) {
+            return `<figure><video controls preload="metadata" src="${escapeHtml(videoUrl)}"></video></figure>`;
+          }
+          return renderMediaAnchor(videoUrl, item.title || "Se video");
+        }
+
+        return "";
+      }).filter(Boolean).join("");
+
+      return renderedItems ? `<div class="wix-gallery">${renderedItems}</div>` : "";
+    }
+
+    if (type === "VIDEO") {
+      const videoData = node.videoData && typeof node.videoData === "object" ? node.videoData : {};
+      const videoUrl = extractVideoLikeUrl(videoData);
+      if (!videoUrl) return "";
+
+      if (/\.mp4($|\?)/i.test(videoUrl)) {
+        return `<figure><video controls preload="metadata" src="${escapeHtml(videoUrl)}"></video></figure>`;
+      }
+
+      return renderMediaAnchor(videoUrl, "Se video");
+    }
+
+    if (type === "AUDIO") {
+      const audioData = node.audioData && typeof node.audioData === "object" ? node.audioData : {};
+      const audio = audioData.audio && typeof audioData.audio === "object" ? audioData.audio : {};
+      const audioUrl = pickRichMediaUrl(audio);
+      if (!audioUrl) return "";
+
+      return `<figure><audio controls preload="none" src="${escapeHtml(audioUrl)}"></audio></figure>`;
+    }
+
+    if (type === "FILE") {
+      const fileData = node.fileData && typeof node.fileData === "object" ? node.fileData : {};
+      const src = fileData.src && typeof fileData.src === "object" ? fileData.src : {};
+      const fileUrl = pickRichMediaUrl(src);
+      const label = wixPickFirstString(fileData.name, fileData.type, "Last ned fil");
+      return renderMediaAnchor(fileUrl, label);
+    }
+
+    if (type === "GIF") {
+      const gifData = node.gifData && typeof node.gifData === "object" ? node.gifData : {};
+      const gifUrl = wixPickFirstString(gifData.gif, gifData.mp4, gifData.still);
+      if (!gifUrl) return "";
+
+      if (/\.mp4($|\?)/i.test(gifUrl)) {
+        return `<figure><video autoplay loop muted playsinline preload="metadata" src="${escapeHtml(gifUrl)}"></video></figure>`;
+      }
+
+      return renderImageFigure(gifUrl, "GIF");
+    }
+
+    if (type === "EMBED") {
+      const embedData = node.embedData && typeof node.embedData === "object" ? node.embedData : {};
+      const oembed = embedData.oembed && typeof embedData.oembed === "object" ? embedData.oembed : {};
+      const embedUrl = wixPickFirstString(oembed.url, oembed.videoUrl, embedData.src);
+      if (!embedUrl) return "";
+      return renderMediaAnchor(embedUrl, "Åpne innhold");
+    }
+
+    if (type === "LINK_PREVIEW") {
+      const linkPreviewData = node.linkPreviewData && typeof node.linkPreviewData === "object" ? node.linkPreviewData : {};
+      const link = linkPreviewData.link && typeof linkPreviewData.link === "object" ? linkPreviewData.link : {};
+      const url = wixPickFirstString(link.url, "");
+      const title = wixPickFirstString(linkPreviewData.title, "Lenke");
+      const description = typeof linkPreviewData.description === "string" ? linkPreviewData.description.trim() : "";
+      const thumbnail = wixPickFirstString(linkPreviewData.thumbnailUrl, "");
+      if (!url && !thumbnail) return "";
+
+      const imagePart = thumbnail ? renderImageFigure(thumbnail, title) : "";
+      const textPart = `${renderMediaAnchor(url, title)}${description ? `<p>${escapeHtml(description)}</p>` : ""}`;
+      return `<div class="wix-link-preview">${imagePart}${textPart}</div>`;
+    }
+
+    if (type === "APP_EMBED") {
+      const appEmbedData = node.appEmbedData && typeof node.appEmbedData === "object" ? node.appEmbedData : {};
+      const url = wixPickFirstString(appEmbedData.url, "");
+      const name = wixPickFirstString(appEmbedData.name, "Åpne innhold");
+      const image = appEmbedData.image && typeof appEmbedData.image === "object" ? appEmbedData.image : {};
+      const imageUrl = pickRichMediaUrl(image);
+
+      const imagePart = imageUrl ? renderImageFigure(imageUrl, name) : "";
+      const linkPart = renderMediaAnchor(url, name);
+      return `${imagePart}${linkPart}`;
+    }
+
+    if (type === "HTML") {
+      const htmlData = node.htmlData && typeof node.htmlData === "object" ? node.htmlData : {};
+      const embedUrl = wixPickFirstString(htmlData.url, "");
+      if (!embedUrl) return "";
+      return renderMediaAnchor(embedUrl, "Åpne innebygd innhold");
+    }
+
+    if (type === "DIVIDER") {
+      return "<hr>";
+    }
+
+    return renderRichContentNodes(childNodes, { inListItem });
+  }).join("");
+}
+
+function renderRichContentToHtml(richContent) {
+  if (!richContent || typeof richContent !== "object") return "";
+  const nodes = Array.isArray(richContent.nodes) ? richContent.nodes : [];
+  return renderRichContentNodes(nodes).trim();
+}
+
 function extractTextFromRichContent(richContent) {
   if (!richContent || typeof richContent !== "object") return "";
 
@@ -1327,6 +1578,55 @@ function extractTextFromRichContent(richContent) {
   }
 
   return deduped.join("\n\n").trim();
+}
+
+function extractFirstImageFromRichContent(richContent) {
+  if (!richContent || typeof richContent !== "object" || !Array.isArray(richContent.nodes)) return "";
+
+  const queue = [...richContent.nodes];
+  while (queue.length > 0) {
+    const node = queue.shift();
+    if (!node || typeof node !== "object") continue;
+
+    const type = typeof node.type === "string" ? node.type.toUpperCase() : "";
+    if (type === "IMAGE" && node.imageData && typeof node.imageData === "object") {
+      const image = node.imageData.image && typeof node.imageData.image === "object" ? node.imageData.image : {};
+      const src = pickRichMediaUrl(image);
+      if (src) return src;
+    }
+
+    if (type === "GALLERY" && node.galleryData && typeof node.galleryData === "object") {
+      const items = Array.isArray(node.galleryData.items) ? node.galleryData.items : [];
+      for (const item of items) {
+        if (!item || typeof item !== "object") continue;
+        const imageData = item.image && typeof item.image === "object" ? item.image : {};
+        const imageMedia = imageData.media && typeof imageData.media === "object" ? imageData.media : {};
+        const imageUrl = pickRichMediaUrl(imageMedia);
+        if (imageUrl) return imageUrl;
+      }
+    }
+
+    if (type === "LINK_PREVIEW" && node.linkPreviewData && typeof node.linkPreviewData === "object") {
+      const thumb = wixPickFirstString(node.linkPreviewData.thumbnailUrl, "");
+      if (thumb) return thumb;
+    }
+
+    if (type === "GIF" && node.gifData && typeof node.gifData === "object") {
+      const gifImage = wixPickFirstString(node.gifData.still, node.gifData.gif, "");
+      if (gifImage) return gifImage;
+    }
+
+    if (type === "APP_EMBED" && node.appEmbedData && typeof node.appEmbedData === "object") {
+      const appImage = pickRichMediaUrl(node.appEmbedData.image || {});
+      if (appImage) return appImage;
+    }
+
+    if (Array.isArray(node.nodes) && node.nodes.length) {
+      queue.push(...node.nodes);
+    }
+  }
+
+  return "";
 }
 
 function extractFirstImageFromHtml(value) {
@@ -1534,11 +1834,13 @@ function normalizeWixBlogApiPost(post, index = 0) {
   const category = "Blogg";
   const date = parseDateIso(post.firstPublishedDate || post.lastPublishedDate || post._createdDate || post._updatedDate);
 
+  const richContentHtml = renderRichContentToHtml(post.richContent);
   const directContentText = typeof post.contentText === "string" ? post.contentText.trim() : "";
   const richContentText = extractTextFromRichContent(post.richContent);
   const contentText = directContentText.length >= richContentText.length ? directContentText : richContentText;
-  const contentHtml = plainTextToHtml(contentText);
-  const excerptSource = typeof post.excerpt === "string" && post.excerpt.trim() ? post.excerpt : contentText;
+  const plainContentHtml = plainTextToHtml(contentText);
+  const contentHtml = richContentHtml.length >= plainContentHtml.length ? richContentHtml : plainContentHtml;
+  const excerptSource = typeof post.excerpt === "string" && post.excerpt.trim() ? post.excerpt : (stripHtmlTags(contentHtml) || contentText);
   const excerpt = clampText(decodeHtmlEntities(excerptSource || ""), 360);
 
   const media = post.media && typeof post.media === "object" ? post.media : {};
@@ -1546,6 +1848,7 @@ function normalizeWixBlogApiPost(post, index = 0) {
     post.heroImage,
     media.image,
     media.url,
+    extractFirstImageFromRichContent(post.richContent),
   );
 
   const stableId = buildBlogItemStableId({
@@ -1578,7 +1881,7 @@ async function fetchWixBlogItemsViaApi() {
   const wixClient = getWixClient();
   let offset = 0;
   const limit = 50;
-  const fieldsets = ["CONTENT_TEXT", "URL"];
+  const fieldsets = ["CONTENT_TEXT", "URL", "RICH_CONTENT"];
   const listPosts = [];
 
   while (true) {

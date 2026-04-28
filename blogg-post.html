@@ -19,18 +19,21 @@
     <link rel="stylesheet" href="css/cookie-consent.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
     <link rel="stylesheet" href="css/interactions.css">
-    <!-- Tailwind CSS Play CDN -->
+    <link rel="stylesheet" href="css/blog-content.css">
+    <!-- Tailwind config (guarded if Play CDN is absent) -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
+        if (window.tailwind) {
+            window.tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'primary-orange': '#f39c12',
+                            'primary-red': '#e74c3c',
+                            'text-dark': '#333333',
+                        }
                     }
                 }
-            }
+            };
         }
     </script>
     <!-- Loader Safety Net -->
