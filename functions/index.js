@@ -60,6 +60,34 @@ function decodeCommonHtmlEntities(value) {
   );
 }
 
+function sanitizeWixInlineHtml(rawInner) {
+  if (typeof rawInner !== "string" || !rawInner) return "";
+
+  let html = rawInner
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/\s*data-[a-z0-9_-]+="[^"]*"/gi, "");
+
+  // Keep only safe inline tags to preserve emphasis/links from Wix content.
+  html = html.replace(/<(?!\/?(?:strong|b|em|i|u|s|br|a)\b)[^>]*>/gi, "");
+
+  // Normalize anchors and strip unsafe protocols.
+  html = html.replace(/<a\b([^>]*)>/gi, (_match, attrs) => {
+    const hrefMatch = String(attrs || "").match(/href\s*=\s*(["'])(.*?)\1/i);
+    const href = hrefMatch && hrefMatch[2] ? hrefMatch[2].trim() : "";
+    if (!href || /^javascript:/i.test(href)) return "";
+    return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">`;
+  });
+
+  html = html
+    .replace(/<\/a\s*>/gi, "</a>")
+    .replace(/<(strong|b|em|i|u|s)\b[^>]*>/gi, "<$1>")
+    .replace(/<br\s*\/?\s*>/gi, "<br>")
+    .trim();
+
+  return html;
+}
+
 function extractWixViewerBlocksAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
 
@@ -71,6 +99,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
   while ((match = blockRegex.exec(pageHtml)) !== null) {
     const tag = String(match[1] || "p").toLowerCase();
     const rawInner = String(match[2] || "");
+    const inlineHtml = sanitizeWixInlineHtml(rawInner);
     const text = decodeCommonHtmlEntities(
       rawInner
         .replace(/<br\s*\/?>/gi, "\n")
@@ -89,6 +118,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
     blocks.push({
       tag: /^h[1-6]$/.test(tag) ? tag : (tag === "li" ? "li" : "p"),
       text,
+      html: inlineHtml,
     });
   }
 
@@ -102,36 +132,22 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
     if (!block) continue;
 
     if (/^h[1-6]$/.test(block.tag)) {
-      parts.push(`<${block.tag}>${escapeHtml(block.text)}</${block.tag}>`);
+      parts.push(`<${block.tag}>${block.html || escapeHtml(block.text)}</${block.tag}>`);
       continue;
     }
 
     if (block.tag === "li") {
-      const listItems = [block.text];
+      const listItems = [block];
       while (i + 1 < blocks.length && blocks[i + 1].tag === "li") {
-        listItems.push(blocks[i + 1].text);
+        listItems.push(blocks[i + 1]);
         i += 1;
       }
-      parts.push(`<ul>${listItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`);
+      parts.push(`<ul>${listItems.map((item) => `<li>${item.html || escapeHtml(item.text)}</li>`).join("")}</ul>`);
       continue;
     }
 
-    // Promote short paragraph titles to headings for a closer Wix reading flow.
-    if (block.tag === "p") {
-      const isFirstLeadTitle = i === 0 && block.text.length <= 110;
-      const isSectionTitle = /:$/.test(block.text) && block.text.length <= 90;
-      if (isFirstLeadTitle) {
-        parts.push(`<h2>${escapeHtml(block.text)}</h2>`);
-        continue;
-      }
-      if (isSectionTitle) {
-        parts.push(`<h3>${escapeHtml(block.text)}</h3>`);
-        continue;
-      }
-    }
-
     if (listLikeParagraph.test(block.text) && block.text.length <= 140) {
-      const run = [block.text];
+      const run = [block];
       let j = i + 1;
       while (
         j < blocks.length &&
@@ -139,18 +155,18 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
         listLikeParagraph.test(blocks[j].text) &&
         blocks[j].text.length <= 140
       ) {
-        run.push(blocks[j].text);
+        run.push(blocks[j]);
         j += 1;
       }
 
       if (run.length >= 2) {
-        parts.push(`<ul>${run.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`);
+        parts.push(`<ul>${run.map((item) => `<li>${item.html || escapeHtml(item.text)}</li>`).join("")}</ul>`);
         i = j - 1;
         continue;
       }
     }
 
-    parts.push(`<p>${escapeHtml(block.text)}</p>`);
+    parts.push(`<p>${block.html || escapeHtml(block.text)}</p>`);
   }
 
   return parts.join("\n");
@@ -2215,23 +2231,6 @@ function sanitizeBlogHtmlForDisplay(html) {
     /<p>\s*(?:Ja,\s*jeg\s*ønsker\s*å\s*abonnere\s*på\s*deres\s*nyhetsbrev\s*\*?|Meld\s*deg\s*på\s*nyhetsbrev[^<]*)\s*<\/p>/gi,
     ""
   );
-
-  // Turn short paragraph titles ending with colon into headings.
-  output = output.replace(/<p>\s*["“”']?\s*([^<]{3,90}:)\s*["“”']?\s*<\/p>/gi, (_match, titleText) => {
-    const clean = decodeHtmlEntities(stripHtmlTags(String(titleText || ""))).trim();
-    if (!clean) return "";
-    return `<h3>${escapeHtml(clean)}</h3>`;
-  });
-
-  // Promote the very first short lead line to a section heading when it looks like a title.
-  output = output.replace(/^\s*<p>\s*([^<]{6,110})\s*<\/p>/i, (match, leadText) => {
-    const clean = decodeHtmlEntities(stripHtmlTags(String(leadText || ""))).trim();
-    if (!clean) return match;
-    const words = clean.split(/\s+/).filter(Boolean);
-    if (words.length < 2 || words.length > 14) return match;
-    if (/[.!?]$/.test(clean)) return match;
-    return `<h2>${escapeHtml(clean)}</h2>`;
-  });
 
   output = output
     .replace(/<p>\s*(?:&nbsp;|\s|<br\s*\/?>)*<\/p>/gi, "")
