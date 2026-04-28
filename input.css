@@ -4777,7 +4777,7 @@ ol.block-list {
 }
 
 .hero-title {
-    font-size: clamp(2.3rem, 6vw, 5.5rem);
+    font-size: clamp(2.3rem, 6vw, 4.2rem);
     font-weight: 800;
     line-height: 1.05;
     margin-bottom: clamp(16px, 2.4vw, 32px);
