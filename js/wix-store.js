@@ -189,6 +189,55 @@ function normalizeOptionValueKey(value) {
     return normalizeForCompare(normalizeOptionValue(value));
 }
 
+function getFallbackStoreUrl() {
+    return String(config.externalStoreBaseUrl || 'https://www.hiskingdomministry.no/butikk').trim();
+}
+
+function getProductBaseUrl() {
+    const fallbackStoreUrl = getFallbackStoreUrl();
+    return String(config.productUrlBase || fallbackStoreUrl).trim().replace(/\/+$/, '');
+}
+
+function isLikelyStoreFrontUrl(urlValue) {
+    if (!urlValue) return true;
+    try {
+        const fallbackStore = new URL(getFallbackStoreUrl(), window.location.origin);
+        const parsed = new URL(String(urlValue), fallbackStore.origin);
+        const normalizePath = (path) => String(path || '/').replace(/\/+$/, '') || '/';
+        const parsedPath = normalizePath(parsed.pathname);
+        const storePath = normalizePath(fallbackStore.pathname);
+
+        // Treat root and known store listing paths as storefront URLs, not product details.
+        if (parsedPath === '/' || parsedPath === storePath) return true;
+        if (parsedPath === '/butikk' || parsedPath === '/shop' || parsedPath === '/store') return true;
+
+        return false;
+    } catch (_err) {
+        return false;
+    }
+}
+
+function resolveProductUrl(product) {
+    const fallbackStoreUrl = getFallbackStoreUrl();
+    const productPathPrefix = String(config.productPathPrefix || '/product-page/').replace(/^\/+|\/+$/g, '');
+    const slug = String(product && (product.slug || product.handle || '')).trim();
+    const directUrl = String(product && product.productUrl ? product.productUrl : '').trim();
+
+    if (directUrl && directUrl !== 'undefined' && directUrl !== 'null' && !isLikelyStoreFrontUrl(directUrl)) {
+        try {
+            return new URL(directUrl, getProductBaseUrl() + '/').toString();
+        } catch (_err) {
+            return directUrl;
+        }
+    }
+
+    if (slug) {
+        return `${getProductBaseUrl()}/${productPathPrefix}/${encodeURIComponent(slug)}`;
+    }
+
+    return fallbackStoreUrl;
+}
+
 function productMatchesCategory(product, category) {
     const cat = normalizeForCompare(category);
     if (!cat || cat === 'all') return true;
@@ -259,6 +308,7 @@ function createSliderSlide(product) {
     );
     const buyNowPrefix = getStoreText('ui.sliderBuyNowPrefix', 'Kjøp nå');
     const scrollIndicator = getStoreText('ui.sliderScrollIndicator', 'Bla ned');
+    const productUrl = resolveProductUrl(product);
 
     return `
         <div class="swiper-slide relative h-screen flex items-center overflow-hidden">
@@ -282,7 +332,7 @@ function createSliderSlide(product) {
                         ${product.description || sliderDescription}
                     </div>
                     <div class="flex flex-wrap justify-center gap-4 pt-4 md:pt-6">
-                        <a href="${escapeHtml(product.productUrl)}" target="_blank" 
+                        <a href="${escapeHtml(productUrl)}" target="_blank" 
                            class="shop-hero-cta w-full md:w-auto px-8 md:px-10 py-4 md:py-5 rounded-full font-black transition-all shadow-2xl hover:scale-105 active:scale-95 text-base md:text-lg">
                             ${escapeHtml(buyNowPrefix)} — ${escapeHtml(product.formattedPrice)}
                         </a>
@@ -376,10 +426,11 @@ function armHeroLoadingWatchdog() {
 function createProductCard(product) {
     // Determine category / type label
     const category = product.slug ? product.slug.split('-')[0] : 'Design';
+    const productUrl = resolveProductUrl(product);
 
     return `
         <article class="group bg-white rounded-2xl border border-slate-100 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-orange-200 flex flex-col h-full overflow-hidden">
-            <a href="${escapeHtml(product.productUrl)}" target="_blank" rel="noopener noreferrer" class="block relative aspect-[3/4] overflow-hidden bg-slate-50 group-hover:opacity-95 transition-opacity">
+            <a href="${escapeHtml(productUrl)}" target="_blank" rel="noopener noreferrer" class="block relative aspect-[3/4] overflow-hidden bg-slate-50 group-hover:opacity-95 transition-opacity">
                 <!-- Wix Badge -->
                 <span class="absolute top-4 left-4 z-10 px-3 py-1 bg-white/90 backdrop-blur rounded-full text-[10px] font-extrabold uppercase tracking-tighter text-slate-900 shadow-sm border border-slate-100">
                     HK Designs
@@ -403,7 +454,7 @@ function createProductCard(product) {
                     <p class="text-lg font-black text-slate-900 tracking-tight">
                         ${escapeHtml(product.formattedPrice)}
                     </p>
-                    <a href="${escapeHtml(product.productUrl)}" target="_blank" rel="noopener noreferrer" 
+                    <a href="${escapeHtml(productUrl)}" target="_blank" rel="noopener noreferrer" 
                        class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-900 text-white hover:bg-primary transition-all shadow-md">
                         <i class="fas fa-shopping-cart text-[10px]"></i>
                     </a>
