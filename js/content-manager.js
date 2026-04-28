@@ -218,6 +218,47 @@ class ContentManager {
         return this.dedupeBlogItems(this.getCollectionItems(data));
     }
 
+    extractContentText(value) {
+        if (typeof value === 'string') return value;
+        if (!value || typeof value !== 'object') return '';
+        if (Array.isArray(value.blocks)) {
+            return value.blocks.map((block) => {
+                const data = block && typeof block === 'object' ? block.data : null;
+                if (!data || typeof data !== 'object') return '';
+                if (typeof data.text === 'string') return data.text;
+                if (Array.isArray(data.items)) return data.items.join(' ');
+                return '';
+            }).join(' ');
+        }
+        if (typeof value.text === 'string') return value.text;
+        if (typeof value.content === 'string') return value.content;
+        return '';
+    }
+
+    hasTranslationServiceWarning(value) {
+        const text = this.extractContentText(value).toUpperCase();
+        if (!text) return false;
+        return text.includes('MYMEMORY WARNING')
+            || text.includes('YOU USED ALL AVAILABLE FREE TRANSLATIONS')
+            || text.includes('TRANSLATED.NET/DOC/USAGELIMITS');
+    }
+
+    isUsableLocalizedString(value) {
+        return typeof value === 'string'
+            && value.trim()
+            && !this.hasTranslationServiceWarning(value);
+    }
+
+    isUsableLocalizedContent(value) {
+        if (typeof value === 'string') {
+            return this.isUsableLocalizedString(value);
+        }
+        if (value && typeof value === 'object' && Array.isArray(value.blocks) && value.blocks.length > 0) {
+            return !this.hasTranslationServiceWarning(value);
+        }
+        return false;
+    }
+
     getLocalizedContentItem(item, lang = this.getCurrentLanguage()) {
         if (!item || typeof item !== 'object') return item;
         if (lang === 'no') {
@@ -243,11 +284,11 @@ class ContentManager {
 
         return {
             ...item,
-            title: typeof localized.title === 'string' && localized.title.trim() ? localized.title : item.title,
-            content: typeof localized.content !== 'undefined' ? localized.content : item.content,
-            category: typeof localized.category === 'string' && localized.category.trim() ? localized.category : item.category,
-            seoTitle: typeof localized.seoTitle === 'string' && localized.seoTitle.trim() ? localized.seoTitle : item.seoTitle,
-            seoDescription: typeof localized.seoDescription === 'string' && localized.seoDescription.trim() ? localized.seoDescription : item.seoDescription,
+            title: this.isUsableLocalizedString(localized.title) ? localized.title : item.title,
+            content: this.isUsableLocalizedContent(localized.content) ? localized.content : item.content,
+            category: this.isUsableLocalizedString(localized.category) ? localized.category : item.category,
+            seoTitle: this.isUsableLocalizedString(localized.seoTitle) ? localized.seoTitle : item.seoTitle,
+            seoDescription: this.isUsableLocalizedString(localized.seoDescription) ? localized.seoDescription : item.seoDescription,
             tags: Array.isArray(localized.tags) && localized.tags.length ? localized.tags : item.tags,
             __stableId: this.getContentItemStableId(item)
         };
@@ -3092,6 +3133,32 @@ class ContentManager {
         return text.substring(0, 120);
     }
 
+    formatEditorListItem(item) {
+        if (item === null || item === undefined) return '';
+
+        const raw = String(item).trim();
+        if (!raw) return '';
+
+        if (/<[^>]+>/.test(raw)) {
+            return `<li>${raw}</li>`;
+        }
+
+        const compact = raw.replace(/\s+/g, ' ').trim();
+        const splitMatch = compact.match(/^([^.!?:]{3,48}?[a-zæøå])([A-ZÆØÅ].{12,})$/);
+
+        if (splitMatch) {
+            const lead = splitMatch[1].trim();
+            const tail = splitMatch[2].trim();
+            const leadWordCount = lead.split(/\s+/).filter(Boolean).length;
+
+            if (leadWordCount <= 6) {
+                return `<li><strong>${this.escapeHtml(lead)}</strong> ${this.escapeHtml(tail)}</li>`;
+            }
+        }
+
+        return `<li>${this.escapeHtml(compact)}</li>`;
+    }
+
     /**
      * Generate a relevant image URL from Unsplash based on event title
      * @param {string} title - Event title
@@ -3116,7 +3183,9 @@ class ContentManager {
                         return `<p class="block-paragraph">${block.data.text}</p>`;
                     case 'list':
                         const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
-                        const items = block.data.items.map(item => `<li>${item}</li>`).join('');
+                        const items = (Array.isArray(block.data.items) ? block.data.items : [])
+                            .map(item => this.formatEditorListItem(item))
+                            .join('');
                         return `<${listTag} class="block-list">${items}</${listTag}>`;
                     case 'image':
                         const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';

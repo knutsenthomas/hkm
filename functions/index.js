@@ -65,7 +65,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
 
   const blockRegex = /<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
   const seen = new Set();
-  const parts = [];
+  const blocks = [];
   let match;
 
   while ((match = blockRegex.exec(pageHtml)) !== null) {
@@ -79,22 +79,66 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
         .trim()
     );
 
-    if (text.length < 20) continue;
+    const minLen = /^h[1-6]$/.test(tag) ? 1 : (tag === "li" ? 1 : 1);
+    if (text.length < minLen) continue;
 
     const dedupKey = `${tag}:${text.toLowerCase()}`;
     if (seen.has(dedupKey)) continue;
     seen.add(dedupKey);
 
-    if (tag === "li") {
-      parts.push(`<p>${escapeHtml(`- ${text}`)}</p>`);
-    } else if (/^h[1-6]$/.test(tag)) {
-      parts.push(`<${tag}>${escapeHtml(text)}</${tag}>`);
-    } else {
-      parts.push(`<p>${escapeHtml(text)}</p>`);
-    }
+    blocks.push({
+      tag: /^h[1-6]$/.test(tag) ? tag : (tag === "li" ? "li" : "p"),
+      text,
+    });
   }
 
-  if (parts.length < 4) return "";
+  if (blocks.length < 4) return "";
+
+  const parts = [];
+  const listLikeParagraph = /^([A-Za-z0-9\u00C0-\u024F\u0400-\u04FF\u0370-\u03FF][^:]{1,48}):\s+.+/;
+
+  for (let i = 0; i < blocks.length; i += 1) {
+    const block = blocks[i];
+    if (!block) continue;
+
+    if (/^h[1-6]$/.test(block.tag)) {
+      parts.push(`<${block.tag}>${escapeHtml(block.text)}</${block.tag}>`);
+      continue;
+    }
+
+    if (block.tag === "li") {
+      const listItems = [block.text];
+      while (i + 1 < blocks.length && blocks[i + 1].tag === "li") {
+        listItems.push(blocks[i + 1].text);
+        i += 1;
+      }
+      parts.push(`<ul>${listItems.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`);
+      continue;
+    }
+
+    if (listLikeParagraph.test(block.text) && block.text.length <= 260) {
+      const run = [block.text];
+      let j = i + 1;
+      while (
+        j < blocks.length &&
+        blocks[j].tag === "p" &&
+        listLikeParagraph.test(blocks[j].text) &&
+        blocks[j].text.length <= 260
+      ) {
+        run.push(blocks[j].text);
+        j += 1;
+      }
+
+      if (run.length >= 2) {
+        parts.push(`<ul>${run.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`);
+        i = j - 1;
+        continue;
+      }
+    }
+
+    parts.push(`<p>${escapeHtml(block.text)}</p>`);
+  }
+
   return parts.join("\n");
 }
 
@@ -108,15 +152,9 @@ async function enrichWixItemsWithPublicPageContent(items = []) {
       if (String(item.source || "").toLowerCase() !== "wix") return false;
 
       const url = String(item.url || "").trim();
-      const contentLen = typeof item.content === "string" ? item.content.trim().length : 0;
-      const hasHtmlStructure = typeof item.content === "string" && /<\s*(h[1-6]|p|ul|ol|li|blockquote)\b/i.test(item.content);
-
       if (!url || !/\/post\//i.test(url)) return false;
-      if (contentLen >= 700) return false;
-      if (hasHtmlStructure && contentLen >= 480) return false;
       return true;
-    })
-    .slice(0, 6);
+    });
 
   if (!candidates.length) return items;
 
@@ -136,7 +174,9 @@ async function enrichWixItemsWithPublicPageContent(items = []) {
 
       const currentLen = typeof item.content === "string" ? item.content.trim().length : 0;
       const enrichedLen = enrichedContent.trim().length;
-      if (enrichedLen <= currentLen + 220) continue;
+      const currentHasStructure = typeof item.content === "string" && /<\s*(h[1-6]|p|ul|ol|li|blockquote)\b/i.test(item.content);
+      const enrichedHasStructure = /<\s*(h[1-6]|p|ul|ol|li|blockquote)\b/i.test(enrichedContent);
+      if (enrichedLen < currentLen && !(enrichedHasStructure && !currentHasStructure)) continue;
 
       const enrichedText = stripHtmlTags(enrichedContent);
       const enrichedMinutesToRead = Math.max(1, Math.ceil((enrichedText.split(/\s+/).filter(Boolean).length || 0) / 225));
@@ -1893,7 +1933,144 @@ function getBlogItemQualityScore(item) {
   const excerptLen = typeof item.excerpt === "string" ? item.excerpt.trim().length : 0;
   const imageBonus = wixPickFirstString(item.imageUrl, item.image, item.dashboardImage) ? 120 : 0;
   const dateBonus = parseDateIso(item.date || "") ? 40 : 0;
-  return contentLen + Math.min(excerptLen, 300) + imageBonus + dateBonus;
+  const sourceBonus = String(item.source || "").toLowerCase() === "wix" ? 220 : 0;
+  const structureBonus = typeof item.content === "string" && hasStructuralHtmlMarkup(item.content) ? 120 : 0;
+  const languageBonus = detectBlogItemLanguage(item) === "no" ? 25 : 0;
+  return contentLen + Math.min(excerptLen, 300) + imageBonus + dateBonus + sourceBonus + structureBonus + languageBonus;
+}
+
+function detectBlogItemLanguage(item) {
+  if (!item || typeof item !== "object") return "no";
+
+  const explicit = typeof item.language === "string" ? item.language.trim().toLowerCase() : "";
+  if (explicit === "no" || explicit === "nb" || explicit === "nn") return "no";
+  if (explicit === "en" || explicit === "es") return explicit;
+
+  const path = normalizeUrlPath(item.url || item.link || "");
+  if (/^\/en\//i.test(path)) return "en";
+  if (/^\/es\//i.test(path)) return "es";
+  return "no";
+}
+
+function buildBlogTitleDateKey(item, index = 0) {
+  if (!item || typeof item !== "object") return `fallback-${index}`;
+  const title = normalizeKeyFragment(item.title || "");
+  const dateIso = parseDateIso(item.date || "");
+  const dateKey = dateIso ? dateIso.slice(0, 10) : "";
+  if (title && dateKey) return `title-date:${title}:${dateKey}`;
+  return buildBlogItemDedupKey(item, index);
+}
+
+function extractTranslationPayload(item) {
+  if (!item || typeof item !== "object") return {};
+
+  const payload = {};
+  const assignString = (key) => {
+    if (typeof item[key] === "string" && item[key].trim()) {
+      payload[key] = item[key];
+    }
+  };
+
+  assignString("title");
+  assignString("content");
+  assignString("category");
+  assignString("excerpt");
+  assignString("seoTitle");
+  assignString("seoDescription");
+
+  if (Array.isArray(item.tags) && item.tags.length > 0) {
+    payload.tags = item.tags.slice();
+  }
+
+  return payload;
+}
+
+function mergeBlogTranslationMaps(baseItem, variantItem, baseLanguage, variantLanguage) {
+  const merged = {};
+
+  const copyTranslationsFrom = (item) => {
+    if (!item || typeof item !== "object" || !item.translations || typeof item.translations !== "object") return;
+    Object.entries(item.translations).forEach(([lang, value]) => {
+      if (!lang || !value || typeof value !== "object") return;
+      merged[lang] = { ...(merged[lang] || {}), ...value };
+    });
+  };
+
+  copyTranslationsFrom(baseItem);
+  copyTranslationsFrom(variantItem);
+
+  if (baseLanguage !== "no") {
+    merged[baseLanguage] = {
+      ...(merged[baseLanguage] || {}),
+      ...extractTranslationPayload(baseItem),
+    };
+  }
+
+  if (variantLanguage !== "no") {
+    merged[variantLanguage] = {
+      ...(merged[variantLanguage] || {}),
+      ...extractTranslationPayload(variantItem),
+    };
+  }
+
+  return Object.keys(merged).length > 0 ? merged : undefined;
+}
+
+function mergeCanonicalBlogItems(existingItem, nextItem) {
+  if (!existingItem) return nextItem;
+  if (!nextItem) return existingItem;
+
+  const existingLanguage = detectBlogItemLanguage(existingItem);
+  const nextLanguage = detectBlogItemLanguage(nextItem);
+
+  if (existingLanguage !== nextLanguage) {
+    const existingScore = getBlogItemQualityScore(existingItem);
+    const nextScore = getBlogItemQualityScore(nextItem);
+    const chooseExisting =
+      (existingLanguage === "no" && nextLanguage !== "no") ||
+      (existingLanguage === nextLanguage ? existingScore >= nextScore : (existingLanguage === "no" ? true : (nextLanguage === "no" ? false : existingScore >= nextScore)));
+
+    const base = chooseExisting ? existingItem : nextItem;
+    const variant = base === existingItem ? nextItem : existingItem;
+    const baseLanguageResolved = detectBlogItemLanguage(base);
+    const variantLanguageResolved = detectBlogItemLanguage(variant);
+
+    const mergedTranslations = mergeBlogTranslationMaps(base, variant, baseLanguageResolved, variantLanguageResolved);
+    const merged = {
+      ...variant,
+      ...base,
+      content: typeof base.content === "string" && base.content.trim() ? base.content : (variant.content || ""),
+      excerpt: typeof base.excerpt === "string" && base.excerpt.trim() ? base.excerpt : (variant.excerpt || ""),
+      imageUrl: wixPickFirstString(base.imageUrl, variant.imageUrl, base.image, variant.image),
+      translations: mergedTranslations,
+    };
+
+    if (baseLanguageResolved === "no") {
+      merged.language = "no";
+    }
+
+    return merged;
+  }
+
+  const merged = mergeBlogItemsPreferred(existingItem, nextItem);
+  const mergedTranslations = mergeBlogTranslationMaps(existingItem, nextItem, existingLanguage, nextLanguage);
+  if (mergedTranslations) {
+    merged.translations = mergedTranslations;
+  }
+  return merged;
+}
+
+function consolidateDuplicateBlogItems(items = []) {
+  if (!Array.isArray(items) || items.length === 0) return [];
+
+  const merged = new Map();
+  items.forEach((item, index) => {
+    const key = buildBlogTitleDateKey(item, index);
+    const existing = merged.get(key);
+    merged.set(key, mergeCanonicalBlogItems(existing, item));
+  });
+
+  return Array.from(merged.values());
 }
 
 function mergeBlogItemsPreferred(existingItem, nextItem) {
@@ -2227,8 +2404,14 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     return dateB - dateA;
   });
 
+  const consolidatedItems = consolidateDuplicateBlogItems(mergedItems).sort((a, b) => {
+    const dateA = new Date(a && a.date ? a.date : 0).getTime();
+    const dateB = new Date(b && b.date ? b.date : 0).getTime();
+    return dateB - dateA;
+  });
+
   const payload = {
-    items: mergedItems,
+    items: consolidatedItems,
     lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
     wixSync: {
       feedUrl,
@@ -2236,7 +2419,7 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
       syncedAt: admin.firestore.FieldValue.serverTimestamp(),
       wixItemCount: wixItems.length,
       rssItemCount: rssItems.length,
-      totalItemCount: mergedItems.length,
+      totalItemCount: consolidatedItems.length,
     },
   };
 
@@ -2248,8 +2431,8 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     source: importSource,
     wixItemCount: wixItems.length,
     rssItemCount: rssItems.length,
-    totalItemCount: mergedItems.length,
-    items: mergedItems,
+    totalItemCount: consolidatedItems.length,
+    items: consolidatedItems,
   };
 }
 
