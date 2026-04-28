@@ -5496,6 +5496,11 @@ a[href*="#deduccion-fiscal"],
         text-align: left !important;
     }
 
+    /* Keep section headers centered on mobile */
+    .section-header .section-description {
+        text-align: center !important;
+    }
+
     .about-content {
         padding: 0 !important;
     }
