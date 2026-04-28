@@ -33,7 +33,16 @@
 #single-post-content h6 {
   margin: 1.4em 0 0.55em;
   line-height: 1.3;
-  color: #111827;
+  color: var(--text-dark);
+  font-family: inherit;
+  font-weight: 700;
+}
+
+.blog-post-content h2,
+.blog-post-content h3,
+#single-post-content h2,
+#single-post-content h3 {
+  font-size: var(--fs-h2-desktop, 28px);
 }
 
 .blog-post-content ul,
@@ -136,8 +145,8 @@
 
 .blog-post-content a,
 #single-post-content a {
-  color: #b45309;
-  text-decoration: underline;
+  color: inherit;
+  text-decoration: none;
   overflow-wrap: anywhere;
 }
 
@@ -146,6 +155,13 @@
   #single-post-content {
     font-size: 1rem;
     line-height: 1.6;
+  }
+
+  .blog-post-content h2,
+  .blog-post-content h3,
+  #single-post-content h2,
+  #single-post-content h3 {
+    font-size: var(--fs-h2-mobile, 20px);
   }
 
   .blog-post-content .wix-gallery,
