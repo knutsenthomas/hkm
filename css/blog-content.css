@@ -14,11 +14,6 @@
   margin: 0;
 }
 
-.blog-post-content p + p,
-#single-post-content p + p {
-  margin-top: 0.9em;
-}
-
 .blog-post-content h1,
 .blog-post-content h2,
 .blog-post-content h3,
