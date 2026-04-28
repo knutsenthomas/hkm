@@ -283,7 +283,7 @@ function createSliderSlide(product) {
                     </div>
                     <div class="flex flex-wrap justify-center gap-4 pt-4 md:pt-6">
                         <a href="${escapeHtml(product.productUrl)}" target="_blank" 
-                           class="w-full md:w-auto px-8 md:px-10 py-4 md:py-5 rounded-full bg-white text-slate-900 font-black hover:bg-primary hover:text-white transition-all shadow-2xl hover:scale-105 active:scale-95 text-base md:text-lg">
+                           class="shop-hero-cta w-full md:w-auto px-8 md:px-10 py-4 md:py-5 rounded-full font-black transition-all shadow-2xl hover:scale-105 active:scale-95 text-base md:text-lg">
                             ${escapeHtml(buyNowPrefix)} — ${escapeHtml(product.formattedPrice)}
                         </a>
                     </div>
@@ -326,7 +326,7 @@ function renderHeroFallback(reason = 'ERROR') {
                     <p class="text-base md:text-lg text-slate-200 leading-relaxed max-w-lg">${escapeHtml(message)}</p>
                     <div class="flex flex-wrap justify-center gap-4 pt-2">
                         <a href="${escapeHtml(config.externalStoreBaseUrl)}" target="_blank" rel="noopener noreferrer"
-                           class="w-full md:w-auto px-8 py-4 rounded-full bg-primary text-white font-black hover:brightness-110 transition-all shadow-xl">
+                           class="shop-hero-cta w-full md:w-auto px-8 py-4 rounded-full font-black transition-all shadow-xl">
                             ${escapeHtml(externalCta)}
                         </a>
                         <button type="button" onclick="sessionStorage.removeItem('hkm_store_catalog_cache'); window.location.reload();"
