@@ -7924,8 +7924,8 @@ class AdminManager {
                         },
                         resources: {
                             teaching: 'Undervisning',
-                            courses: 'E-kurs',
-                            blog: 'Bøker & Blogg',
+                            courses: 'Arrangementer',
+                            blog: 'Nyheter & blogg',
                             store: 'Butikk',
                             myPage: 'Min Side'
                         },
