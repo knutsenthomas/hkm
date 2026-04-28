@@ -2272,15 +2272,16 @@ function normalizeWixBlogApiPost(post, index = 0) {
   const category = "Blogg";
   const date = parseDateIso(post.firstPublishedDate || post.lastPublishedDate || post._createdDate || post._updatedDate);
 
-  const richContentHtml = renderRichContentToHtml(post.richContent);
+  const richContent = post.richContent && typeof post.richContent === "object" ? post.richContent : null;
+  const richContentHtml = renderRichContentToHtml(richContent);
   const directContentText = typeof post.contentText === "string" ? post.contentText.trim() : "";
-  const richContentText = extractTextFromRichContent(post.richContent);
+  const richContentText = extractTextFromRichContent(richContent);
   const contentText = directContentText.length >= richContentText.length ? directContentText : richContentText;
   const plainContentHtml = plainTextToHtml(contentText);
 
-  const richHasStructure = hasStructuralHtmlMarkup(richContentHtml);
-  const richLooksComplete = richContentHtml.length >= Math.max(240, Math.floor(plainContentHtml.length * 0.55));
-  const contentHtml = richContentHtml && (richHasStructure || richLooksComplete) ? richContentHtml : (plainContentHtml || richContentHtml);
+  // Rich Content is the authoritative source for Wix post formatting.
+  // Fall back to plain text HTML only when Rich Content is missing/empty.
+  const contentHtml = richContentHtml || plainContentHtml;
 
   const excerptSource = typeof post.excerpt === "string" && post.excerpt.trim() ? post.excerpt : (stripHtmlTags(contentHtml) || contentText);
   const excerpt = clampText(decodeHtmlEntities(excerptSource || ""), 360);
@@ -2294,7 +2295,7 @@ function normalizeWixBlogApiPost(post, index = 0) {
     heroImageUrl,
     media.image,
     media.url,
-    extractFirstImageFromRichContent(post.richContent),
+    extractFirstImageFromRichContent(richContent),
   );
 
   const stableId = buildBlogItemStableId({
@@ -2346,6 +2347,7 @@ function normalizeWixBlogApiPost(post, index = 0) {
     memberId: typeof post.memberId === "string" ? post.memberId : "",
     contactId: typeof post.contactId === "string" ? post.contactId : "",
     language: typeof post.language === "string" ? post.language : "no",
+    richContent,
   };
 }
 
