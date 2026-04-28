@@ -1197,7 +1197,7 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
   return cacheData;
 }
 
-const DEFAULT_WIX_BLOG_FEED_URL = "https://www.hiskingdomministry.com/blog-feed.xml";
+const DEFAULT_WIX_BLOG_FEED_URL = "https://www.hiskingdomministry.no/blog-feed.xml";
 
 function getWixBlogFeedUrl(req = { query: {} }) {
   const override = req && req.query && typeof req.query.feedUrl === "string" ? req.query.feedUrl.trim() : "";
