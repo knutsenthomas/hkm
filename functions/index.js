@@ -14,6 +14,7 @@ require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
 require("dotenv").config({ path: path.join(__dirname, ".env.local"), override: true, quiet: true });
 const { createClient, OAuthStrategy, ApiKeyStrategy } = require("@wix/sdk");
 const { products } = require("@wix/stores");
+const { posts } = require("@wix/blog");
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -185,7 +186,7 @@ function getWixClient() {
 
   if (apiKey && (siteId || accountId)) {
     return createClient({
-      modules: { products },
+      modules: { products, posts },
       auth: siteId ?
         ApiKeyStrategy({
           apiKey,
@@ -202,7 +203,7 @@ function getWixClient() {
   if (!clientId) throw new Error("Missing WIX_CLIENT_ID.");
 
   return createClient({
-    modules: { products },
+    modules: { products, posts },
     auth: OAuthStrategy({ clientId }),
   });
 }
@@ -1250,6 +1251,84 @@ function decodeHtmlEntities(value) {
     .trim();
 }
 
+function escapeHtml(value) {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function plainTextToHtml(value) {
+  if (typeof value !== "string") return "";
+  const text = value.trim();
+  if (!text) return "";
+
+  return text
+    .split(/\n{2,}/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean)
+    .map((paragraph) => `<p>${escapeHtml(paragraph).replace(/\n/g, "<br>")}</p>`)
+    .join("");
+}
+
+function extractTextFromRichContent(richContent) {
+  if (!richContent || typeof richContent !== "object") return "";
+
+  const preferredTextKeys = new Set(["text", "title", "content", "plainText", "label"]);
+  const skipKeys = new Set(["id", "url", "href", "link", "slug", "src", "type"]);
+  const fragments = [];
+
+  function walk(value, key = "", depth = 0) {
+    if (depth > 10 || value == null) return;
+
+    if (typeof value === "string") {
+      const normalized = decodeHtmlEntities(stripHtmlTags(value));
+      if (!normalized || normalized.length < 2) return;
+
+      if (preferredTextKeys.has(key)) {
+        fragments.push(normalized);
+        return;
+      }
+
+      // Capture likely prose strings and skip obvious metadata/URLs.
+      const looksLikeUrl = /^(https?:\/\/|www\.)/i.test(normalized);
+      const hasSentenceChars = /[a-zA-Z\u00C0-\u017F]/.test(normalized);
+      if (!looksLikeUrl && hasSentenceChars && normalized.split(/\s+/).length >= 3) {
+        fragments.push(normalized);
+      }
+      return;
+    }
+
+    if (Array.isArray(value)) {
+      value.forEach((item) => walk(item, key, depth + 1));
+      return;
+    }
+
+    if (typeof value === "object") {
+      Object.entries(value).forEach(([childKey, childValue]) => {
+        if (skipKeys.has(childKey)) return;
+        walk(childValue, childKey, depth + 1);
+      });
+    }
+  }
+
+  walk(richContent);
+
+  const seen = new Set();
+  const deduped = [];
+  for (const fragment of fragments) {
+    const key = fragment.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    deduped.push(fragment);
+  }
+
+  return deduped.join("\n\n").trim();
+}
+
 function extractFirstImageFromHtml(value) {
   if (typeof value !== "string") return "";
   const match = value.match(/<img[^>]+src=["']([^"']+)["']/i);
@@ -1285,6 +1364,94 @@ function buildBlogItemStableId(item, fallback = "") {
   }
 
   return fallback;
+}
+
+function normalizeKeyFragment(value) {
+  if (typeof value !== "string") return "";
+  return decodeHtmlEntities(value)
+    .toLowerCase()
+    .replace(/[\s\u00A0]+/g, " ")
+    .replace(/[^a-z0-9\u00C0-\u017F\-\/_ ]/g, "")
+    .trim();
+}
+
+function normalizeUrlPath(value) {
+  if (typeof value !== "string") return "";
+  const raw = value.trim();
+  if (!raw) return "";
+
+  try {
+    const withProtocol = /^https?:\/\//i.test(raw) ? raw : `https://${raw.replace(/^\/+/, "")}`;
+    const url = new URL(withProtocol);
+    return url.pathname.replace(/\/+$/, "").toLowerCase();
+  } catch (error) {
+    return raw
+      .replace(/^https?:\/\/[^/]+/i, "")
+      .replace(/[?#].*$/, "")
+      .replace(/\/+$/, "")
+      .toLowerCase();
+  }
+}
+
+function buildBlogItemDedupKey(item, index = 0) {
+  if (!item || typeof item !== "object") return `fallback-${index}`;
+
+  const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
+  const stable = normalizeKeyFragment(buildBlogItemStableId(item, ""));
+  const wixGuid = normalizeKeyFragment(item.wixGuid || item.id || "");
+  const slug = normalizeKeyFragment(item.slug || "");
+  const urlPath = normalizeUrlPath(item.url || item.link || "");
+  const title = normalizeKeyFragment(item.title || "");
+  const dateIso = parseDateIso(item.date || "");
+  const dateKey = dateIso ? dateIso.slice(0, 10) : "";
+
+  if (source === "wix") {
+    if (wixGuid) return `wix-guid:${wixGuid}`;
+    if (urlPath) return `wix-url:${urlPath}`;
+    if (slug) return `wix-slug:${slug}`;
+    if (title && dateKey) return `wix-title-date:${title}:${dateKey}`;
+    if (stable) return `wix-stable:${stable}`;
+  }
+
+  if (stable) return `stable:${stable}`;
+  if (urlPath) return `url:${urlPath}`;
+  if (slug) return `slug:${slug}`;
+  if (title && dateKey) return `title-date:${title}:${dateKey}`;
+  if (title) return `title:${title}`;
+
+  return `fallback-${index}`;
+}
+
+function getBlogItemQualityScore(item) {
+  if (!item || typeof item !== "object") return 0;
+  const contentLen = typeof item.content === "string" ? item.content.trim().length : 0;
+  const excerptLen = typeof item.excerpt === "string" ? item.excerpt.trim().length : 0;
+  const imageBonus = wixPickFirstString(item.imageUrl, item.image, item.dashboardImage) ? 120 : 0;
+  const dateBonus = parseDateIso(item.date || "") ? 40 : 0;
+  return contentLen + Math.min(excerptLen, 300) + imageBonus + dateBonus;
+}
+
+function mergeBlogItemsPreferred(existingItem, nextItem) {
+  if (!existingItem) return nextItem;
+  if (!nextItem) return existingItem;
+
+  const existingScore = getBlogItemQualityScore(existingItem);
+  const nextScore = getBlogItemQualityScore(nextItem);
+  const winner = nextScore >= existingScore ? nextItem : existingItem;
+  const loser = winner === nextItem ? existingItem : nextItem;
+
+  const contentA = typeof winner.content === "string" ? winner.content.trim() : "";
+  const contentB = typeof loser.content === "string" ? loser.content.trim() : "";
+  const excerptA = typeof winner.excerpt === "string" ? winner.excerpt.trim() : "";
+  const excerptB = typeof loser.excerpt === "string" ? loser.excerpt.trim() : "";
+
+  return {
+    ...loser,
+    ...winner,
+    content: contentA.length >= contentB.length ? contentA : contentB,
+    excerpt: excerptA.length >= excerptB.length ? excerptA : excerptB,
+    imageUrl: wixPickFirstString(winner.imageUrl, loser.imageUrl, winner.image, loser.image),
+  };
 }
 
 function normalizeWixBlogRssItem(item, index = 0) {
@@ -1356,7 +1523,96 @@ function normalizeWixBlogRssItem(item, index = 0) {
   };
 }
 
-async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
+function normalizeWixBlogApiPost(post, index = 0) {
+  if (!post || typeof post !== "object") return null;
+
+  const title = typeof post.title === "string" ? post.title.trim() : "";
+  const url = typeof post.url === "string" ? post.url.trim() : "";
+  const slug = typeof post.slug === "string" ? post.slug.trim() : "";
+  const id = typeof post._id === "string" ? post._id.trim() : "";
+  const author = "HKM";
+  const category = "Blogg";
+  const date = parseDateIso(post.firstPublishedDate || post.lastPublishedDate || post._createdDate || post._updatedDate);
+
+  const directContentText = typeof post.contentText === "string" ? post.contentText.trim() : "";
+  const richContentText = extractTextFromRichContent(post.richContent);
+  const contentText = directContentText.length >= richContentText.length ? directContentText : richContentText;
+  const contentHtml = plainTextToHtml(contentText);
+  const excerptSource = typeof post.excerpt === "string" && post.excerpt.trim() ? post.excerpt : contentText;
+  const excerpt = clampText(decodeHtmlEntities(excerptSource || ""), 360);
+
+  const media = post.media && typeof post.media === "object" ? post.media : {};
+  const imageUrl = wixPickFirstString(
+    post.heroImage,
+    media.image,
+    media.url,
+  );
+
+  const stableId = buildBlogItemStableId({
+    id,
+    slug,
+    url,
+    title,
+  }, `wix-blog-api-${index}`);
+
+  const finalHtml = contentHtml || `<p>${escapeHtml(excerpt || "")}</p>`;
+  if (!title && !finalHtml) return null;
+
+  return {
+    id: stableId,
+    title: title || "Blogginnlegg",
+    content: finalHtml,
+    date: date || new Date().toISOString(),
+    author,
+    category,
+    imageUrl,
+    source: "wix",
+    wixGuid: id || "",
+    url,
+    slug,
+    excerpt,
+  };
+}
+
+async function fetchWixBlogItemsViaApi() {
+  const wixClient = getWixClient();
+  let offset = 0;
+  const limit = 50;
+  const fieldsets = ["CONTENT_TEXT", "URL"];
+  const listPosts = [];
+
+  while (true) {
+    const response = await wixClient.posts.listPosts({
+      paging: { limit, offset },
+      fieldsets,
+    });
+    const pagePosts = Array.isArray(response && response.posts) ? response.posts : [];
+    if (!pagePosts.length) break;
+
+    listPosts.push(...pagePosts);
+    if (pagePosts.length < limit) break;
+    offset += limit;
+  }
+
+  const detailedPosts = [];
+  for (const post of listPosts) {
+    const postId = post && typeof post._id === "string" ? post._id : "";
+    if (!postId) continue;
+
+    try {
+      const fullPost = await wixClient.posts.getPost(postId, { fieldsets });
+      if (fullPost) detailedPosts.push(fullPost);
+    } catch (error) {
+      detailedPosts.push(post);
+    }
+  }
+
+  return detailedPosts
+    .map((post, index) => normalizeWixBlogApiPost(post, index))
+    .filter((item) => item && (item.title || item.content));
+}
+
+async function fetchWixBlogItemsViaRss(req = { query: {} }) {
   const feedUrl = getWixBlogFeedUrl(req);
   if (!feedUrl) {
     throw new Error("Missing Wix blog feed URL. Set WIX_BLOG_RSS_URL.");
@@ -1378,9 +1634,27 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
   const channel = rss && rss.channel ? rss.channel : {};
   const rawItems = toArray(channel.item);
 
-  const wixItems = rawItems
+  const items = rawItems
     .map((item, index) => normalizeWixBlogRssItem(item, index))
     .filter((item) => item && (item.title || item.content));
+
+  return { feedUrl, items };
+}
+
+async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
+  let wixItems = [];
+  let importSource = "wix-api";
+  let feedUrl = "";
+
+  try {
+    wixItems = await fetchWixBlogItemsViaApi();
+  } catch (apiError) {
+    console.warn("Wix Blog API sync failed, falling back to RSS:", apiError && apiError.message ? apiError.message : apiError);
+    const rssResult = await fetchWixBlogItemsViaRss(req);
+    wixItems = rssResult.items;
+    feedUrl = rssResult.feedUrl;
+    importSource = "wix-rss-fallback";
+  }
 
   const existingSnap = await db.collection("content").doc("collection_blog").get();
   const existingData = existingSnap.exists ? existingSnap.data() : {};
@@ -1392,13 +1666,15 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
 
   const mergedMap = new Map();
   nonWixItems.forEach((item, index) => {
-    const key = buildBlogItemStableId(item, `manual-${index}`);
-    if (key) mergedMap.set(key, item);
+    const key = buildBlogItemDedupKey(item, index);
+    const existing = mergedMap.get(key);
+    mergedMap.set(key, mergeBlogItemsPreferred(existing, item));
   });
 
   wixItems.forEach((item, index) => {
-    const key = buildBlogItemStableId(item, `wix-${index}`);
-    if (key) mergedMap.set(key, item);
+    const key = buildBlogItemDedupKey(item, nonWixItems.length + index);
+    const existing = mergedMap.get(key);
+    mergedMap.set(key, mergeBlogItemsPreferred(existing, item));
   });
 
   const mergedItems = Array.from(mergedMap.values()).sort((a, b) => {
@@ -1412,6 +1688,7 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
     wixSync: {
       feedUrl,
+      source: importSource,
       syncedAt: admin.firestore.FieldValue.serverTimestamp(),
       wixItemCount: wixItems.length,
       totalItemCount: mergedItems.length,
@@ -1423,6 +1700,7 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
   return {
     ok: true,
     feedUrl,
+    source: importSource,
     wixItemCount: wixItems.length,
     totalItemCount: mergedItems.length,
     items: mergedItems,

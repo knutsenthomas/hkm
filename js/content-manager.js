@@ -128,6 +128,96 @@ class ContentManager {
         return item.id || item.slug || item.title || '';
     }
 
+    normalizeBlogKeyValue(value) {
+        if (typeof value !== 'string') return '';
+        return value
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, ' ');
+    }
+
+    getBlogUrlPath(value) {
+        if (typeof value !== 'string' || !value.trim()) return '';
+
+        try {
+            const raw = value.trim();
+            const normalizedUrl = /^https?:\/\//i.test(raw) ? raw : `https://${raw.replace(/^\/+/, '')}`;
+            const urlObj = new URL(normalizedUrl);
+            return (urlObj.pathname || '').replace(/\/+$/, '').toLowerCase();
+        } catch (error) {
+            return value
+                .trim()
+                .replace(/^https?:\/\/[^/]+/i, '')
+                .replace(/[?#].*$/, '')
+                .replace(/\/+$/, '')
+                .toLowerCase();
+        }
+    }
+
+    buildBlogCanonicalKey(item, index = 0) {
+        if (!item || typeof item !== 'object') return `fallback:${index}`;
+
+        const wixGuid = this.normalizeBlogKeyValue(item.wixGuid || item.id || '');
+        if (wixGuid) return `guid:${wixGuid}`;
+
+        const urlPath = this.getBlogUrlPath(item.url || item.link || '');
+        if (urlPath) return `url:${urlPath}`;
+
+        const slug = this.normalizeBlogKeyValue(item.slug || '');
+        if (slug) return `slug:${slug}`;
+
+        const title = this.normalizeBlogKeyValue(item.title || '');
+        const date = typeof item.date === 'string' ? item.date.slice(0, 10) : '';
+        if (title && date) return `title-date:${title}:${date}`;
+        if (title) return `title:${title}`;
+
+        const stableId = this.normalizeBlogKeyValue(this.getContentItemStableId(item));
+        if (stableId) return `stable:${stableId}`;
+
+        return `fallback:${index}`;
+    }
+
+    mergeDuplicateBlogItems(existingItem, nextItem) {
+        if (!existingItem) return nextItem;
+        if (!nextItem) return existingItem;
+
+        const existingContent = typeof existingItem.content === 'string' ? existingItem.content.trim() : '';
+        const nextContent = typeof nextItem.content === 'string' ? nextItem.content.trim() : '';
+        const existingExcerpt = typeof existingItem.excerpt === 'string' ? existingItem.excerpt.trim() : '';
+        const nextExcerpt = typeof nextItem.excerpt === 'string' ? nextItem.excerpt.trim() : '';
+
+        const existingScore = existingContent.length + Math.min(existingExcerpt.length, 240) + (existingItem.imageUrl ? 80 : 0);
+        const nextScore = nextContent.length + Math.min(nextExcerpt.length, 240) + (nextItem.imageUrl ? 80 : 0);
+
+        const preferred = nextScore >= existingScore ? nextItem : existingItem;
+        const fallback = preferred === nextItem ? existingItem : nextItem;
+
+        return {
+            ...fallback,
+            ...preferred,
+            content: preferred.content || fallback.content || '',
+            excerpt: preferred.excerpt || fallback.excerpt || '',
+            imageUrl: preferred.imageUrl || fallback.imageUrl || '',
+        };
+    }
+
+    dedupeBlogItems(items) {
+        const list = Array.isArray(items) ? items : [];
+        const merged = new Map();
+
+        list.forEach((item, index) => {
+            const key = this.buildBlogCanonicalKey(item, index);
+            const existing = merged.get(key);
+            merged.set(key, this.mergeDuplicateBlogItems(existing, item));
+        });
+
+        return Array.from(merged.values());
+    }
+
+    getDedupedBlogItems(data) {
+        return this.dedupeBlogItems(this.getCollectionItems(data));
+    }
+
     getLocalizedContentItem(item, lang = this.getCurrentLanguage()) {
         if (!item || typeof item !== 'object') return item;
         if (lang === 'no') {
@@ -422,7 +512,7 @@ class ContentManager {
                 this.getContentDoc('collection_teaching', { silent: true })
             ]);
             const allItems = [
-                ...this.getCollectionItems(blogData),
+                ...this.getDedupedBlogItems(blogData),
                 ...this.getCollectionItems(teachingData)
             ];
             const item = this.findContentItemById(allItems, itemId);
@@ -468,7 +558,7 @@ class ContentManager {
             const testimonials = this.getCollectionItems(testimonialsData);
             this.renderTestimonials(testimonials);
 
-            const blogItems = this.getCollectionItems(blogData);
+            const blogItems = this.getDedupedBlogItems(blogData);
             const localizedBlogItems = this.localizeBlogItems(blogItems);
             if (localizedBlogItems.length > 0) {
                 // NO uses #blogg, EN/ES use #blog
@@ -548,7 +638,7 @@ class ContentManager {
                 const blogData = await window.firebaseService.getPageContent('collection_blog');
                 console.log("[ContentManager] Blog data received:", blogData);
 
-                const blogItems = this.getCollectionItems(blogData);
+                const blogItems = this.getDedupedBlogItems(blogData);
                 const localizedBlogItems = this.localizeBlogItems(blogItems);
                 console.log("[ContentManager] Parsed blog items:", blogItems);
                 const postsToRender = localizedBlogItems.length > 0 ? localizedBlogItems : blogItems;
@@ -660,7 +750,7 @@ class ContentManager {
 
         const blogData = await window.firebaseService.getPageContent('collection_blog');
         const teachingData = await window.firebaseService.getPageContent('collection_teaching');
-        const blogItems = this.getCollectionItems(blogData);
+        const blogItems = this.getDedupedBlogItems(blogData);
         const teachingItems = this.getCollectionItems(teachingData);
         const blogItem = this.findContentItemById(blogItems, itemId);
         const teachingItem = this.findContentItemById(teachingItems, itemId);
