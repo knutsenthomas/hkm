@@ -1197,6 +1197,238 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
   return cacheData;
 }
 
+const DEFAULT_WIX_BLOG_FEED_URL = "https://www.hiskingdomministry.com/blog-feed.xml";
+
+function getWixBlogFeedUrl(req = { query: {} }) {
+  const override = req && req.query && typeof req.query.feedUrl === "string" ? req.query.feedUrl.trim() : "";
+  return override || process.env.WIX_BLOG_RSS_URL || DEFAULT_WIX_BLOG_FEED_URL;
+}
+
+function toArray(value) {
+  if (Array.isArray(value)) return value;
+  if (value == null) return [];
+  return [value];
+}
+
+function readXmlText(value) {
+  if (value == null) return "";
+  if (typeof value === "string") return value.trim();
+  if (typeof value === "number") return String(value);
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      const text = readXmlText(item);
+      if (text) return text;
+    }
+    return "";
+  }
+  if (typeof value === "object") {
+    if (typeof value._ === "string") return value._.trim();
+    if (typeof value.__cdata === "string") return value.__cdata.trim();
+  }
+  return "";
+}
+
+function stripHtmlTags(value) {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function decodeHtmlEntities(value) {
+  if (typeof value !== "string") return "";
+  return value
+    .replace(/&nbsp;/g, " ")
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .trim();
+}
+
+function extractFirstImageFromHtml(value) {
+  if (typeof value !== "string") return "";
+  const match = value.match(/<img[^>]+src=["']([^"']+)["']/i);
+  return match && match[1] ? match[1].trim() : "";
+}
+
+function parseDateIso(value) {
+  if (!value) return "";
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return "";
+  return parsed.toISOString();
+}
+
+function buildBlogItemStableId(item, fallback = "") {
+  if (!item || typeof item !== "object") {
+    return fallback;
+  }
+
+  const candidates = [
+    item.__stableId,
+    item.id,
+    item.wixGuid,
+    item.slug,
+    item.url,
+    item.link,
+    item.title,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return fallback;
+}
+
+function normalizeWixBlogRssItem(item, index = 0) {
+  if (!item || typeof item !== "object") return null;
+
+  const title = decodeHtmlEntities(readXmlText(item.title));
+  const link = readXmlText(item.link);
+  const guid = readXmlText(item.guid);
+  const pubDate = readXmlText(item.pubDate);
+  const author = decodeHtmlEntities(readXmlText(item["dc:creator"]) || readXmlText(item.author)) || "HKM";
+
+  const categories = toArray(item.category)
+    .map((category) => decodeHtmlEntities(readXmlText(category)))
+    .filter(Boolean);
+
+  const category = categories[0] || "Blogg";
+
+  const htmlContent = readXmlText(item["content:encoded"]) || readXmlText(item.description);
+  const excerptPlain = stripHtmlTags(htmlContent);
+  const excerpt = clampText(decodeHtmlEntities(excerptPlain), 360);
+
+  const mediaContent = toArray(item["media:content"])[0] || {};
+  const mediaThumbnail = toArray(item["media:thumbnail"])[0] || {};
+  const enclosure = item.enclosure && typeof item.enclosure === "object" ? item.enclosure : {};
+  const imageUrl = wixPickFirstString(
+    mediaContent.url,
+    mediaContent.href,
+    mediaThumbnail.url,
+    enclosure.url,
+    extractFirstImageFromHtml(htmlContent),
+  );
+
+  let slug = "";
+  if (link) {
+    try {
+      const urlObj = new URL(link);
+      const segments = urlObj.pathname.split("/").filter(Boolean);
+      slug = segments.length > 0 ? segments[segments.length - 1] : "";
+    } catch (error) {
+      slug = "";
+    }
+  }
+
+  const stableId = buildBlogItemStableId({
+    id: guid,
+    wixGuid: guid,
+    slug,
+    link,
+    title,
+  }, `wix-blog-${index}`);
+
+  const contentHtml = typeof htmlContent === "string" && htmlContent.trim() ? htmlContent.trim() : `<p>${excerpt}</p>`;
+
+  if (!title && !contentHtml) return null;
+
+  return {
+    id: stableId,
+    title: title || "Blogginnlegg",
+    content: contentHtml,
+    date: parseDateIso(pubDate) || new Date().toISOString(),
+    author,
+    category,
+    imageUrl,
+    source: "wix",
+    wixGuid: guid || "",
+    url: link || "",
+    slug: slug || "",
+    excerpt,
+  };
+}
+
+async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
+  const feedUrl = getWixBlogFeedUrl(req);
+  if (!feedUrl) {
+    throw new Error("Missing Wix blog feed URL. Set WIX_BLOG_RSS_URL.");
+  }
+
+  const response = await fetch(feedUrl);
+  if (!response.ok) {
+    throw new Error(`Wix blog feed request failed with status ${response.status}`);
+  }
+
+  const xml = await response.text();
+  const parsed = await parseStringPromise(xml, {
+    explicitArray: false,
+    trim: true,
+    mergeAttrs: true,
+  });
+
+  const rss = parsed && parsed.rss ? parsed.rss : {};
+  const channel = rss && rss.channel ? rss.channel : {};
+  const rawItems = toArray(channel.item);
+
+  const wixItems = rawItems
+    .map((item, index) => normalizeWixBlogRssItem(item, index))
+    .filter((item) => item && (item.title || item.content));
+
+  const existingSnap = await db.collection("content").doc("collection_blog").get();
+  const existingData = existingSnap.exists ? existingSnap.data() : {};
+  const existingItems = Array.isArray(existingData && existingData.items) ? existingData.items : [];
+  const nonWixItems = existingItems.filter((item) => {
+    const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
+    return source !== "wix";
+  });
+
+  const mergedMap = new Map();
+  nonWixItems.forEach((item, index) => {
+    const key = buildBlogItemStableId(item, `manual-${index}`);
+    if (key) mergedMap.set(key, item);
+  });
+
+  wixItems.forEach((item, index) => {
+    const key = buildBlogItemStableId(item, `wix-${index}`);
+    if (key) mergedMap.set(key, item);
+  });
+
+  const mergedItems = Array.from(mergedMap.values()).sort((a, b) => {
+    const dateA = new Date(a && a.date ? a.date : 0).getTime();
+    const dateB = new Date(b && b.date ? b.date : 0).getTime();
+    return dateB - dateA;
+  });
+
+  const payload = {
+    items: mergedItems,
+    lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
+    wixSync: {
+      feedUrl,
+      syncedAt: admin.firestore.FieldValue.serverTimestamp(),
+      wixItemCount: wixItems.length,
+      totalItemCount: mergedItems.length,
+    },
+  };
+
+  await db.collection("content").doc("collection_blog").set(payload, { merge: true });
+
+  return {
+    ok: true,
+    feedUrl,
+    wixItemCount: wixItems.length,
+    totalItemCount: mergedItems.length,
+    items: mergedItems,
+  };
+}
+
 
 exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) => {
   return cors(req, res, async () => {
@@ -1247,6 +1479,48 @@ exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) =>
   });
 });
 
+exports.wixBlogSync = onRequest({ cors: true, invoker: "public" }, (req, res) => {
+  return cors(req, res, async () => {
+    if (req.method === "OPTIONS") {
+      return res.status(204).send("");
+    }
+
+    if (req.method !== "GET" && req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed. Use GET or POST." });
+    }
+
+    try {
+      if (req.method === "POST" || req.query.force === "true") {
+        const result = await fetchAndCacheWixBlogPosts(req);
+        return res.status(200).json({ ...result, manuallySynced: true });
+      }
+
+      const doc = await db.collection("content").doc("collection_blog").get();
+      if (doc.exists && doc.data() && Array.isArray(doc.data().items) && doc.data().items.length > 0) {
+        const data = doc.data();
+        return res.status(200).json({
+          ok: true,
+          source: "firestore-cache",
+          count: data.items.length,
+          items: data.items,
+          lastUpdated: data.lastUpdated || null,
+          wixSync: data.wixSync || null,
+        });
+      }
+
+      const result = await fetchAndCacheWixBlogPosts(req);
+      return res.status(200).json({ ...result, newlyCached: true });
+    } catch (error) {
+      console.error("Error syncing Wix blog posts:", error);
+      return res.status(500).json({
+        ok: false,
+        error: "Could not sync Wix blog posts.",
+        details: error && error.message ? error.message : String(error),
+      });
+    }
+  });
+});
+
 /**
  * Automatisert synkronisering av Wix-produkter.
  * Kjører hver 5. time for å holde butikken oppdatert.
@@ -1258,6 +1532,16 @@ exports.scheduledWixSync = onSchedule("0 */5 * * *", async (event) => {
     console.log(`Successfully synced ${cacheData.count} products via scheduler.`);
   } catch (error) {
     console.error("Scheduled Wix sync failed:", error);
+  }
+});
+
+exports.scheduledWixBlogSync = onSchedule("15 */3 * * *", async () => {
+  console.log("Starting scheduled Wix blog synchronization...");
+  try {
+    const result = await fetchAndCacheWixBlogPosts({ query: {} });
+    console.log(`Successfully synced ${result.wixItemCount} Wix blog posts.`);
+  } catch (error) {
+    console.error("Scheduled Wix blog sync failed:", error);
   }
 });
 
