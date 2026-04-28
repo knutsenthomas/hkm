@@ -116,14 +116,28 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
       continue;
     }
 
-    if (listLikeParagraph.test(block.text) && block.text.length <= 260) {
+    // Promote short paragraph titles to headings for a closer Wix reading flow.
+    if (block.tag === "p") {
+      const isFirstLeadTitle = i === 0 && block.text.length <= 110;
+      const isSectionTitle = /:$/.test(block.text) && block.text.length <= 90;
+      if (isFirstLeadTitle) {
+        parts.push(`<h2>${escapeHtml(block.text)}</h2>`);
+        continue;
+      }
+      if (isSectionTitle) {
+        parts.push(`<h3>${escapeHtml(block.text)}</h3>`);
+        continue;
+      }
+    }
+
+    if (listLikeParagraph.test(block.text) && block.text.length <= 140) {
       const run = [block.text];
       let j = i + 1;
       while (
         j < blocks.length &&
         blocks[j].tag === "p" &&
         listLikeParagraph.test(blocks[j].text) &&
-        blocks[j].text.length <= 260
+        blocks[j].text.length <= 140
       ) {
         run.push(blocks[j].text);
         j += 1;
@@ -2185,6 +2199,66 @@ function hasStructuralHtmlMarkup(html) {
   return /<(h[1-6]|ul|ol|li|blockquote|figure|img|video|audio|iframe|hr)\b/i.test(html);
 }
 
+function sanitizeBlogHtmlForDisplay(html) {
+  if (typeof html !== "string") return "";
+
+  let output = html.trim();
+  if (!output) return "";
+
+  output = output
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/\r\n?/g, "\n");
+
+  // Remove common newsletter artifacts scraped from Wix post footers.
+  output = output.replace(
+    /<p>\s*(?:Ja,\s*jeg\s*ønsker\s*å\s*abonnere\s*på\s*deres\s*nyhetsbrev\s*\*?|Meld\s*deg\s*på\s*nyhetsbrev[^<]*)\s*<\/p>/gi,
+    ""
+  );
+
+  // Turn short paragraph titles ending with colon into headings.
+  output = output.replace(/<p>\s*["“”']?\s*([^<]{3,90}:)\s*["“”']?\s*<\/p>/gi, (_match, titleText) => {
+    const clean = decodeHtmlEntities(stripHtmlTags(String(titleText || ""))).trim();
+    if (!clean) return "";
+    return `<h3>${escapeHtml(clean)}</h3>`;
+  });
+
+  // Promote the very first short lead line to a section heading when it looks like a title.
+  output = output.replace(/^\s*<p>\s*([^<]{6,110})\s*<\/p>/i, (match, leadText) => {
+    const clean = decodeHtmlEntities(stripHtmlTags(String(leadText || ""))).trim();
+    if (!clean) return match;
+    const words = clean.split(/\s+/).filter(Boolean);
+    if (words.length < 2 || words.length > 14) return match;
+    if (/[.!?]$/.test(clean)) return match;
+    return `<h2>${escapeHtml(clean)}</h2>`;
+  });
+
+  output = output
+    .replace(/<p>\s*(?:&nbsp;|\s|<br\s*\/?>)*<\/p>/gi, "")
+    .replace(/(<br\s*\/?>\s*){3,}/gi, "<br><br>")
+    .trim();
+
+  return output;
+}
+
+function normalizeBlogItemForDisplay(item) {
+  if (!item || typeof item !== "object") return item;
+
+  const content = typeof item.content === "string" ? item.content : "";
+  const normalizedContent = sanitizeBlogHtmlForDisplay(content);
+  if (!normalizedContent) return item;
+
+  const normalizedText = stripHtmlTags(normalizedContent);
+  const minutesToRead = Math.max(1, Math.ceil((normalizedText.split(/\s+/).filter(Boolean).length || 0) / 225));
+
+  return {
+    ...item,
+    content: normalizedContent,
+    excerpt: clampText(decodeHtmlEntities(normalizedText), 360),
+    minutesToRead: Math.max(Number(item.minutesToRead) || 1, minutesToRead),
+  };
+}
+
 function normalizeWixBlogApiPost(post, index = 0) {
   if (!post || typeof post !== "object") return null;
 
@@ -2410,8 +2484,10 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     return dateB - dateA;
   });
 
+  const displayReadyItems = consolidatedItems.map((item) => normalizeBlogItemForDisplay(item));
+
   const payload = {
-    items: consolidatedItems,
+    items: displayReadyItems,
     lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
     wixSync: {
       feedUrl,
@@ -2419,7 +2495,7 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
       syncedAt: admin.firestore.FieldValue.serverTimestamp(),
       wixItemCount: wixItems.length,
       rssItemCount: rssItems.length,
-      totalItemCount: consolidatedItems.length,
+      totalItemCount: displayReadyItems.length,
     },
   };
 
@@ -2431,8 +2507,8 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     source: importSource,
     wixItemCount: wixItems.length,
     rssItemCount: rssItems.length,
-    totalItemCount: consolidatedItems.length,
-    items: consolidatedItems,
+    totalItemCount: displayReadyItems.length,
+    items: displayReadyItems,
   };
 }
 

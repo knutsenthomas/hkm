@@ -831,10 +831,12 @@ class ContentManager {
             heroEl.style.backgroundRepeat = 'no-repeat';
         }
 
+        const articleHtml = this.resolveArticleHtml(item, sourceItem);
+
         // --- Calculate Reading Time ---
         let readingTime = 5; // default fallback
-        if (item.content) {
-            const textContent = this.stripHtml(this.parseBlocks(item.content));
+        if (articleHtml) {
+            const textContent = this.stripHtml(articleHtml);
             const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
             readingTime = Math.max(1, Math.ceil(wordCount / 225)); // 225 words per minute
         }
@@ -891,7 +893,7 @@ class ContentManager {
             viewsEl.style.display = 'inline-block';
         }
 
-        container.innerHTML = this.parseBlocks(item.content) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+        container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
         // Hide skeleton, reveal real content with fade-in
         const skeleton = document.getElementById('post-skeleton');
@@ -3178,6 +3180,46 @@ class ContentManager {
         return `<li>${this.escapeHtml(compact)}</li>`;
     }
 
+    isMeaningfulHtml(html) {
+        if (typeof html !== 'string') return false;
+
+        const trimmed = html.trim();
+        if (!trimmed) return false;
+
+        const textLength = this.stripHtml(trimmed).replace(/\s+/g, ' ').trim().length;
+        if (textLength >= 24) return true;
+
+        return /<(p|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(trimmed);
+    }
+
+    resolveArticleHtml(item, sourceItem) {
+        const candidates = [
+            item?.content,
+            sourceItem?.content,
+            item?.contentHtml,
+            sourceItem?.contentHtml,
+            item?.wixContentHtml,
+            sourceItem?.wixContentHtml,
+            item?.html,
+            sourceItem?.html,
+            item?.body,
+            sourceItem?.body,
+            item?.contentText,
+            sourceItem?.contentText,
+            item?.excerpt,
+            sourceItem?.excerpt
+        ];
+
+        for (const candidate of candidates) {
+            const parsed = this.parseBlocks(candidate);
+            if (this.isMeaningfulHtml(parsed)) {
+                return parsed;
+            }
+        }
+
+        return '';
+    }
+
     /**
      * Generate a relevant image URL from Unsplash based on event title
      * @param {string} title - Event title
@@ -3190,6 +3232,22 @@ class ContentManager {
         // Handle Legacy HTML (string)
         if (typeof content === 'string') {
             return content;
+        }
+
+        // Handle object payloads that already contain HTML/text fields
+        if (typeof content === 'object' && content !== null) {
+            const htmlLike = [
+                content.html,
+                content.content,
+                content.contentHtml,
+                content.wixContentHtml,
+                content.body,
+                content.contentText
+            ].find((value) => typeof value === 'string' && value.trim());
+
+            if (typeof htmlLike === 'string') {
+                return htmlLike;
+            }
         }
 
         // Handle Editor.js JSON
