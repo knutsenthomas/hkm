@@ -5771,6 +5771,32 @@ body:not(.cms-loading) {
     }
 }
 
+@media (max-width: 1024px) and (min-width: 901px) {
+    .shop-home-promo-card {
+        padding: 38px;
+        gap: 34px;
+        margin: 0 18px;
+    }
+
+    .shop-home-promo-title {
+        font-size: 38px !important;
+        margin-bottom: 22px !important;
+    }
+
+    .shop-home-promo-text {
+        font-size: 17px !important;
+        margin-bottom: 32px !important;
+    }
+
+    .shop-home-promo-actions {
+        gap: 18px;
+    }
+
+    .shop-home-promo-link {
+        font-size: 15px;
+    }
+}
+
 .shop-home-promo-pill {
     display: inline-flex;
     align-items: center;
@@ -5807,22 +5833,56 @@ body:not(.cms-loading) {
 .shop-home-promo-actions {
     display: flex;
     align-items: center;
-    gap: 24px;
+    flex-wrap: wrap;
+    gap: 20px;
 }
 
 .shop-home-promo-link {
     font-weight: 700;
+    font-size: 16px;
+    line-height: 1.2;
     color: #0f172a;
     display: flex;
     align-items: center;
+    align-self: center;
     gap: 8px;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, color 0.3s ease;
     text-decoration: none !important;
 }
 
+.shop-home-promo-link:focus-visible {
+    outline: 2px solid var(--primary-orange);
+    outline-offset: 3px;
+    border-radius: 8px;
+}
+
+.shop-home-promo-link i {
+    transition: transform 0.3s ease;
+}
+
 .shop-home-promo-link:hover {
-    transform: translateX(5px);
+    transform: translateX(3px);
     color: var(--primary-orange);
+}
+
+.shop-home-promo-link:hover i {
+    transform: translateX(3px);
+}
+
+@media (hover: none) and (pointer: coarse) {
+    .shop-home-promo-actions .btn,
+    .shop-home-promo-link {
+        min-height: 44px;
+    }
+
+    .shop-home-promo-link {
+        padding: 8px 4px;
+    }
+
+    .shop-home-promo-link:hover,
+    .shop-home-promo-link:hover i {
+        transform: none;
+    }
 }
 
 .shop-home-promo-chip-grid {
@@ -5863,6 +5923,36 @@ body:not(.cms-loading) {
     color: #64748b;
 }
 
+@media (max-width: 900px) and (min-width: 601px) {
+    .shop-home-promo-card {
+        padding: 34px;
+        gap: 32px;
+    }
+
+    .shop-home-promo-title {
+        font-size: 36px !important;
+        margin-bottom: 20px !important;
+    }
+
+    .shop-home-promo-text {
+        font-size: 17px !important;
+        margin-bottom: 30px !important;
+    }
+
+    .shop-home-promo-actions {
+        gap: 16px;
+    }
+
+    .shop-home-promo-actions .btn {
+        padding: 11px 24px !important;
+        font-size: 15px !important;
+    }
+
+    .shop-home-promo-link {
+        font-size: 15px;
+    }
+}
+
 @media (max-width: 600px) {
     .shop-home-promo .container {
         padding-left: 10px !important;
@@ -5878,6 +5968,16 @@ body:not(.cms-loading) {
     .shop-home-promo-chip-grid {
         grid-template-columns: 1fr;
     }
+
+    .shop-home-promo-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+    }
+
+    .shop-home-promo-link {
+        align-self: flex-start;
+    }
     
     .shop-home-promo-title {
         font-size: 32px !important;
@@ -5890,11 +5990,5 @@ body:not(.cms-loading) {
         hyphens: none;
         word-break: normal;
         overflow-wrap: normal;
-    }
-
-    .shop-home-promo-actions {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 16px;
     }
 }
