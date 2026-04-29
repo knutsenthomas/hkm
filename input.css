@@ -5992,3 +5992,42 @@ body:not(.cms-loading) {
         overflow-wrap: normal;
     }
 }
+
+/* === Product Hero Swiper Styling === */
+.product-hero-swiper {
+    width: 100% !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+}
+
+.product-hero-swiper .swiper-slide {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    position: relative !important;
+}
+
+/* Hero image covers full screen */
+.product-hero-swiper .swiper-slide img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+}
+
+/* Content centered both vertically and horizontally */
+.product-hero-swiper .swiper-slide .container {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    height: 100% !important;
+    position: relative !important;
+    z-index: 20 !important;
+}
+
+/* Ensure smooth transitions */
+.product-hero-swiper .swiper-slide-active img {
+    transition: transform 10s ease-out !important;
+}
