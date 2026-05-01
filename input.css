@@ -5437,7 +5437,7 @@ a[href*="#deduccion-fiscal"],
     }
 
     .page-hero-title {
-        font-size: clamp(1.8rem, 8vw, 2.8rem) !important;
+        font-size: clamp(1.4rem, 6vw, 2rem) !important;
         line-height: 1.15 !important;
     }
 
