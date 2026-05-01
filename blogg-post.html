@@ -17,7 +17,7 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="css/cookie-consent.css">
-    <link rel="stylesheet" href="css/subpage-hero.css?v=2026.05.01.2">
+    <link rel="stylesheet" href="css/subpage-hero.css?v=2026.05.01.3">
     <link rel="stylesheet" href="css/interactions.css">
     <link rel="stylesheet" href="css/blog-content.css?v=2026.05.01.8">
     <!-- Tailwind config (guarded if Play CDN is absent) -->
@@ -213,16 +213,16 @@
         <div class="container">
             <!-- Title hidden until JS populates it -->
             <h1 class="page-hero-title" id="single-post-title" style="opacity:0; transition: opacity 0.4s ease;"></h1>
-            <div class="blog-meta"
-                style="display: flex; gap: 16px; justify-content: center; align-items: center; color: white; margin-top: 20px; flex-wrap: wrap; opacity:0; transition: opacity 0.4s ease;"
-                id="blog-meta-row">
+            <div class="blog-meta" id="blog-meta-row"
+                style="display:flex; gap:12px; justify-content:center; align-items:center; color:white; margin-top:16px; flex-wrap:nowrap; opacity:0; transition:opacity 0.4s ease;">
                 <img id="single-post-author-avatar" src="" alt="" loading="lazy"
-                    style="display:none; width:44px; height:44px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.7); flex-shrink:0;">
-                <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;">
-                    <span id="single-post-author" style="font-weight:600; font-size:0.95rem;"></span>
-                    <div style="display:flex; gap:12px; font-size:0.85rem; opacity:0.85;">
+                    style="display:none; width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.7); flex-shrink:0;">
+                <div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px; min-width:0;">
+                    <span id="single-post-author" style="font-weight:600; font-size:0.9rem; white-space:nowrap;"></span>
+                    <div style="display:flex; gap:8px; font-size:0.8rem; opacity:0.85; flex-wrap:nowrap; white-space:nowrap;">
                         <span id="single-post-date"></span>
                         <span id="single-post-readingtime" style="display:none;"></span>
+                        <span id="single-post-views" style="display:none;"></span>
                     </div>
                 </div>
                 <span id="single-post-category" style="display:none;"><i class="fas fa-tag"></i> </span>
