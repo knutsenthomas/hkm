@@ -906,6 +906,31 @@ class ContentManager {
 
         container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
+        // --- Debug Info (only if ?debug=true) ---
+        if (urlParams.get('debug') === 'true') {
+            const debugEl = document.createElement('div');
+            debugEl.style.cssText = 'background:#f8f9fa; border:1px solid #dee2e6; padding:20px; margin:20px 0; font-family:monospace; font-size:12px; overflow:auto; max-height:400px; color:#333;';
+            debugEl.innerHTML = `
+                <h4 style="margin-top:0">Debug Info</h4>
+                <p><strong>Item ID:</strong> ${itemId}</p>
+                <p><strong>Stable ID:</strong> ${postId}</p>
+                <p><strong>Has richContent:</strong> ${!!(item.richContent || sourceItem?.richContent)}</p>
+                <p><strong>richContent Nodes:</strong> ${(item.richContent?.nodes || sourceItem?.richContent?.nodes || []).length}</p>
+                <p><strong>Content Length:</strong> ${articleHtml.length}</p>
+                <p><strong>Source:</strong> ${sourceItem?.source || item.source || 'unknown'}</p>
+                <hr>
+                <details>
+                    <summary>Raw Item Keys</summary>
+                    <pre>${JSON.stringify(Object.keys(item), null, 2)}</pre>
+                </details>
+                <details>
+                    <summary>Raw SourceItem Keys</summary>
+                    <pre>${JSON.stringify(Object.keys(sourceItem || {}), null, 2)}</pre>
+                </details>
+            `;
+            container.prepend(debugEl);
+        }
+
         // Hide skeleton, reveal real content with fade-in
         const skeleton = document.getElementById('post-skeleton');
         if (skeleton) skeleton.style.display = 'none';

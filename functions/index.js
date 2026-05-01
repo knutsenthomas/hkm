@@ -2400,16 +2400,23 @@ function normalizeWixBlogApiPost(post, index = 0) {
   const category = "Blogg";
   const date = parseDateIso(post.firstPublishedDate || post.lastPublishedDate || post._createdDate || post._updatedDate);
 
-  const richContent = post.richContent && typeof post.richContent === "object" ? post.richContent : null;
+  const richContent = post.richContent || (post.content && typeof post.content === 'object' ? post.content : null);
   const richContentHtml = renderRichContentToHtml(richContent);
-  const directContentText = typeof post.contentText === "string" ? post.contentText.trim() : "";
   const richContentText = extractTextFromRichContent(richContent);
+  const directContentText = typeof post.contentText === "string" ? post.contentText.trim() : "";
   const contentText = directContentText.length >= richContentText.length ? directContentText : richContentText;
+  
+  // Direct HTML from Wix (contains <img> and <ul> tags natively)
+  const directHtml = typeof post.content === "string" ? post.content.trim() : "";
+  
+  // Fallback auto-generated HTML
   const plainContentHtml = plainTextToHtml(contentText);
 
-  // Rich Content is the authoritative source for Wix post formatting.
-  // Fall back to plain text HTML only when Rich Content is missing/empty.
-  const contentHtml = richContentHtml || plainContentHtml;
+  // Content Selection Hierarchy:
+  // 1. Rich Content (authoritative structured JSON)
+  // 2. Direct HTML (native Wix HTML output)
+  // 3. Plain Text Fallback (auto-generated <p> tags)
+  const contentHtml = richContentHtml || directHtml || plainContentHtml;
 
   const excerptSource = typeof post.excerpt === "string" && post.excerpt.trim() ? post.excerpt : (stripHtmlTags(contentHtml) || contentText);
   const excerpt = clampText(decodeHtmlEntities(excerptSource || ""), 360);
