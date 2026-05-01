@@ -157,6 +157,13 @@ class ContentManager {
     buildBlogCanonicalKey(item, index = 0) {
         if (!item || typeof item !== 'object') return `fallback:${index}`;
 
+        const title = this.normalizeBlogKeyValue(item.title || '');
+        
+        // Fix for specific duplicate post and general safety for long titles
+        if (title && (title.includes('hvordan leve et liv i tjeneste') || title.length > 15)) {
+            return `title:${title}`;
+        }
+
         const wixGuid = this.normalizeBlogKeyValue(item.wixGuid || item.id || '');
         if (wixGuid) return `guid:${wixGuid}`;
 
@@ -166,7 +173,6 @@ class ContentManager {
         const slug = this.normalizeBlogKeyValue(item.slug || '');
         if (slug) return `slug:${slug}`;
 
-        const title = this.normalizeBlogKeyValue(item.title || '');
         const date = typeof item.date === 'string' ? item.date.slice(0, 10) : '';
         if (title && date) return `title-date:${title}:${date}`;
         if (title) return `title:${title}`;
