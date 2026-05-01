@@ -3234,7 +3234,7 @@ class ContentManager {
         return typeof html === 'string' && /\b(?:WhDDP|mHxYK|KS6-G|viewer-[a-z0-9_-]+)\b/i.test(html);
     }
 
-    normalizeWixViewerHtml(html) {
+    normalizeWixViewerHtml(html, item = null) {
         if (typeof html !== 'string' || !html.trim()) return '';
 
         let output = html
@@ -3255,7 +3255,140 @@ class ContentManager {
             .replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>')
             .trim();
 
-        return output;
+        return this.rebuildWixViewerStructure(output, item);
+    }
+
+    getElementPlainText(el) {
+        return (el && el.textContent ? el.textContent : '').replace(/\s+/g, ' ').trim();
+    }
+
+    isParagraphElement(el) {
+        return el && el.nodeType === 1 && el.tagName && el.tagName.toLowerCase() === 'p';
+    }
+
+    isBoldLeadParagraph(el) {
+        if (!this.isParagraphElement(el)) return false;
+        const text = this.getElementPlainText(el);
+        if (!text || text.length > 90) return false;
+        const strong = el.querySelector('strong, b');
+        if (!strong) return false;
+        const strongText = this.getElementPlainText(strong);
+        return strongText && text.startsWith(strongText);
+    }
+
+    makeListElement(doc, tag, items) {
+        const list = doc.createElement(tag);
+        items.forEach((html) => {
+            const li = doc.createElement('li');
+            li.innerHTML = html;
+            list.appendChild(li);
+        });
+        return list;
+    }
+
+    rebuildWixViewerStructure(html, item = null) {
+        if (typeof DOMParser === 'undefined') return html;
+
+        const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
+        const root = doc.body.firstElementChild;
+        if (!root) return html;
+
+        const imageUrl = item && (item.imageUrl || item.image || item.dashboardImage);
+        const hasInlineImage = !!root.querySelector('img, figure');
+        if (imageUrl && !hasInlineImage) {
+            const figure = doc.createElement('figure');
+            figure.className = 'wix-inline-image';
+            figure.innerHTML = `<img src="${this.escapeHtml(imageUrl)}" alt="${this.escapeHtml(item.title || '')}" loading="lazy">`;
+            root.insertBefore(figure, root.firstChild);
+        }
+
+        const children = () => Array.from(root.children);
+        const replaceRunWithList = (startIndex, count, tag, htmlItems) => {
+            const current = children();
+            const list = this.makeListElement(doc, tag, htmlItems);
+            root.insertBefore(list, current[startIndex]);
+            for (let i = 0; i < count; i += 1) {
+                current[startIndex + i]?.remove();
+            }
+        };
+
+        let changed = true;
+        while (changed) {
+            changed = false;
+            const current = children();
+
+            for (let i = 0; i < current.length; i += 1) {
+                const el = current[i];
+                if (!this.isParagraphElement(el)) continue;
+
+                const text = this.getElementPlainText(el);
+
+                if (/\?$/.test(text)) {
+                    const run = [];
+                    let j = i + 1;
+                    while (
+                        j < current.length &&
+                        this.isParagraphElement(current[j]) &&
+                        !this.isBoldLeadParagraph(current[j])
+                    ) {
+                        const itemText = this.getElementPlainText(current[j]);
+                        if (!itemText || itemText.length > 90 || /[?!]$/.test(itemText)) break;
+                        if (!/[.!]$/.test(itemText)) break;
+                        run.push(current[j]);
+                        j += 1;
+                    }
+                    if (run.length >= 3) {
+                        replaceRunWithList(i + 1, run.length, 'ul', run.map((node) => node.innerHTML));
+                        changed = true;
+                        break;
+                    }
+                }
+
+                if (/konkrete tips:?$/i.test(text)) {
+                    const items = [];
+                    let consumed = 0;
+                    let j = i + 1;
+                    while (
+                        j + 1 < current.length &&
+                        this.isBoldLeadParagraph(current[j]) &&
+                        this.isParagraphElement(current[j + 1]) &&
+                        !this.isBoldLeadParagraph(current[j + 1])
+                    ) {
+                        items.push(`${current[j].innerHTML}${current[j + 1].innerHTML}`);
+                        consumed += 2;
+                        j += 2;
+                    }
+                    if (items.length >= 2) {
+                        replaceRunWithList(i + 1, consumed, 'ol', items);
+                        changed = true;
+                        break;
+                    }
+                }
+
+                if (/motivasjonen oppe/i.test(text) || /viktig å finne måter/i.test(text)) {
+                    const items = [];
+                    let consumed = 0;
+                    let j = i + 1;
+                    while (
+                        j + 1 < current.length &&
+                        this.isBoldLeadParagraph(current[j]) &&
+                        this.isParagraphElement(current[j + 1]) &&
+                        !this.isBoldLeadParagraph(current[j + 1])
+                    ) {
+                        items.push(`${current[j].innerHTML}${current[j + 1].innerHTML}`);
+                        consumed += 2;
+                        j += 2;
+                    }
+                    if (items.length >= 2) {
+                        replaceRunWithList(i + 1, consumed, 'ul', items);
+                        changed = true;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return root.innerHTML.trim();
     }
 
     resolveArticleHtml(item, sourceItem) {
@@ -3300,7 +3433,7 @@ class ContentManager {
         for (const candidate of candidates) {
             let parsed = this.parseBlocks(candidate);
             if (this.isWixViewerHtml(parsed)) {
-                parsed = this.normalizeWixViewerHtml(parsed);
+                parsed = this.normalizeWixViewerHtml(parsed, item || sourceItem);
             }
             if (this.isMeaningfulHtml(parsed)) {
                 // If it contains block-level elements, it's rich content!

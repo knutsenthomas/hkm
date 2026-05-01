@@ -102,6 +102,7 @@ function sanitizeWixInlineHtml(rawInner) {
 function extractWixViewerBlocksAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
 
+  const imageFigures = extractWixArticleImagesAsHtml(pageHtml);
   const blockRegex = /<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
   const seen = new Set();
   const blocks = [];
@@ -180,7 +181,81 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
     parts.push(`<p>${block.html || escapeHtml(block.text)}</p>`);
   }
 
-  return parts.join("\n");
+  const bodyHtml = parts.join("\n");
+  if (!imageFigures) return bodyHtml;
+  if (/<figure\b|<img\b/i.test(bodyHtml)) return bodyHtml;
+  return `${imageFigures}\n${bodyHtml}`;
+}
+
+function decodeHtmlAttribute(value) {
+  if (typeof value !== "string" || !value) return "";
+  return value
+    .replace(/&quot;/gi, '"')
+    .replace(/&#34;/g, '"')
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">");
+}
+
+function readHtmlAttr(attrs, name) {
+  if (typeof attrs !== "string" || !attrs || !name) return "";
+  const pattern = new RegExp(`${name}\\s*=\\s*(["'])([\\s\\S]*?)\\1`, "i");
+  const match = attrs.match(pattern);
+  return match && match[2] ? decodeHtmlAttribute(match[2]) : "";
+}
+
+function wixMediaUrlFromUri(uri) {
+  const clean = typeof uri === "string" ? uri.trim() : "";
+  if (!clean) return "";
+  if (/^https?:\/\//i.test(clean)) return clean;
+
+  const extensionMatch = clean.match(/\.([a-z0-9]+)(?:$|[?#])/i);
+  const extension = extensionMatch && extensionMatch[1] ? extensionMatch[1].toLowerCase() : "jpg";
+  return `https://static.wixstatic.com/media/${clean}/v1/fit/w_1000,h_1000,al_c,q_85/file.${extension}`;
+}
+
+function extractWixArticleImagesAsHtml(pageHtml) {
+  if (typeof pageHtml !== "string" || !pageHtml) return "";
+
+  const figures = [];
+  const seen = new Set();
+  const wowImageRegex = /<wow-image\b([^>]*)>/gi;
+  let match;
+
+  while ((match = wowImageRegex.exec(pageHtml)) !== null) {
+    const attrs = match[1] || "";
+    const alt = readHtmlAttr(attrs, "alt");
+    const infoRaw = readHtmlAttr(attrs, "data-image-info");
+    let info = null;
+
+    if (infoRaw) {
+      try {
+        info = JSON.parse(infoRaw);
+      } catch (error) {
+        info = null;
+      }
+    }
+
+    const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
+    const targetWidth = Number(info && info.targetWidth);
+    const targetHeight = Number(info && info.targetHeight);
+    const imageWidth = Number(imageData.width);
+    const imageHeight = Number(imageData.height);
+
+    // Skip avatars/icons; keep actual article media.
+    const likelyIcon = (targetWidth > 0 && targetWidth <= 80) && (targetHeight > 0 && targetHeight <= 80);
+    const likelySmallImage = (imageWidth > 0 && imageWidth <= 120) && (imageHeight > 0 && imageHeight <= 120);
+    if (likelyIcon || likelySmallImage || /forfatterens bilde/i.test(alt)) continue;
+
+    const src = wixMediaUrlFromUri(imageData.uri || readHtmlAttr(attrs, "src"));
+    if (!src || seen.has(src)) continue;
+    seen.add(src);
+
+    figures.push(renderImageFigure(src, alt || ""));
+    if (figures.length >= 6) break;
+  }
+
+  return figures.join("\n");
 }
 
 async function enrichWixItemsWithPublicPageContent(items = []) {

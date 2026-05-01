@@ -314,7 +314,7 @@
 .blog-post-content.wix-html-content,
 #single-post-content.wix-html-content {
   max-width: 640px;
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-family: Inter, Helvetica, Arial, sans-serif;
   font-size: 18px;
   line-height: 27px;
   color: #151a21;
@@ -357,7 +357,7 @@
 #single-post-content.wix-html-content h2 {
   font-size: 28px;
   line-height: 35px;
-  font-weight: 800;
+  font-weight: 700;
 }
 
 .blog-post-content.wix-html-content h3,
@@ -385,6 +385,32 @@
 .blog-post-content.wix-html-content strong,
 #single-post-content.wix-html-content strong {
   font-weight: 700;
+}
+
+.blog-post-content.wix-html-content ul,
+.blog-post-content.wix-html-content ol,
+#single-post-content.wix-html-content ul,
+#single-post-content.wix-html-content ol {
+  margin: 0 0 1.5em;
+  padding-left: 1.6rem;
+  font-size: 18px;
+  line-height: 27px;
+}
+
+.blog-post-content.wix-html-content li,
+#single-post-content.wix-html-content li {
+  margin: 0.45em 0;
+  padding-left: 0.2rem;
+}
+
+.blog-post-content.wix-html-content li p,
+#single-post-content.wix-html-content li p {
+  margin: 0.35em 0 0;
+}
+
+.blog-post-content.wix-html-content .wix-inline-image,
+#single-post-content.wix-html-content .wix-inline-image {
+  margin: 0 0 1.8em;
 }
 
 @media (max-width: 720px) {
