@@ -824,7 +824,7 @@ class MinSideManager {
                     </div>
                     <div class="ms-card-footer-pad">
                         <div class="edit-form-actions">
-                            <button class="btn btn-primary btn-sm" id="save-prefs-btn">
+                            <button class="btn btn-primary" id="save-prefs-btn">
                                 <span class="material-symbols-outlined">save</span> Lagre preferanser
                             </button>
                         </div>
