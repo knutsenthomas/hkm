@@ -70,7 +70,8 @@
   }
 
   #blog-hero {
-    min-height: 340px !important;
+    min-height: 300px !important;
+    padding-bottom: 36px !important;
     background-size: cover !important;
     background-position: center center !important;
     background-repeat: no-repeat !important;
@@ -85,4 +86,10 @@
 .subpage-hero .page-hero-subtitle,
 .subpage-hero .hero-breadcrumbs {
   margin-bottom: 0 !important;
+}
+
+@media (max-width: 768px) {
+  .blog-post-section {
+    padding-top: 24px !important;
+  }
 }
