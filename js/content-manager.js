@@ -18,8 +18,44 @@ class ContentManager {
             body.classList.add(`page-${this.pageId}`);
         }
 
+        this.ensureResponsiveHeroTitleStyles();
+
         this.init();
         this.agendaMonthsToShow = 1;
+    }
+
+    ensureResponsiveHeroTitleStyles() {
+        if (typeof document === 'undefined') return;
+        if (document.getElementById('hkm-hero-title-responsive-style')) return;
+
+        const styleEl = document.createElement('style');
+        styleEl.id = 'hkm-hero-title-responsive-style';
+        styleEl.textContent = `
+            .page-hero .page-hero-title,
+            .page-hero .hero-title {
+                font-size: clamp(2rem, 4.6vw, 3rem) !important;
+                line-height: 1.12 !important;
+            }
+
+            @media (max-width: 1024px) {
+                .page-hero .page-hero-title,
+                .page-hero .hero-title {
+                    font-size: clamp(1.85rem, 5.6vw, 2.55rem) !important;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .page-hero .page-hero-title,
+                .page-hero .hero-title {
+                    font-size: clamp(1.55rem, 7.3vw, 2.15rem) !important;
+                    max-width: 92vw !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                }
+            }
+        `;
+
+        document.head.appendChild(styleEl);
     }
 
     detectPageId() {
