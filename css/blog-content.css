@@ -292,12 +292,12 @@
 
   .blog-post-content h1,
   #single-post-content h1 {
-    font-size: 1.9rem;
+    font-size: 1.6rem !important;
   }
 
   .blog-post-content h2,
   #single-post-content h2 {
-    font-size: var(--fs-h2-mobile, 20px);
+    font-size: 1.35rem !important;
   }
 
   .blog-post-content h3,
