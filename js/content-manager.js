@@ -3307,6 +3307,152 @@ class ContentManager {
         return this._renderRichNodes(richContent.nodes);
     }
 
+    firstString(...values) {
+        for (const value of values) {
+            if (typeof value === 'string' && value.trim()) return value.trim();
+        }
+        return '';
+    }
+
+    getRichMediaUrl(media) {
+        if (!media) return '';
+        if (typeof media === 'string') return media.trim();
+        if (typeof media !== 'object') return '';
+
+        const src = media.src && typeof media.src === 'object' ? media.src : {};
+        return this.firstString(
+            media.url,
+            media.fileUrl,
+            media.imageUrl,
+            typeof media.src === 'string' ? media.src : '',
+            src.url,
+            src.fileUrl,
+            src.imageUrl
+        );
+    }
+
+    getRichLinkUrl(value) {
+        if (!value || typeof value !== 'object') return '';
+        const link = value.link && typeof value.link === 'object' ? value.link : value;
+        return this.firstString(link.url, link.href, value.url, value.href);
+    }
+
+    getYoutubeEmbedUrl(url) {
+        if (typeof url !== 'string') return '';
+        const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+        return match ? `https://www.youtube.com/embed/${match[1]}` : '';
+    }
+
+    getVimeoEmbedUrl(url) {
+        if (typeof url !== 'string') return '';
+        const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        return match ? `https://player.vimeo.com/video/${match[1]}` : '';
+    }
+
+    renderRichMediaLink(url, label = 'Åpne innhold') {
+        if (!url) return '';
+        return `<p><a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(label)}</a></p>`;
+    }
+
+    renderRichIframe(url, title = 'Innebygd innhold') {
+        const embedUrl = this.getYoutubeEmbedUrl(url) || this.getVimeoEmbedUrl(url);
+        if (!embedUrl) return '';
+        return `<div class="cms-embed"><iframe src="${this.escapeHtml(embedUrl)}" title="${this.escapeHtml(title)}" loading="lazy" allowfullscreen></iframe></div>`;
+    }
+
+    getRichTextStyleAttr(data = {}) {
+        const textStyle = data.textStyle && typeof data.textStyle === 'object' ? data.textStyle : {};
+        const styles = [];
+        const align = this.firstString(textStyle.textAlignment).toUpperCase();
+        const lineHeight = this.firstString(textStyle.lineHeight);
+        const indentation = Number(data.indentation || 0);
+
+        if (['LEFT', 'RIGHT', 'CENTER', 'JUSTIFY'].includes(align)) {
+            styles.push(`text-align:${align.toLowerCase()}`);
+        }
+        if (/^\d+(\.\d+)?$/.test(lineHeight)) {
+            styles.push(`line-height:${lineHeight}`);
+        }
+        if (Number.isFinite(indentation) && indentation > 0) {
+            styles.push(`margin-left:${Math.min(4, indentation) * 1.5}rem`);
+        }
+
+        return styles.length ? ` style="${styles.join(';')}"` : '';
+    }
+
+    getRichNodeStyleAttr(node = {}) {
+        const nodeStyle = node.style && typeof node.style === 'object' ? node.style : {};
+        const styles = [];
+
+        const paddingTop = this.firstString(nodeStyle.paddingTop);
+        const paddingBottom = this.firstString(nodeStyle.paddingBottom);
+        const backgroundColor = this.firstString(nodeStyle.backgroundColor);
+
+        if (/^\d+(\.\d+)?(px|rem|em|%)?$/.test(paddingTop)) styles.push(`padding-top:${paddingTop}`);
+        if (/^\d+(\.\d+)?(px|rem|em|%)?$/.test(paddingBottom)) styles.push(`padding-bottom:${paddingBottom}`);
+        if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(backgroundColor)) styles.push(`background-color:${backgroundColor}`);
+
+        return styles.length ? ` style="${styles.join(';')}"` : '';
+    }
+
+    applyRichTextDecorations(html, decorations) {
+        if (!html || !Array.isArray(decorations)) return html;
+
+        return decorations.reduce((acc, decoration) => {
+            if (!decoration || typeof decoration !== 'object') return acc;
+            const type = this.firstString(decoration.type).toUpperCase();
+
+            if (type === 'BOLD') return `<strong>${acc}</strong>`;
+            if (type === 'ITALIC') return `<em>${acc}</em>`;
+            if (type === 'UNDERLINE') return `<u>${acc}</u>`;
+            if (type === 'STRIKETHROUGH') return `<s>${acc}</s>`;
+            if (type === 'SUPERSCRIPT') return `<sup>${acc}</sup>`;
+            if (type === 'SUBSCRIPT') return `<sub>${acc}</sub>`;
+
+            if (type === 'LINK' || type === 'EXTERNAL') {
+                const href = this.getRichLinkUrl(decoration.linkData || decoration);
+                return href ? `<a href="${this.escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${acc}</a>` : acc;
+            }
+
+            if (type === 'COLOR') {
+                const colorData = decoration.colorData && typeof decoration.colorData === 'object' ? decoration.colorData : {};
+                const styles = [];
+                if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(colorData.foreground || '')) {
+                    styles.push(`color:${colorData.foreground}`);
+                }
+                if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(colorData.background || '')) {
+                    styles.push(`background-color:${colorData.background}`);
+                }
+                return styles.length ? `<span style="${styles.join(';')}">${acc}</span>` : acc;
+            }
+
+            if (type === 'FONT_SIZE') {
+                const fontSizeData = decoration.fontSizeData && typeof decoration.fontSizeData === 'object' ? decoration.fontSizeData : {};
+                const value = Number(fontSizeData.value);
+                const unit = this.firstString(fontSizeData.unit).toLowerCase() || 'px';
+                if (Number.isFinite(value) && value > 0 && value <= 96 && ['px', 'em', 'rem'].includes(unit)) {
+                    return `<span style="font-size:${value}${unit}">${acc}</span>`;
+                }
+            }
+
+            return acc;
+        }, html);
+    }
+
+    stripOuterParagraph(html) {
+        if (typeof html !== 'string') return '';
+        const trimmed = html.trim();
+        const match = trimmed.match(/^<p(?:\s[^>]*)?>([\s\S]*)<\/p>$/i);
+        return match ? match[1].trim() : trimmed;
+    }
+
+    renderRichImageFigure(src, alt = '', caption = '', className = '') {
+        if (!src) return '';
+        const classAttr = className ? ` class="${this.escapeHtml(className)}"` : '';
+        const captionHtml = caption ? `<figcaption>${this.escapeHtml(caption)}</figcaption>` : '';
+        return `<figure${classAttr}><img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(alt)}" loading="lazy">${captionHtml}</figure>`;
+    }
+
     _renderRichNodes(nodes, options = {}) {
         if (!Array.isArray(nodes)) return '';
         const { inListItem = false } = options;
@@ -3320,73 +3466,159 @@ class ContentManager {
                 case 'TEXT': {
                     const textData = node.textData || {};
                     let text = textData.text || '';
-                    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    text = this.escapeHtml(text);
                     text = text.replace(/\n/g, '<br>');
-                    
-                    // Apply basic decorations
-                    if (Array.isArray(textData.decorations)) {
-                        textData.decorations.forEach(dec => {
-                            if (dec.type === 'BOLD') text = `<strong>${text}</strong>`;
-                            if (dec.type === 'ITALIC') text = `<em>${text}</em>`;
-                            if (dec.type === 'UNDERLINE') text = `<u>${text}</u>`;
-                        });
-                    }
-                    return text;
+                    return this.applyRichTextDecorations(text, textData.decorations);
                 }
                 case 'PARAGRAPH': {
                     const inner = this._renderRichNodes(children, { inListItem: true });
                     if (!inner.trim()) return '';
-                    return inListItem ? inner : `<p>${inner}</p>`;
+                    if (inListItem) return inner;
+                    return `<p${this.getRichTextStyleAttr(node.paragraphData || {})}${this.getRichNodeStyleAttr(node)}>${inner}</p>`;
                 }
                 case 'HEADING': {
-                    const level = node.headingData?.level || node.headingData?.renderedLevel || 2;
+                    const level = Math.min(6, Math.max(1, Number(node.headingData?.renderedLevel || node.headingData?.level || 2)));
                     const inner = this._renderRichNodes(children, { inListItem: true });
-                    return `<h${level}>${inner}</h${level}>`;
+                    if (!inner.trim()) return '';
+                    return `<h${level}${this.getRichTextStyleAttr(node.headingData || {})}${this.getRichNodeStyleAttr(node)}>${inner}</h${level}>`;
                 }
                 case 'BULLETED_LIST':
                 case 'ORDERED_LIST':
                 case 'NUMBERED_LIST': {
                     const tag = type === 'BULLETED_LIST' ? 'ul' : 'ol';
+                    const listData = type === 'BULLETED_LIST' ? (node.bulletedListData || {}) : (node.orderedListData || {});
+                    const start = tag === 'ol' && Number(listData.start) > 1 ? ` start="${Number(listData.start)}"` : '';
                     const items = children.map(itemNode => {
                         const itemHtml = this._renderRichNodes([itemNode], { inListItem: true });
-                        // Strip outer P if it exists
-                        const cleaned = itemHtml.replace(/^<p>|<\/p>$/gi, '');
-                        return `<li>${cleaned}</li>`;
+                        const cleaned = this.stripOuterParagraph(itemHtml);
+                        return cleaned ? `<li>${cleaned}</li>` : '';
                     }).join('');
-                    return `<${tag}>${items}</${tag}>`;
+                    return items ? `<${tag}${start}>${items}</${tag}>` : '';
                 }
                 case 'LIST_ITEM':
                     return this._renderRichNodes(children, { inListItem: true });
                 case 'IMAGE': {
                     const img = node.imageData?.image || {};
-                    const src = img.url || img.src || '';
+                    const src = this.getRichMediaUrl(img);
                     if (!src) return '';
                     const alt = node.imageData?.altText || '';
-                    const cap = node.imageData?.caption || '';
-                    return `
-                        <figure>
-                            <img src="${src}" alt="${alt}" loading="lazy">
-                            ${cap ? `<figcaption>${cap}</figcaption>` : ''}
-                        </figure>
-                    `;
+                    const captionFromChild = children
+                        .filter(child => (child?.type || '').toUpperCase() === 'CAPTION')
+                        .map(child => this.stripHtml(this._renderRichNodes(child.nodes || [], { inListItem: true })))
+                        .filter(Boolean)
+                        .join(' ');
+                    const cap = node.imageData?.caption || captionFromChild;
+                    const figure = this.renderRichImageFigure(src, alt, cap, 'wix-image');
+                    const href = this.getRichLinkUrl(node.imageData?.link || {});
+                    return href ? `<a class="wix-image-link" href="${this.escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${figure}</a>` : figure;
                 }
+                case 'CAPTION':
+                    return this._renderRichNodes(children, { inListItem: true });
                 case 'VIDEO': {
-                    const video = node.videoData?.video || {};
-                    const src = video.url || video.src || '';
+                    const videoData = node.videoData || {};
+                    const src = this.getRichMediaUrl(videoData.video || {});
                     if (!src) return '';
-                    if (src.includes('youtube.com') || src.includes('youtu.be')) {
-                        const ytMatch = src.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                        const ytId = ytMatch ? ytMatch[1] : null;
-                        if (ytId) {
-                            return `<div class="cms-yt-embed-wrapper"><div class="cms-yt-embed"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe></div></div>`;
-                        }
+                    const embed = this.renderRichIframe(src, videoData.title || 'Video');
+                    if (embed) return embed;
+                    if (/\.mp4($|\?)/i.test(src)) {
+                        return `<figure><video controls preload="metadata" src="${this.escapeHtml(src)}"></video></figure>`;
                     }
-                    return `<p><a href="${src}" target="_blank">Se video</a></p>`;
+                    return this.renderRichMediaLink(src, videoData.title || 'Se video');
                 }
+                case 'AUDIO': {
+                    const audioData = node.audioData || {};
+                    const src = this.getRichMediaUrl(audioData.audio || {});
+                    return src ? `<figure class="wix-audio"><audio controls preload="none" src="${this.escapeHtml(src)}"></audio></figure>` : '';
+                }
+                case 'GALLERY': {
+                    const galleryData = node.galleryData || {};
+                    const items = Array.isArray(galleryData.items) ? galleryData.items : [];
+                    const rendered = items.map(item => {
+                        const imageUrl = this.getRichMediaUrl(item?.image?.media || {});
+                        if (imageUrl) return this.renderRichImageFigure(imageUrl, item.altText || item.title || '', item.title || '', 'wix-gallery-item');
+
+                        const videoUrl = this.getRichMediaUrl(item?.video?.media || {});
+                        if (!videoUrl) return '';
+                        const embed = this.renderRichIframe(videoUrl, item.title || 'Video');
+                        if (embed) return embed;
+                        if (/\.mp4($|\?)/i.test(videoUrl)) {
+                            return `<figure class="wix-gallery-item"><video controls preload="metadata" src="${this.escapeHtml(videoUrl)}"></video></figure>`;
+                        }
+                        return this.renderRichMediaLink(videoUrl, item.title || 'Se video');
+                    }).filter(Boolean).join('');
+                    return rendered ? `<div class="wix-gallery">${rendered}</div>` : '';
+                }
+                case 'GIF': {
+                    const gifData = node.gifData || {};
+                    const gif = gifData.original || gifData.downsized || gifData;
+                    const src = this.firstString(gif.gif, gif.mp4, gif.still);
+                    if (!src) return '';
+                    if (/\.mp4($|\?)/i.test(src)) {
+                        return `<figure><video autoplay loop muted playsinline preload="metadata" src="${this.escapeHtml(src)}"></video></figure>`;
+                    }
+                    return this.renderRichImageFigure(src, 'GIF', '', 'wix-gif');
+                }
+                case 'EMBED': {
+                    const embedData = node.embedData || {};
+                    const oembed = embedData.oembed || {};
+                    const url = this.firstString(oembed.url, oembed.videoUrl, embedData.src);
+                    const iframe = this.renderRichIframe(url, oembed.title || 'Innebygd innhold');
+                    return iframe || this.renderRichMediaLink(url, oembed.title || 'Åpne innhold');
+                }
+                case 'HTML': {
+                    const htmlData = node.htmlData || {};
+                    const url = this.firstString(htmlData.url);
+                    const iframe = this.renderRichIframe(url, 'Innebygd innhold');
+                    return iframe || this.renderRichMediaLink(url, 'Åpne innebygd innhold');
+                }
+                case 'FILE': {
+                    const fileData = node.fileData || {};
+                    const src = this.getRichMediaUrl(fileData.src || {});
+                    return this.renderRichMediaLink(src, fileData.name || 'Last ned fil');
+                }
+                case 'LINK_PREVIEW': {
+                    const data = node.linkPreviewData || {};
+                    const url = this.getRichLinkUrl(data.link || data);
+                    const thumb = this.firstString(data.thumbnailUrl);
+                    const title = data.title || 'Lenke';
+                    const description = data.description || '';
+                    const image = thumb ? this.renderRichImageFigure(thumb, title, '', '') : '';
+                    return `<div class="wix-link-preview">${image}<div>${this.renderRichMediaLink(url, title)}${description ? `<p>${this.escapeHtml(description)}</p>` : ''}</div></div>`;
+                }
+                case 'BUTTON': {
+                    const buttonData = node.buttonData || {};
+                    const href = this.getRichLinkUrl(buttonData.link || {});
+                    const label = buttonData.text || this.stripHtml(this._renderRichNodes(children, { inListItem: true })) || 'Les mer';
+                    if (!href) return '';
+                    return `<p><a class="wix-button" href="${this.escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(label)}</a></p>`;
+                }
+                case 'CODE_BLOCK':
+                    return `<pre><code>${this._renderRichNodes(children, { inListItem: true })}</code></pre>`;
                 case 'DIVIDER':
                     return '<hr>';
                 case 'BLOCKQUOTE':
-                    return `<blockquote>${this._renderRichNodes(children, { inListItem: true })}</blockquote>`;
+                    return `<blockquote${this.getRichTextStyleAttr(node.blockquoteData || {})}${this.getRichNodeStyleAttr(node)}>${this._renderRichNodes(children, { inListItem: true })}</blockquote>`;
+                case 'TABLE': {
+                    const rows = children.map(row => this._renderRichNodes([row], { inListItem: true })).join('');
+                    return rows ? `<div class="wix-table-wrap"><table>${rows}</table></div>` : '';
+                }
+                case 'TABLE_ROW':
+                    return `<tr>${children.map(child => this._renderRichNodes([child], { inListItem: true })).join('')}</tr>`;
+                case 'TABLE_CELL': {
+                    const data = node.tableCellData || {};
+                    const colspan = Number(data.colspan) > 1 ? ` colspan="${Number(data.colspan)}"` : '';
+                    const rowspan = Number(data.rowspan) > 1 ? ` rowspan="${Number(data.rowspan)}"` : '';
+                    const inner = this._renderRichNodes(children, { inListItem: false });
+                    return `<td${colspan}${rowspan}>${inner}</td>`;
+                }
+                case 'COLLAPSIBLE_LIST':
+                    return `<div class="wix-collapsible">${this._renderRichNodes(children, { inListItem })}</div>`;
+                case 'COLLAPSIBLE_ITEM':
+                    return `<details class="wix-collapsible-item">${this._renderRichNodes(children, { inListItem })}</details>`;
+                case 'COLLAPSIBLE_ITEM_TITLE':
+                    return `<summary>${this._renderRichNodes(children, { inListItem: true })}</summary>`;
+                case 'COLLAPSIBLE_ITEM_BODY':
+                    return this._renderRichNodes(children, { inListItem: false });
                 default:
                     return this._renderRichNodes(children, { inListItem });
             }
