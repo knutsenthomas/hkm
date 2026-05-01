@@ -3222,8 +3222,16 @@ class ContentManager {
         ];
 
         for (const candidate of candidates) {
-            const parsed = this.parseBlocks(candidate);
+            let parsed = this.parseBlocks(candidate);
             if (this.isMeaningfulHtml(parsed)) {
+                // Check if it's plain text (lacks block-level HTML tags) but has newlines
+                if (!/<(p|div|h[1-6]|ul|ol|li|blockquote|br|figure|img|iframe|video)\b/i.test(parsed) && parsed.includes('\n')) {
+                    parsed = parsed
+                        .split(/\n\s*\n/)
+                        .filter(p => p.trim())
+                        .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
+                        .join('');
+                }
                 return parsed;
             }
         }
