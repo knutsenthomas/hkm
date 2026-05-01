@@ -307,3 +307,101 @@
 #single-post-content > *:last-child {
   margin-bottom: 0;
 }
+
+/* Wix Blog viewer HTML fallback.
+   Some imported posts only have Wix's rendered viewer HTML, not Ricos JSON.
+   These values mirror the Wix Blog viewer defaults closely. */
+.blog-post-content.wix-html-content,
+#single-post-content.wix-html-content {
+  max-width: 740px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: #151414;
+}
+
+.blog-post-content.wix-html-content p,
+#single-post-content.wix-html-content p {
+  margin: 0 0 1em;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.blog-post-content.wix-html-content h1,
+.blog-post-content.wix-html-content h2,
+.blog-post-content.wix-html-content h3,
+.blog-post-content.wix-html-content h4,
+.blog-post-content.wix-html-content h5,
+.blog-post-content.wix-html-content h6,
+#single-post-content.wix-html-content h1,
+#single-post-content.wix-html-content h2,
+#single-post-content.wix-html-content h3,
+#single-post-content.wix-html-content h4,
+#single-post-content.wix-html-content h5,
+#single-post-content.wix-html-content h6 {
+  margin: 1.45em 0 0.55em;
+  line-height: 1.333;
+  letter-spacing: 0;
+}
+
+.blog-post-content.wix-html-content h1,
+#single-post-content.wix-html-content h1 {
+  font-size: 32px;
+  line-height: 40px;
+  font-weight: 400;
+}
+
+.blog-post-content.wix-html-content h2,
+#single-post-content.wix-html-content h2 {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 500;
+}
+
+.blog-post-content.wix-html-content h3,
+#single-post-content.wix-html-content h3 {
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: 700;
+}
+
+.blog-post-content.wix-html-content .WhDDP,
+.blog-post-content.wix-html-content .mHxYK,
+#single-post-content.wix-html-content .WhDDP,
+#single-post-content.wix-html-content .mHxYK {
+  display: block;
+}
+
+.blog-post-content.wix-html-content a,
+#single-post-content.wix-html-content a {
+  color: inherit;
+  font-weight: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.12em;
+}
+
+.blog-post-content.wix-html-content strong,
+#single-post-content.wix-html-content strong {
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .blog-post-content.wix-html-content,
+  #single-post-content.wix-html-content {
+    max-width: 100%;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .blog-post-content.wix-html-content h1,
+  #single-post-content.wix-html-content h1 {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .blog-post-content.wix-html-content h2,
+  #single-post-content.wix-html-content h2 {
+    font-size: 24px;
+    line-height: 32px;
+  }
+}

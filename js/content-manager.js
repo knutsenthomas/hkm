@@ -838,6 +838,7 @@ class ContentManager {
         }
 
         const articleHtml = this.resolveArticleHtml(item, sourceItem);
+        const usesWixViewerHtml = this.isWixViewerHtml(articleHtml);
 
         // --- Calculate Reading Time ---
         let readingTime = 5; // default fallback
@@ -904,6 +905,7 @@ class ContentManager {
             viewsEl.style.display = 'inline-block';
         }
 
+        container.classList.toggle('wix-html-content', usesWixViewerHtml);
         container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
         // --- Debug Info (only if ?debug=true) ---
@@ -3228,6 +3230,34 @@ class ContentManager {
         return /<(p|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(trimmed);
     }
 
+    isWixViewerHtml(html) {
+        return typeof html === 'string' && /\b(?:WhDDP|mHxYK|KS6-G|viewer-[a-z0-9_-]+)\b/i.test(html);
+    }
+
+    normalizeWixViewerHtml(html) {
+        if (typeof html !== 'string' || !html.trim()) return '';
+
+        let output = html
+            .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
+            .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '')
+            .replace(/\sdata-[a-z0-9_-]+=(["']).*?\1/gi, '')
+            .replace(/\sclass=(["'])(?:KS6-G|HFpF6t)\1/gi, '');
+
+        // The public Wix page scraper can accidentally capture the newsletter form label
+        // as article text. It is UI chrome, not post content.
+        output = output.replace(
+            /<p\b[^>]*>\s*<span\b[^>]*>\s*<span>\s*Ja,\s*jeg\s*ønsker\s*å\s*abonnere\s*på\s*deres\s*nyhetsbrev[\s\S]*?<\/p>/gi,
+            ''
+        );
+
+        output = output
+            .replace(/<p>\s*(?:&nbsp;|\s|<br\s*\/?>)*<\/p>/gi, '')
+            .replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>')
+            .trim();
+
+        return output;
+    }
+
     resolveArticleHtml(item, sourceItem) {
         // Pass 0: Try to render from raw Wix richContent if available (authoritative)
         let richContent = item?.richContent || sourceItem?.richContent;
@@ -3269,6 +3299,9 @@ class ContentManager {
         // Pass 1: Look for ACTUAL rich HTML or Editor.js blocks that yielded HTML
         for (const candidate of candidates) {
             let parsed = this.parseBlocks(candidate);
+            if (this.isWixViewerHtml(parsed)) {
+                parsed = this.normalizeWixViewerHtml(parsed);
+            }
             if (this.isMeaningfulHtml(parsed)) {
                 // If it contains block-level elements, it's rich content!
                 if (/<(p|div|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(parsed)) {
