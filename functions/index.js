@@ -69,8 +69,8 @@ function sanitizeWixInlineHtml(rawInner) {
     .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
     .replace(/\s*data-[a-z0-9_-]+="[^"]*"/gi, "");
 
-  // Keep only safe inline tags to preserve emphasis/links from Wix content.
-  html = html.replace(/<(?!\/?(?:strong|b|em|i|u|s|br|a)\b)[^>]*>/gi, "");
+  // Keep only safe tags to preserve emphasis/links/images from Wix content.
+  html = html.replace(/<(?!\/?(?:strong|b|em|i|u|s|br|a|img|figure|figcaption|ul|ol|li|blockquote|div|span)\b)[^>]*>/gi, "");
 
   // Normalize anchors and strip unsafe protocols.
   html = html.replace(/<a\b([^>]*)>/gi, (_match, attrs) => {
@@ -78,6 +78,16 @@ function sanitizeWixInlineHtml(rawInner) {
     const href = hrefMatch && hrefMatch[2] ? hrefMatch[2].trim() : "";
     if (!href || /^javascript:/i.test(href)) return "";
     return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">`;
+  });
+
+  // Normalize images
+  html = html.replace(/<img\b([^>]*)>/gi, (_match, attrs) => {
+    const srcMatch = String(attrs || "").match(/src\s*=\s*(["'])(.*?)\1/i);
+    const altMatch = String(attrs || "").match(/alt\s*=\s*(["'])(.*?)\1/i);
+    const src = srcMatch && srcMatch[2] ? srcMatch[2].trim() : "";
+    const alt = altMatch && altMatch[2] ? altMatch[2].trim() : "";
+    if (!src) return "";
+    return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" style="max-width:100%; height:auto; margin:20px 0; border-radius:8px;">`;
   });
 
   html = html
@@ -205,8 +215,10 @@ async function enrichWixItemsWithPublicPageContent(items = []) {
 
       const currentLen = typeof item.content === "string" ? item.content.trim().length : 0;
       const enrichedLen = enrichedContent.trim().length;
-      const currentHasStructure = typeof item.content === "string" && /<\s*(h[1-6]|p|ul|ol|li|blockquote)\b/i.test(item.content);
-      const enrichedHasStructure = /<\s*(h[1-6]|p|ul|ol|li|blockquote)\b/i.test(enrichedContent);
+      // If we already have richContent nodes, we should be VERY careful about overwriting content
+      // with scraped HTML, unless the scraped HTML is significantly better.
+      const hasRichContent = !!(item.richContent && item.richContent.nodes && item.richContent.nodes.length > 0);
+      if (hasRichContent && enrichedLen < currentLen * 0.5) continue;
       if (enrichedLen < currentLen && !(enrichedHasStructure && !currentHasStructure)) continue;
 
       const enrichedText = stripHtmlTags(enrichedContent);
@@ -2776,8 +2788,12 @@ exports.wixBlogSync = onRequest({ cors: true, invoker: "public" }, (req, res) =>
 
     try {
       if (req.method === "POST" || req.query.force === "true") {
+        if (req.query.clean === "true") {
+          console.log("Cleanup requested: Clearing collection_blog cache...");
+          await db.collection("content").doc("collection_blog").delete();
+        }
         const result = await fetchAndCacheWixBlogPosts(req);
-        return res.status(200).json({ ...result, manuallySynced: true });
+        return res.status(200).json({ ...result, manuallySynced: true, cleaned: req.query.clean === "true" });
       }
 
       const doc = await db.collection("content").doc("collection_blog").get();
