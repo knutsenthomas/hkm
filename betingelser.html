@@ -204,7 +204,12 @@
     <!-- Content -->
     <section class="legal-page-body">
         <div class="container">
-            <div class="legal-text-container">
+            <div class="legal-text-container text-center">
+                <style>
+                    .legal-text-container.text-center ul {
+                        list-style-position: inside;
+                    }
+                </style>
                 <p>Vilkår og betingelser for His Kingdom Ministry nettbutikk. Disse vilkårene og betingelsene gjelder for alle kjøp av varer fra His Kingdom Ministry nettbutikk (heretter kalt "Nettbutikken"). Ved å gjennomføre et kjøp aksepterer du disse vilkårene og betingelsene i sin helhet.</p>
 
                 <h2>1. Selgerinformasjon</h2>
@@ -373,6 +378,14 @@
     <script type="module" src="js/cookie-consent.js"></script>
 
     <script type="module" src="js/i18n.js"></script>
+    <script>
+        // Sørger for at siden alltid starter fra toppen ved innlasting
+        window.scrollTo(0, 0);
+        window.addEventListener('DOMContentLoaded', () => {
+            window.scrollTo(0, 0);
+            setTimeout(() => window.scrollTo(0, 0), 100);
+        });
+    </script>
 </body>
 
 </html>
