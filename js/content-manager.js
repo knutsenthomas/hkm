@@ -804,6 +804,11 @@ class ContentManager {
         const sourceItem = blogItem || teachingItem;
         const item = sourceItem ? this.getLocalizedContentItem(sourceItem) : null;
         const isTeaching = !!teachingItem;
+        const isWixReferencePost = this.isWixReferenceBlogPost(itemId, item, sourceItem);
+
+        if (document.body) {
+            document.body.classList.toggle('wix-reference-post-page', isWixReferencePost);
+        }
 
         if (!item) {
             container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
@@ -829,23 +834,25 @@ class ContentManager {
             categoryEl.innerHTML = cat ? `<i class="fas fa-tag"></i> ${cat}` : '';
         }
 
-        const heroImage = item.imageUrl || item.image || item.dashboardImage || sourceItem?.imageUrl || sourceItem?.image || sourceItem?.dashboardImage || '';
+        const articleHtml = this.resolveArticleHtml(item, sourceItem);
+        const heroImage = this.getContentItemImage(item, sourceItem, articleHtml);
         if (heroEl && heroImage) {
             heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${heroImage}')`;
             heroEl.style.backgroundSize = 'cover';
             heroEl.style.backgroundPosition = 'center center';
             heroEl.style.backgroundRepeat = 'no-repeat';
         }
-
-        const articleHtml = this.resolveArticleHtml(item, sourceItem);
         const usesWixViewerHtml = this.isWixViewerHtml(articleHtml);
 
         // --- Calculate Reading Time ---
-        let readingTime = 5; // default fallback
-        if (articleHtml) {
+        let readingTime = Number(item?.minutesToRead ?? sourceItem?.minutesToRead ?? 0);
+        if (!(Number.isFinite(readingTime) && readingTime > 0) && articleHtml) {
             const textContent = this.stripHtml(articleHtml);
             const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
             readingTime = Math.max(1, Math.ceil(wordCount / 225)); // 225 words per minute
+        }
+        if (!(Number.isFinite(readingTime) && readingTime > 0)) {
+            readingTime = 5;
         }
 
         const readingTimeEl = document.getElementById('single-post-readingtime');
@@ -906,7 +913,12 @@ class ContentManager {
         }
 
         container.classList.toggle('wix-html-content', usesWixViewerHtml);
+        container.classList.toggle('wix-reference-post', isWixReferencePost);
         container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+
+        if (isWixReferencePost) {
+            container.insertAdjacentHTML('afterbegin', this.renderWixReferenceAuthorHeader(item, sourceItem));
+        }
 
         // --- Debug Info (only if ?debug=true) ---
         if (urlParams.get('debug') === 'true') {
@@ -1037,7 +1049,7 @@ class ContentManager {
                             <article class="blog-card cms-related-card">
                                 <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.__stableId || this.getContentItemStableId(post))}" class="cms-related-card-link">
                                     <div class="blog-image cms-related-image">
-                                        <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
+                                        <img src="${this.getContentItemImage(post) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
                                              alt="${post.title}" 
                                              class="cms-related-image-el">
                                         ${post.category ? `<span class="cms-related-category">${post.category}</span>` : ''}
@@ -2767,10 +2779,11 @@ class ContentManager {
         if (renderPosts.length > 0) {
             const html = renderPosts.map(post => {
                 const stableId = post.__stableId || this.getContentItemStableId(post);
+                const postImage = this.getContentItemImage(post) || 'https://via.placeholder.com/600x400?text=Ingen+bilde';
                 return `
                 <article class="blog-card">
                     <div class="blog-image">
-                        <img src="${post.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${post.title}">
+                        <img src="${postImage}" alt="${post.title}">
                         ${post.category ? `<span class="blog-category cms-blog-category-badge">${post.category}</span>` : ''}
                     </div>
                     <div class="blog-content cms-blog-content">
@@ -2798,10 +2811,12 @@ class ContentManager {
         if (!container) return;
 
         if (series.length > 0) {
-            const html = series.map(item => `
+            const html = series.map(item => {
+                const itemImage = this.getContentItemImage(item) || 'https://via.placeholder.com/600x400?text=Ingen+bilde';
+                return `
                 <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card cms-media-card-link">
                     <div class="media-thumbnail">
-                        <img src="${item.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${item.title}">
+                        <img src="${itemImage}" alt="${item.title}">
                         <div class="media-play-button">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
@@ -2816,7 +2831,8 @@ class ContentManager {
                         </div>
                     </div>
                 </a>
-            `).join('');
+            `;
+            }).join('');
 
             this.setHTMLIfChanged(container, html, `teaching:${selector}`);
         }
@@ -3293,7 +3309,7 @@ class ContentManager {
         const root = doc.body.firstElementChild;
         if (!root) return html;
 
-        const imageUrl = item && (item.imageUrl || item.image || item.dashboardImage);
+        const imageUrl = this.getContentItemImage(item);
         const hasInlineImage = !!root.querySelector('img, figure');
         if (imageUrl && !hasInlineImage) {
             const figure = doc.createElement('figure');
@@ -3478,6 +3494,130 @@ class ContentManager {
             if (typeof value === 'string' && value.trim()) return value.trim();
         }
         return '';
+    }
+
+    getImageFromHtml(html) {
+        if (typeof html !== 'string' || !html.trim()) return '';
+        const match = html.match(/<img\b[^>]*\bsrc=["']([^"']+)["']/i);
+        return match && match[1] ? match[1].trim() : '';
+    }
+
+    getFirstImageFromRichContent(richContent) {
+        if (!richContent || !Array.isArray(richContent.nodes)) return '';
+
+        const stack = [...richContent.nodes];
+        while (stack.length > 0) {
+            const node = stack.shift();
+            if (!node || typeof node !== 'object') continue;
+
+            const type = (node.type || '').toUpperCase();
+
+            if (type === 'IMAGE') {
+                const imageData = node.imageData || {};
+                const imageUrl = this.getRichMediaUrl(imageData.image || {});
+                if (imageUrl) return imageUrl;
+            }
+
+            if (type === 'GALLERY') {
+                const items = Array.isArray(node.galleryData?.items) ? node.galleryData.items : [];
+                for (const item of items) {
+                    const imageUrl = this.getRichMediaUrl(item?.image?.media || {});
+                    if (imageUrl) return imageUrl;
+                }
+            }
+
+            if (type === 'LINK_PREVIEW') {
+                const thumb = this.firstString(node.linkPreviewData?.thumbnailUrl);
+                if (thumb) return thumb;
+            }
+
+            if (Array.isArray(node.nodes) && node.nodes.length > 0) {
+                stack.push(...node.nodes);
+            }
+        }
+
+        return '';
+    }
+
+    getContentItemImage(item, fallbackItem = null, articleHtml = '') {
+        const candidates = [item, fallbackItem].filter(Boolean);
+
+        for (const current of candidates) {
+            if (!current || typeof current !== 'object') continue;
+
+            const heroImage = current.heroImage && typeof current.heroImage === 'object' ? current.heroImage : {};
+            const mainImage = current.mainImage && typeof current.mainImage === 'object' ? current.mainImage : {};
+
+            const imageUrl = this.firstString(
+                current.imageUrl,
+                current.image,
+                current.dashboardImage,
+                current.coverImage,
+                current.featuredImage,
+                current.heroImageUrl,
+                current.mainImageUrl,
+                current.thumbnail,
+                current.thumbnailUrl,
+                this.getRichMediaUrl(current.media),
+                this.getRichMediaUrl(current.mainMedia),
+                this.getRichMediaUrl(mainImage),
+                this.getRichMediaUrl(heroImage.image),
+                this.getRichMediaUrl(heroImage),
+                this.getRichMediaUrl(current.coverMedia),
+                current.coverMedia?.imageUrl,
+                current.coverMedia?.url
+            );
+
+            if (imageUrl) return imageUrl;
+
+            const richImage = this.getFirstImageFromRichContent(current.richContent);
+            if (richImage) return richImage;
+        }
+
+        const htmlImage = this.getImageFromHtml(articleHtml);
+        if (htmlImage) return htmlImage;
+
+        return '';
+    }
+
+    isWixReferenceBlogPost(itemId, item, sourceItem) {
+        const targetId = '69707d33267e9ce8b5a862b7';
+        if (String(itemId || '') === targetId) return true;
+
+        const url = this.firstString(item?.url, sourceItem?.url).toLowerCase();
+        const slug = this.firstString(item?.slug, sourceItem?.slug).toLowerCase();
+        const title = this.firstString(item?.title, sourceItem?.title).toLowerCase();
+
+        return url.includes('/post/hvordan-leve-et-liv-i-tjeneste-for-hans-rike')
+            || slug === 'hvordan-leve-et-liv-i-tjeneste-for-hans-rike'
+            || title === 'hvordan leve et liv i tjeneste for hans rike';
+    }
+
+    renderWixReferenceAuthorHeader(item, sourceItem) {
+        const authorName = this.firstString(item?.author, sourceItem?.author) || 'Hilde Karin Knutsen';
+        const authorProfileUrl = 'https://www.hiskingdomministry.no/members-area/hildekarin/profile';
+        const authorImageUrl = 'https://images-wixmp-7ef3383b5fd80a9f5a5cc686.wixmp.com/3a1544f7-8319-4a6c-9833-6a4723d7bdbe/1733008750689/v1/fill/w_320,h_320/file.jpg';
+
+        const dateValue = this.firstString(item?.date, sourceItem?.date);
+        const formattedDate = dateValue ? this.formatDate(dateValue) : '';
+        const minutesToRead = Number(item?.minutesToRead ?? sourceItem?.minutesToRead ?? 0);
+        const minuteLabel = this.getTranslation('reading_time') || 'min lesing';
+        const readMeta = Number.isFinite(minutesToRead) && minutesToRead > 0 ? `${minutesToRead} ${minuteLabel}` : '';
+
+        const metaParts = [formattedDate, readMeta].filter(Boolean);
+        const metaHtml = metaParts.length > 0
+            ? `<div class="wix-reference-author-meta">${metaParts.join(' · ')}</div>`
+            : '';
+
+        return `
+            <section class="wix-reference-author-box" aria-label="Forfatter">
+                <img class="wix-reference-author-avatar" src="${this.escapeHtml(authorImageUrl)}" alt="${this.escapeHtml(`Forfatterens bilde: ${authorName}`)}" loading="lazy">
+                <div class="wix-reference-author-content">
+                    <a class="wix-reference-author-name" href="${this.escapeHtml(authorProfileUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(authorName)}</a>
+                    ${metaHtml}
+                </div>
+            </section>
+        `;
     }
 
     getRichMediaUrl(media) {

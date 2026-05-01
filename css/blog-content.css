@@ -433,3 +433,151 @@
     line-height: 35px;
   }
 }
+
+/* Styling for the imported Wix reference post layout */
+#single-post-content.wix-reference-post {
+  max-width: 640px;
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  color: #151a21;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 24px;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex: 0 0 32px;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-content {
+  min-width: 0;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-name {
+  display: inline-block;
+  color: #151a21;
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 21px;
+  text-decoration: none;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-name:hover,
+#single-post-content.wix-reference-post .wix-reference-author-name:focus-visible {
+  text-decoration: underline;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-meta {
+  margin-top: 2px;
+  color: #6b7280;
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 21px;
+}
+
+#single-post-content.wix-reference-post p {
+  margin-bottom: 1.45em;
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 27px;
+  font-weight: 400;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-box + figure,
+#single-post-content.wix-reference-post .wix-reference-author-box + p {
+  margin-top: 0;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-box + figure {
+  margin-bottom: 20px;
+}
+
+#single-post-content.wix-reference-post .wix-reference-author-box + p {
+  margin-bottom: 20px;
+}
+
+#single-post-content.wix-reference-post h2 {
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-size: 28px;
+  line-height: 35px;
+  font-weight: 400;
+  margin-top: 1.45em;
+  margin-bottom: 0.55em;
+  color: #151a21;
+}
+
+#single-post-content.wix-reference-post h3,
+#single-post-content.wix-reference-post h4 {
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+}
+
+#single-post-content.wix-reference-post ul,
+#single-post-content.wix-reference-post ol,
+#single-post-content.wix-reference-post li {
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-size: 18px;
+  line-height: 27px;
+}
+
+body.wix-reference-post-page #single-post-title {
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-size: 40px;
+  line-height: 50px;
+  font-weight: 400;
+}
+
+body.wix-reference-post-page #blog-meta-row {
+  gap: 14px;
+}
+
+body.wix-reference-post-page #blog-meta-row span {
+  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
+  font-size: 16px;
+  line-height: 22px;
+}
+
+@media (max-width: 720px) {
+  #single-post-content.wix-reference-post .wix-reference-author-box {
+    margin-bottom: 18px;
+  }
+
+  #single-post-content.wix-reference-post .wix-reference-author-avatar {
+    width: 30px;
+    height: 30px;
+    flex-basis: 30px;
+  }
+
+  body.wix-reference-post-page #single-post-title {
+    font-size: 32px;
+    line-height: 40px;
+  }
+
+  body.wix-reference-post-page #blog-hero {
+    padding-top: 126px !important;
+  }
+
+  body.wix-reference-post-page #blog-meta-row {
+    margin-top: 12px !important;
+  }
+
+  #single-post-content.wix-reference-post .wix-reference-author-box + figure,
+  #single-post-content.wix-reference-post .wix-reference-author-box + p {
+    margin-top: 0;
+  }
+
+  #single-post-content.wix-reference-post .wix-reference-author-box + figure {
+    margin-bottom: 14px;
+  }
+
+  #single-post-content.wix-reference-post .wix-reference-author-box + p {
+    margin-bottom: 16px;
+  }
+}
