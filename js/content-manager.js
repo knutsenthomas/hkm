@@ -925,6 +925,47 @@ class ContentManager {
         container.classList.toggle('wix-reference-post', isWixReferencePost);
         container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
+        // Mobile cleanup: remove leading spacer/empty blocks that can create a large gap above first paragraph.
+        const normalizeTopSpacingForMobile = (root) => {
+            if (!root || !(window.matchMedia && window.matchMedia('(max-width: 768px)').matches)) return;
+
+            const isSpacerLike = (el) => {
+                if (!el || el.nodeType !== 1) return false;
+
+                const tag = (el.tagName || '').toLowerCase();
+                const cls = ((el.className || '') + '').toLowerCase();
+                const styleAttr = (el.getAttribute('style') || '').toLowerCase();
+                const text = (el.textContent || '').replace(/\u00a0/g, '').trim();
+                const hasMedia = !!el.querySelector('img,video,iframe,svg,canvas,audio,table,blockquote,pre');
+
+                let declaredHeight = 0;
+                const hMatch = styleAttr.match(/(?:min-)?height\s*:\s*(\d+)px/);
+                if (hMatch) declaredHeight = Number(hMatch[1]) || 0;
+
+                const classSuggestsSpacer = /spacer|separator|empty|placeholder/.test(cls);
+                const tagSuggestsSpacer = tag === 'br' || tag === 'hr';
+                const isEmptyBlock = !text && !hasMedia;
+
+                return tagSuggestsSpacer || classSuggestsSpacer || (isEmptyBlock && declaredHeight >= 40) || (isEmptyBlock && (tag === 'div' || tag === 'section' || tag === 'p'));
+            };
+
+            let removed = 0;
+            while (root.firstElementChild && isSpacerLike(root.firstElementChild) && removed < 8) {
+                root.firstElementChild.remove();
+                removed += 1;
+            }
+
+            const firstVisible = Array.from(root.children).find((child) => {
+                const computed = window.getComputedStyle(child);
+                return computed.display !== 'none' && computed.visibility !== 'hidden';
+            });
+
+            if (firstVisible) {
+                firstVisible.style.marginTop = '0';
+                firstVisible.style.paddingTop = '0';
+            }
+        };
+
         if (isWixReferencePost) {
             // Remove cover image injected at top by rebuildWixViewerStructure (wrong position for this post)
             container.querySelector('figure.wix-inline-image')?.remove();
@@ -948,6 +989,8 @@ class ContentManager {
 
             // Author info is now shown in the hero — skip injecting it here.
         }
+
+        normalizeTopSpacingForMobile(container);
 
         // --- Debug Info (only if ?debug=true) ---
         if (urlParams.get('debug') === 'true') {
