@@ -89,8 +89,12 @@
   margin-bottom: 0 !important;
 }
 
+.blog-post-section {
+  padding: 40px 20px 80px;
+}
+
 @media (max-width: 768px) {
   .blog-post-section {
-    padding-top: 20px !important;
+    padding: 20px 16px 60px;
   }
 }
