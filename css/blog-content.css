@@ -400,6 +400,12 @@
   font-weight: 700;
 }
 
+/* Ensure space between bold lead text and following text in list items */
+.blog-post-content.wix-html-content li strong:first-child,
+#single-post-content.wix-html-content li strong:first-child {
+  margin-right: 0.25em;
+}
+
 .blog-post-content.wix-html-content ul,
 .blog-post-content.wix-html-content ol,
 #single-post-content.wix-html-content ul,

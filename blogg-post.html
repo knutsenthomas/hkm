@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="css/cookie-consent.css">
     <link rel="stylesheet" href="css/subpage-hero.css?v=2026.05.01.5">
     <link rel="stylesheet" href="css/interactions.css">
-    <link rel="stylesheet" href="css/blog-content.css?v=2026.05.01.9">
+    <link rel="stylesheet" href="css/blog-content.css?v=2026.05.01.10">
     <!-- Tailwind config (guarded if Play CDN is absent) -->
     <script>
         if (window.tailwind) {
@@ -55,7 +55,7 @@
         @media (max-width: 768px) {
             #blog-hero {
                 padding-top: 100px !important;
-                padding-bottom: 28px !important;
+                padding-bottom: 70px !important;
             }
             #single-post-title {
                 font-size: clamp(1.4rem, 5.5vw, 2rem) !important;
@@ -473,7 +473,7 @@
     <!-- App Scripts -->
     <script type="module" src="js/i18n.js"></script>
     <script type="module" src="script.js?v=2026.04.26.12.00"></script>
-    <script type="module" src="js/content-manager.js?v=2026.05.01.10"></script>
+    <script type="module" src="js/content-manager.js?v=2026.05.01.11"></script>
     <script type="module" src="js/cookie-consent.js"></script>
     <script>
         // Force mobile spacing overrides via inline styles (beats all CSS cascade)
@@ -482,7 +482,7 @@
             var hero = document.getElementById('blog-hero');
             if (hero) {
                 hero.style.setProperty('padding-top', '100px', 'important');
-                hero.style.setProperty('padding-bottom', '28px', 'important');
+                hero.style.setProperty('padding-bottom', '70px', 'important');
             }
             var section = hero && hero.nextElementSibling;
             if (section) {

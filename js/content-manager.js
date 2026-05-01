@@ -3482,7 +3482,7 @@ class ContentManager {
                         this.isParagraphElement(current[j + 1]) &&
                         !this.isBoldLeadParagraph(current[j + 1])
                     ) {
-                        items.push(`${current[j].innerHTML}${current[j + 1].innerHTML}`);
+                        items.push(`${current[j].innerHTML} ${current[j + 1].innerHTML}`);
                         consumed += 2;
                         j += 2;
                     }
@@ -3503,7 +3503,7 @@ class ContentManager {
                         this.isParagraphElement(current[j + 1]) &&
                         !this.isBoldLeadParagraph(current[j + 1])
                     ) {
-                        items.push(`${current[j].innerHTML}${current[j + 1].innerHTML}`);
+                        items.push(`${current[j].innerHTML} ${current[j + 1].innerHTML}`);
                         consumed += 2;
                         j += 2;
                     }
