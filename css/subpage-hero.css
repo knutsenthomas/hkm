@@ -97,4 +97,34 @@
   .blog-post-section {
     padding: 12px 16px 60px;
   }
+
+  #blog-meta-row {
+    gap: 6px !important;
+    padding: 0 10px;
+    box-sizing: border-box;
+  }
+
+  #blog-meta-row .blog-meta-top,
+  #blog-meta-row .blog-meta-bottom {
+    width: 100%;
+    overflow: hidden;
+  }
+
+  #blog-meta-row .blog-meta-top {
+    gap: 8px !important;
+  }
+
+  #single-post-author {
+    display: none;
+  }
+
+  #single-post-date,
+  #single-post-readingtime,
+  #single-post-views {
+    font-size: 0.82rem !important;
+  }
+
+  #post-skeleton {
+    display: none !important;
+  }
 }
