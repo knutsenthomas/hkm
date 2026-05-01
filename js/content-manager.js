@@ -917,6 +917,26 @@ class ContentManager {
         container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
         if (isWixReferencePost) {
+            // Remove cover image injected at top by rebuildWixViewerStructure (wrong position for this post)
+            container.querySelector('figure.wix-inline-image')?.remove();
+
+            // Inject church image (same as cover) before "Praktiske steg" heading
+            const h2s = Array.from(container.querySelectorAll('h2'));
+            const praktiskeH2 = h2s.find(h => /praktiske steg/i.test(h.textContent));
+            if (praktiskeH2) {
+                praktiskeH2.insertAdjacentHTML('beforebegin',
+                    `<figure class="wix-inline-image"><img src="https://static.wixstatic.com/media/db4f96_c04f9a73499b4f189e58ae158d9a9a1a~mv2.png/v1/fit/w_1000,h_1000,al_c,q_80/file.png" alt="En liten kirke i en rolig landsby" loading="lazy"><figcaption>En liten kirke i en rolig landsby</figcaption></figure>`
+                );
+            }
+
+            // Inject Bible image before "his kingdom ministry kan støtte deg" heading
+            const hkmH2 = h2s.find(h => /kingdom ministry/i.test(h.textContent));
+            if (hkmH2) {
+                hkmH2.insertAdjacentHTML('beforebegin',
+                    `<figure class="wix-inline-image"><img src="https://static.wixstatic.com/media/db4f96_78871106685e410f840146ed8723c2ff~mv2.png/v1/fit/w_1000,h_1000,al_c,q_80/file.png" alt="En åpen Bibel med uthevet vers" loading="lazy"><figcaption>En åpen Bibel med uthevet vers</figcaption></figure>`
+                );
+            }
+
             container.insertAdjacentHTML('afterbegin', this.renderWixReferenceAuthorHeader(item, sourceItem));
         }
 
@@ -3450,6 +3470,9 @@ class ContentManager {
             let parsed = this.parseBlocks(candidate);
             if (this.isWixViewerHtml(parsed)) {
                 parsed = this.normalizeWixViewerHtml(parsed, item || sourceItem);
+            } else if (this.isMeaningfulHtml(parsed) && /<(p|div|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(parsed)) {
+                // Plain HTML (e.g. from content field) – run structure rebuild for list detection and cover image
+                parsed = this.rebuildWixViewerStructure(parsed, item || sourceItem);
             }
             if (this.isMeaningfulHtml(parsed)) {
                 // If it contains block-level elements, it's rich content!
