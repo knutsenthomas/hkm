@@ -1118,7 +1118,7 @@ class ContentManager {
             let finalEvents = [];
 
             // 2. Prefer direct GCal fetch when configured
-            const integrations = await window.firebaseService.getPageContent('settings_integrations');
+            const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             const gcal = integrations?.googleCalendar || {};
             const apiKey = gcal.apiKey || '';
             const calendarListRaw = Array.isArray(integrations?.googleCalendars)
@@ -1152,7 +1152,7 @@ class ContentManager {
             }
 
             // 3. Fetch Firestore events (always, to allow overrides or manual events)
-            const eventData = await window.firebaseService.getPageContent('collection_events');
+            const eventData = await this.getContentDoc('collection_events', { silent: true });
             const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
             const taggedFirebase = firebaseItems.map(event => ({
                 ...event,
