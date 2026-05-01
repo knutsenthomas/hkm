@@ -818,15 +818,24 @@ class ContentManager {
         if (titleEl) titleEl.textContent = item.title || 'Blogginnlegg';
         if (breadcrumbEl) breadcrumbEl.textContent = item.title || 'Blogginnlegg';
 
-        if (dateEl) {
-            const dateStr = item.date ? this.formatDate(item.date) : '';
-            dateEl.innerHTML = `<i class="far fa-calendar"></i> ${dateStr}`;
-        }
-
         const authorEl = document.getElementById('single-post-author');
         if (authorEl) {
-            const auth = item.author || 'Ukjent forfatter';
-            authorEl.innerHTML = `<i class="fas fa-user"></i> ${auth}`;
+            const auth = item.author || sourceItem?.author || 'Ukjent forfatter';
+            authorEl.textContent = auth;
+        }
+
+        // Populate author avatar in hero
+        const avatarEl = document.getElementById('single-post-author-avatar');
+        if (avatarEl) {
+            const avatarUrl = 'https://images-wixmp-7ef3383b5fd80a9f5a5cc686.wixmp.com/3a1544f7-8319-4a6c-9833-6a4723d7bdbe/1733008750689/v1/fill/w_320,h_320/file.jpg';
+            avatarEl.src = avatarUrl;
+            avatarEl.alt = `Forfatterens bilde: ${item.author || sourceItem?.author || ''}`;
+            avatarEl.style.display = 'inline-block';
+        }
+
+        if (dateEl) {
+            const dateStr = item.date ? this.formatDate(item.date) : '';
+            dateEl.textContent = dateStr;
         }
 
         if (categoryEl) {
@@ -858,7 +867,7 @@ class ContentManager {
         const readingTimeEl = document.getElementById('single-post-readingtime');
         if (readingTimeEl) {
             const timeLabel = this.getTranslation('reading_time') || 'min lesing';
-            readingTimeEl.innerHTML = `<i class="far fa-clock"></i> ${readingTime} ${timeLabel}`;
+            readingTimeEl.textContent = `${readingTime} ${timeLabel}`;
             readingTimeEl.style.display = 'inline-block';
         }
 
@@ -937,7 +946,7 @@ class ContentManager {
                 );
             }
 
-            container.insertAdjacentHTML('afterbegin', this.renderWixReferenceAuthorHeader(item, sourceItem));
+            // Author info is now shown in the hero — skip injecting it here.
         }
 
         // --- Debug Info (only if ?debug=true) ---
