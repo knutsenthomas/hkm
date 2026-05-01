@@ -2573,10 +2573,15 @@ class ContentManager {
                     'blogg': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
                     'bnn': "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
                     'om-oss': "https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'personvern': "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'betingelser': "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'tilgjengelighet': "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
                     'for-menigheter': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080",
                     'for-bedrifter': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080"
                 }[this.pageId] || "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
-                const bgUrl = value || defaultBg;
+                const rawBg = typeof value === 'string' ? value.trim() : '';
+                const isValidBgUrl = /^https?:\/\//i.test(rawBg) || rawBg.startsWith('/') || rawBg.startsWith('//');
+                const bgUrl = isValidBgUrl ? rawBg : defaultBg;
                 const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
                 if (heroEl) {
                     heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
