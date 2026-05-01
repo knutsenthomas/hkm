@@ -3205,10 +3205,23 @@ class ContentManager {
 
     resolveArticleHtml(item, sourceItem) {
         // Pass 0: Try to render from raw Wix richContent if available (authoritative)
-        const richContent = item?.richContent || sourceItem?.richContent;
+        let richContent = item?.richContent || sourceItem?.richContent;
+        
+        // Handle stringified JSON (sometimes happens with Firestore REST or certain imports)
+        if (typeof richContent === 'string' && richContent.trim().startsWith('{')) {
+            try {
+                richContent = JSON.parse(richContent);
+            } catch (e) {
+                console.warn('[ContentManager] Failed to parse richContent string:', e);
+            }
+        }
+
         if (richContent && typeof richContent === 'object' && Array.isArray(richContent.nodes)) {
             const rendered = this.renderWixRichContent(richContent);
-            if (rendered && rendered.length > 50) return rendered;
+            if (rendered && rendered.length > 50) {
+                console.log('[ContentManager] Successfully rendered content from Wix richContent nodes.');
+                return rendered;
+            }
         }
 
         const candidates = [
