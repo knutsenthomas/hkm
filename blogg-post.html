@@ -54,8 +54,16 @@
     <style>
         @media (max-width: 768px) {
             #blog-hero {
-                padding-top: 100px !important;
-                padding-bottom: 70px !important;
+                padding-top: 80px !important;
+                padding-bottom: 80px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
+                text-align: center !important;
+            }
+            #blog-hero .container {
+                width: 100% !important;
+                text-align: center !important;
             }
             #single-post-title {
                 font-size: clamp(1.4rem, 5.5vw, 2rem) !important;
@@ -481,8 +489,11 @@
             if (window.innerWidth > 768) return;
             var hero = document.getElementById('blog-hero');
             if (hero) {
-                hero.style.setProperty('padding-top', '100px', 'important');
-                hero.style.setProperty('padding-bottom', '70px', 'important');
+                hero.style.setProperty('padding-top', '80px', 'important');
+                hero.style.setProperty('padding-bottom', '80px', 'important');
+                hero.style.setProperty('display', 'flex', 'important');
+                hero.style.setProperty('align-items', 'center', 'important');
+                hero.style.setProperty('justify-content', 'center', 'important');
             }
             var section = hero && hero.nextElementSibling;
             if (section) {
