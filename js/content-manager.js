@@ -955,6 +955,19 @@ class ContentManager {
                 removed += 1;
             }
 
+            // For the Wix reference post on mobile, trim everything before first meaningful text block.
+            if (root.classList.contains('wix-reference-post')) {
+                const topChildren = Array.from(root.children);
+                const firstTextIndex = topChildren.findIndex((child) => {
+                    const text = (child.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
+                    return text.length >= 40 && /[a-zA-ZæøåÆØÅ0-9]/.test(text);
+                });
+
+                if (firstTextIndex > 0) {
+                    topChildren.slice(0, firstTextIndex).forEach((node) => node.remove());
+                }
+            }
+
             const firstVisible = Array.from(root.children).find((child) => {
                 const computed = window.getComputedStyle(child);
                 return computed.display !== 'none' && computed.visibility !== 'hidden';
