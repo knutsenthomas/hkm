@@ -1251,6 +1251,91 @@ body {
     line-height: 1.6;
 }
 
+/* Personal notes (brukerens egne notater) */
+.personal-note-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+}
+
+.personal-note-header {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.personal-note-title {
+    font-size: 1.02rem;
+    font-weight: 700;
+    color: var(--text-main);
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.personal-note-meta {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.personal-note-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.note-btn-edit,
+.note-btn-delete {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1px solid var(--border-solid);
+    background: var(--main-bg);
+    color: var(--text-muted);
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.note-btn-edit:hover,
+.note-btn-delete:hover {
+    transform: translateY(-1px);
+}
+
+.note-btn-edit:hover {
+    color: var(--accent-color);
+    border-color: rgba(249, 115, 22, 0.35);
+    background: var(--accent-light);
+}
+
+.note-btn-delete:hover {
+    color: #dc2626;
+    border-color: rgba(220, 38, 38, 0.25);
+    background: #fef2f2;
+}
+
+.note-btn-edit .material-symbols-outlined,
+.note-btn-delete .material-symbols-outlined {
+    font-size: 19px;
+    font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+}
+
+.personal-note-body {
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--text-main);
+}
+
 /* ══════════════════════════════════════════════════════════════════
    RICH TEXT EDITOR
    ══════════════════════════════════════════════════════════════════ */
