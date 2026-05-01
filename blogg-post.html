@@ -472,6 +472,28 @@
     <script type="module" src="script.js?v=2026.04.26.12.00"></script>
     <script type="module" src="js/content-manager.js?v=2026.05.01.10"></script>
     <script type="module" src="js/cookie-consent.js"></script>
+    <script>
+        // Force mobile spacing overrides via inline styles (beats all CSS cascade)
+        function applyMobileHeroFix() {
+            if (window.innerWidth > 768) return;
+            var hero = document.getElementById('blog-hero');
+            if (hero) {
+                hero.style.setProperty('min-height', '240px', 'important');
+                hero.style.setProperty('padding-top', '100px', 'important');
+                hero.style.setProperty('padding-bottom', '28px', 'important');
+            }
+            var section = hero && hero.nextElementSibling;
+            if (section) {
+                section.style.setProperty('padding-top', '16px', 'important');
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyMobileHeroFix);
+        } else {
+            applyMobileHeroFix();
+        }
+        window.addEventListener('resize', applyMobileHeroFix);
+    </script>
 </body>
 
 </html>
