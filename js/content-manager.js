@@ -3204,6 +3204,13 @@ class ContentManager {
     }
 
     resolveArticleHtml(item, sourceItem) {
+        // Pass 0: Try to render from raw Wix richContent if available (authoritative)
+        const richContent = item?.richContent || sourceItem?.richContent;
+        if (richContent && typeof richContent === 'object' && Array.isArray(richContent.nodes)) {
+            const rendered = this.renderWixRichContent(richContent);
+            if (rendered && rendered.length > 50) return rendered;
+        }
+
         const candidates = [
             item?.contentHtml,
             sourceItem?.contentHtml,
@@ -3250,6 +3257,102 @@ class ContentManager {
         }
 
         return '';
+    }
+
+    /**
+     * Client-side renderer for Wix RichContent (nodes structure)
+     * @param {object} richContent 
+     * @returns {string}
+     */
+    renderWixRichContent(richContent) {
+        if (!richContent || !Array.isArray(richContent.nodes)) return '';
+        return this._renderRichNodes(richContent.nodes);
+    }
+
+    _renderRichNodes(nodes, options = {}) {
+        if (!Array.isArray(nodes)) return '';
+        const { inListItem = false } = options;
+
+        return nodes.map(node => {
+            if (!node || typeof node !== 'object') return '';
+            const type = (node.type || '').toUpperCase();
+            const children = Array.isArray(node.nodes) ? node.nodes : [];
+
+            switch (type) {
+                case 'TEXT': {
+                    const textData = node.textData || {};
+                    let text = textData.text || '';
+                    text = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                    text = text.replace(/\n/g, '<br>');
+                    
+                    // Apply basic decorations
+                    if (Array.isArray(textData.decorations)) {
+                        textData.decorations.forEach(dec => {
+                            if (dec.type === 'BOLD') text = `<strong>${text}</strong>`;
+                            if (dec.type === 'ITALIC') text = `<em>${text}</em>`;
+                            if (dec.type === 'UNDERLINE') text = `<u>${text}</u>`;
+                        });
+                    }
+                    return text;
+                }
+                case 'PARAGRAPH': {
+                    const inner = this._renderRichNodes(children, { inListItem: true });
+                    if (!inner.trim()) return '';
+                    return inListItem ? inner : `<p>${inner}</p>`;
+                }
+                case 'HEADING': {
+                    const level = node.headingData?.level || node.headingData?.renderedLevel || 2;
+                    const inner = this._renderRichNodes(children, { inListItem: true });
+                    return `<h${level}>${inner}</h${level}>`;
+                }
+                case 'BULLETED_LIST':
+                case 'ORDERED_LIST':
+                case 'NUMBERED_LIST': {
+                    const tag = type === 'BULLETED_LIST' ? 'ul' : 'ol';
+                    const items = children.map(itemNode => {
+                        const itemHtml = this._renderRichNodes([itemNode], { inListItem: true });
+                        // Strip outer P if it exists
+                        const cleaned = itemHtml.replace(/^<p>|<\/p>$/gi, '');
+                        return `<li>${cleaned}</li>`;
+                    }).join('');
+                    return `<${tag}>${items}</${tag}>`;
+                }
+                case 'LIST_ITEM':
+                    return this._renderRichNodes(children, { inListItem: true });
+                case 'IMAGE': {
+                    const img = node.imageData?.image || {};
+                    const src = img.url || img.src || '';
+                    if (!src) return '';
+                    const alt = node.imageData?.altText || '';
+                    const cap = node.imageData?.caption || '';
+                    return `
+                        <figure>
+                            <img src="${src}" alt="${alt}" loading="lazy">
+                            ${cap ? `<figcaption>${cap}</figcaption>` : ''}
+                        </figure>
+                    `;
+                }
+                case 'VIDEO': {
+                    const video = node.videoData?.video || {};
+                    const src = video.url || video.src || '';
+                    if (!src) return '';
+                    if (src.includes('youtube.com') || src.includes('youtu.be')) {
+                        const ytMatch = src.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                        const ytId = ytMatch ? ytMatch[1] : null;
+                        if (ytId) {
+                            return `<div class="cms-yt-embed-wrapper"><div class="cms-yt-embed"><iframe src="https://www.youtube.com/embed/${ytId}" frameborder="0" allowfullscreen></iframe></div></div>`;
+                        }
+                    }
+                    return `<p><a href="${src}" target="_blank">Se video</a></p>`;
+                }
+                case 'DIVIDER':
+                    return '<hr>';
+                case 'BLOCKQUOTE':
+                    return `<blockquote>${this._renderRichNodes(children, { inListItem: true })}</blockquote>`;
+                default:
+                    return this._renderRichNodes(children, { inListItem });
+            }
+        }).join('');
     }
 
     /**
