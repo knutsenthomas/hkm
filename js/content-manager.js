@@ -3205,14 +3205,14 @@ class ContentManager {
 
     resolveArticleHtml(item, sourceItem) {
         const candidates = [
-            item?.content,
-            sourceItem?.content,
             item?.contentHtml,
             sourceItem?.contentHtml,
             item?.wixContentHtml,
             sourceItem?.wixContentHtml,
             item?.html,
             sourceItem?.html,
+            item?.content,
+            sourceItem?.content,
             item?.body,
             sourceItem?.body,
             item?.contentText,
@@ -3221,16 +3221,29 @@ class ContentManager {
             sourceItem?.excerpt
         ];
 
+        // Pass 1: Look for ACTUAL rich HTML or Editor.js blocks that yielded HTML
         for (const candidate of candidates) {
             let parsed = this.parseBlocks(candidate);
             if (this.isMeaningfulHtml(parsed)) {
-                // Check if it's plain text (lacks block-level HTML tags) but has newlines
-                if (!/<(p|div|h[1-6]|ul|ol|li|blockquote|br|figure|img|iframe|video)\b/i.test(parsed) && parsed.includes('\n')) {
+                // If it contains block-level elements, it's rich content!
+                if (/<(p|div|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(parsed)) {
+                    return parsed;
+                }
+            }
+        }
+
+        // Pass 2: Fallback to plain text, and format it nicely
+        for (const candidate of candidates) {
+            let parsed = this.parseBlocks(candidate);
+            if (this.isMeaningfulHtml(parsed)) {
+                if (parsed.includes('\n')) {
                     parsed = parsed
                         .split(/\n\s*\n/)
                         .filter(p => p.trim())
                         .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
                         .join('');
+                } else {
+                    parsed = `<p>${parsed}</p>`;
                 }
                 return parsed;
             }
