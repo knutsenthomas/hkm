@@ -1220,16 +1220,22 @@ class MinSideManager {
                 firebase.firestore()
                     .collection('personal_notes')
                     .where('userId', '==', uid)
-                    .orderBy('createdAt', 'desc')
                     .get(),
                 firebase.firestore()
                     .collection('user_notes')
                     .where('userId', '==', uid)
-                    .orderBy('createdAt', 'desc')
                     .get(),
             ]);
             personalSnap.forEach(d => personalNotes.push(this._normalizeNoteDoc(d, 'personal')));
             hkmSnap.forEach(d => hkmNotes.push(this._normalizeNoteDoc(d, 'shared')));
+            // Sort client-side (avoids composite index requirement)
+            const sortByDate = (a, b) => {
+                const ta = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(0);
+                const tb = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(0);
+                return tb - ta;
+            };
+            personalNotes.sort(sortByDate);
+            hkmNotes.sort(sortByDate);
         } catch (e) {
             console.warn('renderNotes fetch:', e);
             this._notify('Kunne ikke laste notater akkurat nå.', 'warning');
