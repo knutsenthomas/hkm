@@ -277,6 +277,19 @@
     line-height: 1.68;
   }
 
+  #single-post-content > :first-child,
+  #single-post-content > :first-child > :first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    min-height: 0 !important;
+  }
+
+  #single-post-content > p:empty,
+  #single-post-content > div:empty,
+  #single-post-content > section:empty {
+    display: none !important;
+  }
+
   .blog-post-content h1,
   #single-post-content h1 {
     font-size: 1.9rem;

@@ -963,6 +963,33 @@ class ContentManager {
             if (firstVisible) {
                 firstVisible.style.marginTop = '0';
                 firstVisible.style.paddingTop = '0';
+
+                // Some Wix payloads wrap content in a first container with nested top spacing.
+                const firstBranch = firstVisible.firstElementChild;
+                if (firstBranch) {
+                    firstBranch.style.marginTop = '0';
+                    firstBranch.style.paddingTop = '0';
+                    firstBranch.style.minHeight = '0';
+                }
+
+                const candidates = [firstVisible, firstBranch].filter(Boolean);
+                candidates.forEach((node) => {
+                    const styleAttr = (node.getAttribute('style') || '').trim();
+                    if (!styleAttr) return;
+
+                    const normalized = styleAttr
+                        .replace(/(?:^|;)\s*margin-top\s*:[^;]*/gi, '')
+                        .replace(/(?:^|;)\s*padding-top\s*:[^;]*/gi, '')
+                        .replace(/(?:^|;)\s*min-height\s*:[^;]*/gi, '')
+                        .replace(/^\s*;|;\s*$/g, '')
+                        .trim();
+
+                    if (normalized) {
+                        node.setAttribute('style', normalized);
+                    } else {
+                        node.removeAttribute('style');
+                    }
+                });
             }
         };
 
