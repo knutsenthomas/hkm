@@ -3496,6 +3496,41 @@ class ContentManager {
         return '';
     }
 
+    normalizePublicImageUrl(value) {
+        if (typeof value !== 'string') return '';
+        const url = value.trim();
+        if (!url) return '';
+
+        if (url.startsWith('wix:image://v1/')) {
+            const imageId = url.replace('wix:image://v1/', '').split('/')[0];
+            return imageId ? `https://static.wixstatic.com/media/${imageId}` : '';
+        }
+
+        const wixImageMatch = url.match(/wix:image:\/\/v1\/([^\/#\?]+)/i);
+        if (wixImageMatch && wixImageMatch[1]) {
+            return `https://static.wixstatic.com/media/${wixImageMatch[1]}`;
+        }
+
+        return url;
+    }
+
+    isRenderableImageUrl(value) {
+        if (typeof value !== 'string') return false;
+        const url = value.trim();
+        if (!url) return false;
+
+        const invalid = ['[object Object]', 'undefined', 'null', 'about:blank'];
+        if (invalid.includes(url)) return false;
+
+        if (/^data:image\//i.test(url)) return true;
+        if (/^https?:\/\//i.test(url)) return true;
+        if (/^\/\//.test(url)) return true;
+        if (/^\//.test(url)) return true;
+        if (/^(?:\.\.?\/)?img\//i.test(url)) return true;
+
+        return false;
+    }
+
     getImageFromHtml(html) {
         if (typeof html !== 'string' || !html.trim()) return '';
         const match = html.match(/<img\b[^>]*\bsrc=["']([^"']+)["']/i);
@@ -3548,7 +3583,7 @@ class ContentManager {
             const heroImage = current.heroImage && typeof current.heroImage === 'object' ? current.heroImage : {};
             const mainImage = current.mainImage && typeof current.mainImage === 'object' ? current.mainImage : {};
 
-            const imageUrl = this.firstString(
+            const imageCandidates = [
                 current.imageUrl,
                 current.image,
                 current.dashboardImage,
@@ -3566,16 +3601,19 @@ class ContentManager {
                 this.getRichMediaUrl(current.coverMedia),
                 current.coverMedia?.imageUrl,
                 current.coverMedia?.url
-            );
+            ];
 
-            if (imageUrl) return imageUrl;
+            for (const candidate of imageCandidates) {
+                const normalized = this.normalizePublicImageUrl(candidate);
+                if (this.isRenderableImageUrl(normalized)) return normalized;
+            }
 
-            const richImage = this.getFirstImageFromRichContent(current.richContent);
-            if (richImage) return richImage;
+            const richImage = this.normalizePublicImageUrl(this.getFirstImageFromRichContent(current.richContent));
+            if (this.isRenderableImageUrl(richImage)) return richImage;
         }
 
-        const htmlImage = this.getImageFromHtml(articleHtml);
-        if (htmlImage) return htmlImage;
+        const htmlImage = this.normalizePublicImageUrl(this.getImageFromHtml(articleHtml));
+        if (this.isRenderableImageUrl(htmlImage)) return htmlImage;
 
         return '';
     }
