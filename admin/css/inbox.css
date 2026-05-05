@@ -1,0 +1,440 @@
+/* Wix-style Unified Inbox CSS */
+:root {
+    --inbox-sidebar-width: 240px;
+    --inbox-list-width: 380px;
+    --inbox-accent: #1B4965; /* HKM Dark Blue */
+    --inbox-orange: #f97316;
+    --inbox-border: #e2e8f0;
+    --inbox-bg-light: #f8fafc;
+    --inbox-selected: #f0f9ff;
+    --inbox-unread-bg: #fff7ed;
+}
+
+.unified-inbox-container {
+    display: flex;
+    height: calc(100vh - 120px);
+    background: #fff;
+    border: 1px solid var(--inbox-border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+}
+
+/* 1. Folders Sidebar */
+.inbox-folders {
+    width: var(--inbox-sidebar-width);
+    border-right: 1px solid var(--inbox-border);
+    background: var(--inbox-bg-light);
+    display: flex;
+    flex-direction: column;
+    padding: 16px 0;
+}
+
+.folder-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 20px;
+    color: #475569;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.folder-item:hover {
+    background: #f1f5f9;
+    color: var(--inbox-accent);
+}
+
+.folder-item.active {
+    background: #fff;
+    color: var(--inbox-accent);
+}
+
+.folder-item.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 4px;
+    bottom: 4px;
+    width: 4px;
+    background: var(--inbox-orange);
+    border-radius: 0 4px 4px 0;
+}
+
+.folder-item .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.folder-badge {
+    margin-left: auto;
+    background: #ef4444;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+/* 2. Thread List */
+.inbox-threads {
+    width: var(--inbox-list-width);
+    border-right: 1px solid var(--inbox-border);
+    display: flex;
+    flex-direction: column;
+}
+
+.threads-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--inbox-border);
+    background: #fff;
+}
+
+.threads-search {
+    position: relative;
+}
+
+.threads-search input {
+    width: 100%;
+    padding: 8px 12px 8px 36px;
+    border: 1px solid var(--inbox-border);
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+}
+
+.threads-search .material-symbols-outlined {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    color: #94a3b8;
+}
+
+.threads-scroll {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.thread-item {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--inbox-border);
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    gap: 12px;
+}
+
+.thread-item:hover {
+    background: var(--inbox-bg-light);
+}
+
+.thread-item.active {
+    background: var(--inbox-selected);
+}
+
+.thread-item.unread {
+    background: var(--inbox-unread-bg);
+}
+
+.thread-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.thread-channel-icon {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--inbox-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.thread-channel-icon .material-symbols-outlined {
+    font-size: 12px;
+}
+
+.thread-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.thread-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.thread-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1e293b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.thread-time {
+    font-size: 11px;
+    color: #94a3b8;
+}
+
+.thread-preview {
+    font-size: 13px;
+    color: #64748b;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.thread-subject {
+    font-weight: 600;
+    font-size: 12px;
+    color: #475569;
+    margin-bottom: 2px;
+}
+
+/* 3. Thread View */
+.inbox-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #fff;
+    position: relative;
+}
+
+.view-header {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--inbox-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.view-contact-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.view-name {
+    font-weight: 800;
+    font-size: 16px;
+    color: #0f172a;
+}
+
+.view-status {
+    font-size: 12px;
+    color: #16a34a;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.view-status::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #16a34a;
+    border-radius: 50%;
+}
+
+.view-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #fdfdfd;
+}
+
+.msg-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.msg-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    font-size: 14px;
+    line-height: 1.5;
+    position: relative;
+}
+
+.msg-bubble.visitor {
+    background: #f1f5f9;
+    color: #1e293b;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+}
+
+.msg-bubble.agent {
+    background: var(--inbox-accent);
+    color: #fff;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+}
+
+.msg-time {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+}
+
+.agent .msg-time {
+    color: rgba(255,255,255,0.7);
+    text-align: right;
+}
+
+/* Email-specific view */
+.email-view-container {
+    padding: 32px;
+}
+
+.email-header {
+    margin-bottom: 24px;
+}
+
+.email-subject {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+    margin-bottom: 16px;
+}
+
+.email-meta-row {
+    display: flex;
+    gap: 8px;
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.email-meta-label {
+    font-weight: 600;
+    width: 60px;
+}
+
+.email-body {
+    font-size: 15px;
+    line-height: 1.6;
+    color: #334155;
+    padding: 24px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid var(--inbox-border);
+    white-space: pre-wrap;
+}
+
+/* Reply Area */
+.view-reply {
+    padding: 20px 24px;
+    border-top: 1px solid var(--inbox-border);
+    background: #fff;
+}
+
+.reply-box {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--inbox-border);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+}
+
+.reply-box:focus-within {
+    border-color: var(--inbox-orange);
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
+}
+
+.reply-box textarea {
+    width: 100%;
+    padding: 12px 16px;
+    border: none;
+    resize: none;
+    font-size: 14px;
+    min-height: 80px;
+    outline: none;
+}
+
+.reply-toolbar {
+    padding: 8px 12px;
+    background: var(--inbox-bg-light);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reply-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Empty State */
+.inbox-empty-view {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    text-align: center;
+    padding: 40px;
+}
+
+.inbox-empty-view .material-symbols-outlined {
+    font-size: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+}
+
+/* Mobile responsive */
+@media (max-width: 1024px) {
+    .inbox-folders {
+        width: 64px;
+    }
+    .folder-item span:not(.material-symbols-outlined) {
+        display: none;
+    }
+    .folder-badge {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        margin: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .inbox-threads {
+        width: 100%;
+    }
+    .inbox-view, .inbox-folders {
+        display: none;
+    }
+    .unified-inbox-container.view-open .inbox-threads {
+        display: none;
+    }
+    .unified-inbox-container.view-open .inbox-view {
+        display: flex;
+    }
+}

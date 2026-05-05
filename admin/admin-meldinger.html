@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20260426h">
     <link rel="stylesheet" href="css/crm.css?v=20260426h">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260426h">
+    <link rel="stylesheet" href="css/inbox.css?v=20260505">
 
     <style>
         .sub-tab-badge {
@@ -148,72 +149,6 @@
             font-size: 13px;
         }
 
-        .visitor-chat-bubble {
-            max-width: 88%;
-            padding: 10px 12px;
-            border-radius: 16px;
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            color: #0f172a;
-            font-size: 13px;
-            line-height: 1.35;
-            margin: 10px 0;
-            box-shadow: 0 6px 18px rgba(2, 6, 23, 0.06);
-            white-space: pre-wrap;
-            word-break: break-word;
-        }
-
-        .visitor-chat-bubble.is-agent {
-            margin-left: auto;
-            border-color: #fed7aa;
-            background: #fff7ed;
-        }
-
-        .visitor-chat-bubble-meta {
-            margin-top: 6px;
-            font-size: 11px;
-            color: rgba(15, 23, 42, 0.55);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .visitor-chat-thread-footer {
-            padding: 12px;
-            border-top: 1px solid #e2e8f0;
-            background: #ffffff;
-        }
-
-        .visitor-chat-reply-row {
-            display: flex;
-            gap: 10px;
-            align-items: flex-end;
-        }
-
-        .visitor-chat-reply-row textarea {
-            flex: 1;
-            min-height: 42px;
-            max-height: 140px;
-            resize: vertical;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
-            padding: 10px 12px;
-            font: inherit;
-            font-size: 13px;
-            line-height: 1.3;
-            outline: none;
-        }
-
-        .visitor-chat-reply-row textarea:focus {
-            border-color: #fb923c;
-            box-shadow: 0 0 0 4px rgba(251, 146, 60, 0.20);
-        }
-
-        .visitor-chat-row.is-selected {
-            outline: 2px solid rgba(251, 146, 60, 0.35);
-            outline-offset: -2px;
-            background: rgba(251, 146, 60, 0.06);
-        }
     </style>
 
     <!-- Firebase SDK (Compat) -->
@@ -458,101 +393,51 @@
                 </div>
             </div>
 
-            <div class="crm-content">
-                <div class="card modern">
-                    <div class="table-header">
-                        <h3 class="card-title">Nettsidechat (Google Chat)</h3>
-                        <div class="header-right-actions">
-                            <span class="chat-pill">Aktive chatter: <span id="active-chat-count">0</span></span>
+            <div class="crm-content" style="padding: 0;">
+                <div class="unified-inbox-container" id="unified-inbox">
+                    <!-- 1. Folders Sidebar -->
+                    <aside class="inbox-folders">
+                        <div class="folder-item active" data-filter="all">
+                            <span class="material-symbols-outlined">inbox</span>
+                            <span>Alle meldinger</span>
+                            <span class="folder-badge" id="badge-all" style="display: none;">0</span>
                         </div>
-                    </div>
-                    <p style="margin: 0 0 12px; color: var(--text-muted); font-size: 13px;">
-                        Klikk på en chat for å lese og svare her i admin. (Valgfritt: du kan fortsatt kopiere Google Chat-kommandoen.)
-                    </p>
-
-                    <div class="visitor-chat-grid">
-                        <div>
-                            <table class="crm-table">
-                                <thead>
-                                    <tr>
-                                        <th>Besøkende</th>
-                                        <th>Siste melding</th>
-                                        <th>Chat-ID</th>
-                                        <th>Sist aktiv</th>
-                                        <th class="col-actions"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="visitor-chats-body">
-                                    <tr>
-                                        <td colspan="5" style="text-align:center; padding: 26px; color: var(--text-muted);">Laster nettsidechatter...</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                        <div class="folder-item" data-filter="unread">
+                            <span class="material-symbols-outlined">mark_as_unread</span>
+                            <span>Uleste</span>
+                            <span class="folder-badge" id="badge-unread" style="display: none;">0</span>
                         </div>
+                        <div class="folder-item" data-filter="chat">
+                            <span class="material-symbols-outlined">chat</span>
+                            <span>Nettsidechat</span>
+                        </div>
+                        <div class="folder-item" data-filter="email">
+                            <span class="material-symbols-outlined">mail</span>
+                            <span>E-post</span>
+                        </div>
+                    </aside>
 
-                        <section class="visitor-chat-thread" aria-label="Valgt nettsidechat">
-                            <div class="visitor-chat-thread-header">
-                                <div class="visitor-chat-thread-title">
-                                    <strong id="visitor-chat-title">Velg en chat</strong>
-                                    <span id="visitor-chat-subtitle">Klikk en rad i listen for å åpne samtalen.</span>
-                                </div>
-                                <div class="visitor-chat-thread-actions">
-                                    <button id="visitor-chat-copy-id" class="btn btn-outline btn-sm" disabled title="Kopier chat-id">
-                                        <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>
-                                    </button>
-                                </div>
-                            </div>
-
-                            <div id="visitor-chat-body" class="visitor-chat-thread-body">
-                                <div id="visitor-chat-empty" class="visitor-chat-empty">
-                                    Ingen chat valgt enda.
-                                </div>
-                            </div>
-
-                            <div class="visitor-chat-thread-footer">
-                                <div class="visitor-chat-reply-row">
-                                    <textarea id="visitor-chat-reply" placeholder="Skriv et svar til besøkende..." disabled></textarea>
-                                    <button id="visitor-chat-send" class="btn btn-primary" disabled>
-                                        Send
-                                    </button>
-                                </div>
-                                <div id="visitor-chat-status" style="margin-top: 8px; font-size: 12px; color: var(--text-muted);"></div>
-                            </div>
-                        </section>
-                    </div>
-                </div>
-
-                <div class="card modern">
-                    <div class="table-header">
-                        <h3 class="card-title">Innboks</h3>
-                        <div class="header-right-actions">
-                            <div class="search-box">
+                    <!-- 2. Thread List -->
+                    <section class="inbox-threads">
+                        <div class="threads-header">
+                            <div class="threads-search">
                                 <span class="material-symbols-outlined">search</span>
-                                <input type="text" id="message-search" placeholder="Søk...">
+                                <input type="text" id="inbox-search" placeholder="Søk i innboks...">
                             </div>
-                            <button class="btn btn-text">Filtrer</button>
                         </div>
-                    </div>
+                        <div class="threads-scroll" id="inbox-threads-list">
+                            <!-- Loader -->
+                            <div class="loader"></div>
+                        </div>
+                    </section>
 
-                    <table class="crm-table">
-                        <thead>
-                            <tr>
-                                <th>Avsender</th>
-                                <th>Emne & Melding</th>
-                                <th>Status</th>
-                                <th>Dato</th>
-                                <th class="col-actions"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="messages-list-body">
-                            <tr>
-                                <td colspan="5" style="text-align:center; padding: 40px;">
-                                    <div class="loader"></div>
-                                    <p style="margin-top: 10px; color: var(--text-muted);">Henter meldinger...</p>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <!-- 3. Thread View -->
+                    <section class="inbox-view" id="inbox-thread-view">
+                        <div class="inbox-empty-view">
+                            <span class="material-symbols-outlined">forum</span>
+                            <p>Velg en samtale for å lese meldinger</p>
+                        </div>
+                    </section>
                 </div>
             </div>
         </main>
