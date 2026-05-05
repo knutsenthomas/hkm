@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="styles.css?v=2026.04.22.09.36">
+    <link rel="stylesheet" href="styles.css?v=2026.05.05.15">
     <link rel="stylesheet" href="css/subpage-hero.css">
     <link rel="stylesheet" href="css/cookie-consent.css">
     
@@ -765,19 +765,31 @@
             <form id="enroll-form">
                 <div class="form-field">
                     <label>Ditt fulle navn *</label>
-                    <input id="enroll-name" type="text" placeholder="Thomas Knutsen" required>
+                    <input id="enroll-name" type="text" placeholder="Navn Navnesen" required>
                 </div>
                 <div class="form-field">
                     <label>E-postadresse *</label>
                     <input id="enroll-email" type="email" placeholder="din@epost.no" required>
                 </div>
                 <div class="form-field">
-                    <label>Melding (valgfritt)</label>
-                    <textarea id="enroll-message" rows="3" placeholder="Noe du vil fortelle oss?"></textarea>
+                    <label>Mobilnummer (for Vipps) *</label>
+                    <input id="enroll-phone" type="tel" placeholder="987 65 432" required>
                 </div>
-                <button type="submit" class="enroll-btn" id="enroll-submit-btn" style="margin-top:8px;">
-                    <i class="fas fa-paper-plane" style="margin-right:8px;"></i> Send forespørsel
-                </button>
+                <div class="form-field">
+                    <label>Melding (valgfritt)</label>
+                    <textarea id="enroll-message" rows="2" placeholder="Noe du vil fortelle oss?"></textarea>
+                </div>
+                
+                <div id="payment-options-container" style="display:flex; flex-direction:column; gap:12px; margin-top:20px;">
+                    <button type="submit" class="enroll-btn" id="enroll-submit-btn">
+                        <i class="fas fa-paper-plane" style="margin-right:8px;"></i> Send forespørsel
+                    </button>
+                    
+                    <button type="button" class="enroll-btn" id="vipps-payment-btn" style="background: #ff5b24; display: none;">
+                        <img src="img/vipps-logo-white.png" alt="Vipps" style="height: 20px; vertical-align: middle; margin-right: 8px; filter: brightness(0) invert(1);"> 
+                        Betal med Vipps
+                    </button>
+                </div>
                 <p id="enroll-status" style="margin-top:12px;font-size:0.875rem;text-align:center;"></p>
             </form>
         </div>
@@ -898,7 +910,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script type="module" src="script.js?v=2026.04.26.12.00"></script>
+    <script type="module" src="script.js?v=2026.05.05.15"></script>
     <script src="https://cdn.jsdelivr.net/npm/editorjs-html@3.4.2/build/edjsHTML.min.js"></script>
 
     <script>
@@ -1045,7 +1057,16 @@
                     document.getElementById('enroll-status').textContent = '';
                     document.getElementById('enroll-form').reset();
                     const submitBtn = document.getElementById('enroll-submit-btn');
-                    submitBtn.textContent = isFree ? '🎓 Start kurset nå' : '💳 Send innmeldingsskjema';
+                    const vippsBtn = document.getElementById('vipps-payment-btn');
+                    
+                    submitBtn.textContent = isFree ? '🎓 Start kurset nå' : '📩 Send forespørsel';
+                    
+                    if (!isFree) {
+                        vippsBtn.style.display = 'block';
+                    } else {
+                        vippsBtn.style.display = 'none';
+                    }
+                    
                     document.getElementById('enroll-modal-overlay').classList.add('open');
                 };
 
@@ -1075,8 +1096,9 @@
                             const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
                             check();
                         });
+                        const phone = document.getElementById('enroll-phone').value.trim();
                         await firebase.firestore().collection('courseEnrollments').add({
-                            name, email, message,
+                            name, email, phone, message,
                             courseId: currentCourse?.id || '',
                             courseTitle: currentCourse?.title || '',
                             coursePrice: currentCourse?.price || 0,
@@ -1099,6 +1121,57 @@
                         btn.textContent = 'Send forespørsel';
                     }
                 });
+                
+                // ── Vipps Payment Handler ──────────────────────────────────────
+                const vBtn = document.getElementById('vipps-payment-btn');
+                if (vBtn) {
+                    vBtn.addEventListener('click', async () => {
+                        const name = document.getElementById('enroll-name').value.trim();
+                        const email = document.getElementById('enroll-email').value.trim();
+                        const phone = document.getElementById('enroll-phone').value.trim();
+                        
+                        if (!name || !email || !phone) {
+                            alert('Vennligst fyll ut navn, e-post og telefonnummer først.');
+                            return;
+                        }
+                        
+                        vBtn.disabled = true;
+                        const originalContent = vBtn.innerHTML;
+                        vBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vennligst vent...';
+                        
+                        try {
+                            const customerDetails = {
+                                name, email, phone,
+                                courseId: currentCourse?.id || '',
+                                courseTitle: currentCourse?.title || '',
+                                type: 'Course'
+                            };
+                            
+                            // Record intention to Firestore before redirecting
+                            await firebase.firestore().collection('courseEnrollments').add({
+                                ...customerDetails,
+                                amount: currentCourse?.price || 0,
+                                enrolledAt: firebase.firestore.FieldValue.serverTimestamp(),
+                                status: 'pending_vipps',
+                                paymentMethod: 'Vipps'
+                            });
+                            
+                            // Start Vipps redirect
+                            if (typeof window.startVippsPayment === 'function') {
+                                await window.startVippsPayment(currentCourse.price, customerDetails);
+                            } else {
+                                alert('Vipps-modulen er ikke klar ennå. Vennligst prøv igjen om et sekund.');
+                                vBtn.disabled = false;
+                                vBtn.innerHTML = originalContent;
+                            }
+                        } catch (err) {
+                            console.error('Vipps error:', err);
+                            alert('Noe gikk galt under oppstart av Vipps: ' + err.message);
+                            vBtn.disabled = false;
+                            vBtn.innerHTML = originalContent;
+                        }
+                    });
+                }
 
                 // Copyright year
                 const yearEl = document.getElementById('copyright-year');
@@ -1108,6 +1181,7 @@
                 loadCourses();
             })();
     </script>
+    <script type="module" src="js/stripe-checkout.js"></script>
     <script type="module" src="js/cookie-consent.js"></script>
 </body>
 
