@@ -314,10 +314,7 @@ class MessagesManager {
             
             return `
                 <div class="msg-group">
-                    <div class="msg-bubble ${isAgent ? 'agent' : 'visitor'}">
-                        ${this.escapeHtml(m.text || '')}
-                        <div class="msg-time">${time.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}</div>
-                    </div>
+                    <div class="msg-bubble ${isAgent ? 'agent' : 'visitor'}">${this.escapeHtml(m.text || '')}<div class="msg-time">${time.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}</div></div>
                 </div>
             `;
         }).join('');
