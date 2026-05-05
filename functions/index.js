@@ -1169,7 +1169,7 @@ exports.getAnalyticsOverview = onRequest({
 
       const accessToken = await getGaAccessToken({ clientEmail, privateKey });
 
-      const [summaryReport, pagesReport, sourcesReport, realtimeReport, devicesReport, geoReport] = await Promise.all([
+      const [summaryReport, pagesReport, sourcesReport, realtimeReport, devicesReport, geoReport, dailyReport] = await Promise.all([
         googleGaPost({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
@@ -1234,7 +1234,22 @@ exports.getAnalyticsOverview = onRequest({
             orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }]
           },
         }),
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+            dimensions: [{ name: "date" }],
+            metrics: [{ name: "activeUsers" }],
+            orderBys: [{ dimension: { dimensionName: "date" }, desc: false }]
+          },
+        }),
       ]);
+
+      const dailyTraffic = (dailyReport.rows || []).map(row => ({
+        date: row.dimensionValues[0].value,
+        users: row.metricValues[0].value
+      }));
 
       const topPages = (pagesReport.rows || []).map(row => ({
         title: row.dimensionValues[0].value,
@@ -1273,9 +1288,11 @@ exports.getAnalyticsOverview = onRequest({
           topPages,
           trafficSources,
           devices,
-          topCities
+          topCities,
+          dailyTraffic
         }
       });
+
 
     } catch (error) {
       console.error("Analytics Error:", error);

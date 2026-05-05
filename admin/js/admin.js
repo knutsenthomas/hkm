@@ -2778,6 +2778,28 @@ class AdminManager {
         const savedMainOrder = JSON.parse(localStorage.getItem('hkm_dashboard_main_order')) || ['chart', 'top-pages'];
 
 
+        const dailyTraffic = (ga.dailyTraffic && ga.dailyTraffic.length) ? ga.dailyTraffic : [
+            { date: 'Day 1', users: '200' },
+            { date: 'Day 2', users: '450' },
+            { date: 'Day 3', users: '300' },
+            { date: 'Day 4', users: '600' },
+            { date: 'Day 5', users: '400' },
+            { date: 'Day 6', users: '700' },
+            { date: 'Day 7', users: '500' }
+        ];
+
+        const chartHtml = dailyTraffic.map((d, i) => {
+            const maxUsers = Math.max(...dailyTraffic.map(x => parseInt(x.users) || 1));
+            const height = Math.min(100, Math.round((parseInt(d.users) / maxUsers) * 100));
+            // Format date string YYYYMMDD to DD.MM
+            let label = d.date;
+            if (d.date.length === 8) {
+                label = `${d.date.substring(6, 8)}.${d.date.substring(4, 6)}`;
+            }
+            const showLabel = i % 2 === 0 || i === dailyTraffic.length - 1;
+            return `<div class="bar" style="height: ${height}%;" data-tooltip-info="${label}: ${parseInt(d.users).toLocaleString('no-NO')} besøkende">${showLabel ? `<span>${label}</span>` : ''}</div>`;
+        }).join('');
+
         const mainWidgets = {
             'chart': `
                 <div class="chart-container card" data-id="chart" style="position: relative;">
@@ -2809,18 +2831,12 @@ class AdminManager {
                     </div>
                     <div class="chart-placeholder">
                         <div class="bar-chart">
-                            <div class="bar" style="height: 40%;" data-tooltip-info="08:00: 340 besøkende"><span>08:00</span></div>
-                            <div class="bar" style="height: 65%;" data-tooltip-info="10:00: 552 besøkende"></div>
-                            <div class="bar" style="height: 85%;" data-tooltip-info="12:00: 722 besøkende"><span>12:00</span></div>
-                            <div class="bar" style="height: 55%;" data-tooltip-info="14:00: 467 besøkende"></div>
-                            <div class="bar" style="height: 75%;" data-tooltip-info="16:00: 637 besøkende"><span>16:00</span></div>
-                            <div class="bar" style="height: 45%;" data-tooltip-info="18:00: 382 besøkende"></div>
-                            <div class="bar" style="height: 80%;" data-tooltip-info="20:00: 680 besøkende"><span>20:00</span></div>
-                            <div class="bar" style="height: 60%;" data-tooltip-info="22:00: 510 besøkende"></div>
+                            ${chartHtml}
                         </div>
                     </div>
                 </div>
             `,
+
             'top-pages': `
                 <div class="top-pages-widget card" data-id="top-pages" style="position: relative;">
                     <span class="material-symbols-outlined drag-handle">drag_indicator</span>
