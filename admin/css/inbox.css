@@ -97,7 +97,7 @@
 
 .threads-search input {
     width: 100%;
-    padding: 10px 12px 10px 42px;
+    padding: 10px 12px 10px 42px !important;
     border: 1px solid var(--inbox-border);
     border-radius: 12px;
     font-size: 14px;
@@ -112,11 +112,13 @@
 
 .threads-search .material-symbols-outlined {
     position: absolute;
-    left: 10px;
+    left: 14px;
     top: 50%;
     transform: translateY(-50%);
-    font-size: 18px;
+    font-size: 20px;
     color: #94a3b8;
+    pointer-events: none;
+    z-index: 2;
 }
 
 .threads-scroll {
