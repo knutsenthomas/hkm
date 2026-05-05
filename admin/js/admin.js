@@ -71,7 +71,7 @@ class AdminManager {
             'campaigns': { id: 'campaigns', label: 'Innsamlinger', icon: 'campaign', color: 'megaphone', default: false },
             'events': { id: 'events', label: 'Arrangementer', icon: 'event', color: 'blue', default: false },
             'next-events': { id: 'next-events', label: 'Neste Arrangementer', icon: 'event_upcoming', color: 'purple', default: false, type: 'list' },
-            'latest-contacts': { id: 'latest-contacts', label: 'Siste Meldinger', icon: 'quick_reference_all', color: 'mint', default: false, type: 'list' }
+
         };
 
         try {
@@ -570,8 +570,7 @@ class AdminManager {
 
         const dbSubs = [
             { key: 'overview:donations', ref: firebaseService.db.collection('donations') },
-            { key: 'overview:users', ref: firebaseService.db.collection('users') },
-            { key: 'overview:contacts', ref: firebaseService.db.collection('contactMessages').limit(4) }
+            { key: 'overview:users', ref: firebaseService.db.collection('users') }
         ];
 
         dbSubs.forEach(({ key, ref }) => {
@@ -1157,9 +1156,6 @@ class AdminManager {
         this.renderOverview();
         console.log("Dashboard initialized.");
 
-        // Start lytter for uleste meldinger (for bjelle)
-        this.initMessageNotifications();
-
         // Søke-funksjon i toppfeltet
         this.initSearch();
 
@@ -1326,22 +1322,9 @@ class AdminManager {
         const bell = document.getElementById('messages-bell');
         if (bell) {
             bell.addEventListener('click', () => {
-                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
-                    window.adminManager.onSectionSwitch('messages');
-                }
-
-                const navLinks = document.querySelectorAll('.nav-link[data-section]');
-                navLinks.forEach(l => {
-                    l.classList.toggle('active', l.getAttribute('data-section') === 'messages');
-                });
-
-                const sections = document.querySelectorAll('.section-content');
-                sections.forEach(section => {
-                    section.classList.remove('active');
-                    if (section.id === 'messages-section') {
-                        section.classList.add('active');
-                    }
-                });
+                this.onSectionSwitch('messages');
+                // Trigger click on nav link to ensure all UI syncs (including mobile sidebar close)
+                document.querySelector('.nav-link[data-section="messages"]')?.click();
             });
         }
 
@@ -1364,15 +1347,32 @@ class AdminManager {
     updateMessageBell(count) {
         const bell = document.getElementById('messages-bell');
         const badge = document.getElementById('messages-badge');
-        if (!bell || !badge) return;
+        const icon = document.getElementById('notification-icon');
+        const dot = document.getElementById('notification-dot');
+
+        const displayCount = count > 9 ? '9+' : String(count);
 
         if (count > 0) {
-            bell.classList.add('has-unread');
-            badge.style.display = 'flex';
-            badge.textContent = count > 9 ? '9+' : String(count);
+            if (bell) bell.classList.add('has-unread');
+            if (icon) icon.classList.add('has-unread');
+            if (badge) {
+                badge.style.display = 'flex';
+                badge.textContent = displayCount;
+            }
+            if (dot) {
+                dot.style.display = 'block';
+                dot.textContent = displayCount;
+            }
         } else {
-            bell.classList.remove('has-unread');
-            badge.style.display = 'none';
+            if (bell) bell.classList.remove('has-unread');
+            if (icon) icon.classList.remove('has-unread');
+            if (badge) {
+                badge.style.display = 'none';
+            }
+            if (dot) {
+                dot.style.display = 'none';
+                dot.textContent = '';
+            }
         }
     }
 
@@ -1838,38 +1838,7 @@ class AdminManager {
         }
     }
 
-    initMessageNotifications() {
-        if (!firebaseService.isInitialized || !firebaseService.db) return;
 
-        const icon = document.getElementById('notification-icon');
-        const dot = document.getElementById('notification-dot');
-
-        if (!icon || !dot) return;
-
-        try {
-            // Lytt på alle meldinger med status 'ny'
-            this.unsubscribeMessagesListener = firebaseService.db
-                .collection('contactMessages')
-                .where('status', '==', 'ny')
-                .onSnapshot((snapshot) => {
-                    const unreadCount = snapshot.size;
-
-                    if (unreadCount > 0) {
-                        dot.style.display = 'block';
-                        icon.classList.add('has-unread');
-                        dot.textContent = unreadCount > 9 ? '9+' : String(unreadCount);
-                    } else {
-                        dot.style.display = 'none';
-                        icon.classList.remove('has-unread');
-                        dot.textContent = '';
-                    }
-                }, (err) => {
-                    console.error('Feil ved melding-notifikasjoner:', err);
-                });
-        } catch (err) {
-            console.error('Kunne ikke starte melding-notifikasjoner:', err);
-        }
-    }
 
     async renderCommentsSection() {
         const section = document.getElementById('comments-section');
@@ -2540,7 +2509,7 @@ class AdminManager {
         let indexStats = {};
         let youtubeStats = { subscribers: 'N/A', videos: 'N/A', views: '0' };
         let podcastCount = '...';
-        let fullEvents = [], latestContactsData = [];
+        let fullEvents = [];
 
         try {
             const [blogData, teachingData, eventData, causesData, indexData, yt, pod, coursesDoc] = await Promise.all([
@@ -2593,12 +2562,7 @@ class AdminManager {
                     }
                 });
 
-                // Fetch latest contacts
-                const contactsSnapshot = await firebaseService.db.collection('contactMessages')
-                    .orderBy('timestamp', 'desc')
-                    .limit(4)
-                    .get();
-                contactsSnapshot.forEach(doc => latestContactsData.push({ id: doc.id, ...doc.data() }));
+
             }
         } catch (e) {
             console.warn('Feil ved henting av statistikk:', e);
@@ -2678,18 +2642,7 @@ class AdminManager {
                         }
                     </ul>`;
                     break;
-                case 'latest-contacts':
-                    value = latestContactsData.length > 0 ? '' : 'Ingen meldinger';
-                    meta = `<ul class="stat-list">
-                        ${latestContactsData.map(c => `
-                            <li class="stat-list-item">
-                                <span class="item-main">${c.name || 'Ukjent'}</span>
-                                <span class="item-meta">${c.status === 'ny' ? '<span class="dot" style="background:#22c55e; width:6px; height:6px; margin-right:4px;"></span>' : ''}${c.subject || 'Ingen emne'}</span>
-                            </li>
-                        `).join('')
-                        }
-                    </ul>`;
-                    break;
+
             }
 
             widgetsHtml += `
