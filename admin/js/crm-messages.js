@@ -13,6 +13,8 @@ class MessagesManager {
         this.activeThreadType = null; // 'chat' or 'email'
         this.activeVisitorChatUnsub = null;
         this.isSendingReply = false;
+        this.replyAttachments = [];
+        this.currentAdminEmail = '';
         this.init();
     }
 
@@ -32,6 +34,7 @@ class MessagesManager {
     startAuthListener() {
         window.firebaseService.onAuthChange((user) => {
             if (user) {
+                this.currentAdminEmail = user.email || '';
                 this.loadUnifiedInbox();
             } else {
                 window.location.href = '/admin/login';
@@ -260,12 +263,43 @@ class MessagesManager {
             </div>
             <div class="view-reply">
                 <div class="reply-box">
-                    <textarea id="inbox-reply-text" placeholder="Skriv et svar til ${this.escapeHtml(chatData.visitorName || 'besøkende')}..."></textarea>
+                    <div
+                        id="inbox-reply-text"
+                        class="reply-editor"
+                        contenteditable="true"
+                        role="textbox"
+                        aria-multiline="true"
+                        data-placeholder="Skriv et svar til ${this.escapeHtml(chatData.visitorName || 'besøkende')}..."></div>
+                    <div class="reply-attachments" id="inbox-reply-attachments"></div>
                     <div class="reply-toolbar">
                         <div class="reply-actions">
-                            <!-- Optional formatting icons -->
+                            <button type="button" class="reply-tool-btn" data-command="bold" title="Fet">
+                                <span class="material-symbols-outlined">format_bold</span>
+                            </button>
+                            <button type="button" class="reply-tool-btn" data-command="italic" title="Kursiv">
+                                <span class="material-symbols-outlined">format_italic</span>
+                            </button>
+                            <button type="button" class="reply-tool-btn" data-command="insertUnorderedList" title="Punktliste">
+                                <span class="material-symbols-outlined">format_list_bulleted</span>
+                            </button>
+                            <button type="button" class="reply-tool-btn" data-command="createLink" title="Lenke">
+                                <span class="material-symbols-outlined">link</span>
+                            </button>
+                            <button type="button" class="reply-tool-btn" data-emoji-toggle title="Emoji">
+                                <span class="material-symbols-outlined">mood</span>
+                            </button>
+                            <label class="reply-tool-btn" title="Bilde/video">
+                                <span class="material-symbols-outlined">attach_file</span>
+                                <input type="file" id="inbox-image-upload" accept="image/*,video/*" hidden>
+                            </label>
+                            <button type="button" class="reply-tool-btn" data-video-link title="Video-lenke">
+                                <span class="material-symbols-outlined">smart_display</span>
+                            </button>
                         </div>
                         <button class="btn btn-primary" id="inbox-send-btn">Send svar</button>
+                    </div>
+                    <div class="reply-emoji-panel" id="inbox-emoji-panel" hidden>
+                        ${['😀','😊','🙏','❤️','🔥','🙌','👍','🎉','✨','☀️','📌','📷','🎥'].map(emoji => `<button type="button" data-emoji="${emoji}">${emoji}</button>`).join('')}
                     </div>
                 </div>
                 <div id="inbox-reply-status" style="margin-top: 8px; font-size: 12px;"></div>
@@ -276,6 +310,8 @@ class MessagesManager {
         const sendBtn = document.getElementById('inbox-send-btn');
         const replyArea = document.getElementById('inbox-reply-text');
         if (sendBtn && replyArea) {
+            this.replyAttachments = [];
+            this.setupRichReplyComposer(replyArea);
             sendBtn.onclick = () => this.sendReply();
             replyArea.onkeydown = (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
@@ -311,15 +347,221 @@ class MessagesManager {
         container.innerHTML = messages.map(m => {
             const isAgent = m.sender === 'agent';
             const time = m.createdAt?.toDate?.() || new Date(m.createdAt || Date.now());
+            const body = m.html
+                ? this.sanitizeRichHtml(m.html)
+                : this.renderPlainMessage(m.text || '');
+            const attachments = this.renderMessageAttachments(m.attachments || []);
             
             return `
                 <div class="msg-group">
-                    <div class="msg-bubble ${isAgent ? 'agent' : 'visitor'}">${this.escapeHtml(m.text || '')}<div class="msg-time">${time.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}</div></div>
+                    <div class="msg-bubble ${isAgent ? 'agent' : 'visitor'}">${body}${attachments}<div class="msg-time">${time.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}</div></div>
                 </div>
             `;
         }).join('');
 
         container.scrollTop = container.scrollHeight;
+    }
+
+    setupRichReplyComposer(replyArea) {
+        const toolbar = document.querySelector('.reply-toolbar');
+        const emojiPanel = document.getElementById('inbox-emoji-panel');
+        const imageInput = document.getElementById('inbox-image-upload');
+
+        toolbar?.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-command], [data-emoji-toggle], [data-video-link]');
+            if (!button) return;
+
+            event.preventDefault();
+            replyArea.focus();
+
+            const command = button.dataset.command;
+            if (command === 'createLink') {
+                const url = window.prompt('Lim inn lenke:');
+                if (url) document.execCommand('createLink', false, this.normalizeUrl(url));
+                return;
+            }
+
+            if (command) {
+                document.execCommand(command, false, null);
+                return;
+            }
+
+            if (button.hasAttribute('data-emoji-toggle') && emojiPanel) {
+                emojiPanel.hidden = !emojiPanel.hidden;
+                return;
+            }
+
+            if (button.hasAttribute('data-video-link')) {
+                const url = window.prompt('Lim inn YouTube/Vimeo/video-lenke:');
+                if (url) this.addReplyAttachment({
+                    type: 'video',
+                    url: this.normalizeUrl(url),
+                    name: 'Video'
+                });
+            }
+        });
+
+        emojiPanel?.addEventListener('click', (event) => {
+            const button = event.target.closest('[data-emoji]');
+            if (!button) return;
+            event.preventDefault();
+            replyArea.focus();
+            document.execCommand('insertText', false, button.dataset.emoji);
+            emojiPanel.hidden = true;
+        });
+
+        imageInput?.addEventListener('change', async (event) => {
+            const files = Array.from(event.target.files || []);
+            event.target.value = '';
+            if (!files.length) return;
+            for (const file of files) {
+                await this.uploadReplyMedia(file);
+            }
+        });
+    }
+
+    async uploadReplyMedia(file) {
+        const statusEl = document.getElementById('inbox-reply-status');
+        const isImage = file.type && file.type.startsWith('image/');
+        const isVideo = file.type && file.type.startsWith('video/');
+        const allowAnyFile = this.activeThreadType === 'email';
+        if (!allowAnyFile && !isImage && !isVideo) {
+            if (statusEl) statusEl.textContent = 'Velg et bilde eller en video.';
+            return;
+        }
+
+        const maxSize = allowAnyFile ? 25 * 1024 * 1024 : 50 * 1024 * 1024;
+        if (file.size > maxSize) {
+            if (statusEl) statusEl.textContent = `Filen er for stor. Maks ${allowAnyFile ? '25' : '50'} MB.`;
+            return;
+        }
+
+        if (statusEl) statusEl.textContent = isImage ? 'Laster opp bilde...' : (isVideo ? 'Laster opp video...' : 'Laster opp vedlegg...');
+
+        try {
+            const ext = (file.name.split('.').pop() || 'bin').replace(/[^a-z0-9]/gi, '').toLowerCase();
+            const folder = allowAnyFile ? 'inbox-email' : 'visitor-chat';
+            const path = `editor/${folder}/${this.activeThreadId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+            let url = '';
+            if (isImage && typeof window.firebaseService.uploadImage === 'function' && !allowAnyFile) {
+                url = await window.firebaseService.uploadImage(file, path, null, {
+                    maxSizeBytes: 10 * 1024 * 1024
+                });
+            } else {
+                const storageRef = window.firebaseService.storage.ref(path);
+                const snapshot = await storageRef.put(file);
+                url = await snapshot.ref.getDownloadURL();
+            }
+            this.addReplyAttachment({
+                type: isImage ? 'image' : (isVideo ? 'video' : 'file'),
+                url,
+                name: file.name,
+                mimeType: file.type || ''
+            });
+            if (statusEl) statusEl.textContent = isImage ? 'Bilde lagt til.' : (isVideo ? 'Video lagt til.' : 'Vedlegg lagt til.');
+            setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 1600);
+        } catch (error) {
+            console.error('Media upload failed:', error);
+            if (statusEl) statusEl.textContent = 'Kunne ikke laste opp filen.';
+        }
+    }
+
+    addReplyAttachment(attachment) {
+        this.replyAttachments = [...this.replyAttachments, attachment];
+        this.renderReplyAttachments();
+    }
+
+    renderReplyAttachments() {
+        const container = document.getElementById('inbox-reply-attachments');
+        if (!container) return;
+
+        container.innerHTML = this.replyAttachments.map((attachment, index) => `
+            <div class="reply-attachment-chip">
+                <span class="material-symbols-outlined">${attachment.type === 'image' ? 'image' : (attachment.type === 'video' ? 'smart_display' : 'attach_file')}</span>
+                <span>${this.escapeHtml(attachment.name || attachment.url || 'Vedlegg')}</span>
+                <button type="button" data-remove-attachment="${index}" title="Fjern">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        `).join('');
+
+        container.querySelectorAll('[data-remove-attachment]').forEach((button) => {
+            button.addEventListener('click', () => {
+                const index = Number(button.dataset.removeAttachment);
+                this.replyAttachments = this.replyAttachments.filter((_, i) => i !== index);
+                this.renderReplyAttachments();
+            });
+        });
+    }
+
+    getReplyPlainText(html, attachments = []) {
+        const div = document.createElement('div');
+        div.innerHTML = html;
+        const text = (div.textContent || '').trim();
+        const attachmentText = attachments.map(item => item.url).filter(Boolean).join('\n');
+        return [text, attachmentText].filter(Boolean).join('\n').trim();
+    }
+
+    sanitizeRichHtml(html) {
+        const template = document.createElement('template');
+        template.innerHTML = html || '';
+        const allowedTags = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'BR', 'P', 'DIV', 'SPAN', 'UL', 'OL', 'LI', 'A']);
+
+        template.content.querySelectorAll('*').forEach((node) => {
+            if (!allowedTags.has(node.tagName)) {
+                node.replaceWith(...Array.from(node.childNodes));
+                return;
+            }
+
+            Array.from(node.attributes).forEach((attr) => {
+                const name = attr.name.toLowerCase();
+                if (node.tagName === 'A' && name === 'href') {
+                    node.setAttribute('href', this.normalizeUrl(attr.value));
+                    node.setAttribute('target', '_blank');
+                    node.setAttribute('rel', 'noopener noreferrer');
+                    return;
+                }
+                node.removeAttribute(attr.name);
+            });
+        });
+
+        return template.innerHTML;
+    }
+
+    renderPlainMessage(text) {
+        return this.escapeHtml(text || '').replace(/\n/g, '<br>');
+    }
+
+    renderMessageAttachments(attachments) {
+        if (!Array.isArray(attachments) || attachments.length === 0) return '';
+        return `<div class="msg-attachments">${attachments.map((attachment) => {
+            const url = this.escapeHtml(attachment.url || '');
+            const name = this.escapeHtml(attachment.name || attachment.url || 'Vedlegg');
+            if (!url) return '';
+            if (attachment.type === 'image') {
+                return `<a href="${url}" target="_blank" rel="noopener noreferrer"><img src="${url}" alt="${name}" class="msg-attachment-image"></a>`;
+            }
+            if (attachment.type === 'video') {
+                const player = this.isDirectVideoAttachment(attachment)
+                    ? `<video controls class="msg-attachment-video" src="${url}"></video>`
+                    : '';
+                return `${player}<a href="${url}" target="_blank" rel="noopener noreferrer" class="msg-attachment-link"><span class="material-symbols-outlined">${player ? 'open_in_new' : 'smart_display'}</span>${name}</a>`;
+            }
+            return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="msg-attachment-link">${name}</a>`;
+        }).join('')}</div>`;
+    }
+
+    isDirectVideoAttachment(attachment) {
+        const mimeType = String(attachment?.mimeType || '').toLowerCase();
+        const url = String(attachment?.url || '').toLowerCase();
+        return mimeType.startsWith('video/') || /\.(mp4|webm|ogg|mov)(?:[?#]|$)/i.test(url);
+    }
+
+    normalizeUrl(url) {
+        const value = String(url || '').trim();
+        if (!value) return '';
+        if (/^(https?:|mailto:|tel:)/i.test(value)) return value;
+        return `https://${value.replace(/^\/+/, '')}`;
     }
 
     async renderEmailView(msgId) {
@@ -328,6 +570,8 @@ class MessagesManager {
         if (!msg) return;
 
         const date = msg.createdAt ? (msg.createdAt.toDate ? msg.createdAt.toDate() : new Date(msg.createdAt)).toLocaleString('no-NO') : 'Ukjent';
+        const replySubject = /^re:/i.test(msg.subject || '') ? (msg.subject || '') : `Re: ${msg.subject || 'Kontakt'}`;
+        const adminEmail = this.currentAdminEmail || window.firebaseService?.auth?.currentUser?.email || '';
 
         viewEl.innerHTML = `
             <div class="view-header">
@@ -363,18 +607,84 @@ class MessagesManager {
                 </div>
             </div>
             <div class="view-reply">
-                <a href="mailto:${msg.email}?subject=Re: ${encodeURIComponent(msg.subject || '')}" class="btn btn-primary" style="width: 100%;">
-                    Svar via e-post
-                </a>
+                <div class="email-composer">
+                    <div class="email-composer-grid">
+                        <label>
+                            <span>Fra</span>
+                            <select id="email-from-mode">
+                                <option value="post">His Kingdom Ministry &lt;post@hiskingdomministry.no&gt;</option>
+                                ${adminEmail ? `<option value="admin">${this.escapeHtml(adminEmail)}</option>` : ''}
+                            </select>
+                        </label>
+                        <label>
+                            <span>Til</span>
+                            <input id="email-to" type="email" value="${this.escapeHtml(msg.email || '')}">
+                        </label>
+                        <label>
+                            <span>Cc</span>
+                            <input id="email-cc" type="text" placeholder="Cc">
+                        </label>
+                        <label>
+                            <span>Bcc</span>
+                            <input id="email-bcc" type="text" placeholder="Bcc">
+                        </label>
+                    </div>
+                    <label class="email-subject-field">
+                        <span>Emne</span>
+                        <input id="email-subject" type="text" value="${this.escapeHtml(replySubject)}">
+                    </label>
+                    <div class="reply-box email-reply-box">
+                        <div
+                            id="inbox-reply-text"
+                            class="reply-editor"
+                            contenteditable="true"
+                            role="textbox"
+                            aria-multiline="true"
+                            data-placeholder="Skriv e-postsvaret..."></div>
+                        <div class="reply-attachments" id="inbox-reply-attachments"></div>
+                        <div class="reply-toolbar">
+                            <div class="reply-actions">
+                                <button type="button" class="reply-tool-btn" data-command="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
+                                <button type="button" class="reply-tool-btn" data-command="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
+                                <button type="button" class="reply-tool-btn" data-command="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
+                                <button type="button" class="reply-tool-btn" data-command="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                                <button type="button" class="reply-tool-btn" data-command="insertOrderedList" title="Nummerert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                                <button type="button" class="reply-tool-btn" data-command="createLink" title="Lenke"><span class="material-symbols-outlined">link</span></button>
+                                <button type="button" class="reply-tool-btn" data-emoji-toggle title="Emoji"><span class="material-symbols-outlined">mood</span></button>
+                                <label class="reply-tool-btn" title="Vedlegg">
+                                    <span class="material-symbols-outlined">attach_file</span>
+                                    <input type="file" id="inbox-image-upload" multiple hidden>
+                                </label>
+                                <button type="button" class="reply-tool-btn" data-video-link title="Video-lenke"><span class="material-symbols-outlined">smart_display</span></button>
+                            </div>
+                            <button class="btn btn-primary" id="inbox-send-btn">Send e-post</button>
+                        </div>
+                        <div class="reply-emoji-panel" id="inbox-emoji-panel" hidden>
+                            ${['😀','😊','🙏','❤️','🔥','🙌','👍','🎉','✨','☀️','📌','📷','🎥'].map(emoji => `<button type="button" data-emoji="${emoji}">${emoji}</button>`).join('')}
+                        </div>
+                    </div>
+                    <div id="inbox-reply-status" style="margin-top: 8px; font-size: 12px;"></div>
+                </div>
             </div>
         `;
+
+        const replyArea = document.getElementById('inbox-reply-text');
+        const sendBtn = document.getElementById('inbox-send-btn');
+        if (replyArea && sendBtn) {
+            this.replyAttachments = [];
+            this.setupRichReplyComposer(replyArea);
+            sendBtn.onclick = () => this.sendReply();
+            replyArea.focus();
+        }
     }
 
     async sendReply() {
         if (this.isSendingReply) return;
         
         const replyArea = document.getElementById('inbox-reply-text');
-        const text = replyArea?.value.trim();
+        const html = this.sanitizeRichHtml(replyArea?.innerHTML || '').trim();
+        const attachments = Array.isArray(this.replyAttachments) ? this.replyAttachments : [];
+        const text = this.getReplyPlainText(html, attachments);
         if (!text) return;
 
         this.isSendingReply = true;
@@ -393,6 +703,8 @@ class MessagesManager {
                         sender: 'agent',
                         source: 'google_chat',
                         text,
+                        html,
+                        attachments,
                         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                         adminOrigin: 'admin_dashboard'
                     });
@@ -407,9 +719,60 @@ class MessagesManager {
                         requestHuman: true
                     }, { merge: true });
 
-                replyArea.value = '';
+                replyArea.innerHTML = '';
+                this.replyAttachments = [];
+                this.renderReplyAttachments();
                 if (statusEl) statusEl.textContent = 'Sendt!';
                 setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2000);
+            } else if (this.activeThreadType === 'email') {
+                const to = document.getElementById('email-to')?.value.trim() || '';
+                const cc = document.getElementById('email-cc')?.value.trim() || '';
+                const bcc = document.getElementById('email-bcc')?.value.trim() || '';
+                const subject = document.getElementById('email-subject')?.value.trim() || '';
+                const fromMode = document.getElementById('email-from-mode')?.value || 'post';
+
+                if (!to || !subject) {
+                    if (statusEl) statusEl.textContent = 'Mottaker og emne må fylles ut.';
+                    return;
+                }
+
+                const user = window.firebaseService?.auth?.currentUser;
+                const idToken = user ? await user.getIdToken(true) : '';
+                const response = await fetch('https://us-central1-his-kingdom-ministry.cloudfunctions.net/sendInboxEmail', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${idToken}`
+                    },
+                    body: JSON.stringify({
+                        messageId: this.activeThreadId,
+                        to,
+                        cc,
+                        bcc,
+                        subject,
+                        text,
+                        html,
+                        attachments,
+                        fromMode,
+                        fromName: fromMode === 'admin' ? (this.currentAdminEmail || 'HKM Team') : 'His Kingdom Ministry'
+                    })
+                });
+
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok || !result.success) {
+                    throw new Error(result.error || 'Kunne ikke sende e-post.');
+                }
+
+                replyArea.innerHTML = '';
+                this.replyAttachments = [];
+                this.renderReplyAttachments();
+                if (statusEl) statusEl.textContent = 'E-post sendt!';
+                setTimeout(() => { if (statusEl) statusEl.textContent = ''; }, 2200);
+                this.messages = this.messages.map((message) =>
+                    message.id === this.activeThreadId ? { ...message, status: 'besvart' } : message
+                );
+                this.updateBadges();
+                this.renderThreadList();
             }
         } catch (err) {
             console.error("Error sending reply:", err);

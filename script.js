@@ -2157,6 +2157,100 @@ window.addEventListener('load', () => {
             bodyEl.appendChild(wrap);
         };
 
+        const normalizeChatUrl = (url) => {
+            const value = String(url || '').trim();
+            if (!value) return '';
+            if (/^(https?:|mailto:|tel:)/i.test(value)) return value;
+            return `https://${value.replace(/^\/+/, '')}`;
+        };
+
+        const escapeChatHtml = (value) => String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+
+        const sanitizeChatRichHtml = (html) => {
+            const template = document.createElement('template');
+            template.innerHTML = String(html || '');
+            const allowedTags = new Set(['B', 'STRONG', 'I', 'EM', 'U', 'S', 'BR', 'P', 'DIV', 'SPAN', 'UL', 'OL', 'LI', 'A']);
+
+            template.content.querySelectorAll('*').forEach((node) => {
+                if (!allowedTags.has(node.tagName)) {
+                    node.replaceWith(...Array.from(node.childNodes));
+                    return;
+                }
+
+                Array.from(node.attributes).forEach((attr) => {
+                    const name = attr.name.toLowerCase();
+                    if (node.tagName === 'A' && name === 'href') {
+                        const href = normalizeChatUrl(attr.value);
+                        node.setAttribute('href', href);
+                        node.setAttribute('target', '_blank');
+                        node.setAttribute('rel', 'noopener noreferrer');
+                        node.classList.add('hkm-chat-link');
+                        return;
+                    }
+                    node.removeAttribute(attr.name);
+                });
+            });
+
+            return template.innerHTML;
+        };
+
+        const renderChatPlainText = (rawText) => {
+            const escaped = escapeChatHtml(rawText);
+
+            return escaped
+                .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
+                .replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+                    const safeUrl = normalizeChatUrl(url);
+                    return `<img src="${escapeChatHtml(safeUrl)}" alt="${escapeChatHtml(alt)}" class="hkm-chat-image">`;
+                })
+                .replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {
+                    const safeUrl = normalizeChatUrl(url);
+                    return `<a href="${escapeChatHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" class="hkm-chat-link">${text}</a>`;
+                })
+                .replace(/(?<!["=])(https?:\/\/[^\s<]+)/g, (match, url) => {
+                    const safeUrl = normalizeChatUrl(url);
+                    return `<a href="${escapeChatHtml(safeUrl)}" target="_blank" rel="noopener noreferrer" class="hkm-chat-link">${escapeChatHtml(url)}</a>`;
+                })
+                .replace(/\n/g, '<br>');
+        };
+
+        const renderChatAttachments = (attachments) => {
+            if (!Array.isArray(attachments) || attachments.length === 0) return '';
+
+            const isDirectVideoAttachment = (attachment) => {
+                const mimeType = String(attachment && attachment.mimeType || '').toLowerCase();
+                const url = String(attachment && attachment.url || '').toLowerCase();
+                return mimeType.startsWith('video/') || /\.(mp4|webm|ogg|mov)(?:[?#]|$)/i.test(url);
+            };
+
+            const html = attachments.map((attachment) => {
+                const url = normalizeChatUrl(attachment && attachment.url);
+                if (!url) return '';
+                const safeUrl = escapeChatHtml(url);
+                const name = escapeChatHtml((attachment && attachment.name) || url);
+
+                if (attachment.type === 'image') {
+                    return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer"><img src="${safeUrl}" alt="${name}" class="hkm-chat-image"></a>`;
+                }
+
+                if (attachment.type === 'video') {
+                    const player = isDirectVideoAttachment(attachment)
+                        ? `<video controls src="${safeUrl}" class="hkm-chat-video"></video>`
+                        : '';
+                    return `${player}<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="hkm-chat-attachment-link">${player ? 'Åpne video' : `🎥 ${name}`}</a>`;
+                }
+
+                return `<a href="${safeUrl}" target="_blank" rel="noopener noreferrer" class="hkm-chat-attachment-link">${name}</a>`;
+            }).join('');
+
+            return html ? `<div class="hkm-chat-attachments">${html}</div>` : '';
+        };
+
         const renderMessages = () => {
             if (activeMode === 'email') {
                 bodyEl.innerHTML = '';
@@ -2177,32 +2271,11 @@ window.addEventListener('load', () => {
                 msg.className = `hkm-chat-msg ${isVisitor ? 'visitor' : 'agent'}`;
                 
                 const rawText = typeof data.text === 'string' ? data.text : '';
-                // Enkel sikkerhets-escaping, bold-konvertering og bilde-rendering
-                const escaped = rawText
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
-                
-                let html = escaped
-                    .replace(/\*\*(.*?)\*\*/g, '<b>$1</b>')
-                    // Støtte for bilder: ![alt](url)
-                    .replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
-                        return `<img src="${url}" alt="${alt}" class="hkm-chat-image" style="display: block; max-width: 100%; height: auto; border-radius: 12px; margin-top: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); border: 1px solid #eee;">`;
-                    })
-                    // Støtte for Markdown-lenker: [tekst](url)
-                    .replace(/\[(.*?)\]\((.*?)\)/g, (match, text, url) => {
-                        const isExternal = (url.startsWith('http') || url.startsWith('//')) && !url.includes('hiskingdomministry.no');
-                        const target = isExternal ? 'target="_blank" rel="noopener noreferrer"' : '';
-                        return `<a href="${url}" ${target} class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${text}</a>`;
-                    })
-                    // Støtte for rå URL-er som ikke er i en tag
-                    .replace(/(?<!["=])(https?:\/\/[^\s<]+)/g, (match, url) => {
-                        const isExternal = (url.startsWith('http') || url.startsWith('//')) && !url.includes('hiskingdomministry.no');
-                        const target = isExternal ? 'target="_blank" rel="noopener noreferrer"' : '';
-                        return `<a href="${url}" ${target} class="hkm-chat-link" style="color: #d17d39; text-decoration: underline; font-weight: 600;">${url}</a>`;
-                    });
+                let html = data.html
+                    ? sanitizeChatRichHtml(data.html)
+                    : renderChatPlainText(rawText);
+
+                html += renderChatAttachments(data.attachments || []);
 
                 msg.innerHTML = html;
                 bodyEl.appendChild(msg);
@@ -2825,7 +2898,61 @@ window.addEventListener('load', () => {
                 font-size: 13px !important;
                 line-height: 1.5 !important;
                 word-wrap: break-word !important;
-                white-space: pre-wrap !important;
+                white-space: normal !important;
+            }
+
+            .hkm-chat-msg p,
+            .hkm-chat-msg div {
+                margin: 0 0 8px !important;
+            }
+
+            .hkm-chat-msg p:last-child,
+            .hkm-chat-msg div:last-child {
+                margin-bottom: 0 !important;
+            }
+
+            .hkm-chat-msg ul,
+            .hkm-chat-msg ol {
+                margin: 8px 0 8px 18px !important;
+                padding: 0 !important;
+            }
+
+            .hkm-chat-link {
+                color: #d17d39 !important;
+                font-weight: 700 !important;
+                text-decoration: underline !important;
+            }
+
+            .hkm-chat-attachments {
+                display: grid !important;
+                gap: 8px !important;
+                margin-top: 10px !important;
+            }
+
+            .hkm-chat-image {
+                display: block !important;
+                max-width: 100% !important;
+                height: auto !important;
+                border-radius: 12px !important;
+                margin-top: 8px !important;
+                border: 1px solid #E2E8F0 !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+            }
+
+            .hkm-chat-video {
+                display: block !important;
+                width: 100% !important;
+                max-height: 220px !important;
+                border-radius: 12px !important;
+                margin-top: 8px !important;
+                background: #0F172A !important;
+                border: 1px solid #E2E8F0 !important;
+            }
+
+            .hkm-chat-attachment-link {
+                color: #d17d39 !important;
+                font-weight: 700 !important;
+                text-decoration: underline !important;
             }
             .hkm-chat-msg.visitor {
                 background: #d17d39 !important;

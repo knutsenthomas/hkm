@@ -3549,7 +3549,7 @@ async function getEmailTemplate(templateId, fallback) {
 /**
  * Helper-funksjon for å sende e-post.
  */
-async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated" }) {
+async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Ministry", type = "automated", cc = "", bcc = "", replyTo = "", attachments = [] }) {
   const user = getSecretOrEnv(emailUserParam, ["EMAIL_USER"]);
   const pass = getSecretOrEnv(emailPassParam, ["EMAIL_PASS"]);
 
@@ -3575,9 +3575,13 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
     await transporter.sendMail({
       from: `"${fromName}" <${user}>`,
       to,
+      cc: cc || undefined,
+      bcc: bcc || undefined,
+      replyTo: replyTo || undefined,
       subject,
       text,
       html,
+      attachments: Array.isArray(attachments) && attachments.length ? attachments : undefined,
     });
 
     // Logg utsendelsen
@@ -3585,6 +3589,9 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
       to,
       subject,
       type,
+      cc: cc || null,
+      bcc: bcc || null,
+      replyTo: replyTo || null,
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
       sentAt: new Date().toISOString(),
       status: "sent"
@@ -3607,6 +3614,68 @@ async function sendEmail({ to, subject, html, text, fromName = "His Kingdom Mini
 
     return false;
   }
+}
+
+function normalizeEmailList(value, maxCount = 20) {
+  if (Array.isArray(value)) {
+    return value
+      .map((item) => String(item || "").trim())
+      .filter(Boolean)
+      .slice(0, maxCount)
+      .join(",");
+  }
+
+  return String(value || "")
+    .split(/[,\s;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .slice(0, maxCount)
+    .join(",");
+}
+
+function isValidEmailList(value) {
+  if (!value) return true;
+  return String(value)
+    .split(",")
+    .filter(Boolean)
+    .every((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email));
+}
+
+function sanitizeInboxEmailHtml(html) {
+  if (typeof html !== "string" || !html.trim()) return "";
+
+  let output = html
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
+    .replace(/\son[a-z]+\s*=\s*(["']).*?\1/gi, "")
+    .replace(/\sstyle\s*=\s*(["']).*?\1/gi, "");
+
+  output = output.replace(/<(?!\/?(?:strong|b|em|i|u|s|br|a|p|div|span|ul|ol|li|blockquote)\b)[^>]*>/gi, "");
+  output = output.replace(/<a\b([^>]*)>/gi, (_match, attrs) => {
+    const hrefMatch = String(attrs || "").match(/href\s*=\s*(["'])(.*?)\1/i);
+    const href = hrefMatch && hrefMatch[2] ? hrefMatch[2].trim() : "";
+    if (!href || !/^(https?:|mailto:|tel:)/i.test(href)) return "";
+    return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">`;
+  });
+
+  return output.trim();
+}
+
+function buildInboxEmailAttachmentLinks(attachments) {
+  if (!Array.isArray(attachments) || !attachments.length) return "";
+
+  const links = attachments
+    .slice(0, 12)
+    .map((attachment) => {
+      const url = typeof attachment.url === "string" ? attachment.url.trim() : "";
+      if (!/^https?:\/\//i.test(url)) return "";
+      const name = escapeHtml(String(attachment.name || "Vedlegg"));
+      return `<li><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${name}</a></li>`;
+    })
+    .filter(Boolean)
+    .join("");
+
+  return links ? `<hr><p><strong>Vedlegg:</strong></p><ul>${links}</ul>` : "";
 }
 
 /**
@@ -3764,6 +3833,115 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
     } catch (error) {
       console.error("Feil ved manuell e-postsending:", error);
       res.status(500).send({ error: error.message });
+    }
+  });
+});
+
+/**
+ * Sender svar fra CRM-innboksen med rik tekst, cc/bcc, reply-to og vedleggslenker.
+ */
+exports.sendInboxEmail = onRequest({ cors: true, secrets: [emailUserParam, emailPassParam] }, async (req, res) => {
+  await verifyAdmin(req, res, async () => {
+    if (req.method === 'OPTIONS') {
+      res.set('Access-Control-Allow-Origin', '*');
+      res.set('Access-Control-Allow-Methods', 'POST');
+      res.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+      res.status(204).send('');
+      return;
+    }
+
+    if (req.method !== 'POST') {
+      res.status(405).send({ error: "Method not allowed." });
+      return;
+    }
+
+    try {
+      const adminEmail = req.user && req.user.email ? String(req.user.email).trim() : "";
+      const userDoc = req.user && req.user.uid ? await db.collection("users").doc(req.user.uid).get() : null;
+      const userData = userDoc && userDoc.exists ? (userDoc.data() || {}) : {};
+
+      const to = normalizeEmailList(req.body.to, 10);
+      const cc = normalizeEmailList(req.body.cc, 10);
+      const bcc = normalizeEmailList(req.body.bcc, 10);
+      const subject = clampText(req.body.subject || "", 200);
+      const text = clampText(req.body.text || "", 12000);
+      const htmlBody = sanitizeInboxEmailHtml(req.body.html || "");
+      const fromMode = req.body.fromMode === "admin" ? "admin" : "post";
+      const fromName = clampText(
+        req.body.fromName || (fromMode === "admin" ? (userData.displayName || adminEmail || "HKM Team") : "His Kingdom Ministry"),
+        120
+      );
+      const replyTo = fromMode === "admin" && adminEmail ? adminEmail : "post@hiskingdomministry.no";
+      const attachments = Array.isArray(req.body.attachments) ? req.body.attachments.slice(0, 12) : [];
+      const messageId = clampText(req.body.messageId || "", 160);
+
+      if (!to || !subject || (!text && !htmlBody && attachments.length === 0)) {
+        res.status(400).send({ error: "Mangler mottaker, emne eller melding." });
+        return;
+      }
+
+      if (![to, cc, bcc, replyTo].every(isValidEmailList)) {
+        res.status(400).send({ error: "Ugyldig e-postadresse." });
+        return;
+      }
+
+      const attachmentLinks = buildInboxEmailAttachmentLinks(attachments);
+      const html = `
+        <div style="font-family:Arial,sans-serif;max-width:680px;margin:0 auto;padding:20px;color:#111827;line-height:1.55;">
+          <div>${htmlBody || escapeHtml(text).replace(/\n/g, "<br>")}</div>
+          ${attachmentLinks}
+          <div style="margin-top:32px;padding-top:18px;border-top:1px solid #e5e7eb;font-size:12px;color:#6b7280;">
+            Vennlig hilsen,<br>${escapeHtml(fromName)}
+          </div>
+        </div>
+      `;
+
+      const success = await sendEmail({
+        to,
+        cc,
+        bcc,
+        subject,
+        html,
+        text,
+        fromName,
+        replyTo,
+        type: "inbox_reply",
+      });
+
+      if (!success) {
+        res.status(500).send({ error: "E-postkonfigurasjon mangler på serveren." });
+        return;
+      }
+
+      const logEntry = {
+        to,
+        cc: cc || null,
+        bcc: bcc || null,
+        subject,
+        text,
+        html: htmlBody,
+        attachments,
+        fromMode,
+        fromName,
+        replyTo,
+        sentByUid: req.user.uid,
+        sentByEmail: adminEmail || null,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+
+      if (messageId) {
+        await db.collection("contactMessages").doc(messageId).set({
+          status: "besvart",
+          lastReplyAt: admin.firestore.FieldValue.serverTimestamp(),
+          lastReplyBy: adminEmail || req.user.uid,
+          replies: admin.firestore.FieldValue.arrayUnion(logEntry),
+        }, { merge: true });
+      }
+
+      res.status(200).send({ success: true });
+    } catch (error) {
+      console.error("Feil ved sending fra CRM-innboks:", error);
+      res.status(500).send({ error: error.message || "Kunne ikke sende e-post." });
     }
   });
 });
