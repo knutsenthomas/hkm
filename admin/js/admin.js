@@ -3119,22 +3119,20 @@ class AdminManager {
     }
 
     async fetchPodcastStats() {
-        // Use the same proxy/RSS as media.js
-        const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
         try {
-            const response = await fetch(proxyUrl);
+            const response = await fetch('https://getpodcast-42bhgdjkcq-uc.a.run.app');
             const data = await response.json();
-            const items = data?.items;
-            if (items) {
-                return Array.isArray(items) ? items.length : 1;
+            // The Cloud Function uses xml2js, so items are in data.rss.channel[0].item
+            const items = data?.rss?.channel?.[0]?.item;
+            if (items && Array.isArray(items)) {
+                return items.length;
             }
         } catch (error) {
-            console.error('Error fetching Podcast stats:', error);
-            throw error; // Rethrow
+            console.error('Error fetching Podcast stats via Cloud Function:', error);
         }
-        return null;
+        return '...';
     }
+
 
     async fetchAnalyticsData() {
         try {
