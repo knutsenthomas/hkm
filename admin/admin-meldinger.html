@@ -151,6 +151,59 @@
 
     </style>
 
+    <!-- Push Notification Modal -->
+    <div id="push-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px; padding: 0; border-radius: 16px; overflow: hidden;">
+            <div style="background: #1B4965; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-symbols-outlined">campaign</span>
+                    Ny push-varsling
+                </h3>
+                <button class="btn-icon" onclick="document.getElementById('push-modal').style.display='none'" style="color: white;">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div style="padding: 24px;">
+                <form id="inbox-push-form">
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Målgruppe</label>
+                        <select id="inbox-push-target" class="form-control" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                            <option value="all">Alle Brukere</option>
+                            <option value="medlem">Bare Medlemmer</option>
+                            <option value="selected">Valgte brukere</option>
+                        </select>
+                    </div>
+                    
+                    <div id="inbox-push-user-selection" style="display: none; max-height: 150px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px; margin-bottom: 20px;">
+                        <!-- User list injected here -->
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Tittel</label>
+                        <input type="text" id="inbox-push-title" class="form-control" placeholder="F.eks. Nytt arrangement!" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Melding</label>
+                        <textarea id="inbox-push-body" class="form-control" rows="3" placeholder="Skriv meldingen din her..." required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;"></textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 24px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">Link (valgfri)</label>
+                        <input type="text" id="inbox-push-link" class="form-control" placeholder="https://..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; border-radius: 12px; gap: 10px;">
+                        <span class="material-symbols-outlined">send</span>
+                        Send Push-varsling
+                    </button>
+                    
+                    <div id="inbox-push-status" style="margin-top: 15px; font-size: 13px; text-align: center;"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -397,6 +450,12 @@
                 <div class="unified-inbox-container" id="unified-inbox">
                     <!-- 1. Folders Sidebar -->
                     <aside class="inbox-folders">
+                        <div style="padding: 15px;">
+                            <button class="btn btn-primary" id="btn-new-push" style="width: 100%; border-radius: 12px; gap: 8px;">
+                                <span class="material-symbols-outlined">campaign</span>
+                                Ny push-varsling
+                            </button>
+                        </div>
                         <div class="folder-item active" data-filter="all">
                             <span class="material-symbols-outlined">inbox</span>
                             <span>Alle meldinger</span>
@@ -415,6 +474,10 @@
                             <span class="material-symbols-outlined">mail</span>
                             <span>E-post</span>
                         </div>
+                        <div class="folder-item" data-filter="push">
+                            <span class="material-symbols-outlined">send_to_mobile</span>
+                            <span>Push-varslinger</span>
+                        </div>
                     </aside>
 
                     <!-- 2. Thread List -->
@@ -423,6 +486,15 @@
                             <div class="threads-search">
                                 <span class="material-symbols-outlined">search</span>
                                 <input type="text" id="inbox-search" placeholder="Søk i innboks...">
+                            </div>
+                            <div class="bulk-actions" id="bulk-actions" style="display: none; padding: 12px 20px; border-top: 1px solid var(--inbox-border); align-items: center; justify-content: space-between; background: var(--inbox-bg-light);">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <input type="checkbox" id="select-all-threads" style="width: 18px; height: 18px; cursor: pointer;">
+                                    <span style="font-size: 13px; font-weight: 600; color: var(--inbox-orange);" id="selected-count">0 valgt</span>
+                                </div>
+                                <button class="btn btn-outline btn-sm" id="bulk-delete-btn" style="color: #ef4444; border-color: #fecaca; background: #fff;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span> Slett markerte
+                                </button>
                             </div>
                         </div>
                         <div class="threads-scroll" id="inbox-threads-list">

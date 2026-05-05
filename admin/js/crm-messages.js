@@ -15,6 +15,8 @@ class MessagesManager {
         this.isSendingReply = false;
         this.replyAttachments = [];
         this.currentAdminEmail = '';
+        this.selectedThreads = new Set();
+        this.pushNotifications = [];
         this.init();
     }
 
@@ -47,6 +49,43 @@ class MessagesManager {
         const searchInput = document.getElementById('inbox-search');
         if (searchInput) {
             searchInput.oninput = (e) => this.handleSearch(e.target.value);
+        }
+
+        // Bulk Actions
+        const selectAll = document.getElementById('select-all-threads');
+        if (selectAll) {
+            selectAll.onchange = (e) => this.toggleAllThreads(e.target.checked);
+        }
+        // Push Notification Listeners
+        const btnNewPush = document.getElementById('btn-new-push');
+        if (btnNewPush) {
+            btnNewPush.onclick = () => {
+                document.getElementById('push-modal').style.display = 'flex';
+                this.resetPushForm();
+            };
+        }
+
+        const pushTarget = document.getElementById('inbox-push-target');
+        if (pushTarget) {
+            pushTarget.onchange = (e) => {
+                const selection = document.getElementById('inbox-push-user-selection');
+                if (e.target.value === 'selected') {
+                    this.renderUserSelection('inbox-push-user-selection');
+                    selection.style.display = 'block';
+                } else {
+                    selection.style.display = 'none';
+                }
+            };
+        }
+
+        const pushForm = document.getElementById('inbox-push-form');
+        if (pushForm) {
+            pushForm.onsubmit = (e) => this.handlePushSubmit(e);
+        }
+
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        if (bulkDeleteBtn) {
+            bulkDeleteBtn.onclick = () => this.deleteSelectedThreads();
         }
 
         // Folders
@@ -101,8 +140,6 @@ class MessagesManager {
 
             this.visitorChats = await Promise.all(chatsSnapshot.docs.map(async (doc) => {
                 const chatData = doc.data() || {};
-                
-                // Get last message for preview
                 const lastMsgSnapshot = await window.firebaseService.db
                     .collection('visitorChats')
                     .doc(doc.id)
@@ -110,15 +147,27 @@ class MessagesManager {
                     .orderBy('createdAt', 'desc')
                     .limit(1)
                     .get();
-
                 const lastMsg = lastMsgSnapshot.docs[0]?.data() || null;
-                
                 return {
                     id: doc.id,
                     type: 'chat',
                     ...chatData,
                     lastMessage: lastMsg
                 };
+            }));
+
+            // Fetch Push Notifications (Campaign logs)
+            const pushSnapshot = await window.firebaseService.db
+                .collection('push_log')
+                .orderBy('sentAt', 'desc')
+                .limit(50)
+                .get();
+
+            this.pushNotifications = pushSnapshot.docs.map(doc => ({
+                id: doc.id,
+                type: 'push',
+                ...doc.data(),
+                createdAt: doc.data().sentAt // Normalize timestamp
             }));
 
             this.buildUnifiedThreads();
@@ -133,7 +182,7 @@ class MessagesManager {
 
     buildUnifiedThreads() {
         // Merge and sort by most recent activity
-        const combined = [...this.messages, ...this.visitorChats];
+        const combined = [...this.messages, ...this.visitorChats, ...this.pushNotifications];
         
         combined.sort((a, b) => {
             const timeA = (a.updatedAt || a.createdAt)?.toDate?.() || new Date(a.updatedAt || a.createdAt || 0);
@@ -164,38 +213,68 @@ class MessagesManager {
             filtered = threads.filter(t => t.type === 'chat');
         } else if (this.activeFilter === 'email') {
             filtered = threads.filter(t => t.type === 'email');
+        } else if (this.activeFilter === 'push') {
+            filtered = threads.filter(t => t.type === 'push');
         }
 
         if (filtered.length === 0) {
             listEl.innerHTML = '<p class="inbox-empty" style="padding: 40px; text-align:center; color: var(--text-muted);">Ingen meldinger funnet.</p>';
+            this.updateBulkToolbar(filtered);
             return;
         }
 
         listEl.innerHTML = filtered.map(t => this.renderThreadItem(t)).join('');
+        this.updateBulkToolbar(filtered);
     }
 
     renderThreadItem(t) {
         const isEmail = t.type === 'email';
-        const name = isEmail ? (t.name || 'Ukjent') : (t.visitorName || 'Anonym besøkende');
-        const time = (t.updatedAt || t.createdAt)?.toDate?.() || new Date(t.updatedAt || t.createdAt || 0);
+        const isPush = t.type === 'push';
+        const isChat = t.type === 'chat';
+
+        let name = 'Ukjent';
+        if (isEmail) name = t.name || 'Ukjent';
+        else if (isChat) name = t.visitorName || 'Anonym';
+        else if (isPush) name = 'Kampanje: ' + (t.sentBy || 'Admin');
+
+        const time = (t.updatedAt || t.createdAt || t.sentAt)?.toDate?.() || new Date(t.updatedAt || t.createdAt || t.sentAt || 0);
         const timeLabel = this.formatTime(time);
         
         let preview = '';
         if (isEmail) {
             preview = t.subject || t.message || '';
-        } else {
+        } else if (isChat) {
             preview = t.lastMessage?.text || 'Ingen meldinger enda';
+        } else if (isPush) {
+            preview = t.title || t.body || '';
         }
 
-        const isUnread = isEmail ? t.status !== 'lest' : (t.lastMessage && t.lastMessage.sender === 'visitor');
+        const isUnread = isEmail ? t.status !== 'lest' : (isChat && t.lastMessage && t.lastMessage.sender === 'visitor');
         const isActive = this.activeThreadId === t.id;
+        const isSelected = this.selectedThreads.has(t.id);
+
+        let icon = 'person';
+        let channelIcon = 'mail';
+        let avatarClass = '';
+
+        if (isChat) {
+            icon = 'chat_bubble';
+            channelIcon = 'forum';
+        } else if (isPush) {
+            icon = 'send_to_mobile';
+            channelIcon = 'campaign';
+            avatarClass = 'push';
+        }
 
         return `
             <div class="thread-item ${isUnread ? 'unread' : ''} ${isActive ? 'active' : ''}" data-id="${t.id}" data-type="${t.type}">
-                <div class="thread-avatar">
-                    <span class="material-symbols-outlined">${isEmail ? 'person' : 'chat_bubble'}</span>
+                <div class="thread-item-checkbox" onclick="event.stopPropagation()">
+                    <input type="checkbox" class="thread-checkbox" data-id="${t.id}" ${isSelected ? 'checked' : ''} onchange="window.messagesManager.toggleThreadSelection('${t.id}', this.checked)">
+                </div>
+                <div class="thread-avatar ${avatarClass}">
+                    <span class="material-symbols-outlined">${icon}</span>
                     <div class="thread-channel-icon">
-                        <span class="material-symbols-outlined">${isEmail ? 'mail' : 'smart_toy'}</span>
+                        <span class="material-symbols-outlined">${channelIcon}</span>
                     </div>
                 </div>
                 <div class="thread-info">
@@ -203,12 +282,13 @@ class MessagesManager {
                         <span class="thread-name">${this.escapeHtml(name)}</span>
                         <span class="thread-time">${timeLabel}</span>
                     </div>
-                    ${isEmail && t.subject ? `<div class="thread-subject">${this.escapeHtml(t.subject)}</div>` : ''}
+                    ${(isEmail || isPush) && (t.title || t.subject) ? `<div class="thread-subject">${this.escapeHtml(t.title || t.subject)}</div>` : ''}
                     <div class="thread-preview">${this.escapeHtml(preview)}</div>
                 </div>
             </div>
         `;
     }
+
 
     async selectThread(id, type) {
         this.activeThreadId = id;
@@ -221,9 +301,11 @@ class MessagesManager {
         if (!viewEl) return;
 
         viewEl.innerHTML = '<div class="loader"></div>';
-
+        
         if (type === 'chat') {
             await this.renderChatView(id);
+        } else if (type === 'push') {
+            await this.renderPushView(id);
         } else {
             await this.renderEmailView(id);
         }
@@ -796,23 +878,172 @@ class MessagesManager {
         }
     }
 
-    async deleteMessage(id) {
-        const ok = confirm('Er du sikker på at du vil slette denne meldingen?');
-        if (!ok) return;
-        try {
-            await window.firebaseService.db.collection('contactMessages').doc(id).delete();
-            this.messages = this.messages.filter(m => m.id !== id);
-            this.buildUnifiedThreads();
-            this.renderThreadList();
-            document.getElementById('inbox-thread-view').innerHTML = `
-                <div class="inbox-empty-view">
-                    <span class="material-symbols-outlined">done_all</span>
-                    <p>Meldingen er slettet</p>
+    async renderPushView(id) {
+        const push = this.pushNotifications.find(p => p.id === id);
+        const viewEl = document.getElementById('inbox-thread-view');
+        if (!push || !viewEl) return;
+
+        const time = (push.sentAt || push.createdAt)?.toDate?.() || new Date(push.sentAt || push.createdAt || 0);
+        
+        viewEl.innerHTML = `
+            <div class="message-detail">
+                <div class="message-detail-header">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%;">
+                        <div>
+                            <h2 class="message-subject">${this.escapeHtml(push.title || 'Push-varsling')}</h2>
+                            <div class="message-meta">
+                                <span>Sendt av: ${this.escapeHtml(push.sentBy || 'Admin')}</span>
+                                <span class="meta-separator">•</span>
+                                <span>Målgruppe: ${this.escapeHtml(push.targetRole || 'alle')}</span>
+                                <span class="meta-separator">•</span>
+                                <span>Dato: ${time.toLocaleString('no-NO')}</span>
+                            </div>
+                        </div>
+                        <button class="btn-icon delete-btn" onclick="window.messagesManager.deleteMessage('${push.id}', 'push')">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
                 </div>
-            `;
-        } catch (err) {
-            console.error("Error deleting message:", err);
+                <div class="message-body" style="padding: 30px; line-height: 1.6; font-size: 15px;">
+                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #4338ca; font-weight: 700;">
+                            <span class="material-symbols-outlined">send_to_mobile</span>
+                            PUSH-VARSLING KAMPANJE
+                        </div>
+                        <div style="font-weight: 600; margin-bottom: 8px;">${this.escapeHtml(push.title)}</div>
+                        <div>${this.escapeHtml(push.body)}</div>
+                        ${push.link ? `<div style="margin-top:15px; font-size: 13px;"><a href="${push.link}" target="_blank" style="color:var(--inbox-orange); text-decoration:none;">${push.link}</a></div>` : ''}
+                    </div>
+                    <p style="color: #64748b; font-size: 13px;">Denne loggføringen viser en push-varsling som ble sendt til brukere via administrasjonspanelet.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // Selection Methods
+    toggleThreadSelection(id, isSelected) {
+        if (isSelected) {
+            this.selectedThreads.add(id);
+        } else {
+            this.selectedThreads.delete(id);
         }
+        this.updateBulkToolbar();
+    }
+
+    toggleAllThreads(isSelected) {
+        const threads = this.getCurrentFilteredThreads();
+        threads.forEach(t => {
+            if (isSelected) this.selectedThreads.add(t.id);
+            else this.selectedThreads.delete(t.id);
+        });
+        this.renderThreadList();
+    }
+
+    getCurrentFilteredThreads() {
+        let threads = this.unifiedThreads;
+        if (this.activeFilter === 'unread') {
+            threads = threads.filter(t => (t.type === 'email' && t.status !== 'lest') || (t.type === 'chat' && t.lastMessage?.sender === 'visitor'));
+        } else if (this.activeFilter && this.activeFilter !== 'all') {
+            threads = threads.filter(t => t.type === this.activeFilter);
+        }
+        return threads;
+    }
+
+    updateBulkToolbar(filtered = this.getCurrentFilteredThreads()) {
+        const toolbar = document.getElementById('bulk-actions');
+        const countEl = document.getElementById('selected-count');
+        const selectAllCb = document.getElementById('select-all-threads');
+        
+        if (!toolbar || !countEl) return;
+
+        const selectedCount = this.selectedThreads.size;
+        
+        if (selectedCount > 0) {
+            toolbar.style.display = 'flex';
+            countEl.textContent = `${selectedCount} valgt`;
+            
+            // Update select all state
+            if (selectAllCb) {
+                const allSelected = filtered.length > 0 && filtered.every(t => this.selectedThreads.has(t.id));
+                selectAllCb.checked = allSelected;
+            }
+        } else {
+            toolbar.style.display = 'none';
+            if (selectAllCb) selectAllCb.checked = false;
+        }
+    }
+
+    async deleteSelectedThreads() {
+        const count = this.selectedThreads.size;
+        if (count === 0) return;
+
+        const confirmText = count === 1 
+            ? "Er du sikker på at du vil slette denne meldingen?" 
+            : `Er du sikker på at du vil slette ${count} valgte meldinger?`;
+
+        if (!confirm(confirmText)) return;
+
+        const btn = document.getElementById('bulk-delete-btn');
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sletter...';
+
+        try {
+            const promises = [];
+            this.selectedThreads.forEach(id => {
+                const thread = this.unifiedThreads.find(t => t.id === id);
+                if (thread) {
+                    promises.push(this.performDelete(thread.id, thread.type));
+                }
+            });
+
+            await Promise.all(promises);
+            window.showToast?.(`Slettet ${count} meldinger`, 'success');
+            
+            this.selectedThreads.clear();
+            await this.loadUnifiedInbox();
+            
+            // Clear view if active thread was deleted
+            const viewEl = document.getElementById('inbox-thread-view');
+            if (viewEl) viewEl.innerHTML = '<div class="inbox-empty-view">Ingen samtale valgt</div>';
+
+        } catch (error) {
+            console.error("Bulk delete error:", error);
+            window.showToast?.("Kunne ikke slette alle meldinger", 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+    }
+
+    async deleteMessage(id, type) {
+        if (!confirm("Er du sikker på at du vil slette denne meldingen?")) return;
+        
+        try {
+            await this.performDelete(id, type);
+            window.showToast?.("Melding slettet", 'success');
+            
+            this.selectedThreads.delete(id);
+            await this.loadUnifiedInbox();
+            
+            const viewEl = document.getElementById('inbox-thread-view');
+            if (viewEl) viewEl.innerHTML = '<div class="inbox-empty-view">Ingen samtale valgt</div>';
+            
+        } catch (error) {
+            console.error("Delete error:", error);
+            window.showToast?.("Kunne ikke slette meldingen", 'error');
+        }
+    }
+
+    async performDelete(id, type) {
+        let collection = '';
+        if (type === 'email') collection = 'contactMessages';
+        else if (type === 'chat') collection = 'visitorChats';
+        else if (type === 'push') collection = 'push_log';
+
+        if (!collection) return;
+
+        await window.firebaseService.db.collection(collection).doc(id).delete();
     }
 
     copyChatId(id) {
@@ -842,8 +1073,20 @@ class MessagesManager {
     handleSearch(query) {
         const q = query.toLowerCase();
         const filtered = this.unifiedThreads.filter(t => {
-            const name = (t.type === 'email' ? t.name : t.visitorName) || '';
-            const preview = (t.type === 'email' ? t.subject : t.lastMessage?.text) || '';
+            let name = '';
+            let preview = '';
+            
+            if (t.type === 'email') {
+                name = t.name || '';
+                preview = t.subject || '';
+            } else if (t.type === 'chat') {
+                name = t.visitorName || '';
+                preview = t.lastMessage?.text || '';
+            } else if (t.type === 'push') {
+                name = 'Kampanje: ' + (t.sentBy || 'Admin');
+                preview = t.title || t.body || '';
+            }
+            
             return name.toLowerCase().includes(q) || preview.toLowerCase().includes(q);
         });
         this.renderThreadList(filtered);
@@ -860,6 +1103,134 @@ class MessagesManager {
             return date.toLocaleDateString('no-NO', { weekday: 'short' });
         } else {
             return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short' });
+        }
+    }
+
+    resetPushForm() {
+        const form = document.getElementById('inbox-push-form');
+        if (form) form.reset();
+        const selection = document.getElementById('inbox-push-user-selection');
+        if (selection) selection.style.display = 'none';
+        const status = document.getElementById('inbox-push-status');
+        if (status) status.textContent = '';
+    }
+
+    async renderUserSelection(containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '<div class="loader"></div>';
+
+        try {
+            const snap = await window.firebaseService.db.collection('users').get();
+            if (snap.empty) {
+                container.innerHTML = '<p>Ingen brukere funnet.</p>';
+                return;
+            }
+
+            container.innerHTML = snap.docs.map(doc => {
+                const data = doc.data();
+                return `
+                    <div style="display:flex; align-items:center; gap:10px; padding: 5px 0;">
+                        <input type="checkbox" class="inbox-user-select" value="${doc.id}">
+                        <span style="font-size: 13px;">${this.escapeHtml(data.displayName || data.email || doc.id)}</span>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error("Error loading users:", err);
+            container.innerHTML = '<p>Feil ved lasting av brukere.</p>';
+        }
+    }
+
+    async handlePushSubmit(e) {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const statusEl = document.getElementById('inbox-push-status');
+        
+        const originalText = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sender...';
+        statusEl.textContent = 'Forbereder utsendelse...';
+        statusEl.style.color = 'var(--text-muted)';
+
+        try {
+            const user = window.firebaseService.auth.currentUser;
+            if (!user) throw new Error('Du må være logget inn.');
+
+            const idToken = await user.getIdToken();
+            const targetRole = document.getElementById('inbox-push-target').value;
+            const title = document.getElementById('inbox-push-title').value;
+            const body = document.getElementById('inbox-push-body').value;
+            const link = document.getElementById('inbox-push-link').value;
+
+            let payload = { targetRole, title, body, click_action: link };
+
+            if (targetRole === 'selected') {
+                const selectedIds = Array.from(document.querySelectorAll('.inbox-user-select:checked')).map(cb => cb.value);
+                if (selectedIds.length === 0) throw new Error("Velg minst én bruker.");
+                payload.selectedUserIds = selectedIds;
+            }
+
+            // 1. Save to user_notifications (in-app)
+            let targetUsers = [];
+            const allUsersSnap = await window.firebaseService.db.collection('users').get();
+            allUsersSnap.forEach(doc => {
+                const data = doc.data();
+                if (targetRole === 'all') targetUsers.push(doc.id);
+                else if (targetRole === 'medlem' && data.role === 'medlem') targetUsers.push(doc.id);
+                else if (targetRole === 'selected' && payload.selectedUserIds?.includes(doc.id)) targetUsers.push(doc.id);
+            });
+
+            if (targetUsers.length > 0) {
+                const batch = window.firebaseService.db.batch();
+                targetUsers.forEach(uid => {
+                    const ref = window.firebaseService.db.collection('user_notifications').doc();
+                    batch.set(ref, {
+                        userId: uid,
+                        title,
+                        body,
+                        type: 'push',
+                        link,
+                        read: false,
+                        createdAt: window.firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+                await batch.commit();
+            }
+
+            // 2. Call FCM Cloud Function
+            try {
+                const response = await fetch('https://sendpushnotification-42bhgdjkcq-uc.a.run.app', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) console.warn("Cloud Function reported error, but notification was saved in-app.");
+            } catch (fcmErr) {
+                console.warn("FCM failed:", fcmErr);
+            }
+
+            // 3. Log to push_log
+            await window.firebaseService.db.collection('push_log').add({
+                title,
+                body,
+                targetRole,
+                link,
+                sentBy: user.email || 'Admin',
+                sentAt: window.firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            window.showToast?.("Push-varsling er sendt!", "success");
+            document.getElementById('push-modal').style.display = 'none';
+            this.loadUnifiedInbox(); // Refresh log
+
+        } catch (error) {
+            console.error("Push send error:", error);
+            statusEl.textContent = error.message;
+            statusEl.style.color = '#ef4444';
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalText;
         }
     }
 

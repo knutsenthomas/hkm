@@ -141,8 +141,35 @@ body.crm-body .threads-search input {
     background: var(--inbox-bg-light);
 }
 
+.thread-item-checkbox {
+    display: flex;
+    align-items: center;
+    padding-right: 4px;
+}
+
+.thread-item-checkbox input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
 .thread-item.active {
     background: var(--inbox-selected);
+}
+
+/* Push Thread Specifics */
+.thread-avatar.push {
+    background: #e0e7ff;
+    color: #4338ca;
+}
+
+.bulk-actions {
+    transition: all 0.3s ease;
+    border-bottom: 1px solid var(--inbox-border);
+}
+
+.bulk-actions button:hover {
+    background: #fef2f2 !important;
 }
 
 .thread-item.unread {
