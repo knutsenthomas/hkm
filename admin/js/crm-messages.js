@@ -473,7 +473,9 @@ class MessagesManager {
                 .doc(chatId)
                 .set({
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    lastAgentMessageAt: firebase.firestore.FieldValue.serverTimestamp()
+                    lastAgentMessageAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    lastTargetMode: 'google_chat', // Switch visitor to human mode
+                    requestHuman: true
                 }, { merge: true });
 
             replyEl.value = '';
