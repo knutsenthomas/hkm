@@ -4281,17 +4281,71 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
   if (shouldSendGoogleChat && webhookUrl) {
     try {
       const fallbackSpaceName = extractGoogleChatSpaceNameFromWebhookUrl(webhookUrl);
+      
+      // Building Card V2 for a professional customer support experience
+      const googleChatCard = {
+        cardsV2: [{
+          cardId: `visitor_msg_${Date.now()}`,
+          card: {
+            header: {
+              title: visitorName,
+              subtitle: visitorEmail || "Ingen e-post oppgitt",
+              imageUrl: "https://hiskingdomministry.no/img/logo-hkm.png",
+              imageType: "CIRCLE"
+            },
+            sections: [
+              {
+                header: "Ny melding",
+                widgets: [
+                  {
+                    textParagraph: {
+                      text: text
+                    }
+                  },
+                  {
+                    decoratedText: {
+                      topLabel: "Side",
+                      text: sourcePage || "Ukjent side",
+                      startIcon: { knownIcon: "DESCRIPTION" }
+                    }
+                  }
+                ]
+              },
+              {
+                widgets: [
+                  {
+                    buttonList: {
+                      buttons: [
+                        {
+                          text: "Svar nå",
+                          onClick: {
+                            action: {
+                              functionName: "open_reply_dialog",
+                              parameters: [
+                                { key: "chatId", value: chatId }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }],
+        thread: {
+          threadKey: `visitor_${chatId}`,
+        }
+      };
+
       const response = await fetch(webhookUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json; charset=UTF-8",
         },
-        body: JSON.stringify({
-          text: googleChatText,
-          thread: {
-            threadKey: `visitor_${chatId}`,
-          },
-        }),
+        body: JSON.stringify(googleChatCard),
       });
 
       if (!response.ok) {
@@ -4323,7 +4377,7 @@ exports.onVisitorChatMessageCreated = onDocumentCreated({
         });
       }
 
-      console.log("[GoogleChatSync] Mapping updated", JSON.stringify({
+      console.log("[GoogleChatSync] Mapping updated with Card V2", JSON.stringify({
         chatId,
         resolvedSpaceName,
         responseThreadName,
@@ -4411,6 +4465,110 @@ exports.googleChatBridge = onRequest({
   const payload = parseGoogleChatEventPayload(req);
   const extracted = extractGoogleChatEventFields(payload);
   const eventType = extracted.eventType;
+
+  // Handle Card Clicked (Interactive buttons and dialogs)
+  if (eventType === "CARD_CLICKED") {
+    const action = payload.action && payload.action.actionMethodName;
+    const params = payload.action && payload.action.parameters ? payload.action.parameters : [];
+    const chatIdParam = params.find(p => p.key === "chatId")?.value;
+
+    if (action === "open_reply_dialog") {
+      return res.status(200).json({
+        action_response: {
+          type: "DIALOG",
+          dialog_action: {
+            dialog: {
+              body: {
+                sections: [
+                  {
+                    widgets: [
+                      {
+                        textInput: {
+                          name: "reply_text",
+                          label: "Skriv ditt svar til den besøkende",
+                          type: "MULTIPLE_LINE"
+                        }
+                      }
+                    ]
+                  }
+                ],
+                fixedFooter: {
+                  buttons: [
+                    {
+                      text: "Send svar",
+                      onClick: {
+                        action: {
+                          functionName: "submit_reply",
+                          parameters: [{ key: "chatId", value: chatIdParam }]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    if (action === "submit_reply") {
+      const formValues = payload.common && payload.common.formValues ? payload.common.formValues : {};
+      const replyText = formValues.reply_text?.stringInputs?.value?.[0] || "";
+      const chatId = chatIdParam;
+
+      if (!replyText || !chatId) {
+        return res.status(200).json({
+          action_response: {
+            type: "DIALOG",
+            dialog_action: {
+              action_status: { statusCode: "INVALID_ARGUMENT", userFacingMessage: "Du må skrive en melding." }
+            }
+          }
+        });
+      }
+
+      const chatRef = db.collection("visitorChats").doc(chatId);
+      const chatSnap = await chatRef.get();
+      if (!chatSnap.exists) {
+        return res.status(200).json({
+          action_response: {
+            type: "DIALOG",
+            dialog_action: {
+              action_status: { statusCode: "NOT_FOUND", userFacingMessage: "Fant ikke chatten." }
+            }
+          }
+        });
+      }
+
+      const fromName = clampText(extracted.userDisplayName || "HKM Team", 120);
+
+      await chatRef.collection("messages").add({
+        sender: "agent",
+        source: "google_chat",
+        fromName,
+        text: replyText,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      await chatRef.set({
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastAgentMessageAt: admin.firestore.FieldValue.serverTimestamp(),
+        lastTargetMode: "google_chat", // Switch to human mode
+        requestHuman: true
+      }, { merge: true });
+
+      return res.status(200).json({
+        action_response: {
+          type: "DIALOG",
+          dialog_action: {
+            action_status: { statusCode: "OK", userFacingMessage: "Svar sendt!" }
+          }
+        }
+      });
+    }
+  }
+
   const isCommandEvent = Boolean(extracted.appCommandId);
   if (eventType && eventType !== "MESSAGE" && !isCommandEvent) {
     return res.status(200).json(makeGoogleChatResponse({ text: "OK" }, isWorkspaceAddon));
@@ -4516,6 +4674,8 @@ exports.googleChatBridge = onRequest({
   await chatRef.set({
     updatedAt: admin.firestore.FieldValue.serverTimestamp(),
     lastAgentMessageAt: admin.firestore.FieldValue.serverTimestamp(),
+    lastTargetMode: "google_chat", // Switch to human mode
+    requestHuman: true
   }, { merge: true });
 
   console.log(`[GoogleChatBridge] Reply stored for chatId=${chatId}`);

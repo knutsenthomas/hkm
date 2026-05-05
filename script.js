@@ -2410,6 +2410,20 @@ window.addEventListener('load', () => {
             .orderBy('createdAt', 'asc')
             .limit(100);
 
+        // Lytt på endringer i selve chat-dokumentet for å håndtere modus-skifter fra agenten
+        db.collection('visitorChats').doc(chatId).onSnapshot((doc) => {
+            const data = doc.data() || {};
+            if (data.lastTargetMode && data.lastTargetMode !== activeMode) {
+                // Skift modus automatisk hvis agent har svart (sikrer sømløs overgang til menneske)
+                if (data.lastTargetMode === 'google_chat' || data.lastTargetMode === 'email') {
+                    activeMode = data.lastTargetMode;
+                    localStorage.setItem(CHAT_MODE_KEY, activeMode);
+                    applyModeUI();
+                    renderMessages();
+                }
+            }
+        });
+
         let isTyping = false;
 
         messagesRef.onSnapshot((snapshot) => {
