@@ -12,13 +12,12 @@
 
 .unified-inbox-container {
     display: flex;
-    height: calc(100vh - 120px);
+    height: calc(100vh - 100px);
     background: #fff;
-    border: 1px solid var(--inbox-border);
-    border-radius: 16px;
+    border-top: 1px solid var(--inbox-border);
     overflow: hidden;
-    margin: 0 20px 20px;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    margin: 0;
+    width: 100%;
 }
 
 /* 1. Folders Sidebar */
