@@ -3334,6 +3334,8 @@ body.admin-body .editor-sidebar-panel {
 body.admin-body .section-content>* {
     margin-left: 0 !important;
     margin-right: 0 !important;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Normalize common card/button spacing in forms */
