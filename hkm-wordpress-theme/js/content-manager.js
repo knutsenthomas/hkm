@@ -519,7 +519,13 @@ class ContentManager {
             let finalEvents = [];
 
             // 2. Prefer direct GCal fetch when configured
-            const integrations = await firebaseService.getPageContent('settings_integrations');
+            const service = window.firebaseService;
+            if (!service || !service.isInitialized || typeof service.getPageContent !== 'function') {
+                console.warn('[ContentManager] Firebase service unavailable while loading events. Using local fallback events.');
+                return monthHolidays;
+            }
+
+            const integrations = await service.getPageContent('settings_integrations') || {};
             const gcal = integrations?.googleCalendar || {};
             const apiKey = gcal.apiKey || '';
             const calendarList = Array.isArray(integrations?.googleCalendars)
@@ -545,7 +551,7 @@ class ContentManager {
             }
 
             // 3. Fetch Firestore events (always, to allow overrides or manual events)
-            const eventData = await firebaseService.getPageContent('collection_events');
+            const eventData = await service.getPageContent('collection_events');
             const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
             const taggedFirebase = firebaseItems.map(event => ({
                 ...event,

@@ -402,7 +402,7 @@ class ContentManager {
 
     async getContentDoc(pageId, { silent = false } = {}) {
         const service = window.firebaseService;
-        if (!service || !service.isInitialized) {
+        if (!service || !service.isInitialized || typeof service.getPageContent !== 'function') {
             if (!silent) {
                 this.reportError('firebase-unavailable', new Error(`Firebase not initialized for ${pageId}`), {
                     notifyUser: true,
@@ -427,7 +427,7 @@ class ContentManager {
 
     async getContentDocs(pageIds, { silent = false } = {}) {
         const service = window.firebaseService;
-        if (!service || !service.isInitialized) return {};
+        if (!service || !service.isInitialized || typeof service.getPageContent !== 'function') return {};
 
         try {
             if (typeof service.getManyPageContents === 'function') {
