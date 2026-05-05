@@ -270,6 +270,7 @@
     flex-direction: column;
     gap: 16px;
     background: #fdfdfd;
+    overflow-x: hidden;
 }
 
 .msg-group {
@@ -285,6 +286,9 @@
     font-size: 14px;
     line-height: 1.5;
     position: relative;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
 }
 
 .msg-bubble.visitor {
