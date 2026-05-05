@@ -432,13 +432,27 @@ class HeroSlider {
 
     goTo(index) {
         // Remove active class from current
-        this.slides[this.currentIndex].classList.remove('active');
+        const currentSlide = this.slides[this.currentIndex];
+        currentSlide.classList.remove('active');
+        
+        // Handle video in current slide
+        const currentVideo = currentSlide.querySelector('video');
+        if (currentVideo) {
+            currentVideo.pause();
+        }
 
         // Update index
         this.currentIndex = index;
 
         // Add active class to new
-        this.slides[this.currentIndex].classList.add('active');
+        const nextSlide = this.slides[this.currentIndex];
+        nextSlide.classList.add('active');
+        
+        // Handle video in next slide
+        const nextVideo = nextSlide.querySelector('video');
+        if (nextVideo) {
+            nextVideo.play().catch(e => console.warn('[HeroSlider] Video play failed:', e));
+        }
     }
     next() {
         const nextIndex = (this.currentIndex + 1) % this.slides.length;

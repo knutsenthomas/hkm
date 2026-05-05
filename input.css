@@ -4717,9 +4717,13 @@ ol.block-list {
 }
 
 /* Background Image */
-.hero-bg {
+.hero-bg,
+.hero-video {
     position: absolute;
     inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
     background-size: cover;
     background-position: center;
     /* Subtle zoom effect on active */
@@ -4728,7 +4732,8 @@ ol.block-list {
     transition: none;
 }
 
-.hero-slide.active .hero-bg {
+.hero-slide.active .hero-bg,
+.hero-slide.active .hero-video {
     transform: scale(1.05);
 }
 

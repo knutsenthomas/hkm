@@ -2836,6 +2836,7 @@ class ContentManager {
                 title: (slide.title || '').trim(),
                 subtitle: (slide.subtitle || '').trim(),
                 imageUrl: (slide.imageUrl || '').trim(),
+                videoUrl: (slide.videoUrl || '').trim(),
                 btnText: (slide.btnText || '').trim(),
                 btnLink: (slide.btnLink || '').trim()
             }));
@@ -2849,6 +2850,7 @@ class ContentManager {
                 title: s.querySelector('.hero-title')?.textContent?.trim() || '',
                 subtitle: s.querySelector('.hero-subtitle')?.textContent?.trim() || '',
                 imageUrl: (s.querySelector('.hero-bg')?.style.backgroundImage || '').replace(/url\(["']?(.*?)["']?\)/, '$1') || '',
+                videoUrl: s.querySelector('.hero-video source')?.getAttribute('src') || '',
                 btnText: s.querySelector('.btn')?.textContent?.trim() || '',
                 btnLink: s.querySelector('.btn')?.getAttribute('href') || ''
             }));
@@ -2868,9 +2870,13 @@ class ContentManager {
                 const currentImg = clean(current.imageUrl);
                 const incomingImg = clean(slide.imageUrl);
 
+                const currentVideo = (current.videoUrl || '').trim();
+                const incomingVideo = (slide.videoUrl || '').trim();
+
                 return title !== current.title ||
                     subtitle !== current.subtitle ||
                     currentImg !== incomingImg ||
+                    currentVideo !== incomingVideo ||
                     btnText !== current.btnText ||
                     btnLink !== current.btnLink;
             });
@@ -2879,9 +2885,19 @@ class ContentManager {
                 console.log("[ContentManager] Hero content changed or updated from dashboard, re-rendering...");
                 document.body.classList.remove('hero-animate');
 
-                const heroMarkup = slides.map((slide, index) => `
+                const heroMarkup = slides.map((slide, index) => {
+                    const videoUrl = (slide.videoUrl || '').trim();
+                    const hasVideo = !!videoUrl;
+
+                    return `
                     <div class="hero-slide ${index === 0 ? 'active' : ''}">
-                        <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                        ${hasVideo ? `
+                            <video class="hero-video" ${index === 0 ? 'autoplay' : ''} muted loop playsinline poster="${slide.imageUrl}">
+                                <source src="${videoUrl}" type="video/mp4">
+                            </video>
+                        ` : `
+                            <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                        `}
                         <div class="container hero-container">
                             <div class="hero-content">
                                 <h1 class="hero-title">${slide.title}</h1>
@@ -2894,7 +2910,7 @@ class ContentManager {
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
 
                 this.setHTMLIfChanged(sliderContainer, heroMarkup, '__hero-slides-html');
                 this._renderHtmlSignatures.set('__hero-slides-data', incomingSignature);
