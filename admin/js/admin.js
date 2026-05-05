@@ -5653,7 +5653,7 @@ class AdminManager {
                     <div class="empty-state-container">
                         <span class="material-symbols-outlined empty-state-icon">volunteer_activism</span>
                         <p class="empty-state-text">Ingen innsamlingsaksjoner er opprettet ennå.</p>
-                        <button class="btn-primary" style="margin: 0 auto;" onclick="document.getElementById('add-cause-btn').click()">
+                        <button class="btn-primary" style="margin: 24px auto 0; display: block;" onclick="document.getElementById('add-cause-btn').click()">
                             Opprett din første aksjon
                         </button>
                     </div>
