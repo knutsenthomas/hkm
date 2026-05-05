@@ -194,7 +194,7 @@
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="kommunikasjon">
-                        <a href="#" class="nav-link" data-section="messages">
+                        <a href="/admin/admin-meldinger" class="nav-link">
                             <span class="material-symbols-outlined">inbox</span>
                             <span>Meldinger</span>
                             <span id="messages-badge" class="nav-badge" style="display: none;">0</span>
@@ -480,7 +480,7 @@
                             å redigere nettsiden og følge opp kommunikasjonen.
                         </p>
                         <button type="button" class="overview-hero-action"
-                            onclick="document.querySelector('.nav-link[data-section=&quot;messages&quot;]')?.click()">
+                            onclick="window.location.href='/admin/admin-meldinger'">
                             Gå til meldinger
                             <span class="material-symbols-outlined">arrow_forward</span>
                         </button>
@@ -711,13 +711,6 @@
                 <div class="loader"></div>
             </div>
 
-            <div id="messages-section" class="section-content">
-                <div class="section-header">
-                    <h2 class="section-title">Meldinger</h2>
-                    <p class="section-subtitle">Laster meldinger...</p>
-                </div>
-                <div class="loader"></div>
-            </div>
 
             <div id="comments-section" class="section-content">
                 <div class="section-header">

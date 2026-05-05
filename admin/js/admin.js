@@ -1322,9 +1322,7 @@ class AdminManager {
         const bell = document.getElementById('messages-bell');
         if (bell) {
             bell.addEventListener('click', () => {
-                this.onSectionSwitch('messages');
-                // Trigger click on nav link to ensure all UI syncs (including mobile sidebar close)
-                document.querySelector('.nav-link[data-section="messages"]')?.click();
+                window.location.href = '/admin/admin-meldinger';
             });
         }
 
@@ -1414,9 +1412,7 @@ class AdminManager {
                 case 'events':
                     this.renderCollectionEditor('events', 'Arrangementer');
                     break;
-                case 'messages':
-                    this.renderMessagesSection();
-                    break;
+
                 case 'media':
                     this.renderMediaManager();
                     break;
@@ -2671,7 +2667,7 @@ class AdminManager {
                     <p class="overview-hero-text">
                         Her har du rask oversikt over innhold, meldinger og aktivitet. Bruk menyen til venstre for å redigere nettsiden og følge opp kommunikasjonen.
                     </p>
-                    <button type="button" class="overview-hero-action" onclick="document.querySelector('.nav-link[data-section=&quot;messages&quot;]')?.click()">
+                    <button type="button" class="overview-hero-action" onclick="window.location.href='/admin/admin-meldinger'">
                         Gå til meldinger
                         <span class="material-symbols-outlined">arrow_forward</span>
                     </button>
@@ -3138,260 +3134,6 @@ class AdminManager {
         document.getElementById('save-media-settings').addEventListener('click', () => this.saveMediaSettings());
         document.getElementById('save-podcast-overrides').addEventListener('click', () => this.savePodcastOverrides());
         document.getElementById('refresh-podcast-list').addEventListener('click', () => this.loadPodcastOverrides());
-    }
-
-    async renderMessagesSection() {
-        const section = document.getElementById('messages-section');
-        if (!section) return;
-
-        section.setAttribute('data-rendered', 'true');
-
-        section.innerHTML = `
-            ${this.renderSectionHeader('mail', 'Innboks & Meldinger', 'Laster meldinger...', `
-                <button class="btn btn-primary" onclick="window.adminManager.renderMessagesSection()">
-                    Oppdater
-                </button>
-            `, 'messages-section-subtitle')}
-
-            <div class="design-ui-shell">
-                <div class="design-ui-workspace" style="padding: 0;">
-                    <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                        <div id="messages-list" class="inbox-messages-list">
-                            <div class="loader"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        const subtitleEl = document.getElementById('messages-section-subtitle');
-        const setSubtitle = (text) => {
-            if (!subtitleEl) return;
-            subtitleEl.textContent = text || '';
-        };
-
-        if (!firebaseService.isInitialized) {
-            document.getElementById('messages-list').innerHTML = '<p class="inbox-empty">Firebase er ikke konfigurert.</p>';
-            setSubtitle('Firebase er ikke konfigurert.');
-            return;
-        }
-
-        let allMessages = [];
-
-        const renderMessages = (messages) => {
-            const listEl = document.getElementById('messages-list');
-            if (!listEl) return;
-
-            if (messages.length === 0) {
-                listEl.innerHTML = '<p class="inbox-empty">Ingen meldinger funnet.</p>';
-                setSubtitle('Ingen meldinger funnet.');
-                return;
-            }
-
-            listEl.innerHTML = messages.map(({ id, data }) => {
-                const isRead = data.status === 'lest';
-                const name = data.name || 'Ukjent';
-                const email = data.email || '';
-                const subject = data.subject || '(ingen emne)';
-                const msgPreview = data.message || '';
-                const emailDomain = email ? email.split('@')[1]?.toUpperCase() || email.toUpperCase() : '';
-
-                const createdAt = data.createdAt && typeof data.createdAt.toDate === 'function'
-                    ? data.createdAt.toDate()
-                    : null;
-                const dateStr = createdAt
-                    ? createdAt.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' + createdAt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })
-                    : '';
-
-		                return `
-		                    <div class="inbox-row ${isRead ? 'inbox-row--read' : 'inbox-row--unread'}" data-id="${id}">
-		                        <div class="inbox-row-icon">
-		                            <svg class="inbox-mail-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-		                                <rect x="4" y="6.5" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2" />
-		                                <path d="M5 7.5l7 6 7-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-		                            </svg>
-		                            ${!isRead ? '<span class="inbox-unread-dot"></span>' : ''}
-		                        </div>
-		                        <div class="inbox-row-body">
-		                            <div class="inbox-row-top">
-	                                <span class="inbox-row-name">${this.escapeHtml(name)}</span>
-                                ${emailDomain ? `<span class="inbox-source-badge">${this.escapeHtml(emailDomain)}</span>` : ''}
-                                ${!isRead ? '<span class="inbox-new-dot"></span>' : ''}
-                            </div>
-                            <div class="inbox-row-preview">${this.escapeHtml(subject)}</div>
-                            <div class="inbox-row-msg">${this.escapeHtml(msgPreview.substring(0, 100))}${msgPreview.length > 100 ? '…' : ''}</div>
-                            ${dateStr ? `<div class="inbox-row-date"><span class="material-symbols-outlined">schedule</span> ${dateStr}</div>` : ''}
-                        </div>
-		                        <div class="inbox-row-actions">
-		                            ${!isRead ? `<button class="btn btn-outline btn-sm message-mark-read" data-id="${id}" title="Marker som lest">
-		                                <svg class="inbox-action-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-		                                    <path d="M20 6.5L9 17.5l-5-5" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-		                                </svg>
-		                            </button>` : '<span class="inbox-read-check material-symbols-outlined" title="Lest">check_circle</span>'}
-		                        </div>
-		                    </div>
-		                `;
-	            }).join('');
-        };
-
-        const updateUnreadLabel = () => {
-            const unreadCount = allMessages.filter(m => m.data.status !== 'lest').length;
-            const labelEl = document.getElementById('inbox-unread-label');
-            const markAllBtn = document.getElementById('mark-all-read-btn');
-            if (labelEl) {
-                labelEl.textContent = unreadCount > 0
-                    ? `Du har ${unreadCount} uleste melding${unreadCount === 1 ? '' : 'er'} i innboksen din.`
-                    : 'Alle meldinger er lest.';
-            }
-            if (markAllBtn) markAllBtn.style.display = unreadCount > 0 ? '' : 'none';
-        };
-
-        try {
-            const snapshot = await firebaseService.db
-                .collection('contactMessages')
-                .orderBy('createdAt', 'desc')
-                .limit(100)
-                .get();
-
-            snapshot.forEach(doc => allMessages.push({ id: doc.id, data: doc.data() || {} }));
-
-            updateUnreadLabel();
-            renderMessages(allMessages);
-
-            // Search
-            const searchInput = document.getElementById('inbox-search-input');
-            if (searchInput) {
-                searchInput.addEventListener('input', () => {
-                    const q = searchInput.value.trim().toLowerCase();
-                    const filtered = !q ? allMessages : allMessages.filter(({ data }) =>
-                        (data.name || '').toLowerCase().includes(q) ||
-                        (data.email || '').toLowerCase().includes(q) ||
-                        (data.subject || '').toLowerCase().includes(q) ||
-                        (data.message || '').toLowerCase().includes(q)
-                    );
-                    renderMessages(filtered);
-                    attachRowListeners();
-                });
-            }
-
-            // Mark all as read
-            const markAllBtn = document.getElementById('mark-all-read-btn');
-            if (markAllBtn) {
-                markAllBtn.addEventListener('click', async () => {
-                    const unread = allMessages.filter(m => m.data.status !== 'lest');
-                    if (!unread.length) return;
-                    markAllBtn.disabled = true;
-                    markAllBtn.textContent = 'Oppdaterer...';
-                    try {
-                        const batch = firebaseService.db.batch();
-                        unread.forEach(({ id }) => {
-                            batch.update(firebaseService.db.collection('contactMessages').doc(id), {
-                                status: 'lest',
-                                readAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                        });
-                        await batch.commit();
-                        allMessages.forEach(m => { m.data.status = 'lest'; });
-                        updateUnreadLabel();
-                        renderMessages(allMessages);
-                        attachRowListeners();
-                    } catch (err) {
-                        console.error('Feil ved markering:', err);
-                    } finally {
-                        markAllBtn.disabled = false;
-                        markAllBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">done_all</span> Marker alle som lest';
-                    }
-                });
-            }
-
-            const attachRowListeners = () => {
-                const listEl = document.getElementById('messages-list');
-                if (!listEl) return;
-                listEl.querySelectorAll('.message-mark-read').forEach(btn => {
-                    btn.onclick = async (e) => {
-                        e.stopPropagation();
-                        const id = btn.dataset.id;
-                        try {
-                            await firebaseService.db.collection('contactMessages').doc(id).update({
-                                status: 'lest',
-                                readAt: firebase.firestore.FieldValue.serverTimestamp()
-                            });
-                            const msg = allMessages.find(m => m.id === id);
-                            if (msg) msg.data.status = 'lest';
-                            updateUnreadLabel();
-                            const row = listEl.querySelector(`.inbox-row[data-id="${id}"]`);
-                            if (row) {
-                                row.classList.remove('inbox-row--unread');
-                                row.classList.add('inbox-row--read');
-                                btn.replaceWith(Object.assign(document.createElement('span'), {
-                                    className: 'inbox-read-check material-symbols-outlined',
-                                    title: 'Lest',
-                                    textContent: 'check_circle'
-                                }));
-                                const dot = row.querySelector('.inbox-unread-dot');
-                                if (dot) dot.remove();
-                                const newDot = row.querySelector('.inbox-new-dot');
-                                if (newDot) newDot.remove();
-                                // SVG icon stays the same; only colors/labels change via CSS classes.
-                            }
-                        } catch (err) {
-                            showToast('Kunne ikke markere melding som lest.');
-                        }
-                    };
-                });
-
-                listEl.querySelectorAll('.inbox-row').forEach((row) => {
-                    row.setAttribute('role', 'button');
-                    row.tabIndex = 0;
-
-                    const openDetail = () => {
-                        const id = row.dataset.id;
-                        const msg = allMessages.find((m) => m.id === id);
-                        if (!msg) return;
-                        const d = msg.data || {};
-                        const createdAt = d.createdAt && typeof d.createdAt.toDate === 'function'
-                            ? d.createdAt.toDate()
-                            : (d.timestamp && typeof d.timestamp.toDate === 'function' ? d.timestamp.toDate() : new Date(0));
-                        this.openDetailPreview({
-                            id,
-                            type: 'message',
-                            title: `Melding fra ${d.name || 'ukjent'}`,
-                            date: createdAt,
-                            raw: d
-                        });
-                    };
-
-                    row.onclick = (e) => {
-                        if (e.target.closest('.message-mark-read')) return;
-                        openDetail();
-                    };
-                    row.onkeydown = (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            openDetail();
-                        }
-                    };
-                });
-            };
-
-            attachRowListeners();
-
-            try {
-                const unreadCount = allMessages.filter(m => (m.data && m.data.status) !== 'lest').length;
-                const now = new Date();
-                const timeStr = now.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
-                setSubtitle(`${allMessages.length} meldinger · ${unreadCount} ulest · Oppdatert ${timeStr}`);
-            } catch (e) {
-                setSubtitle(`${allMessages.length} meldinger`);
-            }
-
-        } catch (err) {
-            console.error('Kunne ikke hente kontaktmeldinger:', err);
-            const listEl = document.getElementById('messages-list');
-            if (listEl) listEl.innerHTML = '<p class="inbox-empty" style="color:#ef4444;">Feil ved henting av meldinger.</p>';
-            const code = err && err.code ? ` (${err.code})` : '';
-            setSubtitle(`Feil ved henting${code}`);
-        }
     }
 
     async loadMediaSettings() {
