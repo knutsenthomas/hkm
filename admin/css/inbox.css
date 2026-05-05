@@ -98,11 +98,17 @@
 
 .threads-search input {
     width: 100%;
-    padding: 8px 12px 8px 36px;
+    padding: 10px 12px 10px 42px;
     border: 1px solid var(--inbox-border);
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 12px;
+    font-size: 14px;
     outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.threads-search input:focus {
+    border-color: var(--inbox-orange);
+    box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.1);
 }
 
 .threads-search .material-symbols-outlined {
