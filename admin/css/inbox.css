@@ -114,12 +114,13 @@ body.crm-body .threads-search input {
 .threads-search .material-symbols-outlined {
     position: absolute;
     left: 16px;
-    top: 50%;
+    top: calc(50% + 1px);
     transform: translateY(-50%);
     font-size: 20px;
     color: #94a3b8;
     pointer-events: none;
     z-index: 2;
+    line-height: 1;
 }
 
 .threads-scroll {
