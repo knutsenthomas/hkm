@@ -34,7 +34,7 @@ class MessagesManager {
             if (user) {
                 this.loadUnifiedInbox();
             } else {
-                window.location.href = 'login.html';
+                window.location.href = '/admin/login';
             }
         });
     }

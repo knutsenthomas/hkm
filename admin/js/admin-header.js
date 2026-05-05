@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Delay redirect slightly to avoid false positives during transient auth refresh.
                 pendingAuthRedirect = setTimeout(() => {
                     if (!firebaseService?.auth?.currentUser) {
-                        window.location.href = 'login.html';
+                        window.location.href = '/admin/login';
                     }
                 }, 2500);
                 return;
@@ -179,9 +179,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isAdmin) {
                 const redirect = typeof adminUtils.redirectToMinSideWithAccessDenied === 'function'
                     ? adminUtils.redirectToMinSideWithAccessDenied
-                    : () => { window.location.href = '../minside/index.html'; };
+                    : () => { window.location.href = '/minside'; };
                 redirect({
-                    path: '../minside/index.html',
+                    path: '/minside',
                     message: 'Access Denied: Du har ikke administratorrettigheter til denne siden.'
                 });
                 return;
@@ -235,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (e) { }
                 logoutBtn.innerHTML = originalHtml;
                 logoutBtn.disabled = false;
-                window.location.replace('login.html');
+                window.location.replace('/admin/login');
             }
         });
     };
@@ -302,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (href && href !== '#' && currentPath.includes(href)) {
             bottomNavItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-        } else if (href === '#' && (currentPath.endsWith('index.html') || currentPath.endsWith('admin/'))) {
+        } else if (href === '#' && (currentPath.endsWith('/admin') || currentPath.endsWith('admin/'))) {
             // Oversikt fallback
             if (item.getAttribute('data-section') === 'overview') {
                 item.classList.add('active');

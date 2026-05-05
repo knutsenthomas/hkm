@@ -48,7 +48,7 @@ class MinSideManager {
                     const startView = window.location.hash.replace('#', '') || 'overview';
                     this.loadView(startView);
                 } else {
-                    window.location.href = 'login.html';
+                    window.location.href = '/minside/login';
                 }
             } catch (error) {
                 console.error('Init Error:', error);
@@ -76,7 +76,7 @@ class MinSideManager {
         document.getElementById('sidebar-overlay')?.addEventListener('click', () => this.toggleSidebar(false));
 
         document.getElementById('logout-btn')?.addEventListener('click', () => {
-            firebase.auth().signOut().then(() => window.location.href = '../index.html');
+            firebase.auth().signOut().then(() => window.location.href = '/');
         });
 
         // Actions dropdown
@@ -1666,12 +1666,12 @@ class MinSideManager {
         try {
             await firebase.firestore().collection('users').doc(user.uid).delete();
             await user.delete();
-            window.location.href = '../index.html';
+            window.location.href = '/';
         } catch (error) {
             if (error.code === 'auth/requires-recent-login') {
                 alert('Vennligst logg inn på nytt for å bekrefte sletting.');
                 await firebase.auth().signOut();
-                window.location.href = 'login.html';
+                window.location.href = '/minside/login';
             } else {
                 alert('Feil: ' + error.message);
             }

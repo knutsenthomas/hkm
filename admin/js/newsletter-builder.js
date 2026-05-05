@@ -207,7 +207,7 @@ class NewsletterBuilder {
     startAuthListener() {
         window.firebaseService.onAuthChange((user) => {
             if (!user) {
-                window.location.href = 'login.html';
+                window.location.href = '/admin/login';
             } else {
                 this.loadTemplates();
             }
@@ -950,7 +950,7 @@ class NewsletterBuilder {
 
                 // Optionally redirect back to dashboard
                 if (confirm("Vil du gå tilbake til dashbordet?")) {
-                    window.location.href = 'index.html';
+                    window.location.href = '/admin';
                 }
             }, 1500);
 

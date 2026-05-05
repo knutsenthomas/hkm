@@ -31,7 +31,7 @@ class SegmentManager {
             if (user) {
                 this.loadSegments();
             } else {
-                window.location.href = 'login.html';
+                window.location.href = '/admin/login';
             }
         });
     }

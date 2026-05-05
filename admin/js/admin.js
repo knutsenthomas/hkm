@@ -751,7 +751,7 @@ class AdminManager {
                 // Delay redirect slightly to avoid random logouts during transient auth/token refresh.
                 this._pendingAuthRedirectTimer = setTimeout(() => {
                     if (!firebaseService?.auth?.currentUser) {
-                        window.location.href = 'login.html';
+                        window.location.href = '/admin/login';
                     }
                 }, 2500);
                 return;
@@ -771,11 +771,11 @@ class AdminManager {
                     console.warn("Access denied: User lacks admin role.");
                     if (typeof adminUtils.redirectToMinSideWithAccessDenied === 'function') {
                         adminUtils.redirectToMinSideWithAccessDenied({
-                            path: '../minside/index.html',
+                            path: '/minside',
                             message: 'Access Denied: Du har ikke administratorrettigheter til adminpanelet.'
                         });
                     } else {
-                        window.location.href = '../minside/index.html';
+                        window.location.href = '/minside';
                     }
                     return;
                 }
@@ -807,11 +807,11 @@ class AdminManager {
                 // On error, steer to safety (public area)
                 if (typeof adminUtils.redirectToMinSideWithAccessDenied === 'function') {
                     adminUtils.redirectToMinSideWithAccessDenied({
-                        path: '../minside/index.html',
+                        path: '/minside',
                         message: 'Tilgang kunne ikke verifiseres. Prøv igjen eller kontakt administrator.'
                     });
                 } else {
-                    window.location.href = '../minside/index.html';
+                    window.location.href = '/minside';
                 }
             }
         });
@@ -1137,7 +1137,7 @@ class AdminManager {
                 event.stopPropagation();
                 logoutBtn.disabled = true;
                 if (firebaseService.isInitialized) await firebaseService.logout();
-                window.location.href = 'login.html';
+                window.location.href = '/admin/login';
             });
         }
 
@@ -1313,7 +1313,7 @@ class AdminManager {
     async logout() {
         try {
             await firebaseService.logout();
-            window.location.href = 'login.html';
+            window.location.href = '/admin/login';
         } catch (error) {
             console.error("Error signing out:", error);
             this.showToast("Failed to log out. Please try again.", "error", 5000);
@@ -7488,21 +7488,21 @@ class AdminManager {
                     title: 'Tenk & gi nestekjærlighet',
                     subtitle: 'Vi er her for å støtte deg på din åndelige reise. Bli med i et trygt miljø der vi utforsker Guds ord, deler livet og styrker relasjonen til Jesus.',
                     btnText: 'Utforsk mer',
-                    btnLink: 'om-oss.html'
+                    btnLink: '/om-oss'
                 },
                 {
                     imageUrl: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=1920&h=1080&fit=crop',
                     title: 'Vekst gjennom felleskap',
                     subtitle: 'Uansett hvor du er på din vandring, ønsker vi å gå sammen med deg. Bli med i et felleskap som utforsker Guds ord og styrker troen.',
                     btnText: 'Les mer',
-                    btnLink: 'om-oss.html'
+                    btnLink: '/om-oss'
                 },
                 {
                     imageUrl: 'https://images.unsplash.com/photo-1507692049790-de58290a4334?w=1920&h=1080&fit=crop',
                     title: 'Støtt vårt arbeid',
                     subtitle: 'Din gave gjør en forskjell. Hjelp oss å nå flere mennesker med evangeliet gjennom undervisning, reisevirksomhet og felleskap.',
                     btnText: 'Gi gave nå',
-                    btnLink: 'donasjoner.html'
+                    btnLink: '/donasjoner'
                 }
             ];
             await firebaseService.savePageContent('hero_slides', { slides: heroSlides });
