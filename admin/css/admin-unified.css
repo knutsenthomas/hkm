@@ -3332,8 +3332,15 @@ body.admin-body .editor-sidebar-panel {
 
 /* Prevent uneven rows caused by mixed top offsets/margins */
 body.admin-body .section-content>* {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+body.admin-body .section-content>.card,
+body.admin-body .section-content>.stats-grid,
+body.admin-body .section-content>.form-container {
+    margin-left: var(--admin-page-gutter, 24px);
+    margin-right: var(--admin-page-gutter, 24px);
 }
 
 /* Normalize common card/button spacing in forms */
