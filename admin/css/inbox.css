@@ -95,9 +95,10 @@
     position: relative;
 }
 
-.threads-search input {
+body.admin-body .threads-search input,
+body.crm-body .threads-search input {
     width: 100%;
-    padding: 10px 12px 10px 42px !important;
+    padding: 10px 12px 10px 44px !important;
     border: 1px solid var(--inbox-border);
     border-radius: 12px;
     font-size: 14px;
@@ -112,7 +113,7 @@
 
 .threads-search .material-symbols-outlined {
     position: absolute;
-    left: 14px;
+    left: 16px;
     top: 50%;
     transform: translateY(-50%);
     font-size: 20px;
