@@ -38,6 +38,10 @@ class CRMManager {
 
         // Setup UI Listeners
         this.setupEventListeners();
+        this.setupDrawerListeners();
+
+        // Show skeletons immediately
+        this.renderSkeleton();
 
         // Wait for Firebase to be ready with a small retry loop
         const waitForFirebase = setInterval(() => {
@@ -160,6 +164,7 @@ class CRMManager {
 
             this.applyCurrentFiltersAndSearch();
             this.updateViewSelector();
+            this.updateStats();
         } catch (error) {
             console.error("Error loading contacts:", error);
             tableBody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:red;">Feil ved lasting av kontakter.</td></tr>`;
@@ -206,6 +211,7 @@ class CRMManager {
             }
 
             const initials = firstName ? (firstName[0] + (lastName ? lastName[0] : '')).toUpperCase() : fullName[0].toUpperCase();
+            const colorClass = this.getAvatarColorClass(fullName);
             const statusClass = this.getStatusClass(contact.status);
             const formatDate = (dateVal) => {
                 if (!dateVal) return '-';
@@ -229,28 +235,28 @@ class CRMManager {
             const safeLastActivity = this.escapeHtml(lastActivity);
 
             return `
-                <tr data-id="${safeId}">
-                    <td class="col-check">
+                <tr data-id="${safeId}" class="contact-row" style="cursor: pointer;">
+                    <td class="col-check" onclick="event.stopPropagation()">
                         <input type="checkbox" class="contact-checkbox" data-id="${safeId}" ${this.selectedContactIds.has(contact.id) ? 'checked' : ''}>
                     </td>
-                    <td>
+                    <td class="open-drawer-trigger">
                         <div class="contact-user">
-                            <div class="avatar">${safeInitials}</div>
+                            <div class="avatar ${colorClass}">${safeInitials}</div>
                             <div class="name-wrap">
                                 <span class="name">${safeName}</span>
                                 <span class="sub">${safeRole}</span>
                             </div>
                         </div>
                     </td>
-                    <td>${safeEmail}</td>
-                    <td>${safePhone}</td>
-                    <td><span class="badge ${statusClass}">${safeStatus}</span></td>
-                    <td>
+                    <td class="open-drawer-trigger">${safeEmail}</td>
+                    <td class="open-drawer-trigger">${safePhone}</td>
+                    <td class="open-drawer-trigger"><span class="badge ${statusClass}">${safeStatus}</span></td>
+                    <td class="open-drawer-trigger">
                         <div class="labels-list">
                             ${this.renderLabels(contact.labels || [contact.label || 'Ny'])}
                         </div>
                     </td>
-                    <td>${safeLastActivity}</td>
+                    <td class="open-drawer-trigger">${safeLastActivity}</td>
                     <td class="col-actions">
                         <div class="contact-row-actions ${isMenuOpen ? 'open' : ''}">
                             <button class="btn-icon contact-actions-btn" type="button" data-id="${safeId}" aria-haspopup="menu" aria-expanded="${isMenuOpen ? 'true' : 'false'}" title="Radhandlinger">
@@ -271,6 +277,14 @@ class CRMManager {
                 </tr>
             `;
         }).join('');
+
+        // Re-attach listeners
+        document.querySelectorAll('.open-drawer-trigger').forEach(el => {
+            el.onclick = (e) => {
+                const id = el.closest('tr').dataset.id;
+                this.openDrawer(id);
+            };
+        });
 
         // Re-attach checkbox listeners
         document.querySelectorAll('.contact-checkbox').forEach(cb => {
@@ -1209,19 +1223,218 @@ class CRMManager {
         });
     }
 
-    renderSegmentsList() {
-        // We are currently using the static "empty state" HTML in the modal 
-        // as per the user request. This method is kept for future data binding
-        // when we want to switch from empty state to list view.
+    // --- PRO: Skeleton Loading ---
+    renderSkeleton() {
+        const tableBody = document.getElementById('contacts-table-body');
+        if (!tableBody) return;
 
-        const countBadge = document.getElementById('segment-count-badge');
-        if (countBadge) countBadge.textContent = '0';
+        let skeletonHtml = '';
+        for (let i = 0; i < 6; i++) {
+            skeletonHtml += `
+                <tr>
+                    <td class="col-check"><div class="skeleton" style="width:18px; height:18px;"></div></td>
+                    <td>
+                        <div class="contact-user">
+                            <div class="skeleton skeleton-avatar"></div>
+                            <div class="name-wrap">
+                                <div class="skeleton skeleton-text" style="width:120px;"></div>
+                                <div class="skeleton skeleton-text" style="width:60px; margin-top:4px;"></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td><div class="skeleton skeleton-text" style="width:140px;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width:100px;"></div></td>
+                    <td><div class="skeleton skeleton-badge"></div></td>
+                    <td><div class="skeleton skeleton-badge" style="width:40px;"></div></td>
+                    <td><div class="skeleton skeleton-text" style="width:80px;"></div></td>
+                    <td></td>
+                </tr>
+            `;
+        }
+        tableBody.innerHTML = skeletonHtml;
+    }
 
-        /* 
-        const listContainer = document.getElementById('segments-content-area');
-        // Example of how we would render list if we had segments:
-        // if (segments.length > 0) { renderList() } else { showEmptyState() }
-        */
+    // --- PRO: Smart Avatars ---
+    getAvatarColorClass(name) {
+        if (!name) return 'color-1';
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        const colorIndex = (Math.abs(hash) % 7) + 1;
+        return `color-${colorIndex}`;
+    }
+
+    // --- PRO: Quick Stats ---
+    updateStats() {
+        const totalEl = document.getElementById('stat-total-contacts');
+        const newEl = document.getElementById('stat-new-contacts');
+        const activeEl = document.getElementById('stat-active-now');
+        if (!totalEl || !newEl || !activeEl) return;
+
+        const total = this.contacts.length;
+        
+        // Count new (created last 30 days)
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        const newCount = this.contacts.filter(c => {
+            const created = c.createdAt ? new Date(c.createdAt) : null;
+            return created && created > thirtyDaysAgo;
+        }).length;
+
+        // Active estimation (logged in last 7 days)
+        const sevenDaysAgo = new Date();
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+        const activeCount = this.contacts.filter(c => {
+            const login = c.lastLogin ? (c.lastLogin.toDate ? c.lastLogin.toDate() : new Date(c.lastLogin)) : null;
+            return login && login > sevenDaysAgo;
+        }).length;
+
+        totalEl.textContent = total.toLocaleString('no-NO');
+        newEl.textContent = `+${newCount}`;
+        activeEl.textContent = activeCount.toLocaleString('no-NO');
+    }
+
+    // --- PRO: Drawer System ---
+    setupDrawerListeners() {
+        const overlay = document.getElementById('contact-drawer-overlay');
+        const closeBtn = document.getElementById('close-drawer-btn');
+        if (overlay) overlay.onclick = () => this.closeDrawer();
+        if (closeBtn) closeBtn.onclick = () => this.closeDrawer();
+    }
+
+    async openDrawer(contactId) {
+        const contact = this.contacts.find(c => c.id === contactId);
+        if (!contact) return;
+
+        const overlay = document.getElementById('contact-drawer-overlay');
+        const drawer = document.getElementById('contact-drawer');
+        const body = document.getElementById('drawer-body');
+        if (!overlay || !drawer || !body) return;
+
+        overlay.classList.add('is-open');
+        drawer.classList.add('is-open');
+
+        // Initial loading state in drawer
+        body.innerHTML = `
+            <div class="drawer-section">
+                <div class="skeleton skeleton-avatar" style="width:80px; height:80px; margin-bottom:16px;"></div>
+                <div class="skeleton skeleton-text" style="width:200px; height:24px; margin-bottom:8px;"></div>
+                <div class="skeleton skeleton-text" style="width:150px;"></div>
+            </div>
+            <div class="drawer-section">
+                <div class="drawer-section-title">Aktivitetslogg</div>
+                <div class="loader"></div>
+            </div>
+        `;
+
+        // Render real profile info
+        const firstName = contact.firstName || '';
+        const lastName = contact.lastName || '';
+        const fullName = contact.displayName || `${firstName} ${lastName}`.trim() || contact.email;
+        const initials = firstName ? (firstName[0] + (lastName ? lastName[0] : '')).toUpperCase() : fullName[0].toUpperCase();
+        const colorClass = this.getAvatarColorClass(fullName);
+
+        body.innerHTML = `
+            <div class="drawer-profile-header" style="text-align: center; margin-bottom: 40px;">
+                <div class="avatar ${colorClass}" style="width: 80px; height: 80px; font-size: 28px; margin: 0 auto 16px auto;">${initials}</div>
+                <h3 style="font-size: 22px; font-weight: 800; margin-bottom: 4px;">${this.escapeHtml(fullName)}</h3>
+                <p style="color: var(--text-muted); font-size: 14px;">${this.escapeHtml(contact.email)}</p>
+                <div style="margin-top: 16px; display: flex; justify-content: center; gap: 10px;">
+                    <button class="btn btn-secondary btn-sm" onclick="window.crm.openEditContactModal('${contact.id}')">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">edit</span>
+                        Rediger
+                    </button>
+                    <a href="mailto:${contact.email}" class="btn btn-primary btn-sm">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
+                        Send e-post
+                    </a>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-section-title">
+                    <span class="material-symbols-outlined">info</span>
+                    Kontaktinformasjon
+                </div>
+                <div style="display: grid; gap: 12px;">
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted); font-size: 13px;">Telefon</span>
+                        <span style="font-weight: 600; font-size: 13px;">${this.escapeHtml(contact.phone || '-')}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted); font-size: 13px;">Rolle</span>
+                        <span style="font-weight: 600; font-size: 13px;">${this.escapeHtml(this._roleLabel(contact.role))}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted); font-size: 13px;">Medlem siden</span>
+                        <span style="font-weight: 600; font-size: 13px;">${contact.createdAt ? new Date(contact.createdAt).toLocaleDateString('no-NO') : '-'}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="drawer-section">
+                <div class="drawer-section-title">
+                    <span class="material-symbols-outlined">history</span>
+                    Aktivitetslogg
+                </div>
+                <div id="drawer-timeline" class="timeline">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        `;
+
+        this.renderTimeline(contact);
+    }
+
+    closeDrawer() {
+        const overlay = document.getElementById('contact-drawer-overlay');
+        const drawer = document.getElementById('contact-drawer');
+        if (overlay) overlay.classList.remove('is-open');
+        if (drawer) drawer.classList.remove('is-open');
+    }
+
+    async renderTimeline(contact) {
+        const timelineEl = document.getElementById('drawer-timeline');
+        if (!timelineEl) return;
+
+        try {
+            // Simplified timeline based on user data
+            const events = [];
+            
+            if (contact.createdAt) {
+                events.push({ title: 'Bruker registrert', time: new Date(contact.createdAt), icon: 'person_add' });
+            }
+            if (contact.lastLogin) {
+                const loginDate = contact.lastLogin.toDate ? contact.lastLogin.toDate() : new Date(contact.lastLogin);
+                events.push({ title: 'Siste pålogging', time: loginDate, icon: 'login' });
+            }
+            if (contact.updatedAt) {
+                events.push({ title: 'Profil oppdatert', time: new Date(contact.updatedAt), icon: 'edit' });
+            }
+
+            // Sort events by time
+            events.sort((a, b) => b.time - a.time);
+
+            if (events.length === 0) {
+                timelineEl.innerHTML = '<p style="font-size: 13px; color: var(--text-muted); font-style: italic;">Ingen nylig aktivitet funnet.</p>';
+                return;
+            }
+
+            timelineEl.innerHTML = events.map(event => `
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <span class="timeline-time">${event.time.toLocaleDateString('no-NO')} kl. ${event.time.getHours().toString().padStart(2, '0')}:${event.time.getMinutes().toString().padStart(2, '0')}</span>
+                        <div class="timeline-title">${event.title}</div>
+                    </div>
+                </div>
+            `).join('');
+
+        } catch (error) {
+            console.error("Timeline error:", error);
+            timelineEl.innerHTML = '<p style="color: red; font-size: 12px;">Kunne ikke laste tidslinje.</p>';
+        }
     }
 }
 

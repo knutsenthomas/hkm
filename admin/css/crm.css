@@ -1091,3 +1091,211 @@ body.crm-body {
         transform: rotate(360deg);
     }
 }
+/* --- PRO UPGRADE STYLES --- */
+
+/* 1. Quick Stats Bar */
+.crm-stats-bar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.stat-item {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.stat-icon .material-symbols-outlined {
+    font-size: 24px;
+}
+
+.stat-info .stat-value {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text-main);
+    display: block;
+    line-height: 1;
+}
+
+.stat-info .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-top: 4px;
+    display: block;
+}
+
+/* 2. Skeleton Loading Animation */
+@keyframes skeleton-pulse {
+    0% { background-color: #f1f5f9; }
+    50% { background-color: #e2e8f0; }
+    100% { background-color: #f1f5f9; }
+}
+
+.skeleton {
+    animation: skeleton-pulse 1.5s infinite ease-in-out;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.skeleton-text { height: 12px; width: 80%; }
+.skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+.skeleton-badge { width: 60px; height: 20px; border-radius: 99px; }
+
+/* 3. Detail Drawer (Slide-in) */
+.contact-drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(4px);
+    z-index: 1100;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.contact-drawer-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.contact-drawer {
+    position: fixed;
+    top: 0;
+    right: -480px; /* Hidden by default */
+    width: 100%;
+    max-width: 480px;
+    height: 100vh;
+    background: white;
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+    z-index: 1200;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    flex-direction: column;
+}
+
+.contact-drawer-overlay.is-open + .contact-drawer,
+.contact-drawer.is-open {
+    transform: translateX(-480px);
+}
+
+.drawer-header {
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.drawer-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px;
+}
+
+.drawer-section {
+    margin-bottom: 40px;
+}
+
+.drawer-section-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 4. Timeline Styles */
+.timeline {
+    position: relative;
+    padding-left: 24px;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--border-color);
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 24px;
+}
+
+.timeline-dot {
+    position: absolute;
+    left: -24px;
+    top: 4px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: white;
+    border: 2px solid var(--accent-orange);
+    z-index: 2;
+}
+
+.timeline-content {
+    background: #f8fafc;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+}
+
+.timeline-time {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.timeline-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+/* 5. Smart Avatar Colors */
+.avatar.color-1 { background: #3b82f6; }
+.avatar.color-2 { background: #10b981; }
+.avatar.color-3 { background: #f59e0b; }
+.avatar.color-4 { background: #8b5cf6; }
+.avatar.color-5 { background: #ec4899; }
+.avatar.color-6 { background: #06b6d4; }
+.avatar.color-7 { background: #f97316; }
+
+/* Responsive tweaks */
+@media (max-width: 640px) {
+    .contact-drawer {
+        max-width: 100%;
+        right: -100%;
+    }
+    .contact-drawer-overlay.is-open + .contact-drawer,
+    .contact-drawer.is-open {
+        transform: translateX(-100%);
+    }
+}

@@ -282,12 +282,43 @@
                     </div>
                 </div>
 
+                <!-- Quick Stats Bar -->
+                <div class="crm-stats-bar" id="crm-stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-icon" style="background: #eff6ff; color: #3b82f6;">
+                            <span class="material-symbols-outlined">group</span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-total-contacts">-</span>
+                            <span class="stat-label">Totalt antall</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon" style="background: #f0fdf4; color: #10b981;">
+                            <span class="material-symbols-outlined">person_add</span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-new-contacts">-</span>
+                            <span class="stat-label">Nye denne måneden</span>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon" style="background: #fff7ed; color: #f97316;">
+                            <span class="material-symbols-outlined">bolt</span>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="stat-active-now">-</span>
+                            <span class="stat-label">Aktive nå (est.)</span>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Contacts Section -->
                 <div class="contacts-grid card modern">
                     <div class="table-header">
                         <div class="header-left-actions">
                             <select class="view-selector">
-                                <option>Alle kontakter (19)</option>
+                                <option>Alle kontakter (0)</option>
                                 <option>Nye kontakter</option>
                                 <option>Givere</option>
                             </select>
@@ -326,18 +357,27 @@
                                 </tr>
                             </thead>
                             <tbody id="contacts-table-body">
-                                <!-- Dynamic rows -->
-                                <tr>
-                                    <td colspan="8" style="text-align: center; padding: 40px;">
-                                        <div class="loader" role="status" aria-label="Laster kontakter"></div>
-                                    </td>
-                                </tr>
+                                <!-- Dynamic rows / Skeleton -->
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Contact Detail Drawer -->
+    <div class="contact-drawer-overlay" id="contact-drawer-overlay"></div>
+    <div class="contact-drawer" id="contact-drawer">
+        <div class="drawer-header">
+            <h2 id="drawer-title">Kontaktdetaljer</h2>
+            <button class="btn-icon" id="close-drawer-btn">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="drawer-body" id="drawer-body">
+            <!-- Dynamic Content -->
+        </div>
     </div>
 
     <nav class="mobile-bottom-nav">
