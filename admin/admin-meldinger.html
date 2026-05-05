@@ -154,7 +154,7 @@
     <!-- Push Notification Modal -->
     <div id="push-modal" class="modal" style="display: none;">
         <div class="modal-content" style="max-width: 500px; padding: 0; border-radius: 16px; overflow: hidden;">
-            <div style="background: #1B4965; color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
                     <span class="material-symbols-outlined">campaign</span>
                     Ny push-varsling
@@ -193,7 +193,7 @@
                         <input type="text" id="inbox-push-link" class="form-control" placeholder="https://..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd;">
                     </div>
 
-                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; border-radius: 12px; gap: 10px;">
+                    <button type="submit" class="btn btn-primary" style="width: 100%; padding: 12px; border-radius: 12px; gap: 10px; background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; display: flex; align-items: center; justify-content: center;">
                         <span class="material-symbols-outlined">send</span>
                         Send Push-varsling
                     </button>
@@ -451,7 +451,7 @@
                     <!-- 1. Folders Sidebar -->
                     <aside class="inbox-folders">
                         <div style="padding: 15px;">
-                            <button class="btn btn-primary" id="btn-new-push" style="width: 100%; border-radius: 12px; gap: 8px;">
+                            <button class="btn btn-primary" id="btn-new-push" style="width: 100%; border-radius: 12px; gap: 8px; background: linear-gradient(135deg, #d17d39, #bd4f2a); border: none; display: flex; align-items: center; justify-content: center;">
                                 <span class="material-symbols-outlined">campaign</span>
                                 Ny push-varsling
                             </button>
@@ -487,13 +487,13 @@
                                 <span class="material-symbols-outlined">search</span>
                                 <input type="text" id="inbox-search" placeholder="Søk i innboks...">
                             </div>
-                            <div class="bulk-actions" id="bulk-actions" style="display: none; padding: 12px 20px; border-top: 1px solid var(--inbox-border); align-items: center; justify-content: space-between; background: var(--inbox-bg-light);">
-                                <div style="display: flex; align-items: center; gap: 12px;">
-                                    <input type="checkbox" id="select-all-threads" style="width: 18px; height: 18px; cursor: pointer;">
-                                    <span style="font-size: 13px; font-weight: 600; color: var(--inbox-orange);" id="selected-count">0 valgt</span>
+                            <div class="bulk-actions" id="bulk-actions" style="display: none;">
+                                <div class="bulk-actions-left">
+                                    <input type="checkbox" id="select-all-threads">
+                                    <span id="selected-count">0 valgt</span>
                                 </div>
-                                <button class="btn btn-outline btn-sm" id="bulk-delete-btn" style="color: #ef4444; border-color: #fecaca; background: #fff;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px;">delete</span> Slett markerte
+                                <button class="btn btn-outline btn-sm delete-selected-btn" id="bulk-delete-btn">
+                                    <span class="material-symbols-outlined">delete</span> Slett markerte
                                 </button>
                             </div>
                         </div>
