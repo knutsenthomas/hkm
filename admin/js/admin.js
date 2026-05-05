@@ -3644,11 +3644,9 @@ class AdminManager {
                     <span class="material-symbols-outlined">add</span> Legg til ny
                 </button>
             `)}
-            <div class="card">
-                <div class="card-body">
-                    <div class="collection-list" id="${collectionId}-list">
-                        <div class="loader">Laster ${title.toLowerCase()}...</div>
-                    </div>
+            <div class="card" style="padding: 0; overflow: hidden; border-radius: 16px;">
+                <div id="${collectionId}-list">
+                    <div class="loader">Laster ${title.toLowerCase()}...</div>
                 </div>
             </div>
         `;
@@ -3898,7 +3896,7 @@ class AdminManager {
         }).join('');
 
         container.innerHTML = `
-            <div class="table-container">
+            <div class="table-container full-bleed">
                 <table class="crm-table">
                     <thead>
                         <tr>

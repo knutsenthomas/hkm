@@ -3143,6 +3143,11 @@ body.admin-body .table-container {
     box-sizing: border-box;
 }
 
+.table-container.full-bleed {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
 /* Contacts table: avoid double horizontal inset (card + table container) */
 body.crm-body .contacts-grid.card.modern .table-container {
     padding-left: 0 !important;
