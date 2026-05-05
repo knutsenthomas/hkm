@@ -32,6 +32,9 @@ const googleChatBridgeTokenParam = defineSecret("GOOGLE_CHAT_BRIDGE_TOKEN");
 const geminiApiKeyParam = defineSecret("GEMINI_API_KEY");
 const emailUserParam = defineSecret("EMAIL_USER");
 const emailPassParam = defineSecret("EMAIL_PASS");
+const gaPropertyIdParam = defineSecret("GA4_PROPERTY_ID");
+const gaServiceAccountEmailParam = defineSecret("GA_SERVICE_ACCOUNT_EMAIL");
+const gaServiceAccountPrivateKeyParam = defineSecret("GA_SERVICE_ACCOUNT_PRIVATE_KEY");
 
 function getSecretOrEnv(secretParam, envKeys = []) {
   const candidates = [];
@@ -98,6 +101,96 @@ function sanitizeWixInlineHtml(rawInner) {
 
   return html;
 }
+
+// --- Google Analytics Data API Helpers ---
+const GA_SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
+const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+const GA_DATA_BASE = "https://analyticsdata.googleapis.com/v1beta";
+
+const base64UrlEncode = (input) => {
+  const buffer = Buffer.isBuffer(input) ? input : Buffer.from(input);
+  return buffer
+    .toString("base64")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/g, "");
+};
+
+const signJwt = ({ clientEmail, privateKey }) => {
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: "RS256", typ: "JWT" };
+  const payload = {
+    iss: clientEmail,
+    scope: GA_SCOPE,
+    aud: GOOGLE_TOKEN_URL,
+    iat: now,
+    exp: now + 3600,
+  };
+
+  const encodedHeader = base64UrlEncode(JSON.stringify(header));
+  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
+  const unsignedToken = `${encodedHeader}.${encodedPayload}`;
+
+  const signer = crypto.createSign("RSA-SHA256");
+  signer.update(unsignedToken);
+  signer.end();
+
+  const signature = signer.sign(privateKey);
+  return `${unsignedToken}.${base64UrlEncode(signature)}`;
+};
+
+const getGaAccessToken = async ({ clientEmail, privateKey }) => {
+  const assertion = signJwt({ clientEmail, privateKey });
+  const body = new URLSearchParams({
+    grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+    assertion,
+  });
+
+  const response = await fetch(GOOGLE_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body,
+  });
+
+  const json = await response.json();
+  if (!response.ok || !json?.access_token) {
+    throw new Error(json?.error_description || json?.error || "Failed to get Google access token");
+  }
+
+  return json.access_token;
+};
+
+const googleGaPost = async ({ path, accessToken, body }) => {
+  const response = await fetch(`${GA_DATA_BASE}${path}`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const json = await response.json();
+  if (!response.ok) {
+    const msg = json?.error?.message || "Google Analytics Data API request failed";
+    throw new Error(msg);
+  }
+  return json;
+};
+
+const gaMetricValue = (report, rowIndex = 0, metricIndex = 0) => {
+  const raw = report?.rows?.[rowIndex]?.metricValues?.[metricIndex]?.value;
+  const num = Number(raw);
+  return Number.isFinite(num) ? num : 0;
+};
+
+const mapGaDimensionMetricRows = (report) => (
+  (report?.rows || []).map((row) => ({
+    dimension: row?.dimensionValues?.[0]?.value || "Unknown",
+    metric: Number(row?.metricValues?.[0]?.value || 0),
+  }))
+);
+
 
 function extractWixViewerBlocksAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
@@ -5233,8 +5326,101 @@ exports.cleanupBlogDuplicates = onRequest(async (req, res) => {
       },
       removed_items: matches.filter(m => m !== toKeep).map(m => ({ title: m.title, source: m.source, _id: m._id }))
     });
+  }
+});
+
+exports.getAnalyticsOverview = onRequest({
+  secrets: [gaPropertyIdParam, gaServiceAccountEmailParam, gaServiceAccountPrivateKeyParam],
+  cors: true
+}, async (req, res) => {
+  try {
+    const propertyId = gaPropertyIdParam.value();
+    const clientEmail = gaServiceAccountEmailParam.value();
+    const privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
+    const privateKey = privateKeyRaw.replace(/\\n/g, "\n").trim();
+
+    if (!propertyId || !clientEmail || !privateKey) {
+      return res.status(503).json({
+        status: "unconfigured",
+        message: "Google Analytics backend is not configured."
+      });
+    }
+
+    const accessToken = await getGaAccessToken({ clientEmail, privateKey });
+
+    const [summaryReport, pagesReport, sourcesReport, realtimeReport] = await Promise.all([
+      googleGaPost({
+        path: `/properties/${propertyId}:runReport`,
+        accessToken,
+        body: {
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          metrics: [{ name: "activeUsers" }, { name: "screenPageViews" }],
+          limit: 1,
+        },
+      }),
+      googleGaPost({
+        path: `/properties/${propertyId}:runReport`,
+        accessToken,
+        body: {
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          dimensions: [{ name: "pageTitle" }],
+          metrics: [{ name: "screenPageViews" }],
+          limit: 8,
+          orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }]
+        },
+      }),
+      googleGaPost({
+        path: `/properties/${propertyId}:runReport`,
+        accessToken,
+        body: {
+          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+          dimensions: [{ name: "sessionDefaultChannelGroup" }],
+          metrics: [{ name: "sessions" }],
+          limit: 8,
+          orderBys: [{ metric: { metricName: "sessions" }, desc: true }]
+        },
+      }),
+      googleGaPost({
+        path: `/properties/${propertyId}:runRealtimeReport`,
+        accessToken,
+        body: {
+          metrics: [{ name: "activeUsers" }],
+          minuteRanges: [{ startMinutesAgo: 29, endMinutesAgo: 0 }],
+          limit: 1,
+        },
+      }).catch((err) => {
+        console.warn("[Analytics] Real-time report failed:", err.message);
+        return null;
+      }),
+    ]);
+
+    const topPages = (pagesReport.rows || []).map(row => ({
+      title: row.dimensionValues[0].value,
+      views: row.metricValues[0].value
+    }));
+
+    const trafficSources = (sourcesReport.rows || []).map(row => ({
+      source: row.dimensionValues[0].value,
+      sessions: row.metricValues[0].value
+    }));
+
+    const activeUsersNow = realtimeReport ? gaMetricValue(realtimeReport, 0, 0) : 0;
+    const active30dUsers = summaryReport.rows?.[0]?.metricValues?.[0]?.value || "0";
+    const screenPageViews = summaryReport.rows?.[0]?.metricValues?.[1]?.value || "0";
+
+    res.json({
+      status: "success",
+      data: {
+        activeUsers: activeUsersNow,
+        active30dUsers,
+        screenPageViews,
+        topPages,
+        trafficSources
+      }
+    });
   } catch (error) {
-    console.error('Cleanup error:', error);
+    console.error("Analytics Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
+

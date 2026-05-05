@@ -2508,7 +2508,7 @@ class AdminManager {
         let fullEvents = [];
 
         try {
-            const [blogData, teachingData, eventData, causesData, indexData, yt, pod, coursesDoc] = await Promise.all([
+            const [blogData, teachingData, eventData, causesData, indexData, yt, pod, coursesDoc, gaData] = await Promise.all([
                 firebaseService.getPageContent('collection_blog'),
                 firebaseService.getPageContent('collection_teaching'),
                 firebaseService.getPageContent('collection_events'),
@@ -2518,8 +2518,11 @@ class AdminManager {
                 this.fetchPodcastStats(),
                 typeof firebaseService.getSiteContent === 'function'
                     ? firebaseService.getSiteContent('collection_courses')
-                    : null
+                    : null,
+                this.fetchAnalyticsData()
             ]);
+
+            this.gaData = gaData; // Store for rendering below
 
             blogCount = (Array.isArray(blogData) ? blogData : (blogData?.items || [])).length;
             teachingCount = (Array.isArray(teachingData) ? teachingData : (teachingData?.items || [])).length;
@@ -2587,16 +2590,16 @@ class AdminManager {
             switch (id) {
                 case 'visitors': {
                     const cachedVisits = localStorage.getItem('hkm_stat_visits');
-                    const liveVisits = indexStats.website_visits;
+                    const liveVisits = this.gaData ? this.gaData.active30dUsers : indexStats.website_visits;
                     if (liveVisits) {
                         localStorage.setItem('hkm_stat_visits', liveVisits);
-                        value = liveVisits.toLocaleString('no-NO');
+                        value = parseInt(liveVisits).toLocaleString('no-NO');
                     } else if (cachedVisits) {
                         value = parseInt(cachedVisits).toLocaleString('no-NO');
                     } else {
                         value = '—';
                     }
-                    meta = '';
+                    meta = '<span class="stat-meta">Siste 30 dager</span>';
                     break;
                 }
                 case 'status':
@@ -2690,8 +2693,38 @@ class AdminManager {
                 ${enabledWidgets.length === 0 ? '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">Ingen analysebokser valgt. Klikk på "Tilpass oversikt" for å legge til.</p>' : ''}
             </div>
         `;
+        // Prepare GA4 Dynamic Data
+        const ga = this.gaData || {};
+        const activeNow = ga.activeUsers != null ? ga.activeUsers : '—';
+        const isGaConfigured = !!this.gaData;
+
+        // Default mock data if GA is not connected
+        const topPages = (ga.topPages && ga.topPages.length) ? ga.topPages : [
+            { title: '/index.html', views: '4230' },
+            { title: '/blogg.html', views: '1240' },
+            { title: '/taler.html', views: '890' },
+            { title: '/kontakt.html', views: '450' }
+        ];
+
+        const topPagesHtml = topPages.map((p) => {
+            const maxViews = Math.max(...topPages.map(x => parseInt(x.views) || 1));
+            const percent = Math.min(100, Math.round((parseInt(p.views) / maxViews) * 100));
+            return `
+                <li>
+                    <div class="page-info">
+                        <span class="page-url">${p.title}</span>
+                        <span class="page-count">${parseInt(p.views).toLocaleString('no-NO')}</span>
+                    </div>
+                    <div class="progress-bar-wrap">
+                        <div class="progress-bar" style="width: ${percent}%;"></div>
+                    </div>
+                </li>
+            `;
+        }).join('');
+
         // Get Main Grid Order
         const savedMainOrder = JSON.parse(localStorage.getItem('hkm_dashboard_main_order')) || ['chart', 'top-pages'];
+
 
         const mainWidgets = {
             'chart': `
@@ -2701,8 +2734,8 @@ class AdminManager {
                         <div>
                             <h3 class="card-title">Trafikkovervåking (Google Analytics)</h3>
                             <div class="live-indicator">
-                                <span class="dot"></span>
-                                Sanntid: 24 aktive akkurat nå
+                                <span class="dot ${isGaConfigured ? 'pulse' : ''}"></span>
+                                Sanntid: ${activeNow} aktive akkurat nå
                             </div>
                         </div>
                         <div class="dropdown-container" style="position: relative;">
@@ -2741,34 +2774,9 @@ class AdminManager {
                     <span class="material-symbols-outlined drag-handle">drag_indicator</span>
                     <h3 class="card-title">Topp Sider</h3>
                     <ul class="page-rank-list">
-                        <li>
-                            <div class="page-info">
-                                <span class="page-url">/index.html</span>
-                                <span class="page-count">4,230</span>
-                            </div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" style="width: 85%;"></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="page-info">
-                                <span class="page-url">/blogg.html</span>
-                                <span class="page-count">2,150</span>
-                            </div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" style="width: 45%;"></div>
-                            </div>
-                        </li>
-                        <li>
-                            <div class="page-info">
-                                <span class="page-url">/media.html</span>
-                                <span class="page-count">1,890</span>
-                            </div>
-                            <div class="progress-bar-wrap">
-                                <div class="progress-bar" style="width: 35%;"></div>
-                            </div>
-                        </li>
+                        ${topPagesHtml}
                     </ul>
+                    ${!isGaConfigured ? '<p class="ga-status-note" style="padding: 12px; font-size: 11px; color: var(--text-muted); font-style: italic; text-align: center;">Viser eksempeldata (GA ikke konfigurert)</p>' : ''}
                 </div>
             `
         };
@@ -3059,6 +3067,25 @@ class AdminManager {
         }
         return null;
     }
+
+    async fetchAnalyticsData() {
+        try {
+            // Call the Firebase Function
+            const response = await fetch('https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app');
+            const result = await response.json();
+            if (result.status === 'success') {
+                return result.data;
+            } else if (result.status === 'unconfigured') {
+                console.warn('Analytics is not configured on the backend.');
+                return null;
+            }
+            throw new Error(result.error || 'Failed to fetch analytics');
+        } catch (error) {
+            console.error('Error fetching Analytics data:', error);
+            return null;
+        }
+    }
+
 
     async renderMediaManager() {
         const section = document.getElementById('media-section');
