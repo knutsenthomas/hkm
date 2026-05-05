@@ -1150,6 +1150,142 @@ exports.getPodcast = onRequest({ cors: true, invoker: "public" }, async (req, re
   }
 });
 
+exports.getAnalyticsOverview = onRequest({
+  secrets: [gaPropertyIdParam, gaServiceAccountEmailParam, gaServiceAccountPrivateKeyParam]
+}, async (req, res) => {
+  return cors(req, res, async () => {
+    try {
+      const propertyId = gaPropertyIdParam.value();
+      const clientEmail = gaServiceAccountEmailParam.value();
+      const privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
+      const privateKey = privateKeyRaw.replace(/\\n/g, "\n").trim();
+
+      if (!propertyId || !clientEmail || !privateKey) {
+        return res.status(503).json({
+          status: "unconfigured",
+          message: "Google Analytics backend is not configured."
+        });
+      }
+
+      const accessToken = await getGaAccessToken({ clientEmail, privateKey });
+
+      const [summaryReport, pagesReport, sourcesReport, realtimeReport, devicesReport, geoReport] = await Promise.all([
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            metrics: [{ name: "activeUsers" }, { name: "screenPageViews" }, { name: "averageSessionDuration" }, { name: "bounceRate" }],
+            limit: 1,
+          },
+        }),
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "pageTitle" }],
+            metrics: [{ name: "screenPageViews" }],
+            limit: 10,
+            orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }]
+          },
+        }),
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "sessionDefaultChannelGroup" }],
+            metrics: [{ name: "sessions" }],
+            limit: 6,
+            orderBys: [{ metric: { metricName: "sessions" }, desc: true }]
+          },
+        }),
+        googleGaPost({
+          path: `/properties/${propertyId}:runRealtimeReport`,
+          accessToken,
+          body: {
+            metrics: [{ name: "activeUsers" }],
+            minuteRanges: [{ startMinutesAgo: 29, endMinutesAgo: 0 }],
+            limit: 1,
+          },
+        }).catch((err) => {
+          console.warn("[Analytics] Real-time report failed:", err.message);
+          return null;
+        }),
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "deviceCategory" }],
+            metrics: [{ name: "activeUsers" }],
+            limit: 5,
+          },
+        }),
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dimensions: [{ name: "city" }],
+            metrics: [{ name: "activeUsers" }],
+            limit: 8,
+            orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }]
+          },
+        }),
+      ]);
+
+      const topPages = (pagesReport.rows || []).map(row => ({
+        title: row.dimensionValues[0].value,
+        views: row.metricValues[0].value
+      }));
+
+      const trafficSources = (sourcesReport.rows || []).map(row => ({
+        source: row.dimensionValues[0].value,
+        sessions: row.metricValues[0].value
+      }));
+
+      const devices = (devicesReport.rows || []).map(row => ({
+        category: row.dimensionValues[0].value,
+        users: row.metricValues[0].value
+      }));
+
+      const topCities = (geoReport.rows || []).map(row => ({
+        city: row.dimensionValues[0].value,
+        users: row.metricValues[0].value
+      }));
+
+      const activeUsersNow = realtimeReport ? gaMetricValue(realtimeReport, 0, 0) : 0;
+      const active30dUsers = summaryReport.rows?.[0]?.metricValues?.[0]?.value || "0";
+      const screenPageViews = summaryReport.rows?.[0]?.metricValues?.[1]?.value || "0";
+      const avgDuration = summaryReport.rows?.[0]?.metricValues?.[2]?.value || "0";
+      const bounceRate = summaryReport.rows?.[0]?.metricValues?.[3]?.value || "0";
+
+      res.json({
+        status: "success",
+        data: {
+          activeUsers: activeUsersNow,
+          active30dUsers,
+          screenPageViews,
+          avgDuration: Math.round(parseFloat(avgDuration)),
+          bounceRate: (parseFloat(bounceRate) * 100).toFixed(1) + "%",
+          topPages,
+          trafficSources,
+          devices,
+          topCities
+        }
+      });
+
+    } catch (error) {
+      console.error("Analytics Error:", error);
+      res.status(500).json({ error: error.message });
+    }
+  });
+});
+
+
+
 /**
  * Henter produkter fra Wix Stores via Wix SDK og returnerer et frontend-vennlig JSON-format.
  * Frontend (`js/wix-store.js`) leser `items` direkte.
@@ -5326,101 +5462,12 @@ exports.cleanupBlogDuplicates = onRequest(async (req, res) => {
       },
       removed_items: matches.filter(m => m !== toKeep).map(m => ({ title: m.title, source: m.source, _id: m._id }))
     });
-  }
-});
-
-exports.getAnalyticsOverview = onRequest({
-  secrets: [gaPropertyIdParam, gaServiceAccountEmailParam, gaServiceAccountPrivateKeyParam],
-  cors: true
-}, async (req, res) => {
-  try {
-    const propertyId = gaPropertyIdParam.value();
-    const clientEmail = gaServiceAccountEmailParam.value();
-    const privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
-    const privateKey = privateKeyRaw.replace(/\\n/g, "\n").trim();
-
-    if (!propertyId || !clientEmail || !privateKey) {
-      return res.status(503).json({
-        status: "unconfigured",
-        message: "Google Analytics backend is not configured."
-      });
-    }
-
-    const accessToken = await getGaAccessToken({ clientEmail, privateKey });
-
-    const [summaryReport, pagesReport, sourcesReport, realtimeReport] = await Promise.all([
-      googleGaPost({
-        path: `/properties/${propertyId}:runReport`,
-        accessToken,
-        body: {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          metrics: [{ name: "activeUsers" }, { name: "screenPageViews" }],
-          limit: 1,
-        },
-      }),
-      googleGaPost({
-        path: `/properties/${propertyId}:runReport`,
-        accessToken,
-        body: {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          dimensions: [{ name: "pageTitle" }],
-          metrics: [{ name: "screenPageViews" }],
-          limit: 8,
-          orderBys: [{ metric: { metricName: "screenPageViews" }, desc: true }]
-        },
-      }),
-      googleGaPost({
-        path: `/properties/${propertyId}:runReport`,
-        accessToken,
-        body: {
-          dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
-          dimensions: [{ name: "sessionDefaultChannelGroup" }],
-          metrics: [{ name: "sessions" }],
-          limit: 8,
-          orderBys: [{ metric: { metricName: "sessions" }, desc: true }]
-        },
-      }),
-      googleGaPost({
-        path: `/properties/${propertyId}:runRealtimeReport`,
-        accessToken,
-        body: {
-          metrics: [{ name: "activeUsers" }],
-          minuteRanges: [{ startMinutesAgo: 29, endMinutesAgo: 0 }],
-          limit: 1,
-        },
-      }).catch((err) => {
-        console.warn("[Analytics] Real-time report failed:", err.message);
-        return null;
-      }),
-    ]);
-
-    const topPages = (pagesReport.rows || []).map(row => ({
-      title: row.dimensionValues[0].value,
-      views: row.metricValues[0].value
-    }));
-
-    const trafficSources = (sourcesReport.rows || []).map(row => ({
-      source: row.dimensionValues[0].value,
-      sessions: row.metricValues[0].value
-    }));
-
-    const activeUsersNow = realtimeReport ? gaMetricValue(realtimeReport, 0, 0) : 0;
-    const active30dUsers = summaryReport.rows?.[0]?.metricValues?.[0]?.value || "0";
-    const screenPageViews = summaryReport.rows?.[0]?.metricValues?.[1]?.value || "0";
-
-    res.json({
-      status: "success",
-      data: {
-        activeUsers: activeUsersNow,
-        active30dUsers,
-        screenPageViews,
-        topPages,
-        trafficSources
-      }
-    });
   } catch (error) {
-    console.error("Analytics Error:", error);
+    console.error("Cleanup Error:", error);
     res.status(500).json({ error: error.message });
   }
 });
+
+
+
 

@@ -71,6 +71,9 @@ class AdminManager {
             'campaigns': { id: 'campaigns', label: 'Innsamlinger', icon: 'campaign', color: 'megaphone', default: false },
             'events': { id: 'events', label: 'Arrangementer', icon: 'event', color: 'blue', default: false },
             'next-events': { id: 'next-events', label: 'Neste Arrangementer', icon: 'event_upcoming', color: 'purple', default: false, type: 'list' },
+            'analytics-engagement': { id: 'analytics-engagement', label: 'Engasjement', icon: 'speed', color: 'mint', default: true },
+            'analytics-devices': { id: 'analytics-devices', label: 'Enheter', icon: 'devices', color: 'blue', default: true },
+            'analytics-cities': { id: 'analytics-cities', label: 'Topp Byer', icon: 'location_city', color: 'purple', default: false, type: 'list' },
 
         };
 
@@ -2599,8 +2602,14 @@ class AdminManager {
                     } else {
                         value = '—';
                     }
-                    meta = '<span class="stat-meta">Siste 30 dager</span>';
+                    const totalViews = this.gaData?.screenPageViews || 0;
+                    meta = `<span class="stat-meta">Unike brukere (30d)</span>
+                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">visibility</span> 
+                                ${parseInt(totalViews).toLocaleString('no-NO')} sidevisninger
+                            </div>`;
                     break;
+
                 }
                 case 'status':
                     value = '<span class="text-green" style="font-size: 24px;">Normal</span>';
@@ -2641,6 +2650,49 @@ class AdminManager {
                         }
                     </ul>`;
                     break;
+                case 'analytics-engagement':
+                    const duration = this.gaData?.avgDuration || 0;
+                    const mins = Math.floor(duration / 60);
+                    const secs = duration % 60;
+                    value = `${mins}m ${secs}s`;
+                    meta = `<span class="stat-meta">Fluktfrekvens: ${this.gaData?.bounceRate || '—'}</span>`;
+                    break;
+                case 'analytics-devices':
+                    const devices = this.gaData?.devices || [];
+                    const totalUsers = devices.reduce((sum, d) => sum + parseInt(d.users || 0), 0) || 1;
+                    value = '';
+                    meta = `<div class="device-list" style="margin-top: 10px; width: 100%;">
+                        ${devices.map(d => {
+                        const pct = Math.round((parseInt(d.users) / totalUsers) * 100);
+                        const icon = d.category.toLowerCase() === 'mobile' ? 'smartphone' : (d.category.toLowerCase() === 'tablet' ? 'tablet_mac' : 'desktop_windows');
+                        const label = d.category === 'mobile' ? 'Mobil' : (d.category === 'desktop' ? 'PC' : d.category);
+                        return `
+                                <div style="margin-bottom: 8px;">
+                                    <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px; color:var(--text-main);">
+                                        <span style="display:flex; align-items:center; gap:4px;"><span class="material-symbols-outlined" style="font-size:14px;">${icon}</span> ${label}</span>
+                                        <span style="font-weight:600;">${pct}%</span>
+                                    </div>
+                                    <div class="progress-bar-wrap" style="height:6px; background:rgba(0,0,0,0.05); border-radius:3px; overflow:hidden;">
+                                        <div class="progress-bar" style="width: ${pct}%; height:100%; background:var(--brand-primary); border-radius:3px;"></div>
+                                    </div>
+                                </div>
+                            `;
+                    }).join('')}
+                    </div>`;
+                    break;
+                case 'analytics-cities':
+                    const cities = this.gaData?.topCities || [];
+                    value = cities.length > 0 ? '' : 'Ingen data';
+                    meta = `<ul class="stat-list">
+                        ${cities.map(c => `
+                            <li class="stat-list-item">
+                                <span class="item-main">${c.city}</span>
+                                <span class="item-meta">${parseInt(c.users).toLocaleString('no-NO')} brukere</span>
+                            </li>
+                        `).join('')}
+                    </ul>`;
+                    break;
+
 
             }
 
