@@ -904,17 +904,17 @@ class MessagesManager {
                         </button>
                     </div>
                 </div>
-                <div class="message-body" style="padding: 30px; line-height: 1.6; font-size: 15px;">
-                    <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: #4338ca; font-weight: 700;">
-                            <span class="material-symbols-outlined">send_to_mobile</span>
+                <div class="message-body">
+                    <div class="message-card">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: #4338ca; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">send_to_mobile</span>
                             PUSH-VARSLING KAMPANJE
                         </div>
-                        <div style="font-weight: 600; margin-bottom: 8px;">${this.escapeHtml(push.title)}</div>
-                        <div>${this.escapeHtml(push.body)}</div>
-                        ${push.link ? `<div style="margin-top:15px; font-size: 13px;"><a href="${push.link}" target="_blank" style="color:var(--inbox-orange); text-decoration:none;">${push.link}</a></div>` : ''}
+                        <div style="font-weight: 700; font-size: 18px; margin-bottom: 12px; color: #1e293b;">${this.escapeHtml(push.title)}</div>
+                        <div style="font-size: 15px; color: #334155; line-height: 1.7;">${this.escapeHtml(push.body)}</div>
+                        ${push.link ? `<div style="margin-top:20px; padding-top:15px; border-top:1px solid #e2e8f0; font-size: 13px;"><span style="color:#64748b; margin-right:8px;">Link:</span><a href="${push.link}" target="_blank" style="color:var(--inbox-orange); text-decoration:none; font-weight:600;">${push.link}</a></div>` : ''}
                     </div>
-                    <p style="color: #64748b; font-size: 13px;">Denne loggføringen viser en push-varsling som ble sendt til brukere via administrasjonspanelet.</p>
+                    <p style="color: #94a3b8; font-size: 13px; font-style: italic;">Denne loggføringen viser en push-varsling som ble sendt til brukere via administrasjonspanelet.</p>
                 </div>
             </div>
         `;
