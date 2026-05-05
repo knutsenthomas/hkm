@@ -1926,6 +1926,8 @@ body.crm-body .crm-table {
     white-space: nowrap;
     width: 110px;
     min-width: 110px;
+    text-align: right;
+    padding-right: 24px;
 }
 
 .crm-table th.col-status,
