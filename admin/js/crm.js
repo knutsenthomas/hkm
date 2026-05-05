@@ -123,6 +123,21 @@ class CRMManager {
             crmToolConfirm.addEventListener('click', () => this.confirmCrmToolDialog());
         }
 
+        document.querySelectorAll('.contact-actions-btn').forEach(btn => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
+                const id = btn.dataset.id;
+                this.openContactMenuId = this.openContactMenuId === id ? null : id;
+                this.renderTable();
+            };
+        });
+
+        // Bulk delete button
+        const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
+        if (bulkDeleteBtn) {
+            bulkDeleteBtn.onclick = () => this.deleteSelectedContacts();
+        }
+
         document.addEventListener('click', (e) => {
             if (!this.openContactMenuId) return;
             const target = e.target;
@@ -263,6 +278,7 @@ class CRMManager {
                 const id = e.target.dataset.id;
                 if (e.target.checked) this.selectedContactIds.add(id);
                 else this.selectedContactIds.delete(id);
+                this.updateBulkActionsVisibility();
             };
         });
 
@@ -1063,6 +1079,62 @@ class CRMManager {
             if (checked) this.selectedContactIds.add(id);
             else this.selectedContactIds.delete(id);
         });
+        this.updateBulkActionsVisibility();
+    }
+
+    updateBulkActionsVisibility() {
+        const btn = document.getElementById('bulk-delete-btn');
+        const text = document.getElementById('bulk-delete-text');
+        if (!btn || !text) return;
+
+        const count = this.selectedContactIds.size;
+        if (count > 0) {
+            btn.style.display = 'flex';
+            text.textContent = `Slett ${count} ${count === 1 ? 'valgt' : 'valgte'}`;
+        } else {
+            btn.style.display = 'none';
+        }
+    }
+
+    async deleteSelectedContacts() {
+        const count = this.selectedContactIds.size;
+        if (count === 0) return;
+
+        const ok = await this.showCrmConfirmDialog({
+            title: 'Masse-sletting',
+            subtitle: 'Denne handlingen kan ikke angres.',
+            message: `Er du sikker på at du vil slette ${count} ${count === 1 ? 'kontakt' : 'kontakter'} permanent?`,
+            confirmLabel: `Slett ${count} ${count === 1 ? 'kontakt' : 'kontakter'}`,
+            confirmVariant: 'danger',
+            cancelLabel: 'Avbryt'
+        });
+
+        if (!ok) return;
+
+        try {
+            const db = window.firebaseService.db;
+            const batch = db.batch();
+            const ids = Array.from(this.selectedContactIds);
+            
+            ids.forEach(id => {
+                batch.delete(db.collection('users').doc(id));
+            });
+
+            await batch.commit();
+            
+            this.selectedContactIds.clear();
+            this.updateBulkActionsVisibility();
+            
+            // Reset select-all checkbox if it exists
+            const selectAll = document.getElementById('select-all-contacts');
+            if (selectAll) selectAll.checked = false;
+
+            await this.loadContacts();
+            this.notify(`${count} kontakter slettet.`);
+        } catch (error) {
+            console.error("Bulk delete error:", error);
+            this.notify("Kunne ikke slette kontakter: " + error.message, 'error');
+        }
     }
 
     // --- Segment Management ---
