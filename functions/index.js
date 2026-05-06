@@ -1130,8 +1130,8 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
     priceValue,
     currency,
     formattedPrice,
-    // Map collection IDs to names for easier filtering in frontend
-    categories: (item.collectionIds || []).map((id) => collectionMap[id]).filter(Boolean),
+    // Prefer embedded collection objects if available via .include("collections")
+    categories: (item.collections || []).map((c) => c.name || c.title).filter(Boolean),
     collectionIds: item.collectionIds || [],
     productOptions: item.productOptions || [],
     variants: item.variants || [],
@@ -1766,9 +1766,11 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
     while (hasMore) {
       console.log(`Fetching Wix products batch: skip=${skip}, limit=${limit}`);
       
+      // Include collections to get names directly in the product object
       const result = await wixClient.products.queryProducts()
         .limit(limit)
         .skip(skip)
+        .include("collections")
         .find();
 
       const rawItems = Array.isArray(result.items) ? result.items : [];
