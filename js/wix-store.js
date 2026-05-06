@@ -2,6 +2,7 @@
  * HIS KINGDOM DESIGNS - Wix Store Integration
  * Theme: Bookle-style Product Display with Hero Slider
  * Integration: Wix Headless API via Firebase Functions Proxy
+ * Last Update: 2026-05-06T13:05:00
  */
 
 // Step 1: Configuration & Auth Placeholder
