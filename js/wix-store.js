@@ -2,7 +2,7 @@
  * HIS KINGDOM DESIGNS - Wix Store Integration
  * Theme: Bookle-style Product Display with Hero Slider
  * Integration: Wix Headless API via Firebase Functions Proxy
- * Last Update: 2026-05-06T13:05:00
+ * Last Update: 2026-05-06T13:55:00
  */
 
 // Step 1: Configuration & Auth Placeholder
@@ -602,7 +602,11 @@ async function fetchAllProductsFromEndpoint(baseUrl, options = {}) {
     let firstBatchNotified = false;
 
     while (page < maxPages) {
-        const requestUrl = buildRequestUrl(baseUrl, { limit: pageSize, offset });
+        const requestUrl = buildRequestUrl(baseUrl, { 
+            limit: pageSize, 
+            offset,
+            _t: Date.now() // Aggressive cache busting
+        });
         const payload = await fetchJsonWithTimeout(requestUrl, timeoutMs);
         if (firstPayload == null) firstPayload = payload;
 
@@ -766,7 +770,7 @@ async function loadProducts() {
     armHeroLoadingWatchdog();
 
     // 1. Check for PRE-FETCHED data (from homepage pre-load)
-    const CACHE_KEY = 'hkm_store_catalog_cache';
+    const CACHE_KEY = 'hkm_store_catalog_cache_v4'; // Incremented to force refresh
     const CACHE_EXPIRY = 30 * 60 * 1000; // 30 minutes
     try {
         if (typeof sessionStorage !== 'undefined' && sessionStorage) {
