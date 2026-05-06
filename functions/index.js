@@ -1741,39 +1741,53 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
   let allItems = [];
   let skip = 0;
   const limit = 100;
-  let totalCount = 0;
+  let totalCountFromWix = 0;
 
   try {
+    console.log("Starting full Wix product fetch...");
     while (true) {
-      console.log(`Fetching Wix products batch: skip=${skip}`);
+      console.log(`Fetching Wix products batch: skip=${skip}, limit=${limit}`);
+      
+      // Use a clean query without extra sorting to ensure maximum compatibility and count
       const result = await wixClient.products.queryProducts()
         .limit(limit)
         .skip(skip)
-        .descending("_createdDate")
         .find();
 
       const rawItems = Array.isArray(result.items) ? result.items : [];
+      totalCountFromWix = typeof result.totalCount === "number" ? result.totalCount : totalCountFromWix;
+      
+      console.log(`Wix Batch Received: ${rawItems.length} items. Total count reported by Wix: ${totalCountFromWix}`);
+
       const items = rawItems
         .map((item) => normalizeWixProduct(item, req, collectionMap))
         .filter((item) => item && item.name);
 
       allItems.push(...items);
-      totalCount = typeof result.totalCount === "number" ? result.totalCount : Math.max(totalCount, allItems.length);
 
-      if (rawItems.length < limit) break;
-      skip += limit;
+      if (rawItems.length === 0 || rawItems.length < limit) {
+        console.log("Reached end of Wix product catalog.");
+        break;
+      }
+      
+      skip += rawItems.length;
 
-      // Safety break to prevent infinite loops (max 5000 products)
-      if (skip >= 5000) break;
+      // Safety break to prevent infinite loops (max 10,000 products)
+      if (skip >= 10000) {
+        console.warn("Safety limit of 10,000 products reached. Stopping sync.");
+        break;
+      }
     }
   } catch (productError) {
-    console.error("Wix products fetch failed:", productError);
+    console.error("Wix products fetch failed during loop:", productError);
   }
+
+  console.log(`Final sync result: Fetched ${allItems.length} normalized items. Wix reported total: ${totalCountFromWix}`);
 
   const cacheData = {
     updatedAt: new Date().toISOString(),
     count: allItems.length,
-    total: totalCount,
+    total: Math.max(totalCountFromWix, allItems.length),
     items: allItems,
     authMode,
     source: "wix-sdk-storage-cached",
