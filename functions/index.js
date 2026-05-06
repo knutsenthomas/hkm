@@ -1130,8 +1130,15 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
     priceValue,
     currency,
     formattedPrice,
-    // Prefer embedded collection objects if available via .include("collections")
-    categories: (item.collections || []).map((c) => c.name || c.title).filter(Boolean),
+    // Triple-Safety Category Detection:
+    // 1. Check embedded collections (from .include("collections"))
+    // 2. Check embedded categories (some versions of the API use this)
+    // 3. Fallback to mapping IDs from collectionMap
+    categories: [
+      ...(item.collections || []).map(c => c.name || c.title),
+      ...(item.categories || []).map(c => c.name || c.title),
+      ...(item.collectionIds || []).map(id => collectionMap[id])
+    ].filter((val, index, self) => val && self.indexOf(val) === index), // Unique non-empty names
     collectionIds: item.collectionIds || [],
     productOptions: item.productOptions || [],
     variants: item.variants || [],
@@ -1734,10 +1741,10 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
         const id = c._id || c.id;
         if (id && c.name) collectionMap[id] = c.name;
       });
-      console.log(`Mapped ${Object.keys(collectionMap).length} collections.`);
+      console.log(`[HKM SYNC] Mapped ${Object.keys(collectionMap).length} collections for fallback.`);
     }
   } catch (collError) {
-    console.warn("Could not fetch Wix collections, categories might be missing:", collError);
+    console.warn("[HKM SYNC] Could not fetch Wix collections:", collError);
   }
 
   // 2. Fetch all products with pagination
