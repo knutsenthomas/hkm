@@ -2053,9 +2053,9 @@ class ContentManager {
             return;
         }
 
-        section.style.display = '';
-
+        // Only show immediately if we are NOT using live feed (showing static/cached content)
         if (!config.useLiveFeed) {
+            section.style.display = '';
             return;
         }
 
@@ -2100,6 +2100,9 @@ class ContentManager {
     renderFacebookFeed(posts, pageUrl = '') {
         const section = document.getElementById('facebook-feed');
         if (!section) return;
+
+        // Ensure section is visible once we have data to render
+        section.style.display = '';
 
         const cards = Array.from(section.querySelectorAll('.facebook-post-card'));
         const pageLink = section.querySelector('.facebook-feed-cta');
