@@ -1138,6 +1138,7 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
     mediaItems: item.mediaItems || [],
     description: item.description || "",
     priceData: item.priceData || {},
+    createdAt: item._createdDate || item.createdDate || item._updatedDate || new Date().toISOString(),
   };
 }
 
@@ -1745,11 +1746,24 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
   let hasMore = true;
 
   try {
-    console.log("Starting Deep Wix product fetch (Active + Hidden)...");
+    console.log("Starting Wix product fetch...");
+    
+    // Quick diagnostic check for visibility counts
+    let visibleCount = 0;
+    let hiddenCount = 0;
+    try {
+        const vRes = await wixClient.products.queryProducts().eq("visible", true).limit(1).find();
+        visibleCount = vRes.totalCount || 0;
+        const hRes = await wixClient.products.queryProducts().eq("visible", false).limit(1).find();
+        hiddenCount = hRes.totalCount || 0;
+        console.log(`Diagnostic: Visible=${visibleCount}, Hidden=${hiddenCount}`);
+    } catch (diagErr) {
+        console.warn("Visibility diagnostic failed:", diagErr);
+    }
+
     while (hasMore) {
       console.log(`Fetching Wix products batch: skip=${skip}, limit=${limit}`);
       
-      // Attempt to include HIDDEN products as well, which might account for the missing items
       const result = await wixClient.products.queryProducts()
         .limit(limit)
         .skip(skip)
@@ -1768,22 +1782,24 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
 
       if (rawItems.length === 0 || rawItems.length < limit || allItems.length >= totalCountFromWix) {
         hasMore = false;
-        console.log("Reached end of Wix product catalog or matched total count.");
       } else {
         skip += rawItems.length;
       }
 
-      // Safety break to prevent infinite loops (max 10,000 products)
-      if (skip >= 10000) {
-        console.warn("Safety limit of 10,000 products reached. Stopping sync.");
-        break;
-      }
+      if (skip >= 10000) break;
     }
   } catch (productError) {
-    console.error("Wix products fetch failed during deep loop:", productError);
+    console.error("Wix products fetch failed during loop:", productError);
   }
 
-  console.log(`Deep sync finished: Fetched ${allItems.length} items. Wix Total: ${totalCountFromWix}`);
+  // 3. Sort by Newest First (descending)
+  allItems.sort((a, b) => {
+    const dateA = new Date(a.createdAt || 0).getTime();
+    const dateB = new Date(b.createdAt || 0).getTime();
+    return dateB - dateA;
+  });
+
+  console.log(`Sync finished: Fetched and sorted ${allItems.length} items.`);
 
   const cacheData = {
     updatedAt: new Date().toISOString(),
@@ -1791,12 +1807,7 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
     total: Math.max(totalCountFromWix, allItems.length),
     items: allItems,
     authMode,
-    source: "wix-sdk-storage-cached-deep",
-    diagnostic: {
-      wixTotal: totalCountFromWix,
-      itemsFetched: allItems.length,
-      skipValue: skip
-    }
+    source: "wix-sdk-storage-cached-sorted",
   };
 
   // 3. Save to Cloud Storage (No size limit!)
