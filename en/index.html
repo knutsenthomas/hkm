@@ -6,7 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>His Kingdom Ministry | A Community for Growth</title>
     <meta name="description"
-        content="His Kingdom Ministry - A non-profit organization dedicated to spiritual growth through teaching, podcast, and missions.">
+        content="His Kingdom Ministry is a non-profit organization dedicated to spiritual growth through teaching, podcast, and missionary travel. Join our community.">
+    <meta name="keywords" content="His Kingdom Ministry, christian ministry, podcast, teaching, prayer community, spiritual growth, missions, Norway">
+    <link rel="canonical" href="https://www.hiskingdomministry.no/en/">
+    
+    <!-- Internationalization -->
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/en/">
+    <meta property="og:title" content="His Kingdom Ministry | A Community for Growth">
+    <meta property="og:description" content="Discover spiritual growth through teaching, podcast, and missionary travel. Join His Kingdom Ministry today.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/en/">
+    <meta property="twitter:title" content="His Kingdom Ministry | A Community for Growth">
+    <meta property="twitter:description" content="Discover spiritual growth through teaching, podcast, and missionary travel.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NGO",
+      "name": "His Kingdom Ministry",
+      "url": "https://www.hiskingdomministry.no/en/",
+      "logo": "https://www.hiskingdomministry.no/img/logo-hkm.png",
+      "description": "A non-profit organization dedicated to spiritual growth through teaching, podcast, and missionary travel.",
+      "sameAs": [
+        "https://www.facebook.com/hiskingdomministry777",
+        "https://www.instagram.com/hiskingdomministry"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "general info",
+        "email": "kontakt@hiskingdomministry.no"
+      }
+    }
+    </script>
 
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -23,29 +66,15 @@
     <link rel="stylesheet" href="../css/cookie-consent.css">
     <link rel="stylesheet" href="../css/features-enhanced.css">
     
-    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>
     <script type="module" src="../js/firebase-service.js"></script>
     <script type="module" src="../js/content-manager.js?v=2026.05.01.13"></script>
 
-
     <!-- Error Logger -->
     <script type="module" src="../js/error-logger.js"></script>
-    <!-- Loader Safety Net -->
-    <script>
-        (function() {
-            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
-            setTimeout(function() {
-                if (document.body && document.body.classList.contains('cms-loading')) {
-                    console.warn('CMS loading timeout - forcing visibility');
-                    document.body.classList.remove('cms-loading');
-                    var loader = document.getElementById('loader-wrapper');
-                    if (loader) loader.style.display = 'none';
-                }
-            }, 4000);
-        })();
-    </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+
 </head>
 
 <body class="page-index header-dark-start cms-loading">
@@ -191,7 +220,7 @@
                     <div class="menu-footer-links">
                         <a href="/en/../butikk" data-content-doc="settings_global"
                             data-content-key="menu.footer.store">Store</a>
-                        <a href="/en/donations.html#tax-deduction" data-content-doc="settings_global"
+                        <a href="/en/donations" data-content-doc="settings_global"
                             data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
                         <a href="/en/about" data-content-doc="settings_global"
                             data-content-key="menu.footer.about">About Us</a>
@@ -569,9 +598,9 @@
                         <div class="nav-col">
                             <h4>About us</h4>
                             <ul>
-                                <li><a href="/en/index.html#home">Home</a></li>
+                                <li><a href="/en">Home</a></li>
                                 <li><a href="/en/about">Who are we?</a></li>
-                                <li><a href="/en/about.html#vision">Our vision</a></li>
+                                <li><a href="/en/about">Our vision</a></li>
                                 <li><a href="/en/contact">Contact us</a></li>
                             </ul>
                         </div>
@@ -579,7 +608,7 @@
                         <div class="nav-col">
                             <h4>Resources</h4>
                             <ul>
-                                <li><a href="/en/media.html#teaching-section">Teaching</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
                                 <li><a href="/en/events">E-courses</a></li>
                                 <li><a href="/en/blog">Books & Blog</a></li>
                                 <li><a href="/en/../minside/index">My Page</a></li>
@@ -589,7 +618,7 @@
                         <div class="nav-col">
                             <h4>Media</h4>
                             <ul>
-                                <li><a href="/en/media.html#podcast-section">Podcast</a></li>
+                                <li><a href="/en/media">Podcast</a></li>
                                 <li><a href="/en/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>

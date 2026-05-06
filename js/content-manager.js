@@ -95,53 +95,56 @@ class ContentManager {
         // Fallback logic if i18n not yet loaded
         const mappings = {
             'en': {
-                'index.html': 'index.html',
-                'om-oss.html': 'about.html',
-                'arrangementer.html': 'events.html',
-                'kontakt.html': 'contact.html',
-                'donasjoner.html': 'donations.html',
-                'for-menigheter.html': 'for-churches.html',
-                'for-bedrifter.html': 'for-businesses.html',
-                'bnn.html': 'bnn.html',
-                'arrangement-detaljer.html': 'event-details.html',
-                'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html',
-                'kalender.html': 'calendar.html',
-                'undervisningsserier.html': 'teaching.html',
-                'undervisning.html': 'teaching.html',
-                'bibelstudier.html': 'teaching.html',
-                'seminarer.html': 'teaching.html',
-                'kurs.html': 'teaching.html',
-                'reisevirksomhet.html': 'events.html',
-                'bli-fast-giver.html': 'regular-donors.html',
-                'personvern.html': 'privacy.html',
-                'tilgjengelighet.html': 'accessibility.html'
+                'index': 'index',
+                'om-oss': 'about',
+                'arrangementer': 'events',
+                'kontakt': 'contact',
+                'donasjoner': 'donations',
+                'for-menigheter': 'for-churches',
+                'for-bedrifter': 'for-businesses',
+                'bnn': 'bnn',
+                'arrangement-detaljer': 'event-details',
+                'blogg': 'blog',
+                'blogg-post': 'blog-post',
+                'kalender': 'calendar',
+                'undervisningsserier': 'teaching',
+                'undervisning': 'teaching',
+                'bibelstudier': 'teaching',
+                'seminarer': 'teaching',
+                'kurs': 'teaching',
+                'reisevirksomhet': 'events',
+                'bli-fast-giver': 'regular-donors',
+                'personvern': 'privacy',
+                'tilgjengelighet': 'accessibility'
             },
             'es': {
-                'index.html': 'index.html',
-                'om-oss.html': 'sobre-nosotros.html',
-                'arrangementer.html': 'eventos.html',
-                'kontakt.html': 'contacto.html',
-                'donasjoner.html': 'donaciones.html',
-                'for-menigheter.html': 'para-iglesias.html',
-                'for-bedrifter.html': 'para-empresas.html',
-                'bnn.html': 'bnn.html',
-                'arrangement-detaljer.html': 'detalles-evento.html',
-                'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html',
-                'kalender.html': 'calendario.html',
-                'undervisningsserier.html': 'ensenanza.html',
-                'undervisning.html': 'ensenanza.html',
-                'bibelstudier.html': 'ensenanza.html',
-                'seminarer.html': 'ensenanza.html',
-                'kurs.html': 'ensenanza.html',
-                'reisevirksomhet.html': 'eventos.html',
-                'bli-fast-giver.html': 'donantes-regulares.html',
-                'personvern.html': 'privacidad.html',
-                'tilgjengelighet.html': 'accesibilidad.html'
+                'index': 'index',
+                'om-oss': 'sobre-nosotros',
+                'arrangementer': 'eventos',
+                'kontakt': 'contacto',
+                'donasjoner': 'donaciones',
+                'for-menigheter': 'para-iglesias',
+                'for-bedrifter': 'para-empresas',
+                'bnn': 'bnn',
+                'arrangement-detaljer': 'detalles-evento',
+                'blogg': 'blog',
+                'blogg-post': 'blog-post',
+                'kalender': 'calendario',
+                'undervisningsserier': 'ensenanza',
+                'undervisning': 'ensenanza',
+                'bibelstudier': 'ensenanza',
+                'seminarer': 'ensenanza',
+                'kurs': 'ensenanza',
+                'reisevirksomhet': 'eventos',
+                'bli-fast-giver': 'donantes-regulares',
+                'personvern': 'privacidad',
+                'tilgjengelighet': 'accesibilidad'
             }
         };
-        return (mappings[lang] && mappings[lang][noFile]) || noFile;
+
+        // Standardize input by removing .html if present
+        const cleanNoFile = noFile.replace(/\.html$/, '');
+        return (mappings[lang] && mappings[lang][cleanNoFile]) || cleanNoFile;
     }
 
     getCurrentLanguage() {
@@ -701,7 +704,7 @@ class ContentManager {
                 const container = document.querySelector('.calendar-section') || document.querySelector('main');
                 if (container) {
                     const lang = document.documentElement.lang || 'no';
-                    const eventsLink = this.getLocalizedLink('arrangementer.html');
+                    const eventsLink = this.getLocalizedLink('arrangementer');
                     const title = lang === 'en' ? 'Calendar is temporarily disabled.' : (lang === 'es' ? 'El calendario está desactivado temporalmente.' : 'Kalenderen er midlertidig deaktivert.');
                     const p = lang === 'en' ? 'Please check our events in the list above.' : (lang === 'es' ? 'Consulte nuestros eventos en la lista de arriba.' : 'Vennligst sjekk våre arrangementer i listen over.');
                     const btn = lang === 'en' ? 'See events' : (lang === 'es' ? 'Ver eventos' : 'Se arrangementer');
@@ -782,7 +785,7 @@ class ContentManager {
             const raised = Number(cause.raised ?? cause.collected ?? 0) || 0;
             const goal = Number(cause.goal ?? 0) || 0;
             const progress = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
-            const link = cause.link || this.getLocalizedLink('donasjoner.html');
+            const link = cause.link || this.getLocalizedLink('donasjoner');
 
             return `
             <div class="cause-card">

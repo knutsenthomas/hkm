@@ -6,7 +6,50 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>His Kingdom Ministry | Et felleskap for vekst</title>
     <meta name="description"
-        content="His Kingdom Ministry - En non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.">
+        content="His Kingdom Ministry er en non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet. Bli med i vårt fellesskap.">
+    <meta name="keywords" content="His Kingdom Ministry, kristen tjeneste, podcast, undervisning, bønnefellesskap, åndelig vekst, Mandal, Norge">
+    <link rel="canonical" href="https://www.hiskingdomministry.no/">
+    
+    <!-- Internationalization -->
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/">
+    <meta property="og:title" content="His Kingdom Ministry | Et felleskap for vekst">
+    <meta property="og:description" content="Oppdag åndelig vekst gjennom undervisning, podcast og reisevirksomhet. Bli en del av His Kingdom Ministry i dag.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/">
+    <meta property="twitter:title" content="His Kingdom Ministry | Et felleskap for vekst">
+    <meta property="twitter:description" content="Oppdag åndelig vekst gjennom undervisning, podcast og reisevirksomhet.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NGO",
+      "name": "His Kingdom Ministry",
+      "url": "https://www.hiskingdomministry.no/",
+      "logo": "https://www.hiskingdomministry.no/img/logo-hkm.png",
+      "description": "En non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.",
+      "sameAs": [
+        "https://www.facebook.com/hiskingdomministry777",
+        "https://www.instagram.com/hiskingdomministry"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "general info",
+        "email": "kontakt@hiskingdomministry.no"
+      }
+    }
+    </script>
 
     <!-- Google Fonts: Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -21,32 +64,16 @@
     <link rel="stylesheet" href="css/notifications.css">
     <link rel="stylesheet" href="css/cookie-consent.css">
     <link rel="stylesheet" href="css/features-enhanced.css">
-    <!-- VERSION CHECK: 2026.04.27.08.37 -->
     
-    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <!-- Firebase Config & Service -->
     <script type="module" src="js/firebase-config.js"></script>
     <script type="module" src="js/firebase-service.js"></script>
     <script type="module" src="js/content-manager.js?v=2026.05.01.13"></script>
 
-
-
     <!-- Error Logger -->
     <script type="module" src="js/error-logger.js"></script>
-    <!-- Loader Safety Net -->
-    <script type="module">
-        (function() {
-            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
-            setTimeout(function() {
-                if (document.body && document.body.classList.contains('cms-loading')) {
-                    console.warn('CMS loading timeout - forcing visibility');
-                    document.body.classList.remove('cms-loading');
-                    var loader = document.getElementById('loader-wrapper');
-                    if (loader) loader.style.display = 'none';
-                }
-            }, 4000);
-        })();
-    </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+
 </head>
 
 <body class="page-index header-dark-start cms-loading">
@@ -74,13 +101,13 @@
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="javascript:void(0)" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="no" data-content-doc="settings_global" data-content-key="header.languages.no">🇳🇴
                             Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="javascript:void(0)" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="en" data-content-doc="settings_global" data-content-key="header.languages.en">🇺🇸
                             English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="javascript:void(0)" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="es" data-content-doc="settings_global" data-content-key="header.languages.es">🇪🇸
                             Español</a>
                     </div>
@@ -199,7 +226,7 @@
                     <div class="menu-footer-links">
                         <a href="/butikk" data-content-doc="settings_global"
                             data-content-key="menu.footer.store">Butikk</a>
-                        <a href="/donasjoner.html#skattefradrag" data-content-doc="settings_global"
+                        <a href="/donasjoner" data-content-doc="settings_global"
                             data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
                         <a href="/om-oss" data-content-doc="settings_global"
                             data-content-key="menu.footer.about">Om oss</a>
@@ -764,11 +791,11 @@
                         <div class="nav-col">
                             <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
                             <ul>
-                                <li><a href="/index.html#hjem" data-content-doc="settings_global"
+                                <li><a href="/" data-content-doc="settings_global"
                                         data-content-key="footer.links.about.home">Hjem</a></li>
                                 <li><a href="/om-oss" data-content-doc="settings_global"
                                         data-content-key="footer.links.about.about">Om oss</a></li>
-                                <li><a href="/om-oss.html#visjon" data-content-doc="settings_global"
+                                <li><a href="/om-oss" data-content-doc="settings_global"
                                         data-content-key="footer.links.about.vision">Vår visjon</a></li>
                                 <li><a href="/kontakt" data-content-doc="settings_global"
                                         data-content-key="footer.links.about.contact">Kontakt oss</a></li>
@@ -779,7 +806,7 @@
                             <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
                             </h4>
                             <ul>
-                                <li><a href="/media.html#teaching-section" data-content-doc="settings_global"
+                                <li><a href="/media" data-content-doc="settings_global"
                                         data-content-key="footer.links.resources.teaching">Undervisning</a></li>
                                 <li><a href="/arrangementer" data-content-doc="settings_global"
                                     data-content-key="footer.links.resources.courses">Arrangementer</a></li>
@@ -795,7 +822,7 @@
                         <div class="nav-col">
                             <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
                             <ul>
-                                <li><a href="/media.html#podcast-section" data-content-doc="settings_global"
+                                <li><a href="/media" data-content-doc="settings_global"
                                         data-content-key="footer.links.media.podcast">Podcast</a></li>
                                 <li><a href="/media" data-content-doc="settings_global"
                                         data-content-key="footer.links.media.videos">Videoer</a></li>
@@ -820,7 +847,7 @@
                                 <li><a href="/tilgjengelighet" data-content-doc="settings_global"
                                         data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
                                 </li>
-                                <li><a href="#"
+                                <li><a href="javascript:void(0)"
                                         onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
                                         data-content-doc="settings_global"
                                         data-content-key="footer.links.involvement.cookies">Cookies</a>

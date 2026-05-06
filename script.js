@@ -574,18 +574,18 @@ async function performSiteSearch(query, resultsEl) {
     try {
         // 1) Faste sider
         const pages = [
-            { id: 'index', label: 'Forside', url: 'index.html' },
-            { id: 'om-oss', label: 'Om oss', url: 'om-oss.html' },
-            { id: 'media', label: 'Media', url: 'media.html' },
-            { id: 'arrangementer', label: 'Arrangementer', url: 'arrangementer.html' },
-            { id: 'blogg', label: 'Blogg', url: 'blogg.html' },
-            { id: 'kontakt', label: 'Kontakt', url: 'kontakt.html' },
-            { id: 'donasjoner', label: 'Donasjoner', url: 'donasjoner.html' },
-            { id: 'undervisning', label: 'Undervisning', url: 'undervisning.html' },
-            { id: 'reisevirksomhet', label: 'Reisevirksomhet', url: 'reisevirksomhet.html' },
-            { id: 'bibelstudier', label: 'Bibelstudier', url: 'bibelstudier.html' },
-            { id: 'seminarer', label: 'Seminarer', url: 'seminarer.html' },
-            { id: 'podcast', label: 'Podcast', url: 'podcast.html' }
+            { id: 'index', label: 'Forside', url: 'index' },
+            { id: 'om-oss', label: 'Om oss', url: 'om-oss' },
+            { id: 'media', label: 'Media', url: 'media' },
+            { id: 'arrangementer', label: 'Arrangementer', url: 'arrangementer' },
+            { id: 'blogg', label: 'Blogg', url: 'blogg' },
+            { id: 'kontakt', label: 'Kontakt', url: 'kontakt' },
+            { id: 'donasjoner', label: 'Donasjoner', url: 'donasjoner' },
+            { id: 'undervisning', label: 'Undervisning', url: 'undervisning' },
+            { id: 'reisevirksomhet', label: 'Reisevirksomhet', url: 'reisevirksomhet' },
+            { id: 'bibelstudier', label: 'Bibelstudier', url: 'bibelstudier' },
+            { id: 'seminarer', label: 'Seminarer', url: 'seminarer' },
+            { id: 'podcast', label: 'Podcast', url: 'podcast' }
         ];
 
         for (const page of pages) {
@@ -607,9 +607,9 @@ async function performSiteSearch(query, resultsEl) {
 
         // 2) Samlinger: blogg, arrangementer, undervisning
         const collections = [
-            { id: 'blog', docId: 'collection_blog', label: 'Blogginnlegg', url: 'blogg.html' },
-            { id: 'events', docId: 'collection_events', label: 'Arrangementer', url: 'arrangementer.html' },
-            { id: 'teaching', docId: 'collection_teaching', label: 'Undervisning', url: 'undervisningsserier.html' }
+            { id: 'blog', docId: 'collection_blog', label: 'Blogginnlegg', url: 'blogg' },
+            { id: 'events', docId: 'collection_events', label: 'Arrangementer', url: 'arrangementer' },
+            { id: 'teaching', docId: 'collection_teaching', label: 'Undervisning', url: 'undervisningsserier' }
         ];
 
         for (const col of collections) {
@@ -674,7 +674,7 @@ async function performSiteSearch(query, resultsEl) {
                         type: 'Podcast',
                         title: ep.title || '(uten tittel)',
                         meta: ep.pubDate ? new Date(ep.pubDate).toLocaleDateString('no-NO') : '',
-                        url: ep.link || 'podcast.html',
+                        url: ep.link || 'podcast',
                         snippet: makeSnippet(ep.description || '', q)
                     });
                 }
@@ -709,7 +709,7 @@ async function performSiteSearch(query, resultsEl) {
                         type: 'YouTube',
                         title: title || '(uten tittel)',
                         meta: v.pubDate ? new Date(v.pubDate).toLocaleDateString('no-NO') : '',
-                        url: v.link || 'youtube.html',
+                        url: v.link || 'youtube',
                         snippet: makeSnippet(description, q)
                     });
                 }
@@ -751,7 +751,7 @@ async function performSiteSearch(query, resultsEl) {
                         type: 'Kalender',
                         title: summary || '(uten tittel)',
                         meta: dateLabel,
-                        url: 'kalender.html',
+                        url: 'kalender',
                         snippet: makeSnippet(description || location || '', q)
                     });
                 }

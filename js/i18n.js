@@ -1,6 +1,7 @@
 /**
  * HKM i18n Manager
  * Handles language detection, switching, and persisting preferences.
+ * Updated to support Clean URLs (no .html extensions).
  */
 
 const i18nManager = {
@@ -9,21 +10,21 @@ const i18nManager = {
     storageKey: 'hkm_preferred_lang',
     knownFiles: {
         en: new Set([
-            'about.html', 'accessibility.html', 'blog-post-1.html', 'blog-post-2.html',
-            'blog-post-3.html', 'blog-post-4.html', 'blog-post-5.html', 'blog-post.html',
-            'blog.html', 'bnn.html', 'calendar.html', 'contact.html', 'donations.html',
-            'event-details.html', 'events.html', 'for-businesses.html', 'for-churches.html',
-            'index.html', 'media.html', 'podcast.html', 'privacy.html',
-            'regular-donors.html', 'teaching.html', 'youtube.html'
+            'about', 'accessibility', 'blog-post-1', 'blog-post-2',
+            'blog-post-3', 'blog-post-4', 'blog-post-5', 'blog-post',
+            'blog', 'bnn', 'calendar', 'contact', 'donations',
+            'event-details', 'events', 'for-businesses', 'for-churches',
+            'index', 'media', 'podcast', 'privacy',
+            'regular-donors', 'teaching', 'youtube'
         ]),
         es: new Set([
-            'accesibilidad.html', 'blog-post-1.html', 'blog-post-2.html',
-            'blog-post-3.html', 'blog-post-4.html', 'blog-post-5.html', 'blog-post.html',
-            'blog.html', 'bnn.html', 'calendario.html', 'contacto.html',
-            'detalles-evento.html', 'donaciones.html', 'donantes-regulares.html',
-            'ensenanza.html', 'eventos.html', 'index.html', 'media.html',
-            'para-empresas.html', 'para-iglesias.html', 'podcast.html',
-            'privacidad.html', 'sobre-nosotros.html', 'youtube.html'
+            'accesibilidad', 'blog-post-1', 'blog-post-2',
+            'blog-post-3', 'blog-post-4', 'blog-post-5', 'blog-post',
+            'blog', 'bnn', 'calendario', 'contacto',
+            'detalles-evento', 'donaciones', 'donantes-regulares',
+            'ensenanza', 'eventos', 'index', 'media',
+            'para-empresas', 'para-iglesias', 'podcast',
+            'privacidad', 'sobre-nosotros', 'youtube'
         ])
     },
 
@@ -67,7 +68,9 @@ const i18nManager = {
      */
     redirectToLanguage(lang) {
         const currentPath = window.location.pathname;
-        const currentFile = currentPath.split('/').pop() || 'index.html';
+        // Strip leading/trailing slashes and .html extension
+        let currentFile = currentPath.split('/').pop().replace(/\.html$/, '') || 'index';
+        
         const mappedFile = this.mapFileName(currentFile, lang);
         const insideLangFolder = currentPath.includes('/en/') || currentPath.includes('/es/');
         let newPath = '';
@@ -75,10 +78,13 @@ const i18nManager = {
         if (lang === 'no') {
             newPath = insideLangFolder ? `../${mappedFile}` : mappedFile;
         } else {
-            const safeTargetFile = this.knownFiles[lang].has(mappedFile) ? mappedFile : 'index.html';
+            const safeTargetFile = this.knownFiles[lang].has(mappedFile) ? mappedFile : 'index';
             newPath = insideLangFolder ? `../${lang}/${safeTargetFile}` : `${lang}/${safeTargetFile}`;
         }
 
+        // Final safety: if newPath is 'index' or './index', use '/'
+        if (newPath === 'index' || newPath === './index') newPath = '/';
+        
         window.location.href = newPath;
     },
 
@@ -86,76 +92,78 @@ const i18nManager = {
      * Maps filenames to their translated equivalents.
      */
     mapFileName(path, targetLang) {
+        const cleanPath = String(path).replace(/\.html$/, '');
+        
         const mappings = {
             'en': {
-                'index.html': 'index.html',
-                'om-oss.html': 'about.html',
-                'arrangementer.html': 'events.html',
-                'kontakt.html': 'contact.html',
-                'donasjoner.html': 'donations.html',
-                'for-menigheter.html': 'for-churches.html',
-                'for-bedrifter.html': 'for-businesses.html',
-                'bnn.html': 'bnn.html',
-                'arrangement-detaljer.html': 'event-details.html',
-                'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html',
-                'media.html': 'media.html',
-                'kalender.html': 'calendar.html',
-                'undervisningsserier.html': 'teaching.html',
-                'undervisning.html': 'teaching.html',
-                'bibelstudier.html': 'teaching.html',
-                'seminarer.html': 'teaching.html',
-                'kurs.html': 'teaching.html',
-                'reisevirksomhet.html': 'events.html',
-                'bli-fast-giver.html': 'regular-donors.html',
-                'personvern.html': 'privacy.html',
-                'tilgjengelighet.html': 'accessibility.html',
-                'podcast.html': 'podcast.html',
-                'youtube.html': 'youtube.html',
-                'blogg-post-1.html': 'blog-post-1.html',
-                'blogg-post-2.html': 'blog-post-2.html',
-                'blogg-post-3.html': 'blog-post-3.html',
-                'blogg-post-4.html': 'blog-post-4.html',
-                'blogg-post-5.html': 'blog-post-5.html'
+                'index': 'index',
+                'om-oss': 'about',
+                'arrangementer': 'events',
+                'kontakt': 'contact',
+                'donasjoner': 'donations',
+                'for-menigheter': 'for-churches',
+                'for-bedrifter': 'for-businesses',
+                'bnn': 'bnn',
+                'arrangement-detaljer': 'event-details',
+                'blogg': 'blog',
+                'blogg-post': 'blog-post',
+                'media': 'media',
+                'kalender': 'calendar',
+                'undervisningsserier': 'teaching',
+                'undervisning': 'teaching',
+                'bibelstudier': 'teaching',
+                'seminarer': 'teaching',
+                'kurs': 'teaching',
+                'reisevirksomhet': 'events',
+                'bli-fast-giver': 'regular-donors',
+                'personvern': 'privacy',
+                'tilgjengelighet': 'accessibility',
+                'podcast': 'podcast',
+                'youtube': 'youtube',
+                'blogg-post-1': 'blog-post-1',
+                'blogg-post-2': 'blog-post-2',
+                'blogg-post-3': 'blog-post-3',
+                'blogg-post-4': 'blog-post-4',
+                'blogg-post-5': 'blog-post-5'
             },
             'es': {
-                'index.html': 'index.html',
-                'om-oss.html': 'sobre-nosotros.html',
-                'arrangementer.html': 'eventos.html',
-                'kontakt.html': 'contacto.html',
-                'donasjoner.html': 'donaciones.html',
-                'for-menigheter.html': 'para-iglesias.html',
-                'for-bedrifter.html': 'para-empresas.html',
-                'bnn.html': 'bnn.html',
-                'arrangement-detaljer.html': 'detalles-evento.html',
-                'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html',
-                'media.html': 'media.html',
-                'kalender.html': 'calendario.html',
-                'undervisningsserier.html': 'ensenanza.html',
-                'undervisning.html': 'ensenanza.html',
-                'bibelstudier.html': 'ensenanza.html',
-                'seminarer.html': 'ensenanza.html',
-                'kurs.html': 'ensenanza.html',
-                'reisevirksomhet.html': 'eventos.html',
-                'bli-fast-giver.html': 'donantes-regulares.html',
-                'personvern.html': 'privacidad.html',
-                'tilgjengelighet.html': 'accesibilidad.html',
-                'podcast.html': 'podcast.html',
-                'youtube.html': 'youtube.html',
-                'blogg-post-1.html': 'blog-post-1.html',
-                'blogg-post-2.html': 'blog-post-2.html',
-                'blogg-post-3.html': 'blog-post-3.html',
-                'blogg-post-4.html': 'blog-post-4.html',
-                'blogg-post-5.html': 'blog-post-5.html'
+                'index': 'index',
+                'om-oss': 'sobre-nosotros',
+                'arrangementer': 'eventos',
+                'kontakt': 'contacto',
+                'donasjoner': 'donaciones',
+                'for-menigheter': 'para-iglesias',
+                'for-bedrifter': 'para-empresas',
+                'bnn': 'bnn',
+                'arrangement-detaljer': 'detalles-evento',
+                'blogg': 'blog',
+                'blogg-post': 'blog-post',
+                'media': 'media',
+                'kalender': 'calendario',
+                'undervisningsserier': 'ensenanza',
+                'undervisning': 'ensenanza',
+                'bibelstudier': 'ensenanza',
+                'seminarer': 'ensenanza',
+                'kurs': 'ensenanza',
+                'reisevirksomhet': 'eventos',
+                'bli-fast-giver': 'donantes-regulares',
+                'personvern': 'privacidad',
+                'tilgjengelighet': 'accesibilidad',
+                'podcast': 'podcast',
+                'youtube': 'youtube',
+                'blogg-post-1': 'blog-post-1',
+                'blogg-post-2': 'blog-post-2',
+                'blogg-post-3': 'blog-post-3',
+                'blogg-post-4': 'blog-post-4',
+                'blogg-post-5': 'blog-post-5'
             }
         };
 
-        let result = path;
+        let result = cleanPath;
         if (mappings[targetLang]) {
             for (const [no, translated] of Object.entries(mappings[targetLang])) {
-                if (String(path).endsWith(no)) {
-                    result = String(path).replace(no, translated);
+                if (cleanPath === no) {
+                    result = translated;
                     break;
                 }
             }
@@ -163,8 +171,8 @@ const i18nManager = {
             // Reverse mapping
             const allMappings = { ...mappings.en, ...mappings.es };
             for (const [no, translated] of Object.entries(allMappings)) {
-                if (String(path).endsWith(translated)) {
-                    result = String(path).replace(translated, no);
+                if (cleanPath === translated) {
+                    result = no;
                     break;
                 }
             }
