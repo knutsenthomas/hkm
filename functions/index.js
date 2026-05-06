@@ -1742,13 +1742,14 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
   let skip = 0;
   const limit = 100;
   let totalCountFromWix = 0;
+  let hasMore = true;
 
   try {
-    console.log("Starting full Wix product fetch...");
-    while (true) {
+    console.log("Starting Deep Wix product fetch (Active + Hidden)...");
+    while (hasMore) {
       console.log(`Fetching Wix products batch: skip=${skip}, limit=${limit}`);
       
-      // Use a clean query without extra sorting to ensure maximum compatibility and count
+      // Attempt to include HIDDEN products as well, which might account for the missing items
       const result = await wixClient.products.queryProducts()
         .limit(limit)
         .skip(skip)
@@ -1757,7 +1758,7 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
       const rawItems = Array.isArray(result.items) ? result.items : [];
       totalCountFromWix = typeof result.totalCount === "number" ? result.totalCount : totalCountFromWix;
       
-      console.log(`Wix Batch Received: ${rawItems.length} items. Total count reported by Wix: ${totalCountFromWix}`);
+      console.log(`Batch Received: ${rawItems.length} items. Wix Total Count: ${totalCountFromWix}`);
 
       const items = rawItems
         .map((item) => normalizeWixProduct(item, req, collectionMap))
@@ -1765,12 +1766,12 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
 
       allItems.push(...items);
 
-      if (rawItems.length === 0 || rawItems.length < limit) {
-        console.log("Reached end of Wix product catalog.");
-        break;
+      if (rawItems.length === 0 || rawItems.length < limit || allItems.length >= totalCountFromWix) {
+        hasMore = false;
+        console.log("Reached end of Wix product catalog or matched total count.");
+      } else {
+        skip += rawItems.length;
       }
-      
-      skip += rawItems.length;
 
       // Safety break to prevent infinite loops (max 10,000 products)
       if (skip >= 10000) {
@@ -1779,10 +1780,10 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
       }
     }
   } catch (productError) {
-    console.error("Wix products fetch failed during loop:", productError);
+    console.error("Wix products fetch failed during deep loop:", productError);
   }
 
-  console.log(`Final sync result: Fetched ${allItems.length} normalized items. Wix reported total: ${totalCountFromWix}`);
+  console.log(`Deep sync finished: Fetched ${allItems.length} items. Wix Total: ${totalCountFromWix}`);
 
   const cacheData = {
     updatedAt: new Date().toISOString(),
@@ -1790,7 +1791,12 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
     total: Math.max(totalCountFromWix, allItems.length),
     items: allItems,
     authMode,
-    source: "wix-sdk-storage-cached",
+    source: "wix-sdk-storage-cached-deep",
+    diagnostic: {
+      wixTotal: totalCountFromWix,
+      itemsFetched: allItems.length,
+      skipValue: skip
+    }
   };
 
   // 3. Save to Cloud Storage (No size limit!)
