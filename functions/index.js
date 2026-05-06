@@ -1134,8 +1134,10 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
     categories: (item.collectionIds || []).map((id) => collectionMap[id]).filter(Boolean),
     collectionIds: item.collectionIds || [],
     productOptions: item.productOptions || [],
-    description: description,
-    // Variants are omitted to save Firestore document space (1MB limit)
+    variants: item.variants || [],
+    mediaItems: item.mediaItems || [],
+    description: item.description || "",
+    priceData: item.priceData || {},
   };
 }
 
@@ -1673,6 +1675,43 @@ exports.facebookFeed = onRequest({ invoker: "public" }, (req, res) => {
   });
 });
 
+/**
+ * Saves large JSON data to Google Cloud Storage as a cache file.
+ */
+async function saveToStorageCache(path, data) {
+  try {
+    const bucket = admin.storage().bucket();
+    const file = bucket.file(path);
+    await file.save(JSON.stringify(data), {
+      contentType: "application/json",
+      resumable: false,
+    });
+    console.log(`Saved cache to Storage: ${path}`);
+    return true;
+  } catch (error) {
+    console.error(`Error saving to Storage cache (${path}):`, error);
+    return false;
+  }
+}
+
+/**
+ * Loads JSON data from Google Cloud Storage cache.
+ */
+async function loadFromStorageCache(path) {
+  try {
+    const bucket = admin.storage().bucket();
+    const file = bucket.file(path);
+    const [exists] = await file.exists();
+    if (!exists) return null;
+
+    const [content] = await file.download();
+    return JSON.parse(content.toString());
+  } catch (error) {
+    console.error(`Error loading from Storage cache (${path}):`, error);
+    return null;
+  }
+}
+
 async function fetchAndCacheWixProducts(req = { query: {} }) {
   const wixClient = getWixClient();
   let authMode = (process.env.WIX_API_KEY && process.env.WIX_SITE_ID) ? "api-key" : "oauth";
@@ -1729,27 +1768,30 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
     }
   } catch (productError) {
     console.error("Wix products fetch failed:", productError);
-    // If we have some items, we still try to cache what we got
   }
 
   const cacheData = {
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    updatedAt: new Date().toISOString(),
     count: allItems.length,
     total: totalCount,
     items: allItems,
     authMode,
-    source: "wix-sdk-cached",
+    source: "wix-sdk-storage-cached",
   };
 
-  // 3. Save to Firestore Cache
+  // 3. Save to Cloud Storage (No size limit!)
+  await saveToStorageCache("cache/wix_products_v2.json", cacheData);
+
+  // Also save a minimal metadata doc in Firestore for quick checks
   try {
-    await db.collection("content").doc("wix_products").set(cacheData);
-    console.log(`Successfully cached ${allItems.length} Wix products.`);
-  } catch (dbError) {
-    console.error("Firestore cache update failed (likely > 1MB limit):", dbError);
-    // If it fails, we might want to try saving a smaller subset or splitting,
-    // but for now we just log it clearly.
-    throw new Error(`Sync failed: Database document too large for ${allItems.length} items.`);
+    await db.collection("content").doc("wix_products_metadata").set({
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      count: allItems.length,
+      total: totalCount,
+      storagePath: "cache/wix_products_v2.json",
+    });
+  } catch (e) {
+    console.warn("Metadata update failed, but storage cache is saved.");
   }
 
   return cacheData;
@@ -3094,49 +3136,34 @@ exports.onBlogCommentCreatedSyncToWixFirestore = onDocumentCreated({
 });
 
 
-exports.wixProducts = onRequest({ cors: true, invoker: "public" }, (req, res) => {
+exports.wixProducts = onRequest({ cors: true, invoker: "public", memory: "512MiB", timeoutSeconds: 300 }, (req, res) => {
   return cors(req, res, async () => {
     if (req.method === "OPTIONS") {
       return res.status(204).send("");
     }
 
-    if (req.method !== "GET" && req.method !== "POST") {
-      return res.status(405).json({ error: "Method not allowed. Use GET or POST." });
-    }
-
     try {
-      // Allow manual sync via POST or ?force=true
-      if (req.method === "POST" || req.query.force === "true") {
-        console.log("Manual Wix sync triggered.");
-        const cacheData = await fetchAndCacheWixProducts(req);
-        return res.status(200).json({ ok: true, ...cacheData, manuallySynced: true });
+      const forceSync = req.method === "POST" || req.query.force === "true";
+
+      // 1. Try to load from Storage cache first
+      if (!forceSync) {
+        const cachedData = await loadFromStorageCache("cache/wix_products_v2.json");
+        if (cachedData && cachedData.items && cachedData.items.length > 0) {
+          return res.status(200).json({ ok: true, ...cachedData, source: "storage-cache" });
+        }
       }
 
-      // Serve from cache
-      const doc = await db.collection("content").doc("wix_products").get();
-      if (doc.exists && doc.data().items && doc.data().items.length > 0) {
-        const data = doc.data();
-        return res.status(200).json({
-          ok: true,
-          source: "firestore-cache",
-          count: data.count,
-          total: data.total,
-          items: data.items,
-          updatedAt: data.updatedAt
-        });
-      }
-
-      // If cache doesn't exist, fetch and build it
-      console.log("Cache missing, fetching from Wix...");
+      // 2. If force sync or no cache, run full sync
+      if (forceSync) console.log("Manual Wix sync triggered.");
       const cacheData = await fetchAndCacheWixProducts(req);
-      return res.status(200).json({ ok: true, ...cacheData, newlyCached: true });
+      return res.status(200).json({ ok: true, ...cacheData, manuallySynced: forceSync });
 
     } catch (error) {
-      console.error("Error fetching Wix products:", error);
+      console.error("Wix products fetch failed:", error);
       return res.status(500).json({
         ok: false,
         error: "Could not load products from Wix.",
-        details: error && error.message ? error.message : String(error),
+        details: error.message,
         fallbackUrl: "https://www.hiskingdomministry.no/butikk",
       });
     }
@@ -3193,7 +3220,7 @@ exports.wixBlogSync = onRequest({ cors: true, invoker: "public" }, (req, res) =>
  * Automatisert synkronisering av Wix-produkter.
  * Kjører hver 5. time for å holde butikken oppdatert.
  */
-exports.scheduledWixSync = onSchedule("0 */5 * * *", async (event) => {
+exports.scheduledWixSync = onSchedule({ schedule: "0 */5 * * *", memory: "512MiB", timeoutSeconds: 300 }, async (event) => {
   console.log("Starting scheduled Wix product synchronization...");
   try {
     const cacheData = await fetchAndCacheWixProducts({ query: {} });
