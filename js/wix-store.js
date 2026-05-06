@@ -808,7 +808,8 @@ async function loadProducts() {
         let data = null;
         let lastError = null;
 
-        // Try Firestore Cache First
+        // SKIP Firestore Cache (Stale/Legacy) - Always go to Proxy for fresh Storage data
+        /* 
         if (window.firebaseService && window.firebaseService.isInitialized) {
             console.log('[HKM SHOP] Attempting fetch from Firestore cache (wix_products)...');
             try {
@@ -821,6 +822,7 @@ async function loadProducts() {
                 console.warn('[HKM SHOP] Firestore cache fetch failed, falling back to proxy...', e);
             }
         }
+        */
 
         // Fallback to HTTP API
         if (!data) {
