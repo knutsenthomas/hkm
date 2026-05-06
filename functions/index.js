@@ -1728,11 +1728,13 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
   // 1. Fetch Collections to map IDs to Names
   const collectionMap = {};
   try {
-    const colls = await wixClient.collections.queryCollections().find();
+    const colls = await wixClient.collections.queryCollections().limit(100).find();
     if (colls && colls.items) {
       colls.items.forEach((c) => {
-        if (c._id && c.name) collectionMap[c._id] = c.name;
+        const id = c._id || c.id;
+        if (id && c.name) collectionMap[id] = c.name;
       });
+      console.log(`Mapped ${Object.keys(collectionMap).length} collections.`);
     }
   } catch (collError) {
     console.warn("Could not fetch Wix collections, categories might be missing:", collError);
