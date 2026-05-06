@@ -1145,7 +1145,8 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
     mediaItems: item.mediaItems || [],
     description: item.description || "",
     priceData: item.priceData || {},
-    createdAt: item._createdDate || item.createdDate || item._updatedDate || new Date().toISOString(),
+    // Capture any available date for sorting, fallback to now
+    createdAt: item._createdDate || item.createdDate || item._updatedDate || item.lastUpdated || new Date().toISOString(),
   };
 }
 
@@ -1805,12 +1806,12 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
 
   // 3. Sort by Newest First (descending)
   allItems.sort((a, b) => {
-    const dateA = new Date(a.createdAt || 0).getTime();
-    const dateB = new Date(b.createdAt || 0).getTime();
-    return dateB - dateA;
+    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+    return timeB - timeA;
   });
 
-  console.log(`Sync finished: Fetched and sorted ${allItems.length} items.`);
+  console.log(`[HKM SYNC] Finished: Fetched ${allItems.length} items. Sorted by newest first.`);
 
   const cacheData = {
     updatedAt: new Date().toISOString(),
