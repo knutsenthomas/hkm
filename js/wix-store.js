@@ -160,7 +160,8 @@ function normalizeForCompare(value) {
         .replace(/å/g, 'a')
         .normalize('NFD')
         .replace(/[\u0300-\u036f]/g, '')
-        .replace(/\s+/g, ' ');
+        .replace(/[\s\-_]+/g, ' ') // Standardize spaces, hyphens, and underscores
+        .trim();
 }
 
 function normalizeOptionName(name) {
@@ -242,6 +243,14 @@ function productMatchesCategory(product, category) {
     const cat = normalizeForCompare(category);
     if (!cat || cat === 'all') return true;
 
+    // 1. Direct match with product's categories array (from Wix collections)
+    if (product && product.categories && Array.isArray(product.categories)) {
+        const productCategories = product.categories.map(c => normalizeForCompare(c.name || c));
+        // Check if any product category matches the requested category slug or name
+        if (productCategories.some(pc => pc === cat || pc.replace(/\s+/g, '-') === cat)) return true;
+    }
+
+    // 2. Keyword/Alias match
     const name = normalizeForCompare(product && product.name);
     const slug = normalizeForCompare(product && product.slug);
     const haystack = `${name} ${slug}`.trim();
@@ -279,19 +288,13 @@ function productMatchesCategory(product, category) {
         'spiritual-battle': ['spiritual', 'battle', 'krig', 'åndelig'],
         'sport': ['sport', 'performance', 'trening'],
         't-shirts': ['t-shirt', 't skjorte', 'tskjorte', 'tee'],
-        'tilbehor': ['tilbehor', 'kopp', 'kopper', 'flaske', 'flasker', 'plakat', 'plakater', 'bilde', 'bilder', 'sticker', 'klistermerke', 'mobildeksel', 'armband', 'smykker'],
+        'tilbehor': ['tilbehor', 'tilbehør', 'kopp', 'kopper', 'flaske', 'flasker', 'plakat', 'plakater', 'bilde', 'bilder', 'sticker', 'klistermerke', 'mobildeksel', 'armband', 'smykker'],
         'undervisning': ['undervisning', 'teaching', 'lære'],
         'varna': ['varna', 'evangeliesenteret', 'evangeliesenter']
     };
 
     if (categoryAliases[cat]) {
         return includesAny(categoryAliases[cat]);
-    }
-
-    // Direct check if product has a collection/category array field that we can match exactly
-    if (product && product.categories && Array.isArray(product.categories)) {
-        const productCategories = product.categories.map(c => normalizeForCompare(c.name || c));
-        if (productCategories.includes(cat)) return true;
     }
 
     return haystack.includes(cat);
@@ -479,10 +482,60 @@ let heroLoadingWatchdogId = null;
 let lastUiErrorType = null;
 
 function setActiveCategoryButtons(category = 'all') {
+    const safeCategory = normalizeForCompare(category);
     document.querySelectorAll('.category-btn').forEach((btn) => {
-        const isActive = (btn.getAttribute('data-category') || 'all') === category;
+        const btnCat = normalizeForCompare(btn.getAttribute('data-category') || 'all');
+        const isActive = btnCat === safeCategory;
         btn.classList.toggle('active', isActive);
     });
+}
+
+/**
+ * Renders the category filter buttons dynamically based on actual products
+ */
+function renderDynamicCategories(products) {
+    const container = document.getElementById('dynamic-category-container');
+    if (!container) return;
+
+    // 1. Collect all unique categories
+    const categorySet = new Set();
+    products.forEach(p => {
+        if (p.categories && Array.isArray(p.categories)) {
+            p.categories.forEach(cat => {
+                const name = typeof cat === 'string' ? cat : (cat.name || '');
+                if (name && name.toLowerCase() !== 'all products') {
+                    categorySet.add(name);
+                }
+            });
+        }
+    });
+
+    // 2. Sort categories (Keep specific ones like 'Abonnement' first if they exist)
+    const sortedCategories = Array.from(categorySet).sort((a, b) => {
+        const aLower = a.toLowerCase();
+        const bLower = b.toLowerCase();
+        if (aLower === 'abonnement') return -1;
+        if (bLower === 'abonnement') return 1;
+        return a.localeCompare(b, 'no');
+    });
+
+    // 3. Clear and render (Keep "Alle varene" as it's hardcoded in HTML for now, 
+    // or we can clear all and re-add it)
+    const allBtnHtml = `
+        <button class="category-btn unified-category-btn ${currentCategory === 'all' ? 'active' : ''} px-4 py-2 rounded-full font-bold text-sm transition-all" data-category="all">
+            ${getStoreText('ui.categoryAll', 'Alle varene')}
+        </button>
+    `;
+
+    container.innerHTML = allBtnHtml + sortedCategories.map(cat => {
+        const slug = cat.toLowerCase().replace(/[\s\-_]+/g, '-');
+        const isActive = currentCategory === slug || normalizeForCompare(currentCategory) === normalizeForCompare(cat);
+        return `
+            <button class="category-btn unified-category-btn ${isActive ? 'active' : ''} px-4 py-2 rounded-full font-bold text-sm transition-all" data-category="${escapeHtml(cat)}">
+                ${escapeHtml(cat)}
+            </button>
+        `;
+    }).join('');
 }
 
 function showProductsGrid() {
@@ -512,8 +565,13 @@ function bindProductUiEvents() {
         });
     }
 
-    document.querySelectorAll('.category-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
+    // Use event delegation for category buttons since they are dynamic
+    const catContainer = document.getElementById('dynamic-category-container');
+    if (catContainer) {
+        catContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.category-btn');
+            if (!btn) return;
+
             currentCategory = btn.getAttribute('data-category') || 'all';
             setActiveCategoryButtons(currentCategory);
             applyFilters();
@@ -523,7 +581,7 @@ function bindProductUiEvents() {
                 if (anchor) anchor.scrollIntoView({ behavior: 'smooth' });
             }
         });
-    });
+    }
 
     productUiEventsBound = true;
 }
@@ -721,6 +779,7 @@ async function loadProducts() {
                         // Success! We can skip the network proxy entirely
                         renderHeroSlidesFromProducts(allProducts);
                         renderFilters();
+                        renderDynamicCategories(allProducts);
                         renderGrid(allProducts);
                         showProductsGrid();
                         bindProductUiEvents();
@@ -800,6 +859,7 @@ async function loadProducts() {
                                 previewRendered = true;
                                 renderHeroSlidesFromProducts(allProducts);
                                 renderFilters();
+                                renderDynamicCategories(allProducts);
                                 showProductsGrid();
                                 bindProductUiEvents();
                             }
@@ -846,6 +906,7 @@ async function loadProducts() {
 
         // 2. Render Filters Sidebar
         renderFilters();
+        renderDynamicCategories(allProducts);
 
         // 3. Initial Render Grid
         renderGrid(allProducts);
@@ -1043,6 +1104,7 @@ document.addEventListener('hkm:page-content-updated', (event) => {
 
     renderHeroSlidesFromProducts(allProducts);
     renderFilters();
+    renderDynamicCategories(allProducts);
     applyFilters();
     if (els.error && !els.error.classList.contains('hidden')) {
         handleError(lastUiErrorType || 'ERROR');
