@@ -13,7 +13,7 @@ const crypto = require("crypto");
 require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
 require("dotenv").config({ path: path.join(__dirname, ".env.local"), override: true, quiet: true });
 const { createClient, OAuthStrategy, ApiKeyStrategy } = require("@wix/sdk");
-const { products } = require("@wix/stores");
+const { products, collections } = require("@wix/stores");
 const { posts } = require("@wix/blog");
 const { comments } = require("@wix/comments");
 
@@ -543,7 +543,7 @@ function getWixClient() {
 
   if (apiKey && (siteId || accountId)) {
     return createClient({
-      modules: { products, posts, comments },
+      modules: { products, collections, posts, comments },
       auth: siteId ?
         ApiKeyStrategy({
           apiKey,
@@ -560,7 +560,7 @@ function getWixClient() {
   if (!clientId) throw new Error("Missing WIX_CLIENT_ID.");
 
   return createClient({
-    modules: { products, posts, comments },
+    modules: { products, collections, posts, comments },
     auth: OAuthStrategy({ clientId }),
   });
 }
@@ -1042,7 +1042,7 @@ function getWixImageUrl(wixUrl) {
   return wixUrl;
 }
 
-function normalizeWixProduct(item, req) {
+function normalizeWixProduct(item, req, collectionMap = {}) {
   const locale = req.query.locale || "no-NO";
   const fallbackBaseUrl = req.query.storeBaseUrl || "https://www.hiskingdomministry.no";
   const fallbackStoreUrl = req.query.externalStoreBaseUrl || "https://www.hiskingdomministry.no/butikk";
@@ -1117,6 +1117,10 @@ function normalizeWixProduct(item, req) {
     item.priceData && item.priceData.formatted,
   ) || formatWixPrice(priceValue, currency, locale);
 
+  const rawDescription = item.description || "";
+  // Truncate description to keep payload small but still usable for search/previews
+  const description = rawDescription.length > 800 ? `${rawDescription.slice(0, 797)}...` : rawDescription;
+
   return {
     id: wixPickFirstString(item.id, item._id, item.productId),
     name: wixPickFirstString(item.name, item.title, item.productName),
@@ -1126,13 +1130,12 @@ function normalizeWixProduct(item, req) {
     priceValue,
     currency,
     formattedPrice,
-    // Keep common Wix fields so the frontend normalizer can still work if needed.
-    priceData: item.priceData,
-    mainMedia: item.mainMedia,
+    // Map collection IDs to names for easier filtering in frontend
+    categories: (item.collectionIds || []).map((id) => collectionMap[id]).filter(Boolean),
     collectionIds: item.collectionIds || [],
     productOptions: item.productOptions || [],
-    variants: item.variants || [],
-    description: item.description || "",
+    description: description,
+    // Variants are omitted to save Firestore document space (1MB limit)
   };
 }
 
@@ -1682,25 +1685,51 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
     }
   }
 
+  // 1. Fetch Collections to map IDs to Names
+  const collectionMap = {};
+  try {
+    const colls = await wixClient.collections.queryCollections().find();
+    if (colls && colls.items) {
+      colls.items.forEach((c) => {
+        if (c._id && c.name) collectionMap[c._id] = c.name;
+      });
+    }
+  } catch (collError) {
+    console.warn("Could not fetch Wix collections, categories might be missing:", collError);
+  }
+
+  // 2. Fetch all products with pagination
   let allItems = [];
   let skip = 0;
   const limit = 100;
   let totalCount = 0;
 
-  while (true) {
-    const result = await wixClient.products.queryProducts()
-      .limit(limit)
-      .skip(skip)
-      .descending("_createdDate")
-      .find();
+  try {
+    while (true) {
+      console.log(`Fetching Wix products batch: skip=${skip}`);
+      const result = await wixClient.products.queryProducts()
+        .limit(limit)
+        .skip(skip)
+        .descending("_createdDate")
+        .find();
 
-    const rawItems = Array.isArray(result.items) ? result.items : [];
-    const items = rawItems.map((item) => normalizeWixProduct(item, req)).filter((item) => item.name);
-    allItems.push(...items);
-    totalCount = typeof result.totalCount === "number" ? result.totalCount : allItems.length;
+      const rawItems = Array.isArray(result.items) ? result.items : [];
+      const items = rawItems
+        .map((item) => normalizeWixProduct(item, req, collectionMap))
+        .filter((item) => item && item.name);
 
-    if (rawItems.length < limit) break;
-    skip += limit;
+      allItems.push(...items);
+      totalCount = typeof result.totalCount === "number" ? result.totalCount : Math.max(totalCount, allItems.length);
+
+      if (rawItems.length < limit) break;
+      skip += limit;
+
+      // Safety break to prevent infinite loops (max 5000 products)
+      if (skip >= 5000) break;
+    }
+  } catch (productError) {
+    console.error("Wix products fetch failed:", productError);
+    // If we have some items, we still try to cache what we got
   }
 
   const cacheData = {
@@ -1709,10 +1738,20 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
     total: totalCount,
     items: allItems,
     authMode,
-    source: "wix-sdk-cached"
+    source: "wix-sdk-cached",
   };
 
-  await db.collection("content").doc("wix_products").set(cacheData);
+  // 3. Save to Firestore Cache
+  try {
+    await db.collection("content").doc("wix_products").set(cacheData);
+    console.log(`Successfully cached ${allItems.length} Wix products.`);
+  } catch (dbError) {
+    console.error("Firestore cache update failed (likely > 1MB limit):", dbError);
+    // If it fails, we might want to try saving a smaller subset or splitting,
+    // but for now we just log it clearly.
+    throw new Error(`Sync failed: Database document too large for ${allItems.length} items.`);
+  }
+
   return cacheData;
 }
 

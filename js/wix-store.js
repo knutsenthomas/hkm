@@ -424,8 +424,10 @@ function armHeroLoadingWatchdog() {
  * Renders a standard Bookle product card
  */
 function createProductCard(product) {
-    // Determine category / type label
-    const category = product.slug ? product.slug.split('-')[0] : 'Design';
+    // Determine category / type label - use the real synchronized category if available
+    const category = (product.categories && product.categories.length > 0) 
+        ? product.categories[0] 
+        : (product.slug ? product.slug.split('-')[0] : 'Design');
     const productUrl = resolveProductUrl(product);
 
     return `
