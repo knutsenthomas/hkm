@@ -2849,7 +2849,7 @@ class AdminManager {
                 /* Mobile Optimizations for Hero Card */
                 @media (max-width: 768px) {
                     .overview-hero-card {
-                        padding: 24px !important;
+                        padding: 32px !important;
                     }
                     .overview-hero-title {
                         font-size: 28px !important;
