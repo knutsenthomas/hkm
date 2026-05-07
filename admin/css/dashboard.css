@@ -620,91 +620,101 @@ body.admin-body {
 .stat-card.modern:has(.podcast)::after { content: 'podcasts'; color: #8b5cf6; }
 .stat-card.modern:has(.campaign)::after { content: 'campaign'; color: #f97316; }
 
-@media (max-width: 650px) {
+@media (max-width: 768px) {
     .stats-grid {
-        grid-template-columns: 1fr !important; /* Back to one column for horizontal cards */
+        grid-template-columns: 1fr !important;
         gap: 16px !important;
         padding: 16px !important;
     }
 
     .stat-card.modern {
-        padding: 16px 20px !important;
-        display: flex !important; /* Switch to flex for more reliable vertical centering */
+        padding: 20px 24px !important;
+        display: flex !important;
+        flex-direction: row !important;
         align-items: center !important;
-        justify-content: space-between !important;
-        text-align: center !important;
-        min-height: 90px !important;
-        gap: 16px !important;
-        position: relative !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+        min-height: 100px !important;
+        gap: 20px !important;
+        border-radius: 20px !important;
     }
 
-    /* Column 1: Icon */
+    /* Column 1: LARGE CIRCULAR ICON */
     .stat-card.modern .stat-icon-wrap {
-        width: 44px !important;
-        height: 44px !important;
+        width: 60px !important;
+        height: 60px !important;
         margin: 0 !important;
-        border-radius: 12px !important;
+        border-radius: 50% !important; /* PERFECT CIRCLE like reference */
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         flex-shrink: 0 !important;
-        align-self: center !important; /* Force center */
+        background: #f1f5f9 !important; /* Default light bg */
     }
 
-    /* Column 2: Content (Title + Value) */
+    /* Specific colors for icon backgrounds */
+    .stat-card.modern .stat-icon-wrap.blue { background: #e0f2fe !important; color: #0284c7 !important; }
+    .stat-card.modern .stat-icon-wrap.green { background: #dcfce7 !important; color: #16a34a !important; }
+    .stat-card.modern .stat-icon-wrap.mint { background: #ccfbf1 !important; color: #0d9488 !important; }
+    .stat-card.modern .stat-icon-wrap.purple { background: #f3e8ff !important; color: #9333ea !important; }
+    .stat-card.modern .stat-icon-wrap.donation { background: #fee2e2 !important; color: #dc2626 !important; }
+    .stat-card.modern .stat-icon-wrap.youtube { background: #fee2e2 !important; color: #e11d48 !important; }
+
+    .stat-card.modern .stat-icon-wrap span {
+        font-size: 28px !important;
+    }
+
+    /* Column 2: Text Stack (Left Aligned like reference) */
     .stat-card.modern .stat-content {
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important;
+        align-items: flex-start !important;
         justify-content: center !important;
-        text-align: center !important;
+        text-align: left !important;
         flex: 1 !important;
     }
 
     .stat-card.modern .stat-label {
-        font-size: 13px !important;
+        font-size: 15px !important;
         font-weight: 600 !important;
-        color: #64748b !important;
+        color: #475569 !important;
         margin: 0 !important;
         line-height: 1.2 !important;
+        opacity: 0.9 !important;
     }
 
     .stat-card.modern .stat-value {
-        font-size: 28px !important;
+        font-size: 32px !important;
         line-height: 1 !important;
-        margin: 2px 0 !important;
+        margin: 4px 0 !important;
         color: #1e293b !important;
         font-weight: 800 !important;
     }
 
-    /* Column 3: Meta Info */
+    /* Meta Info at the bottom of the stack or right side */
     .stat-card.modern .stat-meta {
-        font-size: 12px !important;
+        font-size: 11px !important;
         font-weight: 500 !important;
         color: #94a3b8 !important;
-        text-align: right !important;
-        white-space: nowrap !important;
         margin: 0 !important;
+        opacity: 0.8 !important;
     }
 
     .stat-card.modern .stat-meta-wrapper {
         display: flex !important;
-        flex-direction: column !important;
-        align-items: flex-end !important;
+        gap: 12px !important;
         border: none !important;
         padding: 0 !important;
-        margin: 0 !important;
+        margin-top: 4px !important;
     }
 
     .stat-card.modern .stat-meta-box {
-        text-align: right !important;
-        margin: 0 !important;
-        padding: 0 !important;
+        text-align: left !important;
     }
 
-    /* Keep it subtle */
+    /* No background watermark to keep the clean "Hero" look */
     .stat-card.modern::after {
-        display: none !important; /* Hide background icon to keep it clean in this tight layout */
+        display: none !important;
     }
 }
 
