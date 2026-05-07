@@ -2717,7 +2717,7 @@ class AdminManager {
                         ${meta}
                     </div>
                     <div class="stat-value-wrap">
-                        <p class="stat-value">${value}</p>
+                        <p class="stat-value ${value.length > 5 ? 'long-value' : ''}">${value}</p>
                     </div>
                 </div>
             `;

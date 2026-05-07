@@ -702,14 +702,23 @@ body.admin-body {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-end !important;
+        flex-shrink: 0 !important;
+        min-width: 70px !important; /* Ensure enough space for the number */
+        margin-left: 12px !important;
     }
 
     .stat-card.modern .stat-value {
-        font-size: 32px !important; /* Slightly smaller for safety */
+        font-size: 28px !important; /* Slightly smaller for safety */
         line-height: 1 !important;
         margin: 0 !important;
         color: #1e293b !important;
         font-weight: 800 !important;
+        letter-spacing: -1px !important;
+    }
+
+    /* Extra small font for long values like 4m 21s */
+    .stat-card.modern .stat-value.long-value {
+        font-size: 20px !important;
     }
 
     /* ELIMINATE ALL WATERMARKS on all modern cards */
