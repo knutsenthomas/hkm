@@ -2427,12 +2427,6 @@ body.admin-body .page-title {
     }
 }
 
-body.admin-body .user-profile-link,
-body.crm-body .user-profile-link,
-body.builder-active .user-profile-link {
-    gap: 10px;
-}
-
 body.admin-body .user-avatar,
 body.crm-body .user-avatar,
 body.builder-active .user-avatar {
@@ -2444,9 +2438,43 @@ body.builder-active .user-avatar {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: #1B4965 !important; /* Use primary blue for empty state */
+    background: #1B4965 !important;
     color: #ffffff !important;
     flex-shrink: 0 !important;
+}
+
+body.admin-body .user-profile-link,
+body.crm-body .user-profile-link,
+body.builder-active .user-profile-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.section-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    justify-content: flex-end !important;
+    flex: 1 !important;
+}
+
+#global-search-opener { order: 1 !important; }
+#messages-bell, .notification-btn:not(#global-search-opener) { order: 2 !important; }
+.user-profile-link { order: 3 !important; }
+#mobile-nav-toggle { order: 4 !important; }
+
+/* Ensure the titles don't grow too much */
+.section-header-titles {
+    flex: 0 1 auto !important;
+    margin-right: 24px !important;
+}
+
+.section-header-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
 }
 
 /* Ensure images/icons/text inside fill or center in the square perfectly */
