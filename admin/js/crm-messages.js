@@ -81,6 +81,23 @@ class MessagesManager {
         const pushForm = document.getElementById('inbox-push-form');
         if (pushForm) {
             pushForm.onsubmit = (e) => this.handlePushSubmit(e);
+            
+            // Real-time Preview Listeners
+            const titleInput = document.getElementById('inbox-push-title');
+            const bodyInput = document.getElementById('inbox-push-body');
+            const previewTitle = document.getElementById('preview-push-title');
+            const previewBody = document.getElementById('preview-push-body');
+
+            if (titleInput && previewTitle) {
+                titleInput.addEventListener('input', (e) => {
+                    previewTitle.textContent = e.target.value || 'Tittel på varsel';
+                });
+            }
+            if (bodyInput && previewBody) {
+                bodyInput.addEventListener('input', (e) => {
+                    previewBody.textContent = e.target.value || 'Meldingen din vil vises her...';
+                });
+            }
         }
 
         const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
