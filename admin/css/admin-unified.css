@@ -1482,6 +1482,36 @@ body.admin-body .welcome-subtitle {
     transform: none;
 }
 
+.design-ui-upload-row .file-input {
+    font-size: 13px;
+    padding: 8px 12px;
+    height: 40px;
+    background: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    color: #94a3b8; /* text color for the filename */
+}
+
+/* Custom styling for the file input button (webkit) */
+.design-ui-upload-row .file-input::-webkit-file-upload-button {
+    display: none;
+}
+
+.design-ui-upload-row .file-input::before {
+    content: '\e3f4'; /* material symbol image icon */
+    font-family: 'Material Symbols Outlined';
+    display: inline-block;
+    margin-right: 10px;
+    font-size: 20px;
+    vertical-align: middle;
+    color: var(--accent-color, #f97316);
+    background: #fff7ed;
+    padding: 4px;
+    border-radius: 6px;
+}
+
 .design-ui-preview-container {
     min-height: 94px;
     background: #f8fafc;
@@ -1502,6 +1532,7 @@ body.admin-body .welcome-subtitle {
     justify-content: center;
     gap: 8px;
     font-size: 13px;
+    white-space: nowrap;
 }
 
 .design-ui-empty-preview .material-symbols-outlined {
@@ -2964,20 +2995,25 @@ body.builder-active .newsletter-canvas {
 
 @media (max-width: 768px) {
     :root {
-        --admin-page-gutter: 14px;
+        --admin-page-gutter: 20px;
         --admin-page-radius-xl: 16px;
     }
 
     body.admin-body .main-header,
     body.crm-body .main-header,
     body.builder-active .main-header {
-        padding-left: 14px;
-        padding-right: 14px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    body.admin-body .section-header-actions,
+    body.crm-body .section-header-actions {
+        gap: 16px;
     }
 
     body.crm-body .crm-header {
         margin-top: 14px;
-        padding: 16px;
+        padding: 20px;
     }
 
     body.crm-body .crm-header .header-left::before {
@@ -2988,8 +3024,8 @@ body.builder-active .newsletter-canvas {
 
     body.admin-body .section-content>.section-header,
     body.admin-body .section-content>.design-ui-header {
-        padding: 16px;
-        gap: 12px;
+        padding: 20px;
+        gap: 16px;
     }
 
     body.admin-body .section-content>.section-header::before,
@@ -3004,17 +3040,17 @@ body.builder-active .newsletter-canvas {
     }
 
     body.admin-body .section-content>.section-header:not(.flex-between):not(.design-ui-header)::before {
-        left: 14px;
+        left: 20px;
         top: 16px;
     }
 
     body.admin-body .section-content>.section-header-row {
-        padding: 14px !important;
+        padding: 20px !important;
         padding-left: 58px !important;
     }
 
     body.admin-body .section-content>.section-header-row::before {
-        left: 14px;
+        left: 20px;
         width: 34px;
         height: 34px;
         font-size: 16px;

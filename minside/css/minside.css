@@ -1827,8 +1827,11 @@ body {
 .ms-overview-banner-chip {
     background: rgba(255, 255, 255, 0.15);
     border-radius: var(--radius-sm);
-    padding: 12px 18px;
+    padding: 10px 18px;
     backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .ms-overview-banner-chip-label {
@@ -1837,7 +1840,7 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin-bottom: 3px;
+    margin-bottom: 0;
 }
 
 .ms-overview-banner-chip-value {

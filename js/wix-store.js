@@ -20,7 +20,7 @@ const DEFAULT_CONFIG = {
     maxPages: 50, // Support catalogs up to 5000 products
     locale: 'no-NO',
     currency: 'NOK',
-    timeoutMs: 15000
+    timeoutMs: 30000
 };
 
 const config = {

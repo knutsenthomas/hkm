@@ -2793,11 +2793,13 @@ class AdminManager {
             const height = Math.min(100, Math.round((parseInt(d.users) / maxUsers) * 100));
             // Format date string YYYYMMDD to DD.MM
             let label = d.date;
-            if (d.date.length === 8) {
-                label = `${d.date.substring(6, 8)}.${d.date.substring(4, 6)}`;
+            if (d.date && String(d.date).length === 8) {
+                label = `${String(d.date).substring(6, 8)}.${String(d.date).substring(4, 6)}`;
             }
             const showLabel = i % 2 === 0 || i === dailyTraffic.length - 1;
-            return `<div class="bar" style="height: ${height}%;" data-tooltip-info="${label}: ${parseInt(d.users).toLocaleString('no-NO')} besøkende">${showLabel ? `<span>${label}</span>` : ''}</div>`;
+            const barColor = i % 2 === 0 ? '#c7d2fe' : '#8b5cf6';
+            const displayHeight = height > 0 ? Math.max(height, 4) : 0;
+            return `<div class="bar" style="height: ${displayHeight}%; background-color: ${barColor};" data-tooltip-info="${label}: ${parseInt(d.users).toLocaleString('no-NO')} besøkende">${showLabel ? `<span>${label}</span>` : ''}</div>`;
         }).join('');
 
         const mainWidgets = {

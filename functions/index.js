@@ -1130,6 +1130,7 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
     priceValue,
     currency,
     formattedPrice,
+    ribbon: item.ribbon || "",
     // Triple-Safety Category Detection:
     // 1. Check embedded collections (from .include("collections"))
     // 2. Check embedded categories (some versions of the API use this)
@@ -1145,8 +1146,8 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
     mediaItems: item.mediaItems || [],
     description: item.description || "",
     priceData: item.priceData || {},
-    // Capture any available date for sorting, fallback to now
-    createdAt: item._createdDate || item.createdDate || item._updatedDate || item.lastUpdated || new Date().toISOString(),
+    // Capture any available date for sorting, fallback to a fixed old date for stability
+    createdAt: item._createdDate || item.createdDate || item._updatedDate || item.lastUpdated || "1970-01-01T00:00:00Z",
   };
 }
 
@@ -1830,7 +1831,7 @@ async function fetchAndCacheWixProducts(req = { query: {} }) {
     await db.collection("content").doc("wix_products_metadata").set({
       updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       count: allItems.length,
-      total: totalCount,
+      total: Math.max(totalCountFromWix, allItems.length),
       storagePath: "cache/wix_products_v2.json",
     });
   } catch (e) {
