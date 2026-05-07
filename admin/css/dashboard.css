@@ -688,27 +688,25 @@ body.admin-body {
     }
 
     .stat-card.modern .stat-value {
-        font-size: 36px !important;
+        font-size: 32px !important; /* Slightly smaller for safety */
         line-height: 1 !important;
         margin: 0 !important;
         color: #1e293b !important;
         font-weight: 800 !important;
     }
 
-    /* Handle multi-value (visitors) */
-    .stat-meta-wrapper {
-        display: flex !important;
-        gap: 12px !important;
-        margin-top: 4px !important;
-    }
-
-    .stat-meta-box {
-        text-align: left !important;
-    }
-
-    /* No background icon */
-    .stat-card.modern::after {
+    /* ELIMINATE ALL WATERMARKS on all modern cards */
+    .stat-card.modern::after,
+    .stat-card.modern:has(.youtube)::after,
+    .stat-card.modern:has(.blog)::after,
+    .stat-card.modern:has(.users)::after,
+    .stat-card.modern:has(.donation)::after,
+    .stat-card.modern:has(.status)::after,
+    .stat-card.modern:has(.event)::after,
+    .stat-card.modern:has(.campaign)::after,
+    .stat-card.modern:has(.podcast)::after {
         display: none !important;
+        content: none !important;
     }
 }
 

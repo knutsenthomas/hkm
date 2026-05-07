@@ -2641,8 +2641,9 @@ class AdminManager {
                     meta = `<span class="stat-meta">Totalt: ${Math.round(donationTotal).toLocaleString('no-NO')} kr</span>`;
                     break;
                 case 'youtube':
-                    value = parseInt(youtubeStats.views || 0).toLocaleString('no-NO');
-                    meta = `<span class="stat-meta">${youtubeStats.subscribers} abonnenter</span>`;
+                    // Make subscribers the main value to match title "YouTube Abonnenter"
+                    value = youtubeStats.subscribers || '0';
+                    meta = `<span class="stat-meta">${parseInt(youtubeStats.views || 0).toLocaleString('no-NO')} visninger totalt</span>`;
                     break;
                 case 'podcast': value = podcastCount; meta = '<span class="stat-meta">Episoder totalt</span>'; break;
                 case 'campaigns': value = campaignCount; break;
