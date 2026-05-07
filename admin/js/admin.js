@@ -2679,46 +2679,47 @@ class AdminManager {
 
         // Generate a simple SVG sparkline if daily traffic is available
         let sparklineHtml = `
-            <div style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
+            <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.6;">
                 <span class="material-symbols-outlined" style="font-size: 48px; color: #d97706; margin-bottom: 16px;">monitoring</span>
                 <div style="text-align: center;">
-                    <h4 style="color: #1e293b; margin-bottom: 8px;">Venter på Analytics-data</h4>
-                    <p style="font-size: 13px; color: #94a3b8;">Dataene dine er på vei fra Google...</p>
+                    <h4 style="color: #1e293b; margin-bottom: 8px;">Venter på data</h4>
+                    <p style="font-size: 13px; color: #94a3b8;">Henter dine siste besøkstall...</p>
                 </div>
             </div>
         `;
 
-        if (ga.dailyTraffic && Array.isArray(ga.dailyTraffic) && ga.dailyTraffic.length > 0) {
-            const maxUsers = Math.max(...ga.dailyTraffic.map(d => parseInt(d.users) || 1));
-            const points = ga.dailyTraffic.map((d, i) => {
-                const x = (i / (ga.dailyTraffic.length - 1)) * 100;
-                const y = 100 - ((parseInt(d.users) || 0) / maxUsers) * 80;
+        if (ga.dailyTraffic && Array.isArray(ga.dailyTraffic) && ga.dailyTraffic.length > 1) {
+            const trafficData = ga.dailyTraffic.map(d => parseInt(d.users) || 0);
+            const maxUsers = Math.max(...trafficData, 1);
+            const points = trafficData.map((users, i) => {
+                const x = (i / (trafficData.length - 1)) * 100;
+                const y = 95 - (users / maxUsers) * 85; // Keep 5% padding top/bottom
                 return `${x},${y}`;
             }).join(' ');
 
             sparklineHtml = `
-                <div style="width: 100%; height: 100%; padding: 20px 0; position: relative; display: flex; flex-direction: column;">
-                    <div style="flex: 1; position: relative;">
-                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width: 100%; height: 100%; overflow: visible;">
+                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative;">
+                    <div style="flex: 1; min-height: 140px; position: relative; overflow: hidden; margin: 10px 0;">
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block;">
                             <defs>
                                 <linearGradient id="sparkline-grad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stop-color="#f97316" stop-opacity="0.2" />
+                                    <stop offset="0%" stop-color="#f97316" stop-opacity="0.25" />
                                     <stop offset="100%" stop-color="#f97316" stop-opacity="0" />
                                 </linearGradient>
                             </defs>
                             <path d="M 0 100 L ${points} L 100 100 Z" fill="url(#sparkline-grad)" />
-                            <polyline points="${points}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                            <polyline points="${points}" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
                         </svg>
                     </div>
-                    <div style="display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
-                        <div style="text-align: left;">
-                            <div style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Aktivitet siste 7 dager</div>
-                            <div style="font-size: 20px; font-weight: 800; color: #1e293b;">${ga.screenPageViews || '0'} <span style="font-size: 12px; font-weight: 500; color: #64748b;">sidevisninger</span></div>
+                    <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 15px; border-top: 1px solid #f1f5f9; margin-top: auto;">
+                        <div>
+                            <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Aktivitet siste 7 dager</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">${ga.screenPageViews || '0'} <span style="font-size: 13px; font-weight: 600; color: #64748b; margin-left: 4px;">sidevisninger</span></div>
                         </div>
                         <div style="text-align: right;">
-                            <div style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Akkurat nå</div>
-                            <div style="font-size: 20px; font-weight: 800; color: #f97316; display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
-                                <span style="width: 8px; height: 8px; background: #f97316; border-radius: 50%; display: block; animation: pulse 2s infinite;"></span>
+                            <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Akkurat nå</div>
+                            <div style="font-size: 24px; font-weight: 800; color: #f97316; display: flex; align-items: center; gap: 8px; justify-content: flex-end; letter-spacing: -0.02em;">
+                                <span style="width: 10px; height: 10px; background: #f97316; border-radius: 50%; display: block; animation: hkm-pulse 2s infinite;"></span>
                                 ${ga.activeUsers || '0'}
                             </div>
                         </div>
@@ -2728,6 +2729,13 @@ class AdminManager {
         }
 
         const analyticsFooterHtml = `
+            <style>
+                @keyframes hkm-pulse {
+                    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.7); }
+                    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
+                    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+                }
+            </style>
             <div class="analytics-bottom-row">
                 <div class="big-card">
                     <div class="big-card-title">
