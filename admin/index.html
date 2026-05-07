@@ -64,6 +64,14 @@
             align-items: center !important;
             gap: 15px !important;
         }
+        
+        /* HIDE MOBILE MENU BUTTON ON DESKTOP */
+        @media (min-width: 1025px) {
+            #mobile-nav-toggle, 
+            .mobile-nav-toggle {
+                display: none !important;
+            }
+        }
     </style>
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->
