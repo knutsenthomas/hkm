@@ -938,13 +938,12 @@ class AdminManager {
             if (adminName) adminName.textContent = safeName;
             if (!adminAvatar) return;
 
-            if (photoURL) {
-                adminAvatar.innerHTML = `<img src="${photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-                return;
-            }
-
+            // HKM Fix: Always use initials instead of photoURL
             const initials = safeName.split(' ').map(n => (n || '').trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
             adminAvatar.textContent = (initials || 'A').substring(0, 2);
+            adminAvatar.style.fontSize = '15px';
+            adminAvatar.style.fontWeight = '800';
+            adminAvatar.style.letterSpacing = '0';
         };
 
         const cacheHeaderIdentity = (name, photoURL) => {
