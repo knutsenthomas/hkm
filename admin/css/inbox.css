@@ -822,20 +822,33 @@ body.crm-body .threads-search input {
         flex-shrink: 0;
     }
     #btn-new-push {
-        width: auto !important;
-        padding: 8px 14px !important;
+        height: 36px !important;
+        border-radius: 999px !important;
+        padding: 0 16px !important;
         font-size: 13px !important;
         white-space: nowrap;
+        background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+        border: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 8px !important;
+        box-shadow: 0 2px 8px rgba(209, 125, 57, 0.2) !important;
     }
     .folder-item {
         flex-shrink: 0;
-        padding: 6px 14px;
+        height: 36px !important;
+        padding: 0 16px !important;
+        display: flex !important;
+        align-items: center !important;
         white-space: nowrap;
         background: #f1f5f9;
-        border-radius: 999px;
-        border: 1px solid var(--inbox-border);
-        gap: 6px;
+        border-radius: 999px !important;
+        border: 1px solid var(--inbox-border) !important;
+        gap: 8px !important;
         font-size: 13px;
+        color: #475569;
+        transition: all 0.2s ease;
     }
     .folder-item.active {
         background: var(--inbox-accent) !important;
