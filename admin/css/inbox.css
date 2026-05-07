@@ -917,21 +917,23 @@ body.crm-body .threads-search input {
     }
     .folder-badge {
         position: static !important;
-        margin-left: 6px !important;
+        margin-left: 8px !important;
         margin-right: 0 !important;
         background: #ef4444 !important;
         color: #fff !important;
+        width: 20px !important;
         min-width: 20px !important;
         height: 20px !important;
-        padding: 0 6px !important;
-        border-radius: 10px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
         font-size: 11px !important;
         font-weight: 800 !important;
-        display: inline-flex !important;
+        display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         flex-shrink: 0 !important;
-        line-height: 1 !important;
+        line-height: 0 !important;
+        text-align: center !important;
     }
     .inbox-threads {
         width: 100% !important;
