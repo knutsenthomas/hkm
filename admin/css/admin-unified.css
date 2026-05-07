@@ -2412,10 +2412,19 @@ body.admin-body .page-title {
     flex: 1 !important;
 }
 
-.header-right {
+.header-right,
+.section-header-actions {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
+    justify-content: flex-end !important;
+}
+
+/* Hide user text on mobile to keep header clean */
+@media (max-width: 768px) {
+    .user-info-text {
+        display: none !important;
+    }
 }
 
 body.admin-body .user-profile-link,
