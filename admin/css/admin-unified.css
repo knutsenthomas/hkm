@@ -2429,23 +2429,28 @@ body.crm-body .user-avatar,
 body.builder-active .user-avatar {
     width: 42px !important;
     height: 42px !important;
-    border-radius: 50% !important; /* Circle for profile to distinguish from tools */
-    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     overflow: hidden !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: #e2e8f0 !important;
+    background: #1B4965 !important; /* Use primary blue for empty state */
+    color: #ffffff !important;
     flex-shrink: 0 !important;
 }
 
-/* Ensure images/icons inside fill the circle */
+/* Ensure images/icons/text inside fill or center in the square perfectly */
 body.admin-body .user-avatar img,
-body.admin-body .user-avatar svg,
-body.admin-body .user-avatar .material-symbols-outlined {
+body.admin-body .user-avatar svg {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
+}
+
+body.admin-body .user-avatar .material-symbols-outlined,
+body.admin-body .user-avatar span {
+    font-size: 22px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
