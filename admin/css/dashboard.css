@@ -3709,7 +3709,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 }
 
 .mobile-nav-item span.material-symbols-outlined {
-    font-size: 28px !important; /* Increased from 26px and added !important to override conflicts */
+    font-size: 26px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -4278,8 +4278,10 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
 }
 
-.mobile-bottom-nav .mobile-nav-item span:not(.material-symbols-outlined) {
-    display: none !important; /* Hide text labels for a minimalist icon-only UI */
+.mobile-bottom-nav .mobile-nav-item span {
+    font-size: 14px;
+    font-weight: 700;
+    margin-top: 4px;
 }
 
 .tool-content h4 {

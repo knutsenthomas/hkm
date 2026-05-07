@@ -2528,17 +2528,23 @@ body.admin-body .page-title {
     color: #1B4965 !important;
     background: transparent !important;
     border: none !important;
-    border-radius: 0 !important; /* The link has the radius */
+    border-radius: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
 }
 
-/* Hide fallback icons that might leak through */
+/* HIDEOUSLY AGGRESSIVE ICON BLOCKER */
+.user-avatar span,
+.user-avatar i,
+.user-avatar svg,
+.user-avatar img,
+.user-avatar .material-symbols-outlined,
 .user-avatar::before,
 .user-avatar::after {
-    content: none !important;
-}
-
-.user-avatar span.material-symbols-outlined {
     display: none !important;
+    content: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 /* Mobile cleanup */
@@ -2594,46 +2600,39 @@ body.builder-active .user-profile-link {
     gap: 12px !important;
 }
 
-.section-header-actions {
+/* Final Header Ordering and Alignment (Overriding legacy rules) */
+.main-header .section-header-actions {
     display: flex !important;
+    flex-direction: row !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 10px !important;
     justify-content: flex-end !important;
-    flex: 1 !important;
 }
 
-#global-search-opener { order: 1 !important; margin: 0 !important; }
-#messages-bell, .notification-btn:not(#global-search-opener) { order: 2 !important; margin: 0 !important; }
-.user-profile-link { order: 3 !important; margin: 0 !important; }
-#mobile-nav-toggle { order: 4 !important; margin: 0 !important; }
-
-/* Ensure the titles don't grow too much */
-.section-header-titles {
-    flex: 0 1 auto !important;
-    margin-right: 24px !important;
+/* 1. Profile/Avatar FIRST */
+.user-profile-link { 
+    order: 1 !important; 
+    margin: 0 !important;
 }
 
-.section-header-content {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: space-between !important;
-    width: 100% !important;
+/* 2. Notifications SECOND */
+#messages-bell, 
+.notification-btn:not(#global-search-opener):not(.mobile-nav-toggle) { 
+    order: 2 !important; 
+    margin: 0 !important; 
 }
 
-/* Ensure images/icons/text inside fill or center in the square perfectly */
-body.admin-body .user-avatar img,
-body.admin-body .user-avatar svg {
-    width: 100% !important;
-    height: 100% !important;
-    object-fit: cover !important;
+/* 3. Mobile Menu LAST */
+#mobile-nav-toggle,
+.mobile-nav-toggle { 
+    order: 3 !important; 
+    margin: 0 !important; 
 }
 
-body.admin-body .user-avatar .material-symbols-outlined,
-body.admin-body .user-avatar span {
-    font-size: 22px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
+/* Clean Search (Hidden on mobile) */
+#global-search-opener { 
+    order: 0 !important; 
+    margin: 0 !important; 
 }
 
 /* Main content surfaces */
@@ -4231,4 +4230,52 @@ body.admin-body .nav-link.logout {
 body.admin-body .nav-link.logout:hover {
     background-color: #fef2f2 !important;
     color: #ef4444 !important;
+}
+
+/* ==========================================================================
+   GOLD STANDARD - HEADER & AVATAR FINAL OVERRIDES
+   ========================================================================== */
+
+/* 1. FORCE HEADER BUTTON ORDER [Profile -> Notifications -> Mobile Menu] */
+.section-header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    justify-content: flex-end !important;
+}
+
+.user-profile-link { order: 1 !important; }
+#messages-bell { order: 2 !important; }
+#mobile-nav-toggle, .mobile-nav-toggle { order: 3 !important; }
+
+/* 2. AGGRESSIVE AVATAR CLEANUP - FORCE TEXT-ONLY (TK) */
+.user-avatar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    color: white !important;
+    background: var(--admin-page-primary, #1B4965) !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+}
+
+/* Kill all dynamic icons/spans/fallback-symbols in avatar */
+.user-avatar span, 
+.user-avatar svg, 
+.user-avatar i, 
+.user-avatar .material-symbols-outlined {
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Ensure 'TK' text is visible and centered */
+.user-avatar::after {
+    display: none !important; /* Prevent any pseudo-element icons */
 }
