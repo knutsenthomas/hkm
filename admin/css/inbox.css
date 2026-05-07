@@ -30,9 +30,13 @@
     padding: 16px 0;
 }
 
+#btn-new-push .btn-text-mobile { display: none; }
+#btn-new-push .btn-text-desktop { display: inline; }
+
 #btn-new-push {
     margin: 0 16px 16px;
-    padding: 10px 16px;
+    height: 42px;
+    padding: 0 20px;
     border-radius: 12px;
     background: linear-gradient(135deg, #d17d39, #bd4f2a);
     color: #fff;
@@ -850,24 +854,27 @@ body.crm-body .threads-search input {
     }
     #btn-new-push, .folder-item {
         box-sizing: border-box !important;
-        height: 38px !important;
+        height: 36px !important; /* Unified height */
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        padding: 0 16px !important;
+        padding: 0 14px !important; /* Consistent padding */
         font-size: 13px !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         border-radius: 999px !important;
         white-space: nowrap !important;
         flex-shrink: 0 !important;
         gap: 8px !important;
     }
 
+    #btn-new-push .btn-text-desktop { display: none !important; }
+    #btn-new-push .btn-text-mobile { display: inline !important; }
+
     #btn-new-push {
         background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
         border: none !important;
         color: #fff !important;
-        box-shadow: 0 2px 8px rgba(209, 125, 57, 0.2) !important;
+        box-shadow: none !important; /* Remove shadow to match chips */
     }
 
     .folder-item {
