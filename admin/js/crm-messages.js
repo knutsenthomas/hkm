@@ -122,7 +122,7 @@ class MessagesManager {
             const messagesSnapshot = await window.firebaseService.db
                 .collection('contactMessages')
                 .orderBy('createdAt', 'desc')
-                .limit(50)
+                .limit(20)
                 .get();
             
             this.messages = messagesSnapshot.docs.map(doc => ({
@@ -135,32 +135,20 @@ class MessagesManager {
             const chatsSnapshot = await window.firebaseService.db
                 .collection('visitorChats')
                 .orderBy('updatedAt', 'desc')
-                .limit(50)
+                .limit(20)
                 .get();
 
-            this.visitorChats = await Promise.all(chatsSnapshot.docs.map(async (doc) => {
-                const chatData = doc.data() || {};
-                const lastMsgSnapshot = await window.firebaseService.db
-                    .collection('visitorChats')
-                    .doc(doc.id)
-                    .collection('messages')
-                    .orderBy('createdAt', 'desc')
-                    .limit(1)
-                    .get();
-                const lastMsg = lastMsgSnapshot.docs[0]?.data() || null;
-                return {
-                    id: doc.id,
-                    type: 'chat',
-                    ...chatData,
-                    lastMessage: lastMsg
-                };
+            this.visitorChats = chatsSnapshot.docs.map(doc => ({
+                id: doc.id,
+                type: 'chat',
+                ...doc.data()
             }));
 
             // Fetch Push Notifications (Campaign logs)
             const pushSnapshot = await window.firebaseService.db
                 .collection('push_log')
                 .orderBy('sentAt', 'desc')
-                .limit(50)
+                .limit(20)
                 .get();
 
             this.pushNotifications = pushSnapshot.docs.map(doc => ({
