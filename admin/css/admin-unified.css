@@ -2376,8 +2376,8 @@ body.crm-body .notification-btn,
 body.builder-active .notification-btn,
 body.admin-body .mobile-toggle,
 body.admin-body .mobile-nav-toggle {
-    width: 42px !important;
-    height: 42px !important;
+    width: 48px !important;
+    height: 48px !important;
     border-radius: 12px !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
     background: #f8fafc !important;
@@ -2388,6 +2388,11 @@ body.admin-body .mobile-nav-toggle {
     transition: all 0.2s ease !important;
     cursor: pointer !important;
     flex-shrink: 0 !important;
+}
+
+body.admin-body .notification-btn span,
+body.admin-body .mobile-nav-toggle span {
+    font-size: 28px !important;
 }
 
 body.admin-body .notification-btn:hover,
@@ -2450,8 +2455,8 @@ body.admin-body .page-title {
 body.admin-body .user-avatar,
 body.crm-body .user-avatar,
 body.builder-active .user-avatar {
-    width: 42px !important;
-    height: 42px !important;
+    width: 48px !important;
+    height: 48px !important;
     border-radius: 12px !important;
     border: 1px solid rgba(0, 0, 0, 0.05) !important;
     overflow: hidden !important;
@@ -2461,6 +2466,8 @@ body.builder-active .user-avatar {
     background: #dbeafe !important; /* Light blue background to match profile icon */
     color: #1B4965 !important; /* Dark blue icon color for contrast */
     flex-shrink: 0 !important;
+    font-size: 20px !important; /* Larger initials if no photo */
+    font-weight: 700 !important;
 }
 
 body.admin-body .user-profile-link,
