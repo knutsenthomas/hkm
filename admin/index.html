@@ -21,7 +21,7 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
-    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.07.16.14">
+    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.07.16.16">
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/admin-unified.css?v=2026.05.07.15.52">
     
@@ -1404,6 +1404,31 @@
             }
         });
     </script>
+    <!-- TERMINAL LAYOUT FIX - FORCES 3 COLUMNS ON DESKTOP -->
+    <style>
+        @media (min-width: 1025px) {
+            .stats-grid {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                grid-auto-flow: column !important;
+                gap: 24px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                align-items: start !important;
+            }
+            .dashboard-col {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+                min-width: 0 !important;
+                width: 100% !important;
+            }
+            .stat-card.modern {
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+        }
+    </style>
 </body>
 
 </html>
