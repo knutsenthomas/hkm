@@ -4279,9 +4279,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 }
 
 .mobile-bottom-nav .mobile-nav-item span:not(.material-symbols-outlined) {
-    font-size: 13px;
-    font-weight: 700;
-    margin-top: 4px;
+    display: none !important; /* Hide text labels for a minimalist icon-only UI */
 }
 
 .tool-content h4 {
