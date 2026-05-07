@@ -2465,19 +2465,87 @@ body.admin-body .page-title {
         align-items: center !important;
         justify-content: flex-end !important;
     }
+}
 
-    .user-profile-link {
-        order: 1 !important;
-    }
+/* --- THE HKM ADMIN GOLD STANDARD HEADER --- */
+/* This section forces parity between all admin sub-pages and the index page */
 
-    #messages-bell, 
-    .notification-btn {
-        order: 2 !important;
-    }
+.main-header .section-header-actions {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
 
-    #mobile-nav-toggle,
-    .mobile-nav-toggle {
-        order: 3 !important;
+.user-profile-link {
+    order: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    text-decoration: none !important;
+}
+
+#messages-bell, 
+.notification-btn {
+    order: 2 !important;
+}
+
+#mobile-nav-toggle,
+.mobile-nav-toggle {
+    order: 3 !important;
+}
+
+/* Force square 12px buttons with correct colors */
+.user-profile-link,
+.notification-btn,
+.mobile-nav-toggle {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+    padding: 0 !important;
+    justify-content: center !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    flex-shrink: 0 !important;
+}
+
+.user-profile-link {
+    background: #dbeafe !important;
+}
+
+.notification-btn,
+.mobile-nav-toggle {
+    background: #ffffff !important;
+}
+
+/* Avatar styling - Force initials display */
+.user-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    color: #1B4965 !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important; /* The link has the radius */
+}
+
+/* Hide fallback icons that might leak through */
+.user-avatar::before,
+.user-avatar::after {
+    content: none !important;
+}
+
+.user-avatar span.material-symbols-outlined {
+    display: none !important;
+}
+
+/* Mobile cleanup */
+@media (max-width: 768px) {
+    .user-info-text,
+    #global-search-opener {
+        display: none !important;
     }
 }
 
