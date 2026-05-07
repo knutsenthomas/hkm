@@ -2720,10 +2720,12 @@ class AdminManager {
                     <div class="stat-icon-wrap ${w.color}">
                         <span class="material-symbols-outlined">${w.icon}</span>
                     </div>
-                    <div class="stat-content">
+                    <div class="stat-label-stack">
                         <h3 class="stat-label">${w.label}</h3>
-                        <p class="stat-value">${value}</p>
                         ${meta}
+                    </div>
+                    <div class="stat-value-wrap">
+                        <p class="stat-value">${value}</p>
                     </div>
                 </div>
             `;

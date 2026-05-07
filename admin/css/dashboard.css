@@ -629,8 +629,8 @@ body.admin-body {
 
     .stat-card.modern {
         padding: 20px 24px !important;
-        display: flex !important;
-        flex-direction: row !important;
+        display: grid !important;
+        grid-template-columns: 60px 1fr auto !important; /* ICON | LABEL | VALUE */
         align-items: center !important;
         justify-content: flex-start !important;
         text-align: left !important;
@@ -639,80 +639,74 @@ body.admin-body {
         border-radius: 20px !important;
     }
 
-    /* Column 1: LARGE ROUNDED SQUARE ICON */
+    /* Column 1: ICON */
     .stat-card.modern .stat-icon-wrap {
         width: 60px !important;
         height: 60px !important;
         margin: 0 !important;
-        border-radius: 16px !important; /* ROUNDED SQUARE like regnskap style */
+        border-radius: 16px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
         flex-shrink: 0 !important;
-        background: #f1f5f9 !important; /* Default light bg */
     }
-
-    /* Specific colors for icon backgrounds */
-    .stat-card.modern .stat-icon-wrap.blue { background: #e0f2fe !important; color: #0284c7 !important; }
-    .stat-card.modern .stat-icon-wrap.green { background: #dcfce7 !important; color: #16a34a !important; }
-    .stat-card.modern .stat-icon-wrap.mint { background: #ccfbf1 !important; color: #0d9488 !important; }
-    .stat-card.modern .stat-icon-wrap.purple { background: #f3e8ff !important; color: #9333ea !important; }
-    .stat-card.modern .stat-icon-wrap.donation { background: #fee2e2 !important; color: #dc2626 !important; }
-    .stat-card.modern .stat-icon-wrap.youtube { background: #fee2e2 !important; color: #e11d48 !important; }
 
     .stat-card.modern .stat-icon-wrap span {
         font-size: 28px !important;
     }
 
-    /* Column 2: Text Stack (Left Aligned like reference) */
-    .stat-card.modern .stat-content {
+    /* Column 2: LABEL STACK (Title + Meta) */
+    .stat-label-stack {
         display: flex !important;
         flex-direction: column !important;
         align-items: flex-start !important;
         justify-content: center !important;
-        text-align: left !important;
         flex: 1 !important;
+        min-width: 0 !important;
     }
 
     .stat-card.modern .stat-label {
-        font-size: 15px !important;
+        font-size: 16px !important;
         font-weight: 600 !important;
         color: #475569 !important;
         margin: 0 !important;
         line-height: 1.2 !important;
-        opacity: 0.9 !important;
+    }
+
+    .stat-card.modern .stat-meta {
+        font-size: 12px !important;
+        color: #94a3b8 !important;
+        margin-top: 4px !important;
+        white-space: nowrap !important;
+    }
+
+    /* Column 3: VALUE (Big Number) */
+    .stat-value-wrap {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
     }
 
     .stat-card.modern .stat-value {
-        font-size: 32px !important;
+        font-size: 36px !important;
         line-height: 1 !important;
-        margin: 4px 0 !important;
+        margin: 0 !important;
         color: #1e293b !important;
         font-weight: 800 !important;
     }
 
-    /* Meta Info at the bottom of the stack or right side */
-    .stat-card.modern .stat-meta {
-        font-size: 11px !important;
-        font-weight: 500 !important;
-        color: #94a3b8 !important;
-        margin: 0 !important;
-        opacity: 0.8 !important;
-    }
-
-    .stat-card.modern .stat-meta-wrapper {
+    /* Handle multi-value (visitors) */
+    .stat-meta-wrapper {
         display: flex !important;
         gap: 12px !important;
-        border: none !important;
-        padding: 0 !important;
         margin-top: 4px !important;
     }
 
-    .stat-card.modern .stat-meta-box {
+    .stat-meta-box {
         text-align: left !important;
     }
 
-    /* No background watermark to keep the clean "Hero" look */
+    /* No background icon */
     .stat-card.modern::after {
         display: none !important;
     }
