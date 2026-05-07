@@ -577,6 +577,73 @@ body.admin-body {
     grid-area: content;
     display: flex;
     flex-direction: column;
+    z-index: 2; /* Keep above background icon */
+}
+
+/* New decorative background icon */
+.stat-card.modern::after {
+    content: '';
+    position: absolute;
+    right: -10px;
+    bottom: -10px;
+    font-family: 'Material Symbols Outlined';
+    font-size: 80px;
+    color: currentColor;
+    opacity: 0.04;
+    transform: rotate(-10deg);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Specific background icons based on wrap color */
+.stat-card.modern:has(.purple)::after { content: 'visibility'; color: #a855f7; }
+.stat-card.modern:has(.green)::after { content: 'check_circle'; color: #22c55e; }
+.stat-card.modern:has(.blue)::after { content: 'edit_note'; color: #3b82f6; }
+.stat-card.modern:has(.mint)::after { content: 'school'; color: #0ea5e9; }
+.stat-card.modern:has(.donation)::after { content: 'volunteer_activism'; color: #ec4899; }
+.stat-card.modern:has(.youtube)::after { content: 'video_library'; color: #ef4444; }
+.stat-card.modern:has(.podcast)::after { content: 'podcasts'; color: #8b5cf6; }
+.stat-card.modern:has(.campaign)::after { content: 'campaign'; color: #f97316; }
+
+@media (max-width: 650px) {
+    .stat-card.modern {
+        padding: 24px !important;
+        gap: 24px !important;
+        grid-template-columns: 1fr auto !important;
+        grid-template-areas: "content icon" !important;
+        min-height: 140px !important;
+    }
+
+    .stat-card.modern .stat-icon-wrap {
+        width: 64px !important;
+        height: 64px !important;
+        border-radius: 20px !important;
+        box-shadow: 0 8px 16px rgba(0,0,0,0.06) !important;
+    }
+
+    .stat-card.modern .stat-value {
+        font-size: 42px !important;
+        line-height: 1 !important;
+        margin: 8px 0 !important;
+        letter-spacing: -0.03em !important;
+    }
+
+    .stat-card.modern .stat-label {
+        font-size: 14px !important;
+        opacity: 0.8 !important;
+    }
+
+    .stat-card.modern .stat-meta {
+        font-size: 12px !important;
+        font-weight: 600 !important;
+    }
+
+    .stat-card.modern::after {
+        font-size: 100px !important;
+        right: -15px !important;
+        bottom: -15px !important;
+        opacity: 0.06 !important;
+    }
 }
 
 /* Extra compact for 1x1 widgets */
