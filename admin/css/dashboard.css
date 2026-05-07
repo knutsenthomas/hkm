@@ -690,13 +690,25 @@ body.admin-body {
     font-size: 11px !important;
 }
 
-/* BIG ANALYTICS CARDS (BOTTOM) */
+/* ANALYTICS FOOTER SECTION (OUTSIDE GRID) */
+.analytics-footer-section {
+    margin-top: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
 .analytics-bottom-row {
-    grid-column: 1 / -1;
     display: grid;
     grid-template-columns: 2fr 1fr;
     gap: 24px;
-    margin-top: 24px;
+}
+
+/* HIDE MOBILE BOTTOM NAV ON DESKTOP */
+@media (min-width: 1025px) {
+    .mobile-bottom-nav {
+        display: none !important;
+    }
 }
 
 .big-card {

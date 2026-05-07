@@ -2659,10 +2659,9 @@ class AdminManager {
                 `;
             });
 
-            widgetsHtml += `</div>`; // Close column
         });
 
-        // Add Bottom Analytics Row
+        // Build Analytics Footer HTML
         const topPagesArr = [
             { path: '/hjem', pct: 42 },
             { path: '/blogg/ai-i-produksjon', pct: 28 },
@@ -2671,7 +2670,7 @@ class AdminManager {
             { path: '/kontakt', pct: 5 }
         ];
 
-        widgetsHtml += `
+        const analyticsFooterHtml = `
             <div class="analytics-bottom-row">
                 <div class="big-card">
                     <div class="big-card-title">
@@ -2726,6 +2725,9 @@ class AdminManager {
             </div>
             <div class="stats-grid">
                 ${widgetsHtml}
+            </div>
+            <div class="analytics-footer-section">
+                ${analyticsFooterHtml}
             </div>
         `;
         // Initialize supporting systems
