@@ -3002,13 +3002,23 @@ body.builder-active .newsletter-canvas {
     body.admin-body .main-header,
     body.crm-body .main-header,
     body.builder-active .main-header {
-        padding-left: 20px;
-        padding-right: 20px;
+        padding-left: 24px !important;
+        padding-right: 24px !important;
     }
 
     body.admin-body .section-header-actions,
     body.crm-body .section-header-actions {
-        gap: 16px;
+        gap: 20px !important;
+    }
+
+    body.admin-body .user-info-text,
+    body.crm-body .user-info-text {
+        display: none !important;
+    }
+
+    body.admin-body .main-header .section-header,
+    body.crm-body .main-header .section-header {
+        gap: 8px !important;
     }
 
     body.crm-body .crm-header {
