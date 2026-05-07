@@ -25,34 +25,44 @@
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/admin-unified.css?v=2026.05.07.15.52">
     
-    <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE) -->
+    <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
     <style>
-        @media (max-width: 768px) {
-            .stat-card.modern .stat-value.long-value {
-                font-size: 18px !important;
-                white-space: nowrap !important;
-                color: #1e293b !important;
-                font-weight: 800 !important;
-            }
-            .stat-label-stack {
-                padding-right: 15px !important;
-                min-width: 0 !important;
-                flex: 1 !important;
-            }
-            .stat-value-wrap {
-                width: 90px !important;
-                flex-shrink: 0 !important;
-                text-align: right !important;
-                display: flex !important;
-                justify-content: flex-end !important;
-                align-items: center !important;
-            }
-            .stat-card.modern .stat-label {
-                font-size: 14px !important;
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-            }
+        .stat-card.modern .stat-value.long-value {
+            font-size: 18px !important;
+            white-space: nowrap !important;
+            color: #1e293b !important;
+            font-weight: 800 !important;
+        }
+        .stat-label-stack {
+            padding-right: 15px !important;
+            min-width: 0 !important;
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: center !important;
+        }
+        .stat-value-wrap {
+            width: 85px !important;
+            flex-shrink: 0 !important;
+            text-align: right !important;
+            display: flex !important;
+            justify-content: flex-end !important;
+            align-items: center !important;
+        }
+        .stat-card.modern .stat-label {
+            font-size: 15px !important;
+            font-weight: 600 !important;
+            color: #475569 !important;
+            margin: 0 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+        .stat-card.modern {
+            display: grid !important;
+            grid-template-columns: 60px 1fr 85px !important; /* STRICT GLOBAL COLUMNS */
+            align-items: center !important;
+            gap: 15px !important;
         }
     </style>
     
