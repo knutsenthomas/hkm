@@ -3396,7 +3396,7 @@ class AdminManager {
                         <p style="margin: 6px 0 0 !important; font-size: 15px !important; color: #94a3b8 !important; font-weight: 500 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">Administrer dine ${title.toLowerCase()}.</p>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316 !important; border: none !important; padding: 14px 28px !important; font-weight: 700 !important; border-radius: 10px !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3) !important; color: white !important; cursor: pointer !important; font-family: 'Work Sans', sans-serif !important; white-space: nowrap !important; flex-shrink: 0 !important; margin-left: 20px !important;">
+                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316 !important; border: none !important; padding: 14px 28px !important; font-weight: 700 !important; border-radius: 10px !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3) !important; color: white !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; white-space: nowrap !important; flex-shrink: 0 !important; margin-left: 20px !important;">
                     <span class="material-symbols-outlined" style="font-size: 22px !important;">add</span> Legg til ny
                 </button>
             </div>
