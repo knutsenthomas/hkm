@@ -2662,14 +2662,70 @@ class AdminManager {
             widgetsHtml += `</div>`; // Close column
         });
 
-        // Build Analytics Footer HTML
-        const topPagesArr = [
-            { path: '/hjem', pct: 42 },
-            { path: '/blogg/ai-i-produksjon', pct: 28 },
-            { path: '/podcast', pct: 15 },
-            { path: '/medlem/kurs', pct: 10 },
-            { path: '/kontakt', pct: 5 }
-        ];
+        // Build Analytics Footer HTML with real data if available
+        const ga = this.gaData || {};
+        const topPagesArr = ga.topPages && Array.isArray(ga.topPages) 
+            ? ga.topPages.slice(0, 5).map(p => ({ 
+                path: p.title.length > 30 ? p.title.substring(0, 30) + '...' : p.title, 
+                pct: Math.round((parseInt(p.views) / (parseInt(ga.screenPageViews) || 1)) * 100) || 5 
+              }))
+            : [
+                { path: '/hjem', pct: 42 },
+                { path: '/blogg', pct: 28 },
+                { path: '/podcast', pct: 15 },
+                { path: '/kurs', pct: 10 },
+                { path: '/kontakt', pct: 5 }
+            ];
+
+        // Generate a simple SVG sparkline if daily traffic is available
+        let sparklineHtml = `
+            <div style="height: 100%; width: 100%; display: flex; align-items: center; justify-content: center;">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: #d97706; margin-bottom: 16px;">monitoring</span>
+                <div style="text-align: center;">
+                    <h4 style="color: #1e293b; margin-bottom: 8px;">Venter på Analytics-data</h4>
+                    <p style="font-size: 13px; color: #94a3b8;">Dataene dine er på vei fra Google...</p>
+                </div>
+            </div>
+        `;
+
+        if (ga.dailyTraffic && Array.isArray(ga.dailyTraffic) && ga.dailyTraffic.length > 0) {
+            const maxUsers = Math.max(...ga.dailyTraffic.map(d => parseInt(d.users) || 1));
+            const points = ga.dailyTraffic.map((d, i) => {
+                const x = (i / (ga.dailyTraffic.length - 1)) * 100;
+                const y = 100 - ((parseInt(d.users) || 0) / maxUsers) * 80;
+                return `${x},${y}`;
+            }).join(' ');
+
+            sparklineHtml = `
+                <div style="width: 100%; height: 100%; padding: 20px 0; position: relative; display: flex; flex-direction: column;">
+                    <div style="flex: 1; position: relative;">
+                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width: 100%; height: 100%; overflow: visible;">
+                            <defs>
+                                <linearGradient id="sparkline-grad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#f97316" stop-opacity="0.2" />
+                                    <stop offset="100%" stop-color="#f97316" stop-opacity="0" />
+                                </linearGradient>
+                            </defs>
+                            <path d="M 0 100 L ${points} L 100 100 Z" fill="url(#sparkline-grad)" />
+                            <polyline points="${points}" fill="none" stroke="#f97316" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-top: 15px; border-top: 1px solid #f1f5f9; padding-top: 10px;">
+                        <div style="text-align: left;">
+                            <div style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Aktivitet siste 7 dager</div>
+                            <div style="font-size: 20px; font-weight: 800; color: #1e293b;">${ga.screenPageViews || '0'} <span style="font-size: 12px; font-weight: 500; color: #64748b;">sidevisninger</span></div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 11px; color: #94a3b8; font-weight: 700; text-transform: uppercase;">Akkurat nå</div>
+                            <div style="font-size: 20px; font-weight: 800; color: #f97316; display: flex; align-items: center; gap: 6px; justify-content: flex-end;">
+                                <span style="width: 8px; height: 8px; background: #f97316; border-radius: 50%; display: block; animation: pulse 2s infinite;"></span>
+                                ${ga.activeUsers || '0'}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
 
         const analyticsFooterHtml = `
             <div class="analytics-bottom-row">
@@ -2681,10 +2737,8 @@ class AdminManager {
                             <span class="material-symbols-outlined" style="cursor:pointer; color: #64748b;">more_vert</span>
                         </div>
                     </div>
-                    <div style="height: 300px; background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; text-align: center; padding: 40px;">
-                        <span class="material-symbols-outlined" style="font-size: 48px; color: #d97706; margin-bottom: 16px;">monitoring</span>
-                        <h4 style="color: #1e293b; margin-bottom: 8px;">Visualisering av trafikkdata</h4>
-                        <p style="font-size: 13px;">Sanntidsstatistikk hentet direkte fra Google Analytics</p>
+                    <div style="height: 300px; background: white; border: 1px solid #f1f5f9; border-radius: 12px; display: flex; flex-direction: column; align-items: stretch; color: #94a3b8; padding: 24px;">
+                        ${sparklineHtml}
                     </div>
                 </div>
 
