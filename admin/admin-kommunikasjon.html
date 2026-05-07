@@ -200,62 +200,84 @@
         <!-- Main Content -->
         <main class="crm-main">
             <!-- Page Header -->
-            <div id="crm-main-header" class="main-header">
+            <div id="admin-kommunikasjon-main-header" class="main-header">
                 <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
                     <div class="section-header-icon">
-                        <span class="material-symbols-outlined">group</span>
+                        <span class="material-symbols-outlined">chat</span>
                     </div>
                     <div class="section-header-content">
                         <div class="section-header-titles">
-                            <h2 class="section-title">Kontakter</h2>
-                            <p class="section-subtitle">Administrer og følg opp kunder, leads og medlemmer på
-                                nettstedet.</p>
+                            <h2 class="section-title">Kommunikasjon</h2>
+                            <p class="section-subtitle">Håndter chatter og direktemeldinger.</p>
                         </div>
+                    <div class="section-header-actions">
+                        <button id="global-search-opener" class="notification-btn search-opener-box" aria-label="Søk"
+                            title="Søk på siden">
+                            <span class="material-symbols-outlined">search</span>
+                        </button>
 
-                        <div class="section-header-actions">
-                            <button id="global-search-opener" class="notification-btn" aria-label="Søk"
-                                title="Søk på siden">
-                                <span class="material-symbols-outlined">search</span>
-                            </button>
-                            <button class="notification-btn">
-                                <span id="notification-icon" class="material-symbols-outlined">notifications</span>
-                            </button>
+                        <button id="messages-bell" class="notification-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
+                        </button>
 
-                            <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
-                                <div class="user-info-text">
-                                    <span id="admin-name" class="user-name">Laster...</span>
-                                    <span class="user-role">Administrator</span>
-                                </div>
-                                <div id="admin-avatar" class="user-avatar">?</div>
-                            </a>
+                        <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">Laster...</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar">?</div>
+                        </a>
 
-                            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                                <span class="material-symbols-outlined">menu</span>
-                            </button>
-                        </div>
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
                     </div>
                 </div>
+        </div>
+            </div>
             </div>
 
             <!-- Content Hero Banner -->
             <div class="section-content" style="padding: 0;">
-                <div class="section-header design-ui-header">
-                    <div class="section-header-icon">
+                <div class="section-header design-ui-header in-topbar">
+                    <div class="section-header design-ui-header in-topbar">
                         <span class="material-symbols-outlined">group</span>
                     </div>
-                    <div class="section-header-content">
-                        <div class="section-header-titles">
+                    <div class="section-header design-ui-header in-topbar">
+                        <div class="section-header design-ui-header in-topbar">
                             <h2 class="section-title">Kontakter</h2>
                             <p class="section-subtitle">Administrer og følg opp kunder, leads og medlemmer på
                                 nettstedet.</p>
                         </div>
 
-                        <div class="section-header-actions">
-                            <a href="/admin/admin-segmenter" class="btn btn-secondary">Administrer segmenter</a>
-                            <button class="btn btn-primary" id="add-contact-btn">Opprett ny</button>
-                        </div>
+                        <div class="section-header design-ui-header in-topbar">
+                        <button id="global-search-opener" class="notification-btn search-opener-box" aria-label="Søk"
+                            title="Søk på siden">
+                            <span class="material-symbols-outlined">search</span>
+                        </button>
+
+                        <button id="messages-bell" class="notification-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
+                        </button>
+
+                        <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">Laster...</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar">
+                                ?</div>
+                        </a>
+
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
                     </div>
                 </div>
+            </div>
             </div>
 
             <div class="crm-content">

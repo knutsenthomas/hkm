@@ -361,22 +361,25 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Header -->
-        <div id="logger-main-header" class="main-header">
-            <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
-                <div class="section-header-icon">
-                    <span class="material-symbols-outlined">assignment</span>
-                </div>
-                <div class="section-header-content">
-                    <div class="section-header-titles">
-                        <h2 class="section-title">Systemlogger</h2>
-                        <p class="section-subtitle">Oversikt over systemhendelser og feilmeldinger.</p>
+        <div id="admin-logger-main-header" class="main-header">
+                <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">assignment</span>
                     </div>
+                    <div class="section-header-content">
+                        <div class="section-header-titles">
+                            <h2 class="section-title">Systemlogger</h2>
+                            <p class="section-subtitle">Se hendelser og feilmeldinger i systemet.</p>
+                        </div>
                     <div class="section-header-actions">
-                        <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
+                        <button id="global-search-opener" class="notification-btn search-opener-box" aria-label="Søk"
+                            title="Søk på siden">
                             <span class="material-symbols-outlined">search</span>
                         </button>
-                        <button class="notification-btn">
-                            <span class="material-symbols-outlined">notifications</span>
+
+                        <button id="messages-bell" class="notification-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
                         </button>
 
                         <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
@@ -384,16 +387,16 @@
                                 <span id="admin-name" class="user-name">Laster...</span>
                                 <span class="user-role">Administrator</span>
                             </div>
-                            <div id="admin-avatar" class="user-avatar"
-                                style="width: 38px; height: 38px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px;">
-                                ?</div>
+                            <div id="admin-avatar" class="user-avatar">?</div>
                         </a>
 
                         <button id="mobile-nav-toggle" class="mobile-nav-toggle">
                             <span class="material-symbols-outlined">menu</span>
                         </button>
                     </div>
+                    </div>
                 </div>
+        </div>
             </div>
         </div>
 

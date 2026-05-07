@@ -434,7 +434,7 @@
         <!-- Main Content -->
         <main class="crm-main">
             <!-- Page Header -->
-            <div id="messages-main-header" class="main-header">
+            <div id="admin-meldinger-main-header" class="main-header">
                 <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
                     <div class="section-header-icon">
                         <span class="material-symbols-outlined">mail</span>
@@ -444,30 +444,33 @@
                             <h2 class="section-title">Meldinger</h2>
                             <p class="section-subtitle">Håndter henvendelser fra kontaktskjemaet på nettsiden.</p>
                         </div>
+                    <div class="section-header-actions">
+                        <button id="global-search-opener" class="notification-btn search-opener-box" aria-label="Søk"
+                            title="Søk på siden">
+                            <span class="material-symbols-outlined">search</span>
+                        </button>
 
-                        <div class="section-header-actions">
-                            <button id="global-search-opener" class="notification-btn" aria-label="Søk"
-                                title="Søk på siden">
-                                <span class="material-symbols-outlined">search</span>
-                            </button>
-                            <button class="notification-btn">
-                                <span class="material-symbols-outlined">notifications</span>
-                            </button>
+                        <button id="messages-bell" class="notification-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
+                        </button>
 
-                            <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
-                                <div class="user-info-text">
-                                    <span id="admin-name" class="user-name">Laster...</span>
-                                    <span class="user-role">Administrator</span>
-                                </div>
-                                <div id="admin-avatar" class="user-avatar">?</div>
-                            </a>
+                        <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">Laster...</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar">?</div>
+                        </a>
 
-                            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                                <span class="material-symbols-outlined">menu</span>
-                            </button>
-                        </div>
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
                     </div>
                 </div>
+        </div>
+            </div>
             </div>
 
             <div class="crm-content" style="padding: 0 !important; margin: 0 !important; max-width: 100% !important;">
