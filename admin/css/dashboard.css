@@ -629,13 +629,13 @@ body.admin-body {
 
     .stat-card.modern {
         padding: 16px 20px !important;
-        display: grid !important;
-        grid-template-columns: 44px 1fr auto !important; /* 3 DISTINCT COLUMNS */
+        display: flex !important; /* Switch to flex for more reliable vertical centering */
         align-items: center !important;
-        text-align: center !important;
-        min-height: 80px !important;
-        gap: 16px !important;
         justify-content: space-between !important;
+        text-align: center !important;
+        min-height: 90px !important;
+        gap: 16px !important;
+        position: relative !important;
     }
 
     /* Column 1: Icon */
@@ -648,6 +648,7 @@ body.admin-body {
         align-items: center !important;
         justify-content: center !important;
         flex-shrink: 0 !important;
+        align-self: center !important; /* Force center */
     }
 
     /* Column 2: Content (Title + Value) */
