@@ -916,8 +916,23 @@ body.crm-body .threads-search input {
         display: block !important;
     }
     .folder-badge {
-        position: static;
-        margin-left: 4px;
+        position: static !important;
+        margin-left: 8px !important;
+        margin-right: -4px !important; /* Pull it slightly in for better balance */
+        top: auto !important;
+        right: auto !important;
+        background: #ef4444 !important;
+        color: #fff !important;
+        min-width: 18px !important;
+        height: 18px !important;
+        padding: 0 5px !important;
+        border-radius: 10px !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
     }
     .inbox-threads {
         width: 100% !important;
