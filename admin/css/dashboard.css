@@ -580,7 +580,22 @@ body.admin-body {
     z-index: 2; /* Keep above background icon */
 }
 
-/* New decorative background icon */
+.status-pulse-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+    animation: pulse-green 2s infinite;
+}
+
+@keyframes pulse-green {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
 .stat-card.modern::after {
     content: '';
     position: absolute;
@@ -589,8 +604,8 @@ body.admin-body {
     font-family: 'Material Symbols Outlined';
     font-size: 80px;
     color: currentColor;
-    opacity: 0.04;
-    transform: rotate(-10deg);
+    opacity: 0.03 !important; /* Even more subtle */
+    transform: rotate(-15deg) translateY(10px); /* Better angle */
     pointer-events: none;
     z-index: 1;
 }

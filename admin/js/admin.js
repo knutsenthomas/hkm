@@ -2617,8 +2617,13 @@ class AdminManager {
 
                 }
                 case 'status':
-                    value = '<span class="text-green" style="font-size: 24px;">Normal</span>';
-                    meta = '<span class="stat-meta">Alle systemer operative</span>';
+                    value = `
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <span class="status-pulse-dot"></span>
+                            <span style="color: #059669; font-weight: 800;">Normal</span>
+                        </div>
+                    `;
+                    meta = '<span class="stat-meta" style="font-weight: 600; color: #64748b;">Alle systemer operative</span>';
                     break;
                 case 'users':
                     value = userCount;
