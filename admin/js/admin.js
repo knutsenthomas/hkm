@@ -2594,7 +2594,7 @@ class AdminManager {
             if (catWidgets.length === 0) return;
 
             widgetsHtml += `
-                <div class="dashboard-col">
+                <div class="hkm-dashboard-col">
                     <div class="dashboard-col-header">
                         <span class="material-symbols-outlined">${cat.icon}</span>
                         <h4>${cat.label}</h4>
@@ -2712,6 +2712,27 @@ class AdminManager {
         `;
 
         section.innerHTML = `
+            <style>
+                .hkm-dashboard-grid-saas {
+                    display: grid !important;
+                    grid-template-columns: repeat(3, 1fr) !important;
+                    gap: 32px !important;
+                    width: 100% !important;
+                    margin-top: 32px !important;
+                    align-items: start !important;
+                }
+                @media (max-width: 1024px) {
+                    .hkm-dashboard-grid-saas {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+                .hkm-dashboard-col {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 20px !important;
+                    min-width: 0 !important;
+                }
+            </style>
             <div class="overview-hero-card" style="background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);">
                 <div class="overview-hero-content">
                     <h2 class="overview-hero-title">Velkommen tilbake!</h2>
@@ -2724,7 +2745,7 @@ class AdminManager {
                     </button>
                 </div>
             </div>
-            <div class="stats-grid">
+            <div class="hkm-dashboard-grid-saas">
                 ${widgetsHtml}
             </div>
             <div class="analytics-footer-section">
