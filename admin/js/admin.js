@@ -2707,7 +2707,7 @@ class AdminManager {
             }
 
             widgetsHtml += `
-                <div class="stat-card modern" data-id="${w.id}" data-span="${span}" data-span-v="${spanV}">
+                <div class="stat-card modern" data-id="${w.id}" data-span="${span}" data-span-v="${spanV}" data-icon="${w.icon}">
                     <span class="material-symbols-outlined drag-handle">drag_indicator</span>
                     <div class="resize-handle corner-resize" data-tooltip="Dra for å endre størrelse">
                         <span class="material-symbols-outlined">filter_list</span>

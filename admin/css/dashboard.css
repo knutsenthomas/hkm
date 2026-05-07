@@ -597,15 +597,15 @@ body.admin-body {
 }
 
 .stat-card.modern::after {
-    content: '';
+    content: attr(data-icon);
     position: absolute;
     right: -10px;
     bottom: -10px;
     font-family: 'Material Symbols Outlined';
-    font-size: 80px;
+    font-size: 100px;
     color: currentColor;
-    opacity: 0.03 !important; /* Even more subtle */
-    transform: rotate(-15deg) translateY(10px); /* Better angle */
+    opacity: 0.03 !important;
+    transform: rotate(-10deg);
     pointer-events: none;
     z-index: 1;
 }
@@ -622,58 +622,86 @@ body.admin-body {
 
 @media (max-width: 650px) {
     .stat-card.modern {
-        padding: 32px 24px !important;
-        display: flex !important;
-        flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        min-height: 180px !important;
-        gap: 16px !important;
+        padding: 24px !important;
+        display: grid !important;
+        grid-template-columns: 1fr auto !important;
+        grid-template-areas: "content icon-top" "meta meta" !important;
+        align-items: start !important;
+        text-align: left !important;
+        min-height: 120px !important;
+        gap: 8px !important;
+        position: relative !important;
     }
 
     .stat-card.modern .stat-icon-wrap {
-        width: 50px !important;
-        height: 50px !important;
-        margin-bottom: 8px !important;
-    }
-
-    .stat-card.modern .stat-value {
-        font-size: 56px !important;
-        line-height: 1 !important;
-        margin: 4px 0 !important;
-        color: #1B4965 !important;
-    }
-
-    .stat-card.modern .stat-label {
-        font-size: 15px !important;
-        font-weight: 700 !important;
-        color: #64748b !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.05em !important;
+        grid-area: icon-top;
+        width: 44px !important;
+        height: 44px !important;
+        margin-bottom: 0 !important;
+        border-radius: 12px !important;
     }
 
     .stat-card.modern .stat-content {
+        grid-area: content;
         width: 100% !important;
-        align-items: center !important;
+        align-items: flex-start !important;
+    }
+
+    .stat-card.modern .stat-value {
+        font-size: 38px !important;
+        line-height: 1.1 !important;
+        margin: 2px 0 !important;
+        color: #1e293b !important;
+        font-weight: 800 !important;
+    }
+
+    .stat-card.modern .stat-label {
+        font-size: 13px !important;
+        font-weight: 600 !important;
+        color: #64748b !important;
+        text-transform: none !important;
+        letter-spacing: 0 !important;
+        margin-bottom: 4px !important;
     }
 
     /* Grid for meta info on mobile */
     .stat-card.modern .stat-meta-wrapper {
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
+        grid-area: meta;
+        display: flex !important;
         gap: 12px !important;
         width: 100% !important;
         margin-top: 12px !important;
-        padding-top: 16px !important;
-        border-top: 1px solid rgba(0,0,0,0.05) !important;
+        padding-top: 12px !important;
+        border-top: 1px solid #f1f5f9 !important;
+        justify-content: flex-start !important;
+    }
+
+    .stat-meta-box {
+        background: transparent !important;
+        padding: 0 !important;
+        border: none !important;
+        align-items: flex-start !important;
+        justify-content: flex-start !important;
+    }
+
+    .stat-meta-label {
+        font-size: 11px !important;
+        color: #94a3b8 !important;
+    }
+
+    .stat-meta-value {
+        font-size: 14px !important;
+        color: #475569 !important;
     }
 
     .stat-card.modern::after {
-        font-size: 140px !important;
-        right: 50% !important;
-        bottom: 50% !important;
-        transform: translate(50%, 50%) rotate(0deg) !important;
-        opacity: 0.03 !important;
+        font-size: 110px !important;
+        right: -15px !important;
+        bottom: -15px !important;
+        top: auto !important;
+        left: auto !important;
+        transform: rotate(-10deg) !important;
+        opacity: 0.04 !important;
     }
 }
 
