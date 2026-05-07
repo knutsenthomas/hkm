@@ -596,127 +596,168 @@ body.admin-body {
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-/* CATEGORY HEADERS */
-.dashboard-category-header {
-    grid-column: 1 / -1;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 32px;
-    margin-bottom: 16px;
-    padding-left: 8px;
+/* DASHBOARD GRID & COLUMN LAYOUT */
+.stats-grid {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 24px !important;
+    padding: 0 !important;
 }
 
-.dashboard-category-header h4 {
-    font-size: 14px;
+/* Category Columns */
+.dashboard-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dashboard-col-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    color: #451a03; /* Dark orange/brown tone from image */
+}
+
+.dashboard-col-header span {
+    font-size: 20px;
+}
+
+.dashboard-col-header h4 {
+    font-size: 16px;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #64748b;
     margin: 0;
 }
 
-.dashboard-category-header .line {
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, #e2e8f0, transparent);
-}
-
-/* Force 3-column horizontal layout globally for consistency */
+/* NEW MINIMALIST CARD DESIGN */
 .stat-card.modern {
-    display: grid !important;
-    grid-template-columns: 60px 1fr 100px !important; /* Slightly wider for value/trend */
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 20px !important;
-    padding: 24px !important;
-    border-radius: 20px !important;
-    position: relative !important;
-    background: #ffffff !important;
-    border: 1px solid #f1f5f9 !important;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
-.stat-card.modern:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
-    border-color: #e2e8f0 !important;
-}
-
-.stat-label-stack {
     display: flex !important;
     flex-direction: column !important;
     align-items: flex-start !important;
-    justify-content: center !important;
-    flex: 1 !important;
-    min-width: 0 !important;
+    justify-content: flex-start !important;
+    padding: 24px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important; /* Slightly sharper as in image */
+    box-shadow: none !important;
+    position: relative !important;
+    min-height: 120px !important;
 }
 
 .stat-card.modern .stat-label {
-    font-size: 14px !important;
-    font-weight: 500 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
     color: #64748b !important;
-    margin: 0 !important;
-    line-height: 1.2 !important;
-    letter-spacing: 0.01em !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    margin-bottom: 8px !important;
 }
 
 .stat-card.modern .stat-value {
-    font-size: 26px !important;
-    line-height: 1 !important;
-    margin: 0 !important;
-    color: #1e293b !important;
+    font-size: 36px !important;
     font-weight: 800 !important;
-    letter-spacing: -1px !important;
+    color: #1e293b !important;
+    margin: 0 !important;
+    line-height: 1 !important;
 }
 
-.stat-value-wrap {
+.stat-card.modern .stat-meta {
+    display: none !important; /* Hidden in main stats cards of screenshot */
+}
+
+/* System Status Special Styling */
+.stat-card.modern[data-id="status"] {
+    border-left: 4px solid #10b981 !important;
+    border-color: #d1fae5 !important;
+}
+
+.stat-card.modern[data-id="status"] .stat-value {
+    font-size: 24px !important;
     display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-end !important;
-    justify-content: center !important;
-    text-align: right !important;
+    align-items: center !important;
+    gap: 8px !important;
+    color: #1e293b !important;
 }
 
-/* TREND INDICATORS */
+/* Trend positioning */
 .trend-indicator {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 12px;
-    font-weight: 700;
-    margin-top: 4px;
-    padding: 2px 8px;
+    position: absolute !important;
+    bottom: 24px !important;
+    right: 24px !important;
+    margin: 0 !important;
+    background: transparent !important;
+    padding: 0 !important;
+    font-size: 11px !important;
+}
+
+/* BIG ANALYTICS CARDS (BOTTOM) */
+.analytics-bottom-row {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.big-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
     border-radius: 12px;
+    padding: 32px;
 }
 
-.trend-up {
-    color: #10b981;
-    background: #ecfdf5;
+.big-card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.trend-down {
-    color: #ef4444;
-    background: #fef2f2;
+/* TOP PAGES LIST */
+.top-pages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-/* NEUTRAL ICON COLORS FOR PREMIUM FEEL */
-.stat-icon-wrap {
-    background: #f8fafc !important; /* Default neutral background */
-    color: #64748b !important;
+.top-page-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
-/* Only keep specific colors for status and primary metrics */
-.stat-icon-wrap.green { background: #ecfdf5 !important; color: #10b981 !important; }
-.stat-icon-wrap.purple { background: #f5f3ff !important; color: #8b5cf6 !important; }
-.stat-icon-wrap.blue { background: #eff6ff !important; color: #3b82f6 !important; }
-.stat-icon-wrap.red { background: #fef2f2 !important; color: #ef4444 !important; }
+.top-page-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    font-weight: 500;
+}
 
-@media (max-width: 768px) {
-    .stat-card.modern {
-        grid-template-columns: 60px 1fr auto !important;
-        padding: 20px !important;
+.top-page-path { color: #1e293b; }
+.top-page-pct { color: #d97706; font-weight: 700; }
+
+.top-page-bar-wrap {
+    height: 6px;
+    background: #f1f5f9;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.top-page-bar {
+    height: 100%;
+    background: #78350f; /* Dark brown from image bars */
+    border-radius: 3px;
+}
+
+@media (max-width: 1024px) {
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+    .analytics-bottom-row {
+        grid-template-columns: 1fr !important;
     }
 }
 

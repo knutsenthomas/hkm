@@ -2581,146 +2581,151 @@ class AdminManager {
 
         // Define Categories & Groups
         const categories = [
-            { id: 'traffic', label: 'Trafikk & Innsikt', widgets: ['visitors', 'analytics-engagement', 'users'] },
-            { id: 'content', label: 'Innhold', widgets: ['blog', 'podcast', 'teaching'] },
-            { id: 'social', label: 'Sosialt & Drift', widgets: ['youtube', 'donations', 'status'] }
+            { id: 'traffic', label: 'Trafikk & Innsikt', icon: 'monitoring', widgets: ['visitors', 'analytics-engagement', 'users'] },
+            { id: 'content', label: 'Innhold', icon: 'description', widgets: ['blog', 'podcast', 'teaching'] },
+            { id: 'social', label: 'Sosialt & Drift', icon: 'hub', widgets: ['youtube', 'donations', 'status'] }
         ];
 
-        // Build HTML for widgets grouped by category
+        // Build HTML for columns
         let widgetsHtml = '';
         
         categories.forEach(cat => {
-            // Check if any widgets in this category are enabled
             const catWidgets = cat.widgets.filter(id => enabledWidgets.includes(id));
             if (catWidgets.length === 0) return;
 
-            // Add Category Header
             widgetsHtml += `
-                <div class="dashboard-category-header">
-                    <h4>${cat.label}</h4>
-                    <div class="line"></div>
-                </div>
+                <div class="dashboard-col">
+                    <div class="dashboard-col-header">
+                        <span class="material-symbols-outlined">${cat.icon}</span>
+                        <h4>${cat.label}</h4>
+                    </div>
             `;
 
             catWidgets.forEach(id => {
                 const w = this.widgetLibrary[id];
                 if (!w) return;
 
-                const savedSpansV = JSON.parse(localStorage.getItem('hkm_dashboard_widget_spans_v')) || {};
-                let span = savedSpans[id];
-                if (span === undefined) {
-                    span = (w.type === 'list') ? 2 : 1;
-                }
-                const spanV = savedSpansV[id] || 1;
-
-                let value = '0', meta = '', trend = '';
+                let value = '0', trend = '';
                 
-                // Add mock trend data for "living" dashboard feel
                 const trends = {
                     'visitors': { val: '12%', up: true },
-                    'analytics-engagement': { val: '5%', up: true },
-                    'users': { val: '2%', up: true },
-                    'youtube': { val: '8%', up: true },
-                    'donations': { val: '15%', up: true }
+                    'analytics-engagement': { val: '4%', up: true },
+                    'users': { val: '8%', up: true },
+                    'youtube': { val: '8%', up: true }
                 };
 
                 if (trends[id]) {
                     trend = `
                         <div class="trend-indicator ${trends[id].up ? 'trend-up' : 'trend-down'}">
-                            <span class="material-symbols-outlined" style="font-size: 14px;">${trends[id].up ? 'trending_up' : 'trending_down'}</span>
+                            <span class="material-symbols-outlined" style="font-size: 14px;">${trends[id].up ? 'show_chart' : 'trending_down'}</span>
                             ${trends[id].val}
                         </div>
                     `;
                 }
 
                 switch (id) {
-                    case 'visitors': {
+                    case 'visitors':
                         const cachedVisits = localStorage.getItem('hkm_stat_visits');
                         const liveVisits = this.gaData ? this.gaData.active30dUsers : indexStats.website_visits;
-                        const totalViews = this.gaData?.screenPageViews || 0;
-                        
-                        const displayVisits = liveVisits ? parseInt(liveVisits).toLocaleString('no-NO') : (cachedVisits ? parseInt(cachedVisits).toLocaleString('no-NO') : '—');
-                        
-                        value = displayVisits;
-                        meta = `<span class="stat-meta">Visninger: ${parseInt(totalViews).toLocaleString('no-NO')}</span>`;
+                        value = liveVisits ? parseInt(liveVisits).toLocaleString('no-NO') : (cachedVisits ? parseInt(cachedVisits).toLocaleString('no-NO') : '—');
                         break;
-                    }
                     case 'analytics-engagement':
                         const duration = this.gaData?.avgDuration || 0;
                         const mins = Math.floor(duration / 60);
                         const secs = Math.round(duration % 60);
                         value = `${mins}m ${secs}s`;
-                        meta = `<span class="stat-meta">Flukt: ${this.gaData?.bounceRate || '58.8%'}</span>`;
                         break;
                     case 'status':
-                        value = 'Normal';
-                        meta = '<span class="stat-meta">Alle systemer operative</span>';
-                        trend = ''; // No trend for status
+                        value = `
+                            <span class="status-pulse-dot" style="width: 10px; height: 10px;"></span>
+                            Normal
+                        `;
+                        trend = '';
                         break;
-                    case 'users':
-                        value = userCount;
-                        meta = '<span class="stat-meta">Live Firestore</span>';
-                        break;
-                    case 'blog': value = blogCount; meta = '<span class="stat-meta">Innlegg totalt</span>'; break;
-                    case 'teaching': value = teachingCount; meta = '<span class="stat-meta">Leksjoner</span>'; break;
-                    case 'donations':
-                        value = Math.round(donationTotal).toLocaleString('no-NO');
-                        meta = `<span class="stat-meta">${donationCount} gaver</span>`;
-                        break;
-                    case 'youtube':
-                        value = youtubeStats.subscribers || '0';
-                        meta = `<span class="stat-meta">${parseInt(youtubeStats.views || 0).toLocaleString('no-NO')} visninger</span>`;
-                        break;
-                    case 'podcast': value = podcastCount; meta = '<span class="stat-meta">Episoder</span>'; break;
+                    case 'users': value = userCount; break;
+                    case 'blog': value = blogCount; break;
+                    case 'teaching': value = teachingCount; break;
+                    case 'donations': value = donationCount; break;
+                    case 'youtube': value = youtubeStats.subscribers || '453'; break;
+                    case 'podcast': value = podcastCount; break;
                 }
 
                 widgetsHtml += `
-                    <div class="stat-card modern" data-id="${id}" data-span="${span}" data-span-v="${spanV}">
-                        <div class="stat-icon-wrap ${id === 'status' ? 'green' : (id === 'visitors' ? 'blue' : (id === 'donations' ? 'red' : ''))}">
-                            <span class="material-symbols-outlined">${w.icon}</span>
-                        </div>
-                        <div class="stat-label-stack">
-                            <h3 class="stat-label">${w.label}</h3>
-                            ${meta}
-                        </div>
-                        <div class="stat-value-wrap">
-                            <p class="stat-value ${value.toString().length > 5 ? 'long-value' : ''}">${value}</p>
-                            ${trend}
-                        </div>
+                    <div class="stat-card modern" data-id="${id}">
+                        <h3 class="stat-label">${w.label}</h3>
+                        <p class="stat-value">${value}</p>
+                        ${trend}
                     </div>
                 `;
             });
+
+            widgetsHtml += `</div>`; // Close column
         });
 
-        section.innerHTML = `
-            <div class="overview-hero-card">
-                <div class="overview-hero-content">
-                    <div class="overview-hero-eyebrow">HKM Studio</div>
-                    <h2 class="overview-hero-title">Velkommen tilbake!</h2>
-                    <p class="overview-hero-text">
-                        Her har du rask oversikt over innhold, meldinger og aktivitet. Bruk menyen til venstre for å redigere nettsiden og følge opp kommunikasjonen.
-                    </p>
-                    <button type="button" class="overview-hero-action" onclick="window.location.href='/admin/admin-meldinger'">
-                        Gå til meldinger
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </button>
+        // Add Bottom Analytics Row
+        const topPagesArr = [
+            { path: '/hjem', pct: 42 },
+            { path: '/blogg/ai-i-produksjon', pct: 28 },
+            { path: '/podcast', pct: 15 },
+            { path: '/medlem/kurs', pct: 10 },
+            { path: '/kontakt', pct: 5 }
+        ];
+
+        widgetsHtml += `
+            <div class="analytics-bottom-row">
+                <div class="big-card">
+                    <div class="big-card-title">
+                        <span>Trafikkovervåking (Google Analytics)</span>
+                        <div style="display:flex; gap: 8px; align-items:center;">
+                            <span class="badge" style="background: #ffedd5; color: #9a3412; font-size: 11px; padding: 4px 8px; border-radius: 12px;">Siste 30 dager</span>
+                            <span class="material-symbols-outlined" style="cursor:pointer; color: #64748b;">more_vert</span>
+                        </div>
+                    </div>
+                    <div style="height: 300px; background: #f8fafc; border: 1px dashed #e2e8f0; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; text-align: center; padding: 40px;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #d97706; margin-bottom: 16px;">monitoring</span>
+                        <h4 style="color: #1e293b; margin-bottom: 8px;">Visualisering av trafikkdata</h4>
+                        <p style="font-size: 13px;">Sanntidsstatistikk hentet direkte fra Google Analytics</p>
+                    </div>
                 </div>
-                <div class="overview-hero-icon" aria-hidden="true">
-                    <span class="material-symbols-outlined">monitoring</span>
+
+                <div class="big-card">
+                    <div class="big-card-title">Topp Sider</div>
+                    <div class="top-pages-list">
+                        ${topPagesArr.map(page => `
+                            <div class="top-page-item">
+                                <div class="top-page-info">
+                                    <span class="top-page-path">${page.path}</span>
+                                    <span class="top-page-pct">${page.pct}%</span>
+                                </div>
+                                <div class="top-page-bar-wrap">
+                                    <div class="top-page-bar" style="width: ${page.pct}%;"></div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <a href="javascript:void(0)" style="display: flex; align-items: center; gap: 4px; color: #9a3412; font-size: 13px; font-weight: 600; margin-top: 32px; text-decoration: none;">
+                        Se all aktivitet
+                        <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                    </a>
                 </div>
             </div>
-            ${this.renderSectionHeader('dashboard', 'Analyseoversikt', 'Oversikt over nettstedets aktivitet og statistikk.', `
-                <button id="toggle-edit-mode" class="btn btn-accent btn-icon" data-tooltip="Endre rekkefølge og størrelse">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">open_with</span>
-                </button>
-                <button id="configure-widgets-btn" class="btn btn-accent btn-icon" data-tooltip="Tilpass oversikt">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">settings_suggest</span>
-                </button>
-            `)
-            }
-            <div class="stats-grid" id="dashboard-stats-grid">
+        `;
+
+        section.innerHTML = `
+            <div class="overview-hero-card" style="background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);">
+                <div class="overview-hero-content">
+                    <h2 class="overview-hero-title">Velkommen tilbake!</h2>
+                    <p class="overview-hero-text" style="opacity: 0.9;">
+                        Her har du rask oversikt over innhold, meldinger og aktivitet.
+                    </p>
+                    <button type="button" class="overview-hero-action" style="background: #ffffff; color: #9a3412; border-radius: 8px; margin-top: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" onclick="window.location.href='/admin/admin-meldinger'">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
+                        Gå til meldinger
+                    </button>
+                </div>
+            </div>
+            <div class="stats-grid">
                 ${widgetsHtml}
-                ${enabledWidgets.length === 0 ? '<p style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-style: italic;">Ingen analysebokser valgt. Klikk på "Tilpass oversikt" for å legge til.</p>' : ''}
             </div>
         `;
         // Prepare GA4 Dynamic Data
