@@ -2438,7 +2438,7 @@ body.admin-body .page-title {
     }
 
     .section-header {
-        padding: 10px 16px !important;
+        padding: 10px 0 !important; /* Removed horizontal padding here as it is handled by .main-header */
     }
 
     .section-header-titles h1 {
@@ -2479,10 +2479,10 @@ body.builder-active .user-profile-link {
     flex: 1 !important;
 }
 
-#global-search-opener { order: 1 !important; }
-#messages-bell, .notification-btn:not(#global-search-opener) { order: 2 !important; }
-.user-profile-link { order: 3 !important; }
-#mobile-nav-toggle { order: 4 !important; }
+#global-search-opener { order: 1 !important; margin: 0 !important; }
+#messages-bell, .notification-btn:not(#global-search-opener) { order: 2 !important; margin: 0 !important; }
+.user-profile-link { order: 3 !important; margin: 0 !important; }
+#mobile-nav-toggle { order: 4 !important; margin: 0 !important; }
 
 /* Ensure the titles don't grow too much */
 .section-header-titles {
