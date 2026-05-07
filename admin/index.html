@@ -21,54 +21,30 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
-    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.07.15.52">
+    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.07.16.14">
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/admin-unified.css?v=2026.05.07.15.52">
     
     <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
     <style>
-        .stat-card.modern .stat-value.long-value {
-            font-size: 18px !important;
-            white-space: nowrap !important;
-            color: #1e293b !important;
-            font-weight: 800 !important;
-        }
-        .stat-label-stack {
-            padding-right: 15px !important;
-            min-width: 0 !important;
-            flex: 1 !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: center !important;
-        }
-        .stat-value-wrap {
-            width: 85px !important;
-            flex-shrink: 0 !important;
-            text-align: right !important;
-            display: flex !important;
-            justify-content: flex-end !important;
-            align-items: center !important;
-        }
-        .stat-card.modern .stat-label {
-            font-size: 15px !important;
-            font-weight: 600 !important;
-            color: #475569 !important;
-            margin: 0 !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
-        }
-        .stat-card.modern {
+        /* Modern Dashboard Overrides */
+        #dashboard-stats-grid, .stats-grid {
             display: grid !important;
-            grid-template-columns: 60px 1fr 85px !important; /* STRICT GLOBAL COLUMNS */
-            align-items: center !important;
-            gap: 15px !important;
+            grid-template-columns: repeat(3, 1fr) !important;
+            gap: 24px !important;
         }
         
+        @media (max-width: 1024px) {
+            #dashboard-stats-grid, .stats-grid {
+                grid-template-columns: 1fr !important;
+            }
+        }
+
         /* HIDE MOBILE MENU BUTTON ON DESKTOP */
         @media (min-width: 1025px) {
             #mobile-nav-toggle, 
-            .mobile-nav-toggle {
+            .mobile-nav-toggle,
+            .mobile-bottom-nav {
                 display: none !important;
             }
         }
