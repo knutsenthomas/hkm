@@ -2425,28 +2425,46 @@ body.admin-body .page-title {
 /* Optimize header space on mobile */
 @media (max-width: 768px) {
     .user-info-text {
-        display: flex !important;
-        flex-direction: column;
-        margin-right: 8px;
-        text-align: right;
+        display: none !important;
     }
     
-    .user-name {
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        color: #1e293b !important;
-        line-height: 1.2 !important;
-    }
-    
-    .user-role {
-        font-size: 11px !important;
-        color: #64748b !important;
-    }
-
-    /* Hide search icon in header on mobile - it will be moved to FAB */
     #global-search-opener {
         display: none !important;
     }
+
+    .user-profile-link {
+        width: 42px !important;
+        height: 42px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #dbeafe !important;
+        border-radius: 12px !important;
+        border: 1px solid rgba(0,0,0,0.05) !important;
+        margin-right: 0 !important;
+    }
+
+    .notification-btn,
+    .mobile-nav-toggle {
+        width: 42px !important;
+        height: 42px !important;
+        background: #ffffff !important;
+        border: 1px solid var(--admin-border) !important;
+        border-radius: 12px !important;
+        padding: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        margin: 0 !important;
+    }
+
+    .section-header-actions {
+        gap: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+}
 
     .section-header-actions {
         gap: 12px !important; /* Normal gap since we have more space now */
