@@ -2652,8 +2652,8 @@ class AdminManager {
 
                 widgetsHtml += `
                     <div class="stat-card modern" data-id="${id}">
-                        <h3 class="stat-label">${w.label}</h3>
-                        <p class="stat-value">${value}</p>
+                        <div class="stat-label">${w.label.toUpperCase()}</div>
+                        <div class="stat-value">${value}</div>
                         ${trend}
                     </div>
                 `;
@@ -2729,21 +2729,79 @@ class AdminManager {
                 .hkm-dashboard-col {
                     display: flex !important;
                     flex-direction: column !important;
-                    gap: 20px !important;
+                    gap: 24px !important;
                     min-width: 0 !important;
                 }
+                .dashboard-col-header {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                    color: #1e293b;
+                }
+                .dashboard-col-header h4 {
+                    margin: 0;
+                    font-size: 16px;
+                    font-weight: 700;
+                }
+                .stat-card.modern {
+                    background: white !important;
+                    border: 1px solid #e2e8f0 !important;
+                    border-radius: 12px !important;
+                    padding: 24px !important;
+                    display: flex !important;
+                    flex-direction: column !important;
+                    gap: 8px !important;
+                    transition: all 0.2s ease !important;
+                    box-shadow: 0 1px 2px rgba(0,0,0,0.05) !important;
+                }
+                .stat-card.modern:hover {
+                    border-color: #d17d39 !important;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.05) !important;
+                    transform: translateY(-2px);
+                }
+                .stat-label {
+                    font-size: 11px !important;
+                    font-weight: 700 !important;
+                    color: #64748b !important;
+                    text-transform: uppercase !important;
+                    letter-spacing: 0.05em !important;
+                }
+                .stat-value {
+                    font-size: 28px !important;
+                    font-weight: 800 !important;
+                    color: #1e293b !important;
+                    margin: 0 !important;
+                }
+                .trend-indicator {
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    margin-top: 4px;
+                }
+                .trend-up { color: #16a34a; }
+                .trend-down { color: #dc2626; }
             </style>
-            <div class="overview-hero-card" style="background: linear-gradient(135deg, #ea580c 0%, #f97316 100%);">
-                <div class="overview-hero-content">
-                    <h2 class="overview-hero-title">Velkommen tilbake!</h2>
-                    <p class="overview-hero-text" style="opacity: 0.9;">
-                        Her har du rask oversikt over innhold, meldinger og aktivitet.
+            <div class="overview-hero-card" style="background: var(--admin-orange-gradient); border-radius: 16px; padding: 48px; position: relative; overflow: hidden; color: white;">
+                <div class="overview-hero-content" style="position: relative; z-index: 2;">
+                    <h2 class="overview-hero-title" style="font-size: 36px; font-weight: 800; margin-bottom: 12px;">Velkommen tilbake!</h2>
+                    <p class="overview-hero-text" style="font-size: 16px; opacity: 0.9; max-width: 600px; line-height: 1.6;">
+                        Her har du en fullstendig oversikt over HKM Studio. Se sanntidsdata, administrer innhold og svar på meldinger fra én sentral flate.
                     </p>
-                    <button type="button" class="overview-hero-action" style="background: #ffffff; color: #9a3412; border-radius: 8px; margin-top: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);" onclick="window.location.href='/admin/admin-meldinger'">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">mail</span>
-                        Gå til meldinger
-                    </button>
+                    <div style="display: flex; gap: 12px; margin-top: 32px;">
+                        <button type="button" class="overview-hero-action" style="background: #ffffff; color: #bd4f2a; border-radius: 8px; padding: 12px 24px; font-weight: 700; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; display: flex; align-items: center; gap: 8px;" onclick="window.location.href='/admin/admin-meldinger'">
+                            <span class="material-symbols-outlined" style="font-size: 20px;">mail</span>
+                            Gå til meldinger
+                        </button>
+                        <button type="button" style="background: rgba(255,255,255,0.15); color: white; border-radius: 8px; padding: 12px 24px; font-weight: 700; border: 1px solid rgba(255,255,255,0.3); backdrop-filter: blur(10px); cursor: pointer;" onclick="window.location.href='/admin#content'">
+                            Se sideinnhold
+                        </button>
+                    </div>
                 </div>
+                <!-- Subtle background decoration -->
+                <span class="material-symbols-outlined" style="position: absolute; right: -40px; bottom: -40px; font-size: 320px; opacity: 0.1; transform: rotate(-15deg);">auto_graph</span>
             </div>
             <div class="hkm-dashboard-grid-saas">
                 ${widgetsHtml}
