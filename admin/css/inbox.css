@@ -916,20 +916,22 @@ body.crm-body .threads-search input {
         display: block !important;
     }
     .folder-badge {
-        display: inline-block !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
         width: 20px !important;
         height: 20px !important;
-        line-height: 20px !important; /* Perfect vertical center */
-        text-align: center !important;
         background: #ef4444 !important;
         color: #fff !important;
         border-radius: 50% !important;
         font-size: 11px !important;
-        font-weight: 800 !important;
-        margin-left: 6px !important;
-        vertical-align: middle !important;
-        position: relative !important;
-        top: -1px !important; /* Micro-adjustment for optical centering */
+        font-weight: 700 !important;
+        margin-left: 8px !important;
+        padding: 0 !important;
+        line-height: 1 !important;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+        text-align: center !important;
+        flex-shrink: 0 !important;
     }
     .inbox-threads {
         width: 100% !important;
