@@ -916,20 +916,27 @@ body.crm-body .threads-search input {
         display: block !important;
     }
     .folder-badge {
-        display: grid !important;
-        place-items: center !important;
-        width: 20px !important;
-        height: 20px !important;
-        background: #ef4444 !important;
-        color: #fff !important;
+        display: inline-block !important;
+        width: 18px !important;
+        height: 18px !important;
+        min-width: 18px !important;
+        max-width: 18px !important;
+        min-height: 18px !important;
+        max-height: 18px !important;
+        line-height: 18px !important;
+        background-color: #ef4444 !important;
+        color: #ffffff !important;
         border-radius: 50% !important;
-        font-size: 11px !important;
-        font-weight: 800 !important;
-        margin-left: 10px !important;
-        padding: 0 !important;
-        line-height: 1 !important;
-        flex-shrink: 0 !important;
+        font-size: 10px !important;
+        font-weight: 900 !important;
         text-align: center !important;
+        margin-left: 8px !important;
+        padding: 0 !important;
+        vertical-align: middle !important;
+        position: relative !important;
+        top: -1px !important;
+        box-sizing: border-box !important;
+        overflow: hidden !important;
     }
     .inbox-threads {
         width: 100% !important;
