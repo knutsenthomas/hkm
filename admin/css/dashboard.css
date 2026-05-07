@@ -639,12 +639,12 @@ body.admin-body {
         border-radius: 20px !important;
     }
 
-    /* Column 1: LARGE CIRCULAR ICON */
+    /* Column 1: LARGE ROUNDED SQUARE ICON */
     .stat-card.modern .stat-icon-wrap {
         width: 60px !important;
         height: 60px !important;
         margin: 0 !important;
-        border-radius: 50% !important; /* PERFECT CIRCLE like reference */
+        border-radius: 16px !important; /* ROUNDED SQUARE like regnskap style */
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
