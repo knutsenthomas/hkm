@@ -2603,11 +2603,17 @@ class AdminManager {
                         value = '—';
                     }
                     const totalViews = this.gaData?.screenPageViews || 0;
-                    meta = `<span class="stat-meta">Unike brukere (30d)</span>
-                            <div style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">
-                                <span class="material-symbols-outlined" style="font-size: 12px; vertical-align: middle;">visibility</span> 
-                                ${parseInt(totalViews).toLocaleString('no-NO')} sidevisninger
+                    meta = `<div class="stat-meta-wrapper">
+                                <div class="stat-meta-box">
+                                    <span class="stat-meta-label">Unike (30d)</span>
+                                    <span class="stat-meta-value">${value}</span>
+                                </div>
+                                <div class="stat-meta-box">
+                                    <span class="stat-meta-label">Visninger</span>
+                                    <span class="stat-meta-value">${parseInt(totalViews).toLocaleString('no-NO')}</span>
+                                </div>
                             </div>`;
+                    value = ''; // Move value into the boxes for better distribution
                     break;
 
                 }
