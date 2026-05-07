@@ -1,44 +1,42 @@
-/* Wix-style Unified Inbox CSS */
+/* Kinetic Admin - Messaging System */
 :root {
-    --inbox-sidebar-width: 240px;
-    --inbox-list-width: 380px;
-    --inbox-accent: #1B4965; /* HKM Dark Blue */
-    --inbox-orange: #f97316;
-    --inbox-border: #e2e8f0;
-    --inbox-bg-light: #f8fafc;
-    --inbox-selected: #f0f9ff;
-    --inbox-unread-bg: #fff7ed;
+    --inbox-sidebar-width: 210px;
+    --inbox-list-width: 340px;
+    --inbox-accent: #1B4965;
+    --inbox-orange: #d17d39;
+    --brand-gradient: linear-gradient(135deg, #d17d39, #bd4f2a);
+    --inbox-border: #f1f5f9;
+    --inbox-bg-light: #fdfdfd;
+    --inbox-selected: #f8fafc;
+    --inbox-unread-bg: #fffbf7;
+    --font-main: 'Work Sans', sans-serif;
 }
 
 .unified-inbox-container {
     display: flex;
     height: calc(100vh - 100px);
     background: #fff;
-    border-top: 1px solid var(--inbox-border);
     overflow: hidden;
     margin: 0;
     width: 100%;
+    font-family: var(--font-main);
 }
 
-/* 1. Folders Sidebar */
 .inbox-folders {
     width: var(--inbox-sidebar-width);
     border-right: 1px solid var(--inbox-border);
-    background: var(--inbox-bg-light);
+    background: #fff;
     display: flex;
     flex-direction: column;
-    padding: 16px 0;
+    padding: 24px 0;
 }
 
-#btn-new-push .btn-text-mobile { display: none; }
-#btn-new-push .btn-text-desktop { display: inline; }
-
 #btn-new-push {
-    margin: 0 16px 16px;
-    height: 42px;
+    margin: 0 16px 24px;
+    height: 48px;
     padding: 0 20px;
-    border-radius: 12px;
-    background: linear-gradient(135deg, #d17d39, #bd4f2a);
+    border-radius: 8px;
+    background: var(--brand-gradient);
     color: #fff;
     border: none;
     font-weight: 700;
@@ -46,70 +44,71 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
     cursor: pointer;
-    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.15);
+    box-shadow: 0 4px 14px rgba(209, 125, 57, 0.3);
     transition: all 0.2s ease;
 }
 
 #btn-new-push:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 15px rgba(209, 125, 57, 0.25);
-}
-
-#btn-new-push:active {
-    transform: translateY(0);
-}
-
-#btn-new-push .material-symbols-outlined {
-    font-size: 20px;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(209, 125, 57, 0.4);
 }
 
 .folder-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 20px;
-    color: #475569;
+    gap: 14px;
+    padding: 12px 24px;
+    color: #64748b;
     font-size: 14px;
-    font-weight: 600;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
+    border-radius: 0 8px 8px 0;
+    margin-right: 12px;
 }
 
 .folder-item:hover {
-    background: #f1f5f9;
-    color: var(--inbox-accent);
+    background: #f8fafc;
+    color: #1e293b;
 }
 
 .folder-item.active {
-    background: #fff;
-    color: var(--inbox-accent);
+    background: #fffaf5;
+    color: var(--inbox-orange);
+    font-weight: 600;
 }
 
 .folder-item.active::before {
     content: '';
     position: absolute;
     left: 0;
-    top: 4px;
-    bottom: 4px;
-    width: 4px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
     background: var(--inbox-orange);
-    border-radius: 0 4px 4px 0;
 }
 
 .folder-item .material-symbols-outlined {
     font-size: 20px;
+    opacity: 0.8;
 }
 
 .folder-badge {
     margin-left: auto;
-    background: #ef4444;
-    color: #fff;
+    background: #f1f5f9;
+    color: #64748b;
     font-size: 11px;
-    padding: 2px 6px;
-    border-radius: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.folder-item.active .folder-badge {
+    background: rgba(209, 125, 57, 0.1);
+    color: var(--inbox-orange);
 }
 
 /* 2. Thread List */
@@ -118,10 +117,11 @@
     border-right: 1px solid var(--inbox-border);
     display: flex;
     flex-direction: column;
+    background: #fff;
 }
 
 .threads-header {
-    padding: 16px 20px;
+    padding: 20px 24px;
     border-bottom: 1px solid var(--inbox-border);
     background: #fff;
 }
@@ -164,32 +164,23 @@ body.crm-body .threads-search input {
 }
 
 .thread-item {
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--inbox-border);
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
     display: flex;
-    gap: 12px;
+    gap: 16px;
+    align-items: center;
 }
 
 .thread-item:hover {
-    background: var(--inbox-bg-light);
-}
-
-.thread-item-checkbox {
-    display: flex;
-    align-items: center;
-    padding-right: 4px;
-}
-
-.thread-item-checkbox input {
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
+    background: #fdfdfd;
 }
 
 .thread-item.active {
-    background: var(--inbox-selected);
+    background: #fffaf5;
+    border-left: 3px solid var(--inbox-orange);
+    padding-left: 21px;
 }
 
 /* Push Thread Specifics */
