@@ -621,87 +621,89 @@ body.admin-body {
 .stat-card.modern:has(.campaign)::after { content: 'campaign'; color: #f97316; }
 
 @media (max-width: 650px) {
-    .stat-card.modern {
-        padding: 24px !important;
-        display: grid !important;
-        grid-template-columns: 1fr auto !important;
-        grid-template-areas: "content icon-top" "meta meta" !important;
-        align-items: start !important;
-        text-align: left !important;
-        min-height: 120px !important;
-        gap: 8px !important;
-        position: relative !important;
+    .stats-grid {
+        grid-template-columns: 1fr !important; /* Back to one column for horizontal cards */
+        gap: 16px !important;
+        padding: 16px !important;
     }
 
+    .stat-card.modern {
+        padding: 16px 20px !important;
+        display: grid !important;
+        grid-template-columns: 44px 1fr auto !important; /* 3 DISTINCT COLUMNS */
+        align-items: center !important;
+        text-align: center !important;
+        min-height: 80px !important;
+        gap: 16px !important;
+        justify-content: space-between !important;
+    }
+
+    /* Column 1: Icon */
     .stat-card.modern .stat-icon-wrap {
-        grid-area: icon-top;
         width: 44px !important;
         height: 44px !important;
-        margin-bottom: 0 !important;
+        margin: 0 !important;
         border-radius: 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
     }
 
+    /* Column 2: Content (Title + Value) */
     .stat-card.modern .stat-content {
-        grid-area: content;
-        width: 100% !important;
-        align-items: flex-start !important;
-    }
-
-    .stat-card.modern .stat-value {
-        font-size: 38px !important;
-        line-height: 1.1 !important;
-        margin: 2px 0 !important;
-        color: #1e293b !important;
-        font-weight: 800 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        flex: 1 !important;
     }
 
     .stat-card.modern .stat-label {
         font-size: 13px !important;
         font-weight: 600 !important;
         color: #64748b !important;
-        text-transform: none !important;
-        letter-spacing: 0 !important;
-        margin-bottom: 4px !important;
+        margin: 0 !important;
+        line-height: 1.2 !important;
     }
 
-    /* Grid for meta info on mobile */
-    .stat-card.modern .stat-meta-wrapper {
-        grid-area: meta;
-        display: flex !important;
-        gap: 12px !important;
-        width: 100% !important;
-        margin-top: 12px !important;
-        padding-top: 12px !important;
-        border-top: 1px solid #f1f5f9 !important;
-        justify-content: flex-start !important;
+    .stat-card.modern .stat-value {
+        font-size: 28px !important;
+        line-height: 1 !important;
+        margin: 2px 0 !important;
+        color: #1e293b !important;
+        font-weight: 800 !important;
     }
 
-    .stat-meta-box {
-        background: transparent !important;
-        padding: 0 !important;
-        border: none !important;
-        align-items: flex-start !important;
-        justify-content: flex-start !important;
-    }
-
-    .stat-meta-label {
-        font-size: 11px !important;
+    /* Column 3: Meta Info */
+    .stat-card.modern .stat-meta {
+        font-size: 12px !important;
+        font-weight: 500 !important;
         color: #94a3b8 !important;
+        text-align: right !important;
+        white-space: nowrap !important;
+        margin: 0 !important;
     }
 
-    .stat-meta-value {
-        font-size: 14px !important;
-        color: #475569 !important;
+    .stat-card.modern .stat-meta-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: flex-end !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
 
+    .stat-card.modern .stat-meta-box {
+        text-align: right !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    /* Keep it subtle */
     .stat-card.modern::after {
-        font-size: 110px !important;
-        right: -15px !important;
-        bottom: -15px !important;
-        top: auto !important;
-        left: auto !important;
-        transform: rotate(-10deg) !important;
-        opacity: 0.04 !important;
+        display: none !important; /* Hide background icon to keep it clean in this tight layout */
     }
 }
 
