@@ -3386,21 +3386,21 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            <div class="card kinetic-header-card" style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; padding: 24px 32px; background: white; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
-                <div style="display: flex; align-items: center; gap: 24px;">
-                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b;">
-                        <span class="material-symbols-outlined" style="font-size: 28px;">edit_square</span>
+            <div class="card kinetic-header-card" style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; padding: 32px 40px; background: white; border-radius: 20px; border: 1px solid #f1f5f9; box-shadow: 0 2px 15px rgba(0,0,0,0.03);">
+                <div style="display: flex; align-items: center; gap: 28px;">
+                    <div style="width: 64px; height: 64px; border-radius: 50%; background: #fdfdfd; border: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: center; color: #64748b; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);">
+                        <span class="material-symbols-outlined" style="font-size: 28px; opacity: 0.7;">edit_square</span>
                     </div>
                     <div>
-                        <h2 style="margin: 0; font-size: 24px; font-weight: 800; color: #1e293b;">${title}</h2>
-                        <p style="margin: 4px 0 0; font-size: 14px; color: #64748b; font-weight: 500;">Administrer dine ${title.toLowerCase()}.</p>
+                        <h2 style="margin: 0; font-size: 26px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">${title}</h2>
+                        <p style="margin: 6px 0 0; font-size: 15px; color: #94a3b8; font-weight: 500;">Administrer dine ${title.toLowerCase()}.</p>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: var(--admin-orange-gradient); border: none; padding: 12px 24px; font-weight: 700; border-radius: 8px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25);">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">add</span> Legg til ny
+                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316; border: none; padding: 14px 28px; font-weight: 700; border-radius: 10px; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3); color: white; cursor: pointer; font-family: 'Work Sans', sans-serif;">
+                    <span class="material-symbols-outlined" style="font-size: 22px;">add</span> Legg til ny
                 </button>
             </div>
-            <div class="card" style="padding: 0; overflow: hidden; border-radius: 16px; border: 1px solid #f1f5f9; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+            <div class="card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid #f1f5f9; background: white; box-shadow: 0 2px 15px rgba(0,0,0,0.03);">
                 <div id="${collectionId}-list">
                     <div class="loader">Laster ${title.toLowerCase()}...</div>
                 </div>
