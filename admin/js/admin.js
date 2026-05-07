@@ -3386,12 +3386,21 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader(this.getSectionIcon(collectionId), title, `Administrer dine ${title.toLowerCase()}.`, `
-                <button class="btn btn-primary" id="add-new-${collectionId}">
-                    <span class="material-symbols-outlined">add</span> Legg til ny
+            <div class="card kinetic-header-card" style="margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; padding: 24px 32px; background: white; border-radius: 16px; border: 1px solid #f1f5f9; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
+                <div style="display: flex; align-items: center; gap: 24px;">
+                    <div style="width: 56px; height: 56px; border-radius: 50%; background: #f8fafc; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center; color: #64748b;">
+                        <span class="material-symbols-outlined" style="font-size: 28px;">edit_square</span>
+                    </div>
+                    <div>
+                        <h2 style="margin: 0; font-size: 24px; font-weight: 800; color: #1e293b;">${title}</h2>
+                        <p style="margin: 4px 0 0; font-size: 14px; color: #64748b; font-weight: 500;">Administrer dine ${title.toLowerCase()}.</p>
+                    </div>
+                </div>
+                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: var(--admin-orange-gradient); border: none; padding: 12px 24px; font-weight: 700; border-radius: 8px; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25);">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">add</span> Legg til ny
                 </button>
-            `)}
-            <div class="card" style="padding: 0; overflow: hidden; border-radius: 16px;">
+            </div>
+            <div class="card" style="padding: 0; overflow: hidden; border-radius: 16px; border: 1px solid #f1f5f9; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
                 <div id="${collectionId}-list">
                     <div class="loader">Laster ${title.toLowerCase()}...</div>
                 </div>
@@ -3606,52 +3615,53 @@ class AdminManager {
             const author = item.author ? this.escapeHtml(item.author) : '';
             const dateText = item.date ? this.escapeHtml(String(item.date).split('T')[0]) : '—';
             const statusPill = item.isSynced
-                ? '<span class="badge item-badge-synced">Synkronisert</span>'
-                : '<span class="badge status-automated">Lokal/Firestore</span>';
+                ? '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">SYNKRONISERT</span>'
+                : '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">LOKAL/FIRESTORE</span>';
             const imageCell = item.imageUrl
-                ? `<img src="${this.escapeHtml(item.imageUrl)}" alt="" style="width:40px;height:40px;border-radius:10px;object-fit:cover;border:1px solid #e2e8f0;">`
-                : '<div style="width:40px;height:40px;border-radius:10px;background:#fff7ed;color:#f97316;display:flex;align-items:center;justify-content:center;border:1px solid #fed7aa;"><span class="material-symbols-outlined" style="font-size:18px;">article</span></div>';
+                ? `<img src="${this.escapeHtml(item.imageUrl)}" alt="" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid #f1f5f9;">`
+                : '<div style="width:48px;height:48px;border-radius:12px;background:#f8fafc;color:#94a3b8;display:flex;align-items:center;justify-content:center;border:1px solid #f1f5f9;"><span class="material-symbols-outlined" style="font-size:24px;">image</span></div>';
 
             return `
-                <tr class="${item.isSynced ? 'is-synced' : ''}">
-                    <td>
-                        <div class="user-info-cell">
+                <tr style="border-bottom: 1px solid #f1f5f9;">
+                    <td style="padding: 20px 24px;">
+                        <div style="display: flex; align-items: center; gap: 16px;">
                             ${imageCell}
                             <div>
-                                <div class="user-name">${title}</div>
-                                ${category ? `<div class="text-muted">${category}</div>` : ''}
+                                <div style="font-weight: 700; font-size: 15px; color: #1e293b; margin-bottom: 2px;">${title}</div>
+                                <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${category || 'Norsk'}</div>
                             </div>
                         </div>
                     </td>
-                    <td>${dateText}</td>
-                    <td>${author || '<span class="text-muted">—</span>'}</td>
-                    <td class="col-status">${statusPill}</td>
-                    <td class="col-actions">
-                        <button class="btn-secondary" type="button" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})" style="padding:8px 12px;border-radius:8px;font-size:12px;margin-right:8px;">
-                            Rediger
-                        </button>
-                        ${item.isFirestore ? `
-                            <button class="icon-btn delete" type="button" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" title="Slett">
-                                <span class="material-symbols-outlined">delete</span>
+                    <td style="padding: 20px 24px; color: #64748b; font-size: 14px; font-weight: 500;">${dateText}</td>
+                    <td style="padding: 20px 24px; color: #64748b; font-size: 14px; font-weight: 500;">${author || '<span style="color: #cbd5e1;">—</span>'}</td>
+                    <td style="padding: 20px 24px;">${statusPill}</td>
+                    <td style="padding: 20px 24px; text-align: right;">
+                        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
+                            <button type="button" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})" 
+                                style="background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                                Rediger
                             </button>
-                        ` : `
-                            <span class="text-muted" style="font-size:12px;">Kun visning</span>
-                        `}
+                            <button type="button" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
+                                style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s;" 
+                                onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                            </button>
+                        </div>
                     </td>
                 </tr>
             `;
         }).join('');
 
         container.innerHTML = `
-            <div class="table-container full-bleed">
-                <table class="crm-table">
+            <div style="width: 100%; overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
                     <thead>
-                        <tr>
-                            <th>${collectionId === 'events' ? 'Arrangement' : collectionId === 'teaching' ? 'Undervisning' : 'Innhold'}</th>
-                            <th>Dato</th>
-                            <th>Forfatter</th>
-                            <th class="col-status">Status</th>
-                            <th class="col-actions">Handlinger</th>
+                        <tr style="border-bottom: 1px solid #f1f5f9;">
+                            <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">Innhold</th>
+                            <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">Dato</th>
+                            <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">Forfatter</th>
+                            <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em;">Status</th>
+                            <th style="padding: 16px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.1em; text-align: right;">Handlinger</th>
                         </tr>
                     </thead>
                     <tbody>
