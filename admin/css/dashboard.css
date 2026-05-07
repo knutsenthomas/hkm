@@ -596,29 +596,46 @@ body.admin-body {
     100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }
 
-.stat-card.modern::after {
-    content: attr(data-icon);
-    position: absolute;
-    right: -10px;
-    bottom: -10px;
-    font-family: 'Material Symbols Outlined';
-    font-size: 100px;
-    color: currentColor;
-    opacity: 0.03 !important;
-    transform: rotate(-10deg);
-    pointer-events: none;
-    z-index: 1;
+/* ELIMINATE ALL WATERMARKS GLOBALLY */
+.stat-card.modern::after,
+.stat-card.modern:has(.purple)::after,
+.stat-card.modern:has(.green)::after,
+.stat-card.modern:has(.blue)::after,
+.stat-card.modern:has(.mint)::after,
+.stat-card.modern:has(.donation)::after,
+.stat-card.modern:has(.youtube)::after,
+.stat-card.modern:has(.podcast)::after,
+.stat-card.modern:has(.campaign)::after {
+    display: none !important;
+    content: none !important;
 }
 
-/* Specific background icons based on wrap color */
-.stat-card.modern:has(.purple)::after { content: 'visibility'; color: #a855f7; }
-.stat-card.modern:has(.green)::after { content: 'check_circle'; color: #22c55e; }
-.stat-card.modern:has(.blue)::after { content: 'edit_note'; color: #3b82f6; }
-.stat-card.modern:has(.mint)::after { content: 'school'; color: #0ea5e9; }
-.stat-card.modern:has(.donation)::after { content: 'volunteer_activism'; color: #ec4899; }
-.stat-card.modern:has(.youtube)::after { content: 'video_library'; color: #ef4444; }
-.stat-card.modern:has(.podcast)::after { content: 'podcasts'; color: #8b5cf6; }
-.stat-card.modern:has(.campaign)::after { content: 'campaign'; color: #f97316; }
+/* Force 3-column horizontal layout globally for consistency */
+.stat-card.modern {
+    display: grid !important;
+    grid-template-columns: 60px 1fr auto !important; /* ICON | LABEL | VALUE */
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 20px !important;
+    padding: 20px 24px !important;
+    border-radius: 20px !important;
+    position: relative !important;
+}
+
+.stat-label-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    justify-content: center !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+}
+
+.stat-value-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+}
 
 @media (max-width: 768px) {
     .stats-grid {

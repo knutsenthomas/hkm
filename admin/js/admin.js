@@ -2607,17 +2607,8 @@ class AdminManager {
                         value = '—';
                     }
                     const totalViews = this.gaData?.screenPageViews || 0;
-                    meta = `<div class="stat-meta-wrapper">
-                                <div class="stat-meta-box">
-                                    <span class="stat-meta-label">Unike (30d)</span>
-                                    <span class="stat-meta-value">${value}</span>
-                                </div>
-                                <div class="stat-meta-box">
-                                    <span class="stat-meta-label">Visninger</span>
-                                    <span class="stat-meta-value">${parseInt(totalViews).toLocaleString('no-NO')}</span>
-                                </div>
-                            </div>`;
-                    value = ''; // Move value into the boxes for better distribution
+                    meta = `<span class="stat-meta">Unike: ${value} • Visninger: ${parseInt(totalViews).toLocaleString('no-NO')}</span>`;
+                    value = ''; // Hide main value to show combined meta
                     break;
 
                 }
