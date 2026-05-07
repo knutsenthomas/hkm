@@ -3622,29 +3622,29 @@ class AdminManager {
                 : '<div style="width:48px;height:48px;border-radius:12px;background:#f8fafc;color:#94a3b8;display:flex;align-items:center;justify-content:center;border:1px solid #f1f5f9;"><span class="material-symbols-outlined" style="font-size:24px;">image</span></div>';
 
             return `
-                <tr style="border-bottom: 1px solid #f8fafc; transition: background 0.2s;">
-                    <td style="padding: 16px 24px;">
+                <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.2s;">
+                    <td style="padding: 24px;">
                         <div style="display: flex; align-items: center; gap: 20px;">
                             ${imageCell}
                             <div>
-                                <div style="font-weight: 700; font-size: 15px; color: #1e293b; margin-bottom: 1px;">${title}</div>
-                                <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${category || 'Norsk'}</div>
+                                <div style="font-weight: 700; font-size: 15px; color: #1e293b; margin-bottom: 2px;">${title}</div>
+                                <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${category || 'Blogg'}</div>
                             </div>
                         </div>
                     </td>
-                    <td style="padding: 16px 24px; color: #64748b; font-size: 13px; font-weight: 600;">${dateText}</td>
-                    <td style="padding: 16px 24px; color: #64748b; font-size: 13px; font-weight: 600;">${author || '<span style="color: #cbd5e1;">—</span>'}</td>
-                    <td style="padding: 16px 24px;">${statusPill}</td>
-                    <td style="padding: 16px 24px; text-align: right;">
+                    <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600;">${dateText}</td>
+                    <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600;">${author || '<span style="color: #cbd5e1;">—</span>'}</td>
+                    <td style="padding: 24px;">${statusPill}</td>
+                    <td style="padding: 24px; text-align: right;">
                         <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
                             <button type="button" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})" 
-                                style="background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 7px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s;">
+                                style="background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
                                 Rediger
                             </button>
                             <button type="button" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
                                 style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s;" 
                                 onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                                <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                             </button>
                         </div>
                     </td>
@@ -3655,13 +3655,13 @@ class AdminManager {
         container.innerHTML = `
             <div style="width: 100%; overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                    <thead>
-                        <tr style="border-bottom: 1px solid #f1f5f9;">
-                            <th style="padding: 16px 24px; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Innhold</th>
-                            <th style="padding: 16px 24px; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Dato</th>
-                            <th style="padding: 16px 24px; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Forfatter</th>
-                            <th style="padding: 16px 24px; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Status</th>
-                            <th style="padding: 16px 24px; font-size: 10px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; text-align: right;">Handlinger</th>
+                    <thead style="background: #fafbfc; border-bottom: 1px solid #f1f5f9;">
+                        <tr>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Innhold</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Dato</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Forfatter</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Status</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; text-align: right;">Handlinger</th>
                         </tr>
                     </thead>
                     <tbody>
