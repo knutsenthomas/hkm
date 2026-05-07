@@ -2659,6 +2659,7 @@ class AdminManager {
                 `;
             });
 
+            widgetsHtml += `</div>`; // Close column
         });
 
         // Build Analytics Footer HTML
