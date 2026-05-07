@@ -103,7 +103,7 @@ body.builder-active {
 .section-header-icon {
     width: 48px;
     height: 48px;
-    border-radius: 50% !important;
+    border-radius: 12px !important;
     /* Forces circular shape */
     background: #ffffff;
     border: 1px solid var(--admin-border);
@@ -2456,8 +2456,11 @@ body.admin-body .page-title {
         padding: 10px 0 !important; /* Removed horizontal padding here as it is handled by .main-header */
     }
 
-    .section-header-titles h1 {
+    .section-header-titles h1,
+    .section-header-titles h2 {
         font-size: 20px !important;
+        font-weight: 800 !important;
+        color: #1e293b !important;
         display: block !important;
     }
 }
@@ -2662,7 +2665,7 @@ body.admin-body .section-content>.design-ui-header {
 .section-header-icon {
     width: 48px;
     height: 48px;
-    border-radius: 50% !important;
+    border-radius: 12px !important;
     background: #ffffff;
     border: 1px solid var(--admin-border);
     display: flex;
