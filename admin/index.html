@@ -21,9 +21,40 @@
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
-    <link rel="stylesheet" href="css/dashboard.css?v=2026.04.22.09.36">
+    <link rel="stylesheet" href="css/dashboard.css?v=2026.05.07.15.52">
     <link rel="stylesheet" href="../css/notifications.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260426h">
+    <link rel="stylesheet" href="css/admin-unified.css?v=2026.05.07.15.52">
+    
+    <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE) -->
+    <style>
+        @media (max-width: 768px) {
+            .stat-card.modern .stat-value.long-value {
+                font-size: 18px !important;
+                white-space: nowrap !important;
+                color: #1e293b !important;
+                font-weight: 800 !important;
+            }
+            .stat-label-stack {
+                padding-right: 15px !important;
+                min-width: 0 !important;
+                flex: 1 !important;
+            }
+            .stat-value-wrap {
+                width: 90px !important;
+                flex-shrink: 0 !important;
+                text-align: right !important;
+                display: flex !important;
+                justify-content: flex-end !important;
+                align-items: center !important;
+            }
+            .stat-card.modern .stat-label {
+                font-size: 14px !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+        }
+    </style>
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->
     <script type="module" src="../js/firebase-config.js"></script>
@@ -1371,7 +1402,7 @@
 
     <script type="module" src="../js/user-roles.js"></script>
     <script type="module" src="../js/notifications.js"></script>
-    <script type="module" src="js/admin.js?v=2026.04.27.13.05"></script>
+    <script type="module" src="js/admin.js?v=2026.05.07.15.52"></script>
     <script type="module">
         window.addEventListener('load', () => {
             if (!window.adminManager) {
