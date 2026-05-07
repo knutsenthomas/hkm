@@ -2460,9 +2460,24 @@ body.admin-body .page-title {
     }
 
     .section-header-actions {
-        gap: 8px !important;
+        gap: 10px !important;
         display: flex !important;
         align-items: center !important;
+        justify-content: flex-end !important;
+    }
+
+    .user-profile-link {
+        order: 1 !important;
+    }
+
+    #messages-bell, 
+    .notification-btn {
+        order: 2 !important;
+    }
+
+    #mobile-nav-toggle,
+    .mobile-nav-toggle {
+        order: 3 !important;
     }
 }
 
@@ -2494,9 +2509,13 @@ body.builder-active .user-avatar {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: #dbeafe !important; /* Light blue background to match profile icon */
-    color: #1B4965 !important; /* Dark blue icon color for contrast */
+    background: #dbeafe !important;
+    color: #1B4965 !important;
     flex-shrink: 0 !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    font-family: 'Work Sans', sans-serif !important;
+    text-transform: uppercase !important;
 }
 
 body.admin-body .user-profile-link,
