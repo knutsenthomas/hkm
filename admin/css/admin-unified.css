@@ -2421,9 +2421,28 @@ body.admin-body .page-title {
 }
 
 /* Hide user text on mobile to keep header clean */
+/* Optimize header space on mobile */
 @media (max-width: 768px) {
     .user-info-text {
         display: none !important;
+    }
+
+    /* Hide search icon in header on mobile - it will be moved to FAB */
+    #global-search-opener {
+        display: none !important;
+    }
+
+    .section-header-actions {
+        gap: 12px !important; /* Normal gap since we have more space now */
+    }
+
+    .section-header {
+        padding: 10px 16px !important;
+    }
+
+    .section-header-titles h1 {
+        font-size: 20px !important;
+        display: block !important;
     }
 }
 

@@ -2029,10 +2029,15 @@ class AdminManager {
         if (!searchOpener || !searchModal || !modalSearchInput) return;
 
         // Open search modal
-        searchOpener.addEventListener('click', () => {
+        const openModal = () => {
             searchModal.style.display = 'flex';
             setTimeout(() => modalSearchInput.focus(), 100);
-        });
+        };
+
+        searchOpener.addEventListener('click', openModal);
+        
+        // Expose to window for FAB and other access
+        window.openGlobalSearch = openModal;
 
         // Close search modal
         const closeModal = () => {
