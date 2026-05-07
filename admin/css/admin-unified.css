@@ -2438,8 +2438,8 @@ body.builder-active .user-avatar {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: #1B4965 !important;
-    color: #ffffff !important;
+    background: #dbeafe !important; /* Light blue background to match profile icon */
+    color: #1B4965 !important; /* Dark blue icon color for contrast */
     flex-shrink: 0 !important;
 }
 
