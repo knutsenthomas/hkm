@@ -67,7 +67,7 @@ class NewsletterBuilder {
 
     switchTab(tab) {
         this.activeTab = tab;
-        document.querySelectorAll('.nav-icon-btn').forEach(btn => {
+        document.querySelectorAll('.rail-item').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.tab === tab);
         });
         document.querySelectorAll('.tab-pane').forEach(pane => {
@@ -240,7 +240,7 @@ class NewsletterBuilder {
         });
 
         // Block Tool Clicks
-        document.querySelectorAll('.block-tool').forEach(btn => {
+        document.querySelectorAll('.element-card').forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
                 this.addBlock(type);
@@ -284,7 +284,7 @@ class NewsletterBuilder {
         }
 
         // View Toggles
-        document.querySelectorAll('.view-toggle').forEach(btn => {
+        document.querySelectorAll('.device-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const view = btn.dataset.view;
                 this.setView(view);
@@ -392,7 +392,7 @@ class NewsletterBuilder {
 
     setView(view) {
         this.currentView = view;
-        document.querySelectorAll('.view-toggle').forEach(btn => {
+        document.querySelectorAll('.device-btn').forEach(btn => {
             btn.classList.toggle('active', btn.dataset.view === view);
         });
 
