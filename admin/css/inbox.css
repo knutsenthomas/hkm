@@ -24,6 +24,7 @@
 
 .inbox-folders {
     width: var(--inbox-sidebar-width);
+    flex-shrink: 0;
     border-right: 1px solid var(--inbox-border);
     background: #fff;
     display: flex;
@@ -114,6 +115,7 @@
 /* 2. Thread List */
 .inbox-threads {
     width: var(--inbox-list-width);
+    flex-shrink: 0;
     border-right: 1px solid var(--inbox-border);
     display: flex;
     flex-direction: column;

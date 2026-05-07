@@ -24,12 +24,12 @@ body.crm-body {
 .crm-main {
     flex: 1;
     margin-left: 280px;
-    /* Sidebar width from dashboard.css */
     width: calc(100% - 280px);
     display: flex;
     flex-direction: column;
     min-width: 0;
-    /* Prevent flex overflow */
+    height: 100vh;
+    overflow: hidden;
 }
 
 

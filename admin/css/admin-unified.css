@@ -3329,10 +3329,11 @@ body.builder-active .newsletter-canvas {
         font-size: 17px !important;
     }
 
-    body.admin-body .user-info-text,
+    /* Hide name/role on sub-pages desktop to prevent overlap */
+    body.admin-body:not(.main-dashboard) .user-info-text,
     body.crm-body .user-info-text,
     body.builder-active .user-info-text {
-        display: none;
+        display: none !important;
     }
 
     body.builder-active .workspace-header {
