@@ -865,8 +865,10 @@ body.crm-body .threads-search input {
         font-weight: 600 !important;
         border-radius: 999px !important;
         white-space: nowrap !important;
-        flex: none !important; /* Prevent stretching */
-        width: fit-content !important;
+        flex: 0 0 auto !important; /* Strictly no growing */
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 150px !important; /* Defensive max width */
         gap: 8px !important;
         margin: 0 !important;
         cursor: pointer !important;
@@ -883,6 +885,7 @@ body.crm-body .threads-search input {
         color: #fff !important;
         box-shadow: none !important;
         outline: none !important;
+        position: relative !important;
     }
 
     .folder-item {

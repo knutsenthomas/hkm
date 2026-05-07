@@ -3002,23 +3002,44 @@ body.builder-active .newsletter-canvas {
     body.admin-body .main-header,
     body.crm-body .main-header,
     body.builder-active .main-header {
-        padding-left: 24px !important;
-        padding-right: 24px !important;
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    .header-left {
+        flex: 1 !important;
+        min-width: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 12px !important;
+    }
+
+    .header-right {
+        flex: 0 0 auto !important;
+        display: flex !important;
+        align-items: center !important;
+        gap: 16px !important; /* Better spacing between icons */
+    }
+
+    .page-title {
+        font-size: 16px !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 120px !important;
+    }
+
+    .user-profile {
+        margin-left: 4px !important;
     }
 
     body.admin-body .section-header-actions,
     body.crm-body .section-header-actions {
-        gap: 20px !important;
-    }
-
-    body.admin-body .user-info-text,
-    body.crm-body .user-info-text {
-        display: none !important;
-    }
-
-    body.admin-body .main-header .section-header,
-    body.crm-body .main-header .section-header {
-        gap: 8px !important;
+        gap: 12px !important;
     }
 
     body.crm-body .crm-header {
