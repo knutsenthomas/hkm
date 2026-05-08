@@ -962,6 +962,7 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
         audio.src = url;
         barTitle.textContent = title;
         barImg.src = thumbnail;
+        barImg.style.display = thumbnail ? '' : 'none';
         
         const fsTitle = document.querySelector('.fullscreen-title');
         const fsSummary = document.querySelector('.fullscreen-summary');
@@ -1126,7 +1127,7 @@ function createPlayerBar() {
         <div class="player-container">
             <audio id="global-audio-element"></audio>
             <div class="player-info" id="player-info-toggle" style="cursor: pointer;" title="Vis i fullskjerm">
-                <img src="" class="player-info-img">
+                <img src="" class="player-info-img" style="display:none;">
                 <div class="player-info-text"><span class="player-info-title">${t('selectEpisode')}</span></div>
             </div>
             <div class="player-controls">

@@ -700,6 +700,7 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex) {
         audio.src = url;
         barTitle.textContent = title;
         barImg.src = thumbnail;
+        barImg.style.display = thumbnail ? '' : 'none';
         audio.play();
         document.getElementById('podcast-player-bar').classList.add('active');
         updatePlayIcons(true, btn);
@@ -724,7 +725,7 @@ function createPlayerBar() {
         <div class="player-container">
             <audio id="global-audio-element"></audio>
             <div class="player-info">
-                <img src="" class="player-info-img">
+                <img src="" class="player-info-img" style="display:none;">
                 <div class="player-info-text"><span class="player-info-title">${t('selectEpisode')}</span></div>
             </div>
             <div class="player-controls">
