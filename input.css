@@ -4541,6 +4541,38 @@ body {
     top: 0;
 }
 
+.fs-x-close-btn {
+    position: fixed;
+    top: max(16px, env(safe-area-inset-top));
+    right: max(16px, env(safe-area-inset-right));
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: rgba(255, 255, 255, 0.94);
+    color: var(--text-dark);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    cursor: pointer;
+    z-index: 10002;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.16);
+    transition: background 0.2s, color 0.2s, transform 0.2s;
+}
+
+.fs-x-close-btn:hover,
+.fs-x-close-btn:focus-visible {
+    background: var(--primary-orange);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.fs-x-close-btn:focus-visible {
+    outline: 3px solid rgba(243, 156, 18, 0.25);
+    outline-offset: 3px;
+}
+
 .fs-header {
     display: flex;
     justify-content: flex-end;
@@ -4638,6 +4670,12 @@ body {
 }
 
 @media (max-width: 768px) {
+    .fs-x-close-btn {
+        top: max(12px, env(safe-area-inset-top));
+        right: max(12px, env(safe-area-inset-right));
+        width: 42px;
+        height: 42px;
+    }
     .fullscreen-title {
         font-size: 1.5rem;
     }

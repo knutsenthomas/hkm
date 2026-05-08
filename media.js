@@ -812,6 +812,9 @@ function createPlayerBar() {
             </div>
         </div>
         <div id="podcast-fullscreen-overlay" class="podcast-fullscreen-overlay">
+            <button class="fs-x-close-btn" type="button" aria-label="Lukk fullskjerm">
+                <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
             <div class="fs-header">
                 <button class="fs-close-btn"><i class="fas fa-chevron-down"></i> Lukk</button>
             </div>
@@ -846,6 +849,7 @@ function createPlayerBar() {
     const infoToggle = bar.querySelector('#player-info-toggle');
     const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
     const fsCloseBtn = bar.querySelector('.fs-close-btn');
+    const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
 
     function openFs() {
         fsOverlay.classList.add('active');
@@ -859,6 +863,7 @@ function createPlayerBar() {
     infoToggle.addEventListener('click', openFs);
     if(expandBtn) expandBtn.addEventListener('click', openFs);
     fsCloseBtn.addEventListener('click', closeFs);
+    if (fsXCloseBtn) fsXCloseBtn.addEventListener('click', closeFs);
 
     playBtn.addEventListener('click', () => {
         if (audio.paused) { audio.play(); updatePlayIcons(true); }
