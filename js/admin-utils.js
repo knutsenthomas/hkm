@@ -380,6 +380,24 @@
                     </div>
                 </div>
             `;
+        },
+        async logSystemEvent(level, message, source = 'System') {
+            try {
+                // Check if firebase is available (compat version)
+                if (typeof firebase === 'undefined' || !firebase.apps.length) return;
+                
+                const db = firebase.firestore();
+                await db.collection('system_logs').add({
+                    level: (level || 'info').toLowerCase(),
+                    message: String(message),
+                    source: source || 'System',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    userAgent: navigator.userAgent,
+                    path: window.location.pathname + window.location.hash
+                });
+            } catch (e) {
+                console.warn('System log failed:', e);
+            }
         }
     };
 })();

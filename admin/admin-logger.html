@@ -18,7 +18,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/dashboard.css?v=20260508_G36">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260508_G37">
 
     <style>
         .logs-container {
@@ -180,7 +180,7 @@
         }
     </style>
 
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260508_G36">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260508_G37">
 
     <style>
         body.admin-logs-page .content-wrapper {
@@ -527,58 +527,57 @@
     </script>
 
     <script type="module" src="../js/admin-utils.js"></script>
-    <script type="module" src="js/admin-header.js?v=20260508_G36"></script>
+    <script type="module" src="js/admin-header.js?v=20260508_G37"></script>
     <script type="module">
         document.addEventListener('DOMContentLoaded', async () => {
             const logsBody = document.getElementById('logs-body');
             const logCount = document.getElementById('log-count');
 
-            // Mock Data Generator for demo/fallback
-            const generateMockLogs = () => {
-                const types = ['info', 'warn', 'error', 'success'];
-                const sources = ['System', 'Firebase', 'Auth', 'UserAction'];
-                const messages = [
-                    'Database backup completed successfully',
-                    'Failed to load user profile image',
-                    'New user registered: thomas@hkm.no',
-                    'API rate limit approaching',
-                    'Page cache cleared manually',
-                    'Login attempt failed from IP 192.168.1.1',
-                    'Settings updated by Admin'
-                ];
 
-                return Array.from({ length: 15 }, (_, i) => {
-                    const date = new Date();
-                    date.setMinutes(date.getMinutes() - i * 12);
-                    const type = types[Math.floor(Math.random() * types.length)];
-                    return {
-                        timestamp: date.toISOString(),
-                        level: type,
-                        message: messages[Math.floor(Math.random() * messages.length)],
-                        source: sources[Math.floor(Math.random() * sources.length)]
-                    };
-                });
-            };
 
-            // Fetch logs (Replace with real Firebase fetches later if needed)
-            // For now we use mock data to populate the view as requested
+            // Fetch logs from Firestore
             let logs = [];
 
-            try {
-                // If real collection exists:
-                // const snapshot = await firebase.firestore().collection('system_logs').orderBy('timestamp', 'desc').limit(50).get();
-                // logs = snapshot.docs.map(doc => doc.data());
-
-                // Fallback to mock if empty or not implemented
-                if (logs.length === 0) logs = generateMockLogs();
-            } catch (e) {
-                console.warn('Could not fetch real logs, using mock data', e);
-                logs = generateMockLogs();
-            }
+            const fetchLogs = async () => {
+                try {
+                    if (typeof firebase === 'undefined') {
+                        throw new Error('Firebase not loaded');
+                    }
+                    
+                    const snapshot = await firebase.firestore()
+                        .collection('system_logs')
+                        .orderBy('timestamp', 'desc')
+                        .limit(100)
+                        .get();
+                    
+                    logs = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            ...data,
+                            // Convert Firestore timestamp to ISO string if it exists
+                            timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : new Date().toISOString()
+                        };
+                    });
+                } catch (e) {
+                    console.error('Firestore fetch failed:', e);
+                    // Minimal fallback
+                    logs = [{
+                        timestamp: new Date().toISOString(),
+                        level: 'error',
+                        message: 'Kunne ikke hente logg fra databasen: ' + e.message,
+                        source: 'System'
+                    }];
+                }
+            };
 
             const renderLogs = (filter = 'all') => {
                 const filtered = logs.filter(log => filter === 'all' || log.level === filter);
                 logCount.textContent = filtered.length;
+
+                if (filtered.length === 0) {
+                    logsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:#64748b;">Ingen logger funnet i databasen.</td></tr>`;
+                    return;
+                }
 
                 logsBody.innerHTML = filtered.map(log => `
                     <tr>
@@ -590,13 +589,18 @@
                 `).join('');
             };
 
+            // Initial load
+            await fetchLogs();
             renderLogs();
 
             // Filter Click Handlers
             document.querySelectorAll('.log-filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', async (e) => {
                     document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
                     e.target.classList.add('active');
+                    
+                    // Refresh logs on filter change to get latest
+                    await fetchLogs();
                     renderLogs(e.target.dataset.filter);
                 });
             });
