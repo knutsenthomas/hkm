@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G38) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G39) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -4785,4 +4785,99 @@ body.builder-active .main-header [id="admin-avatar"] {
 
 /* End of file */
 
-/* End of file */
+/* ─── Design Upload Cards (Logo & Favicon) ─────────────────────────────── */
+.design-ui-upload-card {
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    overflow: hidden;
+    gap: 0;
+}
+
+.design-ui-upload-card-preview {
+    width: 160px;
+    min-height: 120px;
+    flex-shrink: 0;
+    background: #f8fafc;
+    border-right: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.design-ui-upload-card-preview--favicon {
+    width: 100px;
+}
+
+.design-ui-upload-card-preview img {
+    max-width: 100%;
+    max-height: 100px;
+    object-fit: contain;
+    border-radius: 6px;
+}
+
+.design-ui-upload-card-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    color: #94a3b8;
+    font-size: 12px;
+    text-align: center;
+}
+
+.design-ui-upload-card-placeholder .material-symbols-outlined {
+    font-size: 28px;
+    color: #cbd5e1;
+}
+
+.design-ui-upload-card-body {
+    flex: 1;
+    padding: 16px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+}
+
+.design-ui-upload-card-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.design-ui-upload-card-hint {
+    font-size: 12px;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.design-ui-upload-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.design-ui-upload-url-input {
+    flex: 1;
+    min-width: 0;
+    height: 36px !important;
+    font-size: 13px !important;
+}
+
+.design-ui-upload-card-btns {
+    flex-shrink: 0;
+}
+
+.design-ui-branding-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}

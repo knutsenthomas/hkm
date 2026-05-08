@@ -4907,39 +4907,55 @@ class AdminManager {
                             </div>
                             <div class="design-ui-panel-body">
                                 <div class="design-ui-branding-layout">
-                                    <div class="design-ui-brand-block">
-                                        <div class="form-group">
-                                            <label>Logo URL</label>
-                                            <input type="text" id="site-logo-url" class="form-control" placeholder="https://...">
-                                        </div>
-                                        <div class="upload-row design-ui-upload-row">
-                                            <input type="file" id="site-logo-file" class="form-control file-input" accept="image/*">
-                                            <button class="btn btn-secondary" id="upload-logo-btn" type="button">Last opp logo</button>
-                                        </div>
-                                        <div class="preview-container design-ui-preview-container" id="logo-preview-container">
-                                            <div class="design-ui-empty-preview">
+
+                                    <!-- Logo Upload Card -->
+                                    <div class="design-ui-upload-card">
+                                        <div class="design-ui-upload-card-preview" id="logo-preview-container">
+                                            <div class="design-ui-upload-card-placeholder">
                                                 <span class="material-symbols-outlined">image</span>
-                                                <span>Logo-forhåndsvisning</span>
+                                                <span>Ingen logo lastet opp</span>
+                                            </div>
+                                        </div>
+                                        <div class="design-ui-upload-card-body">
+                                            <label class="design-ui-upload-card-label">Logo</label>
+                                            <p class="design-ui-upload-card-hint">Anbefalt: SVG eller PNG med transparent bakgrunn</p>
+                                            <div class="design-ui-upload-card-actions">
+                                                <input type="text" id="site-logo-url" class="form-control design-ui-upload-url-input" placeholder="https://...">
+                                                <div class="design-ui-upload-card-btns">
+                                                    <input type="file" id="site-logo-file" accept="image/*" style="display:none;">
+                                                    <button class="btn btn-primary btn-sm" id="upload-logo-btn" type="button" onclick="document.getElementById('site-logo-file').click()">
+                                                        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">upload</span>
+                                                        Last opp
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div class="design-ui-brand-block">
-                                        <div class="form-group">
-                                            <label>Favicon URL</label>
-                                            <input type="text" id="site-favicon-url" class="form-control" placeholder="https://...">
-                                        </div>
-                                        <div class="upload-row design-ui-upload-row">
-                                            <input type="file" id="site-favicon-file" class="form-control file-input" accept="image/png,image/x-icon,image/svg+xml">
-                                            <button class="btn btn-secondary" id="upload-favicon-btn" type="button">Last opp favicon</button>
-                                        </div>
-                                        <div class="preview-container design-ui-preview-container" id="favicon-preview-container">
-                                            <div class="design-ui-empty-preview">
+                                    <!-- Favicon Upload Card -->
+                                    <div class="design-ui-upload-card">
+                                        <div class="design-ui-upload-card-preview design-ui-upload-card-preview--favicon" id="favicon-preview-container">
+                                            <div class="design-ui-upload-card-placeholder">
                                                 <span class="material-symbols-outlined">web_asset</span>
-                                                <span>Favicon-forhåndsvisning</span>
+                                                <span>Ingen favicon lastet opp</span>
+                                            </div>
+                                        </div>
+                                        <div class="design-ui-upload-card-body">
+                                            <label class="design-ui-upload-card-label">Favicon</label>
+                                            <p class="design-ui-upload-card-hint">Anbefalt: 32×32 px PNG eller ICO-format</p>
+                                            <div class="design-ui-upload-card-actions">
+                                                <input type="text" id="site-favicon-url" class="form-control design-ui-upload-url-input" placeholder="https://...">
+                                                <div class="design-ui-upload-card-btns">
+                                                    <input type="file" id="site-favicon-file" accept="image/png,image/x-icon,image/svg+xml" style="display:none;">
+                                                    <button class="btn btn-primary btn-sm" id="upload-favicon-btn" type="button" onclick="document.getElementById('site-favicon-file').click()">
+                                                        <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;">upload</span>
+                                                        Last opp
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
+
                                 </div>
 
                                 <div class="design-ui-form-grid">
