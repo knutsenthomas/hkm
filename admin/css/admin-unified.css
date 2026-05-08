@@ -4577,6 +4577,8 @@ body.builder-active .main-header [id="admin-avatar"] {
     body.crm-body .main-header .mobile-nav-toggle,
     body.builder-active .main-header .mobile-nav-toggle {
         display: none !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
 }
 
