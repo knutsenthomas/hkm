@@ -611,6 +611,31 @@ function isTranscriptChapterHeading(text) {
         || /^(?:kapittel|kap\.)\s*\d+(?:\s*[-:]\s*.*)?$/i.test(value);
 }
 
+function splitChapterHeadingInParagraph(text) {
+    const value = String(text || '').trim();
+    if (!value) return null;
+
+    const patterns = [
+        /((?:[1-3]\.?\s*)?[A-Za-zÆØÅæøå\-\s]{0,40}?kapittel\s+\d+(?:\s*[-:]\s*[^.!?\n]+)?)/i,
+        /((?:kapittel|kap\.)\s*\d+(?:\s*[-:]\s*[^.!?\n]+)?)/i
+    ];
+
+    for (const pattern of patterns) {
+        const match = value.match(pattern);
+        if (!match || !match[1]) continue;
+
+        const heading = match[1].trim();
+        const idx = value.indexOf(match[1]);
+        if (idx < 0) continue;
+
+        const before = value.slice(0, idx).trim();
+        const after = value.slice(idx + match[1].length).trim();
+        return { before, heading, after };
+    }
+
+    return null;
+}
+
 function enhanceTranscriptRichFormatting(html) {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html;
@@ -631,6 +656,38 @@ function enhanceTranscriptRichFormatting(html) {
             heading.style.paddingLeft = '10px';
             heading.textContent = text;
             paragraph.replaceWith(heading);
+            return;
+        }
+
+        const chapterParts = splitChapterHeadingInParagraph(text);
+        if (chapterParts) {
+            const fragment = document.createDocumentFragment();
+
+            if (chapterParts.before) {
+                const beforeParagraph = document.createElement('p');
+                beforeParagraph.textContent = chapterParts.before;
+                fragment.appendChild(beforeParagraph);
+            }
+
+            const inlineHeading = document.createElement('h4');
+            inlineHeading.className = 'transcript-chapter-heading';
+            inlineHeading.style.margin = '26px 0 12px';
+            inlineHeading.style.fontSize = '1.15rem';
+            inlineHeading.style.fontWeight = '800';
+            inlineHeading.style.color = '#1f3348';
+            inlineHeading.style.letterSpacing = '0.01em';
+            inlineHeading.style.borderLeft = '4px solid #d17d39';
+            inlineHeading.style.paddingLeft = '10px';
+            inlineHeading.textContent = chapterParts.heading;
+            fragment.appendChild(inlineHeading);
+
+            if (chapterParts.after) {
+                const afterParagraph = document.createElement('p');
+                afterParagraph.textContent = chapterParts.after;
+                fragment.appendChild(afterParagraph);
+            }
+
+            paragraph.replaceWith(fragment);
             return;
         }
 
