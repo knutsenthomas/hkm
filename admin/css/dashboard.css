@@ -3709,7 +3709,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 }
 
 .mobile-nav-item span.material-symbols-outlined {
-    font-size: 26px;
+    font-size: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3717,7 +3717,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 }
 
 .mobile-nav-item span:not(.material-symbols-outlined) {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.2px;
 }
