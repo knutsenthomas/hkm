@@ -2,7 +2,7 @@
 
 /* Global Typography Fixes */
 body.builder-active, 
-body.builder-active * {
+body.builder-active *:not(.material-symbols-outlined) {
     font-family: 'Inter', sans-serif !important;
 }
 
