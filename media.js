@@ -636,6 +636,14 @@ function splitChapterHeadingInParagraph(text) {
     return null;
 }
 
+function hasMeaningfulTextFragment(text) {
+    const value = String(text || '').trim();
+    if (!value) return false;
+
+    // Ignore fragments that are only punctuation/symbols (e.g. a lone ".").
+    return /[A-Za-zÆØÅæøå0-9]/.test(value);
+}
+
 function enhanceTranscriptRichFormatting(html) {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = html;
@@ -647,7 +655,7 @@ function enhanceTranscriptRichFormatting(html) {
         if (isTranscriptChapterHeading(text)) {
             const heading = document.createElement('h4');
             heading.className = 'transcript-chapter-heading';
-            heading.style.margin = '26px 0 12px';
+            heading.style.margin = '16px 0 8px';
             heading.style.fontSize = '1.15rem';
             heading.style.fontWeight = '800';
             heading.style.color = '#1f3348';
@@ -663,15 +671,16 @@ function enhanceTranscriptRichFormatting(html) {
         if (chapterParts) {
             const fragment = document.createDocumentFragment();
 
-            if (chapterParts.before) {
+            if (hasMeaningfulTextFragment(chapterParts.before)) {
                 const beforeParagraph = document.createElement('p');
                 beforeParagraph.textContent = chapterParts.before;
+                beforeParagraph.style.margin = '0 0 12px';
                 fragment.appendChild(beforeParagraph);
             }
 
             const inlineHeading = document.createElement('h4');
             inlineHeading.className = 'transcript-chapter-heading';
-            inlineHeading.style.margin = '26px 0 12px';
+            inlineHeading.style.margin = '16px 0 8px';
             inlineHeading.style.fontSize = '1.15rem';
             inlineHeading.style.fontWeight = '800';
             inlineHeading.style.color = '#1f3348';
@@ -681,15 +690,18 @@ function enhanceTranscriptRichFormatting(html) {
             inlineHeading.textContent = chapterParts.heading;
             fragment.appendChild(inlineHeading);
 
-            if (chapterParts.after) {
+            if (hasMeaningfulTextFragment(chapterParts.after)) {
                 const afterParagraph = document.createElement('p');
                 afterParagraph.textContent = chapterParts.after;
+                afterParagraph.style.margin = '0 0 12px';
                 fragment.appendChild(afterParagraph);
             }
 
             paragraph.replaceWith(fragment);
             return;
         }
+
+        paragraph.style.margin = '0 0 12px';
 
         const containsInlineHtml = /<[^>]+>/.test(paragraph.innerHTML || '');
         if (containsInlineHtml) return;
