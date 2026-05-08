@@ -7,15 +7,23 @@ body.builder-active *:not(.material-symbols-outlined) {
 }
 
 body.builder-active .toolbar-action-btn,
-body.builder-active .toolbar-action-btn * {
+body.builder-active .toolbar-action-btn *:not(.material-symbols-outlined) {
     font-size: 14px !important;
     font-weight: 500 !important;
+}
+
+body.builder-active .toolbar-action-btn .material-symbols-outlined {
+    font-size: 18px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 body.builder-active .toolbar-action-btn {
     padding: 10px 20px !important;
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
     gap: 8px !important;
     height: 42px !important;
 }
