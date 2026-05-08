@@ -4230,11 +4230,14 @@ body.admin-body .nav-link.logout:hover {
 /* 1. Global Header Container Standards */
 body.admin-body .main-header,
 body.crm-body .main-header,
+body.builder-active .main-header,
 body.builder-active .workspace-top-bar,
-body.admin-body #dashboard-main-header {
+body.admin-body #dashboard-main-header,
+body.crm-body #dashboard-main-header,
+body.builder-active #dashboard-main-header {
     height: 72px !important;
     min-height: 72px !important;
-    background-color: #f4f7fa !important; /* Premium light-gray dashboard background */
+    background-color: #f4f7fa !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -4244,7 +4247,6 @@ body.admin-body #dashboard-main-header {
     z-index: 1000 !important;
     border-bottom: 1px solid rgba(0,0,0,0.06) !important;
     box-sizing: border-box !important;
-    box-shadow: none !important;
     width: 100% !important;
     margin-bottom: 0 !important;
     transition: all 0.3s ease !important;
@@ -4253,6 +4255,7 @@ body.admin-body #dashboard-main-header {
 /* 2. Unified Content Structure Alignment */
 body.admin-body .section-header,
 body.crm-body .section-header,
+body.builder-active .section-header,
 body.builder-active .breadcrumb-nav {
     width: 100% !important;
     height: 100% !important;
@@ -4263,11 +4266,11 @@ body.builder-active .breadcrumb-nav {
     margin: 0 !important;
     background: transparent !important;
     border: none !important;
-    box-shadow: none !important;
 }
 
 body.admin-body .section-header-content,
 body.crm-body .section-header-content,
+body.builder-active .section-header-content,
 body.builder-active .top-bar-actions {
     display: flex !important;
     align-items: center !important;
@@ -4279,15 +4282,15 @@ body.builder-active .top-bar-actions {
 body.admin-body .user-avatar,
 body.crm-body .user-avatar,
 body.builder-active .user-avatar,
-body.admin-body #admin-avatar {
+[id="admin-avatar"] {
     width: 42px !important;
     height: 42px !important;
-    background-color: #1B4965 !important; /* HKM Mørkeblå */
+    background-color: #1B4965 !important;
     color: #ffffff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 50% !important; /* Strictly circular */
+    border-radius: 50% !important;
     font-weight: 800 !important;
     font-size: 15px !important;
     text-transform: uppercase !important;
@@ -4300,9 +4303,7 @@ body.admin-body #admin-avatar {
 }
 
 /* Suppress any child nodes (icons/images) to guarantee initials visibility */
-body.admin-body .user-avatar *,
-body.crm-body .user-avatar *,
-body.builder-active .user-avatar * {
+.user-avatar *, [id="admin-avatar"] * {
     display: none !important;
 }
 
@@ -4311,6 +4312,7 @@ body.admin-body .crm-content,
 body.crm-body .crm-content,
 body.crm-body .inbox-container, 
 body.builder-active .newsletter-builder-container,
+body.builder-active .builder-workspace,
 body.admin-body .segments-container,
 body.admin-body .content-wrapper,
 body.admin-body .section-container {
@@ -4322,6 +4324,7 @@ body.admin-body .section-container {
 /* 5. Header Typography Standards */
 body.admin-body .section-title,
 body.crm-body .section-title,
+body.builder-active .section-title,
 body.builder-active .breadcrumb-current {
     font-size: 18px !important;
     font-weight: 800 !important;
@@ -4331,18 +4334,58 @@ body.builder-active .breadcrumb-current {
 }
 
 body.admin-body .section-subtitle,
-body.crm-body .section-subtitle {
+body.crm-body .section-subtitle,
+body.builder-active .section-subtitle {
     font-size: 12px !important;
     font-weight: 500 !important;
     color: #64748b !important;
     margin: 4px 0 0 0 !important;
 }
 
-/* 6. Action Elements (Bell, Menu, Toggle) */
+/* 6. Action Elements (Search, Bell, Menu, Toggle) */
+.header-search-container {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.08) !important;
+    border-radius: 12px !important;
+    padding: 0 16px !important;
+    height: 42px !important;
+    width: 300px !important;
+    margin-right: 20px !important;
+    transition: all 0.3s ease !important;
+}
+
+.header-search-container:focus-within {
+    border-color: #1B4965 !important;
+    box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.05) !important;
+    width: 340px !important;
+}
+
+.header-search-container .search-icon {
+    font-size: 20px !important;
+    color: #94a3b8 !important;
+    margin-right: 10px !important;
+}
+
+.header-search-container input {
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
+    width: 100% !important;
+    font-size: 14px !important;
+    font-family: inherit !important;
+    color: #0f172a !important;
+}
+
 body.admin-body .notification-btn,
 body.crm-body .notification-btn,
+body.builder-active .notification-btn,
 body.builder-active .top-icon-btn,
-body.admin-body .mobile-nav-toggle {
+body.admin-body .mobile-nav-toggle,
+body.crm-body .mobile-nav-toggle,
+body.builder-active .mobile-nav-toggle {
     width: 42px !important;
     height: 42px !important;
     display: flex !important;
@@ -4356,13 +4399,6 @@ body.admin-body .mobile-nav-toggle {
     margin-left: 12px !important;
 }
 
-body.admin-body .notification-btn:hover,
-body.builder-active .top-icon-btn:hover {
-    background: #f1f5f9 !important;
-    color: #1B4965 !important;
-    transform: translateY(-1px) !important;
-}
-
 body.admin-body .user-profile-link,
 body.crm-body .user-profile-link,
 body.builder-active .user-profile-link {
@@ -4372,18 +4408,21 @@ body.builder-active .user-profile-link {
     text-decoration: none !important;
     padding: 6px 10px !important;
     border-radius: 12px !important;
-    transition: background 0.2s !important;
     background: transparent !important;
     margin-left: auto !important;
 }
 
-body.admin-body .user-name {
+body.admin-body .user-name,
+body.crm-body .user-name,
+body.builder-active .user-name {
     font-size: 14px !important;
     font-weight: 800 !important;
     color: #0f172a !important;
 }
 
-body.admin-body .user-role {
+body.admin-body .user-role,
+body.crm-body .user-role,
+body.builder-active .user-role {
     font-size: 10px !important;
     font-weight: 700 !important;
     color: #64748b !important;
@@ -4395,17 +4434,15 @@ body.admin-body .user-role {
 @media (max-width: 800px) {
     body.admin-body .main-header,
     body.crm-body .main-header,
-    body.builder-active .workspace-top-bar {
+    body.builder-active .main-header {
         height: 64px !important;
         padding: 0 16px !important;
     }
-    body.admin-body .user-info-text,
-    body.crm-body .user-info-text,
-    body.admin-body .section-header-icon, 
-    body.admin-body .section-subtitle,
-    body.crm-body .section-subtitle,
-    body.builder-active .breadcrumb-divider,
-    body.builder-active .breadcrumb-item {
+    .user-info-text,
+    .section-header-icon, 
+    .section-subtitle,
+    .breadcrumb-divider,
+    .breadcrumb-item {
         display: none !important;
     }
 }

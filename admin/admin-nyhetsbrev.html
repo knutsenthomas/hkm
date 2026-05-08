@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20260426h">
     <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="css/newsletter-builder.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260508_GOLD_v2">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260508_GOLD_v3">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -53,6 +53,9 @@
                 <div class="rail-logo">
                     <img src="/img/logo-hkm.png" alt="HKM">
                 </div>
+                <button id="mobile-sidebar-close" style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;" class="mobile-sidebar-close-btn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
             <div class="rail-middle">
                 <a href="/admin" class="rail-item" title="Dashboard">
@@ -132,36 +135,42 @@
 
             <!-- 3. Main Workspace -->
             <main class="builder-workspace">
-                <!-- Premium Top Header -->
-                <header class="workspace-top-bar">
-                    <div class="breadcrumb-nav">
-                        <a href="/admin" class="breadcrumb-item">
-                            <span class="material-symbols-outlined">arrow_back</span>
-                            Dashboard
-                        </a>
-                        <div class="breadcrumb-divider"></div>
-                        <span class="breadcrumb-current">His Kingdom Ministry</span>
+                <!-- Page Header (Unified Standard) -->
+        <div id="dashboard-main-header" class="main-header">
+            <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                <div class="section-header-icon">
+                    <span class="material-symbols-outlined">mail_outline</span>
+                </div>
+                <div class="section-header-content">
+                    <div class="section-header-titles">
+                        <h2 class="section-title">Nyhetsbrevbygger</h2>
+                        <p class="section-subtitle">His Kingdom Ministry</p>
                     </div>
+                    <div class="section-header-actions">
+                        <div class="header-search-container">
+                            <i class="material-symbols-outlined search-icon">search</i>
+                            <input type="text" id="admin-global-search" placeholder="Søk i systemet...">
+                        </div>
 
-                    <div class="top-bar-actions">
                         <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
                             <div class="user-info-text">
-                                <span id="admin-name" class="user-name">TK Admin</span>
+                                <span id="admin-name" class="user-name">Laster...</span>
                                 <span class="user-role">Administrator</span>
                             </div>
                             <div id="admin-avatar" class="user-avatar">TK</div>
                         </a>
 
-                        <button id="messages-bell" class="top-icon-btn">
+                        <button id="messages-bell" class="notification-btn">
                             <span id="notification-icon" class="material-symbols-outlined">notifications</span>
                             <span id="notification-dot" class="notification-dot"></span>
                         </button>
-                        
-                        <button id="mobile-nav-toggle" class="top-icon-btn mobile-nav-toggle" style="display: none;">
+
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
                             <span class="material-symbols-outlined">menu</span>
                         </button>
                     </div>
-                </header>
+                </div>
+            </div>
 
                 <header class="editor-toolbar">
                     <div class="toolbar-left">

@@ -284,10 +284,74 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleSidebar(false);
             });
         }
+    }
 
+    // --- Collapsible Sidebar Categories ---
+    const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
+    
+    function setCategory(category, shouldBeOpen) {
+        const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
+        const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
+        if (!header) return;
+
+        if (shouldBeOpen) {
+            header.classList.remove('collapsed');
+            items.forEach(item => {
+                item.classList.add('visible');
+                item.classList.remove('nav-cat-hidden');
+                item.style.display = 'block';
+            });
+        } else {
+            header.classList.add('collapsed');
+            items.forEach(item => {
+                item.classList.remove('visible');
+                item.classList.add('nav-cat-hidden');
+                item.style.display = 'none';
+            });
+        }
+        sessionStorage.setItem(`nav_cat_${category}`, shouldBeOpen ? 'open' : 'closed');
+    }
+
+    categoryHeaders.forEach(header => {
+        const cat = header.getAttribute('data-target-category');
+        if (!cat) return;
+
+        // Auto-expand if active page is inside this category
+        const hasActiveItem = document.querySelector(`.nav-item[data-nav-category="${cat}"] .nav-link.active`) !== null;
+        
+        const saved = sessionStorage.getItem(`nav_cat_${cat}`);
+        const defaultOpen = (cat === 'nettsted' || hasActiveItem);
+        const shouldBeOpen = saved ? (saved === 'open') : defaultOpen;
+        
+        setCategory(cat, shouldBeOpen);
+
+        header.addEventListener('click', function() {
+            const currentlyClosed = this.classList.contains('collapsed');
+            setCategory(cat, currentlyClosed);
+        });
+    });
+
+    // Mobile Sidebar Close Button
+    const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
+    if (mobileSidebarClose && sidebar) {
+        mobileSidebarClose.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        });
+    }
+
+    // --- Global Search Handler (Visual Only) ---outside
+    if (sidebar) {
         // Close when clicking outside
         document.addEventListener('click', (e) => {
             if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== mobileNavToggle) {
+                const toggleSidebar = (force) => {
+                    const isActive = force !== undefined ? force : !sidebar.classList.contains('active');
+                    sidebar.classList.toggle('active', isActive);
+                    if (sidebarOverlay) {
+                        sidebarOverlay.classList.toggle('active', isActive);
+                    }
+                };
                 toggleSidebar(false);
             }
         });

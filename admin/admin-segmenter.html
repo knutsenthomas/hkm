@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="css/dashboard.css?v=20260426h">
     <link rel="stylesheet" href="css/crm.css?v=20260426h">
     <link rel="stylesheet" href="css/crm-segmenter.css">
-    <link rel="stylesheet" href="css/admin-unified.css?v=20260508_GOLD_v2">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260508_GOLD_v3">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -49,11 +49,14 @@
     <div class="crm-layout">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
+            <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="logo" style="margin-bottom: 0;">
                     <img src="/img/logo-hkm.png" alt="HKM Logo">
                     <h1 class="logo-text">HKM Studio</h1>
                 </div>
+                <button id="mobile-sidebar-close" style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;" class="mobile-sidebar-close-btn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
 
             <nav class="sidebar-nav">
@@ -212,6 +215,11 @@
                             <p class="section-subtitle">Organiser kontaktene dine i målgrupper.</p>
                         </div>
                         <div class="section-header-actions">
+                            <div class="header-search-container">
+                                <i class="material-symbols-outlined search-icon">search</i>
+                                <input type="text" id="admin-global-search" placeholder="Søk i systemet...">
+                            </div>
+
                             <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
                                 <div class="user-info-text">
                                     <span id="admin-name" class="user-name">Laster...</span>
@@ -232,8 +240,6 @@
                     </div>
                 </div>
             </div>
-        </div>
-
 
 
             <div class="crm-content">
