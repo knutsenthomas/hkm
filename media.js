@@ -580,6 +580,7 @@ async function initPodcastRSS() {
                 const safeDateStr = pubDateText ? pubDateText.replace(/-/g, '/') : new Date().toISOString();
                 
                 return {
+                    id: episode.guid || episode.link || '',
                     title: episode.title || '',
                     pubDate: pubDateText || '',
                     dateObj: new Date(safeDateStr),
@@ -737,10 +738,34 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
         const fsTitle = document.querySelector('.fullscreen-title');
         const fsSummary = document.querySelector('.fullscreen-summary');
         const fsArtwork = document.querySelector('.fullscreen-artwork');
+        const fsTranscript = document.querySelector('.fullscreen-transcript');
+        
         if (fsTitle && episodeData) {
             fsTitle.textContent = title;
             fsSummary.innerHTML = episodeData.description || 'Ingen oppsummering tilgjengelig.';
             if (fsArtwork) fsArtwork.src = thumbnail;
+            
+            if (fsTranscript) {
+                fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ser etter transkripsjon...</p>';
+                const svc = window.firebaseService;
+                if (svc && svc.isInitialized && episodeData.id) {
+                    // Try to fetch transcript from backend
+                    firebase.firestore().collection('podcast_transcripts').doc(episodeData.id).get()
+                        .then(doc => {
+                            if (doc.exists && doc.data().text) {
+                                fsTranscript.innerHTML = `<div class="transcript-content" style="line-height: 1.8;">${doc.data().text}</div>`;
+                            } else {
+                                fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+                            }
+                        })
+                        .catch(err => {
+                            console.error("Feil ved henting av transkripsjon:", err);
+                            fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+                        });
+                } else {
+                    fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+                }
+            }
         }
 
         audio.play();

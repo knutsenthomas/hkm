@@ -5598,3 +5598,105 @@ exports.cleanupBlogDuplicates = onRequest(async (req, res) => {
 
 
 
+
+const { HttpsError } = require("firebase-functions/v2/https");
+
+exports.transcribePodcast = onCall({
+  cors: true,
+  secrets: [geminiApiKeyParam],
+  timeoutSeconds: 540,
+  memory: "1GiB"
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Må være innlogget for å transkribere.');
+  }
+
+  const { audioUrl, episodeId } = request.data;
+  if (!audioUrl || !episodeId) {
+    throw new HttpsError('invalid-argument', 'Mangler audioUrl eller episodeId');
+  }
+
+  const geminiKey = getGeminiApiKey();
+  if (!geminiKey) {
+    throw new HttpsError('internal', 'Gemini API-nøkkel mangler på serveren.');
+  }
+
+  const os = require('os');
+  const fs = require('fs');
+  const path = require('path');
+  const { pipeline } = require('stream');
+  const { promisify } = require('util');
+  const streamPipeline = promisify(pipeline);
+  const fetch = require('node-fetch');
+  const { GoogleAIFileManager } = require("@google/generative-ai/server");
+  const { GoogleGenerativeAI } = require("@google/generative-ai");
+
+  const tmpFilePath = path.join(os.tmpdir(), `podcast_${episodeId}.mp3`);
+
+  try {
+    console.log(`Laster ned podcast ${episodeId} fra ${audioUrl}...`);
+    const response = await fetch(audioUrl);
+    if (!response.ok) throw new Error(`Klarte ikke laste ned: ${response.statusText}`);
+    await streamPipeline(response.body, fs.createWriteStream(tmpFilePath));
+    console.log(`Nedlasting fullført: ${tmpFilePath}`);
+
+    const fileManager = new GoogleAIFileManager(geminiKey);
+    console.log(`Laster opp til Gemini...`);
+    const uploadResult = await fileManager.uploadFile(tmpFilePath, {
+      mimeType: "audio/mpeg",
+      displayName: `Podcast ${episodeId}`,
+    });
+    console.log(`Opplasting fullført. File URI: ${uploadResult.file.uri}`);
+
+    let fileState = uploadResult.file.state;
+    while (fileState === "PROCESSING") {
+      console.log("Venter på prosessering av lydfilen...");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      const getFile = await fileManager.getFile(uploadResult.file.name);
+      fileState = getFile.state;
+      if (fileState === "FAILED") {
+        throw new Error("Gemini prosessering av lydfilen feilet.");
+      }
+    }
+
+    console.log(`Genererer transkripsjon...`);
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+
+    const result = await model.generateContent([
+      {
+        fileData: {
+          mimeType: uploadResult.file.mimeType,
+          fileUri: uploadResult.file.uri
+        }
+      },
+      { text: "Vennligst lag en nøyaktig og ordrett transkripsjon (skriftlig versjon) av denne norske podcast-episoden. Sett inn avsnitt der det er naturlig for å gjøre teksten lett å lese. Bruk riktig tegnsetting og stor forbokstav. Formater teksten med HTML: bruk <p> for avsnitt, og <br> for linjeskift. Ikke inkluder noen overskrift eller markdown-blokker (som ```html), kun den rene HTML-teksten." }
+    ]);
+
+    const transcriptHtml = result.response.text();
+    console.log(`Transkripsjon generert (${transcriptHtml.length} tegn).`);
+
+    try {
+      await fileManager.deleteFile(uploadResult.file.name);
+    } catch (e) {
+      console.warn("Kunne ikke slette fil fra Gemini:", e);
+    }
+
+    await db.collection('podcast_transcripts').doc(episodeId).set({
+      text: transcriptHtml,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      episodeId: episodeId
+    });
+
+    console.log(`Transkripsjon lagret vellykket i Firestore.`);
+    
+    if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath);
+
+    return { success: true, message: "Transkribering fullført" };
+
+  } catch (error) {
+    console.error("Feil under transkribering:", error);
+    if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath);
+    throw new HttpsError('internal', error.message || 'En feil oppstod under transkribering.');
+  }
+});

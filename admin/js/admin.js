@@ -3344,18 +3344,57 @@ class AdminManager {
                     return `
                         <div class="podcast-override-item" style="padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px;">
                             <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${ep.title}">${ep.title}</div>
-                            <div style="display: flex; align-items: center; gap: 10px;">
-                                <select class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 4px 8px; height: auto;">
+                            <div style="display: flex; align-items: center; gap: 10px; justify-content: space-between; width: 100%;">
+                                <select class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 4px 8px; height: auto; max-width: 150px;">
                                     <option value="">Auto (Nøkkelord)</option>
                                     <option value="tro" ${currentCat === 'tro' ? 'selected' : ''}>Tro</option>
                                     <option value="bibel" ${currentCat === 'bibel' ? 'selected' : ''}>Bibel</option>
                                     <option value="bønn" ${currentCat === 'bønn' ? 'selected' : ''}>Bønn</option>
                                     <option value="undervisning" ${currentCat === 'undervisning' ? 'selected' : ''}>Undervisning</option>
                                 </select>
+                                <button class="btn-secondary btn-sm btn-transcribe" data-id="${id}" data-url="${ep.enclosure?.link}" data-title="${ep.title.replace(/"/g, '&quot;')}" style="font-size: 12px; padding: 4px 8px;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">memory</span>
+                                    Transkriber
+                                </button>
                             </div>
                         </div>
                     `;
                 }).join('');
+
+                // Add transcribe click listeners
+                setTimeout(() => {
+                    document.querySelectorAll('.btn-transcribe').forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            const id = e.currentTarget.getAttribute('data-id');
+                            const url = e.currentTarget.getAttribute('data-url');
+                            const title = e.currentTarget.getAttribute('data-title');
+                            
+                            if (!url) {
+                                this.showToast('Fant ingen lydfil for denne episoden.', 'error');
+                                return;
+                            }
+
+                            if (!confirm(`Vil du starte AI-transkribering av "${title}"?\n\nDette kan ta 2-5 minutter avhengig av lengden på podcasten.`)) {
+                                return;
+                            }
+
+                            const originalText = e.currentTarget.innerHTML;
+                            e.currentTarget.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">sync</span> Jobber...';
+                            e.currentTarget.disabled = true;
+
+                            try {
+                                const transcribePodcast = firebase.functions().httpsCallable('transcribePodcast');
+                                const result = await transcribePodcast({ audioUrl: url, episodeId: id });
+                                this.showToast(`Transkribering fullført for "${title}"!`, 'success', 5000);
+                            } catch (err) {
+                                console.error("Transcribe error:", err);
+                                this.showToast(`Feil under transkribering: ${err.message}`, 'error', 5000);
+                            } finally {
+                                e.currentTarget.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">check</span> Ferdig';
+                            }
+                        });
+                    });
+                }, 100);
             } else {
                 listContainer.innerHTML = '<p class="text-muted">Ingen episoder funnet.</p>';
             }
