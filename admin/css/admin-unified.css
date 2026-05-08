@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G34) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G35) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -3540,9 +3540,9 @@ body.admin-body .editor-sidebar-panel {
 }
 
 /* Tables and list wrappers need balanced inset spacing */
-body.admin-body .logs-table-wrap,
-body.crm-body .table-container,
-body.admin-body .table-container {
+body.admin-body .logs-table-wrap:not(.full-bleed),
+body.crm-body .table-container:not(.full-bleed),
+body.admin-body .table-container:not(.full-bleed) {
     padding-left: var(--audit-space-3);
     padding-right: var(--audit-space-3);
     box-sizing: border-box;
@@ -3570,6 +3570,8 @@ body.crm-body .card.modern .table-header,
 #automation-section .automation-tabs {
     padding-left: 24px !important;
     padding-right: 24px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* Logs table: avoid double horizontal inset (container + table wrapper) */
