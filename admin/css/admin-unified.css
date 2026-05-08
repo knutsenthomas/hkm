@@ -4226,16 +4226,33 @@ body.admin-body .nav-link.logout:hover {
 ========================================================================== 
 */
 
-/* 1. Header Layout - Force horizontal flow and spacing */
-.section-header {
+/* 1. Header Layout - Force Gold Standard Dashboard Style */
+.main-header {
+    height: 100px !important;
+    background-color: #f4f7fa !important; /* Match var(--main-bg) */
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 12px 20px !important;
-    height: 72px !important;
+    padding: 0 40px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    border: none !important;
     box-sizing: border-box !important;
-    background: #ffffff !important;
-    border-bottom: 1px solid #f1f5f9 !important;
+}
+
+/* Ensure section-header is transparent and fits perfectly inside main-header */
+.section-header {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 .section-header-content {
@@ -4246,119 +4263,122 @@ body.admin-body .nav-link.logout:hover {
     gap: 16px !important;
 }
 
-/* 2. Actions Group - Profile, Bell, Menu */
+/* 2. Header Elements Alignment */
+.section-header-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 48px !important;
+    height: 48px !important;
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    margin-right: 16px !important;
+    color: #1B4965 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
+}
+
+.section-header-titles {
+    flex: 1 !important;
+}
+
+.section-title {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    line-height: 1.2 !important;
+}
+
+.section-subtitle {
+    font-size: 13px !important;
+    color: #64748b !important;
+    margin: 4px 0 0 0 !important;
+}
+
+/* 3. Actions & Profile */
 .section-header-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
-    flex-shrink: 0 !important;
+    gap: 16px !important;
 }
 
-/* 3. User Profile - Combined Name and Avatar */
 .user-profile-link {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    padding: 4px 4px 4px 12px !important;
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
-    border-radius: 14px !important;
+    padding: 6px 12px !important;
+    border-radius: 16px !important;
+    transition: all 0.3s ease !important;
     text-decoration: none !important;
-    transition: all 0.2s ease !important;
+}
+
+.user-profile-link:hover {
+    background: rgba(27, 73, 101, 0.05) !important;
 }
 
 .user-info-text {
     display: flex !important;
     flex-direction: column !important;
-    align-items: flex-end !important;
     text-align: right !important;
 }
 
 .user-name {
     font-size: 14px !important;
-    font-weight: 700 !important;
-    color: #1B4965 !important;
-    white-space: nowrap !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
 }
 
 .user-role {
-    font-size: 10px !important;
-    font-weight: 700 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
     color: #64748b !important;
     text-transform: uppercase !important;
 }
 
-/* 4. Avatar - The 'TK' Circle */
+/* 4. THE NUCLEAR AVATAR FIX - FORCE INITIALS 'TK' */
 .user-avatar {
-    width: 36px !important;
-    height: 36px !important;
-    background: #1B4965 !important;
-    color: #ffffff !important;
-    border-radius: 10px !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    font-weight: 800 !important;
-    font-size: 14px !important;
-    flex-shrink: 0 !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    line-height: 1 !important;
-}
-
-/* Ensure images inside avatar work too */
-.user-avatar img {
-    width: 100% !important;
-    height: 100% !important;
-    border-radius: 10px !important;
-    object-fit: cover !important;
-    display: block !important;
-}
-
-/* Kill only material icons, keep text/spans */
-.user-avatar .material-symbols-outlined,
-.user-avatar .material-icons {
-    display: none !important;
-}
-
-/* 5. Utility Buttons - Bell and Menu */
-.notification-btn,
-.mobile-nav-toggle {
     width: 42px !important;
     height: 42px !important;
-    border-radius: 12px !important;
-    border: 1px solid #e2e8f0 !important;
-    background: #ffffff !important;
+    background: #1B4965 !important; /* Mørkeblå */
+    color: #ffffff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    color: #475569 !important;
+    border-radius: 50% !important; /* Round like dashboard */
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    position: relative !important;
+    overflow: hidden !important;
 }
 
-/* 6. Mobile Responsiveness - Match Dashboard Standard */
+/* Kill ALL children (spans, icons, images) to reveal the text nodes underneath */
+.user-avatar * {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* Fallback content if empty */
+.user-avatar:empty::before {
+    content: "TK" !important;
+}
+
+/* 5. Mobile Adjustments */
 @media (max-width: 800px) {
-    .user-info-text {
+    .main-header {
+        height: 72px !important;
+        padding: 0 16px !important;
+    }
+    
+    .user-info-text,
+    .section-header-icon,
+    .section-subtitle {
         display: none !important;
     }
     
-    .user-profile-link {
-        padding: 0 !important;
-        background: transparent !important;
-        border: none !important;
-    }
-
-    .user-avatar {
-        width: 42px !important;
-        height: 42px !important;
-        border-radius: 12px !important;
-        border: 1px solid #e2e8f0 !important;
-    }
-
-    .section-header-actions {
-        gap: 8px !important;
-    }
-
-    .section-header {
-        padding: 8px 12px !important;
+    .section-title {
+        font-size: 16px !important;
     }
 }
+/* End of Unified Header Reconstruction */
