@@ -21,6 +21,11 @@
         display: flex !important;
     }
 
+    /* Ensure the workspace is the reference point for absolute elements */
+    body.builder-active .builder-workspace {
+        position: relative !important;
+    }
+
     body.builder-active .builder-tools-fab,
     body.builder-active .fab-menu-container {
         display: none !important;
