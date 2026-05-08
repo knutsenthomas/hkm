@@ -182,6 +182,27 @@
 
     <link rel="stylesheet" href="css/admin-unified.css?v=20260508_GOLD_v4">
 
+    <style>
+        body.admin-logs-page .content-wrapper {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 24px 40px 28px !important;
+            box-sizing: border-box !important;
+        }
+
+        body.admin-logs-page .logs-container {
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            body.admin-logs-page .content-wrapper {
+                padding: 16px !important;
+            }
+        }
+    </style>
+
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
@@ -208,7 +229,7 @@
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
-<body class="admin-body">
+<body class="admin-body admin-logs-page">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
             <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
