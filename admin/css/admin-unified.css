@@ -4572,7 +4572,7 @@ body.builder-active .main-header [id="admin-avatar"] {
     overflow: hidden !important;
 }
 
-@media (min-width: 1025px) {
+@media (min-width: 801px) {
     body.admin-body .main-header .mobile-nav-toggle,
     body.crm-body .main-header .mobile-nav-toggle,
     body.builder-active .main-header .mobile-nav-toggle {
