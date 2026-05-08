@@ -1196,7 +1196,12 @@ function createPlayerBar() {
             left: '0',
             right: '0',
             bottom: '0',
-            zIndex: '26003'
+            zIndex: '26003',
+            background: '#fff',
+            boxShadow: '0 -5px 25px rgba(0, 0, 0, 0.15)',
+            borderTop: '1px solid rgba(15, 23, 42, 0.08)',
+            paddingTop: '10px',
+            paddingBottom: 'calc(10px + env(safe-area-inset-bottom, 0px))'
         });
         bar.classList.add('active');
         fsOverlay.classList.add('active');
@@ -1209,6 +1214,11 @@ function createPlayerBar() {
         playerContainer.style.right = '';
         playerContainer.style.bottom = '';
         playerContainer.style.zIndex = '';
+        playerContainer.style.background = '';
+        playerContainer.style.boxShadow = '';
+        playerContainer.style.borderTop = '';
+        playerContainer.style.paddingTop = '';
+        playerContainer.style.paddingBottom = '';
         fsOverlay.classList.remove('active');
         fsOverlay.style.top = '100vh';
         document.body.style.overflow = '';
