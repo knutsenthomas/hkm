@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G29) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G30) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -398,7 +398,7 @@ h6 {
     display: flex;
     flex-direction: column;
     height: 100%;
-    /* Symmetrical heights in grids */
+    overflow: hidden;
 }
 
 .main-header,
@@ -4212,37 +4212,7 @@ body.admin-body #overview-section .stat-icon-wrap>.material-symbols-outlined {
     text-align: center !important;
 }
 
-/* Contacts table toolbar search: icon on the right side */
-body.crm-body .contacts-grid .table-header .search-box {
-    position: relative;
-}
 
-body.crm-body .contacts-grid .table-header .search-box>.material-symbols-outlined {
-    left: auto !important;
-    right: 12px !important;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
-
-body.crm-body .contacts-grid .table-header .search-box>input {
-    padding-left: 14px !important;
-    padding-right: 42px !important;
-}
-
-/* Segment page list search: icon on the right side */
-body.crm-body .card.modern .table-header .search-box>input#segment-search {
-    padding-left: 14px !important;
-    padding-right: 42px !important;
-}
-
-body.crm-body .card.modern .table-header .search-box>.material-symbols-outlined {
-    left: auto !important;
-    right: 12px !important;
-    top: 50%;
-    transform: translateY(-50%);
-    pointer-events: none;
-}
 
 /* Unify admin dashboard sidebar with the cleaner Segmenter/CRM menu style */
 body.admin-body .sidebar {
@@ -4763,16 +4733,26 @@ body.builder-active .main-header [id="admin-avatar"] {
     }
 }
 /* Global Search Box Fix for icon overlap */
+.search-box {
+    position: relative !important;
+    display: inline-block !important;
+}
+
 .search-box input {
     padding-left: 52px !important;
+    padding-right: 16px !important;
 }
 
 .search-box .material-symbols-outlined {
-    position: absolute;
-    left: 18px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #64748b;
-    pointer-events: none;
-    z-index: 1;
+    position: absolute !important;
+    left: 16px !important;
+    right: auto !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    color: #64748b !important;
+    pointer-events: none !important;
+    z-index: 10 !important;
+    display: block !important;
 }
+
+/* End of file */

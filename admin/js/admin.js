@@ -3724,7 +3724,7 @@ class AdminManager {
                                 Rediger
                             </button>
                             <button type="button" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
-                                style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s;" 
+                                style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s; display: inline-flex; align-items: center; justify-content: center;" 
                                 onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                             </button>
