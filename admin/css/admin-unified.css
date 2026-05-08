@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G35) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G36) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -1968,7 +1968,7 @@ body.admin-body .welcome-subtitle {
 
 .automation-pane {
     display: none;
-    padding: 24px;
+    padding: 0;
 }
 
 .automation-pane.active {
