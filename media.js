@@ -489,6 +489,16 @@ const PODCAST_KEYWORDS = {
     undervisning: ["undervisning", "lære", "serie", "studie", "disippel", "lærling"]
 };
 
+const PODCAST_SUMMARY_OVERRIDES = {
+    "7b7726b7-1b5b-4aa1-9d2e-a27cde5ef48e": `
+        <div class="podcast-summary-rich" style="display:flex; flex-direction:column; gap:10px; line-height:1.75; color:var(--text-dark);">
+            <p><strong>Episode 47</strong> er en rolig og sammenhengende lydboklesning av <strong>2. Petersbrev</strong>, med musikk i bakgrunnen som gir rom for refleksjon.</p>
+            <p>Fokuset i teksten er å <em>stå fast i troen</em>, vokse i åndelig modenhet og holde blikket festet på Jesus i en tid med press og villfarelse.</p>
+            <p style="margin:0;"><strong>Passer godt for:</strong> personlig andakt, stillhet med Bibelen og fordypning i Det nye testamentet.</p>
+        </div>
+    `
+};
+
 function asText(value) {
     if (Array.isArray(value)) {
         return value[0] || '';
@@ -547,6 +557,48 @@ function getEpisodeCategory(episode) {
         }
     }
     return 'other';
+}
+
+function getEpisodeSummaryHtml(episodeData) {
+    if (!episodeData) {
+        return '<p>Ingen oppsummering tilgjengelig.</p>';
+    }
+
+    const episodeId = String(episodeData.id || '').trim();
+    if (episodeId && PODCAST_SUMMARY_OVERRIDES[episodeId]) {
+        return PODCAST_SUMMARY_OVERRIDES[episodeId];
+    }
+
+    const summaryText = String(episodeData.description || '').trim();
+    if (!summaryText) {
+        return '<p>Ingen oppsummering tilgjengelig.</p>';
+    }
+
+    return `<p style="line-height:1.75;">${summaryText}</p>`;
+}
+
+function getFormattedTranscriptHtml(rawTranscriptHtml) {
+    const source = String(rawTranscriptHtml || '').trim();
+    if (!source) {
+        return '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+    }
+
+    const hasHtml = /<[^>]+>/.test(source);
+    const normalized = hasHtml
+        ? source
+        : source
+            .split(/\n\s*\n/)
+            .map(paragraph => paragraph.trim())
+            .filter(Boolean)
+            .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
+            .join('');
+
+    return `
+        <div class="transcript-content" style="line-height: 1.9; color: var(--text-dark);">
+            <p style="margin:0 0 14px;"><strong>Teksting</strong> fra episoden:</p>
+            ${normalized}
+        </div>
+    `;
 }
 
 async function initPodcastRSS() {
@@ -739,7 +791,7 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
             firebase.firestore().collection('podcast_transcripts').doc(transcriptEpisode.id).get()
                 .then(doc => {
                     if (doc.exists && doc.data().text) {
-                        fsTranscript.innerHTML = `<div class="transcript-content" style="line-height: 1.8;">${doc.data().text}</div>`;
+                        fsTranscript.innerHTML = getFormattedTranscriptHtml(doc.data().text);
                     } else {
                         fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
                     }
@@ -775,7 +827,7 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
         
         if (fsTitle && episodeData) {
             fsTitle.textContent = title;
-            fsSummary.innerHTML = episodeData.description || 'Ingen oppsummering tilgjengelig.';
+            fsSummary.innerHTML = getEpisodeSummaryHtml(episodeData);
             if (fsArtwork) fsArtwork.src = thumbnail;
             loadEpisodeTranscript(episodeData);
         }
