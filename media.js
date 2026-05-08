@@ -777,6 +777,10 @@ async function initPodcastRSS() {
 }
 
 function initPodcastControls() {
+
+        if (window.location.pathname.includes('/podcast')) {
+            ensurePodcastBarVisibleOnPodcastPage();
+        }
     const filterButtons = document.querySelectorAll('#podcast-categories [data-filter]');
     const sortSelect = document.getElementById('podcast-sort-select');
 
@@ -794,6 +798,25 @@ function initPodcastControls() {
             currentPodcastSort = e.target.value;
             renderPodcastEpisodes();
         });
+    }
+}
+
+function ensurePodcastBarVisibleOnPodcastPage() {
+    let bar = document.getElementById('podcast-player-bar');
+    if (!bar) {
+        createPlayerBar();
+        bar = document.getElementById('podcast-player-bar');
+    }
+
+    if (!bar) return;
+
+    bar.classList.add('active');
+
+    if (!currentAudio) {
+        const title = bar.querySelector('.player-info-title');
+        if (title) {
+            title.textContent = t('selectEpisode');
+        }
     }
 }
 
@@ -1261,7 +1284,9 @@ function createPlayerBar() {
 
     bar.querySelector('.player-close').addEventListener('click', () => {
         audio.pause();
-        bar.classList.remove('active');
+        if (!window.location.pathname.includes('/podcast')) {
+            bar.classList.remove('active');
+        }
         updatePlayIcons(false);
     });
 }
