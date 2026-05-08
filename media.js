@@ -798,6 +798,9 @@ function applyFullscreenPlayerLayout(bar) {
     const fsTitle = bar.querySelector('.fullscreen-title');
     const fsSections = bar.querySelectorAll('.fs-summary-container, .fs-transcript-container');
     const fsSectionTitles = bar.querySelectorAll('.fs-section-title');
+    const pageHeader = document.getElementById('header');
+    const closeButtonSpacing = window.innerWidth < 768 ? 12 : 20;
+    const xCloseTopOffset = `${(pageHeader?.offsetHeight || 100) + closeButtonSpacing}px`;
 
     Object.assign(fsOverlay.style, {
         position: 'fixed',
@@ -815,7 +818,7 @@ function applyFullscreenPlayerLayout(bar) {
 
     Object.assign(fsXCloseBtn.style, {
         position: 'absolute',
-        top: '16px',
+        top: xCloseTopOffset,
         right: '16px',
         width: '46px',
         height: '46px',
