@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G28) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G29) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -3551,20 +3551,25 @@ body.admin-body .table-container {
 }
 
 .table-container.full-bleed {
+    margin-left: -24px !important;
+    margin-right: -24px !important;
+    width: calc(100% + 48px) !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
 }
 
 /* Contacts table: avoid double horizontal inset (card + table container) */
 body.crm-body .contacts-grid.card.modern .table-container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    margin-left: -24px !important;
+    margin-right: -24px !important;
+    width: calc(100% + 48px) !important;
 }
 
 /* Logs table: avoid double horizontal inset (container + table wrapper) */
 body.admin-body .logs-container .logs-table-wrap {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
+    margin-left: -24px !important;
+    margin-right: -24px !important;
+    width: calc(100% + 48px) !important;
 }
 
 /* 8px system for headers/body spacing */
@@ -4756,4 +4761,18 @@ body.builder-active .main-header [id="admin-avatar"] {
         min-width: auto !important;
         box-shadow: none !important;
     }
+}
+/* Global Search Box Fix for icon overlap */
+.search-box input {
+    padding-left: 52px !important;
+}
+
+.search-box .material-symbols-outlined {
+    position: absolute;
+    left: 18px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #64748b;
+    pointer-events: none;
+    z-index: 1;
 }
