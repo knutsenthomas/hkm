@@ -3315,40 +3315,6 @@ class AdminManager {
         }
     }
 
-    async ensureFirebaseFunctions() {
-        if (typeof firebase === 'undefined') {
-            throw new Error('Firebase SDK er ikke lastet inn. Last inn siden på nytt.');
-        }
-
-        if (typeof firebase.functions === 'function') {
-            return firebase.functions;
-        }
-
-        await new Promise((resolve, reject) => {
-            const existingScript = document.querySelector('script[src*="firebase-functions-compat.js"]');
-
-            if (existingScript) {
-                existingScript.addEventListener('load', resolve, { once: true });
-                existingScript.addEventListener('error', () => reject(new Error('Kunne ikke laste Firebase Functions.')), { once: true });
-                setTimeout(resolve, 1000);
-                return;
-            }
-
-            const script = document.createElement('script');
-            script.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js';
-            script.async = true;
-            script.onload = resolve;
-            script.onerror = () => reject(new Error('Kunne ikke laste Firebase Functions.'));
-            document.head.appendChild(script);
-        });
-
-        if (typeof firebase.functions !== 'function') {
-            throw new Error('Firebase Functions er ikke tilgjengelig. Last inn siden på nytt og prøv igjen.');
-        }
-
-        return firebase.functions;
-    }
-
     async loadPodcastOverrides() {
         const listContainer = document.getElementById('podcast-overrides-list');
         if (!listContainer) return;
@@ -3386,67 +3352,10 @@ class AdminManager {
                                     <option value="bønn" ${currentCat === 'bønn' ? 'selected' : ''}>Bønn</option>
                                     <option value="undervisning" ${currentCat === 'undervisning' ? 'selected' : ''}>Undervisning</option>
                                 </select>
-                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
-                                    <button class="btn-secondary btn-sm btn-paste-transcript" data-id="${id}" data-title="${ep.title.replace(/"/g, '&quot;')}" style="font-size: 12px; padding: 4px 8px;">
-                                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">edit_note</span>
-                                        Lim inn teksting
-                                    </button>
-                                    <button class="btn-secondary btn-sm btn-transcribe" data-id="${id}" data-url="${ep.enclosure?.link}" data-title="${ep.title.replace(/"/g, '&quot;')}" style="font-size: 12px; padding: 4px 8px;">
-                                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">memory</span>
-                                        Transkriber
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     `;
                 }).join('');
-
-                // Add transcribe click listeners
-                setTimeout(() => {
-                    document.querySelectorAll('.btn-paste-transcript').forEach(btn => {
-                        btn.addEventListener('click', (e) => {
-                            const button = e.currentTarget;
-                            const id = button.getAttribute('data-id');
-                            const title = button.getAttribute('data-title');
-                            this.openPodcastTranscriptModal(id, title);
-                        });
-                    });
-
-                    document.querySelectorAll('.btn-transcribe').forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            const button = e.currentTarget;
-                            const id = button.getAttribute('data-id');
-                            const url = button.getAttribute('data-url');
-                            const title = button.getAttribute('data-title');
-                            
-                            if (!url) {
-                                this.showToast('Fant ingen lydfil for denne episoden.', 'error');
-                                return;
-                            }
-
-                            if (!confirm(`Vil du starte AI-transkribering av "${title}"?\n\nDette kan ta 2-5 minutter avhengig av lengden på podcasten.`)) {
-                                return;
-                            }
-
-                            const originalText = button.innerHTML;
-                            button.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">sync</span> Jobber...';
-                            button.disabled = true;
-
-                            try {
-                                const functionsFactory = await this.ensureFirebaseFunctions();
-                                const transcribePodcast = functionsFactory().httpsCallable('transcribePodcast');
-                                await transcribePodcast({ audioUrl: url, episodeId: id });
-                                this.showToast(`Transkribering fullført for "${title}"!`, 'success', 5000);
-                                button.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">check</span> Ferdig';
-                            } catch (err) {
-                                console.error("Transcribe error:", err);
-                                this.showToast(`Feil under transkribering: ${this.getTranscriptionErrorMessage(err)}`, 'error', 5000);
-                                button.innerHTML = originalText;
-                                button.disabled = false;
-                            }
-                        });
-                    });
-                }, 100);
             } else {
                 listContainer.innerHTML = '<p class="text-muted">Ingen episoder funnet.</p>';
             }
@@ -3483,123 +3392,6 @@ class AdminManager {
             btn.textContent = 'Lagre overstyringer';
             btn.disabled = false;
         }
-    }
-
-    getTranscriptionErrorMessage(error) {
-        const details = typeof error?.details === 'string' ? error.details.trim() : '';
-        const message = typeof error?.message === 'string' ? error.message.trim() : '';
-
-        if (details) return details;
-
-        if (message) {
-            return message.replace(/^\[[^\]]+\]\s*/,'');
-        }
-
-        return 'En feil oppstod under transkribering.';
-    }
-
-    formatTranscriptHtml(transcriptText) {
-        const text = typeof transcriptText === 'string' ? transcriptText.trim() : '';
-        if (!text) return '';
-
-        const safeText = this.escapeHtml(text);
-        return safeText
-            .split(/\n\s*\n/)
-            .map(block => block.trim())
-            .filter(Boolean)
-            .map(block => `<p>${block.replace(/\n/g, '<br>')}</p>`)
-            .join('');
-    }
-
-    openPodcastTranscriptModal(episodeId, title) {
-        const modal = this._ensureDetailModal();
-        const titleEl = modal.querySelector('#admin-detail-title');
-        const metaEl = modal.querySelector('#admin-detail-meta');
-        const bodyEl = modal.querySelector('#admin-detail-body');
-        const actionsEl = modal.querySelector('#admin-detail-actions');
-
-        if (!titleEl || !metaEl || !bodyEl || !actionsEl) return;
-
-        titleEl.textContent = 'Lagre podcast-teksting';
-        metaEl.textContent = title || episodeId;
-        bodyEl.innerHTML = `
-            <div class="admin-detail-row">
-                <div class="admin-detail-label">Episode-ID</div>
-                <div class="admin-detail-value admin-detail-value--box" style="font-family: monospace; font-size: 0.85rem;">${this.escapeHtml(episodeId)}</div>
-            </div>
-            <div class="admin-detail-row">
-                <div class="admin-detail-label">Teksting</div>
-                <div class="admin-detail-value" style="padding: 0; background: transparent; border: 0; box-shadow: none;">
-                    <p style="margin: 0 0 10px; color: #64748b; line-height: 1.5;">Lim inn tekst fra Spotify for Creators. Linjeskift og avsnitt blir bevart når teksten lagres.</p>
-                    <textarea id="podcast-transcript-input" class="form-control" rows="16" placeholder="Lim inn transkripsjonen her..." style="width: 100%; min-height: 320px; resize: vertical;"></textarea>
-                </div>
-            </div>
-        `;
-
-        actionsEl.style.display = 'flex';
-        actionsEl.style.justifyContent = 'space-between';
-        actionsEl.innerHTML = `
-            <button type="button" class="btn btn-ghost admin-transcript-cancel-btn">Avbryt</button>
-            <button type="button" class="btn btn-primary admin-transcript-save-btn">
-                <span class="material-symbols-outlined">save</span> Lagre teksting
-            </button>
-        `;
-
-        const closeModal = () => {
-            modal.classList.remove('is-open');
-            modal.setAttribute('aria-hidden', 'true');
-        };
-
-        const textarea = bodyEl.querySelector('#podcast-transcript-input');
-        const cancelBtn = actionsEl.querySelector('.admin-transcript-cancel-btn');
-        const saveBtn = actionsEl.querySelector('.admin-transcript-save-btn');
-
-        if (cancelBtn) {
-            cancelBtn.onclick = () => closeModal();
-        }
-
-        if (saveBtn) {
-            saveBtn.onclick = async () => {
-                const rawTranscript = textarea?.value || '';
-                const transcriptHtml = this.formatTranscriptHtml(rawTranscript);
-
-                if (!transcriptHtml) {
-                    this.showToast('Lim inn tekstingen før du lagrer.', 'error', 4000);
-                    textarea?.focus();
-                    return;
-                }
-
-                saveBtn.disabled = true;
-                saveBtn.innerHTML = '<span class="material-symbols-outlined">sync</span> Lagrer...';
-
-                try {
-                    if (!firebaseService?.db) {
-                        throw new Error('Firestore er ikke tilgjengelig akkurat nå.');
-                    }
-
-                    await firebaseService.db.collection('podcast_transcripts').doc(episodeId).set({
-                        text: transcriptHtml,
-                        rawText: rawTranscript.trim(),
-                        source: 'spotify-creators-manual',
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        episodeId
-                    }, { merge: true });
-
-                    closeModal();
-                    this.showToast(`Teksting lagret for "${title}".`, 'success', 5000);
-                } catch (err) {
-                    console.error('Save transcript error:', err);
-                    this.showToast(`Kunne ikke lagre teksting: ${err.message || 'Ukjent feil'}`, 'error', 5000);
-                } finally {
-                    saveBtn.disabled = false;
-                    saveBtn.innerHTML = '<span class="material-symbols-outlined">save</span> Lagre teksting';
-                }
-            };
-        }
-
-        modal.classList.add('is-open');
-        modal.setAttribute('aria-hidden', 'false');
-        setTimeout(() => textarea?.focus(), 50);
     }
 
     /**
