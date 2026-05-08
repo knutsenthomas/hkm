@@ -2433,9 +2433,10 @@ body.admin-body .page-title {
     }
 
     .user-profile-link {
-        width: 42px !important;
+        width: auto !important;
+        min-width: 42px !important;
         height: 42px !important;
-        padding: 0 !important;
+        padding: 0 4px !important;
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
@@ -2495,16 +2496,31 @@ body.admin-body .page-title {
 }
 
 /* Force square 12px buttons with correct colors */
-.user-profile-link,
 .notification-btn,
 .mobile-nav-toggle {
     width: 42px !important;
     height: 42px !important;
     border-radius: 12px !important;
     padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
     justify-content: center !important;
     border: 1px solid rgba(0,0,0,0.05) !important;
     flex-shrink: 0 !important;
+}
+
+.user-profile-link {
+    width: auto !important;
+    min-width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+    padding: 0 4px 0 12px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    flex-shrink: 0 !important;
+    gap: 8px !important;
 }
 
 .user-profile-link {
