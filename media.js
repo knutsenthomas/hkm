@@ -748,7 +748,10 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
             if (fsTranscript) {
                 fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ser etter transkripsjon...</p>';
                 const svc = window.firebaseService;
-                if (svc && svc.isInitialized && episodeData.id) {
+                if (svc && !svc.isInitialized && typeof svc.tryAutoInit === 'function') {
+                    svc.tryAutoInit();
+                }
+                if (svc && svc.isInitialized && episodeData.id && typeof firebase !== 'undefined') {
                     // Try to fetch transcript from backend
                     firebase.firestore().collection('podcast_transcripts').doc(episodeData.id).get()
                         .then(doc => {
@@ -783,6 +786,119 @@ function updatePlayIcons(isPlaying, activeBtn) {
         const barPlayIcon = document.querySelector('.player-control-play i');
         if (barPlayIcon) barPlayIcon.className = 'fas fa-pause';
     }
+}
+
+function applyFullscreenPlayerLayout(bar) {
+    const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
+    const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
+    const fsHeader = bar.querySelector('.fs-header');
+    const fsContent = bar.querySelector('.fs-scrollable-content');
+    const fsArtworkContainer = bar.querySelector('.fs-artwork-container');
+    const fsArtwork = bar.querySelector('.fullscreen-artwork');
+    const fsTitle = bar.querySelector('.fullscreen-title');
+    const fsSections = bar.querySelectorAll('.fs-summary-container, .fs-transcript-container');
+    const fsSectionTitles = bar.querySelectorAll('.fs-section-title');
+
+    Object.assign(fsOverlay.style, {
+        position: 'fixed',
+        top: '100vh',
+        left: '0',
+        width: '100vw',
+        height: '100vh',
+        background: '#fff',
+        zIndex: '26000',
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden',
+        transition: 'top 0.4s cubic-bezier(0.19, 1, 0.22, 1)'
+    });
+
+    Object.assign(fsXCloseBtn.style, {
+        position: 'absolute',
+        top: '16px',
+        right: '16px',
+        width: '46px',
+        height: '46px',
+        borderRadius: '999px',
+        border: '1px solid rgba(15, 23, 42, 0.12)',
+        background: 'rgba(255, 255, 255, 0.96)',
+        color: '#26384c',
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '18px',
+        zIndex: '26002',
+        boxShadow: '0 10px 28px rgba(15, 23, 42, 0.16)'
+    });
+
+    Object.assign(fsHeader.style, {
+        display: 'flex',
+        justifyContent: 'flex-end',
+        padding: '18px 20px',
+        background: '#f8f9fa',
+        borderBottom: '1px solid #eee',
+        flex: '0 0 auto'
+    });
+
+    Object.assign(fsContent.style, {
+        flex: '1 1 auto',
+        overflowY: 'auto',
+        width: '100%',
+        maxWidth: '860px',
+        margin: '0 auto',
+        padding: 'clamp(24px, 5vw, 42px) clamp(15px, 4vw, 24px) 110px',
+        boxSizing: 'border-box'
+    });
+
+    Object.assign(fsArtworkContainer.style, {
+        width: '100%',
+        maxWidth: '300px',
+        margin: '0 auto 30px',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)'
+    });
+
+    Object.assign(fsArtwork.style, {
+        display: 'block',
+        width: '100%',
+        aspectRatio: '1 / 1',
+        objectFit: 'cover'
+    });
+
+    Object.assign(fsTitle.style, {
+        margin: '0 auto 38px',
+        maxWidth: '15ch',
+        color: '#26384c',
+        fontSize: 'clamp(2rem, 5vw, 3rem)',
+        fontWeight: '800',
+        lineHeight: '1.12',
+        letterSpacing: '0',
+        textAlign: 'center'
+    });
+
+    fsSections.forEach(section => {
+        Object.assign(section.style, {
+            marginBottom: '28px',
+            background: '#fcfcfc',
+            padding: 'clamp(24px, 4vw, 36px)',
+            borderRadius: '14px',
+            border: '1px solid #edf1f4',
+            boxShadow: '0 14px 34px rgba(15, 23, 42, 0.06)'
+        });
+    });
+
+    fsSectionTitles.forEach(title => {
+        Object.assign(title.style, {
+            display: 'inline-block',
+            margin: '0 0 18px',
+            paddingBottom: '5px',
+            borderBottom: '2px solid #d17d39',
+            color: '#26384c',
+            fontSize: '1.25rem',
+            fontWeight: '800'
+        });
+    });
 }
 
 function createPlayerBar() {
@@ -837,6 +953,7 @@ function createPlayerBar() {
         </div>
     `;
     document.body.appendChild(bar);
+    applyFullscreenPlayerLayout(bar);
 
     const audio = document.getElementById('global-audio-element');
     const playBtn = bar.querySelector('.player-control-play');
@@ -853,10 +970,12 @@ function createPlayerBar() {
 
     function openFs() {
         fsOverlay.classList.add('active');
+        fsOverlay.style.top = '0';
         document.body.style.overflow = 'hidden';
     }
     function closeFs() {
         fsOverlay.classList.remove('active');
+        fsOverlay.style.top = '100vh';
         document.body.style.overflow = '';
     }
 
