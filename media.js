@@ -593,12 +593,61 @@ function getFormattedTranscriptHtml(rawTranscriptHtml) {
             .map(paragraph => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
             .join('');
 
+    const enhanced = enhanceTranscriptRichFormatting(normalized);
+
     return `
         <div class="transcript-content" style="line-height: 1.9; color: var(--text-dark);">
             <p style="margin:0 0 14px;"><strong>Teksting</strong> fra episoden:</p>
-            ${normalized}
+            ${enhanced}
         </div>
     `;
+}
+
+function isTranscriptChapterHeading(text) {
+    const value = String(text || '').trim();
+    if (!value) return false;
+
+    return /^(?:\d+\.\s*)?[\wÆØÅæøå\s-]+\s+kapittel\s+\d+(?:\s*[-:]\s*.*)?$/i.test(value)
+        || /^(?:kapittel|kap\.)\s*\d+(?:\s*[-:]\s*.*)?$/i.test(value);
+}
+
+function enhanceTranscriptRichFormatting(html) {
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = html;
+
+    wrapper.querySelectorAll('p').forEach((paragraph) => {
+        const text = String(paragraph.textContent || '').trim();
+        if (!text) return;
+
+        if (isTranscriptChapterHeading(text)) {
+            const heading = document.createElement('h4');
+            heading.className = 'transcript-chapter-heading';
+            heading.style.margin = '26px 0 12px';
+            heading.style.fontSize = '1.15rem';
+            heading.style.fontWeight = '800';
+            heading.style.color = '#1f3348';
+            heading.style.letterSpacing = '0.01em';
+            heading.style.borderLeft = '4px solid #d17d39';
+            heading.style.paddingLeft = '10px';
+            heading.textContent = text;
+            paragraph.replaceWith(heading);
+            return;
+        }
+
+        const containsInlineHtml = /<[^>]+>/.test(paragraph.innerHTML || '');
+        if (containsInlineHtml) return;
+
+        const verseMatch = text.match(/^(\d{1,3})([.:])\s+(.+)$/);
+        if (!verseMatch) return;
+
+        paragraph.textContent = '';
+        const verseNumber = document.createElement('strong');
+        verseNumber.textContent = `${verseMatch[1]}${verseMatch[2]}`;
+        paragraph.appendChild(verseNumber);
+        paragraph.appendChild(document.createTextNode(` ${verseMatch[3]}`));
+    });
+
+    return wrapper.innerHTML;
 }
 
 async function initPodcastRSS() {
