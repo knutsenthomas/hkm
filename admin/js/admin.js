@@ -3402,7 +3402,7 @@ class AdminManager {
         if (!section) return;
 
         section.innerHTML = `
-            ${this.renderSectionHeader('description', 'Sideinnhold', 'Rediger tekst på de faste sidene.', '')}
+
             <div class="content-editor-grid">
                 <aside class="content-sidebar card">
                     <div class="content-sidebar-head">
