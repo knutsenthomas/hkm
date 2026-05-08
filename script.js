@@ -3278,6 +3278,15 @@ window.addEventListener('load', () => {
                     grid-column: span 2 !important;
                 }
             }
+            /* Move chat button above podcast player bar when it's active */
+            body:has(#podcast-player-bar.active) #hkm-visitor-chat-widget:not(.open) {
+                bottom: 100px !important;
+            }
+            @media (max-width: 480px) {
+                body:has(#podcast-player-bar.active) #hkm-visitor-chat-widget:not(.open) {
+                    bottom: 92px !important;
+                }
+            }
         `;
         document.head.appendChild(style);
     }
