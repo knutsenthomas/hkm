@@ -4600,10 +4600,13 @@ body.builder-active .main-header [id="admin-avatar"] {
 
     body.admin-body .main-header,
     body.crm-body .main-header,
-    body.builder-active .main-header {
+    body.builder-active .main-header,
+    body.admin-body #dashboard-main-header,
+    body.crm-body #dashboard-main-header,
+    body.builder-active #dashboard-main-header {
         height: 64px !important;
         min-height: 64px !important;
-        padding: 0px !important;
+        padding: 0 10px !important;
     }
 
     body.admin-body .main-header .section-header-icon,
