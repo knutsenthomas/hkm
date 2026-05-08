@@ -432,6 +432,10 @@ body.builder-active .builder-workspace > .editor-toolbar {
     flex-wrap: wrap;
 }
 
+body.builder-active .builder-workspace {
+    padding-top: 0 !important;
+}
+
 body.builder-active .builder-workspace > .editor-toolbar .toolbar-left,
 body.builder-active .builder-workspace > .editor-toolbar .toolbar-center,
 body.builder-active .builder-workspace > .editor-toolbar .toolbar-right {

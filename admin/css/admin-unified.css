@@ -4402,6 +4402,12 @@ body.builder-active .user-role {
         display: none !important;
     }
 }
+
+/* Newsletter builder uses the global admin header as its first workspace child.
+   The generic builder spacing pushed that header 24px down and made it look taller. */
+body.builder-active .builder-workspace {
+    padding-top: 0 !important;
+}
 /* End of Unified Header Reconstruction */
 
 /* 
