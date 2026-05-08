@@ -184,7 +184,6 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger.html', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
             { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
             { label: 'Nyhetsbrev', icon: 'mail_outline', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
-            { label: 'Push-varslinger', icon: 'send_to_mobile', section: 'kommunikasjon', category: 'kommunikasjon', id: 'nav-kommunikasjon-hidden' },
             { header: 'administrasjon', label: 'Administrasjon' },
             { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },
             { label: 'Brukere', icon: 'group', section: 'users', category: 'administrasjon' },
