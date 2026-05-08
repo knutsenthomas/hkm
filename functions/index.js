@@ -7,6 +7,7 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
 const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 const admin = require("firebase-admin");
+const { FieldValue, Timestamp } = require("firebase-admin/firestore");
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const os = require("os");
@@ -27,7 +28,7 @@ const db = admin.firestore();
 const streamPipeline = promisify(pipeline);
 const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
 const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
-const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 1;
+const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 2;
 
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
@@ -1248,9 +1249,9 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = ""
     audioUrl,
     status: "processing",
     source: transcriptSource,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-    lastAttemptAt: admin.firestore.FieldValue.serverTimestamp(),
-    attemptCount: admin.firestore.FieldValue.increment(1),
+    updatedAt: FieldValue.serverTimestamp(),
+    lastAttemptAt: FieldValue.serverTimestamp(),
+    attemptCount: FieldValue.increment(1),
   }, { merge: true });
 
   try {
@@ -1345,16 +1346,16 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = ""
       audioUrl,
       source: transcriptSource,
       status: "completed",
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      completedAt: admin.firestore.FieldValue.serverTimestamp(),
-      lastError: admin.firestore.FieldValue.delete(),
-      nextRetryAt: admin.firestore.FieldValue.delete(),
+      updatedAt: FieldValue.serverTimestamp(),
+      completedAt: FieldValue.serverTimestamp(),
+      lastError: FieldValue.delete(),
+      nextRetryAt: FieldValue.delete(),
     }, { merge: true });
 
     console.log(`Transkripsjon lagret vellykket i Firestore.`);
     return { success: true, message: "Transkribering fullført" };
   } catch (error) {
-    const retryAt = admin.firestore.Timestamp.fromMillis(Date.now() + PODCAST_TRANSCRIPT_RETRY_MS);
+    const retryAt = Timestamp.fromMillis(Date.now() + PODCAST_TRANSCRIPT_RETRY_MS);
     await transcriptRef.set({
       episodeId,
       title: episodeTitle || null,
@@ -1363,7 +1364,7 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = ""
       status: isGeminiRateLimitError(error) ? "deferred" : "failed",
       lastError: getTranscriptionErrorMessage(error),
       nextRetryAt: retryAt,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: FieldValue.serverTimestamp(),
     }, { merge: true });
     throw error;
   } finally {
@@ -5895,7 +5896,7 @@ exports.scheduledPodcastTranscription = onSchedule({
   memory: "1GiB",
   secrets: [geminiApiKeyParam]
 }, async () => {
-  const episodes = await fetchPodcastEpisodesFromRss(5);
+  const episodes = await fetchPodcastEpisodesFromRss(Number.MAX_SAFE_INTEGER);
   const nowMs = Date.now();
   let processedCount = 0;
 
