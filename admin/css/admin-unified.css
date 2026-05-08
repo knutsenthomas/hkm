@@ -9,15 +9,23 @@ body.builder-active *:not(.material-symbols-outlined) {
 /* Fix Sidebar Logo Alignment */
 body.builder-active .sidebar-header,
 body.builder-active .logo-container,
-body.builder-active .sidebar-brand {
+body.builder-active .sidebar-brand,
+body.builder-active .logo {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
 }
 
 body.builder-active .logo-img,
-body.builder-active .sidebar-logo {
-    margin-bottom: 0 !important;
+body.builder-active .sidebar-logo,
+body.builder-active .logo img {
+    margin: 0 !important;
+    display: block !important;
+}
+
+body.builder-active .logo-text {
+    margin: 0 !important;
+    line-height: 1 !important;
 }
 
 body.builder-active .toolbar-action-btn,
