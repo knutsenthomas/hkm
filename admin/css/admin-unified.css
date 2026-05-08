@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G30) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G31) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -3551,25 +3551,42 @@ body.admin-body .table-container {
 }
 
 .table-container.full-bleed {
-    margin-left: -24px !important;
-    margin-right: -24px !important;
-    width: calc(100% + 48px) !important;
+    width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+/* Contacts & Segments table: avoid double horizontal inset (card + table container) */
+body.crm-body .contacts-grid.card.modern,
+body.admin-body .contacts-grid.card.modern,
+body.crm-body .card.modern:has(.table-container) {
     padding-left: 0 !important;
     padding-right: 0 !important;
 }
 
-/* Contacts table: avoid double horizontal inset (card + table container) */
-body.crm-body .contacts-grid.card.modern .table-container {
-    margin-left: -24px !important;
-    margin-right: -24px !important;
-    width: calc(100% + 48px) !important;
+body.crm-body .contacts-grid.card.modern .table-header,
+body.admin-body .contacts-grid.card.modern .table-header,
+body.crm-body .card.modern .table-header {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
 }
 
 /* Logs table: avoid double horizontal inset (container + table wrapper) */
+body.admin-body .logs-container {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+body.admin-body .logs-container .logs-header {
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+}
+
 body.admin-body .logs-container .logs-table-wrap {
-    margin-left: -24px !important;
-    margin-right: -24px !important;
-    width: calc(100% + 48px) !important;
+    width: 100% !important;
+    margin: 0 !important;
 }
 
 /* 8px system for headers/body spacing */
@@ -4733,17 +4750,21 @@ body.builder-active .main-header [id="admin-avatar"] {
     }
 }
 /* Global Search Box Fix for icon overlap */
-.search-box {
+.search-box, .threads-search {
     position: relative !important;
-    display: inline-block !important;
+    display: inline-flex !important;
+    align-items: center !important;
 }
 
-.search-box input {
+.search-box input, .threads-search input {
     padding-left: 52px !important;
     padding-right: 16px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    text-indent: 0 !important;
 }
 
-.search-box .material-symbols-outlined {
+.search-box .material-symbols-outlined, .threads-search .material-symbols-outlined {
     position: absolute !important;
     left: 16px !important;
     right: auto !important;
@@ -4753,6 +4774,8 @@ body.builder-active .main-header [id="admin-avatar"] {
     pointer-events: none !important;
     z-index: 10 !important;
     display: block !important;
+    font-size: 20px !important;
+    line-height: 1 !important;
 }
 
 /* End of file */
