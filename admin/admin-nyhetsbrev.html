@@ -48,38 +48,78 @@
 <body class="builder-active">
     <div class="builder-app-container">
         <!-- 1. Nav-Rail (Extreme Left) -->
-        <nav class="builder-nav-rail">
-            <div class="rail-top">
-                <div class="rail-logo">
-                    <img src="/img/logo-hkm.png" alt="HKM">
+        <!-- Sidebar Navigation (Standardized) -->
+        <aside class="sidebar">
+            <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="logo" style="margin-bottom: 0;">
+                    <img src="/img/logo-hkm.png" alt="HKM Logo">
+                    <h1 class="logo-text">HKM Studio</h1>
                 </div>
                 <button id="mobile-sidebar-close" style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;" class="mobile-sidebar-close-btn">
                     <span class="material-symbols-outlined">close</span>
                 </button>
             </div>
-            <div class="rail-middle">
-                <a href="/admin" class="rail-item" title="Dashboard">
-                    <span class="material-symbols-outlined">grid_view</span>
-                </a>
-                <a href="/admin#content" class="rail-item" title="Sider">
-                    <span class="material-symbols-outlined">description</span>
-                </a>
-                <a href="/admin#media" class="rail-item" title="Media">
-                    <span class="material-symbols-outlined">image</span>
-                </a>
-                <a href="/admin/admin-meldinger" class="rail-item active" title="Meldinger">
-                    <span class="material-symbols-outlined">mail</span>
-                </a>
-                <a href="/admin#users" class="rail-item" title="Brukere">
-                    <span class="material-symbols-outlined">group</span>
-                </a>
-            </div>
-            <div class="rail-bottom">
-                <a href="/admin#settings" class="rail-item" title="Innstillinger">
-                    <span class="material-symbols-outlined">settings</span>
-                </a>
-            </div>
-        </nav>
+
+            <nav class="sidebar-nav">
+                <div class="nav-group">
+                    <div class="nav-group-header">Hovedmeny</div>
+                    <ul class="nav-list">
+                        <li class="nav-item">
+                            <a href="/admin" class="nav-link">
+                                <span class="material-symbols-outlined">grid_view</span>
+                                <span>Oversikt</span>
+                            </a>
+                        </li>
+                        
+                        <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="nettsted">
+                            <a href="/admin#content" class="nav-link">
+                                <span class="material-symbols-outlined">description</span>
+                                <span>Sideinnhold</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-nav-category="nettsted">
+                            <a href="/admin#blog" class="nav-link">
+                                <span class="material-symbols-outlined">edit_note</span>
+                                <span>Blogg</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-category-header active" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                            <a href="/admin#events" class="nav-link">
+                                <span class="material-symbols-outlined">event</span>
+                                <span>Arrangementer</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                            <a href="/admin/admin-kommunikasjon" class="nav-link">
+                                <span class="material-symbols-outlined">group</span>
+                                <span>Kontakter</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                            <a href="/admin/admin-segmenter" class="nav-link">
+                                <span class="material-symbols-outlined">segment</span>
+                                <span>Segmenter</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                            <a href="/admin/admin-meldinger" class="nav-link">
+                                <span class="material-symbols-outlined">chat</span>
+                                <span>Meldinger</span>
+                            </a>
+                        </li>
+                        <li class="nav-item" data-nav-category="kommunikasjon">
+                            <a href="/admin/admin-nyhetsbrev" class="nav-link active">
+                                <span class="material-symbols-outlined">mail</span>
+                                <span>Nyhetsbrev</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+        </aside>
 
         <div class="builder-main-layout">
             <!-- 2. Sidebar: Elements Grid -->
@@ -147,10 +187,7 @@
                         <p class="section-subtitle">His Kingdom Ministry</p>
                     </div>
                     <div class="section-header-actions">
-                        <div class="header-search-container">
-                            <i class="material-symbols-outlined search-icon">search</i>
-                            <input type="text" id="admin-global-search" placeholder="Søk i systemet...">
-                        </div>
+                        <!-- Search bar removed to match Gold Standard dashboard -->
 
                         <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
                             <div class="user-info-text">
@@ -441,7 +478,7 @@
     <!-- App Scripts -->
     <script type="module" src="../js/notifications.js"></script>
     <script type="module" src="../js/admin-utils.js"></script>
-    <script type="module" src="js/admin-header.js"></script>
+    <script type="module" src="js/admin-header.js?v=2026.05.08.G1"></script>
     <script type="module" src="js/newsletter-builder.js"></script>
 </body>
 

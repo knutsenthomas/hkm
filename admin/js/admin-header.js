@@ -299,14 +299,15 @@ document.addEventListener('DOMContentLoaded', () => {
             items.forEach(item => {
                 item.classList.add('visible');
                 item.classList.remove('nav-cat-hidden');
-                item.style.display = 'block';
+                // Ensure it's visible by overriding any CSS display: none
+                item.style.setProperty('display', 'block', 'important');
             });
         } else {
             header.classList.add('collapsed');
             items.forEach(item => {
                 item.classList.remove('visible');
                 item.classList.add('nav-cat-hidden');
-                item.style.display = 'none';
+                item.style.setProperty('display', 'none', 'important');
             });
         }
         sessionStorage.setItem(`nav_cat_${category}`, shouldBeOpen ? 'open' : 'closed');
@@ -320,6 +321,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const hasActiveItem = document.querySelector(`.nav-item[data-nav-category="${cat}"] .nav-link.active`) !== null;
         
         const saved = sessionStorage.getItem(`nav_cat_${cat}`);
+        // Default: Nettsted is open, or if we are on a page in this category
         const defaultOpen = (cat === 'nettsted' || hasActiveItem);
         const shouldBeOpen = saved ? (saved === 'open') : defaultOpen;
         

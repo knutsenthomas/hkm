@@ -2329,11 +2329,11 @@ body.builder-active {
 body.admin-body .main-header,
 body.crm-body .main-header,
 body.builder-active .main-header {
-    height: 64px !important;
-    min-height: 64px !important;
+    height: 72px !important;
+    min-height: 72px !important;
     background: #ffffff !important;
     border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
-    padding: 0 16px !important;
+    padding: 0 32px !important;
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important;
@@ -4343,41 +4343,7 @@ body.builder-active .section-subtitle {
 }
 
 /* 6. Action Elements (Search, Bell, Menu, Toggle) */
-.header-search-container {
-    position: relative !important;
-    display: flex !important;
-    align-items: center !important;
-    background: #ffffff !important;
-    border: 1px solid rgba(0,0,0,0.08) !important;
-    border-radius: 12px !important;
-    padding: 0 16px !important;
-    height: 42px !important;
-    width: 300px !important;
-    margin-right: 20px !important;
-    transition: all 0.3s ease !important;
-}
-
-.header-search-container:focus-within {
-    border-color: #1B4965 !important;
-    box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.05) !important;
-    width: 340px !important;
-}
-
-.header-search-container .search-icon {
-    font-size: 20px !important;
-    color: #94a3b8 !important;
-    margin-right: 10px !important;
-}
-
-.header-search-container input {
-    background: transparent !important;
-    border: none !important;
-    outline: none !important;
-    width: 100% !important;
-    font-size: 14px !important;
-    font-family: inherit !important;
-    color: #0f172a !important;
-}
+/* Header search container removed to match Gold Standard dashboard */
 
 body.admin-body .notification-btn,
 body.crm-body .notification-btn,
