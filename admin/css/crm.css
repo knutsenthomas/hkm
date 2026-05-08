@@ -886,9 +886,25 @@ body.crm-body {
     border-color: #b91c1c;
 }
 
-/* Responsive Adjustments */
-/* Keep CRM "mobile" layout for actual small screens only.
-   Use a tighter breakpoint so desktop browser windows don't accidentally trigger it. */
+/* Tablet/mobile shell: the sidebar becomes a drawer in dashboard.css at 1024px,
+   so CRM pages must release the desktop content offset at the same breakpoint. */
+@media (max-width: 1024px) {
+    body.crm-body .crm-layout {
+        display: block !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        overflow-x: hidden !important;
+    }
+
+    body.crm-body .crm-main {
+        margin-left: 0 !important;
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+}
+
+/* Compact phone adjustments */
 @media (max-width: 520px) {
 
     /* FORCE HIDE all standard dashboard elements that interfere */
