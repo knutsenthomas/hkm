@@ -145,7 +145,7 @@ class NewsletterBuilder {
     }
 
     isMobileViewport() {
-        return window.matchMedia('(max-width: 1366px)').matches;
+        return window.matchMedia('(max-width: 1024px)').matches;
     }
 
     openToolsPanel(tab = null) {
