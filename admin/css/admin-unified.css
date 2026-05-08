@@ -1756,7 +1756,7 @@ body.admin-body .welcome-subtitle {
 }
 
 /* --- Global Mobile Optimization for Fixed UI --- */
-@media (max-width: 1024px) {
+@media (max-width: 991px) {
     html {
         height: 100% !important;
     }
