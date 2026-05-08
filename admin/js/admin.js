@@ -1855,7 +1855,7 @@ class AdminManager {
             <div class="design-ui-shell">
                 <div class="design-ui-workspace" style="padding: 0;">
                     <div class="design-ui-panel" style="border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
-                        <div class="table-container">
+                        <div class="table-container full-bleed">
                             <table class="crm-table">
                                 <thead>
                                     <tr>
@@ -1863,7 +1863,7 @@ class AdminManager {
                                         <th>Forfatter</th>
                                         <th>Kommentar</th>
                                         <th>Post ID</th>
-                                        <th class="col-actions" style="text-align:right; padding-right:20px;">Handlinger</th>
+                                        <th class="col-actions" style="text-align:right; padding-right:24px;">Handlinger</th>
                                     </tr>
                                 </thead>
                                 <tbody id="comments-list-body">
@@ -1927,10 +1927,10 @@ class AdminManager {
                         <td style="font-weight: 600;">${this.escapeHtml(d.author_name || 'Anonym')}</td>
                         <td style="max-width: 400px; line-height: 1.5; padding: 12px 15px; overflow-wrap: break-word;">${this.escapeHtml(d.text || '')}</td>
                         <td style="font-size: 11px; color: #94a3b8; font-family: monospace;">${this.escapeHtml(c.postId)}</td>
-                        <td class="col-actions" style="text-align:right; padding-right:15px;">
+                        <td class="col-actions" style="text-align:right; padding-right:20px;">
                             <button class="btn btn-icon danger delete-comment-btn" data-comment-id="${c.id}" data-post-id="${c.postId}" title="Slett kommentar" 
-                                style="color: #ef4444; background: #fee2e2; border-radius: 6px; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+                                style="color: #ef4444; background: #fee2e2; border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; padding: 0;">
+                                <span class="material-symbols-outlined" style="font-size:20px; line-height: 1; display: block;">delete</span>
                             </button>
                         </td>
                     </tr>
