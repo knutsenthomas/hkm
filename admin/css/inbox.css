@@ -132,10 +132,9 @@
     position: relative;
 }
 
-body.admin-body .threads-search input,
-body.crm-body .threads-search input {
+.threads-search input {
     width: 100%;
-    padding: 10px 12px 10px 48px !important;
+    padding: 10px 12px 10px 52px !important;
     border: 1px solid var(--inbox-border);
     border-radius: 12px;
     font-size: 14px;
@@ -150,7 +149,7 @@ body.crm-body .threads-search input {
 
 .threads-search .material-symbols-outlined {
     position: absolute;
-    left: 14px;
+    left: 12px;
     top: calc(50% + 1px);
     transform: translateY(-50%);
     font-size: 20px;
