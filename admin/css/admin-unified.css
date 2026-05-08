@@ -4226,10 +4226,10 @@ body.admin-body .nav-link.logout:hover {
 ========================================================================== 
 */
 
-/* 1. Header Layout - Force Gold Standard Dashboard Style */
+/* 1. Gold Standard Header - Dashboard Parity */
 .main-header {
     height: 100px !important;
-    background-color: #f4f7fa !important; /* Match var(--main-bg) */
+    background-color: #f4f7fa !important; /* Exact dashboard background */
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -4237,11 +4237,10 @@ body.admin-body .nav-link.logout:hover {
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important;
-    border: none !important;
+    border-bottom: 1px solid rgba(0,0,0,0.05) !important;
     box-sizing: border-box !important;
 }
 
-/* Ensure section-header is transparent and fits perfectly inside main-header */
 .section-header {
     width: 100% !important;
     height: 100% !important;
@@ -4252,7 +4251,6 @@ body.admin-body .nav-link.logout:hover {
     margin: 0 !important;
     background: transparent !important;
     border: none !important;
-    box-shadow: none !important;
 }
 
 .section-header-content {
@@ -4260,56 +4258,65 @@ body.admin-body .nav-link.logout:hover {
     align-items: center !important;
     justify-content: space-between !important;
     flex: 1 !important;
-    gap: 16px !important;
 }
 
-/* 2. Header Elements Alignment */
+/* 2. Avatar Fix - Force initials, kill all sub-elements */
+.user-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    background: #1B4965 !important; /* HKM Mørkeblå */
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    text-transform: uppercase !important;
+    border: 2px solid #ffffff !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+}
+
+/* Nuclear strike on all children to ensure ONLY the text node (initials) shows */
+.user-avatar span,
+.user-avatar i,
+.user-avatar img,
+.user-avatar svg,
+.user-avatar .material-symbols-outlined {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+}
+
+/* 3. Content Spacing Fix - Stop pushing content too far down */
+.crm-content, 
+.inbox-container, 
+.newsletter-builder-container,
+.segments-container {
+    padding-top: 15px !important;
+    margin-top: 0 !important;
+}
+
 .section-header-icon {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 48px !important;
-    height: 48px !important;
+    width: 44px !important;
+    height: 44px !important;
     background: #ffffff !important;
-    border-radius: 14px !important;
-    margin-right: 16px !important;
+    border-radius: 12px !important;
+    margin-right: 15px !important;
     color: #1B4965 !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03) !important;
-}
-
-.section-header-titles {
-    flex: 1 !important;
-}
-
-.section-title {
-    font-size: 18px !important;
-    font-weight: 800 !important;
-    color: #0f172a !important;
-    margin: 0 !important;
-    line-height: 1.2 !important;
-}
-
-.section-subtitle {
-    font-size: 13px !important;
-    color: #64748b !important;
-    margin: 4px 0 0 0 !important;
-}
-
-/* 3. Actions & Profile */
-.section-header-actions {
-    display: flex !important;
-    align-items: center !important;
-    gap: 16px !important;
 }
 
 .user-profile-link {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
-    padding: 6px 12px !important;
-    border-radius: 16px !important;
-    transition: all 0.3s ease !important;
     text-decoration: none !important;
+    padding: 4px 8px !important;
+    border-radius: 12px !important;
+    transition: background 0.2s !important;
 }
 
 .user-profile-link:hover {
@@ -4335,50 +4342,14 @@ body.admin-body .nav-link.logout:hover {
     text-transform: uppercase !important;
 }
 
-/* 4. THE NUCLEAR AVATAR FIX - FORCE INITIALS 'TK' */
-.user-avatar {
-    width: 42px !important;
-    height: 42px !important;
-    background: #1B4965 !important; /* Mørkeblå */
-    color: #ffffff !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    border-radius: 50% !important; /* Round like dashboard */
-    font-weight: 800 !important;
-    font-size: 14px !important;
-    text-transform: uppercase !important;
-    position: relative !important;
-    overflow: hidden !important;
-}
-
-/* Kill ALL children (spans, icons, images) to reveal the text nodes underneath */
-.user-avatar * {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
-}
-
-/* Fallback content if empty */
-.user-avatar:empty::before {
-    content: "TK" !important;
-}
-
-/* 5. Mobile Adjustments */
+/* 4. Mobile Refinements */
 @media (max-width: 800px) {
     .main-header {
         height: 72px !important;
         padding: 0 16px !important;
     }
-    
-    .user-info-text,
-    .section-header-icon,
-    .section-subtitle {
+    .user-info-text, .section-header-icon, .section-subtitle {
         display: none !important;
-    }
-    
-    .section-title {
-        font-size: 16px !important;
     }
 }
 /* End of Unified Header Reconstruction */
