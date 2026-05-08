@@ -867,8 +867,10 @@ body.crm-body .threads-search input {
         cursor: pointer !important;
     }
 
-    #btn-new-push .btn-text-desktop { display: none !important; }
-    #btn-new-push .btn-text-mobile { display: inline !important; }
+    #btn-new-push .btn-text-desktop,
+    #btn-new-push .btn-text-mobile {
+        display: inline !important;
+    }
 
     #btn-new-push {
         appearance: none !important;
@@ -879,6 +881,7 @@ body.crm-body .threads-search input {
         box-shadow: none !important;
         outline: none !important;
         position: relative !important;
+        min-width: 176px !important;
     }
 
     .folder-item {
