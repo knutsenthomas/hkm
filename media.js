@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', async function () {
     const playlists = (settings && settings.youtubePlaylists) ? settings.youtubePlaylists : "";
 
     // Init YouTube hvis elementene finnes (både media.html og youtube.html)
-    if (document.getElementById('youtube-grid') || window.location.pathname.includes('youtube.html')) {
+    if (document.getElementById('youtube-grid') || window.location.pathname.includes('/youtube')) {
         initYouTubeAPI(channelId, playlists);
     }
 
@@ -128,7 +128,7 @@ function initMediaNavigation() {
     });
 
     const mediaCards = document.querySelectorAll('.media-card[data-category], .podcast-card[data-category]');
-    if (mediaCards.length > 0 && currentPath === 'media.html') {
+    if (mediaCards.length > 0 && (currentPath === 'media.html' || currentPath === 'media')) {
         const filterTabs = document.querySelectorAll('.media-tab[data-tab]');
         filterTabs.forEach(tab => {
             tab.addEventListener('click', function (e) {
@@ -170,7 +170,7 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
     }
 
     // Vis kategorier øverst hvis på youtube.html
-    if (window.location.pathname.includes('youtube.html') && categoriesDiv && playlists.length > 0) {
+    if (window.location.pathname.includes('/youtube') && categoriesDiv && playlists.length > 0) {
         categoriesDiv.innerHTML = '';
         // "Alle"-knapp
         const allBtn = document.createElement('button');
@@ -367,7 +367,7 @@ async function initYouTubeAPI(channelId, playlistsRaw = "") {
         }
         currentCategory = playlistId || 'all';
         // Vis alle videoer hvis vi er på youtube.html
-        if (window.location.pathname.includes('youtube.html')) {
+        if (window.location.pathname.includes('/youtube')) {
             currentShowCount = videos.length;
         } else {
             currentShowCount = SHOW_STEP;
@@ -648,7 +648,7 @@ function renderPodcastEpisodes() {
     // Husk nåværende rekkefølge for spillerkøen
     currentEpisodeOrder = filtered;
 
-    const isFullPage = window.location.pathname.includes('podcast.html');
+    const isFullPage = window.location.pathname.includes('/podcast');
     const limit = isFullPage ? filtered.length : 3;
 
     if (filtered.length === 0) {
