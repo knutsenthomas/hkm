@@ -4256,7 +4256,7 @@ body.admin-body .nav-link.logout:hover {
 */
 
 /* 1. Header Layout - Force horizontal flow and spacing */
-.main-header .section-header {
+.section-header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
