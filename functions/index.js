@@ -1300,20 +1300,35 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = ""
     let result = null;
     let lastModelError = null;
     for (const modelName of transcriptionModelCandidates) {
-      try {
-        console.log(`Prøver Gemini-modell for transkripsjon: ${modelName}`);
-        const model = genAI.getGenerativeModel({ model: modelName });
-        result = await model.generateContent(transcriptionPrompt);
-        console.log(`Transkripsjon generert med ${modelName}.`);
-        break;
-      } catch (modelError) {
-        lastModelError = modelError;
-        console.error(`Transkripsjon feilet med ${modelName}:`, modelError);
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const maxAttemptsPerModel = 2;
 
-        if (isGeminiRateLimitError(modelError)) {
+      for (let attempt = 1; attempt <= maxAttemptsPerModel; attempt += 1) {
+        try {
+          console.log(`Prøver Gemini-modell for transkripsjon: ${modelName} (forsøk ${attempt}/${maxAttemptsPerModel})`);
+          result = await model.generateContent(transcriptionPrompt);
+          console.log(`Transkripsjon generert med ${modelName}.`);
           break;
+        } catch (modelError) {
+          lastModelError = modelError;
+          console.error(`Transkripsjon feilet med ${modelName}:`, modelError);
+
+          if (!isGeminiRateLimitError(modelError)) {
+            break;
+          }
+
+          const retryDelayMs = getGeminiRetryDelayMs(modelError);
+          const boundedDelayMs = Math.min(Math.max(retryDelayMs, 0), 65000);
+          if (attempt >= maxAttemptsPerModel || boundedDelayMs <= 0) {
+            break;
+          }
+
+          console.log(`Gemini rate limit. Venter ${boundedDelayMs} ms før nytt forsøk.`);
+          await new Promise((resolve) => setTimeout(resolve, boundedDelayMs));
         }
       }
+
+      if (result) break;
     }
 
     if (!result) {
@@ -5827,6 +5842,19 @@ function getTranscriptionErrorMessage(error) {
   }
 
   return 'En feil oppstod under transkribering.';
+}
+
+function getGeminiRetryDelayMs(error) {
+  const details = Array.isArray(error?.errorDetails) ? error.errorDetails : [];
+  const retryInfo = details.find((entry) => entry && entry['@type'] === 'type.googleapis.com/google.rpc.RetryInfo');
+  const retryDelay = typeof retryInfo?.retryDelay === 'string' ? retryInfo.retryDelay : '';
+  const match = retryDelay.match(/(\d+)(?:\.(\d+))?s/);
+  if (!match) return 0;
+
+  const seconds = Number(match[1] || '0');
+  const fraction = Number(`0.${match[2] || '0'}`);
+  const totalMs = Math.round((seconds + fraction) * 1000);
+  return Number.isFinite(totalMs) ? totalMs : 0;
 }
 
 exports.transcribePodcast = onCall({
