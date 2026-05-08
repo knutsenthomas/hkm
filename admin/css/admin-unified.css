@@ -36,6 +36,20 @@
     body.builder-recipients-open .builder-elements-sidebar-v2 {
         display: none !important;
     }
+
+    /* Fix recipients drawer positioning on PC */
+    body.builder-recipients-open .recipients-drawer {
+        position: absolute !important;
+        top: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+        background: #ffffff !important;
+        z-index: 10000 !important;
+        display: block !important;
+    }
 }
 
 /* Mobile View */
