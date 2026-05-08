@@ -286,60 +286,76 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- Collapsible Sidebar Categories ---
-    const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
-    
-    function setCategory(category, shouldBeOpen) {
-        const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
-        const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
-        if (!header) return;
+    // --- Collapsible Sidebar Categories (Hardened) ---
+    const initSidebarCategories = () => {
+        const categoryHeaders = document.querySelectorAll('.nav-category-header[data-target-category]');
+        if (categoryHeaders.length === 0) return;
 
-        if (shouldBeOpen) {
-            header.classList.remove('collapsed');
-            items.forEach(item => {
-                item.classList.add('visible');
-                item.classList.remove('nav-cat-hidden');
-                // Ensure it's visible by overriding any CSS display: none
-                item.style.setProperty('display', 'block', 'important');
-            });
-        } else {
-            header.classList.add('collapsed');
-            items.forEach(item => {
-                item.classList.remove('visible');
-                item.classList.add('nav-cat-hidden');
-                item.style.setProperty('display', 'none', 'important');
-            });
+        function setCategory(category, shouldBeOpen) {
+            const header = document.querySelector(`.nav-category-header[data-target-category="${category}"]`);
+            const items = document.querySelectorAll(`.nav-item[data-nav-category="${category}"]`);
+            if (!header) return;
+
+            if (shouldBeOpen) {
+                header.classList.remove('collapsed');
+                items.forEach(item => {
+                    item.classList.remove('nav-cat-hidden');
+                    item.classList.add('visible');
+                    item.style.setProperty('display', 'block', 'important');
+                    item.style.setProperty('visibility', 'visible', 'important');
+                    item.style.setProperty('opacity', '1', 'important');
+                });
+            } else {
+                header.classList.add('collapsed');
+                items.forEach(item => {
+                    item.classList.add('nav-cat-hidden');
+                    item.classList.remove('visible');
+                    item.style.setProperty('display', 'none', 'important');
+                });
+            }
+            sessionStorage.setItem(`nav_cat_${category}`, shouldBeOpen ? 'open' : 'closed');
         }
-        sessionStorage.setItem(`nav_cat_${category}`, shouldBeOpen ? 'open' : 'closed');
-    }
 
-    categoryHeaders.forEach(header => {
-        const cat = header.getAttribute('data-target-category');
-        if (!cat) return;
+        categoryHeaders.forEach(header => {
+            const cat = header.getAttribute('data-target-category');
+            const path = window.location.pathname.toLowerCase();
+            
+            // Auto-detect if we should be open
+            const hasActiveLink = document.querySelector(`.nav-item[data-nav-category="${cat}"] .nav-link.active`) !== null;
+            const savedState = sessionStorage.getItem(`nav_cat_${cat}`);
+            
+            // Priority: 1. Active Link, 2. URL Match, 3. Saved State, 4. Default (Nettsted open)
+            let shouldBeOpen = (cat === 'nettsted');
+            if (savedState) shouldBeOpen = (savedState === 'open');
+            if (hasActiveLink) shouldBeOpen = true; 
 
-        // Auto-expand if active page is inside this category
-        const hasActiveItem = document.querySelector(`.nav-item[data-nav-category="${cat}"] .nav-link.active`) !== null;
-        
-        const saved = sessionStorage.getItem(`nav_cat_${cat}`);
-        // Default: Nettsted is open, or if we are on a page in this category
-        const defaultOpen = (cat === 'nettsted' || hasActiveItem);
-        const shouldBeOpen = saved ? (saved === 'open') : defaultOpen;
-        
-        setCategory(cat, shouldBeOpen);
+            // Force open Communication category if on related pages
+            if (cat === 'kommunikasjon' && (path.includes('kommunikasjon') || path.includes('segmenter') || path.includes('meldinger') || path.includes('nyhetsbrev'))) {
+                shouldBeOpen = true;
+            }
 
-        header.addEventListener('click', function() {
-            const currentlyClosed = this.classList.contains('collapsed');
-            setCategory(cat, currentlyClosed);
+            setCategory(cat, shouldBeOpen);
+
+            // Use direct onclick to ensure it's not blocked by other listeners
+            header.onclick = (e) => {
+                e.preventDefault();
+                const currentlyCollapsed = header.classList.contains('collapsed');
+                setCategory(cat, currentlyCollapsed);
+            };
         });
-    });
+    };
+
+    // Run immediately and also on DOMContentLoaded just in case
+    initSidebarCategories();
+    document.addEventListener('DOMContentLoaded', initSidebarCategories);
 
     // Mobile Sidebar Close Button
     const mobileSidebarClose = document.getElementById('mobile-sidebar-close');
     if (mobileSidebarClose && sidebar) {
-        mobileSidebarClose.addEventListener('click', () => {
+        mobileSidebarClose.onclick = () => {
             sidebar.classList.remove('active');
             if (sidebarOverlay) sidebarOverlay.classList.remove('active');
-        });
+        };
     }
 
     // --- Global Search Handler (Visual Only) ---outside

@@ -4344,6 +4344,13 @@ body.builder-active .section-subtitle {
 
 /* 6. Action Elements (Search, Bell, Menu, Toggle) */
 /* Header search container removed to match Gold Standard dashboard */
+/* Sidebar item visibility fallback */
+.nav-item[data-nav-category].visible {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    height: auto !important;
+}
 
 body.admin-body .notification-btn,
 body.crm-body .notification-btn,
