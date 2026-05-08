@@ -4332,8 +4332,12 @@ body.admin-body .nav-link.logout:hover {
     flex-shrink: 0 !important;
 }
 
-/* Kill icons inside avatar */
-.user-avatar * { display: none !important; }
+/* Kill icons/spans inside avatar but keep text nodes */
+.user-avatar span, 
+.user-avatar i, 
+.user-avatar svg { 
+    display: none !important; 
+}
 
 /* 5. Utility Buttons - Bell and Menu */
 .notification-btn,
