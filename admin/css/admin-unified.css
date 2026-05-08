@@ -4226,8 +4226,8 @@ body.admin-body .nav-link.logout:hover {
 ========================================================================== 
 */
 
-/* 1. Gold Standard Header - Dashboard Parity */
-.main-header {
+/* 1. Gold Standard Header - Increased Specificity to override dashboard.css */
+body.admin-body .main-header {
     height: 100px !important;
     background-color: #f4f7fa !important; /* Exact dashboard background */
     display: flex !important;
@@ -4239,9 +4239,10 @@ body.admin-body .nav-link.logout:hover {
     z-index: 1000 !important;
     border-bottom: 1px solid rgba(0,0,0,0.05) !important;
     box-sizing: border-box !important;
+    box-shadow: none !important;
 }
 
-.section-header {
+body.admin-body .section-header {
     width: 100% !important;
     height: 100% !important;
     display: flex !important;
@@ -4251,53 +4252,53 @@ body.admin-body .nav-link.logout:hover {
     margin: 0 !important;
     background: transparent !important;
     border: none !important;
+    box-shadow: none !important;
 }
 
-.section-header-content {
+body.admin-body .section-header-content {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     flex: 1 !important;
 }
 
-/* 2. Avatar Fix - Force initials, kill all sub-elements */
-.user-avatar {
+/* 2. Avatar Fix - Ultra High Specificity */
+body.admin-body .main-header .user-avatar {
     width: 44px !important;
     height: 44px !important;
-    background: #1B4965 !important; /* HKM Mørkeblå */
+    background-color: #1B4965 !important; /* HKM Mørkeblå */
     color: #ffffff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     border-radius: 50% !important;
     font-weight: 800 !important;
-    font-size: 15px !important;
+    font-size: 16px !important;
     text-transform: uppercase !important;
     border: 2px solid #ffffff !important;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
-/* Nuclear strike on all children to ensure ONLY the text node (initials) shows */
-.user-avatar span,
-.user-avatar i,
-.user-avatar img,
-.user-avatar svg,
-.user-avatar .material-symbols-outlined {
+/* Ensure text node is visible */
+body.admin-body .main-header .user-avatar * {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
 }
 
-/* 3. Content Spacing Fix - Stop pushing content too far down */
-.crm-content, 
-.inbox-container, 
-.newsletter-builder-container,
-.segments-container {
-    padding-top: 15px !important;
+/* 3. Content Spacing - Prevent excessive push-down */
+body.admin-body .crm-content, 
+body.admin-body .inbox-container, 
+body.admin-body .newsletter-builder-container,
+body.admin-body .segments-container,
+body.admin-body .newsletter-builder-header {
+    padding-top: 10px !important;
     margin-top: 0 !important;
 }
 
-.section-header-icon {
+body.admin-body .section-header-icon {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -4309,7 +4310,7 @@ body.admin-body .nav-link.logout:hover {
     color: #1B4965 !important;
 }
 
-.user-profile-link {
+body.admin-body .user-profile-link {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
@@ -4317,38 +4318,42 @@ body.admin-body .nav-link.logout:hover {
     padding: 4px 8px !important;
     border-radius: 12px !important;
     transition: background 0.2s !important;
+    background: transparent !important;
+    border: none !important;
 }
 
-.user-profile-link:hover {
+body.admin-body .user-profile-link:hover {
     background: rgba(27, 73, 101, 0.05) !important;
 }
 
-.user-info-text {
+body.admin-body .user-info-text {
     display: flex !important;
     flex-direction: column !important;
     text-align: right !important;
 }
 
-.user-name {
+body.admin-body .user-name {
     font-size: 14px !important;
     font-weight: 800 !important;
     color: #0f172a !important;
 }
 
-.user-role {
+body.admin-body .user-role {
     font-size: 11px !important;
     font-weight: 600 !important;
     color: #64748b !important;
     text-transform: uppercase !important;
 }
 
-/* 4. Mobile Refinements */
+/* 4. Mobile Adjustments */
 @media (max-width: 800px) {
-    .main-header {
+    body.admin-body .main-header {
         height: 72px !important;
         padding: 0 16px !important;
     }
-    .user-info-text, .section-header-icon, .section-subtitle {
+    body.admin-body .user-info-text, 
+    body.admin-body .section-header-icon, 
+    body.admin-body .section-subtitle {
         display: none !important;
     }
 }
