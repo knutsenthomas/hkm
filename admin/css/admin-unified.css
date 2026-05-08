@@ -4557,8 +4557,8 @@ body.builder-active #dashboard-main-header {
     width: 100% !important;
     padding: 0 40px !important;
     margin: 0 !important;
-    background: #cc6f2c !important;
-    border-bottom: 1px solid #b85f23 !important;
+    background: #f4f7fa !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
     box-shadow: none !important;
     position: sticky !important;
     top: 0 !important;
@@ -4601,9 +4601,9 @@ body.builder-active .main-header .section-header-icon {
     width: 36px !important;
     height: 36px !important;
     border-radius: 12px !important;
-    background: rgba(255, 255, 255, 0.18) !important;
-    border: 1px solid rgba(255, 255, 255, 0.32) !important;
-    color: #ffffff !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: #64748b !important;
     box-shadow: none !important;
 }
 
@@ -4613,7 +4613,7 @@ body.builder-active .main-header .section-title {
     font-size: 18px !important;
     line-height: 1.15 !important;
     font-weight: 800 !important;
-    color: #ffffff !important;
+    color: #0f172a !important;
     margin: 0 !important;
     letter-spacing: 0 !important;
 }
@@ -4646,8 +4646,8 @@ body.builder-active .main-header .user-profile-link {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
-    background: rgba(255, 255, 255, 0.16) !important;
-    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    background: #cc6f2c !important;
+    border: 1px solid #b85f23 !important;
     border-radius: 12px !important;
     text-decoration: none !important;
 }
@@ -4677,10 +4677,10 @@ body.builder-active .main-header .mobile-nav-toggle {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: rgba(255, 255, 255, 0.16) !important;
-    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
     border-radius: 12px !important;
-    color: #ffffff !important;
+    color: #64748b !important;
     flex-shrink: 0 !important;
 }
 
