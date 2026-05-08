@@ -4264,7 +4264,7 @@ body.admin-body .nav-link.logout:hover {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 20px !important;
+    gap: 12px !important;
     width: 100% !important;
 }
 
@@ -4283,7 +4283,7 @@ body.admin-body .nav-link.logout:hover {
 .section-header-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 12px !important;
+    gap: 8px !important;
     flex-shrink: 0 !important;
     justify-content: flex-end !important;
 }
@@ -4313,7 +4313,8 @@ body.admin-body .nav-link.logout:hover {
     width: auto !important;
     padding: 0 4px 0 12px !important;
     gap: 12px !important;
-    background: #f8fafc !important; /* Subtle background to match dashboard */
+    background: #f8fafc !important; 
+    flex-direction: row !important; /* Force Name then Avatar */
 }
 
 .user-info-text {
@@ -4321,6 +4322,7 @@ body.admin-body .nav-link.logout:hover {
     flex-direction: column !important;
     align-items: flex-end !important;
     text-align: right !important;
+    order: 1 !important; /* Ensure it stays before avatar if DOM is correct */
 }
 
 .user-name {
@@ -4353,6 +4355,7 @@ body.admin-body .nav-link.logout:hover {
     font-weight: 800 !important;
     font-size: 13px !important;
     flex-shrink: 0 !important;
+    order: 2 !important; /* Stay after text */
 }
 
 /* Kill all dynamic icons/spans/fallback-symbols in avatar */
@@ -4378,23 +4381,33 @@ body.admin-body .nav-link.logout:hover {
     background: #f1f5f9 !important;
 }
 
-/* Ensure visibility on all sub-pages */
+/* Ensure visibility on all sub-pages, but ONLY ON DESKTOP */
 body.admin-body:not(.main-dashboard) .user-info-text,
 body.crm-body .user-info-text,
 body.builder-active .user-info-text {
     display: flex !important;
 }
 
-/* Mobile Adjustments */
-@media (max-width: 768px) {
+/* 7. THE FINAL MOBILE OVERRIDE - MUST BE LAST AND SPECIFIC */
+@media (max-width: 850px) {
     .user-info-text {
         display: none !important;
     }
+    
     .user-profile-link {
-        padding: 0 !important;
         width: 42px !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: none !important;
     }
+
+    .user-avatar {
+        width: 40px !important;
+        height: 40px !important;
+        border-radius: 12px !important;
+    }
+
     .section-header-actions {
-        gap: 8px !important;
+        gap: 4px !important;
     }
 }
