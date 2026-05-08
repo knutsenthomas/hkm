@@ -1690,7 +1690,7 @@ class AdminManager {
                     pushStatusEl.className = 'status-message error';
                 } finally {
                     btn.disabled = false;
-                    btn.textContent = 'Send Push-varsling';
+                    btn.textContent = 'Send push-varsling';
                 }
             });
         }

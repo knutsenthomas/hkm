@@ -121,6 +121,110 @@ document.addEventListener('DOMContentLoaded', () => {
     const authFallbackName = (user) => user?.displayName || user?.email || 'Administrator';
     const cachedIdentity = readCachedIdentity();
 
+    const normalizeSidebarNavigation = () => {
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (!sidebarNav || sidebarNav.dataset.hkmNormalized === '1') return;
+
+        const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
+        const hash = window.location.hash.replace('#', '');
+        const isAdminHome = path.endsWith('/admin') || path.endsWith('/admin/index.html');
+        const currentSection = hash || (isAdminHome ? 'overview' : '');
+
+        const itemHref = (section) => `/admin#${section}`;
+        const isActive = (item) => {
+            if (item.path && path.includes(item.path)) return true;
+            if (item.section && currentSection === item.section) return true;
+            return false;
+        };
+
+        const renderItem = (item) => {
+            const active = isActive(item) ? ' active' : '';
+            const visible = item.alwaysVisible ? ' visible' : '';
+            const hiddenClass = item.hidden ? ' nav-helper-hidden' : '';
+            const hiddenStyle = item.hidden ? ' style="display:none"' : '';
+            const categoryAttr = item.category ? ` data-nav-category="${item.category}"` : ' data-nav-category="all"';
+            const dataSection = item.section ? ` data-section="${item.section}"` : '';
+            const id = item.id ? ` id="${item.id}"` : '';
+            const target = item.target ? ` target="${item.target}"` : '';
+            const rel = item.target === '_blank' ? ' rel="noopener noreferrer"' : '';
+            const href = item.href || (item.section ? itemHref(item.section) : '#');
+
+            return `
+                <li class="nav-item${visible}${hiddenClass}"${hiddenStyle}${categoryAttr}>
+                    <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel}>
+                        <span class="material-symbols-outlined">${item.icon}</span>
+                        <span>${item.label}</span>
+                        ${item.badgeId ? `<span id="${item.badgeId}" class="nav-badge" style="display: none;">0</span>` : ''}
+                    </a>
+                </li>
+            `;
+        };
+
+        const renderHeader = (category, label) => `
+            <li class="nav-category-header" data-target-category="${category}">
+                <span>${label}</span>
+                <span class="material-symbols-outlined expand-icon">expand_more</span>
+            </li>
+        `;
+
+        const mainItems = [
+            { label: 'Oversikt', icon: 'home', section: 'overview', href: '/admin#overview', alwaysVisible: true },
+            { header: 'nettsted', label: 'Nettsted' },
+            { label: 'Sideinnhold', icon: 'description', section: 'content', category: 'nettsted' },
+            { label: 'Blogg', icon: 'edit_note', section: 'blog', category: 'nettsted' },
+            { label: 'Media', icon: 'image', section: 'media', category: 'nettsted' },
+            { label: 'Hero Slider', icon: 'view_carousel', section: 'hero', category: 'nettsted' },
+            { label: 'Undervisning', icon: 'school', section: 'teaching', category: 'nettsted' },
+            { label: 'Kursadministrasjon', icon: 'menu_book', section: 'courses', category: 'nettsted' },
+            { label: 'Design & Logo', icon: 'palette', section: 'design', category: 'nettsted' },
+            { header: 'kommunikasjon', label: 'Kommunikasjon' },
+            { label: 'Arrangementer', icon: 'event', section: 'events', category: 'kommunikasjon' },
+            { label: 'Kontakter', icon: 'group', href: '/admin/admin-kommunikasjon', path: 'admin-kommunikasjon', category: 'kommunikasjon' },
+            { label: 'Segmenter', icon: 'segment', href: '/admin/admin-segmenter', path: 'admin-segmenter', category: 'kommunikasjon' },
+            { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
+            { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
+            { label: 'Nyhetsbrev', icon: 'mail_outline', href: '/admin/admin-nyhetsbrev', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
+            { label: 'Push-varslinger', icon: 'send_to_mobile', section: 'kommunikasjon', category: 'kommunikasjon', id: 'nav-kommunikasjon-hidden' },
+            { header: 'administrasjon', label: 'Administrasjon' },
+            { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },
+            { label: 'Brukere', icon: 'group', section: 'users', category: 'administrasjon' },
+            { label: 'Automatisering', icon: 'auto_awesome', section: 'automation', category: 'administrasjon' },
+            { label: 'SEO & Meta', icon: 'search_insights', section: 'seo', category: 'administrasjon' },
+            { label: 'Innstillinger', icon: 'settings', section: 'settings', category: 'administrasjon' },
+            { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
+        ];
+
+        const footerItems = [
+            { label: 'Min Side', icon: 'account_circle', href: '/minside/index', alwaysVisible: true, id: 'admin-profile-trigger-sidebar' },
+            { label: 'Se nettside', icon: 'visibility', href: '/', alwaysVisible: true, target: '_blank' },
+        ];
+
+        const mainHtml = mainItems.map((item) => (
+            item.header ? renderHeader(item.header, item.label) : renderItem(item)
+        )).join('');
+
+        const footerHtml = footerItems.map(renderItem).join('') + `
+            <li class="nav-item visible" data-nav-category="all">
+                <button id="logout-btn" class="nav-link logout">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span>Logg ut</span>
+                </button>
+            </li>
+        `;
+
+        sidebarNav.innerHTML = `
+            <div class="nav-group">
+                <ul class="nav-list">${mainHtml}</ul>
+            </div>
+            <div class="nav-group bottom">
+                <ul class="nav-list">${footerHtml}</ul>
+            </div>
+        `;
+        sidebarNav.dataset.hkmNormalized = '1';
+    };
+
+    normalizeSidebarNavigation();
+
     // Hydrate cached identity immediately to avoid visible "Laster..." hangs.
     if (cachedIdentity?.displayName) {
         renderIdentity(cachedIdentity.displayName, cachedIdentity.photoURL || '');

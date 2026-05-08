@@ -913,7 +913,7 @@ class MessagesManager {
                     <div class="message-card">
                         <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 16px; color: #4338ca; font-weight: 700; font-size: 13px; letter-spacing: 0.5px;">
                             <span class="material-symbols-outlined" style="font-size: 20px;">send_to_mobile</span>
-                            PUSH-VARSLING KAMPANJE
+                            Push-varsling kampanje
                         </div>
                         <div style="font-weight: 700; font-size: 18px; margin-bottom: 12px; color: #1e293b;">${this.escapeHtml(push.title)}</div>
                         <div style="font-size: 15px; color: #334155; line-height: 1.7;">${this.escapeHtml(push.body)}</div>
