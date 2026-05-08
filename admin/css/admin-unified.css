@@ -21,9 +21,16 @@
     }
     
     /* Ensure global sidebar is visible on PC */
-    body.builder-active .sidebar {
+    body.builder-active .sidebar,
+    body.builder-active #admin-sidebar {
         display: flex !important;
+        width: 280px !important;
+        min-width: 280px !important;
         transform: translateX(0) !important;
+        visibility: visible !important;
+        background: #ffffff !important;
+        position: relative !important;
+        left: 0 !important;
     }
 }
 
