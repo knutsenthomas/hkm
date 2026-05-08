@@ -1289,7 +1289,7 @@ input:checked+.slider:before {
 }
 
 /* Responsive Builder Layout */
-@media (max-width: 1024px) {
+@media (max-width: 991px) {
     body.builder-active {
         height: auto;
         min-height: 100vh;
