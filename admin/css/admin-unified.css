@@ -32,6 +32,10 @@
         position: relative !important;
         left: 0 !important;
     }
+    /* Hide tools when recipients drawer is open to give more space */
+    body.builder-recipients-open .builder-elements-sidebar-v2 {
+        display: none !important;
+    }
 }
 
 /* Mobile View */
