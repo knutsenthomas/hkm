@@ -102,20 +102,22 @@ body.builder-active {
 /* 2. Main Layout Area */
 .builder-main-layout {
     flex: 1;
-    display: flex;
+    display: flex !important;
     overflow: hidden;
 }
 
 /* 3. Elements Sidebar */
 .builder-elements-sidebar {
-    width: var(--sidebar-modern-width);
-    background: #ffffff;
-    border-right: 1px solid var(--border-light);
-    display: flex;
-    flex-direction: column;
-    padding: 24px;
-    overflow-y: auto;
-    z-index: 50;
+    width: var(--sidebar-modern-width, 280px) !important;
+    background: #ffffff !important;
+    border-right: 1px solid var(--border-light, #e2e8f0) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 24px !important;
+    overflow-y: auto !important;
+    z-index: 50 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
 
 .sidebar-header-modern h2 {
@@ -1285,7 +1287,7 @@ input:checked+.slider:before {
 
 .builder-tools-backdrop,
 .builder-tools-fab {
-    display: none;
+    display: none !important;
 }
 
 /* Responsive Builder Layout */
