@@ -8,17 +8,26 @@ const fetch = require("node-fetch");
 const { parseStringPromise } = require("xml2js");
 const admin = require("firebase-admin");
 const nodemailer = require("nodemailer");
+const fs = require("fs");
+const os = require("os");
 const path = require("path");
 const crypto = require("crypto");
+const { pipeline } = require("stream");
+const { promisify } = require("util");
 require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
 require("dotenv").config({ path: path.join(__dirname, ".env.local"), override: true, quiet: true });
 const { createClient, OAuthStrategy, ApiKeyStrategy } = require("@wix/sdk");
 const { products, collections } = require("@wix/stores");
 const { posts } = require("@wix/blog");
 const { comments } = require("@wix/comments");
+const { GoogleAIFileManager } = require("@google/generative-ai/server");
 
 admin.initializeApp();
 const db = admin.firestore();
+const streamPipeline = promisify(pipeline);
+const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
+const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
+const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 1;
 
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
@@ -1152,7 +1161,7 @@ function normalizeWixProduct(item, req, collectionMap = {}) {
 }
 
 exports.getPodcast = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
-  const rssUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+  const rssUrl = PODCAST_RSS_URL;
 
   try {
     const response = await fetch(rssUrl);
@@ -1164,6 +1173,199 @@ exports.getPodcast = onRequest({ cors: true, invoker: "public" }, async (req, re
     res.status(500).send("Error fetching podcast");
   }
 });
+
+function firstArrayValue(value) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function asPodcastText(value) {
+  const raw = firstArrayValue(value);
+  if (raw && typeof raw === "object") {
+    if (typeof raw._ === "string") return raw._.trim();
+    return "";
+  }
+  return typeof raw === "string" ? raw.trim() : "";
+}
+
+function normalizePodcastEpisode(item = {}) {
+  const rawGuid = firstArrayValue(item.guid);
+  const guid = rawGuid && typeof rawGuid === "object"
+    ? asPodcastText(rawGuid._)
+    : asPodcastText(rawGuid);
+  const enclosure = firstArrayValue(item.enclosure);
+  const audioUrl = enclosure && enclosure.$ && typeof enclosure.$.url === "string"
+    ? enclosure.$.url.trim()
+    : "";
+  const title = asPodcastText(item.title);
+  const link = asPodcastText(item.link);
+  const pubDate = asPodcastText(item.pubDate);
+  const episodeId = guid || link || title;
+
+  return {
+    episodeId,
+    title,
+    link,
+    audioUrl,
+    pubDate,
+  };
+}
+
+async function fetchPodcastEpisodesFromRss(limit = 5) {
+  const response = await fetch(PODCAST_RSS_URL);
+  if (!response.ok) {
+    throw new Error(`Podcast RSS utilgjengelig: ${response.status} ${response.statusText}`);
+  }
+
+  const xml = await response.text();
+  const parsed = await parseStringPromise(xml);
+  const channel = parsed?.rss?.channel?.[0] || {};
+  const items = Array.isArray(channel.item) ? channel.item : [];
+
+  return items
+    .map(normalizePodcastEpisode)
+    .filter((episode) => episode.episodeId && episode.audioUrl)
+    .slice(0, limit);
+}
+
+async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = "", initiatedBy = "manual" }) {
+  if (!audioUrl || !episodeId) {
+    throw new Error("Mangler audioUrl eller episodeId");
+  }
+
+  const geminiKey = getGeminiApiKey();
+  if (!geminiKey) {
+    throw new Error("Gemini API-nøkkel mangler på serveren.");
+  }
+
+  const transcriptRef = db.collection("podcast_transcripts").doc(episodeId);
+  const tmpFilePath = path.join(os.tmpdir(), `podcast_${episodeId}_${Date.now()}.mp3`);
+  const transcriptSource = initiatedBy === "scheduled" ? "gemini-auto" : "gemini-manual";
+  let uploadedFileName = "";
+
+  await transcriptRef.set({
+    episodeId,
+    title: episodeTitle || null,
+    audioUrl,
+    status: "processing",
+    source: transcriptSource,
+    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    lastAttemptAt: admin.firestore.FieldValue.serverTimestamp(),
+    attemptCount: admin.firestore.FieldValue.increment(1),
+  }, { merge: true });
+
+  try {
+    console.log(`Laster ned podcast ${episodeId} fra ${audioUrl}...`);
+    const response = await fetch(audioUrl);
+    if (!response.ok) throw new Error(`Klarte ikke laste ned: ${response.statusText}`);
+    await streamPipeline(response.body, fs.createWriteStream(tmpFilePath));
+    console.log(`Nedlasting fullført: ${tmpFilePath}`);
+
+    const fileManager = new GoogleAIFileManager(geminiKey);
+    console.log(`Laster opp til Gemini...`);
+    const uploadResult = await fileManager.uploadFile(tmpFilePath, {
+      mimeType: "audio/mpeg",
+      displayName: `Podcast ${episodeId}`,
+    });
+    uploadedFileName = uploadResult.file.name;
+    console.log(`Opplasting fullført. File URI: ${uploadResult.file.uri}`);
+
+    let fileState = uploadResult.file.state;
+    while (fileState === "PROCESSING") {
+      console.log("Venter på prosessering av lydfilen...");
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      const getFile = await fileManager.getFile(uploadResult.file.name);
+      fileState = getFile.state;
+      if (fileState === "FAILED") {
+        throw new Error("Gemini prosessering av lydfilen feilet.");
+      }
+    }
+
+    console.log(`Genererer transkripsjon...`);
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const transcriptionModelCandidates = [
+      "gemini-2.0-flash",
+      "gemini-2.5-flash",
+      "gemini-2.0-flash-lite",
+    ];
+    const transcriptionPrompt = [
+      {
+        fileData: {
+          mimeType: uploadResult.file.mimeType,
+          fileUri: uploadResult.file.uri
+        }
+      },
+      { text: "Vennligst lag en nøyaktig og ordrett transkripsjon (skriftlig versjon) av denne norske podcast-episoden. Sett inn avsnitt der det er naturlig for å gjøre teksten lett å lese. Bruk riktig tegnsetting og stor forbokstav. Formater teksten med HTML: bruk <p> for avsnitt, og <br> for linjeskift. Ikke inkluder noen overskrift eller markdown-blokker (som ```html), kun den rene HTML-teksten." }
+    ];
+
+    let result = null;
+    let lastModelError = null;
+    for (const modelName of transcriptionModelCandidates) {
+      try {
+        console.log(`Prøver Gemini-modell for transkripsjon: ${modelName}`);
+        const model = genAI.getGenerativeModel({ model: modelName });
+        result = await model.generateContent(transcriptionPrompt);
+        console.log(`Transkripsjon generert med ${modelName}.`);
+        break;
+      } catch (modelError) {
+        lastModelError = modelError;
+        console.error(`Transkripsjon feilet med ${modelName}:`, modelError);
+
+        if (isGeminiRateLimitError(modelError)) {
+          break;
+        }
+      }
+    }
+
+    if (!result) {
+      throw lastModelError || new Error("Ingen Gemini-modell kunne transkribere lydfilen.");
+    }
+
+    const transcriptHtml = result.response.text();
+    console.log(`Transkripsjon generert (${transcriptHtml.length} tegn).`);
+
+    await transcriptRef.set({
+      text: transcriptHtml,
+      episodeId,
+      title: episodeTitle || null,
+      audioUrl,
+      source: transcriptSource,
+      status: "completed",
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      completedAt: admin.firestore.FieldValue.serverTimestamp(),
+      lastError: admin.firestore.FieldValue.delete(),
+      nextRetryAt: admin.firestore.FieldValue.delete(),
+    }, { merge: true });
+
+    console.log(`Transkripsjon lagret vellykket i Firestore.`);
+    return { success: true, message: "Transkribering fullført" };
+  } catch (error) {
+    const retryAt = admin.firestore.Timestamp.fromMillis(Date.now() + PODCAST_TRANSCRIPT_RETRY_MS);
+    await transcriptRef.set({
+      episodeId,
+      title: episodeTitle || null,
+      audioUrl,
+      source: transcriptSource,
+      status: isGeminiRateLimitError(error) ? "deferred" : "failed",
+      lastError: getTranscriptionErrorMessage(error),
+      nextRetryAt: retryAt,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    }, { merge: true });
+    throw error;
+  } finally {
+    if (uploadedFileName) {
+      try {
+        const fileManager = new GoogleAIFileManager(geminiKey);
+        await fileManager.deleteFile(uploadedFileName);
+      } catch (cleanupError) {
+        console.warn("Kunne ikke slette fil fra Gemini:", cleanupError);
+      }
+    }
+
+    if (fs.existsSync(tmpFilePath)) {
+      fs.unlinkSync(tmpFilePath);
+    }
+  }
+}
 
 exports.getAnalyticsOverview = onRequest({
   secrets: [gaPropertyIdParam, gaServiceAccountEmailParam, gaServiceAccountPrivateKeyParam]
@@ -5601,6 +5803,32 @@ exports.cleanupBlogDuplicates = onRequest(async (req, res) => {
 
 const { HttpsError } = require("firebase-functions/v2/https");
 
+function isGeminiRateLimitError(error) {
+  if (!error) return false;
+
+  const message = typeof error?.message === 'string' ? error.message : '';
+  const status = error?.status || error?.code || error?.cause?.status;
+
+  return status === 429
+    || status === 'RESOURCE_EXHAUSTED'
+    || /429/.test(message)
+    || /too many requests/i.test(message)
+    || /resource exhausted/i.test(message)
+    || /quota/i.test(message);
+}
+
+function getTranscriptionErrorMessage(error) {
+  if (isGeminiRateLimitError(error)) {
+    return 'Gemini API-kvoten er brukt opp akkurat nå. Vent litt og prøv transkribering igjen senere.';
+  }
+
+  if (typeof error?.message === 'string' && error.message.trim()) {
+    return error.message.trim();
+  }
+
+  return 'En feil oppstod under transkribering.';
+}
+
 exports.transcribePodcast = onCall({
   cors: true,
   secrets: [geminiApiKeyParam],
@@ -5616,109 +5844,71 @@ exports.transcribePodcast = onCall({
     throw new HttpsError('invalid-argument', 'Mangler audioUrl eller episodeId');
   }
 
-  const geminiKey = getGeminiApiKey();
-  if (!geminiKey) {
-    throw new HttpsError('internal', 'Gemini API-nøkkel mangler på serveren.');
-  }
-
-  const os = require('os');
-  const fs = require('fs');
-  const path = require('path');
-  const { pipeline } = require('stream');
-  const { promisify } = require('util');
-  const streamPipeline = promisify(pipeline);
-  const fetch = require('node-fetch');
-  const { GoogleAIFileManager } = require("@google/generative-ai/server");
-  const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-  const tmpFilePath = path.join(os.tmpdir(), `podcast_${episodeId}.mp3`);
-
   try {
-    console.log(`Laster ned podcast ${episodeId} fra ${audioUrl}...`);
-    const response = await fetch(audioUrl);
-    if (!response.ok) throw new Error(`Klarte ikke laste ned: ${response.statusText}`);
-    await streamPipeline(response.body, fs.createWriteStream(tmpFilePath));
-    console.log(`Nedlasting fullført: ${tmpFilePath}`);
-
-    const fileManager = new GoogleAIFileManager(geminiKey);
-    console.log(`Laster opp til Gemini...`);
-    const uploadResult = await fileManager.uploadFile(tmpFilePath, {
-      mimeType: "audio/mpeg",
-      displayName: `Podcast ${episodeId}`,
+    return await transcribePodcastEpisode({
+      audioUrl,
+      episodeId,
+      episodeTitle: typeof request.data?.episodeTitle === 'string' ? request.data.episodeTitle : '',
+      initiatedBy: 'manual'
     });
-    console.log(`Opplasting fullført. File URI: ${uploadResult.file.uri}`);
-
-    let fileState = uploadResult.file.state;
-    while (fileState === "PROCESSING") {
-      console.log("Venter på prosessering av lydfilen...");
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      const getFile = await fileManager.getFile(uploadResult.file.name);
-      fileState = getFile.state;
-      if (fileState === "FAILED") {
-        throw new Error("Gemini prosessering av lydfilen feilet.");
-      }
-    }
-
-    console.log(`Genererer transkripsjon...`);
-    const genAI = new GoogleGenerativeAI(geminiKey);
-    const transcriptionModelCandidates = [
-      "gemini-2.0-flash",
-      "gemini-2.5-flash",
-      "gemini-2.0-flash-lite",
-    ];
-    const transcriptionPrompt = [
-      {
-        fileData: {
-          mimeType: uploadResult.file.mimeType,
-          fileUri: uploadResult.file.uri
-        }
-      },
-      { text: "Vennligst lag en nøyaktig og ordrett transkripsjon (skriftlig versjon) av denne norske podcast-episoden. Sett inn avsnitt der det er naturlig for å gjøre teksten lett å lese. Bruk riktig tegnsetting og stor forbokstav. Formater teksten med HTML: bruk <p> for avsnitt, og <br> for linjeskift. Ikke inkluder noen overskrift eller markdown-blokker (som ```html), kun den rene HTML-teksten." }
-    ];
-
-    let result = null;
-    let lastModelError = null;
-    for (const modelName of transcriptionModelCandidates) {
-      try {
-        console.log(`Prøver Gemini-modell for transkripsjon: ${modelName}`);
-        const model = genAI.getGenerativeModel({ model: modelName });
-        result = await model.generateContent(transcriptionPrompt);
-        console.log(`Transkripsjon generert med ${modelName}.`);
-        break;
-      } catch (modelError) {
-        lastModelError = modelError;
-        console.error(`Transkripsjon feilet med ${modelName}:`, modelError);
-      }
-    }
-
-    if (!result) {
-      throw lastModelError || new Error("Ingen Gemini-modell kunne transkribere lydfilen.");
-    }
-
-    const transcriptHtml = result.response.text();
-    console.log(`Transkripsjon generert (${transcriptHtml.length} tegn).`);
-
-    try {
-      await fileManager.deleteFile(uploadResult.file.name);
-    } catch (e) {
-      console.warn("Kunne ikke slette fil fra Gemini:", e);
-    }
-
-    await db.collection('podcast_transcripts').doc(episodeId).set({
-      text: transcriptHtml,
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      episodeId: episodeId
-    });
-
-    console.log(`Transkripsjon lagret vellykket i Firestore.`);
-    
-    if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath);
-
-    return { success: true, message: "Transkribering fullført" };
 
   } catch (error) {
     console.error("Feil under transkribering:", error);
-    if (fs.existsSync(tmpFilePath)) fs.unlinkSync(tmpFilePath);
-    throw new HttpsError('internal', error.message || 'En feil oppstod under transkribering.');
+    throw new HttpsError(
+      isGeminiRateLimitError(error) ? 'resource-exhausted' : 'internal',
+      getTranscriptionErrorMessage(error)
+    );
+  }
+});
+
+exports.scheduledPodcastTranscription = onSchedule({
+  schedule: "*/30 * * * *",
+  timeoutSeconds: 540,
+  memory: "1GiB",
+  secrets: [geminiApiKeyParam]
+}, async () => {
+  const episodes = await fetchPodcastEpisodesFromRss(5);
+  const nowMs = Date.now();
+  let processedCount = 0;
+
+  for (const episode of episodes) {
+    if (processedCount >= PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN) {
+      break;
+    }
+
+    const transcriptRef = db.collection("podcast_transcripts").doc(episode.episodeId);
+    const transcriptSnap = await transcriptRef.get();
+    const transcriptData = transcriptSnap.exists ? transcriptSnap.data() : {};
+    const nextRetryAtMs = transcriptData?.nextRetryAt && typeof transcriptData.nextRetryAt.toMillis === "function"
+      ? transcriptData.nextRetryAt.toMillis()
+      : 0;
+
+    if (transcriptData?.text) {
+      continue;
+    }
+
+    if (transcriptData?.status === "processing") {
+      continue;
+    }
+
+    if (nextRetryAtMs && nextRetryAtMs > nowMs) {
+      continue;
+    }
+
+    try {
+      console.log(`Starter automatisk transkribering for episode ${episode.episodeId}`);
+      await transcribePodcastEpisode({
+        audioUrl: episode.audioUrl,
+        episodeId: episode.episodeId,
+        episodeTitle: episode.title,
+        initiatedBy: 'scheduled'
+      });
+      processedCount += 1;
+    } catch (error) {
+      console.error(`Automatisk transkribering feilet for ${episode.episodeId}:`, error);
+      if (isGeminiRateLimitError(error)) {
+        break;
+      }
+    }
   }
 });
