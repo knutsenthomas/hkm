@@ -501,12 +501,15 @@ const PODCAST_SUMMARY_OVERRIDES = {
 
 function asText(value) {
     if (Array.isArray(value)) {
-        return value[0] || '';
+        return asText(value[0]);
     }
     if (value && typeof value === 'object') {
-        return value._ || '';
+        if (typeof value._ === 'string') return value._;
+        if (typeof value.href === 'string') return value.href;
+        if (typeof value.url === 'string') return value.url;
+        return '';
     }
-    return value || '';
+    return typeof value === 'string' ? value : '';
 }
 
 function getChannelImage(channel) {
@@ -752,7 +755,7 @@ async function initPodcastRSS() {
         allPodcastEpisodes = episodes.map((episode, index) => {
             const pubDateText = asText(episode.pubDate);
             return {
-                id: asText(episode.guid) || asText(episode.link),
+                id: getEpisodeId(episode),
                 title: asText(episode.title),
                 pubDate: pubDateText,
                 dateObj: new Date(pubDateText),
