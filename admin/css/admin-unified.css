@@ -4249,72 +4249,51 @@ body.admin-body .nav-link.logout:hover {
     color: #ef4444 !important;
 }
 
-/* ==========================================================================
-   GOLD STANDARD - HEADER & AVATAR FINAL OVERRIDES
-   ========================================================================== */
-
 /* 
 ==========================================================================
-   HEADER HARMONIZATION - THE NEW GOLD STANDARD
+   HEADER RECONSTRUCTION v2.0 - CLEAN SLATE
 ========================================================================== 
 */
 
-/* 1. Main Header Container - Ensure flex and spacing */
-.main-header .section-header-content {
+/* 1. Header Layout - Force horizontal flow and spacing */
+.main-header .section-header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 12px !important;
-    width: 100% !important;
+    padding: 12px 20px !important;
+    height: 72px !important;
+    box-sizing: border-box !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #f1f5f9 !important;
 }
 
-.section-header-titles {
+.section-header-content {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
     flex: 1 !important;
-    min-width: 0 !important; /* Allow shrinking to prevent push */
+    gap: 16px !important;
 }
 
-.section-title {
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-}
-
-/* 2. Actions Container - Right aligned, no wrapping */
+/* 2. Actions Group - Profile, Bell, Menu */
 .section-header-actions {
     display: flex !important;
     align-items: center !important;
-    gap: 8px !important;
+    gap: 12px !important;
     flex-shrink: 0 !important;
-    justify-content: flex-end !important;
 }
 
-/* 3. Button/Profile Order & Base Styles */
-.user-profile-link { order: 1 !important; }
-#messages-bell { order: 2 !important; }
-#mobile-nav-toggle, .mobile-nav-toggle { order: 3 !important; }
-
-.user-profile-link,
-.notification-btn,
-.mobile-nav-toggle {
-    height: 42px !important;
-    border-radius: 12px !important;
-    border: 1px solid rgba(0,0,0,0.05) !important;
+/* 3. User Profile - Combined Name and Avatar */
+.user-profile-link {
     display: flex !important;
     align-items: center !important;
-    justify-content: center !important;
-    background: transparent !important;
-    transition: all 0.2s ease !important;
-    text-decoration: none !important;
-    color: inherit !important;
-}
-
-/* 4. Profile Link - Specific layout (Text on LEFT, Avatar on RIGHT) */
-.user-profile-link {
-    width: auto !important;
-    padding: 0 4px 0 12px !important;
     gap: 12px !important;
-    background: #f8fafc !important; 
-    flex-direction: row !important; /* Force Name then Avatar */
+    padding: 4px 4px 4px 12px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
 }
 
 .user-info-text {
@@ -4322,7 +4301,6 @@ body.admin-body .nav-link.logout:hover {
     flex-direction: column !important;
     align-items: flex-end !important;
     text-align: right !important;
-    order: 1 !important; /* Ensure it stays before avatar if DOM is correct */
 }
 
 .user-name {
@@ -4330,84 +4308,71 @@ body.admin-body .nav-link.logout:hover {
     font-weight: 700 !important;
     color: #1B4965 !important;
     white-space: nowrap !important;
-    line-height: 1.1 !important;
 }
 
 .user-role {
     font-size: 10px !important;
-    font-weight: 800 !important;
+    font-weight: 700 !important;
     color: #64748b !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    line-height: 1.1 !important;
 }
 
-/* 5. Avatar - Force TK initials, clean square */
+/* 4. Avatar - The 'TK' Circle */
 .user-avatar {
-    width: 34px !important;
-    height: 34px !important;
+    width: 36px !important;
+    height: 36px !important;
     background: #1B4965 !important;
     color: #ffffff !important;
-    border-radius: 8px !important;
+    border-radius: 10px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     font-weight: 800 !important;
-    font-size: 13px !important;
+    font-size: 14px !important;
     flex-shrink: 0 !important;
-    order: 2 !important; /* Stay after text */
 }
 
-/* Kill all dynamic icons/spans/fallback-symbols in avatar */
-.user-avatar span, 
-.user-avatar svg, 
-.user-avatar i, 
-.user-avatar .material-symbols-outlined,
-.user-avatar::before,
-.user-avatar::after {
-    display: none !important;
-}
+/* Kill icons inside avatar */
+.user-avatar * { display: none !important; }
 
-/* 6. Notifications & Menu Buttons - Standard Square */
+/* 5. Utility Buttons - Bell and Menu */
 .notification-btn,
 .mobile-nav-toggle {
     width: 42px !important;
+    height: 42px !important;
+    border-radius: 12px !important;
+    border: 1px solid #e2e8f0 !important;
     background: #ffffff !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02) !important;
-}
-
-.notification-btn:hover,
-.mobile-nav-toggle:hover {
-    background: #f1f5f9 !important;
-}
-
-/* Ensure visibility on all sub-pages, but ONLY ON DESKTOP */
-body.admin-body:not(.main-dashboard) .user-info-text,
-body.crm-body .user-info-text,
-body.builder-active .user-info-text {
     display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #475569 !important;
 }
 
-/* 7. THE FINAL MOBILE OVERRIDE - MUST BE LAST AND SPECIFIC */
-@media (max-width: 850px) {
+/* 6. Mobile Responsiveness - Match Dashboard Standard */
+@media (max-width: 800px) {
     .user-info-text {
         display: none !important;
     }
     
     .user-profile-link {
-        width: 42px !important;
         padding: 0 !important;
         background: transparent !important;
         border: none !important;
     }
 
     .user-avatar {
-        width: 40px !important;
-        height: 40px !important;
+        width: 42px !important;
+        height: 42px !important;
         border-radius: 12px !important;
+        border: 1px solid #e2e8f0 !important;
     }
 
     .section-header-actions {
-        gap: 4px !important;
+        gap: 8px !important;
+    }
+
+    .section-header {
+        padding: 8px 12px !important;
     }
 }
