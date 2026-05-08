@@ -1,5 +1,17 @@
 /* Kinetic Admin System - HKM Studio Standard */
 
+/* Global Typography Fixes */
+body.builder-active, 
+body.builder-active * {
+    font-family: 'Inter', sans-serif !important;
+}
+
+body.builder-active .toolbar-action-btn {
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    padding: 10px 20px !important;
+}
+
 /* --- EMERGENCY NEWSLETTER BUILDER FIXES --- */
 /* Desktop View */
 @media (min-width: 992px) {
