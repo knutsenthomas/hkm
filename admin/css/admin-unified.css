@@ -4226,9 +4226,12 @@ body.admin-body .nav-link.logout:hover {
 ========================================================================== 
 */
 
-/* 1. Gold Standard Header - Increased Specificity to override dashboard.css */
-body.admin-body .main-header {
-    height: 100px !important;
+/* 1. Gold Standard Header - Unified 72px Standard across ALL admin pages */
+body.admin-body .main-header,
+body.builder-active .workspace-top-bar,
+body.admin-body #dashboard-main-header {
+    height: 72px !important;
+    min-height: 72px !important;
     background-color: #f4f7fa !important; /* Exact dashboard background */
     display: flex !important;
     align-items: center !important;
@@ -4237,12 +4240,16 @@ body.admin-body .main-header {
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important;
-    border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+    border-bottom: 1px solid rgba(0,0,0,0.06) !important;
     box-sizing: border-box !important;
     box-shadow: none !important;
+    width: 100% !important;
+    margin-bottom: 0 !important;
 }
 
-body.admin-body .section-header {
+/* 2. Header Content Structure */
+body.admin-body .section-header,
+body.builder-active .workspace-top-bar .breadcrumb-nav {
     width: 100% !important;
     height: 100% !important;
     display: flex !important;
@@ -4255,71 +4262,86 @@ body.admin-body .section-header {
     box-shadow: none !important;
 }
 
-body.admin-body .section-header-content {
+body.admin-body .section-header-content,
+body.builder-active .workspace-top-bar .top-bar-actions {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     flex: 1 !important;
 }
 
-/* 2. Avatar Fix - Ultra High Specificity */
-body.admin-body .main-header .user-avatar {
-    width: 44px !important;
-    height: 44px !important;
+/* 3. Avatar & Profile - Gold Standard circular fix */
+body.admin-body .main-header .user-avatar,
+body.builder-active .workspace-top-bar .user-avatar,
+body.admin-body #admin-avatar.user-avatar {
+    width: 42px !important;
+    height: 42px !important;
     background-color: #1B4965 !important; /* HKM Mørkeblå */
     color: #ffffff !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 50% !important;
+    border-radius: 50% !important; /* Perfect circle */
     font-weight: 800 !important;
-    font-size: 16px !important;
+    font-size: 15px !important;
     text-transform: uppercase !important;
     border: 2px solid #ffffff !important;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08) !important;
     visibility: visible !important;
     opacity: 1 !important;
+    flex-shrink: 0 !important;
 }
 
-/* Ensure text node is visible */
-body.admin-body .main-header .user-avatar * {
+/* Kill icons inside to ensure initials show */
+body.admin-body .main-header .user-avatar *,
+body.builder-active .workspace-top-bar .user-avatar * {
     display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
 }
 
-/* 3. Content Spacing - Prevent excessive push-down */
+/* 4. Content Spacing - Standardized for 72px header */
 body.admin-body .crm-content, 
 body.admin-body .inbox-container, 
-body.admin-body .newsletter-builder-container,
+body.builder-active .newsletter-builder-container,
 body.admin-body .segments-container,
-body.admin-body .newsletter-builder-header {
-    padding-top: 10px !important;
+body.admin-body .content-wrapper,
+body.admin-body .section-container {
+    padding-top: 24px !important;
     margin-top: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* 5. Typography Standards */
+body.admin-body .section-title,
+body.builder-active .breadcrumb-current {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    line-height: 1 !important;
 }
 
 body.admin-body .section-header-icon {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 44px !important;
-    height: 44px !important;
+    width: 42px !important;
+    height: 42px !important;
     background: #ffffff !important;
     border-radius: 12px !important;
-    margin-right: 15px !important;
+    margin-right: 16px !important;
     color: #1B4965 !important;
 }
 
-body.admin-body .user-profile-link {
+body.admin-body .user-profile-link,
+body.builder-active .user-profile-link {
     display: flex !important;
     align-items: center !important;
     gap: 12px !important;
     text-decoration: none !important;
-    padding: 4px 8px !important;
+    padding: 6px 10px !important;
     border-radius: 12px !important;
     transition: background 0.2s !important;
     background: transparent !important;
-    border: none !important;
 }
 
 body.admin-body .user-profile-link:hover {
@@ -4330,6 +4352,7 @@ body.admin-body .user-info-text {
     display: flex !important;
     flex-direction: column !important;
     text-align: right !important;
+    line-height: 1.2 !important;
 }
 
 body.admin-body .user-name {
@@ -4339,21 +4362,24 @@ body.admin-body .user-name {
 }
 
 body.admin-body .user-role {
-    font-size: 11px !important;
-    font-weight: 600 !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
     color: #64748b !important;
     text-transform: uppercase !important;
+    letter-spacing: 0.02em !important;
 }
 
-/* 4. Mobile Adjustments */
+/* 6. Mobile Refinements */
 @media (max-width: 800px) {
-    body.admin-body .main-header {
-        height: 72px !important;
+    body.admin-body .main-header,
+    body.builder-active .workspace-top-bar {
+        height: 64px !important;
         padding: 0 16px !important;
     }
     body.admin-body .user-info-text, 
     body.admin-body .section-header-icon, 
-    body.admin-body .section-subtitle {
+    body.admin-body .section-subtitle,
+    body.builder-active .breadcrumb-divider {
         display: none !important;
     }
 }
