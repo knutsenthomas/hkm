@@ -9,8 +9,8 @@
     --admin-accent: #d17d39;
     --admin-accent-dark: #bd4f2a;
     --admin-orange-gradient: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
-    --admin-shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-    --admin-shadow-md: 0 10px 15px -3px rgba(0,0,0,0.05);
+    --admin-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+    --admin-shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
     --admin-radius-lg: 16px;
     --admin-radius-md: 12px;
     --admin-radius-sm: 8px;
@@ -1491,7 +1491,8 @@ body.admin-body .welcome-subtitle {
     display: flex;
     align-items: center;
     overflow: hidden;
-    color: #94a3b8; /* text color for the filename */
+    color: #94a3b8;
+    /* text color for the filename */
 }
 
 /* Custom styling for the file input button (webkit) */
@@ -1500,7 +1501,8 @@ body.admin-body .welcome-subtitle {
 }
 
 .design-ui-upload-row .file-input::before {
-    content: '\e3f4'; /* material symbol image icon */
+    content: '\e3f4';
+    /* material symbol image icon */
     font-family: 'Material Symbols Outlined';
     display: inline-block;
     margin-right: 10px;
@@ -2426,7 +2428,7 @@ body.admin-body .page-title {
     .user-info-text {
         display: none !important;
     }
-    
+
     #global-search-opener {
         display: none !important;
     }
@@ -2441,7 +2443,7 @@ body.admin-body .page-title {
         justify-content: center !important;
         background: transparent !important;
         border-radius: 12px !important;
-        border: 1px solid rgba(0,0,0,0.05) !important;
+        border: 1px solid rgba(0, 0, 0, 0.05) !important;
         margin-right: 0 !important;
     }
 
@@ -2484,7 +2486,7 @@ body.admin-body .page-title {
     text-decoration: none !important;
 }
 
-#messages-bell, 
+#messages-bell,
 .notification-btn {
     order: 2 !important;
 }
@@ -2504,7 +2506,7 @@ body.admin-body .page-title {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border: 1px solid rgba(0,0,0,0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     flex-shrink: 0 !important;
 }
 
@@ -2517,7 +2519,7 @@ body.admin-body .page-title {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border: 1px solid rgba(0,0,0,0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     flex-shrink: 0 !important;
     gap: 8px !important;
 }
@@ -2552,6 +2554,7 @@ body.admin-body .page-title {
 
 /* Mobile cleanup */
 @media (max-width: 768px) {
+
     .user-info-text,
     #global-search-opener {
         display: none !important;
@@ -2579,29 +2582,29 @@ body.builder-active .user-profile-link {
 }
 
 /* 1. Profile/Avatar FIRST */
-.user-profile-link { 
-    order: 1 !important; 
+.user-profile-link {
+    order: 1 !important;
     margin: 0 !important;
 }
 
 /* 2. Notifications SECOND */
-#messages-bell, 
-.notification-btn:not(#global-search-opener):not(.mobile-nav-toggle) { 
-    order: 2 !important; 
-    margin: 0 !important; 
+#messages-bell,
+.notification-btn:not(#global-search-opener):not(.mobile-nav-toggle) {
+    order: 2 !important;
+    margin: 0 !important;
 }
 
 /* 3. Mobile Menu LAST */
 #mobile-nav-toggle,
-.mobile-nav-toggle { 
-    order: 3 !important; 
-    margin: 0 !important; 
+.mobile-nav-toggle {
+    order: 3 !important;
+    margin: 0 !important;
 }
 
 /* Clean Search (Hidden on mobile) */
-#global-search-opener { 
-    order: 0 !important; 
-    margin: 0 !important; 
+#global-search-opener {
+    order: 0 !important;
+    margin: 0 !important;
 }
 
 /* Main content surfaces */
@@ -3226,7 +3229,8 @@ body.builder-active .newsletter-canvas {
         flex: 0 0 auto !important;
         display: flex !important;
         align-items: center !important;
-        gap: 16px !important; /* Better spacing between icons */
+        gap: 16px !important;
+        /* Better spacing between icons */
     }
 
     .page-title {
@@ -3804,10 +3808,10 @@ body.admin-body .section-container {
 }
 
 /* Make topbar-to-first-box spacing match the standard box rhythm (24px total) */
-body.admin-body .section-content > .section-header:first-child,
-body.admin-body .section-content > .design-ui-header:first-child,
-body.admin-body .section-content > .section-header-row:first-child,
-body.admin-body #overview-section > .overview-hero-card:first-child {
+body.admin-body .section-content>.section-header:first-child,
+body.admin-body .section-content>.design-ui-header:first-child,
+body.admin-body .section-content>.section-header-row:first-child,
+body.admin-body #overview-section>.overview-hero-card:first-child {
     margin-top: 12px !important;
 }
 
@@ -4057,12 +4061,12 @@ body.admin-body #overview-section .stat-icon-wrap {
     line-height: 0;
 }
 
-body.admin-body .section-header-icon > .material-symbols-outlined,
-body.crm-body .section-header-icon > .material-symbols-outlined,
-body.builder-active .section-header-icon > .material-symbols-outlined,
-body.admin-body .design-ui-panel-header-icon > .material-symbols-outlined,
-body.crm-body .design-ui-panel-header-icon > .material-symbols-outlined,
-body.admin-body #overview-section .stat-icon-wrap > .material-symbols-outlined {
+body.admin-body .section-header-icon>.material-symbols-outlined,
+body.crm-body .section-header-icon>.material-symbols-outlined,
+body.builder-active .section-header-icon>.material-symbols-outlined,
+body.admin-body .design-ui-panel-header-icon>.material-symbols-outlined,
+body.crm-body .design-ui-panel-header-icon>.material-symbols-outlined,
+body.admin-body #overview-section .stat-icon-wrap>.material-symbols-outlined {
     display: grid !important;
     place-items: center !important;
     width: 1em !important;
@@ -4079,7 +4083,7 @@ body.crm-body .contacts-grid .table-header .search-box {
     position: relative;
 }
 
-body.crm-body .contacts-grid .table-header .search-box > .material-symbols-outlined {
+body.crm-body .contacts-grid .table-header .search-box>.material-symbols-outlined {
     left: auto !important;
     right: 12px !important;
     top: 50%;
@@ -4087,18 +4091,18 @@ body.crm-body .contacts-grid .table-header .search-box > .material-symbols-outli
     pointer-events: none;
 }
 
-body.crm-body .contacts-grid .table-header .search-box > input {
+body.crm-body .contacts-grid .table-header .search-box>input {
     padding-left: 14px !important;
     padding-right: 42px !important;
 }
 
 /* Segment page list search: icon on the right side */
-body.crm-body .card.modern .table-header .search-box > input#segment-search {
+body.crm-body .card.modern .table-header .search-box>input#segment-search {
     padding-left: 14px !important;
     padding-right: 42px !important;
 }
 
-body.crm-body .card.modern .table-header .search-box > .material-symbols-outlined {
+body.crm-body .card.modern .table-header .search-box>.material-symbols-outlined {
     left: auto !important;
     right: 12px !important;
     top: 50%;
@@ -4227,7 +4231,7 @@ body.builder-active #dashboard-main-header {
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important;
-    border-bottom: 1px solid rgba(0,0,0,0.06) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
     box-sizing: border-box !important;
     width: 100% !important;
     margin-bottom: 0 !important;
@@ -4277,7 +4281,7 @@ body.builder-active .user-avatar,
     font-size: 15px !important;
     text-transform: uppercase !important;
     border: 2px solid #ffffff !important;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.08) !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
     visibility: visible !important;
     opacity: 1 !important;
     flex-shrink: 0 !important;
@@ -4285,14 +4289,15 @@ body.builder-active .user-avatar,
 }
 
 /* Suppress any child nodes (icons/images) to guarantee initials visibility */
-.user-avatar *, [id="admin-avatar"] * {
+.user-avatar *,
+[id="admin-avatar"] * {
     display: none !important;
 }
 
 /* 4. Content Spacing Fixes - Universal consistency */
-body.admin-body .crm-content, 
+body.admin-body .crm-content,
 body.crm-body .crm-content,
-body.crm-body .inbox-container, 
+body.crm-body .inbox-container,
 body.builder-active .newsletter-builder-container,
 body.builder-active .builder-workspace,
 body.admin-body .segments-container,
@@ -4348,7 +4353,7 @@ body.builder-active .mobile-nav-toggle {
     justify-content: center !important;
     border-radius: 12px !important;
     background: #ffffff !important;
-    border: 1px solid rgba(0,0,0,0.05) !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
     color: #64748b !important;
     transition: all 0.2s ease !important;
     margin-left: 12px !important;
@@ -4387,14 +4392,16 @@ body.builder-active .user-role {
 
 /* 7. Mobile Adaptive Rules */
 @media (max-width: 800px) {
+
     body.admin-body .main-header,
     body.crm-body .main-header,
     body.builder-active .main-header {
         height: 64px !important;
         padding: 0 16px !important;
     }
+
     .user-info-text,
-    .section-header-icon, 
+    .section-header-icon,
     .section-subtitle,
     .breadcrumb-divider,
     .breadcrumb-item {
@@ -4407,6 +4414,7 @@ body.builder-active .user-role {
 body.builder-active .builder-workspace {
     padding-top: 0 !important;
 }
+
 /* End of Unified Header Reconstruction */
 
 /* 
@@ -4440,9 +4448,9 @@ body.builder-active #dashboard-main-header {
     box-sizing: border-box !important;
 }
 
-body.admin-body .main-header > .section-header,
-body.crm-body .main-header > .section-header,
-body.builder-active .main-header > .section-header {
+body.admin-body .main-header>.section-header,
+body.crm-body .main-header>.section-header,
+body.builder-active .main-header>.section-header {
     width: 100% !important;
     max-width: var(--admin-page-max, 1280px) !important;
     height: 100% !important;
@@ -4578,6 +4586,7 @@ body.builder-active .main-header [id="admin-avatar"] {
 }
 
 @media (min-width: 801px) {
+
     body.admin-body .main-header .mobile-nav-toggle,
     body.crm-body .main-header .mobile-nav-toggle,
     body.builder-active .main-header .mobile-nav-toggle {
@@ -4588,12 +4597,13 @@ body.builder-active .main-header [id="admin-avatar"] {
 }
 
 @media (max-width: 800px) {
+
     body.admin-body .main-header,
     body.crm-body .main-header,
     body.builder-active .main-header {
         height: 64px !important;
         min-height: 64px !important;
-        padding: 0 10px !important;
+        padding: 0px !important;
     }
 
     body.admin-body .main-header .section-header-icon,
