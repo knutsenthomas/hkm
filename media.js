@@ -607,8 +607,8 @@ function isTranscriptChapterHeading(text) {
     const value = String(text || '').trim();
     if (!value) return false;
 
-    return /^(?:\d+\.\s*)?[\wÆØÅæøå\s-]+\s+kapittel\s+\d+(?:\s*[-:]\s*.*)?$/i.test(value)
-        || /^(?:kapittel|kap\.)\s*\d+(?:\s*[-:]\s*.*)?$/i.test(value);
+    return /^(?:\d+\.\s*)?[\wÆØÅæøå\s-]+\s+kapittel\s+\d+(?:\s*[-:.]\s*.*)?\.?$/i.test(value)
+        || /^(?:kapittel|kap\.)\s*\d+(?:\s*[-:.]\s*.*)?\.?$/i.test(value);
 }
 
 function splitChapterHeadingInParagraph(text) {
@@ -616,8 +616,8 @@ function splitChapterHeadingInParagraph(text) {
     if (!value) return null;
 
     const patterns = [
-        /((?:[1-3]\.?\s*)?[A-Za-zÆØÅæøå\-\s]{0,40}?kapittel\s+\d+(?:\s*[-:]\s*[^.!?\n]+)?)/i,
-        /((?:kapittel|kap\.)\s*\d+(?:\s*[-:]\s*[^.!?\n]+)?)/i
+        /((?:[1-3]\.?\s*)?[A-Za-zÆØÅæøå\-\s]{0,40}?kapittel\s+\d+(?:\s*[-:.]\s*[^\n]+)?\.?)/i,
+        /((?:kapittel|kap\.)\s*\d+(?:\s*[-:.]\s*[^\n]+)?\.?)/i
     ];
 
     for (const pattern of patterns) {
