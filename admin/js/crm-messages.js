@@ -60,8 +60,8 @@ class MessagesManager {
         const btnNewPush = document.getElementById('btn-new-push');
         if (btnNewPush) {
             btnNewPush.onclick = () => {
-                document.getElementById('push-modal').style.display = 'flex';
-                this.resetPushForm();
+                const folderPush = document.querySelector('.folder-item[data-filter="push"]');
+                if (folderPush) folderPush.click();
             };
         }
 
@@ -107,12 +107,20 @@ class MessagesManager {
 
         // Folders
         const folders = document.querySelectorAll('.folder-item');
+        const unifiedContainer = document.getElementById('unified-inbox');
         folders.forEach(folder => {
             folder.addEventListener('click', () => {
                 folders.forEach(f => f.classList.remove('active'));
                 folder.classList.add('active');
                 this.activeFilter = folder.dataset.filter;
-                this.renderThreadList();
+                
+                if (this.activeFilter === 'push') {
+                    unifiedContainer.classList.add('push-active');
+                    this.initPushDashboard();
+                } else {
+                    unifiedContainer.classList.remove('push-active');
+                    this.renderThreadList();
+                }
             });
         });
 
@@ -1150,28 +1158,28 @@ class MessagesManager {
     async handlePushSubmit(e) {
         e.preventDefault();
         const btn = e.target.querySelector('button[type="submit"]');
-        const statusEl = document.getElementById('inbox-push-status');
+        const statusEl = document.getElementById('push-status');
         
         const originalText = btn.innerHTML;
         btn.disabled = true;
         btn.innerHTML = '<span class="material-symbols-outlined rotating">sync</span> Sender...';
         statusEl.textContent = 'Forbereder utsendelse...';
-        statusEl.style.color = 'var(--text-muted)';
+        statusEl.className = 'status-message info';
 
         try {
             const user = window.firebaseService.auth.currentUser;
             if (!user) throw new Error('Du må være logget inn.');
 
             const idToken = await user.getIdToken();
-            const targetRole = document.getElementById('inbox-push-target').value;
-            const title = document.getElementById('inbox-push-title').value;
-            const body = document.getElementById('inbox-push-body').value;
-            const link = document.getElementById('inbox-push-link').value;
+            const targetRole = document.getElementById('push-target-role').value;
+            const title = document.getElementById('push-title').value;
+            const body = document.getElementById('push-body').value;
+            const link = document.getElementById('push-click-action').value;
 
             let payload = { targetRole, title, body, click_action: link };
 
             if (targetRole === 'selected') {
-                const selectedIds = Array.from(document.querySelectorAll('.inbox-user-select:checked')).map(cb => cb.value);
+                const selectedIds = Array.from(document.querySelectorAll('.user-select-checkbox:checked')).map(cb => cb.value);
                 if (selectedIds.length === 0) throw new Error("Velg minst én bruker.");
                 payload.selectedUserIds = selectedIds;
             }
@@ -1225,18 +1233,114 @@ class MessagesManager {
                 sentAt: window.firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            window.showToast?.("Push-varsling er sendt!", "success");
-            document.getElementById('push-modal').style.display = 'none';
-            this.loadUnifiedInbox(); // Refresh log
+            statusEl.textContent = 'Push-varsling er sendt!';
+            statusEl.className = 'status-message success';
+            e.target.reset();
+            
+            // Refresh log
+            await this.loadUnifiedInbox();
+            this.loadActivityLog('all');
 
         } catch (error) {
             console.error("Push send error:", error);
             statusEl.textContent = error.message;
-            statusEl.style.color = '#ef4444';
+            statusEl.className = 'status-message error';
         } finally {
             btn.disabled = false;
             btn.innerHTML = originalText;
         }
+    }
+
+    initPushDashboard() {
+        const form = document.getElementById('push-notification-form');
+        if (form) {
+            form.onsubmit = (e) => this.handlePushSubmit(e);
+        }
+        
+        const targetRole = document.getElementById('push-target-role');
+        if (targetRole) {
+            targetRole.onchange = (e) => {
+                const selection = document.getElementById('push-user-selection');
+                if (e.target.value === 'selected') {
+                    this.renderUserSelection('push-user-selection');
+                    selection.style.display = 'block';
+                } else {
+                    selection.style.display = 'none';
+                }
+            };
+        }
+
+        // Filters
+        document.querySelectorAll('.log-filter-btn').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this.loadActivityLog(btn.dataset.filter);
+            };
+        });
+
+        this.loadActivityLog('all');
+    }
+
+    async loadActivityLog(filter = 'all') {
+        const container = document.getElementById('activity-log-list');
+        if (!container) return;
+        
+        container.innerHTML = '<div class="loader">Laster...</div>';
+        
+        // Ensure data is loaded
+        if (this.unifiedThreads.length === 0) {
+            await this.loadUnifiedInbox();
+        }
+
+        let filtered = this.unifiedThreads;
+        if (filter === 'push') filtered = this.pushNotifications;
+        else if (filter === 'message') filtered = this.messages;
+
+        if (filtered.length === 0) {
+            container.innerHTML = '<p style="padding: 20px; color: var(--text-muted); font-size: 14px;">Ingen aktiviteter funnet.</p>';
+            return;
+        }
+
+        container.innerHTML = filtered.map(item => {
+            let icon = 'campaign';
+            let color = '#3b82f6';
+            let bg = '#eff6ff';
+            let title = '';
+            let meta = '';
+            
+            if (item.type === 'push') {
+                title = item.title || 'Push-varsling';
+                meta = `${item.body || ''} · Til: ${item.targetRole === 'all' ? 'Alle' : item.targetRole} · Sendt av ${item.sentBy || 'Admin'}`;
+            } else if (item.type === 'email') {
+                icon = 'mail';
+                color = '#10b981';
+                bg = '#f0fdf4';
+                title = `E-post fra ${item.name || 'Ukjent'}`;
+                meta = item.subject || item.message || '';
+            } else if (item.type === 'chat') {
+                icon = 'forum';
+                color = '#8b5cf6';
+                bg = '#f5f3ff';
+                title = `Chat med ${item.visitorName || 'Anonym'}`;
+                meta = item.lastMessage?.text || 'Ingen meldinger';
+            }
+
+            const date = (item.updatedAt || item.createdAt || item.sentAt)?.toDate?.() || new Date(item.updatedAt || item.createdAt || item.sentAt || 0);
+            
+            return `
+                <div class="log-item">
+                    <div class="log-item-icon" style="background: ${bg}; color: ${color};">
+                        <span class="material-symbols-outlined">${icon}</span>
+                    </div>
+                    <div class="log-item-content">
+                        <div class="log-item-title">${this.escapeHtml(title)}</div>
+                        <div class="log-item-meta">${this.escapeHtml(meta)}</div>
+                        <div class="log-item-date">${this.formatTime(date)}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
     escapeHtml(value) {
