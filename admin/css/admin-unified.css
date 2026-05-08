@@ -4593,7 +4593,7 @@ body.builder-active .main-header [id="admin-avatar"] {
     body.builder-active .main-header {
         height: 64px !important;
         min-height: 64px !important;
-        padding: 0 16px !important;
+        padding: 0 10px !important;
     }
 
     body.admin-body .main-header .section-header-icon,
