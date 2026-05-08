@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G31) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G32) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -3542,8 +3542,6 @@ body.admin-body .editor-sidebar-panel {
 /* Tables and list wrappers need balanced inset spacing */
 body.admin-body .logs-table-wrap,
 body.crm-body .table-container,
-body.crm-body .contacts-grid.card.modern,
-body.admin-body .contacts-grid.card.modern,
 body.admin-body .table-container {
     padding-left: var(--audit-space-3);
     padding-right: var(--audit-space-3);
@@ -4752,11 +4750,13 @@ body.builder-active .main-header [id="admin-avatar"] {
 /* Global Search Box Fix for icon overlap */
 .search-box, .threads-search {
     position: relative !important;
-    display: inline-flex !important;
-    align-items: center !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 280px !important;
 }
 
-.search-box input, .threads-search input {
+.search-box input, .threads-search input,
+#contact-search, #segment-search, #inbox-search {
     padding-left: 52px !important;
     padding-right: 16px !important;
     width: 100% !important;
@@ -4773,9 +4773,14 @@ body.builder-active .main-header [id="admin-avatar"] {
     color: #64748b !important;
     pointer-events: none !important;
     z-index: 10 !important;
-    display: block !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     font-size: 20px !important;
-    line-height: 1 !important;
+    height: 100% !important;
+    width: 24px !important;
 }
+
+/* End of file */
 
 /* End of file */
