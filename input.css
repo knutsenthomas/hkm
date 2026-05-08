@@ -3270,7 +3270,7 @@ body.hero-animate .slide-buttons {
 
 
     .slider-nav {
-        bottom: 60px;
+        bottom: 90px;
         gap: 40px;
     }
 
@@ -3284,7 +3284,7 @@ body.hero-animate .slide-buttons {
     }
 
     .slide-content {
-        padding-bottom: 80px;
+        padding-bottom: 120px;
     }
 
     .features-grid,
