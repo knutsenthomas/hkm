@@ -127,10 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
         const hash = window.location.hash.replace('#', '');
-        const isAdminHome = path.endsWith('/admin') || path.endsWith('/admin/index.html');
+        const isAdminHome = path.endsWith('/admin/index.html') || path.endsWith('/admin/index.html');
         const currentSection = hash || (isAdminHome ? 'overview' : '');
 
-        const itemHref = (section) => `/admin#${section}`;
+        const itemHref = (section) => `/admin/index.html#${section}`;
         const isActive = (item) => {
             if (item.path && path.includes(item.path)) return true;
             if (item.section && currentSection === item.section) return true;
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
 
         const mainItems = [
-            { label: 'Oversikt', icon: 'home', section: 'overview', href: '/admin#overview', alwaysVisible: true },
+            { label: 'Oversikt', icon: 'home', section: 'overview', href: '/admin/index.html#overview', alwaysVisible: true },
             { header: 'nettsted', label: 'Nettsted' },
             { label: 'Sideinnhold', icon: 'description', section: 'content', category: 'nettsted' },
             { label: 'Blogg', icon: 'edit_note', section: 'blog', category: 'nettsted' },
@@ -179,11 +179,11 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Design & Logo', icon: 'palette', section: 'design', category: 'nettsted' },
             { header: 'kommunikasjon', label: 'Kommunikasjon' },
             { label: 'Arrangementer', icon: 'event', section: 'events', category: 'kommunikasjon' },
-            { label: 'Kontakter', icon: 'group', href: '/admin/admin-kommunikasjon', path: 'admin-kommunikasjon', category: 'kommunikasjon' },
-            { label: 'Segmenter', icon: 'segment', href: '/admin/admin-segmenter', path: 'admin-segmenter', category: 'kommunikasjon' },
-            { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
+            { label: 'Kontakter', icon: 'group', href: '/admin/admin-kommunikasjon.html', path: 'admin-kommunikasjon', category: 'kommunikasjon' },
+            { label: 'Segmenter', icon: 'segment', href: '/admin/admin-segmenter.html', path: 'admin-segmenter', category: 'kommunikasjon' },
+            { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger.html', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
             { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
-            { label: 'Nyhetsbrev', icon: 'mail_outline', href: '/admin/admin-nyhetsbrev', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
+            { label: 'Nyhetsbrev', icon: 'mail_outline', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
             { label: 'Push-varslinger', icon: 'send_to_mobile', section: 'kommunikasjon', category: 'kommunikasjon', id: 'nav-kommunikasjon-hidden' },
             { header: 'administrasjon', label: 'Administrasjon' },
             { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },
@@ -191,11 +191,11 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Automatisering', icon: 'auto_awesome', section: 'automation', category: 'administrasjon' },
             { label: 'SEO & Meta', icon: 'search_insights', section: 'seo', category: 'administrasjon' },
             { label: 'Innstillinger', icon: 'settings', section: 'settings', category: 'administrasjon' },
-            { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
+            { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
         ];
 
         const footerItems = [
-            { label: 'Min Side', icon: 'account_circle', href: '/minside/index', alwaysVisible: true, id: 'admin-profile-trigger-sidebar' },
+            { label: 'Min Side', icon: 'account_circle', href: '/minside/index.html', alwaysVisible: true, id: 'admin-profile-trigger-sidebar' },
             { label: 'Se nettside', icon: 'visibility', href: '/', alwaysVisible: true, target: '_blank' },
         ];
 
@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Delay redirect slightly to avoid false positives during transient auth refresh.
                 pendingAuthRedirect = setTimeout(() => {
                     if (!firebaseService?.auth?.currentUser) {
-                        window.location.href = '/admin/login';
+                        window.location.href = '/admin/login.html';
                     }
                 }, 2500);
                 return;
@@ -287,9 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!isAdmin) {
                 const redirect = typeof adminUtils.redirectToMinSideWithAccessDenied === 'function'
                     ? adminUtils.redirectToMinSideWithAccessDenied
-                    : () => { window.location.href = '/minside'; };
+                    : () => { window.location.href = '/minside/index.html'; };
                 redirect({
-                    path: '/minside',
+                    path: '/minside/index.html',
                     message: 'Access Denied: Du har ikke administratorrettigheter til denne siden.'
                 });
                 return;
@@ -343,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } catch (e) { }
                 logoutBtn.innerHTML = originalHtml;
                 logoutBtn.disabled = false;
-                window.location.replace('/admin/login');
+                window.location.replace('/admin/login.html');
             }
         });
     };
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (href && href !== '#' && currentPath.includes(href)) {
             bottomNavItems.forEach(i => i.classList.remove('active'));
             item.classList.add('active');
-        } else if (href === '#' && (currentPath.endsWith('/admin') || currentPath.endsWith('admin/'))) {
+        } else if (href === '#' && (currentPath.endsWith('/admin/index.html') || currentPath.endsWith('admin/'))) {
             // Oversikt fallback
             if (item.getAttribute('data-section') === 'overview') {
                 item.classList.add('active');

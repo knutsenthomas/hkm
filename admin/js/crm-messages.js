@@ -39,7 +39,7 @@ class MessagesManager {
                 this.currentAdminEmail = user.email || '';
                 this.loadUnifiedInbox();
             } else {
-                window.location.href = '/admin/login';
+                window.location.href = '/admin/login.html';
             }
         });
     }

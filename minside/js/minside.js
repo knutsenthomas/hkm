@@ -48,7 +48,7 @@ class MinSideManager {
                     const startView = window.location.hash.replace('#', '') || 'overview';
                     this.loadView(startView);
                 } else {
-                    window.location.href = '/minside/login';
+                    window.location.href = '/minside/login.html';
                 }
             } catch (error) {
                 console.error('Init Error:', error);
@@ -1671,7 +1671,7 @@ class MinSideManager {
             if (error.code === 'auth/requires-recent-login') {
                 alert('Vennligst logg inn på nytt for å bekrefte sletting.');
                 await firebase.auth().signOut();
-                window.location.href = '/minside/login';
+                window.location.href = '/minside/login.html';
             } else {
                 alert('Feil: ' + error.message);
             }

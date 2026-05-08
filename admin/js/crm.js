@@ -57,7 +57,7 @@ class CRMManager {
             if (user) {
                 this.loadContacts();
             } else {
-                window.location.href = '/admin/login';
+                window.location.href = '/admin/login.html';
             }
         });
     }

@@ -212,7 +212,7 @@
                                     data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
                             <li><a href="/kurs" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.courses">Kurs</a></li>
-                            <li><a href="/minside/index" data-content-doc="settings_global"
+                            <li><a href="/minside/index.html" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.myPage">Min Side</a></li>
                         </ul>
                     </div>
@@ -814,7 +814,7 @@
                                     data-content-key="footer.links.resources.blog">Nyheter & blogg</a></li>
                                 <li><a href="/butikk" data-content-doc="settings_global"
                                         data-content-key="footer.links.resources.store">Butikk</a></li>
-                                <li><a href="/minside/index" target="_blank" data-content-doc="settings_global"
+                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global"
                                         data-content-key="footer.links.resources.myPage">Min Side</a></li>
                             </ul>
                         </div>
@@ -910,7 +910,7 @@
             <div class="footer-bottom">
                 <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
                         data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
-                <a href="/admin/login" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
                     data-content-key="footer.adminLink">Admin</a>
             </div>
         </div>
@@ -962,7 +962,7 @@
                     && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
                     && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
 
-                adminLink.href = canAccessAdmin ? '/admin' : '/minside';
+                adminLink.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
             });
         })();
         // Dynamisk profil-lenke i header
@@ -987,7 +987,7 @@
                 const canAccessAdmin = window.HKM_PERMISSIONS
                     && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
                     && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
-                profileLink.href = canAccessAdmin ? '/admin' : '/minside';
+                profileLink.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
             });
         })();
     </script>

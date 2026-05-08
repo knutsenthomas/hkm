@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const service = window.firebaseService;
         const user = firebase.auth().currentUser;
         if (!user || !service) {
-            window.location.href = '/minside';
+            window.location.href = '/minside/index.html';
             return;
         }
 
@@ -191,14 +191,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (roleLookupFailed) {
             // Avoid misrouting admins to member area when Firestore is temporarily slow.
             showMessage('Innlogging er gjennomført, men rolleverifisering er treg. Prøver medlemssiden først.', 'success');
-            window.location.href = '/minside';
+            window.location.href = '/minside/index.html';
             return;
         }
 
         const normalizedRole = String(role || '').trim().toLowerCase();
         const canAccessAdmin = normalizedRole === 'admin' || normalizedRole === 'superadmin';
 
-        window.location.href = canAccessAdmin ? '/admin' : '/minside';
+        window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
     }
 
     function getErrorMessage(error) {

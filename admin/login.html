@@ -239,7 +239,7 @@
                     const service = window.firebaseService;
                     const user = firebase.auth().currentUser;
                     if (!user || !service) {
-                        window.location.href = '/admin';
+                        window.location.href = '/admin/index.html';
                         return;
                     }
 
@@ -257,7 +257,7 @@
 
                     if (roleLookupFailed) {
                         // Let admin dashboard perform the final RBAC check to avoid false "medlem" redirects on slow Firestore.
-                        window.location.href = '/admin';
+                        window.location.href = '/admin/index.html';
                         return;
                     }
 
@@ -270,7 +270,7 @@
                         adminUtils.pushFlashNotice('Access Denied: Du har ikke administratorrettigheter til adminpanelet.', 'error', 6000);
                     }
 
-                    window.location.href = canAccessAdmin ? '/admin' : '/minside';
+                    window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
                 }
 
                 const loginForm = document.getElementById('login-form');

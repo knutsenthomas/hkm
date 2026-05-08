@@ -753,7 +753,7 @@ class AdminManager {
                 // Delay redirect slightly to avoid random logouts during transient auth/token refresh.
                 this._pendingAuthRedirectTimer = setTimeout(() => {
                     if (!firebaseService?.auth?.currentUser) {
-                        window.location.href = '/admin/login';
+                        window.location.href = '/admin/login.html';
                     }
                 }, 2500);
                 return;
@@ -773,11 +773,11 @@ class AdminManager {
                     console.warn("Access denied: User lacks admin role.");
                     if (typeof adminUtils.redirectToMinSideWithAccessDenied === 'function') {
                         adminUtils.redirectToMinSideWithAccessDenied({
-                            path: '/minside',
+                            path: '/minside/index.html',
                             message: 'Access Denied: Du har ikke administratorrettigheter til adminpanelet.'
                         });
                     } else {
-                        window.location.href = '/minside';
+                        window.location.href = '/minside/index.html';
                     }
                     return;
                 }
@@ -809,11 +809,11 @@ class AdminManager {
                 // On error, steer to safety (public area)
                 if (typeof adminUtils.redirectToMinSideWithAccessDenied === 'function') {
                     adminUtils.redirectToMinSideWithAccessDenied({
-                        path: '/minside',
+                        path: '/minside/index.html',
                         message: 'Tilgang kunne ikke verifiseres. Prøv igjen eller kontakt administrator.'
                     });
                 } else {
-                    window.location.href = '/minside';
+                    window.location.href = '/minside/index.html';
                 }
             }
         });
@@ -1138,7 +1138,7 @@ class AdminManager {
                 event.stopPropagation();
                 logoutBtn.disabled = true;
                 if (firebaseService.isInitialized) await firebaseService.logout();
-                window.location.href = '/admin/login';
+                window.location.href = '/admin/login.html';
             });
         }
 
@@ -1311,7 +1311,7 @@ class AdminManager {
     async logout() {
         try {
             await firebaseService.logout();
-            window.location.href = '/admin/login';
+            window.location.href = '/admin/login.html';
         } catch (error) {
             console.error("Error signing out:", error);
             this.showToast("Failed to log out. Please try again.", "error", 5000);
@@ -1324,7 +1324,7 @@ class AdminManager {
         const bell = document.getElementById('messages-bell');
         if (bell) {
             bell.addEventListener('click', () => {
-                window.location.href = '/admin/admin-meldinger';
+                window.location.href = '/admin/admin-meldinger.html';
             });
         }
 
@@ -2871,11 +2871,11 @@ class AdminManager {
                         Her har du en fullstendig oversikt over HKM Studio. Se sanntidsdata, administrer innhold og svar på meldinger fra én sentral flate.
                     </p>
                     <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; align-items: center !important; justify-content: flex-start !important;">
-                        <button type="button" class="overview-hero-action" style="height: 48px !important; background: #ffffff !important; color: #bd4f2a !important; border-radius: 8px !important; padding: 0 24px !important; font-weight: 600 !important; border: 1px solid transparent !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; font-family: 'Inter', sans-serif !important; transition: all 0.2s ease !important; font-size: 14px !important; white-space: nowrap !important; box-sizing: border-box !important; margin: 0 !important;" onclick="window.location.href='/admin/admin-meldinger'" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
+                        <button type="button" class="overview-hero-action" style="height: 48px !important; background: #ffffff !important; color: #bd4f2a !important; border-radius: 8px !important; padding: 0 24px !important; font-weight: 600 !important; border: 1px solid transparent !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; font-family: 'Inter', sans-serif !important; transition: all 0.2s ease !important; font-size: 14px !important; white-space: nowrap !important; box-sizing: border-box !important; margin: 0 !important;" onclick="window.location.href='/admin/admin-meldinger.html'" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
                             <span class="material-symbols-outlined" style="font-size: 20px !important;">mail</span>
                             Gå til meldinger
                         </button>
-                        <button type="button" class="overview-hero-action-secondary" style="height: 48px !important; background: rgba(255,255,255,0.1) !important; color: white !important; border-radius: 8px !important; padding: 0 24px !important; font-weight: 600 !important; border: 1px solid rgba(255,255,255,0.4) !important; backdrop-filter: blur(8px) !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; transition: all 0.2s ease !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; font-size: 14px !important; white-space: nowrap !important; box-sizing: border-box !important; margin: 0 !important;" onclick="window.location.href='/admin#content'" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.borderColor='rgba(255,255,255,0.6)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.4)';">
+                        <button type="button" class="overview-hero-action-secondary" style="height: 48px !important; background: rgba(255,255,255,0.1) !important; color: white !important; border-radius: 8px !important; padding: 0 24px !important; font-weight: 600 !important; border: 1px solid rgba(255,255,255,0.4) !important; backdrop-filter: blur(8px) !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; transition: all 0.2s ease !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; font-size: 14px !important; white-space: nowrap !important; box-sizing: border-box !important; margin: 0 !important;" onclick="window.location.href='/admin/index.html#content'" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.borderColor='rgba(255,255,255,0.6)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.4)';">
                             <span class="material-symbols-outlined" style="font-size: 20px !important;">dashboard_customize</span>
                             Se sideinnhold
                         </button>
