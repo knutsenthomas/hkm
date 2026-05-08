@@ -2439,7 +2439,7 @@ body.admin-body .page-title {
         display: flex !important;
         align-items: center !important;
         justify-content: center !important;
-        background: #dbeafe !important;
+        background: transparent !important;
         border-radius: 12px !important;
         border: 1px solid rgba(0,0,0,0.05) !important;
         margin-right: 0 !important;
@@ -4279,4 +4279,47 @@ body.admin-body .nav-link.logout:hover {
 /* Ensure 'TK' text is visible and centered */
 .user-avatar::after {
     display: none !important; /* Prevent any pseudo-element icons */
+}
+
+/* 3. RESTORE & LEGALIZE USER INFO TEXT (Name/Role) */
+.user-info-text {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    margin-right: 12px !important;
+    text-align: right !important;
+    order: -1 !important; /* Ensure it comes BEFORE the avatar circle */
+}
+
+.user-name {
+    white-space: nowrap !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1.1 !important;
+    display: block !important;
+    color: #1B4965 !important;
+}
+
+.user-role {
+    white-space: nowrap !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    opacity: 0.8 !important;
+    display: block !important;
+    color: #64748b !important;
+}
+
+/* Ensure visibility on all sub-pages */
+body.admin-body .user-info-text,
+body.crm-body .user-info-text,
+body.builder-active .user-info-text {
+    display: flex !important;
+}
+
+/* Hide on mobile to prevent overflow */
+@media (max-width: 600px) {
+    .user-info-text {
+        display: none !important;
+    }
 }
