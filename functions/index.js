@@ -5862,7 +5862,7 @@ exports.transcribePodcast = onCall({
 });
 
 exports.scheduledPodcastTranscription = onSchedule({
-  schedule: "*/30 * * * *",
+  schedule: "*/5 * * * *",
   timeoutSeconds: 540,
   memory: "1GiB",
   secrets: [geminiApiKeyParam]
