@@ -6,6 +6,20 @@ body.builder-active *:not(.material-symbols-outlined) {
     font-family: 'Inter', sans-serif !important;
 }
 
+/* Fix Sidebar Logo Alignment */
+body.builder-active .sidebar-header,
+body.builder-active .logo-container,
+body.builder-active .sidebar-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+body.builder-active .logo-img,
+body.builder-active .sidebar-logo {
+    margin-bottom: 0 !important;
+}
+
 body.builder-active .toolbar-action-btn,
 body.builder-active .toolbar-action-btn *:not(.material-symbols-outlined) {
     font-size: 14px !important;
