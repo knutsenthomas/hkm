@@ -4557,8 +4557,8 @@ body.builder-active #dashboard-main-header {
     width: 100% !important;
     padding: 0 40px !important;
     margin: 0 !important;
-    background: #f4f7fa !important;
-    border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+    background: #cc6f2c !important;
+    border-bottom: 1px solid #b85f23 !important;
     box-shadow: none !important;
     position: sticky !important;
     top: 0 !important;
@@ -4601,8 +4601,9 @@ body.builder-active .main-header .section-header-icon {
     width: 36px !important;
     height: 36px !important;
     border-radius: 12px !important;
-    background: #f8fafc !important;
-    border: 1px solid #e2e8f0 !important;
+    background: rgba(255, 255, 255, 0.18) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
+    color: #ffffff !important;
     box-shadow: none !important;
 }
 
@@ -4612,7 +4613,7 @@ body.builder-active .main-header .section-title {
     font-size: 18px !important;
     line-height: 1.15 !important;
     font-weight: 800 !important;
-    color: #0f172a !important;
+    color: #ffffff !important;
     margin: 0 !important;
     letter-spacing: 0 !important;
 }
@@ -4645,10 +4646,22 @@ body.builder-active .main-header .user-profile-link {
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
-    background: transparent !important;
-    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
     border-radius: 12px !important;
     text-decoration: none !important;
+}
+
+body.admin-body .main-header .user-name,
+body.crm-body .main-header .user-name,
+body.builder-active .main-header .user-name {
+    color: #ffffff !important;
+}
+
+body.admin-body .main-header .user-role,
+body.crm-body .main-header .user-role,
+body.builder-active .main-header .user-role {
+    color: #ffedd5 !important;
 }
 
 body.admin-body .main-header .notification-btn,
@@ -4664,10 +4677,10 @@ body.builder-active .main-header .mobile-nav-toggle {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    background: rgba(255, 255, 255, 0.16) !important;
+    border: 1px solid rgba(255, 255, 255, 0.32) !important;
     border-radius: 12px !important;
-    color: #64748b !important;
+    color: #ffffff !important;
     flex-shrink: 0 !important;
 }
 
@@ -4696,8 +4709,8 @@ body.builder-active .main-header [id="admin-avatar"] {
     align-items: center !important;
     justify-content: center !important;
     border-radius: 12px !important;
-    border: 2px solid #ffffff !important;
-    background: #1B4965 !important;
+    border: 2px solid rgba(255, 255, 255, 0.72) !important;
+    background: #b85f23 !important;
     color: #ffffff !important;
     box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08) !important;
     font-size: 15px !important;
