@@ -703,7 +703,7 @@ function createPodcastCard(episode, indexInView) {
             if (episode.audioUrl) {
                 // Finn global indeks i dagens spillerkø
                 const queueIndex = currentEpisodeOrder.indexOf(episode);
-                toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, queueIndex);
+                toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, queueIndex, episode);
             }
         });
     });
@@ -714,7 +714,7 @@ function createPodcastCard(episode, indexInView) {
 /**
  * Audio Player Logikk
  */
-function toggleAudio(url, title, thumbnail, btn, episodeIndex) {
+function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
     let playerBar = document.getElementById('podcast-player-bar');
     if (!playerBar) createPlayerBar();
 
@@ -733,6 +733,16 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex) {
         audio.src = url;
         barTitle.textContent = title;
         barImg.src = thumbnail;
+        
+        const fsTitle = document.querySelector('.fullscreen-title');
+        const fsSummary = document.querySelector('.fullscreen-summary');
+        const fsArtwork = document.querySelector('.fullscreen-artwork');
+        if (fsTitle && episodeData) {
+            fsTitle.textContent = title;
+            fsSummary.innerHTML = episodeData.description || 'Ingen oppsummering tilgjengelig.';
+            if (fsArtwork) fsArtwork.src = thumbnail;
+        }
+
         audio.play();
         document.getElementById('podcast-player-bar').classList.add('active');
         updatePlayIcons(true, btn);
@@ -756,7 +766,7 @@ function createPlayerBar() {
     bar.innerHTML = `
         <div class="player-container">
             <audio id="global-audio-element"></audio>
-            <div class="player-info">
+            <div class="player-info" id="player-info-toggle" style="cursor: pointer;" title="Vis i fullskjerm">
                 <img src="" class="player-info-img">
                 <div class="player-info-text"><span class="player-info-title">${t('selectEpisode')}</span></div>
             </div>
@@ -771,8 +781,30 @@ function createPlayerBar() {
                 <span class="time-total">0:00</span>
             </div>
             <div class="player-extra">
+                <button class="player-control-btn player-expand" title="Fullskjerm"><i class="fas fa-expand"></i></button>
                 <button class="player-control-btn player-speed" title="${t('playbackSpeed')}">1x</button>
                 <button class="player-control-btn player-close"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div id="podcast-fullscreen-overlay" class="podcast-fullscreen-overlay">
+            <div class="fs-header">
+                <button class="fs-close-btn"><i class="fas fa-chevron-down"></i></button>
+            </div>
+            <div class="fs-scrollable-content">
+                <div class="fs-artwork-container">
+                    <img src="" class="fullscreen-artwork">
+                </div>
+                <h2 class="fullscreen-title">Velg en episode</h2>
+                <div class="fs-summary-container">
+                    <h3 class="fs-section-title">Oppsummering</h3>
+                    <div class="fullscreen-summary"></div>
+                </div>
+                <div class="fs-transcript-container">
+                    <h3 class="fs-section-title">Teksting</h3>
+                    <div class="fullscreen-transcript">
+                        <p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -785,13 +817,29 @@ function createPlayerBar() {
     const prevBtn = bar.querySelector('.player-control-prev');
     const nextBtn = bar.querySelector('.player-control-next');
     const speedBtn = bar.querySelector('.player-speed');
+    const expandBtn = bar.querySelector('.player-expand');
+    const infoToggle = bar.querySelector('#player-info-toggle');
+    const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
+    const fsCloseBtn = bar.querySelector('.fs-close-btn');
+
+    function openFs() {
+        fsOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+    function closeFs() {
+        fsOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    infoToggle.addEventListener('click', openFs);
+    if(expandBtn) expandBtn.addEventListener('click', openFs);
+    fsCloseBtn.addEventListener('click', closeFs);
 
     playBtn.addEventListener('click', () => {
         if (audio.paused) { audio.play(); updatePlayIcons(true); }
         else { audio.pause(); updatePlayIcons(false); }
     });
 
-    // Klikkbar tidslinje (seek)
     if (progressBar) {
         progressBar.addEventListener('click', (e) => {
             if (!audio.duration) return;
@@ -801,7 +849,6 @@ function createPlayerBar() {
         });
     }
 
-    // Forrige / neste episode i køen
     if (prevBtn) {
         prevBtn.addEventListener('click', () => playEpisodeRelative(-1));
     }
@@ -809,7 +856,6 @@ function createPlayerBar() {
         nextBtn.addEventListener('click', () => playEpisodeRelative(1));
     }
 
-    // Hastighetskontroll (1x, 1.25x, 1.5x, 2x)
     if (speedBtn) {
         const speeds = [1, 1.25, 1.5, 2];
         let idx = 0;
@@ -860,7 +906,7 @@ function playEpisodeAtIndex(index) {
     }
 
     const thumbnail = episode.thumbnail || '';
-    toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, index);
+    toggleAudio(episode.audioUrl, episode.title, thumbnail, btn, index, episode);
 }
 
 function formatTime(seconds) {

@@ -4522,6 +4522,128 @@ body {
 }
 
 /* =================================== 
+   Podcast Fullscreen Overlay
+   =================================== */
+.podcast-fullscreen-overlay {
+    position: fixed;
+    top: 100vh;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #fff;
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    transition: top 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.podcast-fullscreen-overlay.active {
+    top: 0;
+}
+
+.fs-header {
+    display: flex;
+    justify-content: flex-end;
+    padding: 20px;
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+}
+
+.fs-close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-dark);
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+.fs-close-btn:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.fs-scrollable-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.fs-artwork-container {
+    width: 100%;
+    max-width: 300px;
+    margin: 0 auto 30px auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.fullscreen-artwork {
+    width: 100%;
+    aspect-ratio: 1/1;
+    object-fit: cover;
+    display: block;
+}
+
+.fullscreen-title {
+    font-size: 2rem;
+    text-align: center;
+    color: var(--text-dark);
+    margin-bottom: 40px;
+    line-height: 1.3;
+}
+
+.fs-section-title {
+    font-size: 1.2rem;
+    color: var(--text-dark);
+    margin-bottom: 15px;
+    border-bottom: 2px solid var(--primary-orange);
+    padding-bottom: 5px;
+    display: inline-block;
+}
+
+.fs-summary-container, .fs-transcript-container {
+    margin-bottom: 40px;
+    background: #fcfcfc;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 15px rgba(0,0,0,0.03);
+    border: 1px solid #f1f1f1;
+}
+
+.fullscreen-summary {
+    color: var(--text-light);
+    line-height: 1.8;
+    font-size: 1.05rem;
+}
+
+.fullscreen-transcript {
+    color: var(--text-light);
+    line-height: 1.8;
+}
+
+.fs-muted {
+    font-style: italic;
+    opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+    .fullscreen-title {
+        font-size: 1.5rem;
+    }
+    .fs-scrollable-content {
+        padding: 20px 15px;
+    }
+    .fs-summary-container, .fs-transcript-container {
+        padding: 20px;
+    }
+}
+
+/* =================================== 
    Blog Post Content Styles (Editor.js) 
    =================================== */
 
