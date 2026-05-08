@@ -4683,7 +4683,7 @@ class AdminManager {
         };
 
         section.innerHTML = `
-            ${this.renderSectionHeader('palette', 'Tema & Farger', 'Tilpass farger, font og grafisk profil for hele nettsiden med HKM-uttrykket.', '')}
+            ${this.renderSectionHeader('palette', 'Tema & Farger', '', '')}
 
             <div class="design-ui-shell">
                 <div class="design-ui-topbar design-ui-panel">
