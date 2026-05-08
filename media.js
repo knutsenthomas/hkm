@@ -1206,17 +1206,32 @@ function createPlayerBar() {
     const speedBtn = bar.querySelector('.player-speed');
     const expandBtn = bar.querySelector('.player-expand');
     const infoToggle = bar.querySelector('#player-info-toggle');
+    const playerContainer = bar.querySelector('.player-container');
     const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
     const fsCloseBtn = bar.querySelector('.fs-close-btn');
     const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
     const fsTranscriptPlayBtn = bar.querySelector('.fs-transcript-play');
 
     function openFs() {
+        // Keep the regular player bar visible above the fullscreen transcript view.
+        Object.assign(playerContainer.style, {
+            position: 'fixed',
+            left: '0',
+            right: '0',
+            bottom: '0',
+            zIndex: '26003'
+        });
+        bar.classList.add('active');
         fsOverlay.classList.add('active');
         fsOverlay.style.top = '0';
         document.body.style.overflow = 'hidden';
     }
     function closeFs() {
+        playerContainer.style.position = '';
+        playerContainer.style.left = '';
+        playerContainer.style.right = '';
+        playerContainer.style.bottom = '';
+        playerContainer.style.zIndex = '';
         fsOverlay.classList.remove('active');
         fsOverlay.style.top = '100vh';
         document.body.style.overflow = '';
