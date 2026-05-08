@@ -3315,6 +3315,40 @@ class AdminManager {
         }
     }
 
+    async ensureFirebaseFunctions() {
+        if (typeof firebase === 'undefined') {
+            throw new Error('Firebase SDK er ikke lastet inn. Last inn siden på nytt.');
+        }
+
+        if (typeof firebase.functions === 'function') {
+            return firebase.functions;
+        }
+
+        await new Promise((resolve, reject) => {
+            const existingScript = document.querySelector('script[src*="firebase-functions-compat.js"]');
+
+            if (existingScript) {
+                existingScript.addEventListener('load', resolve, { once: true });
+                existingScript.addEventListener('error', () => reject(new Error('Kunne ikke laste Firebase Functions.')), { once: true });
+                setTimeout(resolve, 1000);
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js';
+            script.async = true;
+            script.onload = resolve;
+            script.onerror = () => reject(new Error('Kunne ikke laste Firebase Functions.'));
+            document.head.appendChild(script);
+        });
+
+        if (typeof firebase.functions !== 'function') {
+            throw new Error('Firebase Functions er ikke tilgjengelig. Last inn siden på nytt og prøv igjen.');
+        }
+
+        return firebase.functions;
+    }
+
     async loadPodcastOverrides() {
         const listContainer = document.getElementById('podcast-overrides-list');
         if (!listContainer) return;
@@ -3365,9 +3399,10 @@ class AdminManager {
                 setTimeout(() => {
                     document.querySelectorAll('.btn-transcribe').forEach(btn => {
                         btn.addEventListener('click', async (e) => {
-                            const id = e.currentTarget.getAttribute('data-id');
-                            const url = e.currentTarget.getAttribute('data-url');
-                            const title = e.currentTarget.getAttribute('data-title');
+                            const button = e.currentTarget;
+                            const id = button.getAttribute('data-id');
+                            const url = button.getAttribute('data-url');
+                            const title = button.getAttribute('data-title');
                             
                             if (!url) {
                                 this.showToast('Fant ingen lydfil for denne episoden.', 'error');
@@ -3378,19 +3413,21 @@ class AdminManager {
                                 return;
                             }
 
-                            const originalText = e.currentTarget.innerHTML;
-                            e.currentTarget.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">sync</span> Jobber...';
-                            e.currentTarget.disabled = true;
+                            const originalText = button.innerHTML;
+                            button.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">sync</span> Jobber...';
+                            button.disabled = true;
 
                             try {
-                                const transcribePodcast = firebase.functions().httpsCallable('transcribePodcast');
-                                const result = await transcribePodcast({ audioUrl: url, episodeId: id });
+                                const functionsFactory = await this.ensureFirebaseFunctions();
+                                const transcribePodcast = functionsFactory().httpsCallable('transcribePodcast');
+                                await transcribePodcast({ audioUrl: url, episodeId: id });
                                 this.showToast(`Transkribering fullført for "${title}"!`, 'success', 5000);
+                                button.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">check</span> Ferdig';
                             } catch (err) {
                                 console.error("Transcribe error:", err);
                                 this.showToast(`Feil under transkribering: ${err.message}`, 'error', 5000);
-                            } finally {
-                                e.currentTarget.innerHTML = '<span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">check</span> Ferdig';
+                                button.innerHTML = originalText;
+                                button.disabled = false;
                             }
                         });
                     });
