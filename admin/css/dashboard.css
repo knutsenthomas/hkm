@@ -4278,10 +4278,16 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
 }
 
-.mobile-bottom-nav .mobile-nav-item span {
-    font-size: 14px;
-    font-weight: 700;
-    margin-top: 4px;
+.mobile-bottom-nav .mobile-nav-item .material-symbols-outlined {
+    font-size: 36px !important;
+    margin-bottom: 2px !important;
+}
+
+.mobile-bottom-nav .mobile-nav-item span:not(.material-symbols-outlined) {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    margin-top: 2px !important;
+    display: block !important;
 }
 
 .tool-content h4 {
