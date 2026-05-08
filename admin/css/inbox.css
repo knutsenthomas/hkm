@@ -135,7 +135,7 @@
 body.admin-body .threads-search input,
 body.crm-body .threads-search input {
     width: 100%;
-    padding: 10px 12px 10px 44px !important;
+    padding: 10px 12px 10px 48px !important;
     border: 1px solid var(--inbox-border);
     border-radius: 12px;
     font-size: 14px;
@@ -150,7 +150,7 @@ body.crm-body .threads-search input {
 
 .threads-search .material-symbols-outlined {
     position: absolute;
-    left: 16px;
+    left: 14px;
     top: calc(50% + 1px);
     transform: translateY(-50%);
     font-size: 20px;
@@ -949,7 +949,7 @@ body.crm-body .threads-search input {
         flex-shrink: 0 !important;
     }
     .threads-search input {
-        padding: 8px 12px 8px 40px !important;
+        padding: 8px 12px 8px 48px !important;
         font-size: 14px !important;
         background: #f8fafc !important;
         border: 1px solid #e2e8f0 !important;
