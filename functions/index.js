@@ -1284,8 +1284,8 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = ""
     console.log(`Genererer transkripsjon...`);
     const genAI = new GoogleGenerativeAI(geminiKey);
     const transcriptionModelCandidates = [
-      "gemini-2.0-flash",
       "gemini-2.5-flash",
+      "gemini-2.0-flash",
       "gemini-2.0-flash-lite",
     ];
     const transcriptionPrompt = [
@@ -1315,6 +1315,11 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = ""
           console.error(`Transkripsjon feilet med ${modelName}:`, modelError);
 
           if (!isGeminiRateLimitError(modelError)) {
+            break;
+          }
+
+          if (isGeminiZeroLimitError(modelError)) {
+            console.log(`Gemini-modell ${modelName} har ingen tilgjengelig kvote for denne nøkkelen. Prøver neste modell.`);
             break;
           }
 
@@ -5856,6 +5861,13 @@ function getGeminiRetryDelayMs(error) {
   const fraction = Number(`0.${match[2] || '0'}`);
   const totalMs = Math.round((seconds + fraction) * 1000);
   return Number.isFinite(totalMs) ? totalMs : 0;
+}
+
+function isGeminiZeroLimitError(error) {
+  if (!error) return false;
+
+  const message = typeof error?.message === 'string' ? error.message : '';
+  return /free[_ -]?tier/i.test(message) && /limit:\s*0/i.test(message);
 }
 
 exports.transcribePodcast = onCall({
