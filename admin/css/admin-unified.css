@@ -6,10 +6,18 @@ body.builder-active *:not(.material-symbols-outlined) {
     font-family: 'Inter', sans-serif !important;
 }
 
-body.builder-active .toolbar-action-btn {
+body.builder-active .toolbar-action-btn,
+body.builder-active .toolbar-action-btn * {
     font-size: 14px !important;
     font-weight: 500 !important;
+}
+
+body.builder-active .toolbar-action-btn {
     padding: 10px 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    height: 42px !important;
 }
 
 /* --- EMERGENCY NEWSLETTER BUILDER FIXES --- */
