@@ -944,6 +944,7 @@ class AdminManager {
             adminAvatar.style.fontSize = '15px';
             adminAvatar.style.fontWeight = '800';
             adminAvatar.style.letterSpacing = '0';
+            adminAvatar.style.borderRadius = '12px';
         };
 
         const cacheHeaderIdentity = (name, photoURL) => {

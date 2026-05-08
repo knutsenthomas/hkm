@@ -82,10 +82,9 @@ body.builder-active {
     display: inline-flex !important;
     width: 36px;
     height: 36px;
-    border-radius: 10px !important;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    box-shadow: none;
+    border-radius: 12px !important;
+    background: linear-gradient(135deg, #d17d39, #b54d2b);
+    color: white;
 }
 
 .main-header .section-header-icon span {
@@ -4273,7 +4272,7 @@ body.builder-active .user-avatar,
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 50% !important;
+    border-radius: 12px !important;
     font-weight: 800 !important;
     font-size: 15px !important;
     text-transform: uppercase !important;
@@ -4472,7 +4471,7 @@ body.crm-body .main-header .section-header-icon,
 body.builder-active .main-header .section-header-icon {
     width: 36px !important;
     height: 36px !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
     box-shadow: none !important;
@@ -4501,7 +4500,7 @@ body.builder-active .main-header .section-header-actions {
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
-    gap: 10px !important;
+    gap: 12px !important;
     margin-left: auto !important;
     flex-shrink: 0 !important;
 }
@@ -4567,7 +4566,7 @@ body.builder-active .main-header [id="admin-avatar"] {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 50% !important;
+    border-radius: 12px !important;
     border: 2px solid #ffffff !important;
     background: #1B4965 !important;
     color: #ffffff !important;
