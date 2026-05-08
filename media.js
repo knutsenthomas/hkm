@@ -958,13 +958,15 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
 }
 
 function updatePlayIcons(isPlaying, activeBtn) {
-    document.querySelectorAll('.play-btn-circle i, .btn-play-internal i, .player-control-play i').forEach(i => {
+    document.querySelectorAll('.play-btn-circle i, .btn-play-internal i, .player-control-play i, .fs-transcript-play i').forEach(i => {
         i.className = 'fas fa-play';
     });
     if (isPlaying) {
         if (activeBtn) activeBtn.querySelector('i').className = 'fas fa-pause';
         const barPlayIcon = document.querySelector('.player-control-play i');
         if (barPlayIcon) barPlayIcon.className = 'fas fa-pause';
+        const transcriptPlayIcon = document.querySelector('.fs-transcript-play i');
+        if (transcriptPlayIcon) transcriptPlayIcon.className = 'fas fa-pause';
     }
 }
 
@@ -978,6 +980,8 @@ function applyFullscreenPlayerLayout(bar) {
     const fsTitle = bar.querySelector('.fullscreen-title');
     const fsSections = bar.querySelectorAll('.fs-summary-container, .fs-transcript-container');
     const fsSectionTitles = bar.querySelectorAll('.fs-section-title');
+    const fsTranscriptHeader = bar.querySelector('.fs-transcript-header');
+    const fsTranscriptPlay = bar.querySelector('.fs-transcript-play');
     const pageHeader = document.getElementById('header');
     const closeButtonSpacing = window.innerWidth < 768 ? 12 : 20;
     const xCloseTopOffset = `${(pageHeader?.offsetHeight || 100) + closeButtonSpacing}px`;
@@ -1082,6 +1086,32 @@ function applyFullscreenPlayerLayout(bar) {
             fontWeight: '800'
         });
     });
+
+    if (fsTranscriptHeader) {
+        Object.assign(fsTranscriptHeader.style, {
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '12px',
+            marginBottom: '18px'
+        });
+    }
+
+    if (fsTranscriptPlay) {
+        Object.assign(fsTranscriptPlay.style, {
+            border: '1px solid rgba(209, 125, 57, 0.35)',
+            background: '#fff7f0',
+            color: '#9d4f15',
+            borderRadius: '999px',
+            padding: '8px 14px',
+            fontWeight: '700',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            fontSize: '0.95rem'
+        });
+    }
 }
 
 function createPlayerBar() {
@@ -1127,7 +1157,13 @@ function createPlayerBar() {
                     <div class="fullscreen-summary"></div>
                 </div>
                 <div class="fs-transcript-container">
-                    <h3 class="fs-section-title">Teksting</h3>
+                    <div class="fs-transcript-header">
+                        <h3 class="fs-section-title" style="margin:0;">Teksting</h3>
+                        <button class="fs-transcript-play" type="button" aria-label="Spill av eller pause episode">
+                            <i class="fas fa-play" aria-hidden="true"></i>
+                            <span>Spill/Pause</span>
+                        </button>
+                    </div>
                     <div class="fullscreen-transcript">
                         <p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>
                     </div>
@@ -1150,6 +1186,7 @@ function createPlayerBar() {
     const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
     const fsCloseBtn = bar.querySelector('.fs-close-btn');
     const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
+    const fsTranscriptPlayBtn = bar.querySelector('.fs-transcript-play');
 
     function openFs() {
         fsOverlay.classList.add('active');
@@ -1171,6 +1208,19 @@ function createPlayerBar() {
         if (audio.paused) { audio.play(); updatePlayIcons(true); }
         else { audio.pause(); updatePlayIcons(false); }
     });
+
+    if (fsTranscriptPlayBtn) {
+        fsTranscriptPlayBtn.addEventListener('click', () => {
+            if (!audio.src) return;
+            if (audio.paused) {
+                audio.play();
+                updatePlayIcons(true);
+            } else {
+                audio.pause();
+                updatePlayIcons(false);
+            }
+        });
+    }
 
     if (progressBar) {
         progressBar.addEventListener('click', (e) => {
