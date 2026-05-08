@@ -144,16 +144,22 @@
                     </div>
 
                     <div class="top-bar-actions">
-                        <button class="top-icon-btn"><span class="material-symbols-outlined">search</span></button>
-                        <button class="top-icon-btn"><span class="material-symbols-outlined">notifications</span><span class="notification-dot"></span></button>
-                        
-                        <div class="user-profile-widget">
-                            <div class="user-text">
-                                <span class="user-name">Thomas Knutsen</span>
+                        <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">TK Admin</span>
                                 <span class="user-role">Administrator</span>
                             </div>
-                            <div class="user-avatar-circle">TK</div>
-                        </div>
+                            <div id="admin-avatar" class="user-avatar">TK</div>
+                        </a>
+
+                        <button id="messages-bell" class="top-icon-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
+                        </button>
+                        
+                        <button id="mobile-nav-toggle" class="top-icon-btn mobile-nav-toggle" style="display: none;">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
                     </div>
                 </header>
 

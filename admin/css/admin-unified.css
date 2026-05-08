@@ -2508,7 +2508,7 @@ body.admin-body .page-title {
 }
 
 .user-profile-link {
-    background: #dbeafe !important;
+    background: transparent !important;
 }
 
 .notification-btn,
@@ -4258,10 +4258,10 @@ body.admin-body .nav-link.logout:hover {
     font-weight: 800 !important;
     font-size: 15px !important;
     color: white !important;
-    background: var(--admin-page-primary, #1B4965) !important;
+    background: #1B4965 !important;
     width: 40px !important;
     height: 40px !important;
-    border-radius: 50% !important;
+    border-radius: 12px !important;
 }
 
 /* Kill all dynamic icons/spans/fallback-symbols in avatar */
