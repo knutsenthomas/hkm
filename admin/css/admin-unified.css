@@ -2559,23 +2559,6 @@ body.admin-body .page-title {
     }
 }
 
-    .section-header-actions {
-        gap: 12px !important; /* Normal gap since we have more space now */
-    }
-
-    .section-header {
-        padding: 10px 0 !important; /* Removed horizontal padding here as it is handled by .main-header */
-    }
-
-    .section-header-titles h1,
-    .section-header-titles h2 {
-        font-size: 20px !important;
-        font-weight: 800 !important;
-        color: #1e293b !important;
-        display: block !important;
-    }
-}
-
 /* Cleaned up legacy overrides */
 /* End of legacy cleanup */
 
@@ -4420,3 +4403,198 @@ body.builder-active .user-role {
     }
 }
 /* End of Unified Header Reconstruction */
+
+/* 
+==========================================================================
+   UNIFIED ADMIN HEADER v7.0
+   Final pass kept at the end of the stylesheet so every admin module shares
+   the same header as the dashboard front page.
+==========================================================================
+*/
+
+body.admin-body .main-header,
+body.crm-body .main-header,
+body.builder-active .main-header,
+body.admin-body #dashboard-main-header,
+body.crm-body #dashboard-main-header,
+body.builder-active #dashboard-main-header {
+    height: 72px !important;
+    min-height: 72px !important;
+    width: 100% !important;
+    padding: 0 40px !important;
+    margin: 0 !important;
+    background: #f4f7fa !important;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06) !important;
+    box-shadow: none !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    box-sizing: border-box !important;
+}
+
+body.admin-body .main-header > .section-header,
+body.crm-body .main-header > .section-header,
+body.builder-active .main-header > .section-header {
+    width: 100% !important;
+    max-width: var(--admin-page-max, 1280px) !important;
+    height: 100% !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body.admin-body .main-header .section-header-content,
+body.crm-body .main-header .section-header-content,
+body.builder-active .main-header .section-header-content {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+}
+
+body.admin-body .main-header .section-header-icon,
+body.crm-body .main-header .section-header-icon,
+body.builder-active .main-header .section-header-icon {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+}
+
+body.admin-body .main-header .section-title,
+body.crm-body .main-header .section-title,
+body.builder-active .main-header .section-title {
+    font-size: 18px !important;
+    line-height: 1.15 !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    margin: 0 !important;
+    letter-spacing: 0 !important;
+}
+
+body.admin-body .main-header .section-subtitle,
+body.crm-body .main-header .section-subtitle,
+body.builder-active .main-header .section-subtitle {
+    display: none !important;
+}
+
+body.admin-body .main-header .section-header-actions,
+body.crm-body .main-header .section-header-actions,
+body.builder-active .main-header .section-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    gap: 10px !important;
+    margin-left: auto !important;
+    flex-shrink: 0 !important;
+}
+
+body.admin-body .main-header .user-profile-link,
+body.crm-body .main-header .user-profile-link,
+body.builder-active .main-header .user-profile-link {
+    order: 1 !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    padding: 0 4px 0 12px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    background: transparent !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
+}
+
+body.admin-body .main-header .notification-btn,
+body.crm-body .main-header .notification-btn,
+body.builder-active .main-header .notification-btn,
+body.admin-body .main-header .mobile-nav-toggle,
+body.crm-body .main-header .mobile-nav-toggle,
+body.builder-active .main-header .mobile-nav-toggle {
+    width: 42px !important;
+    height: 42px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.06) !important;
+    border-radius: 12px !important;
+    color: #64748b !important;
+    flex-shrink: 0 !important;
+}
+
+body.admin-body .main-header .notification-btn,
+body.crm-body .main-header .notification-btn,
+body.builder-active .main-header .notification-btn {
+    order: 2 !important;
+}
+
+body.admin-body .main-header .mobile-nav-toggle,
+body.crm-body .main-header .mobile-nav-toggle,
+body.builder-active .main-header .mobile-nav-toggle {
+    order: 3 !important;
+}
+
+body.admin-body .main-header .user-avatar,
+body.crm-body .main-header .user-avatar,
+body.builder-active .main-header .user-avatar,
+body.admin-body .main-header [id="admin-avatar"],
+body.crm-body .main-header [id="admin-avatar"],
+body.builder-active .main-header [id="admin-avatar"] {
+    width: 42px !important;
+    height: 42px !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    border: 2px solid #ffffff !important;
+    background: #1B4965 !important;
+    color: #ffffff !important;
+    box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08) !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    overflow: hidden !important;
+}
+
+@media (min-width: 1025px) {
+    body.admin-body .main-header .mobile-nav-toggle,
+    body.crm-body .main-header .mobile-nav-toggle,
+    body.builder-active .main-header .mobile-nav-toggle {
+        display: none !important;
+    }
+}
+
+@media (max-width: 800px) {
+    body.admin-body .main-header,
+    body.crm-body .main-header,
+    body.builder-active .main-header {
+        height: 64px !important;
+        min-height: 64px !important;
+        padding: 0 16px !important;
+    }
+
+    body.admin-body .main-header .section-header-icon,
+    body.crm-body .main-header .section-header-icon,
+    body.builder-active .main-header .section-header-icon,
+    body.admin-body .main-header .user-info-text,
+    body.crm-body .main-header .user-info-text,
+    body.builder-active .main-header .user-info-text {
+        display: none !important;
+    }
+}

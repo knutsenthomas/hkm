@@ -1,3 +1,6 @@
+if (!window.__HKMAdminHeaderInitialized) {
+window.__HKMAdminHeaderInitialized = true;
+
 document.addEventListener('DOMContentLoaded', () => {
     const adminUtils = window.HKMAdminUtils || {};
     let pendingAuthRedirect = null;
@@ -88,6 +91,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const getInitials = (displayName) => {
+        const safeName = (displayName || '').trim() || 'Administrator';
+        return safeName
+            .split(' ')
+            .map((n) => (n || '').trim())
+            .filter(Boolean)
+            .map((n) => n[0])
+            .join('')
+            .toUpperCase()
+            .substring(0, 2) || 'A';
+    };
+
     const renderIdentity = (displayName, photoURL) => {
         const { adminName, adminAvatar } = getIdentityEls();
         const safeName = (displayName || '').trim() || 'Administrator';
@@ -98,20 +113,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!adminAvatar) return;
 
-        if (photoURL) {
-            adminAvatar.innerHTML = `<img src="${photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-            return;
-        }
-
-        const initials = safeName
-            .split(' ')
-            .map((n) => (n || '').trim())
-            .filter(Boolean)
-            .map((n) => n[0])
-            .join('')
-            .toUpperCase()
-            .substring(0, 2) || 'A';
-        adminAvatar.textContent = initials;
+        adminAvatar.textContent = getInitials(safeName);
+        adminAvatar.title = safeName;
+        if (photoURL) adminAvatar.dataset.photoUrl = photoURL;
     };
 
     const authFallbackName = (user) => user?.displayName || user?.email || 'Administrator';
@@ -358,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    // --- Global Search Handler (Visual Only) ---outside
+    // --- Global Search Handler (Visual Only) ---
     if (sidebar) {
         // Close when clicking outside
         document.addEventListener('click', (e) => {
@@ -450,3 +454,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Sidebar Category logic is now handled in the main dashboard script in index.html
 });
+}
