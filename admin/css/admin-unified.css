@@ -1,4 +1,4 @@
-/* Kinetic Admin System - HKM Studio Standard (v=20260508_G33) */
+/* Kinetic Admin System - HKM Studio Standard (v=20260508_G34) */
 
 /* Global Typography Fixes */
 body.builder-active, 
@@ -3559,13 +3559,15 @@ body.admin-body .table-container {
 /* Contacts & Segments table: avoid double horizontal inset (card + table container) */
 body.crm-body .contacts-grid.card.modern,
 body.admin-body .contacts-grid.card.modern,
+#automation-section .card.modern,
 body.crm-body .card.modern:has(.table-container) {
     padding: 0 !important;
 }
 
 body.crm-body .contacts-grid.card.modern .table-header,
 body.admin-body .contacts-grid.card.modern .table-header,
-body.crm-body .card.modern .table-header {
+body.crm-body .card.modern .table-header,
+#automation-section .automation-tabs {
     padding-left: 24px !important;
     padding-right: 24px !important;
 }
