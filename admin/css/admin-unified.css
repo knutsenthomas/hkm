@@ -4222,17 +4222,19 @@ body.admin-body .nav-link.logout:hover {
 
 /* 
 ==========================================================================
-   HEADER RECONSTRUCTION v2.0 - CLEAN SLATE
+   UNIFIED ADMIN HEADER v6.0 - THE GOLD STANDARD (72px)
+   Targeting: Dashboard, CRM, Messaging, Newsletter Builder, Logger
 ========================================================================== 
 */
 
-/* 1. Gold Standard Header - Unified 72px Standard across ALL admin pages */
+/* 1. Global Header Container Standards */
 body.admin-body .main-header,
+body.crm-body .main-header,
 body.builder-active .workspace-top-bar,
 body.admin-body #dashboard-main-header {
     height: 72px !important;
     min-height: 72px !important;
-    background-color: #f4f7fa !important; /* Exact dashboard background */
+    background-color: #f4f7fa !important; /* Premium light-gray dashboard background */
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -4245,11 +4247,13 @@ body.admin-body #dashboard-main-header {
     box-shadow: none !important;
     width: 100% !important;
     margin-bottom: 0 !important;
+    transition: all 0.3s ease !important;
 }
 
-/* 2. Header Content Structure */
+/* 2. Unified Content Structure Alignment */
 body.admin-body .section-header,
-body.builder-active .workspace-top-bar .breadcrumb-nav {
+body.crm-body .section-header,
+body.builder-active .breadcrumb-nav {
     width: 100% !important;
     height: 100% !important;
     display: flex !important;
@@ -4263,17 +4267,19 @@ body.builder-active .workspace-top-bar .breadcrumb-nav {
 }
 
 body.admin-body .section-header-content,
-body.builder-active .workspace-top-bar .top-bar-actions {
+body.crm-body .section-header-content,
+body.builder-active .top-bar-actions {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     flex: 1 !important;
 }
 
-/* 3. Avatar & Profile - Gold Standard circular fix */
-body.admin-body .main-header .user-avatar,
-body.builder-active .workspace-top-bar .user-avatar,
-body.admin-body #admin-avatar.user-avatar {
+/* 3. Avatar & Identity - Absolute Parity Across All Modules */
+body.admin-body .user-avatar,
+body.crm-body .user-avatar,
+body.builder-active .user-avatar,
+body.admin-body #admin-avatar {
     width: 42px !important;
     height: 42px !important;
     background-color: #1B4965 !important; /* HKM Mørkeblå */
@@ -4281,7 +4287,7 @@ body.admin-body #admin-avatar.user-avatar {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border-radius: 50% !important; /* Perfect circle */
+    border-radius: 50% !important; /* Strictly circular */
     font-weight: 800 !important;
     font-size: 15px !important;
     text-transform: uppercase !important;
@@ -4290,17 +4296,20 @@ body.admin-body #admin-avatar.user-avatar {
     visibility: visible !important;
     opacity: 1 !important;
     flex-shrink: 0 !important;
+    margin-left: 8px !important;
 }
 
-/* Kill icons inside to ensure initials show */
-body.admin-body .main-header .user-avatar *,
-body.builder-active .workspace-top-bar .user-avatar * {
+/* Suppress any child nodes (icons/images) to guarantee initials visibility */
+body.admin-body .user-avatar *,
+body.crm-body .user-avatar *,
+body.builder-active .user-avatar * {
     display: none !important;
 }
 
-/* 4. Content Spacing - Standardized for 72px header */
+/* 4. Content Spacing Fixes - Universal consistency */
 body.admin-body .crm-content, 
-body.admin-body .inbox-container, 
+body.crm-body .crm-content,
+body.crm-body .inbox-container, 
 body.builder-active .newsletter-builder-container,
 body.admin-body .segments-container,
 body.admin-body .content-wrapper,
@@ -4310,8 +4319,9 @@ body.admin-body .section-container {
     box-sizing: border-box !important;
 }
 
-/* 5. Typography Standards */
+/* 5. Header Typography Standards */
 body.admin-body .section-title,
+body.crm-body .section-title,
 body.builder-active .breadcrumb-current {
     font-size: 18px !important;
     font-weight: 800 !important;
@@ -4320,19 +4330,41 @@ body.builder-active .breadcrumb-current {
     line-height: 1 !important;
 }
 
-body.admin-body .section-header-icon {
+body.admin-body .section-subtitle,
+body.crm-body .section-subtitle {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    color: #64748b !important;
+    margin: 4px 0 0 0 !important;
+}
+
+/* 6. Action Elements (Bell, Menu, Toggle) */
+body.admin-body .notification-btn,
+body.crm-body .notification-btn,
+body.builder-active .top-icon-btn,
+body.admin-body .mobile-nav-toggle {
+    width: 42px !important;
+    height: 42px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    width: 42px !important;
-    height: 42px !important;
-    background: #ffffff !important;
     border-radius: 12px !important;
-    margin-right: 16px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0,0,0,0.05) !important;
+    color: #64748b !important;
+    transition: all 0.2s ease !important;
+    margin-left: 12px !important;
+}
+
+body.admin-body .notification-btn:hover,
+body.builder-active .top-icon-btn:hover {
+    background: #f1f5f9 !important;
     color: #1B4965 !important;
+    transform: translateY(-1px) !important;
 }
 
 body.admin-body .user-profile-link,
+body.crm-body .user-profile-link,
 body.builder-active .user-profile-link {
     display: flex !important;
     align-items: center !important;
@@ -4342,17 +4374,7 @@ body.builder-active .user-profile-link {
     border-radius: 12px !important;
     transition: background 0.2s !important;
     background: transparent !important;
-}
-
-body.admin-body .user-profile-link:hover {
-    background: rgba(27, 73, 101, 0.05) !important;
-}
-
-body.admin-body .user-info-text {
-    display: flex !important;
-    flex-direction: column !important;
-    text-align: right !important;
-    line-height: 1.2 !important;
+    margin-left: auto !important;
 }
 
 body.admin-body .user-name {
@@ -4366,20 +4388,24 @@ body.admin-body .user-role {
     font-weight: 700 !important;
     color: #64748b !important;
     text-transform: uppercase !important;
-    letter-spacing: 0.02em !important;
+    letter-spacing: 0.05em !important;
 }
 
-/* 6. Mobile Refinements */
+/* 7. Mobile Adaptive Rules */
 @media (max-width: 800px) {
     body.admin-body .main-header,
+    body.crm-body .main-header,
     body.builder-active .workspace-top-bar {
         height: 64px !important;
         padding: 0 16px !important;
     }
-    body.admin-body .user-info-text, 
+    body.admin-body .user-info-text,
+    body.crm-body .user-info-text,
     body.admin-body .section-header-icon, 
     body.admin-body .section-subtitle,
-    body.builder-active .breadcrumb-divider {
+    body.crm-body .section-subtitle,
+    body.builder-active .breadcrumb-divider,
+    body.builder-active .breadcrumb-item {
         display: none !important;
     }
 }
