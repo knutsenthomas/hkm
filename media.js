@@ -788,7 +788,7 @@ function createPlayerBar() {
         </div>
         <div id="podcast-fullscreen-overlay" class="podcast-fullscreen-overlay">
             <div class="fs-header">
-                <button class="fs-close-btn"><i class="fas fa-chevron-down"></i></button>
+                <button class="fs-close-btn"><i class="fas fa-chevron-down"></i> Lukk</button>
             </div>
             <div class="fs-scrollable-content">
                 <div class="fs-artwork-container">
