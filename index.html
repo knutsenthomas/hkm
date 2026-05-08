@@ -73,7 +73,26 @@
     <!-- Error Logger -->
     <script type="module" src="js/error-logger.js"></script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
-
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#1B4965">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/img/logo-hkm.png">
+    <!-- PWA Service Worker -->
+    <script type="module">
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+            window.addEventListener('load', async () => {
+                try {
+                    const reg = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker registrert for PWA!', reg);
+                } catch (err) {
+                    console.log('Service Worker feilet:', err);
+                }
+            });
+        })();
+    </script>
 </head>
 
 <body class="page-index header-dark-start cms-loading">
