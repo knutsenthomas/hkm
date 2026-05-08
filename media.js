@@ -737,38 +737,36 @@ async function initPodcastRSS() {
             }
         }
 
-        const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+        const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
         const response = await fetch(proxyUrl);
         const data = await response.json();
-        
-        if (data.status === 'ok' && data.items) {
-            const episodes = data.items;
+        const channel = Array.isArray(data.rss?.channel) ? data.rss.channel[0] : data.rss?.channel;
+        const items = channel?.item;
 
-            allPodcastEpisodes = episodes.map((episode, index) => {
-                const pubDateText = episode.pubDate;
-                // Handle different date formats safely
-                const safeDateStr = pubDateText ? pubDateText.replace(/-/g, '/') : new Date().toISOString();
-                
-                return {
-                    id: episode.guid || episode.link || '',
-                    title: episode.title || '',
-                    pubDate: pubDateText || '',
-                    dateObj: new Date(safeDateStr),
-                    link: episode.link || '',
-                    description: episode.description || episode.content || '',
-                    thumbnail: episode.thumbnail || (data.feed && data.feed.image) || '',
-                    audioUrl: episode.enclosure?.link || '',
-                    episodeNumber: episodes.length - index,
-                    category: getEpisodeCategory(episode)
-                };
-            });
-
-            initPodcastControls();
-            renderPodcastEpisodes();
-        } else {
-             throw new Error('Failed to fetch podcast or no items found.');
+        if (!items) {
+            throw new Error('Failed to fetch podcast or no items found.');
         }
+
+        const episodes = Array.isArray(items) ? items : [items];
+
+        allPodcastEpisodes = episodes.map((episode, index) => {
+            const pubDateText = asText(episode.pubDate);
+            return {
+                id: asText(episode.guid) || asText(episode.link),
+                title: asText(episode.title),
+                pubDate: pubDateText,
+                dateObj: new Date(pubDateText),
+                link: asText(episode.link),
+                description: asText(episode.description) || asText(episode["itunes:summary"]),
+                thumbnail: getChannelImage(channel) || getItunesImage(episode),
+                audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
+                episodeNumber: episodes.length - index,
+                category: getEpisodeCategory(episode)
+            };
+        });
+
+        initPodcastControls();
+        renderPodcastEpisodes();
     } catch (error) {
         console.error('[Podcast] Feil ved henting:', error);
         grid.innerHTML = `<p class="text-danger">${t('loadingPodcastError')}</p>`;
