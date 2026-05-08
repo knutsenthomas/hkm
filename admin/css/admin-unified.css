@@ -1,5 +1,25 @@
 /* Kinetic Admin System - HKM Studio Standard */
 
+/* --- EMERGENCY NEWSLETTER BUILDER FIXES --- */
+body.builder-active .builder-elements-sidebar-v2 {
+    display: flex !important;
+    width: 280px !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 9999 !important;
+}
+
+body.builder-active .builder-main-layout {
+    display: flex !important;
+}
+
+body.builder-active .builder-tools-fab,
+body.builder-active .fab-menu-container {
+    display: none !important;
+}
+
+/* --- End Emergency Fixes --- */
+
 :root {
     --admin-surface: #ffffff;
     --admin-surface-muted: #f4f7fa;
