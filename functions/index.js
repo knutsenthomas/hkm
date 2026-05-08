@@ -5661,9 +5661,12 @@ exports.transcribePodcast = onCall({
 
     console.log(`Genererer transkripsjon...`);
     const genAI = new GoogleGenerativeAI(geminiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
-
-    const result = await model.generateContent([
+    const transcriptionModelCandidates = [
+      "gemini-2.0-flash",
+      "gemini-2.5-flash",
+      "gemini-2.0-flash-lite",
+    ];
+    const transcriptionPrompt = [
       {
         fileData: {
           mimeType: uploadResult.file.mimeType,
@@ -5671,7 +5674,26 @@ exports.transcribePodcast = onCall({
         }
       },
       { text: "Vennligst lag en nøyaktig og ordrett transkripsjon (skriftlig versjon) av denne norske podcast-episoden. Sett inn avsnitt der det er naturlig for å gjøre teksten lett å lese. Bruk riktig tegnsetting og stor forbokstav. Formater teksten med HTML: bruk <p> for avsnitt, og <br> for linjeskift. Ikke inkluder noen overskrift eller markdown-blokker (som ```html), kun den rene HTML-teksten." }
-    ]);
+    ];
+
+    let result = null;
+    let lastModelError = null;
+    for (const modelName of transcriptionModelCandidates) {
+      try {
+        console.log(`Prøver Gemini-modell for transkripsjon: ${modelName}`);
+        const model = genAI.getGenerativeModel({ model: modelName });
+        result = await model.generateContent(transcriptionPrompt);
+        console.log(`Transkripsjon generert med ${modelName}.`);
+        break;
+      } catch (modelError) {
+        lastModelError = modelError;
+        console.error(`Transkripsjon feilet med ${modelName}:`, modelError);
+      }
+    }
+
+    if (!result) {
+      throw lastModelError || new Error("Ingen Gemini-modell kunne transkribere lydfilen.");
+    }
 
     const transcriptHtml = result.response.text();
     console.log(`Transkripsjon generert (${transcriptHtml.length} tegn).`);
