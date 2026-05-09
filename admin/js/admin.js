@@ -4190,8 +4190,8 @@ class AdminManager {
                         </div>
                         <div class="editor-header-right">
                                       ${collectionId === 'blog' ? `
-                                      <button class="btn-ghost" id="translate-col-item" title="Oversett dette innlegget" style="display:flex; align-items:center; gap:6px;">
-                                          <span class="material-symbols-outlined">g_translate</span> Oversett dette innlegget
+                                      <button class="btn-ghost" id="translate-col-item" title="Oversett til engelsk og spansk" style="display:flex; align-items:center; gap:6px;">
+                                          <span class="material-symbols-outlined">g_translate</span> Oversett til engelsk og spansk
                                       </button>
                                       ` : ''}
                              <button class="btn-ghost" id="print-col-item" title="Skriv ut" style="display:flex; align-items:center; gap:6px;">
