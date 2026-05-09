@@ -605,6 +605,86 @@ function getFormattedTranscriptHtml(rawTranscriptHtml) {
     `;
 }
 
+function convertEditorJsBlocksToHtml(blocks) {
+    if (!Array.isArray(blocks) || !blocks.length) return '';
+
+    return blocks.map((block) => {
+        const type = String(block?.type || '').toLowerCase();
+        const data = block?.data || {};
+
+        if (type === 'header') {
+            const level = Math.min(Math.max(Number(data.level) || 2, 2), 4);
+            return `<h${level}>${data.text || ''}</h${level}>`;
+        }
+
+        if (type === 'list') {
+            const style = String(data.style || 'unordered').toLowerCase();
+            const tag = style === 'ordered' ? 'ol' : 'ul';
+            const items = Array.isArray(data.items) ? data.items : [];
+            const listItems = items
+                .map(item => {
+                    if (typeof item === 'string') return item;
+                    if (item && typeof item === 'object') return item.content || item.text || '';
+                    return '';
+                })
+                .filter(Boolean)
+                .map(itemText => `<li>${itemText}</li>`)
+                .join('');
+            return listItems ? `<${tag}>${listItems}</${tag}>` : '';
+        }
+
+        if (type === 'quote') {
+            const quoteText = String(data.text || '').trim();
+            if (!quoteText) return '';
+            const caption = String(data.caption || '').trim();
+            return caption
+                ? `<blockquote><p>${quoteText}</p><cite>${caption}</cite></blockquote>`
+                : `<blockquote><p>${quoteText}</p></blockquote>`;
+        }
+
+        if (type === 'delimiter') {
+            return '<hr>';
+        }
+
+        if (type === 'code') {
+            const codeText = String(data.code || '').trim();
+            return codeText ? `<pre><code>${codeText}</code></pre>` : '';
+        }
+
+        const text = String(data.text || '').trim();
+        return text ? `<p>${text}</p>` : '';
+    }).join('');
+}
+
+async function fetchPodcastTranscriptData(episodeId) {
+    const id = String(episodeId || '').trim();
+    if (!id) return null;
+
+    const svc = window.firebaseService;
+    if (svc && !svc.isInitialized && typeof svc.tryAutoInit === 'function') {
+        const maybePromise = svc.tryAutoInit();
+        if (maybePromise && typeof maybePromise.then === 'function') {
+            try {
+                await maybePromise;
+            } catch (err) {
+                console.warn('[Podcast] Firebase auto-init feilet:', err);
+            }
+        }
+    }
+
+    if (!(svc && svc.isInitialized && typeof firebase !== 'undefined')) {
+        return null;
+    }
+
+    try {
+        const doc = await firebase.firestore().collection('podcast_transcripts').doc(id).get();
+        return doc.exists ? doc.data() : null;
+    } catch (err) {
+        console.error('Feil ved henting av podcastdata:', err);
+        return null;
+    }
+}
+
 function isTranscriptChapterHeading(text) {
     const value = String(text || '').trim();
     if (!value) return false;
@@ -918,37 +998,39 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
     const barImg = document.querySelector('.player-info-img');
     const fsTranscript = document.querySelector('.fullscreen-transcript');
 
-    function loadEpisodeTranscript(transcriptEpisode) {
+    function loadEpisodeTranscript(transcriptEpisode, fsSummaryNode) {
         if (!fsTranscript || !transcriptEpisode || !transcriptEpisode.id) return;
 
         fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ser etter transkripsjon...</p>';
 
-        const svc = window.firebaseService;
-        if (svc && !svc.isInitialized && typeof svc.tryAutoInit === 'function') {
-            svc.tryAutoInit();
-        }
+        fetchPodcastTranscriptData(transcriptEpisode.id)
+            .then(stored => {
+                if (fsSummaryNode && stored && typeof stored.description === 'string' && stored.description.trim()) {
+                    fsSummaryNode.innerHTML = `<p style="line-height:1.75;">${stored.description.trim()}</p>`;
+                }
 
-        if (svc && svc.isInitialized && typeof firebase !== 'undefined') {
-            firebase.firestore().collection('podcast_transcripts').doc(transcriptEpisode.id).get()
-                .then(doc => {
-                    if (doc.exists && doc.data().text) {
-                        fsTranscript.innerHTML = getFormattedTranscriptHtml(doc.data().text);
-                    } else {
-                        fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
-                    }
-                })
-                .catch(err => {
-                    console.error('Feil ved henting av transkripsjon:', err);
+                const htmlText = stored && typeof stored.text === 'string' ? stored.text.trim() : '';
+                const editorBlocks = stored?.content?.blocks;
+                const blocksHtml = htmlText ? '' : convertEditorJsBlocksToHtml(editorBlocks);
+                const transcriptHtml = htmlText || blocksHtml;
+
+                if (transcriptHtml) {
+                    fsTranscript.innerHTML = getFormattedTranscriptHtml(transcriptHtml);
+                } else {
                     fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
-                });
-        } else {
-            fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
-        }
+                }
+            })
+            .catch(err => {
+                console.error('Feil ved henting av transkripsjon:', err);
+                fsTranscript.innerHTML = '<p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>';
+            });
     }
 
     if (currentAudio === url) {
         if (episodeData) currentEpisodeData = episodeData;
-        if (currentEpisodeData) loadEpisodeTranscript(currentEpisodeData);
+        if (currentEpisodeData) {
+            loadEpisodeTranscript(currentEpisodeData, document.querySelector('.fullscreen-summary'));
+        }
 
         if (audio.paused) { audio.play(); updatePlayIcons(true, btn); }
         else { audio.pause(); updatePlayIcons(false, btn); }
@@ -970,22 +1052,10 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
         if (fsTitle && episodeData) {
             fsTitle.textContent = title;
             if (fsArtwork) fsArtwork.src = thumbnail;
-            // Load summary from Firestore if available, otherwise fall back to RSS description
             if (fsSummary) {
                 fsSummary.innerHTML = getEpisodeSummaryHtml(episodeData);
-                const svc = window.firebaseService;
-                if (svc && svc.isInitialized && typeof firebase !== 'undefined' && episodeData.id) {
-                    firebase.firestore().collection('podcast_transcripts').doc(episodeData.id).get()
-                        .then(doc => {
-                            const stored = doc.exists ? doc.data() : null;
-                            if (stored && stored.description && stored.description.trim()) {
-                                fsSummary.innerHTML = `<p style="line-height:1.75;">${stored.description.trim()}</p>`;
-                            }
-                        })
-                        .catch(() => {});
-                }
             }
-            loadEpisodeTranscript(episodeData);
+            loadEpisodeTranscript(episodeData, fsSummary);
         }
 
         audio.play();
