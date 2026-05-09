@@ -355,6 +355,48 @@ function wixMediaUrlFromUri(uri) {
   return `https://static.wixstatic.com/media/${clean}/v1/fit/w_1000,h_1000,al_c,q_85/file.${extension}`;
 }
 
+function extractWixMediaIdentity(url) {
+  if (typeof url !== "string" || !url) return "";
+  const normalized = url.trim();
+  if (!normalized) return "";
+
+  const mediaMatch = normalized.match(/\/media\/([^\/\?]+)\//i);
+  if (mediaMatch && mediaMatch[1]) return mediaMatch[1].toLowerCase();
+
+  return normalized.toLowerCase();
+}
+
+function contentHasEquivalentImage(content, imageUrl) {
+  if (typeof content !== "string" || !content || typeof imageUrl !== "string" || !imageUrl) return false;
+  const targetIdentity = extractWixMediaIdentity(imageUrl);
+  if (!targetIdentity) return false;
+
+  const imgRegex = /<img\b[^>]*src=("|')([^"']+)\1/gi;
+  let match;
+  while ((match = imgRegex.exec(content)) !== null) {
+    const existingUrl = match[2] || "";
+    if (extractWixMediaIdentity(existingUrl) === targetIdentity) return true;
+  }
+  return false;
+}
+
+function dedupeFigureImagesInHtml(content) {
+  if (typeof content !== "string" || !content) return content || "";
+  const seen = new Set();
+
+  return content.replace(/<figure\b[\s\S]*?<\/figure>/gi, (figureHtml) => {
+    const imgMatch = figureHtml.match(/<img\b[^>]*src=("|')([^"']+)\1/i);
+    if (!imgMatch || !imgMatch[2]) return figureHtml;
+
+    const identity = extractWixMediaIdentity(imgMatch[2]);
+    if (!identity) return figureHtml;
+    if (seen.has(identity)) return "";
+
+    seen.add(identity);
+    return figureHtml;
+  });
+}
+
 function extractWixArticleImagesAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
 
@@ -454,24 +496,31 @@ async function enrichWixItemsWithPublicPageContent(items = []) {
 
       const hasInlineImage = /<img\b|<figure\b/i.test(enrichedContent);
       const fallbackImageUrl = typeof item.imageUrl === "string" ? item.imageUrl.trim() : "";
-      const contentWithFallbackImage = (!hasInlineImage && fallbackImageUrl)
+      const shouldAddFallbackImage =
+        !hasInlineImage &&
+        !!fallbackImageUrl &&
+        !contentHasEquivalentImage(enrichedContent, fallbackImageUrl);
+
+      const contentWithFallbackImage = shouldAddFallbackImage
         ? `${renderImageFigure(fallbackImageUrl, item.title || "")}` + "\n" + enrichedContent
         : enrichedContent;
 
+      const sanitizedContent = dedupeFigureImagesInHtml(contentWithFallbackImage);
+
       const currentLen = typeof item.content === "string" ? item.content.trim().length : 0;
-      const enrichedLen = contentWithFallbackImage.trim().length;
+      const enrichedLen = sanitizedContent.trim().length;
       // If we already have richContent nodes, we should be VERY careful about overwriting content
       // with scraped HTML, unless the scraped HTML is significantly better.
       const hasRichContent = !!(item.richContent && item.richContent.nodes && item.richContent.nodes.length > 0);
       if (hasRichContent && enrichedLen < currentLen * 0.5) continue;
       if (enrichedLen < currentLen && !(enrichedHasStructure && !currentHasStructure)) continue;
 
-      const enrichedText = stripHtmlTags(contentWithFallbackImage);
+      const enrichedText = stripHtmlTags(sanitizedContent);
       const enrichedMinutesToRead = Math.max(1, Math.ceil((enrichedText.split(/\s+/).filter(Boolean).length || 0) / 225));
 
       updates.set(index, {
         ...item,
-        content: contentWithFallbackImage,
+        content: sanitizedContent,
         excerpt: clampText(decodeHtmlEntities(enrichedText), 360),
         minutesToRead: Math.max(Number(item.minutesToRead) || 1, enrichedMinutesToRead),
       });
