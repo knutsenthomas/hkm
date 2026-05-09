@@ -651,6 +651,11 @@ async function performSiteSearch(query, resultsEl) {
 
             items.forEach((item) => {
                 const combined = [
+                    col.label,
+                    'blogg',
+                    'nyheter',
+                    'undervisning',
+                    'arrangement',
                     item.title,
                     item.content,
                     item.category,
@@ -701,7 +706,7 @@ async function performSiteSearch(query, resultsEl) {
 
         if (Array.isArray(podcastEpisodes) && podcastEpisodes.length) {
             podcastEpisodes.forEach(ep => {
-                const combined = [ep.title, ep.description].filter(Boolean).join(' ').toLowerCase();
+                const combined = ['podcast', 'lyd', 'episode', ep.title, ep.description].filter(Boolean).join(' ').toLowerCase();
                 if (combined.includes(qLower)) {
                     results.push({
                         type: 'Podcast',
@@ -736,7 +741,7 @@ async function performSiteSearch(query, resultsEl) {
             youtubeVideos.forEach(v => {
                 const title = v.title;
                 const description = v.description || '';
-                const combined = [title, description].filter(Boolean).join(' ').toLowerCase();
+                const combined = ['video', 'youtube', 'film', title, description].filter(Boolean).join(' ').toLowerCase();
                 if (combined.includes(qLower)) {
                     results.push({
                         type: 'YouTube',
@@ -775,7 +780,7 @@ async function performSiteSearch(query, resultsEl) {
                 const summary = ev.summary || '';
                 const description = ev.description || '';
                 const location = ev.location || '';
-                const combined = [summary, description, location].filter(Boolean).join(' ').toLowerCase();
+                const combined = ['kalender', 'arrangement', 'event', 'møte', summary, description, location].filter(Boolean).join(' ').toLowerCase();
                 if (combined.includes(qLower)) {
                     const start = ev.start && (ev.start.dateTime || ev.start.date);
                     const dateLabel = start ? new Date(start).toLocaleString('no-NO') : '';
@@ -795,7 +800,7 @@ async function performSiteSearch(query, resultsEl) {
         const courseData = await firebaseService.getPageContent('collection_courses');
         const courses = Array.isArray(courseData) ? courseData : (courseData && Array.isArray(courseData.items) ? courseData.items : []);
         courses.forEach(course => {
-            const combined = [course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
+            const combined = ['kurs', 'undervisning', 'serie', course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
             if (combined.includes(qLower)) {
                 results.push({
                     type: 'Kurs',
