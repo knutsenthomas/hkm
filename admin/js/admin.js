@@ -316,6 +316,112 @@ class AdminManager {
         return chunks;
     }
 
+    async _getTranslationSettings(forceReload = false) {
+        const now = Date.now();
+        if (!forceReload && this._translationSettingsCache && (now - this._translationSettingsCacheLoadedAt) < 5 * 60 * 1000) {
+            return this._translationSettingsCache;
+        }
+
+        let settings = {};
+        try {
+            settings = await firebaseService.getPageContent('settings_integrations') || {};
+        } catch (error) {
+            console.warn('[AdminManager] Could not load translation settings, using defaults.', error);
+        }
+
+        const translation = (settings.translation && typeof settings.translation === 'object')
+            ? settings.translation
+            : {};
+        const fallbackGeminiKey = String(
+            translation.geminiApiKey
+            || settings.googleAI?.apiKey
+            || settings.googleAi?.apiKey
+            || settings.googleCalendar?.apiKey
+            || ''
+        ).trim();
+
+        const provider = String(translation.provider || 'mymemory').toLowerCase() === 'gemini'
+            ? 'gemini'
+            : 'mymemory';
+
+        this._translationSettingsCache = {
+            provider,
+            geminiApiKey: fallbackGeminiKey,
+            geminiModel: String(translation.geminiModel || 'gemini-1.5-flash').trim() || 'gemini-1.5-flash'
+        };
+        this._translationSettingsCacheLoadedAt = now;
+
+        return this._translationSettingsCache;
+    }
+
+    _extractGeminiText(responseJson) {
+        const candidates = Array.isArray(responseJson?.candidates) ? responseJson.candidates : [];
+        for (const candidate of candidates) {
+            const parts = Array.isArray(candidate?.content?.parts) ? candidate.content.parts : [];
+            const text = parts
+                .map((part) => (typeof part?.text === 'string' ? part.text : ''))
+                .join('')
+                .trim();
+            if (text) return text;
+        }
+        return '';
+    }
+
+    async _translateTextChunkWithGemini(text, targetLang, sourceLang = 'no') {
+        const settings = await this._getTranslationSettings();
+        if (!settings.geminiApiKey) {
+            throw new Error('Gemini API key mangler i integrasjonsinnstillinger.');
+        }
+
+        const languageMap = {
+            no: 'Norwegian Bokmal',
+            en: 'English',
+            es: 'Spanish'
+        };
+
+        const sourceName = languageMap[sourceLang] || sourceLang;
+        const targetName = languageMap[targetLang] || targetLang;
+
+        const model = encodeURIComponent(settings.geminiModel || 'gemini-1.5-flash');
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(settings.geminiApiKey)}`;
+
+        const prompt = `Translate the following text from ${sourceName} to ${targetName}.\n\nRules:\n- Preserve meaning and tone.\n- Keep HTML tags unchanged.\n- Return only translated text, no explanation.\n\nText:\n${text}`;
+
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [
+                    {
+                        role: 'user',
+                        parts: [{ text: prompt }]
+                    }
+                ],
+                generationConfig: {
+                    temperature: 0.1,
+                    topP: 0.8,
+                    topK: 40,
+                    maxOutputTokens: 1024
+                }
+            })
+        });
+
+        if (!res.ok) {
+            const errorBody = await res.text().catch(() => '');
+            throw new Error(`Gemini request failed (${res.status}): ${errorBody || 'Unknown error'}`);
+        }
+
+        const data = await res.json();
+        const translated = this._extractGeminiText(data);
+        if (!translated) {
+            throw new Error('Gemini svarte uten oversatt tekst.');
+        }
+
+        return translated;
+    }
+
     async _translateTextChunk(text, targetLang, sourceLang = 'no') {
         const raw = String(text || '');
         if (!raw.trim()) return raw;
@@ -325,6 +431,21 @@ class AdminManager {
         this._translationCache = this._translationCache || new Map();
         if (this._translationCache.has(cacheKey)) {
             return this._translationCache.get(cacheKey);
+        }
+
+        const translationSettings = await this._getTranslationSettings();
+
+        if (translationSettings.provider === 'gemini' && translationSettings.geminiApiKey) {
+            try {
+                const translatedByGemini = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
+                const finalGeminiText = (typeof translatedByGemini === 'string' && translatedByGemini.trim())
+                    ? translatedByGemini
+                    : raw;
+                this._translationCache.set(cacheKey, finalGeminiText);
+                return finalGeminiText;
+            } catch (error) {
+                console.warn(`[AdminManager] Gemini translation failed, falling back to MyMemory (${targetLang})`, error);
+            }
         }
 
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=${encodeURIComponent(sourceLang)}|${encodeURIComponent(targetLang)}`;
@@ -7512,6 +7633,33 @@ class AdminManager {
                                         <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Sørg for at 'Google Calendar API' er aktivert i Cloud Console.</p>
                                 </div>
 
+                                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                                    <h4 style="margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px; color: #7c3aed;">translate</span>
+                                        AI-oversettelse for blogg
+                                    </h4>
+                                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Velg oversetter for EN/ES-blogginnhold. Gemini anbefales hvis du har API-nøkkel.</p>
+
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="translation-provider">Oversettelsesleverandør</label>
+                                        <select id="translation-provider" class="form-control">
+                                            <option value="mymemory">MyMemory (gratis, begrenset)</option>
+                                            <option value="gemini">Gemini (Google AI API)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 10px;">
+                                        <label for="gemini-api-key">Gemini API Key</label>
+                                        <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 0;">
+                                        <label for="gemini-model">Gemini modell</label>
+                                        <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
+                                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Tips: Sett API key-restriksjoner i Google Cloud for tryggere bruk.</p>
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <label>Calendar ID</label>
                                     <div id="gcal-list" class="gcal-list" style="margin-bottom: 8px;"></div>
@@ -7626,10 +7774,17 @@ class AdminManager {
         // Load existing settings
         const settings = await firebaseService.getPageContent('settings_integrations') || {};
         const gcal = settings.googleCalendar || {};
+        const translation = (settings.translation && typeof settings.translation === 'object')
+            ? settings.translation
+            : {};
+        const fallbackGeminiKey = String(translation.geminiApiKey || gcal.apiKey || '').trim();
 
         document.getElementById('gcal-api-key').value = gcal.apiKey || '';
         document.getElementById('gcal-show-month').checked = settings.showMonthView !== false; // Default true
         document.getElementById('gcal-show-agenda').checked = settings.showAgendaView !== false; // Default true
+        document.getElementById('translation-provider').value = translation.provider === 'gemini' ? 'gemini' : 'mymemory';
+        document.getElementById('gemini-api-key').value = fallbackGeminiKey;
+        document.getElementById('gemini-model').value = translation.geminiModel || 'gemini-1.5-flash';
 
         const listEl = document.getElementById('gcal-list');
         const addBtn = document.getElementById('add-gcal');
@@ -7678,6 +7833,10 @@ class AdminManager {
         document.getElementById('save-gcal-settings').onclick = async (e) => {
             const btn = e.target;
             const apiKey = document.getElementById('gcal-api-key').value.trim();
+            const translationProvider = document.getElementById('translation-provider').value;
+            const geminiApiKeyInput = document.getElementById('gemini-api-key').value.trim();
+            const geminiApiKey = geminiApiKeyInput || translation.geminiApiKey || apiKey || '';
+            const geminiModel = document.getElementById('gemini-model').value.trim() || 'gemini-1.5-flash';
             const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
             const calendars = rows.map(row => {
                 const label = row.querySelector('.gcal-label')?.value.trim();
@@ -7699,10 +7858,18 @@ class AdminManager {
                         label: calendars[0]?.label || '',
                         lastUpdated: new Date().toISOString()
                     },
-                    googleCalendars: calendars
+                    googleCalendars: calendars,
+                    translation: {
+                        provider: translationProvider === 'gemini' ? 'gemini' : 'mymemory',
+                        geminiApiKey,
+                        geminiModel,
+                        lastUpdated: new Date().toISOString()
+                    }
                 };
 
                 await firebaseService.savePageContent('settings_integrations', newSettings);
+                this._translationSettingsCache = null;
+                this._translationSettingsCacheLoadedAt = 0;
 
                 btn.textContent = 'Lagret!';
                 const statusBadge = document.getElementById('gcal-status');
