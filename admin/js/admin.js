@@ -4456,33 +4456,77 @@ class AdminManager {
 
             // 2. Fetch episodes from the same source used by Podcast redigering
             const episodes = await this.fetchPodcastEpisodesForAdmin();
+            const podcastCategories = [
+                { value: 'tro', label: 'Tro' },
+                { value: 'bibel', label: 'Bibel' },
+                { value: 'bønn', label: 'Bønn' },
+                { value: 'undervisning', label: 'Undervisning' }
+            ];
 
             if (episodes.length > 0) {
                 listContainer.innerHTML = episodes.map((ep) => {
                     const id = ep.id;
+                    const encodedId = encodeURIComponent(String(id || '').trim());
                     const currentCats = this.parsePodcastOverrideCategories(overrides[id]);
                     const title = this.escapeHtml(ep.title || 'Uten tittel');
 
+                    const chipsHtml = podcastCategories.map((category) => {
+                        const isSelected = currentCats.includes(category.value);
+                        return `
+                            <button
+                                type="button"
+                                class="podcast-category-chip"
+                                data-value="${category.value}"
+                                data-selected="${isSelected ? 'true' : 'false'}"
+                                aria-pressed="${isSelected ? 'true' : 'false'}"
+                                style="border:1px solid ${isSelected ? '#fdba74' : '#e2e8f0'}; background:${isSelected ? '#fff7ed' : '#ffffff'}; color:${isSelected ? '#c2410c' : '#334155'}; padding:7px 12px; border-radius:999px; font-size:12px; font-weight:700; letter-spacing:0.02em; cursor:pointer; transition:all .15s ease;">
+                                ${category.label}
+                            </button>
+                        `;
+                    }).join('');
+
                     return `
-                        <div class="podcast-override-item" style="padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px;">
+                        <div class="podcast-override-item" data-episode-key="${encodedId}" style="padding: 14px 12px; border-bottom: 1px solid #f1f5f9; display: flex; flex-direction: column; gap: 10px;">
                             <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${title}">${title}</div>
-                            <div style="display: flex; align-items: center; gap: 10px; justify-content: space-between; width: 100%;">
-                                <div style="display:flex; align-items:center; gap:10px; width:100%;">
-                                    <select multiple class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 6px 8px; min-height: 96px; max-width: 220px;">
-                                        <option value="tro" ${currentCats.includes('tro') ? 'selected' : ''}>Tro</option>
-                                        <option value="bibel" ${currentCats.includes('bibel') ? 'selected' : ''}>Bibel</option>
-                                        <option value="bønn" ${currentCats.includes('bønn') ? 'selected' : ''}>Bønn</option>
-                                        <option value="undervisning" ${currentCats.includes('undervisning') ? 'selected' : ''}>Undervisning</option>
-                                    </select>
-                                    <div style="display:flex; flex-direction:column; gap:6px;">
-                                        <button type="button" class="btn-secondary btn-sm" data-open-podcast-id="${this.escapeHtml(id)}">Rediger tekst</button>
-                                        <span style="font-size:11px; color:#94a3b8;">Ingen valg = Auto (nøkkelord)</span>
+                            <div style="display: flex; align-items: flex-start; gap: 12px; justify-content: space-between; width: 100%;">
+                                <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
+                                    <div class="podcast-category-chip-group" style="display:flex; flex-wrap:wrap; gap:8px;">
+                                        ${chipsHtml}
                                     </div>
+                                    <span style="font-size:11px; color:#94a3b8;">Klikk for å velge flere. Ingen valg = Auto (nøkkelord).</span>
+                                </div>
+                                <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-end; min-width:120px;">
+                                    <button type="button" class="btn-secondary btn-sm clear-podcast-categories" style="font-size:12px;">Auto</button>
+                                    <button type="button" class="btn-secondary btn-sm" data-open-podcast-id="${this.escapeHtml(id)}">Rediger tekst</button>
                                 </div>
                             </div>
                         </div>
                     `;
                 }).join('');
+
+                listContainer.querySelectorAll('.podcast-override-item').forEach((itemEl) => {
+                    const chips = Array.from(itemEl.querySelectorAll('.podcast-category-chip'));
+                    const clearBtn = itemEl.querySelector('.clear-podcast-categories');
+
+                    const updateChip = (chip, selected) => {
+                        chip.dataset.selected = selected ? 'true' : 'false';
+                        chip.setAttribute('aria-pressed', selected ? 'true' : 'false');
+                        chip.style.borderColor = selected ? '#fdba74' : '#e2e8f0';
+                        chip.style.background = selected ? '#fff7ed' : '#ffffff';
+                        chip.style.color = selected ? '#c2410c' : '#334155';
+                    };
+
+                    chips.forEach((chip) => {
+                        chip.addEventListener('click', () => {
+                            const isSelected = chip.dataset.selected === 'true';
+                            updateChip(chip, !isSelected);
+                        });
+                    });
+
+                    clearBtn?.addEventListener('click', () => {
+                        chips.forEach((chip) => updateChip(chip, false));
+                    });
+                });
             } else {
                 listContainer.innerHTML = '<p class="text-muted">Ingen episoder funnet.</p>';
             }
@@ -4494,18 +4538,22 @@ class AdminManager {
 
     async savePodcastOverrides() {
         const btn = document.getElementById('save-podcast-overrides');
-        const selects = document.querySelectorAll('.override-select');
+        const rows = document.querySelectorAll('.podcast-override-item');
         const overrides = {};
 
-        selects.forEach((select) => {
-            const selected = Array.from(select.selectedOptions || [])
-                .map((option) => String(option.value || '').trim())
+        rows.forEach((row) => {
+            const encodedId = row.getAttribute('data-episode-key') || '';
+            const episodeId = decodeURIComponent(encodedId || '');
+            if (!episodeId) return;
+
+            const selected = Array.from(row.querySelectorAll('.podcast-category-chip[data-selected="true"]'))
+                .map((chip) => String(chip.getAttribute('data-value') || '').trim())
                 .filter(Boolean);
 
             if (selected.length === 1) {
-                overrides[select.getAttribute('data-id')] = selected[0];
+                overrides[episodeId] = selected[0];
             } else if (selected.length > 1) {
-                overrides[select.getAttribute('data-id')] = selected;
+                overrides[episodeId] = selected;
             }
         });
 
