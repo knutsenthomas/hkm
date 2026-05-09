@@ -3932,7 +3932,9 @@ class AdminManager {
             const isTeachingCollection = collectionId === 'teaching';
             const selectedTeachingType = (item.teachingType || item.category || 'Bibelstudie').toLowerCase();
             const seriesSelection = Array.isArray(item.seriesItems) ? item.seriesItems : [];
-            const podcastSummary = item.description || item.summary || '';
+            const rawDescription = item.description || item.summary || '';
+            // Strip HTML tags from description for clean display in textarea
+            const podcastSummary = rawDescription.replace(/<[^>]*>/g, '').trim();
             const teachingCandidates = (collectionItems || [])
                 .filter((opt, optIndex) => optIndex !== index)
                 .filter(opt => (opt.id || opt.title))
