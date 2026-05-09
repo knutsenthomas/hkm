@@ -4869,7 +4869,7 @@ body.builder-active .main-header [id="admin-avatar"] {
     text-transform: uppercase !important;
 }
 
-@media (min-width: 801px) {
+@media (min-width: 1025px) {
 
     body.admin-body .main-header .mobile-nav-toggle,
     body.crm-body .main-header .mobile-nav-toggle,
