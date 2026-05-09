@@ -29,9 +29,14 @@ const i18nManager = {
     },
 
     init() {
-        this.detectLanguage();
+        const currentLang = this.detectLanguage();
         this.fixLocalizedHeaderLogoPath();
+        this.syncCurrentLanguageBadge(currentLang);
         this.bindEvents();
+
+        // Some pages hydrate header labels after i18n init; resync shortly after.
+        setTimeout(() => this.syncCurrentLanguageBadge(), 300);
+        setTimeout(() => this.syncCurrentLanguageBadge(), 1200);
     },
 
     fixLocalizedHeaderLogoPath() {
@@ -71,6 +76,23 @@ const i18nManager = {
         else if (path.includes('/es/')) currentLang = 'es';
 
         document.documentElement.lang = currentLang;
+        return currentLang;
+    },
+
+    syncCurrentLanguageBadge(lang = null) {
+        const activeLang = (lang || document.documentElement.lang || this.defaultLang).toLowerCase();
+        const normalized = this.languages.includes(activeLang) ? activeLang : this.defaultLang;
+        const label = normalized.toUpperCase();
+
+        document.querySelectorAll('.lang-btn span').forEach((el) => {
+            el.textContent = label;
+        });
+
+        document.querySelectorAll('.lang-switch-btn').forEach((link) => {
+            const linkLang = (link.getAttribute('data-lang') || this.inferLanguageFromElement(link) || '').toLowerCase();
+            const isActive = linkLang === normalized;
+            link.classList.toggle('font-bold', isActive);
+        });
     },
 
     /**
@@ -83,6 +105,7 @@ const i18nManager = {
 
         localStorage.setItem(this.storageKey, lang);
         document.documentElement.lang = lang;
+        this.syncCurrentLanguageBadge(lang);
 
         if (redirect) {
             this.redirectToLanguage(lang);
