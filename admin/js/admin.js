@@ -71,6 +71,7 @@ class AdminManager {
         this._activityLogItems = [];
         this._editorRestoreStateKey = 'hkm_admin_open_editor_state';
         this._restoringEditorState = false;
+        this.analyticsRangeDays = this._getSavedAnalyticsRangeDays();
 
         // User Detail View State
         this.currentUserDetailId = null;
@@ -3262,6 +3263,32 @@ class AdminManager {
         return window.HKMAdminUtils.renderSectionHeader(icon, title, subtitle, actionsHtml, subtitleId);
     }
 
+    _getSavedAnalyticsRangeDays() {
+        const saved = parseInt(localStorage.getItem('hkm_analytics_range_days'), 10);
+        const allowed = [7, 14, 30, 60, 90, 180, 365];
+        return allowed.includes(saved) ? saved : 30;
+    }
+
+    _formatAnalyticsRangeLabel(days = this.analyticsRangeDays) {
+        return `Siste ${days} ${days === 1 ? 'dag' : 'dager'}`;
+    }
+
+    initAnalyticsRangeControl() {
+        const select = document.getElementById('analytics-range-days');
+        if (!select) return;
+
+        select.value = String(this.analyticsRangeDays);
+        select.addEventListener('change', () => {
+            const nextDays = parseInt(select.value, 10);
+            if (!Number.isFinite(nextDays) || nextDays === this.analyticsRangeDays) return;
+
+            this.analyticsRangeDays = nextDays;
+            localStorage.setItem('hkm_analytics_range_days', String(nextDays));
+            this.renderOverview();
+            this.showToast(`Viser ${this._formatAnalyticsRangeLabel(nextDays).toLowerCase()}.`, 'success', 2500);
+        });
+    }
+
     async renderOverview() {
         const section = document.getElementById('overview-section');
         if (!section) return;
@@ -3288,7 +3315,7 @@ class AdminManager {
                 typeof firebaseService.getSiteContent === 'function'
                     ? firebaseService.getSiteContent('collection_courses')
                     : null,
-                this.fetchAnalyticsData()
+                this.fetchAnalyticsData(this.analyticsRangeDays)
             ]);
 
             this.gaData = gaData; // Store for rendering below
@@ -3388,7 +3415,7 @@ class AdminManager {
                 switch (id) {
                     case 'visitors':
                         const cachedVisits = localStorage.getItem('hkm_stat_visits');
-                        const liveVisits = this.gaData ? this.gaData.active30dUsers : indexStats.website_visits;
+                        const liveVisits = this.gaData ? (this.gaData.activeRangeUsers || this.gaData.active30dUsers) : indexStats.website_visits;
                         value = liveVisits ? parseInt(liveVisits).toLocaleString('no-NO') : (cachedVisits ? parseInt(cachedVisits).toLocaleString('no-NO') : '—');
                         break;
                     case 'analytics-engagement':
@@ -3475,7 +3502,7 @@ class AdminManager {
                     </div>
                     <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 15px; border-top: 1px solid #f1f5f9; margin-top: auto;">
                         <div>
-                            <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Aktivitet siste 7 dager</div>
+                            <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Aktivitet ${this._formatAnalyticsRangeLabel().toLowerCase()}</div>
                             <div style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">${ga.screenPageViews || '0'} <span style="font-size: 13px; font-weight: 600; color: #64748b; margin-left: 4px;">sidevisninger</span></div>
                         </div>
                         <div style="text-align: right;">
@@ -3503,7 +3530,12 @@ class AdminManager {
                     <div class="big-card-title">
                         <span>Trafikkovervåking (Google Analytics)</span>
                         <div style="display:flex; gap: 8px; align-items:center;">
-                            <span class="badge" style="background: #ffedd5; color: #9a3412; font-size: 11px; padding: 4px 8px; border-radius: 12px;">Siste 30 dager</span>
+                            <label for="analytics-range-days" class="sr-only">Velg periode</label>
+                            <select id="analytics-range-days" class="analytics-range-select" aria-label="Velg periode for Google Analytics">
+                                ${[7, 14, 30, 60, 90, 180, 365].map(days => `
+                                    <option value="${days}" ${days === this.analyticsRangeDays ? 'selected' : ''}>${this._formatAnalyticsRangeLabel(days)}</option>
+                                `).join('')}
+                            </select>
                             <span class="material-symbols-outlined" style="cursor:pointer; color: #64748b;">more_vert</span>
                         </div>
                     </div>
@@ -3527,9 +3559,9 @@ class AdminManager {
                             </div>
                         `).join('')}
                     </div>
-                    <a href="javascript:void(0)" style="display: flex; align-items: center; gap: 4px; color: #9a3412; font-size: 13px; font-weight: 600; margin-top: 32px; text-decoration: none;">
-                        Se all aktivitet
-                        <span class="material-symbols-outlined" style="font-size: 16px;">arrow_forward</span>
+                    <a href="https://analytics.google.com/analytics/web/" class="analytics-open-link" target="_blank" rel="noopener noreferrer">
+                        Åpne Google Analytics
+                        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
                     </a>
                 </div>
             </div>
@@ -3665,6 +3697,7 @@ class AdminManager {
         this.initSortableWidgets();
         this.initSortableMainGrid();
         this.initWidgetResizers();
+        this.initAnalyticsRangeControl();
 
         // Edit Mode Toggle
         const editToggle = document.getElementById('toggle-edit-mode');
@@ -4353,10 +4386,11 @@ class AdminManager {
     }
 
 
-    async fetchAnalyticsData() {
+    async fetchAnalyticsData(days = this.analyticsRangeDays) {
         try {
+            const safeDays = [7, 14, 30, 60, 90, 180, 365].includes(Number(days)) ? Number(days) : 30;
             // Call the Firebase Function
-            const response = await fetch('https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app');
+            const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${safeDays}`);
             const result = await response.json();
             if (result.status === 'success') {
                 return result.data;

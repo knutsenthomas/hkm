@@ -3807,6 +3807,73 @@ body.admin-body #overview-section .stat-card.modern .stat-content {
     text-align: left;
 }
 
+body.admin-body #overview-section .analytics-range-select {
+    min-height: 28px;
+    padding: 4px 28px 4px 10px;
+    border: 0;
+    border-radius: 999px;
+    background: #ffedd5;
+    color: #9a3412;
+    font-size: 11px;
+    font-weight: 800;
+    line-height: 1;
+    text-transform: uppercase;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    background-image:
+        linear-gradient(45deg, transparent 50%, #9a3412 50%),
+        linear-gradient(135deg, #9a3412 50%, transparent 50%);
+    background-position:
+        calc(100% - 14px) 11px,
+        calc(100% - 9px) 11px;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat: no-repeat;
+}
+
+body.admin-body #overview-section .analytics-range-select:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.18);
+}
+
+body.admin-body #overview-section .analytics-open-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    margin-top: 32px;
+    color: #9a3412;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-decoration: none;
+}
+
+body.admin-body #overview-section .analytics-open-link .material-symbols-outlined {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+    transform: translateY(1px);
+}
+
+body.admin-body #overview-section .analytics-open-link:hover {
+    color: #7c2d12;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
 /* Consistent alignment: left-align card content by default */
 body.admin-body .card,
 body.crm-body .card,

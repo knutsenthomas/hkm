@@ -1625,6 +1625,10 @@ exports.getAnalyticsOverview = onRequest({
         });
       }
 
+      const requestedDays = Number.parseInt(req.query.days, 10);
+      const allowedDays = [7, 14, 30, 60, 90, 180, 365];
+      const rangeDays = allowedDays.includes(requestedDays) ? requestedDays : 30;
+      const rangeStartDate = `${rangeDays}daysAgo`;
       const accessToken = await getGaAccessToken({ clientEmail, privateKey });
 
       const [summaryReport, pagesReport, sourcesReport, realtimeReport, devicesReport, geoReport, dailyReport] = await Promise.all([
@@ -1632,7 +1636,7 @@ exports.getAnalyticsOverview = onRequest({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
           body: {
-            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
             metrics: [{ name: "activeUsers" }, { name: "screenPageViews" }, { name: "averageSessionDuration" }, { name: "bounceRate" }],
             limit: 1,
           },
@@ -1641,7 +1645,7 @@ exports.getAnalyticsOverview = onRequest({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
           body: {
-            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
             dimensions: [{ name: "pageTitle" }],
             metrics: [{ name: "screenPageViews" }],
             limit: 10,
@@ -1652,7 +1656,7 @@ exports.getAnalyticsOverview = onRequest({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
           body: {
-            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
             dimensions: [{ name: "sessionDefaultChannelGroup" }],
             metrics: [{ name: "sessions" }],
             limit: 6,
@@ -1675,7 +1679,7 @@ exports.getAnalyticsOverview = onRequest({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
           body: {
-            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
             dimensions: [{ name: "deviceCategory" }],
             metrics: [{ name: "activeUsers" }],
             limit: 5,
@@ -1685,7 +1689,7 @@ exports.getAnalyticsOverview = onRequest({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
           body: {
-            dateRanges: [{ startDate: "30daysAgo", endDate: "today" }],
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
             dimensions: [{ name: "city" }],
             metrics: [{ name: "activeUsers" }],
             limit: 8,
@@ -1696,7 +1700,7 @@ exports.getAnalyticsOverview = onRequest({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
           body: {
-            dateRanges: [{ startDate: "7daysAgo", endDate: "today" }],
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
             dimensions: [{ name: "date" }],
             metrics: [{ name: "activeUsers" }],
             orderBys: [{ dimension: { dimensionName: "date" }, desc: false }]
@@ -1730,7 +1734,7 @@ exports.getAnalyticsOverview = onRequest({
       }));
 
       const activeUsersNow = realtimeReport ? gaMetricValue(realtimeReport, 0, 0) : 0;
-      const active30dUsers = summaryReport.rows?.[0]?.metricValues?.[0]?.value || "0";
+      const activeRangeUsers = summaryReport.rows?.[0]?.metricValues?.[0]?.value || "0";
       const screenPageViews = summaryReport.rows?.[0]?.metricValues?.[1]?.value || "0";
       const avgDuration = summaryReport.rows?.[0]?.metricValues?.[2]?.value || "0";
       const bounceRate = summaryReport.rows?.[0]?.metricValues?.[3]?.value || "0";
@@ -1738,8 +1742,10 @@ exports.getAnalyticsOverview = onRequest({
       res.json({
         status: "success",
         data: {
+          rangeDays,
           activeUsers: activeUsersNow,
-          active30dUsers,
+          activeRangeUsers,
+          active30dUsers: activeRangeUsers,
           screenPageViews,
           avgDuration: Math.round(parseFloat(avgDuration)),
           bounceRate: (parseFloat(bounceRate) * 100).toFixed(1) + "%",
