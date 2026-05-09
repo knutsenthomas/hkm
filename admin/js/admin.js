@@ -577,6 +577,36 @@ class AdminManager {
         return translated;
     }
 
+    async _translateTextChunkWithGoogleTranslate(raw, targetLang, sourceLang = 'no') {
+        const mapLang = (lang) => {
+            const normalized = String(lang || '').trim().toLowerCase();
+            if (normalized === 'no') return 'no';
+            return normalized;
+        };
+
+        const sl = mapLang(sourceLang) || 'no';
+        const tl = mapLang(targetLang) || 'en';
+        const endpoint = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${encodeURIComponent(sl)}&tl=${encodeURIComponent(tl)}&dt=t&q=${encodeURIComponent(raw)}`;
+
+        const res = await this._fetchWithTimeout(endpoint, {}, 25000);
+        if (!res.ok) {
+            throw new Error(`Google Translate request failed (${res.status})`);
+        }
+
+        const data = await res.json();
+        const sentences = Array.isArray(data?.[0]) ? data[0] : [];
+        const translated = sentences
+            .map((entry) => (Array.isArray(entry) ? String(entry[0] || '') : ''))
+            .join('')
+            .trim();
+
+        if (!translated) {
+            throw new Error('Google Translate svarte uten oversatt tekst.');
+        }
+
+        return translated;
+    }
+
     async _translateTextChunk(text, targetLang, sourceLang = 'no') {
         const raw = String(text || '');
         if (!raw.trim()) return raw;
@@ -626,6 +656,19 @@ class AdminManager {
                 }
             }
 
+            if (!this._isMeaningfullyTranslatedField(raw, finalText)) {
+                try {
+                    const translatedByGoogle = await this._translateTextChunkWithGoogleTranslate(raw, targetLang, sourceLang);
+                    const finalGoogleText = (typeof translatedByGoogle === 'string' && translatedByGoogle.trim())
+                        ? translatedByGoogle
+                        : raw;
+                    this._translationCache.set(cacheKey, finalGoogleText);
+                    return finalGoogleText;
+                } catch (googleError) {
+                    console.warn(`[AdminManager] Google fallback failed after MyMemory no-op (${targetLang})`, googleError);
+                }
+            }
+
             this._translationCache.set(cacheKey, finalText);
             return finalText;
         } catch (error) {
@@ -641,6 +684,17 @@ class AdminManager {
                 } catch (geminiError) {
                     console.warn(`[AdminManager] Gemini fallback failed after MyMemory quota hit (${targetLang})`, geminiError);
                 }
+            }
+
+            try {
+                const translatedByGoogle = await this._translateTextChunkWithGoogleTranslate(raw, targetLang, sourceLang);
+                const finalGoogleText = (typeof translatedByGoogle === 'string' && translatedByGoogle.trim())
+                    ? translatedByGoogle
+                    : raw;
+                this._translationCache.set(cacheKey, finalGoogleText);
+                return finalGoogleText;
+            } catch (googleError) {
+                console.warn(`[AdminManager] Google fallback failed (${targetLang})`, googleError);
             }
 
             if (quotaExceeded) {
