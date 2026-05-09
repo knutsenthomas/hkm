@@ -3223,6 +3223,10 @@ class AdminManager {
                     ? episode['itunes:image'][0]
                     : episode?.['itunes:image'];
                 const imageUrl = imageNode?.$?.href || '';
+                const enclosureNode = Array.isArray(episode?.enclosure)
+                    ? episode.enclosure[0]
+                    : episode?.enclosure;
+                const audioUrl = enclosureNode?.$?.url || this._extractPodcastText(enclosureNode?.url) || '';
 
                 const id = guid || link || title;
 
@@ -3232,6 +3236,7 @@ class AdminManager {
                     date,
                     description,
                     imageUrl,
+                    audioUrl,
                     source: 'feed'
                 };
             }).filter((ep) => ep.id);
@@ -4007,6 +4012,13 @@ class AdminManager {
                                 <div style="margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #e2e8f0;">
                                     <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 12px;">Oppsummering</h4>
                                     <textarea id="col-item-summary" style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;" placeholder="Kort oppsummering av episoden...">${podcastSummary}</textarea>
+                                    <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                                        <button type="button" id="generate-podcast-ai-transcript" class="btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">smart_toy</span>
+                                            Generer AI-tekst
+                                        </button>
+                                        <span id="podcast-ai-status" style="font-size: 12px; color: #64748b;">Genererer transkripsjon fra lydfilen for denne episoden.</span>
+                                    </div>
                                 </div>
                                 ` : ''}
                                 <div id="editorjs-container-v2"></div>
@@ -4346,6 +4358,81 @@ class AdminManager {
                         }
                     });
                 });
+            }
+
+            if (collectionId === 'podcast_transcripts') {
+                const generateAiBtn = document.getElementById('generate-podcast-ai-transcript');
+                const aiStatus = document.getElementById('podcast-ai-status');
+
+                if (generateAiBtn) {
+                    generateAiBtn.onclick = async () => {
+                        const episodeId = String(item?.id || '').trim();
+                        const audioUrl = String(item?.audioUrl || '').trim();
+
+                        if (!episodeId) {
+                            this.showToast('Mangler episode-ID. Kan ikke generere AI-tekst.', 'error', 5000);
+                            return;
+                        }
+
+                        if (!audioUrl) {
+                            this.showToast('Fant ingen lydfil for episoden. Kan ikke generere AI-tekst.', 'error', 5000);
+                            return;
+                        }
+
+                        const originalBtnHtml = generateAiBtn.innerHTML;
+                        generateAiBtn.disabled = true;
+                        generateAiBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Genererer...';
+                        if (aiStatus) {
+                            aiStatus.textContent = 'Genererer AI-tekst nå. Dette kan ta litt tid...';
+                            aiStatus.style.color = '#334155';
+                        }
+
+                        try {
+                            const callable = firebase.functions().httpsCallable('transcribePodcast');
+                            await callable({
+                                episodeId,
+                                audioUrl,
+                                episodeTitle: String(item?.title || '')
+                            });
+
+                            const refreshedDoc = await firebase.firestore().collection('podcast_transcripts').doc(episodeId).get();
+                            const refreshedData = refreshedDoc.exists ? refreshedDoc.data() : null;
+
+                            if (refreshedData && typeof refreshedData.text === 'string' && refreshedData.text.trim()) {
+                                const refreshedBlocks = this.htmlToEditorJsBlocks(refreshedData.text);
+                                await editor.render(refreshedBlocks);
+                                item.text = refreshedData.text;
+                                item.content = refreshedBlocks;
+                            }
+
+                            if (refreshedData && typeof refreshedData.description === 'string') {
+                                const summaryField = document.getElementById('col-item-summary');
+                                if (summaryField) summaryField.value = refreshedData.description;
+                            }
+
+                            if (refreshedData && typeof refreshedData.audioUrl === 'string' && refreshedData.audioUrl.trim()) {
+                                item.audioUrl = refreshedData.audioUrl.trim();
+                            }
+
+                            this.showToast('AI-tekst er klar. Du kan redigere og lagre nå.', 'success', 5000);
+                            if (aiStatus) {
+                                aiStatus.textContent = 'AI-tekst hentet. Husk å klikke Lagre og publiser.';
+                                aiStatus.style.color = '#166534';
+                            }
+                        } catch (error) {
+                            console.error('AI-transkripsjon feilet:', error);
+                            const errorMessage = error?.message ? ` ${error.message}` : '';
+                            this.showToast(`Kunne ikke generere AI-tekst.${errorMessage}`, 'error', 7000);
+                            if (aiStatus) {
+                                aiStatus.textContent = 'AI-generering feilet. Prøv igjen om litt.';
+                                aiStatus.style.color = '#b91c1c';
+                            }
+                        } finally {
+                            generateAiBtn.disabled = false;
+                            generateAiBtn.innerHTML = originalBtnHtml;
+                        }
+                    };
+                }
             }
 
             // --- Tag Management Logic ---
