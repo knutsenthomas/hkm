@@ -285,8 +285,42 @@ body {
 }
 
 @media (max-width: 768px) {
-    .mobile-nav-toggle {
-        display: flex;
+    .main-header .section-header {
+        padding: 0 16px !important;
+        gap: 12px !important;
+    }
+
+    .main-header .section-header-icon {
+        display: none !important;
+    }
+
+    .main-header .section-title {
+        font-size: 16px !important;
+    }
+
+    .user-info-text {
+        display: none !important;
+    }
+
+    .user-profile-link {
+        padding: 0 !important;
+        border: none !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .user-profile-link:hover {
+        transform: scale(1.05);
+    }
+
+    .main-header .section-header-actions {
+        gap: 8px;
+    }
+
+    .notification-btn, .mobile-nav-toggle {
+        width: 34px;
+        height: 34px;
+        display: flex !important;
     }
 }
 
