@@ -285,9 +285,17 @@ body {
 }
 
 @media (max-width: 768px) {
+    .main-header {
+        height: 64px !important;
+        padding: 0 !important;
+    }
+
     .main-header .section-header {
         padding: 0 16px !important;
-        gap: 12px !important;
+        gap: 10px !important;
+        height: 100%;
+        display: flex !important;
+        align-items: center !important;
     }
 
     .main-header .section-header-icon {
@@ -295,7 +303,9 @@ body {
     }
 
     .main-header .section-title {
-        font-size: 16px !important;
+        font-size: 17px !important;
+        white-space: nowrap;
+        color: #1e293b !important;
     }
 
     .user-info-text {
@@ -307,20 +317,48 @@ body {
         border: none !important;
         background: transparent !important;
         box-shadow: none !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 38px !important;
+        height: 38px !important;
+        min-width: 38px !important;
     }
 
-    .user-profile-link:hover {
-        transform: scale(1.05);
+    .user-avatar {
+        width: 38px !important;
+        height: 38px !important;
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        border-radius: 10px !important;
     }
 
     .main-header .section-header-actions {
-        gap: 8px;
+        gap: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+        margin-left: auto;
     }
 
     .notification-btn, .mobile-nav-toggle {
-        width: 34px;
-        height: 34px;
+        width: 38px !important;
+        height: 38px !important;
         display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        background: #ffffff !important;
+        border: 1px solid #e2e8f0 !important;
+        color: #64748b !important;
+        border-radius: 10px !important;
+        padding: 0 !important;
+        min-width: 38px !important;
+    }
+
+    .notification-btn span, .mobile-nav-toggle span {
+        display: block !important;
+        font-size: 22px !important;
+        color: #64748b !important;
     }
 }
 
