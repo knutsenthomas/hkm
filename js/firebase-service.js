@@ -72,10 +72,9 @@ class FirebaseService {
     }
 
     _shouldPreferRestPublicReads() {
-        // Defaulting to false to prefer the native SDK even in local dev.
-        // The REST API triggers browser-level 404 errors for missing documents,
-        // while the SDK handles them silently.
-        return false;
+        // Public pages are read-heavy and must remain stable even when Firestore
+        // WebChannel long-polling is flaky. Keep SDK reads for admin/minside.
+        return !this._isAdminLikeRoute();
     }
 
     _getReadableConfig() {

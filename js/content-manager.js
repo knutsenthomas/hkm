@@ -339,11 +339,33 @@ class ContentManager {
         };
     }
 
+    hasUsableLocalizedTranslation(item, lang = this.getCurrentLanguage()) {
+        if (!item || typeof item !== 'object' || lang === 'no') return true;
+
+        const translations = (item.translations && typeof item.translations === 'object')
+            ? item.translations
+            : null;
+        const localized = (translations && translations[lang] && typeof translations[lang] === 'object')
+            ? translations[lang]
+            : null;
+
+        if (!localized) return false;
+
+        return this.isUsableLocalizedString(localized.title)
+            || this.isUsableLocalizedContent(localized.content)
+            || this.isUsableLocalizedString(localized.category)
+            || this.isUsableLocalizedString(localized.seoTitle)
+            || this.isUsableLocalizedString(localized.seoDescription);
+    }
+
     localizeBlogItems(items) {
         const lang = this.getCurrentLanguage();
         try {
             const list = Array.isArray(items) ? items : [];
-            return list.map((item) => this.getLocalizedContentItem(item, lang));
+            const filtered = lang === 'no'
+                ? list
+                : list.filter((item) => this.hasUsableLocalizedTranslation(item, lang));
+            return filtered.map((item) => this.getLocalizedContentItem(item, lang));
         } catch (error) {
             console.warn('[ContentManager] localizeBlogItems fallback to source language', error);
             return Array.isArray(items) ? items : [];
@@ -727,14 +749,24 @@ class ContentManager {
                 const blogItems = this.getDedupedBlogItems(blogData);
                 const localizedBlogItems = this.localizeBlogItems(blogItems);
                 console.log("[ContentManager] Parsed blog items:", blogItems);
-                const postsToRender = localizedBlogItems.length > 0 ? localizedBlogItems : blogItems;
+                const currentLang = this.getCurrentLanguage();
+                const postsToRender = currentLang === 'no'
+                    ? (localizedBlogItems.length > 0 ? localizedBlogItems : blogItems)
+                    : localizedBlogItems;
 
                 if (postsToRender.length > 0) {
                     this.renderBlogPosts(postsToRender, '.blog-page .blog-grid');
                 } else {
                     console.warn("[ContentManager] No blog posts found in 'collection_blog'.");
                     const container = document.querySelector('.blog-page .blog-grid');
-                    if (container) container.innerHTML = '<p class="cms-empty-copy">Ingen blogginnlegg funnet. Kjør seed-scriptet.</p>';
+                    if (container) {
+                        const msg = currentLang === 'en'
+                            ? 'No translated blog posts are available in English yet.'
+                            : (currentLang === 'es'
+                                ? 'Todavia no hay entradas de blog traducidas al espanol.'
+                                : 'Ingen blogginnlegg funnet. Kjor seed-scriptet.');
+                        container.innerHTML = `<p class="cms-empty-copy">${msg}</p>`;
+                    }
                 }
             } catch (err) {
                 console.error("[ContentManager] Error loading blog posts:", err);
@@ -2932,6 +2964,17 @@ class ContentManager {
 
         const localizedPosts = this.localizeBlogItems(posts);
         const renderPosts = localizedPosts.length > 0 ? localizedPosts : (Array.isArray(posts) ? posts : []);
+        if (!renderPosts.length) {
+            const lang = this.getCurrentLanguage();
+            const emptyMsg = lang === 'en'
+                ? 'No translated blog posts are available in English yet.'
+                : (lang === 'es'
+                    ? 'Todavia no hay entradas de blog traducidas al espanol.'
+                    : 'Ingen blogginnlegg tilgjengelig enda.');
+            this.setHTMLIfChanged(container, `<p class="cms-empty-copy">${emptyMsg}</p>`, `blog-empty:${selector}`);
+            return;
+        }
+
         if (renderPosts.length > 0) {
             const html = renderPosts.map(post => {
                 const stableId = post.__stableId || this.getContentItemStableId(post);
