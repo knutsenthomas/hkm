@@ -818,13 +818,13 @@ function enhanceTranscriptRichFormatting(html) {
         if (isTranscriptChapterHeading(text)) {
             const heading = document.createElement('h4');
             heading.className = 'transcript-chapter-heading';
-            heading.style.margin = '16px 0 8px';
-            heading.style.fontSize = '1.15rem';
+            heading.style.margin = '24px 0 12px';
+            heading.style.fontSize = '1.2rem';
             heading.style.fontWeight = '800';
-            heading.style.color = '#1f3348';
+            heading.style.color = '#1b4965'; // Mandal Regnskapskontor Mørkeblå
             heading.style.letterSpacing = '0.01em';
             heading.style.borderLeft = '4px solid #d17d39';
-            heading.style.paddingLeft = '10px';
+            heading.style.paddingLeft = '12px';
             heading.textContent = text;
             paragraph.replaceWith(heading);
             return;
@@ -837,26 +837,28 @@ function enhanceTranscriptRichFormatting(html) {
             if (hasMeaningfulTextFragment(chapterParts.before)) {
                 const beforeParagraph = document.createElement('p');
                 beforeParagraph.textContent = chapterParts.before;
-                beforeParagraph.style.margin = '0 0 12px';
+                beforeParagraph.style.margin = '0 0 16px';
+                beforeParagraph.style.lineHeight = '1.6';
                 fragment.appendChild(beforeParagraph);
             }
 
             const inlineHeading = document.createElement('h4');
             inlineHeading.className = 'transcript-chapter-heading';
-            inlineHeading.style.margin = '16px 0 8px';
-            inlineHeading.style.fontSize = '1.15rem';
+            inlineHeading.style.margin = '24px 0 12px';
+            inlineHeading.style.fontSize = '1.2rem';
             inlineHeading.style.fontWeight = '800';
-            inlineHeading.style.color = '#1f3348';
+            inlineHeading.style.color = '#1b4965';
             inlineHeading.style.letterSpacing = '0.01em';
             inlineHeading.style.borderLeft = '4px solid #d17d39';
-            inlineHeading.style.paddingLeft = '10px';
+            inlineHeading.style.paddingLeft = '12px';
             inlineHeading.textContent = chapterParts.heading;
             fragment.appendChild(inlineHeading);
 
             if (hasMeaningfulTextFragment(chapterParts.after)) {
                 const afterParagraph = document.createElement('p');
                 afterParagraph.textContent = chapterParts.after;
-                afterParagraph.style.margin = '0 0 12px';
+                afterParagraph.style.margin = '0 0 16px';
+                afterParagraph.style.lineHeight = '1.6';
                 fragment.appendChild(afterParagraph);
             }
 
@@ -864,19 +866,31 @@ function enhanceTranscriptRichFormatting(html) {
             return;
         }
 
-        paragraph.style.margin = '0 0 12px';
+        // Parse timestamps like [00:00] or (00:00) or 00:00
+        const timestampRegex = /(\[|\()?(\d{1,2}:)?(\d{1,2}:\d{2})(\]|\))?/g;
+        let enhancedHtml = paragraph.innerHTML;
+        
+        enhancedHtml = enhancedHtml.replace(timestampRegex, (match, p1, p2, p3, p4) => {
+            const timeStr = (p2 || '') + p3;
+            return `<button class="ts-link" data-time="${timeStr}" title="Hopp til ${timeStr}">${match}</button>`;
+        });
 
-        const containsInlineHtml = /<[^>]+>/.test(paragraph.innerHTML || '');
-        if (containsInlineHtml) return;
+        paragraph.innerHTML = enhancedHtml;
+        paragraph.style.margin = '0 0 16px';
+        paragraph.style.lineHeight = '1.6';
+        paragraph.style.fontSize = '1.05rem';
+        paragraph.style.color = '#334155';
 
         const verseMatch = text.match(/^(\d{1,3})([.:])\s+(.+)$/);
-        if (!verseMatch) return;
-
-        paragraph.textContent = '';
-        const verseNumber = document.createElement('strong');
-        verseNumber.textContent = `${verseMatch[1]}${verseMatch[2]}`;
-        paragraph.appendChild(verseNumber);
-        paragraph.appendChild(document.createTextNode(` ${verseMatch[3]}`));
+        if (verseMatch && !enhancedHtml.includes('ts-link')) {
+            paragraph.textContent = '';
+            const verseNumber = document.createElement('strong');
+            verseNumber.style.color = '#d17d39';
+            verseNumber.style.marginRight = '8px';
+            verseNumber.textContent = `${verseMatch[1]}${verseMatch[2]}`;
+            paragraph.appendChild(verseNumber);
+            paragraph.appendChild(document.createTextNode(` ${verseMatch[3]}`));
+        }
     });
 
     return wrapper.innerHTML;
@@ -1174,7 +1188,91 @@ function applyFullscreenPlayerLayout(bar) {
     const fsSections = bar.querySelectorAll('.fs-summary-container, .fs-transcript-container');
     const fsSectionTitles = bar.querySelectorAll('.fs-section-title');
     const fsTranscriptHeader = bar.querySelector('.fs-transcript-header');
+    const fsSearchWrap = bar.querySelector('.fs-transcript-search-wrap');
+    const fsSearchInput = bar.querySelector('#fs-transcript-search');
+
     const isSmallScreen = window.innerWidth < 768;
+
+    // Injisere CSS for transkripsjon-funksjonalitet
+    if (!document.getElementById('fs-player-extra-styles')) {
+        const style = document.createElement('style');
+        style.id = 'fs-player-extra-styles';
+        style.textContent = `
+            .ts-link {
+                background: #f1f5f9;
+                border: 1px solid #e2e8f0;
+                color: #1b4965;
+                padding: 2px 8px;
+                border-radius: 6px;
+                font-size: 0.9em;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                display: inline-flex;
+                align-items: center;
+                margin: 0 4px;
+                vertical-align: middle;
+            }
+            .ts-link:hover {
+                background: #1b4965;
+                color: #fff;
+                border-color: #1b4965;
+                transform: translateY(-1px);
+            }
+            .fs-transcript-search-wrap {
+                position: relative;
+                flex: 1;
+                max-width: 300px;
+                display: flex;
+                align-items: center;
+            }
+            .fs-transcript-search-wrap i {
+                position: absolute;
+                left: 12px;
+                color: #94a3b8;
+                font-size: 14px;
+            }
+            #fs-transcript-search {
+                width: 100%;
+                padding: 10px 12px 10px 36px;
+                border: 1.5px solid #e2e8f0;
+                border-radius: 10px;
+                font-size: 14px;
+                font-family: inherit;
+                outline: none;
+                transition: all 0.2s ease;
+                background: #fff;
+            }
+            #fs-transcript-search:focus {
+                border-color: #1b4965;
+                box-shadow: 0 0 0 4px rgba(27, 73, 101, 0.1);
+            }
+            .search-highlight {
+                background: #fef08a;
+                color: #854d0e;
+                padding: 0 2px;
+                border-radius: 2px;
+                font-weight: 600;
+            }
+            .search-highlight.current {
+                background: #f97316;
+                color: #fff;
+            }
+            @media (max-width: 600px) {
+                .fs-transcript-header {
+                    flex-direction: column;
+                    align-items: flex-start !important;
+                    gap: 12px !important;
+                }
+                .fs-transcript-search-wrap {
+                    max-width: 100%;
+                    width: 100%;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     const xCloseTopOffset = isSmallScreen
         ? 'max(6px, env(safe-area-inset-top))'
         : 'max(14px, env(safe-area-inset-top))';
@@ -1294,7 +1392,6 @@ function applyFullscreenPlayerLayout(bar) {
             marginBottom: '18px'
         });
     }
-
 }
 
 function createPlayerBar() {
@@ -1338,6 +1435,10 @@ function createPlayerBar() {
                 <div class="fs-transcript-container">
                     <div class="fs-transcript-header">
                         <h3 class="fs-section-title" style="margin:0;">Teksting</h3>
+                        <div class="fs-transcript-search-wrap">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="fs-transcript-search" placeholder="Søk i tekstingen...">
+                        </div>
                     </div>
                     <div class="fullscreen-transcript">
                         <p class="fs-muted" style="color: var(--text-light);">Ingen teksting er tilgjengelig for denne episoden.</p>
@@ -1426,6 +1527,76 @@ function createPlayerBar() {
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && fsOverlay.classList.contains('active')) {
             closeFs();
+        }
+    });
+
+    const fsSearchInput = bar.querySelector('#fs-transcript-search');
+    const fsTranscriptBody = bar.querySelector('.fullscreen-transcript');
+
+    if (fsSearchInput && fsTranscriptBody) {
+        fsSearchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            const paragraphs = fsTranscriptBody.querySelectorAll('p, h4');
+            
+            paragraphs.forEach(p => {
+                const text = p.textContent;
+                if (!query) {
+                    p.innerHTML = p.getAttribute('data-original-html') || p.innerHTML;
+                    return;
+                }
+                
+                if (!p.hasAttribute('data-original-html')) {
+                    p.setAttribute('data-original-html', p.innerHTML);
+                }
+
+                const originalHtml = p.getAttribute('data-original-html');
+                // Vi må være forsiktige med å ikke ødelegge HTML-tags (som ts-link) når vi søker.
+                // En enkel måte er å bare søke i textContent hvis det er en match, men vi vil highlighte.
+                if (text.toLowerCase().includes(query)) {
+                    const regex = new RegExp(`(${query})`, 'gi');
+                    // Vi highlighter bare i selve teksten, unngår å ødelegge buttons
+                    const tempDiv = document.createElement('div');
+                    tempDiv.innerHTML = originalHtml;
+                    
+                    const walk = document.createTreeWalker(tempDiv, NodeFilter.SHOW_TEXT, null, false);
+                    let node;
+                    const nodesToReplace = [];
+                    while(node = walk.nextNode()) {
+                        if (node.textContent.toLowerCase().includes(query)) {
+                            nodesToReplace.push(node);
+                        }
+                    }
+                    
+                    nodesToReplace.forEach(textNode => {
+                        const span = document.createElement('span');
+                        span.innerHTML = textNode.textContent.replace(regex, '<span class="search-highlight">$1</span>');
+                        textNode.replaceWith(span);
+                    });
+                    
+                    p.innerHTML = tempDiv.innerHTML;
+                } else {
+                    p.innerHTML = originalHtml;
+                }
+            });
+        });
+    }
+
+    // Delegert klikk-håndtering for tidsstempler
+    fsTranscriptBody.addEventListener('click', (e) => {
+        const tsBtn = e.target.closest('.ts-link');
+        if (tsBtn) {
+            const timeStr = tsBtn.getAttribute('data-time');
+            if (timeStr) {
+                const parts = timeStr.split(':').map(Number).reverse();
+                let secs = 0;
+                if (parts[0]) secs += parts[0];
+                if (parts[1]) secs += parts[1] * 60;
+                if (parts[2]) secs += parts[2] * 3600;
+                
+                audio.currentTime = secs;
+                audio.play();
+                updatePlayIcons(true);
+            }
         }
     });
 

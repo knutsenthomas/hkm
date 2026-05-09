@@ -148,6 +148,7 @@ body.builder-active .toolbar-action-btn {
 
 /* Base Body Style Update */
 body.admin-body,
+body.minside-body,
 body.crm-body,
 body.builder-active {
     font-family: var(--admin-font) !important;
@@ -2458,6 +2459,7 @@ body.builder-active {
 /* Shared top application header (title + actions) */
 body.admin-body .main-header,
 body.crm-body .main-header,
+body.minside-body .main-header,
 body.builder-active .main-header {
     height: 72px !important;
     min-height: 72px !important;
@@ -2477,6 +2479,7 @@ body.builder-active .main-header {
 
     body.admin-body .main-header,
     body.crm-body .main-header,
+    body.minside-body .main-header,
     body.builder-active .main-header {
         padding-left: 32px;
         padding-right: 32px;
@@ -2484,6 +2487,7 @@ body.builder-active .main-header {
 }
 
 body.admin-body .welcome-title,
+body.minside-body .welcome-title,
 body.crm-body .welcome-title,
 body.builder-active .welcome-title {
     font-size: 16px;
@@ -2494,6 +2498,7 @@ body.builder-active .welcome-title {
 }
 
 body.admin-body .welcome-subtitle,
+body.minside-body .welcome-subtitle,
 body.crm-body .welcome-subtitle,
 body.builder-active .welcome-subtitle {
     font-size: 12px;
@@ -2502,10 +2507,12 @@ body.builder-active .welcome-subtitle {
 }
 
 body.admin-body .notification-btn,
+body.minside-body .notification-btn,
 body.crm-body .notification-btn,
-body.builder-active .notification-btn,
 body.admin-body .mobile-toggle,
-body.admin-body .mobile-nav-toggle {
+body.minside-body .mobile-toggle,
+body.admin-body .mobile-nav-toggle,
+body.minside-body .mobile-nav-toggle {
     width: 42px !important;
     height: 42px !important;
     border-radius: 12px !important;
@@ -3110,6 +3117,7 @@ body.crm-body .logs-header {
 /* Editor/form chrome closer to screenshot */
 body.admin-body .form-group label,
 body.crm-body .form-group label,
+body.minside-body .form-group label,
 body.builder-active .form-group label {
     font-size: 12px;
     font-weight: 700;
@@ -3119,6 +3127,7 @@ body.builder-active .form-group label {
 
 body.admin-body .form-control,
 body.crm-body .form-control,
+body.minside-body .form-control,
 body.builder-active .form-control,
 body.admin-body .form-group input,
 body.admin-body .form-group textarea,
@@ -3126,6 +3135,9 @@ body.admin-body .form-group select,
 body.crm-body .form-group input,
 body.crm-body .form-group textarea,
 body.crm-body .form-group select,
+body.minside-body .form-group input,
+body.minside-body .form-group textarea,
+body.minside-body .form-group select,
 body.builder-active .subject-input {
     border: 1px solid #dfe4ea;
     border-radius: 10px;
@@ -3135,11 +3147,14 @@ body.builder-active .subject-input {
 
 body.admin-body .form-control:focus,
 body.crm-body .form-control:focus,
+body.minside-body .form-control:focus,
 body.builder-active .subject-input:focus,
 body.admin-body .form-group input:focus,
 body.admin-body .form-group textarea:focus,
 body.crm-body .form-group input:focus,
-body.crm-body .form-group textarea:focus {
+body.crm-body .form-group textarea:focus,
+body.minside-body .form-group input:focus,
+body.minside-body .form-group textarea:focus {
     border-color: #c6d0dc;
     box-shadow: 0 0 0 3px rgba(148, 163, 184, 0.12);
 }
@@ -3164,7 +3179,8 @@ body.admin-body .editor-sidebar-panel {
 }
 
 /* CRM page blocks spacing to look like the example scaffold */
-body.crm-body .content-header {
+body.crm-body .content-header,
+body.minside-body .content-header {
     max-width: var(--audit-max-width, var(--admin-page-max, 1280px));
     width: 100%;
     margin-left: auto;
@@ -3173,23 +3189,28 @@ body.crm-body .content-header {
     padding: 18px var(--audit-page-gutter, var(--admin-page-gutter, 20px)) 0 !important;
 }
 
-body.crm-body .content-header .tabs-container {
+body.crm-body .content-header .tabs-container,
+body.minside-body .content-header .tabs-container {
     padding-left: 0 !important;
     padding-right: 0 !important;
 }
 
-body.crm-body .promo-cards {
+body.crm-body .promo-cards,
+body.minside-body .promo-cards {
     gap: 20px;
     margin-bottom: 20px;
 }
 
-body.crm-body .promo-card {
+body.crm-body .promo-card,
+body.minside-body .promo-card {
     padding: 20px;
     border-radius: var(--admin-page-radius-xl);
 }
 
 body.crm-body .contacts-grid.card.modern,
-body.crm-body .card.modern {
+body.minside-body .contacts-grid.card.modern,
+body.crm-body .card.modern,
+body.minside-body .card.modern {
     border-radius: var(--admin-page-radius-xl);
 }
 
@@ -3312,6 +3333,7 @@ body.builder-active .newsletter-canvas {
     }
 
     body.crm-body .crm-header,
+    body.minside-body .crm-header,
     body.builder-active .workspace-header,
     body.admin-body .section-content>.section-header,
     body.admin-body .section-content>.design-ui-header {
@@ -3320,6 +3342,7 @@ body.builder-active .newsletter-canvas {
     }
 
     body.crm-body .crm-header .header-actions,
+    body.minside-body .crm-header .header-actions,
     body.builder-active .workspace-header .workspace-actions {
         justify-content: stretch;
     }
@@ -3337,6 +3360,7 @@ body.builder-active .newsletter-canvas {
 
     body.admin-body .main-header,
     body.crm-body .main-header,
+    body.minside-body .main-header,
     body.builder-active .main-header {
         padding-left: 16px !important;
         padding-right: 16px !important;
@@ -3375,16 +3399,19 @@ body.builder-active .newsletter-canvas {
     }
 
     body.admin-body .section-header-actions,
-    body.crm-body .section-header-actions {
+    body.crm-body .section-header-actions,
+    body.minside-body .section-header-actions {
         gap: 12px !important;
     }
 
-    body.crm-body .crm-header {
+    body.crm-body .crm-header,
+    body.minside-body .crm-header {
         margin-top: 14px;
         padding: 20px;
     }
 
-    body.crm-body .crm-header .header-left::before {
+    body.crm-body .crm-header .header-left::before,
+    body.minside-body .crm-header .header-left::before {
         width: 34px;
         height: 34px;
         font-size: 16px;
@@ -3427,13 +3454,15 @@ body.builder-active .newsletter-canvas {
     body.admin-body .section-content>.section-header .section-title,
     body.admin-body .section-content>.design-ui-header .section-title,
     body.admin-body .section-content>.section-header-row h2,
-    body.crm-body .crm-header .header-titles h1 {
+    body.crm-body .crm-header .header-titles h1,
+    body.minside-body .crm-header .header-titles h1 {
         font-size: 17px !important;
     }
 
     /* Hide name/role on sub-pages desktop to prevent overlap */
     body.admin-body:not(.main-dashboard) .user-info-text,
     body.crm-body .user-info-text,
+    body.minside-body .user-info-text,
     body.builder-active .user-info-text {
         display: none !important;
     }
@@ -3486,7 +3515,9 @@ body.builder-active .newsletter-canvas {
 body.admin-body .section-container,
 body.admin-body .content-wrapper,
 body.crm-body .crm-content,
-body.crm-body .content-wrapper {
+body.minside-body .crm-content,
+body.crm-body .content-wrapper,
+body.minside-body .content-wrapper {
     max-width: var(--audit-max-width) !important;
     width: 100%;
     margin-left: auto !important;
@@ -3507,6 +3538,7 @@ body.admin-body .section-content>.section-header,
 body.admin-body .section-content>.design-ui-header,
 body.admin-body .section-content>.section-header-row,
 body.crm-body .crm-header,
+body.minside-body .crm-header,
 body.builder-active .workspace-header,
 body.admin-body #overview-section .overview-hero-card {
     padding: var(--audit-space-3) !important;
@@ -3524,13 +3556,17 @@ body.admin-body .top-pages-widget.card {
 body.admin-body .card-header,
 body.admin-body .logs-header,
 body.crm-body .logs-header,
+body.minside-body .logs-header,
 body.crm-body .table-header,
+body.minside-body .table-header,
 body.admin-body .table-header,
 body.admin-body .card-body,
 body.admin-body .design-ui-panel-header,
 body.admin-body .design-ui-panel-body,
 body.crm-body .promo-card,
+body.minside-body .promo-card,
 body.crm-body .segment-empty-state,
+body.minside-body .segment-empty-state,
 body.builder-active .selection-card,
 body.builder-active .workspace-header .newsletter-meta,
 body.admin-body .editor-content-wrapper,
@@ -3542,6 +3578,7 @@ body.admin-body .editor-sidebar-panel {
 /* Tables and list wrappers need balanced inset spacing */
 body.admin-body .logs-table-wrap:not(.full-bleed),
 body.crm-body .table-container:not(.full-bleed),
+body.minside-body .table-container:not(.full-bleed),
 body.admin-body .table-container:not(.full-bleed) {
     padding-left: var(--audit-space-3);
     padding-right: var(--audit-space-3);
@@ -3558,15 +3595,19 @@ body.admin-body .table-container:not(.full-bleed) {
 
 /* Contacts & Segments table: avoid double horizontal inset (card + table container) */
 body.crm-body .contacts-grid.card.modern,
+body.minside-body .contacts-grid.card.modern,
 body.admin-body .contacts-grid.card.modern,
 #automation-section .card.modern,
-body.crm-body .card.modern:has(.table-container) {
+body.crm-body .card.modern:has(.table-container),
+body.minside-body .card.modern:has(.table-container) {
     padding: 0 !important;
 }
 
 body.crm-body .contacts-grid.card.modern .table-header,
+body.minside-body .contacts-grid.card.modern .table-header,
 body.admin-body .contacts-grid.card.modern .table-header,
 body.crm-body .card.modern .table-header,
+body.minside-body .card.modern .table-header,
 #automation-section .automation-tabs {
     padding-left: 24px !important;
     padding-right: 24px !important;
@@ -3592,22 +3633,28 @@ body.admin-body .logs-container .logs-table-wrap {
 /* 8px system for headers/body spacing */
 body.admin-body .card-title,
 body.crm-body .card-title,
+body.minside-body .card-title,
 body.builder-active .card-title,
 body.crm-body .promo-card h3,
+body.minside-body .promo-card h3,
 body.admin-body .collection-item-card .item-title,
 body.admin-body .section-content>.section-header .section-title,
 body.admin-body .section-content>.design-ui-header .section-title,
 body.admin-body .section-content>.section-header-row h2,
-body.crm-body .crm-header .header-titles h1 {
+body.crm-body .crm-header .header-titles h1,
+body.minside-body .crm-header .header-titles h1 {
     margin-bottom: var(--audit-space-2) !important;
 }
 
 body.admin-body .card p,
 body.crm-body .card p,
+body.minside-body .card p,
 body.crm-body .promo-card p,
+body.minside-body .promo-card p,
 body.builder-active .card p,
 body.admin-body .section-subtitle,
-body.crm-body .header-titles p {
+body.crm-body .header-titles p,
+body.minside-body .header-titles p {
     margin-bottom: 0;
 }
 
@@ -3615,8 +3662,11 @@ body.admin-body p+.btn,
 body.admin-body p+a.btn,
 body.admin-body p+button.btn,
 body.crm-body p+.btn,
+body.minside-body p+.btn,
 body.crm-body p+a.btn,
+body.minside-body p+a.btn,
 body.crm-body p+button.btn,
+body.minside-body p+button.btn,
 body.builder-active p+.btn,
 body.builder-active p+a.btn,
 body.builder-active p+button.btn {
@@ -3626,6 +3676,7 @@ body.builder-active p+button.btn {
 /* 12-column desktop grid system */
 body.admin-body .stats-grid,
 body.crm-body .promo-cards,
+body.minside-body .promo-cards,
 body.admin-body #blog-section .collection-grid,
 body.admin-body #events-section .collection-grid,
 body.admin-body #teaching-section .collection-grid,
@@ -3684,7 +3735,8 @@ body.admin-body #dashboard-main-grid>[data-id="top-pages"] {
 }
 
 /* CRM promo cards */
-body.crm-body .promo-cards>* {
+body.crm-body .promo-cards>*,
+body.minside-body .promo-cards>* {
     grid-column: span 4;
     min-width: 0;
 }
@@ -3705,6 +3757,7 @@ body.admin-body #media-section .collection-grid>* {
 /* Equal-height cards */
 body.admin-body .stat-card.modern,
 body.crm-body .promo-card,
+body.minside-body .promo-card,
 body.admin-body .collection-item-card,
 body.admin-body .chart-container.card,
 body.admin-body .top-pages-widget.card,
@@ -3717,6 +3770,7 @@ body.builder-active .selection-card {
 
 body.admin-body .collection-item-card .item-content,
 body.crm-body .promo-card,
+body.minside-body .promo-card,
 body.admin-body .card-body,
 body.admin-body .top-pages-widget.card,
 body.admin-body .chart-container.card {
@@ -3726,8 +3780,11 @@ body.admin-body .chart-container.card {
 
 body.admin-body .collection-item-card .item-actions,
 body.crm-body .promo-card .btn-link,
+body.minside-body .promo-card .btn-link,
 body.crm-body .promo-card a.btn,
-body.crm-body .promo-card .btn {
+body.minside-body .promo-card a.btn,
+body.crm-body .promo-card .btn,
+body.minside-body .promo-card .btn {
     margin-top: auto;
 }
 
@@ -3749,7 +3806,9 @@ body.admin-body #overview-section .stat-card.modern .stat-content {
 /* Consistent alignment: left-align card content by default */
 body.admin-body .card,
 body.crm-body .card,
+body.minside-body .card,
 body.crm-body .promo-card,
+body.minside-body .promo-card,
 body.admin-body .collection-item-card,
 body.admin-body .editor-content-wrapper,
 body.admin-body .editor-panel,
@@ -3768,12 +3827,14 @@ body.admin-body .section-content>* {
 /* Normalize common card/button spacing in forms */
 body.admin-body .form-group,
 body.crm-body .form-group,
+body.minside-body .form-group,
 body.builder-active .form-group {
     margin-bottom: var(--audit-space-3);
 }
 
 body.admin-body .form-group:last-child,
 body.crm-body .form-group:last-child,
+body.minside-body .form-group:last-child,
 body.builder-active .form-group:last-child {
     margin-bottom: 0;
 }
@@ -3781,15 +3842,20 @@ body.builder-active .form-group:last-child {
 /* Inputs and textareas get comfortable internal padding */
 body.admin-body .form-control,
 body.crm-body .form-control,
+body.minside-body .form-control,
 body.builder-active .form-control,
 body.admin-body input[type="text"],
 body.admin-body input[type="number"],
 body.admin-body input[type="email"],
 body.admin-body textarea,
 body.crm-body input[type="text"],
+body.minside-body input[type="text"],
 body.crm-body input[type="number"],
+body.minside-body input[type="number"],
 body.crm-body input[type="email"],
-body.crm-body textarea {
+body.minside-body input[type="email"],
+body.crm-body textarea,
+body.minside-body textarea {
     padding: 12px 14px !important;
 }
 
@@ -3806,6 +3872,7 @@ body.crm-body textarea {
     body.admin-body #teaching-section .collection-grid>*,
     body.admin-body #media-section .collection-grid>*,
     body.crm-body .promo-cards>*,
+    body.minside-body .promo-cards>*,
     body.admin-body .grid-2-cols> :first-child,
     body.admin-body .grid-2-cols> :last-child,
     body.admin-body .grid-2-cols.equal> :first-child,
@@ -3825,7 +3892,9 @@ body.crm-body textarea {
     body.admin-body .section-container,
     body.admin-body .content-wrapper,
     body.crm-body .crm-content,
+    body.minside-body .crm-content,
     body.crm-body .content-wrapper,
+    body.minside-body .content-wrapper,
     body.builder-active .canvas-container {
         padding-left: 14px !important;
         padding-right: 14px !important;
@@ -3833,6 +3902,7 @@ body.crm-body textarea {
 
     body.admin-body .stats-grid,
     body.crm-body .promo-cards,
+    body.minside-body .promo-cards,
     body.admin-body #blog-section .collection-grid,
     body.admin-body #events-section .collection-grid,
     body.admin-body #teaching-section .collection-grid,
@@ -3852,15 +3922,19 @@ body.crm-body textarea {
     body.admin-body .section-content>.design-ui-header,
     body.admin-body .section-content>.section-header-row,
     body.crm-body .crm-header,
+    body.minside-body .crm-header,
     body.builder-active .workspace-header,
     body.admin-body #overview-section .overview-hero-card,
     body.admin-body .card-header,
     body.admin-body .logs-header,
     body.crm-body .logs-header,
+    body.minside-body .logs-header,
     body.crm-body .table-header,
+    body.minside-body .table-header,
     body.admin-body .table-header,
     body.admin-body .card-body,
-    body.crm-body .promo-card {
+    body.crm-body .promo-card,
+    body.minside-body .promo-card {
         padding: var(--audit-space-2) !important;
     }
 }
@@ -4028,7 +4102,8 @@ body.admin-body .nav-item.nav-helper-hidden {
 }
 
 /* Inbox icons: make them smaller and round (dashboard.css uses rounded-square defaults). */
-body.crm-body .inbox-row-icon {
+body.crm-body .inbox-row-icon,
+body.minside-body .inbox-row-icon {
     width: 34px;
     height: 34px;
     border-radius: 999px;
@@ -4052,7 +4127,8 @@ body.admin-body .inbox-row-icon {
 }
 
 body.admin-body .inbox-row-icon .inbox-mail-icon,
-body.crm-body .inbox-row-icon .inbox-mail-icon {
+body.crm-body .inbox-row-icon .inbox-mail-icon,
+body.minside-body .inbox-row-icon .inbox-mail-icon {
     display: block;
     width: 18px;
     height: 18px;
@@ -4066,18 +4142,21 @@ body.admin-body .inbox-row--unread .inbox-row-icon {
     color: #9a3412;
 }
 
-body.crm-body .inbox-row-icon .material-symbols-outlined {
+body.crm-body .inbox-row-icon .material-symbols-outlined,
+body.minside-body .inbox-row-icon .material-symbols-outlined {
     font-size: 17px;
 }
 
 body.admin-body .inbox-row-icon .material-symbols-outlined.inbox-mail-icon,
-body.crm-body .inbox-row-icon .material-symbols-outlined.inbox-mail-icon {
+body.crm-body .inbox-row-icon .material-symbols-outlined.inbox-mail-icon,
+body.minside-body .inbox-row-icon .material-symbols-outlined.inbox-mail-icon {
     font-size: 18px;
     display: grid;
     place-items: center;
 }
 
-body.crm-body .inbox-unread-dot {
+body.crm-body .inbox-unread-dot,
+body.minside-body .inbox-unread-dot {
     width: 9px;
     height: 9px;
 }
@@ -4205,18 +4284,22 @@ body.crm-body .inbox-unread-dot {
 /* Icon centering normalization inside icon boxes (Material Symbols has uneven line box) */
 body.admin-body .section-header-icon,
 body.crm-body .section-header-icon,
+body.minside-body .section-header-icon,
 body.builder-active .section-header-icon,
 body.admin-body .design-ui-panel-header-icon,
 body.crm-body .design-ui-panel-header-icon,
+body.minside-body .design-ui-panel-header-icon,
 body.admin-body #overview-section .stat-icon-wrap {
     line-height: 0;
 }
 
 body.admin-body .section-header-icon>.material-symbols-outlined,
 body.crm-body .section-header-icon>.material-symbols-outlined,
+body.minside-body .section-header-icon>.material-symbols-outlined,
 body.builder-active .section-header-icon>.material-symbols-outlined,
 body.admin-body .design-ui-panel-header-icon>.material-symbols-outlined,
 body.crm-body .design-ui-panel-header-icon>.material-symbols-outlined,
+body.minside-body .design-ui-panel-header-icon>.material-symbols-outlined,
 body.admin-body #overview-section .stat-icon-wrap>.material-symbols-outlined {
     display: grid !important;
     place-items: center !important;
@@ -4337,10 +4420,12 @@ body.admin-body .nav-link.logout:hover {
 /* 1. Global Header Container Standards */
 body.admin-body .main-header,
 body.crm-body .main-header,
+body.minside-body .main-header,
 body.builder-active .main-header,
 body.builder-active .workspace-top-bar,
 body.admin-body #dashboard-main-header,
 body.crm-body #dashboard-main-header,
+body.minside-body #dashboard-main-header,
 body.builder-active #dashboard-main-header {
     height: 72px !important;
     min-height: 72px !important;
@@ -4361,6 +4446,7 @@ body.builder-active #dashboard-main-header {
 
 /* 2. Unified Content Structure Alignment */
 body.admin-body .section-header,
+body.minside-body .section-header,
 body.crm-body .section-header,
 body.builder-active .section-header,
 body.builder-active .breadcrumb-nav {
@@ -4376,6 +4462,7 @@ body.builder-active .breadcrumb-nav {
 }
 
 body.admin-body .section-header-content,
+body.minside-body .section-header-content,
 body.crm-body .section-header-content,
 body.builder-active .section-header-content,
 body.builder-active .top-bar-actions {
@@ -4387,6 +4474,7 @@ body.builder-active .top-bar-actions {
 
 /* 3. Avatar & Identity - Absolute Parity Across All Modules */
 body.admin-body .user-avatar,
+body.minside-body .user-avatar,
 body.crm-body .user-avatar,
 body.builder-active .user-avatar,
 [id="admin-avatar"] {
@@ -4416,9 +4504,11 @@ body.builder-active .user-avatar,
 }
 
 /* 4. Content Spacing Fixes - Universal consistency */
-body.admin-body .crm-content,
-body.crm-body .crm-content,
+body.admin-body .main-content,
+body.minside-body .main-content,
+body.crm-body .main-content,
 body.crm-body .inbox-container,
+body.minside-body .inbox-container,
 body.builder-active .newsletter-builder-container,
 body.builder-active .builder-workspace,
 body.admin-body .segments-container,
@@ -4431,6 +4521,7 @@ body.admin-body .section-container {
 
 /* 5. Header Typography Standards */
 body.admin-body .section-title,
+body.minside-body .section-title,
 body.crm-body .section-title,
 body.builder-active .section-title,
 body.builder-active .breadcrumb-current {
@@ -4442,6 +4533,7 @@ body.builder-active .breadcrumb-current {
 }
 
 body.admin-body .section-subtitle,
+body.minside-body .section-subtitle,
 body.crm-body .section-subtitle,
 body.builder-active .section-subtitle {
     font-size: 12px !important;
