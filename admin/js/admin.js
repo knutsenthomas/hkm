@@ -3307,7 +3307,10 @@ class AdminManager {
                 <div class="card">
                     <div class="card-header flex-between">
                         <h3 class="card-title">Podcast-kategorier (Manuell overstyring)</h3>
-                        <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater liste</button>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button class="btn-secondary btn-sm" id="open-podcast-transcripts">Rediger transkripsjoner</button>
+                            <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater liste</button>
+                        </div>
                     </div>
                     <div class="card-body" style="max-height: 600px; overflow-y: auto;">
                         <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Her kan du manuelt overstyre kategorien for hver episode. Hvis ingen er valgt, brukes automatisk kategorisering.</p>
@@ -3331,6 +3334,50 @@ class AdminManager {
         document.getElementById('save-media-settings').addEventListener('click', () => this.saveMediaSettings());
         document.getElementById('save-podcast-overrides').addEventListener('click', () => this.savePodcastOverrides());
         document.getElementById('refresh-podcast-list').addEventListener('click', () => this.loadPodcastOverrides());
+        document.getElementById('open-podcast-transcripts').addEventListener('click', () => this.openPodcastTranscriptEditorById(''));
+
+        const overridesList = document.getElementById('podcast-overrides-list');
+        if (overridesList) {
+            overridesList.addEventListener('click', (event) => {
+                const btn = event.target.closest('button[data-open-podcast-id]');
+                if (!btn) return;
+                event.preventDefault();
+                this.openPodcastTranscriptEditorById(btn.getAttribute('data-open-podcast-id') || '');
+            });
+        }
+    }
+
+    async openPodcastTranscriptEditorById(episodeId) {
+        const targetId = (episodeId || '').trim();
+        const navLink = document.querySelector('.nav-link[data-section="podcast"]');
+
+        if (navLink) {
+            navLink.click();
+        } else if (typeof this.onSectionSwitch === 'function') {
+            this.onSectionSwitch('podcast');
+        }
+
+        if (!targetId) return;
+
+        const maxAttempts = 20;
+        let attempts = 0;
+        const tryOpen = () => {
+            const items = this._collectionItemsCache['podcast_transcripts'] || [];
+            const idx = items.findIndex((it) => (it?.id || '') === targetId);
+            if (idx >= 0) {
+                this.editCollectionItem('podcast_transcripts', idx);
+                return;
+            }
+
+            attempts += 1;
+            if (attempts < maxAttempts) {
+                setTimeout(tryOpen, 200);
+            } else {
+                this.showToast('Fant ikke episode i podcastlisten ennå. Prøv igjen om et øyeblikk.', 'warning', 5000);
+            }
+        };
+
+        setTimeout(tryOpen, 200);
     }
 
     async loadMediaSettings() {
@@ -3389,32 +3436,29 @@ class AdminManager {
             const overridesData = await firebaseService.getPageContent('settings_podcast_overrides') || {};
             const overrides = overridesData.overrides || {};
 
-            // 2. Fetch episodes from RSS (via proxy)
-            const settings = await firebaseService.getPageContent('settings_media');
-            const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
-            const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
-            const response = await fetch(proxyUrl);
-            const data = await response.json();
-            const items = data?.items;
+            // 2. Fetch episodes from the same source used by Podcast redigering
+            const episodes = await this.fetchPodcastEpisodesForAdmin();
 
-            if (items) {
-                const episodes = Array.isArray(items) ? items : [items];
-
-                listContainer.innerHTML = episodes.map((ep, idx) => {
-                    const id = ep.guid?._ || ep.guid || ep.link; // Use guid as unique key
+            if (episodes.length > 0) {
+                listContainer.innerHTML = episodes.map((ep) => {
+                    const id = ep.id;
                     const currentCat = overrides[id] || '';
+                    const title = this.escapeHtml(ep.title || 'Uten tittel');
 
                     return `
                         <div class="podcast-override-item" style="padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px;">
-                            <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${ep.title}">${ep.title}</div>
+                            <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${title}">${title}</div>
                             <div style="display: flex; align-items: center; gap: 10px; justify-content: space-between; width: 100%;">
-                                <select class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 4px 8px; height: auto; max-width: 150px;">
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <select class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 4px 8px; height: auto; max-width: 150px;">
                                     <option value="">Auto (Nøkkelord)</option>
                                     <option value="tro" ${currentCat === 'tro' ? 'selected' : ''}>Tro</option>
                                     <option value="bibel" ${currentCat === 'bibel' ? 'selected' : ''}>Bibel</option>
                                     <option value="bønn" ${currentCat === 'bønn' ? 'selected' : ''}>Bønn</option>
                                     <option value="undervisning" ${currentCat === 'undervisning' ? 'selected' : ''}>Undervisning</option>
-                                </select>
+                                    </select>
+                                    <button type="button" class="btn-secondary btn-sm" data-open-podcast-id="${this.escapeHtml(id)}">Rediger tekst</button>
+                                </div>
                             </div>
                         </div>
                     `;
