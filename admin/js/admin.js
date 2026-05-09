@@ -566,6 +566,23 @@ class AdminManager {
             const finalText = (typeof translatedByMyMemory === 'string' && translatedByMyMemory.trim())
                 ? translatedByMyMemory
                 : raw;
+
+            // MyMemory can return unchanged source text without an explicit error.
+            // If Gemini is configured, retry with Gemini so no-op responses do not block translation.
+            const isMyMemoryNoOp = !this._isMeaningfullyTranslatedField(raw, finalText);
+            if (translationSettings.provider === 'mymemory' && isMyMemoryNoOp && hasGeminiKey) {
+                try {
+                    const translatedByGemini = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
+                    const finalGeminiText = (typeof translatedByGemini === 'string' && translatedByGemini.trim())
+                        ? translatedByGemini
+                        : raw;
+                    this._translationCache.set(cacheKey, finalGeminiText);
+                    return finalGeminiText;
+                } catch (geminiError) {
+                    console.warn(`[AdminManager] Gemini no-op fallback failed (${targetLang})`, geminiError);
+                }
+            }
+
             this._translationCache.set(cacheKey, finalText);
             return finalText;
         } catch (error) {
@@ -5127,7 +5144,12 @@ class AdminManager {
                                 return tr && typeof tr === 'object' && tr._translationFailed !== true;
                             });
                             if (!successfulLanguages.length) {
-                                throw new Error('Ingen språk ble oversatt. Mest sannsynlig er oversettelsestjenesten midlertidig blokkert (rate limit). Prøv igjen om et par minutter.');
+                                const translationSettings = await this._getTranslationSettings();
+                                const hasGeminiKey = !!translationSettings?.geminiApiKey;
+                                if (!hasGeminiKey) {
+                                    throw new Error('Ingen språk ble oversatt. MyMemory-kvote/no-op stopper oversettelse nå. Legg inn Gemini API key i Integrasjoner for stabil oversettelse.');
+                                }
+                                throw new Error('Ingen språk ble oversatt. Oversettelsestjenesten svarte uten gyldig oversettelse. Prøv igjen, eller bytt provider i Integrasjoner.');
                             }
 
                             const currentData = await firebaseService.getPageContent('collection_blog');
