@@ -1491,7 +1491,6 @@ class MinSideManager {
                         <div class="rte-divider"></div>
                         <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
                         <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Numrert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
-                        <div class="rte-divider"></div>
                         <button type="button" class="rte-btn" data-cmd="removeFormat" title="Fjern formatering"><span class="material-symbols-outlined">format_clear</span></button>
                     </div>
                     <div class="rte-editor" id="edit-note-body" contenteditable="true"></div>
