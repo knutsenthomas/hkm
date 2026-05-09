@@ -4494,7 +4494,7 @@ body.builder-active .user-avatar,
 [id="ph-avatar"] {
     width: 42px !important;
     height: 42px !important;
-    background-color: #1B4965 !important;
+    background: var(--admin-orange-gradient) !important;
     color: #ffffff !important;
     display: flex !important;
     align-items: center !important;
@@ -4850,7 +4850,7 @@ body.builder-active .main-header [id="admin-avatar"] {
     justify-content: center !important;
     border-radius: 12px !important;
     border: 2px solid rgba(255, 255, 255, 0.72) !important;
-    background: #b85f23 !important;
+    background: var(--admin-orange-gradient) !important;
     color: #ffffff !important;
     box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08) !important;
     font-size: 16px !important;
