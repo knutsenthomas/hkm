@@ -207,6 +207,7 @@ const mapGaDimensionMetricRows = (report) => (
 function extractWixViewerBlocksAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
 
+  const imageFigures = extractWixArticleImagesAsHtml(pageHtml);
   const blockRegex = /<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
   const seen = new Set();
   const blocks = [];
@@ -286,7 +287,9 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
   }
 
   const bodyHtml = parts.join("\n");
-  return bodyHtml;
+  if (!imageFigures) return bodyHtml;
+  if (/<figure\b|<img\b/i.test(bodyHtml)) return bodyHtml;
+  return `${imageFigures}\n${bodyHtml}`;
 }
 
 function decodeHtmlAttribute(value) {
@@ -318,33 +321,24 @@ function wixMediaUrlFromUri(uri) {
 
 function extractWixArticleImagesAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
-  // Extract ALL viewer block content to get accurate article boundaries
-  const viewerBlockRegex = /<(h[1-6]|p|li|div)\b[^>]*id="viewer-[^"]*"[\s\S]*?<\/\1>/gi;
-  const viewerBlocks = [];
-  let blockMatch;
-  let articleStartPos = pageHtml.length;
-  let articleEndPos = 0;
-  while ((blockMatch = viewerBlockRegex.exec(pageHtml)) !== null) {
-    viewerBlocks.push({
-      start: blockMatch.index,
-      end: blockMatch.index + blockMatch[0].length,
-      content: blockMatch[0],
-    });
-    articleStartPos = Math.min(articleStartPos, blockMatch.index);
-    articleEndPos = Math.max(articleEndPos, blockMatch.index + blockMatch[0].length);
-  }
-  // If we found viewer blocks, only search images within the article area
-  // Otherwise search the first half of the page (before related posts)
-  const searchBoundary = articleEndPos > 0 
-    ? articleEndPos 
-    : pageHtml.length / 2;
-  const searchHtml = pageHtml.substring(0, searchBoundary);
+
+  // Hard filter to article-owned images only:
+  // - must carry a Wix rich-content containerId
+  // - that containerId must also exist as a viewer-* element on the page
+  // This excludes avatars and "Siste innlegg" thumbnails.
+  const searchHtml = pageHtml;
   const figures = [];
   const seen = new Set();
   const wowImageRegex = /<wow-image\b([^>]*)>/gi;
+  const recentPostsIndex = pageHtml.search(/data-hook\s*=\s*["']recent-posts["']/i);
   let match;
+
   while ((match = wowImageRegex.exec(searchHtml)) !== null) {
     const attrs = match[1] || "";
+    const matchIndex = match.index;
+    const cssClass = readHtmlAttr(attrs, "class");
+    if (/fluid-avatar-image/i.test(cssClass)) continue;
+
     const alt = readHtmlAttr(attrs, "alt");
     const infoRaw = readHtmlAttr(attrs, "data-image-info");
     let info = null;
@@ -355,11 +349,30 @@ function extractWixArticleImagesAsHtml(pageHtml) {
         info = null;
       }
     }
+
+    const containerId = info && typeof info.containerId === "string" ? info.containerId.trim() : "";
+    const hasViewerAnchor = containerId && (
+      pageHtml.includes(`id="viewer-${containerId}"`) ||
+      pageHtml.includes(`id='viewer-${containerId}'`)
+    );
+
     const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
     const targetWidth = Number(info && info.targetWidth);
     const targetHeight = Number(info && info.targetHeight);
     const imageWidth = Number(imageData.width);
     const imageHeight = Number(imageData.height);
+
+    // Primary allow rule: image is explicitly anchored to a viewer-* block.
+    // Fallback allow rule: some Wix pages emit article images without containerId.
+    // In those cases, only allow if the image appears before the recent-posts section
+    // and has article-like dimensions.
+    const beforeRecentPosts = recentPostsIndex < 0 || matchIndex < recentPostsIndex;
+    const articleLikeSize =
+      (targetWidth > 0 && targetWidth >= 300 && targetHeight > 0 && targetHeight >= 150) ||
+      (imageWidth > 0 && imageWidth >= 300 && imageHeight > 0 && imageHeight >= 150);
+    const allowByFallback = !hasViewerAnchor && beforeRecentPosts && articleLikeSize;
+    if (!hasViewerAnchor && !allowByFallback) continue;
+
     // Skip avatars/icons; keep actual article media.
     const likelyIcon = (targetWidth > 0 && targetWidth <= 80) && (targetHeight > 0 && targetHeight <= 80);
     const likelySmallImage = (imageWidth > 0 && imageWidth <= 120) && (imageHeight > 0 && imageHeight <= 120);
