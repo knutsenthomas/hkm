@@ -600,7 +600,6 @@ function getFormattedTranscriptHtml(rawTranscriptHtml) {
 
     return `
         <div class="transcript-content" style="line-height: 1.9; color: var(--text-dark);">
-            <p style="margin:0 0 14px;"><strong>Teksting</strong> fra episoden:</p>
             ${enhanced}
         </div>
     `;
