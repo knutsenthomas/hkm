@@ -101,7 +101,7 @@ const i18nManager = {
 
     fixLocalizedHeaderLogoPath() {
         const path = window.location.pathname || '';
-        const inLangFolder = path.includes('/en/') || path.includes('/es/');
+        const inLangFolder = /^\/(en|es)(\/|$)/.test(path);
         if (!inLangFolder) return;
 
         const headerLogo = document.querySelector('.logo img');
@@ -132,8 +132,8 @@ const i18nManager = {
         let currentLang = 'no';
 
         // Set language based strictly on the URL path
-        if (path.includes('/en/')) currentLang = 'en';
-        else if (path.includes('/es/')) currentLang = 'es';
+        if (/^\/en(\/|$)/.test(path)) currentLang = 'en';
+        else if (/^\/es(\/|$)/.test(path)) currentLang = 'es';
 
         document.documentElement.lang = currentLang;
         return currentLang;
