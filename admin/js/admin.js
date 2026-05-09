@@ -677,7 +677,8 @@ class AdminManager {
             ? { ...updatedPost.translations }
             : {};
 
-        for (const lang of ['en', 'es']) {
+        const targetLanguages = this._getBlogTranslationTargetLanguages();
+        for (const lang of targetLanguages) {
             const existing = (existingTranslations[lang] && typeof existingTranslations[lang] === 'object')
                 ? existingTranslations[lang]
                 : null;
@@ -725,6 +726,23 @@ class AdminManager {
         return [];
     }
 
+    _getBlogTranslationTargetLanguages() {
+        const fromI18n = Array.isArray(window?.i18n?.languages)
+            ? window.i18n.languages
+            : [];
+
+        const fromDefaults = Object.keys(
+            this.getPageContentEditorDefaults('settings_global')?.header?.languages || {}
+        );
+
+        const candidates = (fromI18n.length ? fromI18n : fromDefaults)
+            .map((lang) => String(lang || '').trim().toLowerCase())
+            .filter(Boolean);
+
+        const targets = Array.from(new Set(candidates)).filter((lang) => lang !== 'no');
+        return targets.length ? targets : ['en', 'es'];
+    }
+
     async translateAllExistingBlogPosts({ force = false, silent = false } = {}) {
         if (this._blogTranslationBackfillRunning) return;
         this._blogTranslationBackfillRunning = true;
@@ -750,10 +768,10 @@ class AdminManager {
                 await firebaseService.savePageContent('collection_blog', { items: translatedItems });
                 await this.loadCollection('blog');
                 if (!silent) {
-                    this.showToast('✅ Blogginnlegg er oversatt til engelsk og spansk.', 'success', 5000);
+                    this.showToast('✅ Blogginnlegg er oversatt til tilgjengelige språk.', 'success', 5000);
                 }
             } else if (!silent) {
-                this.showToast('Blogginnlegg er allerede oppdatert på engelsk og spansk.', 'success', 3500);
+                this.showToast('Blogginnlegg er allerede oppdatert på tilgjengelige språk.', 'success', 3500);
             }
         } catch (error) {
             console.error('[AdminManager] Failed to translate existing blog posts', error);
@@ -4190,8 +4208,8 @@ class AdminManager {
                         </div>
                         <div class="editor-header-right">
                                       ${collectionId === 'blog' ? `
-                                      <button class="btn-ghost" id="translate-col-item" title="Oversett til engelsk og spansk" style="display:flex; align-items:center; gap:6px;">
-                                          <span class="material-symbols-outlined">g_translate</span> Oversett til engelsk og spansk
+                                      <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk" style="display:flex; align-items:center; gap:6px;">
+                                          <span class="material-symbols-outlined">g_translate</span> Oversett til tilgjengelige språk
                                       </button>
                                       ` : ''}
                              <button class="btn-ghost" id="print-col-item" title="Skriv ut" style="display:flex; align-items:center; gap:6px;">
@@ -5006,7 +5024,7 @@ class AdminManager {
 
                             await firebaseService.savePageContent('collection_blog', { items: list });
                             Object.assign(item, translatedItem);
-                            this.showToast('✅ Innlegget er oversatt (EN/ES) og lagret.', 'success', 5000);
+                            this.showToast('✅ Innlegget er oversatt til tilgjengelige språk og lagret.', 'success', 5000);
                         } catch (error) {
                             console.error('Error translating current blog item:', error);
                             this.showToast(error?.message || 'Kunne ikke oversette innlegget nå.', 'error', 6000);
