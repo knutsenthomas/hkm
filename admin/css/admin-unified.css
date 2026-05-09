@@ -3943,6 +3943,18 @@ body.minside-body textarea {
     }
 }
 
+@media (max-width: 1024px) {
+    body.admin-body #hero-section>.section-header>.section-header-content,
+    body.admin-body #hero-section>.design-ui-header>.section-header-content {
+        gap: 28px !important;
+        flex-wrap: wrap !important;
+    }
+
+    body.admin-body #hero-section .section-header-actions {
+        margin-left: 0 !important;
+    }
+}
+
 /* Users page: move "Ny bruker" panel to the top and make form horizontal */
 body.admin-body #users-section .design-ui-top-grid {
     grid-template-columns: 1fr !important;
