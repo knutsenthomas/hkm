@@ -322,12 +322,21 @@ function wixMediaUrlFromUri(uri) {
 function extractWixArticleImagesAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
 
+  // Extract only the main article viewer area to avoid related posts images
+  const viewerMatch = pageHtml.match(/<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[\s\S]*?(?=<[^>]*(?:id="[^"]*related|class="[^"]*recommended|class="[^"]*reciprocal)[^>]*>|$)/i);
+  const articleHtml = viewerMatch ? viewerMatch[0] : pageHtml;
+
+  // Find the approximate boundary before "related posts" / "recommendations" section
+  const relatedMatch = pageHtml.search(/(?:relaterte|recommended|du kan ogs|inspiration from|other posts)/i);
+  const contentBoundary = relatedMatch > 0 ? Math.min(relatedMatch, pageHtml.length) : pageHtml.length;
+  const limitedHtml = pageHtml.substring(0, contentBoundary);
+
   const figures = [];
   const seen = new Set();
   const wowImageRegex = /<wow-image\b([^>]*)>/gi;
   let match;
 
-  while ((match = wowImageRegex.exec(pageHtml)) !== null) {
+  while ((match = wowImageRegex.exec(limitedHtml)) !== null) {
     const attrs = match[1] || "";
     const alt = readHtmlAttr(attrs, "alt");
     const infoRaw = readHtmlAttr(attrs, "data-image-info");
