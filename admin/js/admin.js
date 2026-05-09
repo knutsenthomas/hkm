@@ -4306,6 +4306,11 @@ class AdminManager {
                                 <label>Apple Podcasts URL</label>
                                 <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
                             </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Egne Podcast-kategorier (Hurtigvalg)</label>
+                                <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
+                                <p style="font-size: 11px; color: #64748b; margin-top: 4px;">Separer med komma. Disse legges til som valgbare knapper under.</p>
+                            </div>
                         </div>
 
                         <div style="margin-top: 30px;">
@@ -4391,6 +4396,7 @@ class AdminManager {
                 if (settings.podcastRssUrl) document.getElementById('podcast-rss-url').value = settings.podcastRssUrl;
                 if (settings.spotifyUrl) document.getElementById('podcast-spotify-url').value = settings.spotifyUrl;
                 if (settings.appleUrl) document.getElementById('podcast-apple-url').value = settings.appleUrl;
+                if (settings.podcastCustomCategories) document.getElementById('podcast-custom-categories').value = settings.podcastCustomCategories;
             }
         } catch (e) {
             console.error("Load media settings error:", e);
@@ -4404,6 +4410,7 @@ class AdminManager {
         const podcastRssUrl = document.getElementById('podcast-rss-url').value.trim();
         const spotifyUrl = document.getElementById('podcast-spotify-url').value.trim();
         const appleUrl = document.getElementById('podcast-apple-url').value.trim();
+        const podcastCustomCategories = document.getElementById('podcast-custom-categories').value.trim();
 
         btn.textContent = 'Lagrer...';
         btn.disabled = true;
@@ -4415,9 +4422,11 @@ class AdminManager {
                 podcastRssUrl: podcastRssUrl,
                 spotifyUrl: spotifyUrl,
                 appleUrl: appleUrl,
+                podcastCustomCategories: podcastCustomCategories,
                 updatedAt: new Date().toISOString()
             });
             this.showToast('✅ Media-innstillinger er lagret!', 'success', 5000);
+            this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save media settings error:", err);
             this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
@@ -4454,6 +4463,10 @@ class AdminManager {
             const overridesData = await firebaseService.getPageContent('settings_podcast_overrides') || {};
             const overrides = overridesData.overrides || {};
 
+            const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
+            const customCatStr = mediaSettings.podcastCustomCategories || '';
+            const customCatArr = customCatStr.split(',').map(s => s.trim()).filter(Boolean);
+
             // 2. Fetch episodes from the same source used by Podcast redigering
             const episodes = await this.fetchPodcastEpisodesForAdmin();
             const podcastCategories = [
@@ -4463,15 +4476,26 @@ class AdminManager {
                 { value: 'undervisning', label: 'Undervisning' }
             ];
 
+            customCatArr.forEach(cat => {
+                const val = cat.toLowerCase();
+                if (!podcastCategories.find(p => p.value === val)) {
+                    podcastCategories.push({ value: val, label: cat });
+                }
+            });
+
             if (episodes.length > 0) {
                 listContainer.innerHTML = episodes.map((ep) => {
                     const id = ep.id;
                     const encodedId = encodeURIComponent(String(id || '').trim());
                     const currentCats = this.parsePodcastOverrideCategories(overrides[id]);
+                    
+                    const normalizedCurrentCats = currentCats.map(c => c.toLowerCase());
+                    const knownValues = podcastCategories.map((category) => category.value.toLowerCase());
+                    const customCats = currentCats.filter((value) => !knownValues.includes(value.toLowerCase()));
                     const title = this.escapeHtml(ep.title || 'Uten tittel');
 
                     const chipsHtml = podcastCategories.map((category) => {
-                        const isSelected = currentCats.includes(category.value);
+                        const isSelected = normalizedCurrentCats.includes(category.value.toLowerCase());
                         return `
                             <button
                                 type="button"
@@ -4492,6 +4516,15 @@ class AdminManager {
                                 <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
                                     <div class="podcast-category-chip-group" style="display:flex; flex-wrap:wrap; gap:8px;">
                                         ${chipsHtml}
+                                    </div>
+                                    <div style="display:flex; flex-direction:column; gap:6px;">
+                                        <label style="font-size:11px; font-weight:700; color:#64748b; letter-spacing:0.04em; text-transform:uppercase;">Egne kategorier</label>
+                                        <input
+                                            type="text"
+                                            class="custom-podcast-categories form-control"
+                                            placeholder="f.eks. vitnesbyrd, lederskap"
+                                            value="${this.escapeHtml(customCats.join(', '))}"
+                                            style="font-size:12px; padding:8px 10px; max-width:380px; border-radius:10px; border:1px solid #e2e8f0; background:#fff;">
                                     </div>
                                     <span style="font-size:11px; color:#94a3b8;">Klikk for å velge flere. Ingen valg = Auto (nøkkelord).</span>
                                 </div>
@@ -4525,6 +4558,8 @@ class AdminManager {
 
                     clearBtn?.addEventListener('click', () => {
                         chips.forEach((chip) => updateChip(chip, false));
+                        const customInput = itemEl.querySelector('.custom-podcast-categories');
+                        if (customInput) customInput.value = '';
                     });
                 });
             } else {
@@ -4550,10 +4585,15 @@ class AdminManager {
                 .map((chip) => String(chip.getAttribute('data-value') || '').trim())
                 .filter(Boolean);
 
-            if (selected.length === 1) {
-                overrides[episodeId] = selected[0];
-            } else if (selected.length > 1) {
-                overrides[episodeId] = selected;
+            const customInput = row.querySelector('.custom-podcast-categories');
+            const customCategories = this.parsePodcastOverrideCategories(customInput?.value || '');
+
+            const merged = Array.from(new Set([...selected, ...customCategories]));
+
+            if (merged.length === 1) {
+                overrides[episodeId] = merged[0];
+            } else if (merged.length > 1) {
+                overrides[episodeId] = merged;
             }
         });
 

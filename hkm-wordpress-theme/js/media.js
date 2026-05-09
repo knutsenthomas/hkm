@@ -545,6 +545,67 @@ function getEpisodeCategory(episode) {
     return categories[0] || 'other';
 }
 
+function formatPodcastCategoryLabel(category) {
+    const normalized = String(category || '').trim();
+    if (!normalized) return '';
+
+    const map = {
+        tro: 'Tro',
+        bibel: 'Bibel',
+        bønn: 'Bønn',
+        undervisning: 'Undervisning',
+    };
+
+    if (map[normalized]) return map[normalized];
+
+    return normalized
+        .split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
+function ensureDynamicPodcastCategoryButtons() {
+    const container = document.getElementById('podcast-categories');
+    if (!container) return;
+
+    const existingFilters = new Set(
+        Array.from(container.querySelectorAll('[data-filter]'))
+            .map((button) => String(button.getAttribute('data-filter') || '').trim())
+            .filter(Boolean)
+    );
+
+    const dynamicCategories = new Set();
+    allPodcastEpisodes.forEach((episode) => {
+        const categories = Array.isArray(episode?.categories)
+            ? episode.categories
+            : (episode?.category ? [episode.category] : []);
+        categories.forEach((category) => {
+            const normalized = String(category || '').trim();
+            if (!normalized || normalized === 'all') return;
+            dynamicCategories.add(normalized);
+        });
+    });
+
+    const preferredOrder = ['tro', 'bibel', 'bønn', 'undervisning'];
+    const orderedCategories = [
+        ...preferredOrder.filter((category) => dynamicCategories.has(category)),
+        ...Array.from(dynamicCategories)
+            .filter((category) => !preferredOrder.includes(category))
+            .sort((a, b) => a.localeCompare(b, 'no'))
+    ];
+
+    orderedCategories.forEach((category) => {
+        if (existingFilters.has(category)) return;
+        const button = document.createElement('button');
+        button.className = 'category-btn';
+        button.setAttribute('data-filter', category);
+        button.textContent = formatPodcastCategoryLabel(category);
+        container.appendChild(button);
+        existingFilters.add(category);
+    });
+}
+
 async function initPodcastRSS() {
     const grid = document.getElementById('podcast-grid');
     if (!grid) return;
@@ -598,6 +659,8 @@ async function initPodcastRSS() {
 }
 
 function initPodcastControls() {
+    ensureDynamicPodcastCategoryButtons();
+
     const filterButtons = document.querySelectorAll('#podcast-categories [data-filter]');
     const sortSelect = document.getElementById('podcast-sort-select');
 
