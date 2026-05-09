@@ -1033,6 +1033,83 @@ class AdminManager {
         return targets.length ? targets : ['en', 'es'];
     }
 
+    _getBlogTranslationStatus(post) {
+        const targetLanguages = this._getBlogTranslationTargetLanguages();
+        const sourceHash = this._buildBlogTranslationSourceHash(post || {});
+        const translations = (post?.translations && typeof post.translations === 'object')
+            ? post.translations
+            : {};
+
+        let upToDate = 0;
+        let failed = 0;
+        let stale = 0;
+        let missing = 0;
+
+        targetLanguages.forEach((lang) => {
+            const tr = translations?.[lang];
+            if (!tr || typeof tr !== 'object') {
+                missing += 1;
+                return;
+            }
+
+            if (tr._translationFailed) {
+                failed += 1;
+                return;
+            }
+
+            const isFresh = tr._sourceHash === sourceHash && !!tr.title && !!tr.content;
+            if (isFresh) {
+                upToDate += 1;
+            } else {
+                stale += 1;
+            }
+        });
+
+        const total = targetLanguages.length;
+        let level = 'none';
+        if (upToDate === total && total > 0) {
+            level = 'ok';
+        } else if (upToDate > 0) {
+            level = 'partial';
+        } else if (failed > 0 || stale > 0 || missing > 0) {
+            level = 'missing';
+        }
+
+        return { total, upToDate, failed, stale, missing, level };
+    }
+
+    _renderBlogTranslationStatusBadge(post) {
+        const badge = document.getElementById('blog-translation-status');
+        if (!badge) return;
+
+        const stats = this._getBlogTranslationStatus(post);
+        badge.style.display = 'inline-flex';
+        badge.style.alignItems = 'center';
+        badge.style.gap = '6px';
+        badge.style.padding = '6px 10px';
+        badge.style.borderRadius = '999px';
+        badge.style.fontSize = '12px';
+        badge.style.fontWeight = '700';
+
+        if (stats.level === 'ok') {
+            badge.style.background = '#dcfce7';
+            badge.style.color = '#166534';
+            badge.textContent = `Oversatt (${stats.upToDate}/${stats.total})`;
+            return;
+        }
+
+        if (stats.level === 'partial') {
+            badge.style.background = '#fef3c7';
+            badge.style.color = '#92400e';
+            badge.textContent = `Delvis oversatt (${stats.upToDate}/${stats.total})`;
+            return;
+        }
+
+        badge.style.background = '#fee2e2';
+        badge.style.color = '#991b1b';
+        badge.textContent = `Ikke oppdatert (${stats.upToDate}/${stats.total})`;
+    }
+
     async translateAllExistingBlogPosts({ force = false, silent = false } = {}) {
         if (this._blogTranslationBackfillRunning) return;
         this._blogTranslationBackfillRunning = true;
@@ -4500,6 +4577,9 @@ class AdminManager {
                         </div>
                         <div class="editor-header-right">
                                       ${collectionId === 'blog' ? `
+                                      <span id="blog-translation-status" title="Status for oversettelser" style="display:none;"></span>
+                                      ` : ''}
+                                      ${collectionId === 'blog' ? `
                                       <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk" style="display:flex; align-items:center; gap:6px;">
                                           <span class="material-symbols-outlined">g_translate</span> Oversett til tilgjengelige språk
                                       </button>
@@ -4689,6 +4769,10 @@ class AdminManager {
                     typeSelect.addEventListener('change', syncSeriesVisibility);
                     syncSeriesVisibility();
                 }
+            }
+
+            if (collectionId === 'blog') {
+                this._renderBlogTranslationStatusBadge(item);
             }
 
             // --- Editor.js Data Prep ---
@@ -5218,7 +5302,7 @@ class AdminManager {
                 };
             }
 
-            const buildSafeItemFromForm = async () => {
+            const buildSafeItemFromForm = async ({ preserveExistingContentIfEmpty = false } = {}) => {
                 let savedData;
                 try {
                     savedData = await editor.save();
@@ -5227,10 +5311,20 @@ class AdminManager {
                     throw new Error('Kunne ikke hente innhold fra editor.');
                 }
 
+                const previousContent = item.content;
+
                 item.title = document.getElementById('col-item-title-v2')?.value
                     || document.getElementById('col-item-title-sidebar')?.value
                     || '';
-                item.content = savedData;
+                let nextContent = savedData;
+                if (preserveExistingContentIfEmpty && collectionId === 'blog') {
+                    const savedBlocks = Array.isArray(savedData?.blocks) ? savedData.blocks : [];
+                    const previousBlocks = Array.isArray(previousContent?.blocks) ? previousContent.blocks : [];
+                    if (!savedBlocks.length && previousBlocks.length) {
+                        nextContent = previousContent;
+                    }
+                }
+                item.content = nextContent;
                 item.date = document.getElementById('col-item-date')?.value || '';
 
                 if (collectionId !== 'podcast_transcripts') {
@@ -5317,7 +5411,7 @@ class AdminManager {
                                 this.showToast('Oversettelse pågår fortsatt. Dette kan ta litt tid ved store innlegg.', 'warning', 4500);
                             }, 6000);
 
-                            const safeItem = await buildSafeItemFromForm();
+                            const safeItem = await buildSafeItemFromForm({ preserveExistingContentIfEmpty: true });
                             const translatedItem = await Promise.race([
                                 this.ensureBlogPostTranslations(safeItem, { force: false }),
                                 new Promise((_, reject) => setTimeout(() => reject(new Error('Oversettelsen tok for lang tid. Prøv igjen om litt.')), 600000))
@@ -5360,7 +5454,12 @@ class AdminManager {
 
                             await firebaseService.savePageContent('collection_blog', { items: list });
                             Object.assign(item, translatedItem);
-                            this.showToast('✅ Innlegget er oversatt til tilgjengelige språk og lagret.', 'success', 5000);
+                            this._renderBlogTranslationStatusBadge(item);
+                            if (successfulLanguages.length === targetLanguages.length) {
+                                this.showToast('✅ Innlegget er oversatt til tilgjengelige språk og lagret.', 'success', 5000);
+                            } else {
+                                this.showToast(`⚠️ Delvis oversettelse lagret (${successfulLanguages.length}/${targetLanguages.length} språk).`, 'warning', 6500);
+                            }
                         } catch (error) {
                             console.error('Error translating current blog item:', error);
                             this.showToast(error?.message || 'Kunne ikke oversette innlegget nå.', 'error', 6000);
