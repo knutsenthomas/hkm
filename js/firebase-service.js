@@ -785,20 +785,27 @@ class FirebaseService {
      * Storage Methods
      */
     async uploadImage(file, path, onProgress = null, options = {}) {
+        return this.uploadFile(file, path, ['image/'], 10, onProgress, options);
+    }
+
+    async uploadFile(file, path, allowedTypes = ['image/'], maxSizeMB = 10, onProgress = null, options = {}) {
         if (!this.isInitialized) throw new Error("Firebase er ikke initialisert.");
         if (!this.storage) throw new Error("Firebase Storage er ikke initialisert.");
-        if (!file) throw new Error("Ingen bildefil valgt.");
+        if (!file) throw new Error("Ingen fil valgt.");
         if (!this.auth || !this.auth.currentUser) {
-            throw new Error("Du er ikke logget inn. Logg inn på nytt før du laster opp bilder.");
+            throw new Error("Du er ikke logget inn. Logg inn på nytt før du laster opp filer.");
         }
 
-        const maxSizeBytes = options.maxSizeBytes || 10 * 1024 * 1024;
-        const timeoutMs = options.timeoutMs || 90000;
+        const maxSizeBytes = (options.maxSizeBytes || maxSizeMB * 1024 * 1024);
+        const timeoutMs = options.timeoutMs || 120000;
+        
         if (file.size > maxSizeBytes) {
-            throw new Error("Bildet er for stort. Maks størrelse er 10 MB.");
+            throw new Error(`Filen er for stor. Maks størrelse er ${maxSizeMB} MB.`);
         }
-        if (!file.type || !file.type.startsWith('image/')) {
-            throw new Error("Filen må være et bilde.");
+        
+        const isAllowedType = allowedTypes.some(type => file.type && file.type.startsWith(type));
+        if (!isAllowedType) {
+            throw new Error("Ugyldig filtype.");
         }
 
         try {
@@ -809,7 +816,7 @@ class FirebaseService {
             const snapshot = await new Promise((resolve, reject) => {
                 const timeoutId = window.setTimeout(() => {
                     uploadTask.cancel();
-                    reject(new Error("Opplastingen tok for lang tid. Prøv igjen med et mindre bilde."));
+                    reject(new Error("Opplastingen tok for lang tid. Prøv igjen med en mindre fil."));
                 }, timeoutMs);
 
                 uploadTask.on(
@@ -833,6 +840,7 @@ class FirebaseService {
             return await snapshot.ref.getDownloadURL();
         } catch (error) {
             console.error("[FirebaseService] Upload error:", error);
+
             throw error;
         }
     }

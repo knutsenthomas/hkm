@@ -8056,12 +8056,20 @@ class AdminManager {
                             <textarea id="hero-subtitle" class="form-control" style="height: 80px;">${safeSlideSubtitle}</textarea>
                         </div>
                         <div class="form-group">
-                            <label>Bakgrunnsvideo (Valgfritt YouTube eller MP4-lenke)</label>
+                            <label>Bakgrunnsvideo (Valgfritt YouTube eller opplastet MP4)</label>
                             <div style="display:flex; gap:10px; align-items:center;">
                                 <span class="material-symbols-outlined" style="color:#d17d39;">video_library</span>
                                 <input type="text" id="hero-video-url" class="form-control" value="${slide.videoUrl || slide.youtubeId || ''}" placeholder="Lim inn lenke (YouTube eller MP4)">
                             </div>
-                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Støtter YouTube-ID, YouTube-lenke eller direkte MP4-URL.</p>
+                            <input type="file" id="hero-video-file" style="display: none;" accept="video/mp4,video/webm">
+                            <div style="display:flex; gap:10px; align-items:center; margin-top:8px;">
+                                <button type="button" class="btn-secondary" id="hero-upload-video-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; white-space:nowrap; font-size:12px; padding:6px 12px;">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">upload</span>
+                                    Last opp MP4
+                                </button>
+                                <span id="hero-video-upload-status" style="font-size:11px; color:#64748b;">(Maks 50 MB, MP4 anbefales)</span>
+                            </div>
+                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Støtter YouTube-ID, YouTube-lenke eller opplastet MP4-fil.</p>
                         </div>
                         <div class="form-group">
                             <label>Visningstid i sekunder</label>
@@ -8174,6 +8182,51 @@ class AdminManager {
                 fileInput.value = '';
             }
         };
+
+        // Video Upload Logic
+        const videoInput = modal.querySelector('#hero-video-url');
+        const videoFileInput = modal.querySelector('#hero-video-file');
+        const uploadVideoBtn = modal.querySelector('#hero-upload-video-btn');
+        const uploadVideoStatus = modal.querySelector('#hero-video-upload-status');
+
+        if (uploadVideoBtn && videoFileInput) {
+            uploadVideoBtn.onclick = () => videoFileInput.click();
+
+            videoFileInput.onchange = async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                uploadVideoStatus.textContent = 'Laster opp...';
+                uploadVideoBtn.disabled = true;
+                uploadVideoBtn.innerHTML = '<span class="material-symbols-outlined spin">sync</span> Laster opp...';
+
+                try {
+                    const url = await firebaseService.uploadFile(
+                        file, 
+                        `hero_videos/${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`, 
+                        ['video/'], 
+                        50, // 50MB max
+                        (progress) => {
+                            uploadVideoStatus.textContent = `Laster opp: ${progress}%`;
+                        },
+                        { timeoutMs: 300000 } // 5 min timeout
+                    );
+                    
+                    videoInput.value = url;
+                    videoInput.dispatchEvent(new Event('input')); 
+                    this.showToast('Video lastet opp!', 'success');
+                    uploadVideoStatus.textContent = '✅ Video opplastet';
+                } catch (err) {
+                    console.error("Upload error:", err);
+                    this.showToast('Kunne ikke laste opp video: ' + (err.message || 'Ukjent feil'), 'error', 6000);
+                    uploadVideoStatus.textContent = '❌ Opplasting feilet';
+                } finally {
+                    uploadVideoBtn.disabled = false;
+                    uploadVideoBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:16px;">upload</span> Last opp MP4';
+                    videoFileInput.value = '';
+                }
+            };
+        }
 
         // Save Logic
         saveBtn.onclick = async () => {
