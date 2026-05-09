@@ -391,6 +391,49 @@ class AdminManager {
         return 'MyMemory dagskvote er brukt opp. Prøv igjen senere eller bytt til Gemini i integrasjonsinnstillinger.';
     }
 
+    async _diagnoseTranslationProviders() {
+        const sample = 'Gud er god';
+        const out = {
+            hasGeminiKey: false,
+            gemini: 'not-configured',
+            myMemory: 'unknown'
+        };
+
+        try {
+            const settings = await this._getTranslationSettings();
+            out.hasGeminiKey = !!settings?.geminiApiKey;
+
+            if (out.hasGeminiKey) {
+                try {
+                    const g = await this._translateTextChunkWithGemini(sample, 'en', 'no');
+                    out.gemini = this._isMeaningfullyTranslatedField(sample, g) ? 'ok' : 'no-op';
+                } catch (error) {
+                    out.gemini = `error:${error?.message || 'unknown'}`;
+                }
+            }
+
+            try {
+                const m = await this._translateTextChunkWithMyMemory(sample, 'en', 'no');
+                if (this._isTranslationQuotaExceededMessage(m)) {
+                    out.myMemory = 'quota';
+                } else {
+                    out.myMemory = this._isMeaningfullyTranslatedField(sample, m) ? 'ok' : 'no-op';
+                }
+            } catch (error) {
+                const msg = String(error?.message || '');
+                if (this._isTranslationQuotaExceededMessage(msg)) {
+                    out.myMemory = 'quota';
+                } else {
+                    out.myMemory = `error:${msg}`;
+                }
+            }
+        } catch (error) {
+            out.myMemory = `error:${error?.message || 'unknown'}`;
+        }
+
+        return out;
+    }
+
     async _fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), Math.max(1000, Number(timeoutMs) || 30000));
@@ -5149,6 +5192,23 @@ class AdminManager {
                                 if (!hasGeminiKey) {
                                     throw new Error('Ingen språk ble oversatt. MyMemory-kvote/no-op stopper oversettelse nå. Legg inn Gemini API key i Integrasjoner for stabil oversettelse.');
                                 }
+
+                                const diag = await this._diagnoseTranslationProviders();
+                                if (String(diag.gemini).startsWith('error:')) {
+                                    const geminiErr = String(diag.gemini).slice(6);
+                                    if (/403|permission|api.*not.*enabled|generativelanguage|api key/i.test(geminiErr)) {
+                                        throw new Error('Ingen språk ble oversatt. Gemini er konfigurert, men API-tilgang feiler (403/API key/API ikke aktiv). Aktiver Generative Language API og bruk gyldig nøkkel i Integrasjoner.');
+                                    }
+                                    if (/model|not found|unsupported/i.test(geminiErr)) {
+                                        throw new Error('Ingen språk ble oversatt. Gemini-modellen er ikke gyldig/tilgjengelig. Velg en støttet modell i Integrasjoner.');
+                                    }
+                                    throw new Error(`Ingen språk ble oversatt. Gemini-feil: ${geminiErr}`);
+                                }
+
+                                if (diag.gemini === 'no-op' && diag.myMemory === 'quota') {
+                                    throw new Error('Ingen språk ble oversatt. MyMemory-kvoten er brukt opp, og Gemini svarte uten gyldig oversettelse. Sjekk Gemini-oppsett i Integrasjoner.');
+                                }
+
                                 throw new Error('Ingen språk ble oversatt. Oversettelsestjenesten svarte uten gyldig oversettelse. Prøv igjen, eller bytt provider i Integrasjoner.');
                             }
 
