@@ -101,6 +101,25 @@ class MinSideManager {
         if (!this.views[viewId]) viewId = 'overview';
         window.location.hash = viewId;
 
+        // View info mapping for header
+        const viewInfo = {
+            overview: { title: 'Oversikt', icon: 'grid_view' },
+            profile: { title: 'Min Profil', icon: 'person' },
+            activity: { title: 'Aktivitet', icon: 'history' },
+            notifications: { title: 'Varslinger', icon: 'notifications' },
+            giving: { title: 'Gaver & Betalinger', icon: 'volunteer_activism' },
+            courses: { title: 'Kurs & Undervisning', icon: 'school' },
+            notes: { title: 'Notater', icon: 'notes' },
+        };
+
+        // Update Header Title and Icon (Admin Style)
+        const info = viewInfo[viewId] || { title: 'Min Side', icon: 'person' };
+        const titleEl = document.getElementById('dashboard-main-header-title');
+        const iconEl = document.getElementById('dashboard-main-header-icon');
+        
+        if (titleEl) titleEl.textContent = info.title;
+        if (iconEl) iconEl.textContent = info.icon;
+
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active');
 
@@ -173,19 +192,6 @@ class MinSideManager {
 
         // Avatar
         this._setAvatarEl(document.getElementById('ph-avatar'), p.photoURL, name);
-
-        // Email
-        const emailText = document.getElementById('ph-email-text');
-        if (emailText) emailText.textContent = this.currentUser?.email || '—';
-
-        // Phone
-        const phoneText = document.getElementById('ph-phone-text');
-        const phoneEl = document.getElementById('ph-phone');
-        if (p.phone) {
-            if (phoneText) phoneText.textContent = p.phone;
-        } else {
-            if (phoneEl) phoneEl.style.display = 'none';
-        }
 
         // Role
         const roleEl = document.getElementById('ph-role');
@@ -406,9 +412,16 @@ class MinSideManager {
 
     _setBadge(count) {
         const el = document.getElementById('notif-badge');
-        if (!el) return;
-        el.textContent = count > 9 ? '9+' : count;
-        el.style.display = count > 0 ? 'inline-block' : 'none';
+        const headerDot = document.getElementById('notif-badge-header');
+        
+        if (el) {
+            el.textContent = count > 9 ? '9+' : count;
+            el.style.display = count > 0 ? 'inline-block' : 'none';
+        }
+        
+        if (headerDot) {
+            headerDot.style.display = count > 0 ? 'block' : 'none';
+        }
     }
 
     _timeAgo(dateVal) {

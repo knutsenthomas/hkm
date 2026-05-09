@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+    <link rel="stylesheet" href="../admin/css/dashboard.css">
+    <link rel="stylesheet" href="../admin/css/admin-unified.css">
     <link rel="stylesheet" href="css/minside.css">
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->
@@ -55,55 +57,54 @@
 <body class="cms-loading">
     <div id="app">
 
-        <!-- ── Profile Header ─────────────────────────────────────── -->
-        <header class="profile-header">
-            <div class="profile-header-inner">
-                <div class="ph-left">
-                    <div class="ph-avatar-wrap">
-                        <div id="ph-avatar" class="ph-avatar">?</div>
-                    </div>
-                    <div class="ph-info">
-                        <h1 id="ph-name">Laster...</h1>
-                        <div class="ph-meta">
-                            <span id="ph-email" class="ph-meta-item">
-                                <span class="material-symbols-outlined">mail</span>
-                                <span id="ph-email-text">—</span>
-                            </span>
-                            <span id="ph-phone" class="ph-meta-item">
-                                <span class="material-symbols-outlined">phone</span>
-                                <span id="ph-phone-text">—</span>
-                            </span>
-                        </div>
-                    </div>
+        <!-- ── Profile Header (Admin Style) ────────────────────────── -->
+        <header id="dashboard-main-header" class="main-header">
+            <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                <div class="section-header-icon">
+                    <span id="dashboard-main-header-icon" class="material-symbols-outlined">home</span>
                 </div>
-                <div class="ph-right">
-                    <div class="ph-badges">
-                        <span class="role-chip">
-                            <span class="material-symbols-outlined">person</span>
-                            <span id="ph-role">Medlem</span>
-                        </span>
+                <div class="section-header-content">
+                    <div class="section-header-titles">
+                        <h2 id="dashboard-main-header-title" class="section-title">Oversikt</h2>
+                        <p id="dashboard-main-header-subtitle" class="section-subtitle">Min Side | His Kingdom Ministry</p>
                     </div>
-                    <div class="actions-wrap">
-                        <button class="actions-btn" id="actions-btn">
-                            Handlinger
-                            <span class="material-symbols-outlined">expand_more</span>
-                        </button>
-                        <div class="actions-menu" id="actions-menu">
-                            <a href="/admin/index.html" class="actions-item is-hidden" id="ph-admin-link">
-                                <span class="material-symbols-outlined">dashboard</span> Tilbake til admin
+
+                    <div class="section-header-actions">
+                        <!-- User Profile Link (Triggers Handlinger menu) -->
+                        <div class="actions-wrap">
+                            <a href="javascript:void(0)" class="user-profile-link" id="actions-btn">
+                                <div class="user-info-text">
+                                    <span id="ph-name" class="user-name">Laster...</span>
+                                    <span id="ph-role" class="user-role">Medlem</span>
+                                </div>
+                                <div id="ph-avatar" class="user-avatar">?</div>
                             </a>
-                            <a href="/" class="actions-item">
-                                <span class="material-symbols-outlined">home</span> Til HKM.no
-                            </a>
-                            <div class="actions-divider"></div>
-                            <button id="logout-btn" class="actions-item danger">
-                                <span class="material-symbols-outlined">logout</span> Logg ut
-                            </button>
+
+                            <!-- Actions dropdown menu -->
+                            <div class="actions-menu" id="actions-menu">
+                                <a href="/admin/index.html" class="actions-item is-hidden" id="ph-admin-link">
+                                    <span class="material-symbols-outlined">dashboard</span> Tilbake til admin
+                                </a>
+                                <a href="/" class="actions-item">
+                                    <span class="material-symbols-outlined">home</span> Til HKM.no
+                                </a>
+                                <div class="actions-divider"></div>
+                                <button id="logout-btn" class="actions-item danger">
+                                    <span class="material-symbols-outlined">logout</span> Logg ut
+                                </button>
+                            </div>
                         </div>
+
+                        <!-- Notification bell (optional, matching admin style) -->
+                        <button class="notification-btn" onclick="window.minSideManager.loadView('notifications')">
+                            <span class="material-symbols-outlined">notifications</span>
+                            <span id="notif-badge-header" class="notification-dot" style="display:none"></span>
+                        </button>
+
+                        <button id="mobile-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
                     </div>
-                    <button id="mobile-toggle" class="mobile-toggle-btn">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
                 </div>
             </div>
         </header>

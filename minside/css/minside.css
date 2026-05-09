@@ -96,118 +96,42 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   PROFILE HEADER  (samme struktur som admin-header)
+   PROFILE HEADER  (Admin Unified Integration)
    ══════════════════════════════════════════════════════════════════ */
-.profile-header {
+.main-header {
     background: var(--main-bg);
     border-bottom: 1px solid var(--border-color);
     z-index: 200;
     position: sticky;
     top: 0;
-    margin-left: var(--sidebar-w);
-    transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    /* transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1); */
 }
 
-.profile-header-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: var(--hkm-space-4) var(--hkm-space-6);
-    gap: 16px;
-}
-
-/* Left */
-.ph-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    min-width: 0;
-}
-
-.ph-avatar-wrap {
+/* Ensure the header actions wrap correctly for the profile dropdown */
+.section-header-actions .actions-wrap {
     position: relative;
-    flex-shrink: 0;
-}
-
-.ph-avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--accent-gradient);
-    color: #fff;
-    font-size: 1.35rem;
-    font-weight: 800;
     display: flex;
     align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    box-shadow: 0 4px 12px var(--accent-glow);
 }
 
-.ph-avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 12px;
+/* Fix for mobile toggle visibility if admin CSS hides it */
+.main-header .mobile-nav-toggle {
+    display: none;
 }
 
-.ph-avatar-overlay {
-    position: absolute;
-    inset: 0;
-    border-radius: 12px;
-    background: rgba(0, 0, 0, 0.45);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    cursor: pointer;
-    transition: opacity 0.2s;
+@media (max-width: 768px) {
+    .main-header .mobile-nav-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 
-.ph-avatar-wrap:hover .ph-avatar-overlay {
-    opacity: 1;
+/* Cleanup ph-* legacy styles */
+.ph-left, .ph-right, .ph-info, .ph-meta, .ph-avatar-wrap, .ph-avatar {
+    /* These are now mapped to admin-style classes */
 }
 
-.ph-avatar-overlay .material-symbols-outlined {
-    font-size: 20px;
-    color: #fff;
-}
-
-.ph-info h1 {
-    font-size: 1.2rem;
-    font-weight: 800;
-    color: var(--text-main);
-    letter-spacing: -0.01em;
-    margin-bottom: 3px;
-}
-
-.ph-meta {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    flex-wrap: wrap;
-}
-
-.ph-meta-item {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 500;
-}
-
-.ph-meta-item .material-symbols-outlined {
-    font-size: 14px;
-}
-
-/* Right */
-.ph-right {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-}
 
 .role-chip {
     display: inline-flex;
