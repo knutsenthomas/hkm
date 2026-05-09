@@ -964,10 +964,12 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
         barImg.style.display = thumbnail ? '' : 'none';
         
         const fsTitle = document.querySelector('.fullscreen-title');
+        const fsSummary = document.querySelector('.fullscreen-summary');
         const fsArtwork = document.querySelector('.fullscreen-artwork');
         
         if (fsTitle && episodeData) {
             fsTitle.textContent = title;
+            if (fsSummary) fsSummary.innerHTML = getEpisodeSummaryHtml(episodeData);
             if (fsArtwork) fsArtwork.src = thumbnail;
             loadEpisodeTranscript(episodeData);
         }
@@ -1153,6 +1155,10 @@ function createPlayerBar() {
                     <img src="" class="fullscreen-artwork">
                 </div>
                 <h2 class="fullscreen-title">Velg en episode</h2>
+                <div class="fs-summary-container">
+                    <h3 class="fs-section-title">Oppsummering</h3>
+                    <div class="fullscreen-summary"></div>
+                </div>
                 <div class="fs-transcript-container">
                     <div class="fs-transcript-header">
                         <h3 class="fs-section-title" style="margin:0;">Teksting</h3>
