@@ -30,6 +30,7 @@ const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
 const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
 const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 2;
 const PODCAST_AUTO_TRANSCRIPTION_ENABLED = true;
+const WIX_BLOG_API_ENABLED = false;
 const WIX_BLOG_PUBLIC_PAGE_ENRICHMENT_ENABLED = true;
 
 // Stripe is initialized inside the function to avoid build-time errors
@@ -112,6 +113,12 @@ function sanitizeWixInlineHtml(rawInner) {
     .trim();
 
   return html;
+}
+
+function readCssBackgroundImageUrl(styleValue) {
+  if (typeof styleValue !== "string" || !styleValue) return "";
+  const match = styleValue.match(/background-image\s*:\s*url\((['"]?)(.*?)\1\)/i);
+  return match && match[2] ? decodeHtmlAttribute(match[2].trim()) : "";
 }
 
 // --- Google Analytics Data API Helpers ---
@@ -209,7 +216,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
 
   const blockRegex = /<(h[1-6]|p|li|div)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
   const seen = new Set();
-  const blocks = [];
+  const blocks = extractWixFigureBlocks(pageHtml);
   let match;
 
   while ((match = blockRegex.exec(pageHtml)) !== null) {
@@ -242,6 +249,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
       seen.add(imageKey);
 
       blocks.push({
+        index: match.index,
         tag: "figure",
         text: "",
         html: renderImageFigure(src, alt || ""),
@@ -258,21 +266,37 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
         .trim()
     );
 
+    if (/ja,?\s*jeg ønsker å abonnere på .*nyhetsbrev/i.test(text) || /subscribe to .*newsletter/i.test(text)) {
+      continue;
+    }
+
     const minLen = /^h[1-6]$/.test(tag) ? 1 : (tag === "li" ? 1 : 1);
     if (text.length < minLen) continue;
 
-    const dedupKey = `${tag}:${text.toLowerCase()}`;
+    const normalizedTag = (() => {
+      const trimmedHtml = inlineHtml.trim();
+      if (tag === "div" && /^<blockquote\b/i.test(trimmedHtml)) return "blockquote";
+      if (tag === "div" && /^<figure\b/i.test(trimmedHtml)) return "figure";
+      if (/^h[1-6]$/.test(tag)) return tag;
+      if (tag === "li") return "li";
+      return "p";
+    })();
+
+    const dedupKey = `${normalizedTag}:${text.toLowerCase()}`;
     if (seen.has(dedupKey)) continue;
     seen.add(dedupKey);
 
     blocks.push({
-      tag: /^h[1-6]$/.test(tag) ? tag : (tag === "li" ? "li" : "p"),
+      index: match.index,
+      tag: normalizedTag,
       text,
       html: inlineHtml,
     });
   }
 
   if (blocks.length < 2) return "";
+
+  blocks.sort((a, b) => (a.index || 0) - (b.index || 0));
 
   const parts = [];
   const listLikeParagraph = /^([A-Za-z0-9\u00C0-\u024F\u0400-\u04FF\u0370-\u03FF][^:]{1,48}):\s+.+/;
@@ -288,6 +312,11 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
 
     if (/^h[1-6]$/.test(block.tag)) {
       parts.push(`<${block.tag}>${block.html || escapeHtml(block.text)}</${block.tag}>`);
+      continue;
+    }
+
+    if (block.tag === "blockquote") {
+      parts.push(block.html || `<blockquote>${escapeHtml(block.text)}</blockquote>`);
       continue;
     }
 
@@ -343,6 +372,74 @@ function readHtmlAttr(attrs, name) {
   const pattern = new RegExp(`${name}\\s*=\\s*(["'])([\\s\\S]*?)\\1`, "i");
   const match = attrs.match(pattern);
   return match && match[2] ? decodeHtmlAttribute(match[2]) : "";
+}
+
+function extractWixFigureBlocks(pageHtml) {
+  if (typeof pageHtml !== "string" || !pageHtml) return [];
+
+  const recentPostsIndex = pageHtml.search(/data-hook\s*=\s*["']recent-posts["']/i);
+  const searchHtml = recentPostsIndex >= 0 ? pageHtml.slice(0, recentPostsIndex) : pageHtml;
+  const blocks = [];
+  const figureRegex = /<figure\b[^>]*data-hook=("|')(figure-IMAGE|figure-VIDEO)\1[^>]*>[\s\S]*?<\/figure>/gi;
+  let match;
+
+  while ((match = figureRegex.exec(searchHtml)) !== null) {
+    const figureHtml = match[0] || "";
+    const hook = match[2] || "";
+    const wowMatch = figureHtml.match(/<wow-image\b([^>]*)>/i);
+    const wowAttrs = wowMatch && wowMatch[1] ? wowMatch[1] : "";
+    const imgMatch = figureHtml.match(/<img\b([^>]*)>/i);
+    const imgAttrs = imgMatch && imgMatch[1] ? imgMatch[1] : "";
+    const infoRaw = readHtmlAttr(wowAttrs, "data-image-info");
+
+    let info = null;
+    if (infoRaw) {
+      try {
+        info = JSON.parse(infoRaw);
+      } catch (error) {
+        info = null;
+      }
+    }
+
+    const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
+    const alt = readHtmlAttr(imgAttrs, "alt") || readHtmlAttr(wowAttrs, "alt") || (hook === "figure-VIDEO" ? "Video" : "");
+    let src = wixPickFirstString(
+      readHtmlAttr(imgAttrs, "data-pin-media"),
+      wixMediaUrlFromUri(imageData.uri || readHtmlAttr(wowAttrs, "src")),
+      readHtmlAttr(imgAttrs, "src"),
+    );
+
+    if (hook === "figure-VIDEO") {
+      const previewButtonMatch = figureHtml.match(/<button\b([^>]*)class=("|')[^"']*react-player__preview[^"']*\2([^>]*)>/i);
+      const previewAttrs = `${previewButtonMatch && previewButtonMatch[1] ? previewButtonMatch[1] : ""} ${previewButtonMatch && previewButtonMatch[3] ? previewButtonMatch[3] : ""}`;
+      const previewStyle = readHtmlAttr(previewAttrs, "style");
+      const previewImage = readCssBackgroundImageUrl(previewStyle);
+      if (previewImage) src = previewImage;
+
+      if (!src) continue;
+
+      const youtubeIdMatch = src.match(/\/vi\/([^\/?]+)/i);
+      const youtubeUrl = youtubeIdMatch && youtubeIdMatch[1] ? `https://www.youtube.com/watch?v=${youtubeIdMatch[1]}` : "";
+      const previewFigure = renderImageFigure(src, alt || "Video");
+      blocks.push({
+        index: match.index,
+        tag: "figure",
+        text: alt || "Video",
+        html: youtubeUrl ? `${previewFigure}\n${renderMediaAnchor(youtubeUrl, "Se video")}` : previewFigure,
+      });
+      continue;
+    }
+
+    if (!src) continue;
+    blocks.push({
+      index: match.index,
+      tag: "figure",
+      text: alt || "",
+      html: renderImageFigure(src, alt || ""),
+    });
+  }
+
+  return blocks;
 }
 
 function wixMediaUrlFromUri(uri) {
@@ -512,6 +609,8 @@ async function enrichWixItemsWithPublicPageContent(items = []) {
       // If we already have richContent nodes, we should be VERY careful about overwriting content
       // with scraped HTML, unless the scraped HTML is significantly better.
       const hasRichContent = !!(item.richContent && item.richContent.nodes && item.richContent.nodes.length > 0);
+      const currentHasStructure = /<(figure|blockquote|ul|ol|h[1-6])\b/i.test(item.content || "");
+      const enrichedHasStructure = /<(figure|blockquote|ul|ol|h[1-6])\b/i.test(sanitizedContent);
       if (hasRichContent && enrichedLen < currentLen * 0.5) continue;
       if (enrichedLen < currentLen && !(enrichedHasStructure && !currentHasStructure)) continue;
 
@@ -3348,20 +3447,27 @@ async function fetchWixBlogItemsViaRss(req = { query: {} }) {
 async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
   let wixItems = [];
   let rssItems = [];
-  let importSource = "wix-api";
+  let importSource = WIX_BLOG_API_ENABLED ? "wix-api" : "wix-rss-only";
   let feedUrl = "";
 
   try {
-    wixItems = await fetchWixBlogItemsViaApi();
+    if (WIX_BLOG_API_ENABLED) {
+      wixItems = await fetchWixBlogItemsViaApi();
+    }
+
     try {
       const rssResult = await fetchWixBlogItemsViaRss(req);
       rssItems = Array.isArray(rssResult && rssResult.items) ? rssResult.items : [];
       feedUrl = rssResult && typeof rssResult.feedUrl === "string" ? rssResult.feedUrl : "";
       if (rssItems.length > 0) {
-        importSource = "wix-api-rss-merged";
+        importSource = WIX_BLOG_API_ENABLED ? "wix-api-rss-merged" : "wix-rss-only";
       }
     } catch (rssError) {
-      console.warn("Wix Blog RSS enrichment failed, continuing with API only:", rssError && rssError.message ? rssError.message : rssError);
+      if (WIX_BLOG_API_ENABLED) {
+        console.warn("Wix Blog RSS enrichment failed, continuing with API only:", rssError && rssError.message ? rssError.message : rssError);
+      } else {
+        throw rssError;
+      }
     }
 
   } catch (apiError) {
