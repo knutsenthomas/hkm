@@ -5000,6 +5000,8 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 @media (max-width: 1024px) {
     .desktop-richtools {
         display: none !important;
+        position: static !important;
+        /* Ensure no sticky positioning on tablet/mobile */
     }
 
     .editor-sidebar-v2 {
@@ -5014,6 +5016,20 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 
     #col-item-title-v2 {
         font-size: 32px !important;
+    }
+
+    /* Fix mobile scroll context and layout */
+    .editor-content-wrapper {
+        overflow: auto !important;
+        /* Allow wrapper to handle scrolling properly */
+    }
+
+    .editor-main-canvas {
+        overflow: visible !important;
+        /* Let parent handle scrolling */
+        padding: 15px 10px !important;
+        flex-direction: column !important;
+        align-items: center !important;
     }
 }
 
@@ -5037,8 +5053,20 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
         font-size: 13px !important;
     }
 
+    .editor-layout-v2 {
+        height: auto !important;
+        /* Don't force 100vh on mobile, let content determine height */
+    }
+
+    .editor-content-wrapper {
+        overflow: auto !important;
+        max-height: calc(100vh - 120px) !important;
+        /* Ensure scrollable but not clipped */
+    }
+
     .editor-main-canvas {
         padding: 15px 10px !important;
+        overflow: visible !important;
     }
 
     .editor-paper {

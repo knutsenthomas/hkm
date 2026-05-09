@@ -3215,6 +3215,9 @@ class AdminManager {
                 const link = this._extractPodcastText(episode?.link);
                 const title = this._extractPodcastText(episode?.title) || 'Uten tittel';
                 const date = this._normalizePodcastDate(this._extractPodcastText(episode?.pubDate));
+                const description = this._extractPodcastText(episode?.description)
+                    || this._extractPodcastText(episode?.['itunes:summary'])
+                    || '';
 
                 const imageNode = Array.isArray(episode?.['itunes:image'])
                     ? episode['itunes:image'][0]
@@ -3227,6 +3230,7 @@ class AdminManager {
                     id,
                     title,
                     date,
+                    description,
                     imageUrl,
                     source: 'feed'
                 };
@@ -3928,6 +3932,7 @@ class AdminManager {
             const isTeachingCollection = collectionId === 'teaching';
             const selectedTeachingType = (item.teachingType || item.category || 'Bibelstudie').toLowerCase();
             const seriesSelection = Array.isArray(item.seriesItems) ? item.seriesItems : [];
+            const podcastSummary = item.description || item.summary || '';
             const teachingCandidates = (collectionItems || [])
                 .filter((opt, optIndex) => optIndex !== index)
                 .filter(opt => (opt.id || opt.title))
@@ -4008,7 +4013,11 @@ class AdminManager {
                              </div>
                              <div class="sidebar-group">
                                  <label>Episode-tittel</label>
-                                 <input type="text" id="col-item-title-readonly" class="sidebar-control" value="${item.title || ''}" disabled style="background: #f1f5f9; color: #64748b; cursor: not-allowed;">
+                                 <input type="text" id="col-item-title-sidebar" class="sidebar-control" value="${item.title || ''}" placeholder="Skriv episodetittel">
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Oppsummering</label>
+                                 <textarea id="col-item-summary" class="sidebar-control" style="height: 120px;" placeholder="Kort oppsummering av episoden...">${podcastSummary}</textarea>
                              </div>
                              <div class="sidebar-group">
                                  <label>Publiseringsdato</label>
@@ -4098,6 +4107,18 @@ class AdminManager {
                 `;
 
             document.body.appendChild(modal);
+
+            if (collectionId === 'podcast_transcripts') {
+                const titleMain = document.getElementById('col-item-title-v2');
+                const titleSidebar = document.getElementById('col-item-title-sidebar');
+                if (titleMain && titleSidebar) {
+                    const syncTitle = (source, target) => {
+                        target.value = source.value;
+                    };
+                    titleMain.addEventListener('input', () => syncTitle(titleMain, titleSidebar));
+                    titleSidebar.addEventListener('input', () => syncTitle(titleSidebar, titleMain));
+                }
+            }
 
             if (isTeachingCollection) {
                 const typeSelect = document.getElementById('col-item-type');
@@ -4704,7 +4725,9 @@ class AdminManager {
                                 return;
                             }
 
-                            item.title = document.getElementById('col-item-title-v2')?.value || '';
+                            item.title = document.getElementById('col-item-title-v2')?.value
+                                || document.getElementById('col-item-title-sidebar')?.value
+                                || '';
                             item.content = savedData; // Store as JSON object
 
                             item.date = document.getElementById('col-item-date')?.value || '';
@@ -4741,6 +4764,7 @@ class AdminManager {
 
                             // For podcast, convert savedData to HTML for backwards compatibility (media.js expects 'text' field)
                             if (collectionId === 'podcast_transcripts') {
+                                item.description = document.getElementById('col-item-summary')?.value || item.description || '';
                                 item.text = this.editorJsBlocksToHtml(savedData.blocks || []);
                             }
 
