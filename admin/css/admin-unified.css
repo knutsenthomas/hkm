@@ -2660,8 +2660,11 @@ body.admin-body .page-title {
     gap: 8px !important;
 }
 
-.user-profile-link {
-    background: transparent !important;
+body.admin-body .user-profile-link,
+body.minside-body .user-profile-link,
+body.crm-body .user-profile-link,
+body.builder-active .user-profile-link {
+    background: #ffffff !important;
 }
 
 .notification-btn,
@@ -4477,7 +4480,8 @@ body.admin-body .user-avatar,
 body.minside-body .user-avatar,
 body.crm-body .user-avatar,
 body.builder-active .user-avatar,
-[id="admin-avatar"] {
+[id="admin-avatar"],
+[id="ph-avatar"] {
     width: 42px !important;
     height: 42px !important;
     background-color: #1B4965 !important;
@@ -4499,7 +4503,8 @@ body.builder-active .user-avatar,
 
 /* Suppress any child nodes (icons/images) to guarantee initials visibility */
 .user-avatar *,
-[id="admin-avatar"] * {
+[id="admin-avatar"] *,
+[id="ph-avatar"] * {
     display: none !important;
 }
 
@@ -4586,6 +4591,7 @@ body.builder-active .user-profile-link {
 }
 
 body.admin-body .user-name,
+body.minside-body .user-name,
 body.crm-body .user-name,
 body.builder-active .user-name {
     font-size: 14px !important;
@@ -4594,6 +4600,7 @@ body.builder-active .user-name {
 }
 
 body.admin-body .user-role,
+body.minside-body .user-role,
 body.crm-body .user-role,
 body.builder-active .user-role {
     font-size: 10px !important;
@@ -4745,12 +4752,14 @@ body.builder-active .main-header .user-profile-link {
 }
 
 body.admin-body .main-header .user-name,
+body.minside-body .main-header .user-name,
 body.crm-body .main-header .user-name,
 body.builder-active .main-header .user-name {
     color: #0f172a !important;
 }
 
 body.admin-body .main-header .user-role,
+body.minside-body .main-header .user-role,
 body.crm-body .main-header .user-role,
 body.builder-active .main-header .user-role {
     color: #64748b !important;
@@ -4789,9 +4798,11 @@ body.builder-active .main-header .mobile-nav-toggle {
 }
 
 body.admin-body .main-header .user-avatar,
+body.minside-body .main-header .user-avatar,
 body.crm-body .main-header .user-avatar,
 body.builder-active .main-header .user-avatar,
 body.admin-body .main-header [id="admin-avatar"],
+body.minside-body .main-header [id="ph-avatar"],
 body.crm-body .main-header [id="admin-avatar"],
 body.builder-active .main-header [id="admin-avatar"] {
     width: 42px !important;

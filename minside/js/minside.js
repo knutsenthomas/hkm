@@ -210,7 +210,14 @@ class MinSideManager {
         if (photoURL) {
             el.innerHTML = `<img src="${photoURL}" alt="${name}">`;
         } else {
-            el.textContent = (name || '?').charAt(0).toUpperCase();
+            // Get initials (e.g. "Thomas Knutsen" -> "TK")
+            const initials = (name || '?')
+                .split(' ')
+                .filter(n => n.length > 0)
+                .map(n => n[0].toUpperCase())
+                .slice(0, 2)
+                .join('');
+            el.textContent = initials || '?';
         }
     }
 
