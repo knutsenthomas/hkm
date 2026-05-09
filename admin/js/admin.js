@@ -384,7 +384,7 @@ class AdminManager {
         }
     }
 
-    async _throttleMyMemory(minIntervalMs = 1200) {
+    async _throttleMyMemory(minIntervalMs = 800) {
         const now = Date.now();
         const last = Number(this._myMemoryLastRequestAt || 0);
         const waitMs = Math.max(0, minIntervalMs - (now - last));
@@ -395,8 +395,13 @@ class AdminManager {
     }
 
     async _translateTextChunkWithMyMemory(raw, targetLang, sourceLang = 'no') {
+        const blockedUntil = Number(this._myMemoryBlockedUntil || 0);
+        if (blockedUntil > Date.now()) {
+            throw new Error('MyMemory er midlertidig rate-limitet. Prøv igjen om et par minutter.');
+        }
+
         const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=${encodeURIComponent(sourceLang)}|${encodeURIComponent(targetLang)}`;
-        const maxAttempts = 6;
+        const maxAttempts = 3;
 
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             await this._throttleMyMemory();
@@ -404,11 +409,19 @@ class AdminManager {
             try {
                 const res = await this._fetchWithTimeout(url, {}, 25000);
                 if (res.status === 429) {
-                    const backoffMs = Math.min(20000, 1200 * Math.pow(2, attempt - 1));
+                    this._myMemoryConsecutive429 = Number(this._myMemoryConsecutive429 || 0) + 1;
+                    if (this._myMemoryConsecutive429 >= 2) {
+                        this._myMemoryBlockedUntil = Date.now() + 3 * 60 * 1000;
+                        throw new Error('MyMemory er rate-limitet akkurat nå.');
+                    }
+
+                    const backoffMs = Math.min(6000, 800 * Math.pow(2, attempt - 1));
                     console.warn(`[AdminManager] MyMemory rate-limited (429). Waiting ${backoffMs}ms before retry ${attempt}/${maxAttempts}.`);
                     await this._sleep(backoffMs);
                     continue;
                 }
+
+                this._myMemoryConsecutive429 = 0;
 
                 if (!res.ok) {
                     throw new Error(`MyMemory request failed (${res.status})`);
@@ -5053,6 +5066,15 @@ class AdminManager {
                                 this.ensureBlogPostTranslations(safeItem, { force: false }),
                                 new Promise((_, reject) => setTimeout(() => reject(new Error('Oversettelsen tok for lang tid. Prøv igjen om litt.')), 600000))
                             ]);
+
+                            const targetLanguages = this._getBlogTranslationTargetLanguages();
+                            const successfulLanguages = targetLanguages.filter((lang) => {
+                                const tr = translatedItem?.translations?.[lang];
+                                return tr && typeof tr === 'object' && tr._translationFailed !== true;
+                            });
+                            if (!successfulLanguages.length) {
+                                throw new Error('Ingen språk ble oversatt. Mest sannsynlig er oversettelsestjenesten midlertidig blokkert (rate limit). Prøv igjen om et par minutter.');
+                            }
 
                             const currentData = await firebaseService.getPageContent('collection_blog');
                             const list = this._getCollectionItems(currentData);
