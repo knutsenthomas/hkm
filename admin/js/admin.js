@@ -371,6 +371,19 @@ class AdminManager {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
+    async _fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), Math.max(1000, Number(timeoutMs) || 30000));
+        try {
+            return await fetch(url, {
+                ...options,
+                signal: controller.signal
+            });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
     async _throttleMyMemory(minIntervalMs = 1200) {
         const now = Date.now();
         const last = Number(this._myMemoryLastRequestAt || 0);
@@ -389,7 +402,7 @@ class AdminManager {
             await this._throttleMyMemory();
 
             try {
-                const res = await fetch(url);
+                const res = await this._fetchWithTimeout(url, {}, 25000);
                 if (res.status === 429) {
                     const backoffMs = Math.min(20000, 1200 * Math.pow(2, attempt - 1));
                     console.warn(`[AdminManager] MyMemory rate-limited (429). Waiting ${backoffMs}ms before retry ${attempt}/${maxAttempts}.`);
@@ -438,7 +451,7 @@ class AdminManager {
 
         const prompt = `Translate the following text from ${sourceName} to ${targetName}.\n\nRules:\n- Preserve meaning and tone.\n- Keep HTML tags unchanged.\n- Return only translated text, no explanation.\n\nText:\n${text}`;
 
-        const res = await fetch(endpoint, {
+        const res = await this._fetchWithTimeout(endpoint, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -457,7 +470,7 @@ class AdminManager {
                     maxOutputTokens: 1024
                 }
             })
-        });
+        }, 45000);
 
         if (!res.ok) {
             const errorBody = await res.text().catch(() => '');
@@ -5023,7 +5036,7 @@ class AdminManager {
                             const safeItem = await buildSafeItemFromForm();
                             const translatedItem = await Promise.race([
                                 this.ensureBlogPostTranslations(safeItem, { force: false }),
-                                new Promise((_, reject) => setTimeout(() => reject(new Error('Oversettelsen tok for lang tid. Prøv igjen om litt.')), 120000))
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Oversettelsen tok for lang tid. Prøv igjen om litt.')), 600000))
                             ]);
 
                             const currentData = await firebaseService.getPageContent('collection_blog');
