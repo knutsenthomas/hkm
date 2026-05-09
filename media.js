@@ -969,8 +969,22 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
         
         if (fsTitle && episodeData) {
             fsTitle.textContent = title;
-            if (fsSummary) fsSummary.innerHTML = getEpisodeSummaryHtml(episodeData);
             if (fsArtwork) fsArtwork.src = thumbnail;
+            // Load summary from Firestore if available, otherwise fall back to RSS description
+            if (fsSummary) {
+                fsSummary.innerHTML = getEpisodeSummaryHtml(episodeData);
+                const svc = window.firebaseService;
+                if (svc && svc.isInitialized && typeof firebase !== 'undefined' && episodeData.id) {
+                    firebase.firestore().collection('podcast_transcripts').doc(episodeData.id).get()
+                        .then(doc => {
+                            const stored = doc.exists ? doc.data() : null;
+                            if (stored && stored.description && stored.description.trim()) {
+                                fsSummary.innerHTML = `<p style="line-height:1.75;">${stored.description.trim()}</p>`;
+                            }
+                        })
+                        .catch(() => {});
+                }
+            }
             loadEpisodeTranscript(episodeData);
         }
 
