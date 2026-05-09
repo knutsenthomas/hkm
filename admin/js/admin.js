@@ -367,6 +367,57 @@ class AdminManager {
         return '';
     }
 
+    _sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    async _throttleMyMemory(minIntervalMs = 1200) {
+        const now = Date.now();
+        const last = Number(this._myMemoryLastRequestAt || 0);
+        const waitMs = Math.max(0, minIntervalMs - (now - last));
+        if (waitMs > 0) {
+            await this._sleep(waitMs);
+        }
+        this._myMemoryLastRequestAt = Date.now();
+    }
+
+    async _translateTextChunkWithMyMemory(raw, targetLang, sourceLang = 'no') {
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=${encodeURIComponent(sourceLang)}|${encodeURIComponent(targetLang)}`;
+        const maxAttempts = 6;
+
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+            await this._throttleMyMemory();
+
+            try {
+                const res = await fetch(url);
+                if (res.status === 429) {
+                    const backoffMs = Math.min(20000, 1200 * Math.pow(2, attempt - 1));
+                    console.warn(`[AdminManager] MyMemory rate-limited (429). Waiting ${backoffMs}ms before retry ${attempt}/${maxAttempts}.`);
+                    await this._sleep(backoffMs);
+                    continue;
+                }
+
+                if (!res.ok) {
+                    throw new Error(`MyMemory request failed (${res.status})`);
+                }
+
+                const data = await res.json();
+                const translated = data?.responseData?.translatedText;
+                return (typeof translated === 'string' && translated.trim())
+                    ? translated
+                    : raw;
+            } catch (error) {
+                if (attempt >= maxAttempts) {
+                    throw error;
+                }
+                const retryDelay = Math.min(10000, 800 * attempt);
+                await this._sleep(retryDelay);
+            }
+        }
+
+        return raw;
+    }
+
     async _translateTextChunkWithGemini(text, targetLang, sourceLang = 'no') {
         const settings = await this._getTranslationSettings();
         if (!settings.geminiApiKey) {
@@ -448,13 +499,10 @@ class AdminManager {
             }
         }
 
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=${encodeURIComponent(sourceLang)}|${encodeURIComponent(targetLang)}`;
         try {
-            const res = await fetch(url);
-            const data = await res.json();
-            const translated = data?.responseData?.translatedText;
-            const finalText = (typeof translated === 'string' && translated.trim())
-                ? translated
+            const translatedByMyMemory = await this._translateTextChunkWithMyMemory(raw, targetLang, sourceLang);
+            const finalText = (typeof translatedByMyMemory === 'string' && translatedByMyMemory.trim())
+                ? translatedByMyMemory
                 : raw;
             this._translationCache.set(cacheKey, finalText);
             return finalText;
