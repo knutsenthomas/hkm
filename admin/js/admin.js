@@ -2433,6 +2433,27 @@ class AdminManager {
                 });
             }
 
+            // Fetch System Logs (Errors & Warnings)
+            if (filter === 'all' || filter === 'system') {
+                const logSnap = await db.collection('system_logs')
+                    .orderBy('timestamp', 'desc').limit(15).get();
+                logSnap.forEach(doc => {
+                    const d = doc.data();
+                    const isError = d.level === 'error' || d.severity === 'CRITICAL';
+                    results.push({
+                        id: doc.id,
+                        type: 'system_log',
+                        icon: isError ? 'report' : 'warning',
+                        color: isError ? '#ef4444' : '#f59e0b',
+                        bg: isError ? '#fef2f2' : '#fffbeb',
+                        title: `System: ${d.type || 'Feil'}`,
+                        meta: d.message || '',
+                        date: d.timestamp?.toDate ? d.timestamp.toDate() : new Date(0),
+                        raw: d
+                    });
+                });
+            }
+
             // Sort by date descending
             results.sort((a, b) => b.date - a.date);
 
@@ -3120,7 +3141,8 @@ class AdminManager {
         const typeLabelMap = {
             push: 'Push-varsling',
             message: 'Melding',
-            new_user: 'Ny bruker'
+            new_user: 'Ny bruker',
+            system_log: 'Systemlogg'
         };
         const typeLabel = typeLabelMap[item.type] || 'Aktivitet';
         const absoluteDate = this._formatAdminDateTime(item.date);
@@ -3146,6 +3168,15 @@ class AdminManager {
             rows.push(this._renderDetailField('Bruker', raw.userName || item.title || 'Ukjent'));
             rows.push(this._renderDetailField('E-post', raw.userEmail || item.meta || ''));
             rows.push(this._renderDetailField('Melding', raw.message || raw.description || '', { multiline: true }));
+        } else if (item.type === 'system_log') {
+            rows.push(this._renderDetailField('Feiltype', raw.type || 'Systemfeil'));
+            rows.push(this._renderDetailField('Alvorlighet', (raw.severity || raw.level || 'warning').toUpperCase()));
+            rows.push(this._renderDetailField('Kilde', raw.source || 'Ukjent'));
+            rows.push(this._renderDetailField('URL', raw.url || '', { multiline: false }));
+            rows.push(this._renderDetailField('Feilmelding', raw.message || '', { multiline: true }));
+            if (raw.additionalData && raw.additionalData.stack) {
+                rows.push(this._renderDetailField('Stack Trace', raw.additionalData.stack, { multiline: true }));
+            }
         } else {
             rows.push(this._renderDetailField('Tittel', item.title || ''));
             rows.push(this._renderDetailField('Detaljer', item.meta || '', { multiline: true }));
