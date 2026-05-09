@@ -3057,7 +3057,66 @@ input[type="range"] {
     padding: 40px 20px;
     display: flex;
     justify-content: center;
+    align-items: flex-start;
+    gap: 24px;
     scroll-behavior: smooth;
+}
+
+.desktop-richtools {
+    position: sticky;
+    top: 24px;
+    width: 190px;
+    flex-shrink: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    padding: 12px;
+    max-height: calc(100vh - 140px);
+    overflow-y: auto;
+}
+
+.desktop-richtools-title {
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #64748b;
+    margin-bottom: 10px;
+}
+
+.desktop-richtools-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 9px 10px;
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: all 0.15s ease;
+}
+
+.desktop-richtools-btn .material-symbols-outlined {
+    font-size: 18px;
+    color: #475569;
+}
+
+.desktop-richtools-btn:hover {
+    border-color: #cbd5e1;
+    background: #f8fafc;
+}
+
+.desktop-richtools-btn.is-disabled,
+.desktop-richtools-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: #f8fafc;
 }
 
 .editor-paper {
@@ -4939,6 +4998,10 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 
 /* --- Editor V2 Mobile Responsiveness --- */
 @media (max-width: 1024px) {
+    .desktop-richtools {
+        display: none !important;
+    }
+
     .editor-sidebar-v2 {
         display: none !important;
         /* Hide sidebar by default on tablet to give space to editor */

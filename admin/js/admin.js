@@ -3963,6 +3963,37 @@ class AdminManager {
                     </header>
                     <div class="editor-content-wrapper">
                         <div class="editor-main-canvas">
+                            <div class="desktop-richtools" id="desktop-richtools">
+                                <div class="desktop-richtools-title">Blokkverktøy</div>
+                                <button type="button" class="desktop-richtools-btn" data-tool="paragraph">
+                                    <span class="material-symbols-outlined">notes</span>
+                                    <span>Tekst</span>
+                                </button>
+                                <button type="button" class="desktop-richtools-btn" data-tool="header">
+                                    <span class="material-symbols-outlined">title</span>
+                                    <span>Heading</span>
+                                </button>
+                                <button type="button" class="desktop-richtools-btn" data-tool="list">
+                                    <span class="material-symbols-outlined">format_list_bulleted</span>
+                                    <span>Liste</span>
+                                </button>
+                                <button type="button" class="desktop-richtools-btn" data-tool="image">
+                                    <span class="material-symbols-outlined">image</span>
+                                    <span>Bilde</span>
+                                </button>
+                                <button type="button" class="desktop-richtools-btn" data-tool="quote">
+                                    <span class="material-symbols-outlined">format_quote</span>
+                                    <span>Sitat</span>
+                                </button>
+                                <button type="button" class="desktop-richtools-btn" data-tool="delimiter">
+                                    <span class="material-symbols-outlined">horizontal_rule</span>
+                                    <span>Skillelinje</span>
+                                </button>
+                                <button type="button" class="desktop-richtools-btn" data-tool="youtubeVideo">
+                                    <span class="material-symbols-outlined">smart_display</span>
+                                    <span>YouTube</span>
+                                </button>
+                            </div>
                             <div class="editor-paper">
                                 <input type="text" id="col-item-title-v2" placeholder="Skriv din tittel her..." value="${item.title || ''}">
                                 <div id="editorjs-container-v2"></div>
@@ -4256,6 +4287,41 @@ class AdminManager {
                     console.log('Editor.js is ready for work!');
                 }
             });
+
+            const desktopTools = document.getElementById('desktop-richtools');
+            if (desktopTools) {
+                const toolHandlers = {
+                    paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
+                    header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
+                    list: () => editor.blocks.insert('list', { style: 'unordered', items: [] }, undefined, undefined, true),
+                    image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
+                    quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
+                    delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
+                    youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
+                };
+
+                desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
+                    const tool = btn.getAttribute('data-tool');
+                    const needsConfig = ['header', 'list', 'image', 'quote', 'delimiter', 'youtubeVideo'];
+                    const isAvailable = tool === 'paragraph' || !needsConfig.includes(tool) || !!toolsConfig[tool];
+
+                    if (!isAvailable) {
+                        btn.disabled = true;
+                        btn.classList.add('is-disabled');
+                        btn.title = 'Verktøyet er ikke tilgjengelig akkurat nå';
+                        return;
+                    }
+
+                    btn.addEventListener('click', () => {
+                        try {
+                            const handler = toolHandlers[tool];
+                            if (handler) handler();
+                        } catch (err) {
+                            console.error(`Could not insert block for tool '${tool}':`, err);
+                        }
+                    });
+                });
+            }
 
             // --- Tag Management Logic ---
             let currentTags = [...existingTags];
