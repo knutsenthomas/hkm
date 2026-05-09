@@ -972,8 +972,8 @@ class AdminManager {
 
         // Editor Restrictions: Can only manage content
         if (role === ROLES.EDITOR) {
-            // Hide admin-only sections
-            const adminOnlySections = ['settings', 'integrations', 'hero', 'design', 'seo', 'users'];
+            // Hide admin-only sections from editors
+            const adminOnlySections = ['settings', 'hero', 'design', 'seo', 'users'];
             document.querySelectorAll('.nav-item').forEach(item => {
                 const section = item.querySelector('a')?.getAttribute('data-section');
                 if (adminOnlySections.includes(section)) {
