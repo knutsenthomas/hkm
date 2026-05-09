@@ -4189,6 +4189,11 @@ class AdminManager {
                              </span>
                         </div>
                         <div class="editor-header-right">
+                                      ${collectionId === 'blog' ? `
+                                      <button class="btn-ghost" id="translate-col-item" title="Oversett dette innlegget" style="display:flex; align-items:center; gap:6px;">
+                                          <span class="material-symbols-outlined">g_translate</span> Oversett dette innlegget
+                                      </button>
+                                      ` : ''}
                              <button class="btn-ghost" id="print-col-item" title="Skriv ut" style="display:flex; align-items:center; gap:6px;">
                                 <span class="material-symbols-outlined">print</span> Skriv ut
                              </button>
@@ -4898,6 +4903,120 @@ class AdminManager {
             const closeBtn = document.getElementById('close-col-modal');
             if (closeBtn) closeBtn.onclick = () => modal.remove();
 
+            const buildSafeItemFromForm = async () => {
+                let savedData;
+                try {
+                    savedData = await editor.save();
+                } catch (error) {
+                    console.error('Saving failed', error);
+                    throw new Error('Kunne ikke hente innhold fra editor.');
+                }
+
+                item.title = document.getElementById('col-item-title-v2')?.value
+                    || document.getElementById('col-item-title-sidebar')?.value
+                    || '';
+                item.content = savedData;
+                item.date = document.getElementById('col-item-date')?.value || '';
+
+                if (collectionId !== 'podcast_transcripts') {
+                    item.imageUrl = document.getElementById('col-item-img')?.value || '';
+                    item.author = document.getElementById('col-item-author')?.value || '';
+                }
+
+                if (isTeachingCollection) {
+                    const typeValue = document.getElementById('col-item-type')?.value || 'Bibelstudier';
+                    const seriesSelect = document.getElementById('col-item-series-items');
+                    item.teachingType = typeValue;
+                    item.category = typeValue;
+                    item.seriesItems = typeValue === 'Undervisningsserier' && seriesSelect
+                        ? Array.from(seriesSelect.selectedOptions).map(opt => opt.value)
+                        : [];
+                } else if (collectionId !== 'podcast_transcripts') {
+                    item.category = document.getElementById('col-item-cat')?.value || '';
+                }
+
+                if (collectionId !== 'podcast_transcripts') {
+                    item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
+                    item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
+                    item.tags = currentTags;
+                }
+
+                if (collectionId === 'blog') {
+                    const relatedSelect = document.getElementById('col-item-related');
+                    if (relatedSelect) {
+                        item.relatedPosts = Array.from(relatedSelect.selectedOptions).map(opt => opt.value);
+                    }
+                }
+
+                if (collectionId === 'podcast_transcripts') {
+                    item.description = document.getElementById('col-item-summary')?.value || item.description || '';
+                    item.text = this.editorJsBlocksToHtml(savedData.blocks || []);
+                }
+
+                if (item.isSynced && item.id && !item.gcalId) {
+                    item.gcalId = item.id;
+                }
+
+                const normalizedItem = typeof adminUtils.sanitizeCollectionItem === 'function'
+                    ? adminUtils.sanitizeCollectionItem(collectionId, item)
+                    : { ok: true, value: item, errors: [] };
+
+                if (!normalizedItem.ok) {
+                    throw new Error(normalizedItem.errors.join(' ') || 'Validering feilet.');
+                }
+
+                return normalizedItem.value;
+            };
+
+            const upsertItemInList = (list, nextItem) => {
+                let existingIdx = -1;
+                if (nextItem.id) {
+                    existingIdx = list.findIndex(fi => fi.id === nextItem.id);
+                }
+
+                if (existingIdx === -1 && collectionId === 'events') {
+                    existingIdx = list.findIndex(fi =>
+                        (nextItem.gcalId && fi.gcalId === nextItem.gcalId) ||
+                        (fi.title === nextItem.title && fi.date?.split('T')[0] === nextItem.date?.split('T')[0])
+                    );
+                }
+
+                if (existingIdx === -1 && nextItem.isFirestore && typeof index === 'number' && index >= 0 && !nextItem.isSynced) {
+                    existingIdx = index;
+                }
+
+                if (existingIdx >= 0) {
+                    list[existingIdx] = nextItem;
+                } else {
+                    list.unshift(nextItem);
+                }
+            };
+
+            const translateBtn = document.getElementById('translate-col-item');
+            if (translateBtn && collectionId === 'blog') {
+                translateBtn.onclick = async () => {
+                    await this._withButtonLoading(translateBtn, async () => {
+                        try {
+                            const safeItem = await buildSafeItemFromForm();
+                            const translatedItem = await this.ensureBlogPostTranslations(safeItem, { force: true });
+
+                            const currentData = await firebaseService.getPageContent('collection_blog');
+                            const list = this._getCollectionItems(currentData);
+                            upsertItemInList(list, translatedItem);
+
+                            await firebaseService.savePageContent('collection_blog', { items: list });
+                            Object.assign(item, translatedItem);
+                            this.showToast('✅ Innlegget er oversatt (EN/ES) og lagret.', 'success', 5000);
+                        } catch (error) {
+                            console.error('Error translating current blog item:', error);
+                            this.showToast(error?.message || 'Kunne ikke oversette innlegget nå.', 'error', 6000);
+                        }
+                    }, {
+                        loadingText: '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Oversetter...'
+                    });
+                };
+            }
+
             // --- Print Button ---
             const printBtn = document.getElementById('print-col-item');
             if (printBtn) {
@@ -5168,113 +5287,21 @@ class AdminManager {
 
                     await this._runWriteLocked(`collection-save:${collectionId}`, async () => {
                         await this._withButtonLoading(btn, async () => {
-                            // Get JSON data from Editor.js
-                            let savedData;
                             try {
-                                savedData = await editor.save();
-                            } catch (error) {
-                                console.error('Saving failed', error);
-                                this.showToast('Kunne ikke hente innhold fra editor.', 'error');
-                                return;
-                            }
+                                let safeItem = await buildSafeItemFromForm();
 
-                            item.title = document.getElementById('col-item-title-v2')?.value
-                                || document.getElementById('col-item-title-sidebar')?.value
-                                || '';
-                            item.content = savedData; // Store as JSON object
-
-                            item.date = document.getElementById('col-item-date')?.value || '';
-                            
-                            if (collectionId !== 'podcast_transcripts') {
-                                item.imageUrl = document.getElementById('col-item-img')?.value || '';
-                                item.author = document.getElementById('col-item-author')?.value || '';
-                            }
-                            
-                            if (isTeachingCollection) {
-                                const typeValue = document.getElementById('col-item-type')?.value || 'Bibelstudier';
-                                const seriesSelect = document.getElementById('col-item-series-items');
-                                item.teachingType = typeValue;
-                                item.category = typeValue;
-                                item.seriesItems = typeValue === 'Undervisningsserier' && seriesSelect
-                                    ? Array.from(seriesSelect.selectedOptions).map(opt => opt.value)
-                                    : [];
-                            } else if (collectionId !== 'podcast_transcripts') {
-                                item.category = document.getElementById('col-item-cat')?.value || '';
-                            }
-                            
-                            if (collectionId !== 'podcast_transcripts') {
-                                item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
-                                item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
-                                item.tags = currentTags;
-                            }
-
-                            if (collectionId === 'blog') {
-                                const relatedSelect = document.getElementById('col-item-related');
-                                if (relatedSelect) {
-                                    item.relatedPosts = Array.from(relatedSelect.selectedOptions).map(opt => opt.value);
-                                }
-                            }
-
-                            // For podcast, convert savedData to HTML for backwards compatibility (media.js expects 'text' field)
-                            if (collectionId === 'podcast_transcripts') {
-                                item.description = document.getElementById('col-item-summary')?.value || item.description || '';
-                                item.text = this.editorJsBlocksToHtml(savedData.blocks || []);
-                            }
-
-                            // Ensure gcalId is preserved if this was a synced item
-                            if (item.isSynced && item.id && !item.gcalId) {
-                                item.gcalId = item.id;
-                            }
-
-                            const normalizedItem = typeof adminUtils.sanitizeCollectionItem === 'function'
-                                ? adminUtils.sanitizeCollectionItem(collectionId, item)
-                                : { ok: true, value: item, errors: [] };
-
-                            if (!normalizedItem.ok) {
-                                this.showToast(normalizedItem.errors.join(' '), 'error', 5000);
-                                return;
-                            }
-
-                            let safeItem = normalizedItem.value;
-
-                            try {
                                 if (collectionId === 'podcast_transcripts') {
                                     // For podcast transcripts, save directly to Firestore collection
                                     await firebase.firestore().collection('podcast_transcripts').doc(safeItem.id).set(safeItem, { merge: true });
                                 } else {
                                     const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                                    const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+                                    const list = this._getCollectionItems(currentData);
 
                                     if (collectionId === 'blog') {
                                         safeItem = await this.ensureBlogPostTranslations(safeItem, { force: false });
                                     }
 
-                                    // Use ID-based matching if available (most reliable)
-                                    let existingIdx = -1;
-                                    if (safeItem.id) {
-                                        existingIdx = list.findIndex(fi => fi.id === safeItem.id);
-                                    }
-
-                                    // Fallback to "Smart Matching" for legacy items or events without ID
-                                    if (existingIdx === -1) {
-                                        if (collectionId === 'events') {
-                                            existingIdx = list.findIndex(fi =>
-                                                (safeItem.gcalId && fi.gcalId === safeItem.gcalId) ||
-                                                (fi.title === safeItem.title && fi.date?.split('T')[0] === safeItem.date?.split('T')[0])
-                                            );
-                                        } else if (safeItem.isFirestore) {
-                                            // Only use index-based fallback for items that we know were already in Firestore
-                                            if (typeof index === 'number' && index >= 0 && !safeItem.isSynced) {
-                                                existingIdx = index;
-                                            }
-                                        }
-                                    }
-
-                                    if (existingIdx >= 0) {
-                                        list[existingIdx] = safeItem;
-                                    } else {
-                                        list.unshift(safeItem); // Push to top if truly new
-                                    }
+                                    upsertItemInList(list, safeItem);
 
                                     await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
 
@@ -5294,7 +5321,7 @@ class AdminManager {
                                 this.showToast('✅ Lagret!', 'success');
                             } catch (err) {
                                 console.error('Error saving item:', err);
-                                this.showToast('Kunne ikke lagre. Sjekk konsollen for detaljer.', 'error', 5000);
+                                this.showToast(err?.message || 'Kunne ikke lagre. Sjekk konsollen for detaljer.', 'error', 5000);
                             }
                         }, {
                             loadingText: '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Lagrer...'
