@@ -5014,9 +5014,17 @@ class AdminManager {
             if (translateBtn && collectionId === 'blog') {
                 translateBtn.onclick = async () => {
                     await this._withButtonLoading(translateBtn, async () => {
+                        let slowNoticeTimer = null;
                         try {
+                            slowNoticeTimer = setTimeout(() => {
+                                this.showToast('Oversettelse pågår fortsatt. Dette kan ta litt tid ved store innlegg.', 'warning', 4500);
+                            }, 6000);
+
                             const safeItem = await buildSafeItemFromForm();
-                            const translatedItem = await this.ensureBlogPostTranslations(safeItem, { force: false });
+                            const translatedItem = await Promise.race([
+                                this.ensureBlogPostTranslations(safeItem, { force: false }),
+                                new Promise((_, reject) => setTimeout(() => reject(new Error('Oversettelsen tok for lang tid. Prøv igjen om litt.')), 120000))
+                            ]);
 
                             const currentData = await firebaseService.getPageContent('collection_blog');
                             const list = this._getCollectionItems(currentData);
@@ -5028,6 +5036,8 @@ class AdminManager {
                         } catch (error) {
                             console.error('Error translating current blog item:', error);
                             this.showToast(error?.message || 'Kunne ikke oversette innlegget nå.', 'error', 6000);
+                        } finally {
+                            if (slowNoticeTimer) clearTimeout(slowNoticeTimer);
                         }
                     }, {
                         loadingText: '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Oversetter...'
