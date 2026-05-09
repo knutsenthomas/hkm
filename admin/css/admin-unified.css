@@ -1886,7 +1886,7 @@ body.admin-body .welcome-subtitle {
 }
 
 /* --- Global Mobile Optimization for Fixed UI --- */
-@media (max-width: 991px) {
+@media (max-width: 1024px) {
     html {
         height: 100% !important;
     }
@@ -4640,7 +4640,7 @@ body.builder-active .user-role {
 }
 
 /* 7. Mobile Adaptive Rules */
-@media (max-width: 800px) {
+@media (max-width: 1024px) {
 
     body.admin-body .main-header,
     body.minside-body .main-header,
@@ -4871,7 +4871,7 @@ body.builder-active .main-header [id="admin-avatar"] {
     }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 1024px) {
 
     body.admin-body .main-header,
     body.minside-body .main-header,
