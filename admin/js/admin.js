@@ -3129,6 +3129,13 @@ class AdminManager {
         `;
     }
 
+    extractYoutubeId(url) {
+        if (!url) return '';
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : '');
+    }
+
     openDetailPreview(item) {
         if (!item) return;
         const modal = this._ensureDetailModal();
@@ -8004,12 +8011,14 @@ class AdminManager {
 
     async editHeroSlide(index = -1) {
         const isNew = index === -1;
-        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', btnText: '', btnLink: '' } : this.heroSlides[index];
+        const slide = isNew ? { title: '', subtitle: '', imageUrl: '', youtubeId: '', btnText: '', btnLink: '', duration: 4 } : this.heroSlides[index];
         const safeSlideImage = this.escapeHtml(slide.imageUrl || '');
+        const safeSlideYoutubeId = this.escapeHtml(slide.youtubeId || '');
         const safeSlideTitle = this.escapeHtml(slide.title || '');
         const safeSlideSubtitle = this.escapeHtml(slide.subtitle || '');
         const safeSlideBtnText = this.escapeHtml(slide.btnText || '');
         const safeSlideBtnLink = this.escapeHtml(slide.btnLink || '');
+        const slideDuration = slide.duration || 4;
 
         const modal = document.createElement('div');
         modal.className = 'dashboard-modal';
@@ -8045,6 +8054,19 @@ class AdminManager {
                         <div class="form-group">
                             <label>Undertekst</label>
                             <textarea id="hero-subtitle" class="form-control" style="height: 80px;">${safeSlideSubtitle}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Bakgrunnsvideo (Valgfritt YouTube eller MP4-lenke)</label>
+                            <div style="display:flex; gap:10px; align-items:center;">
+                                <span class="material-symbols-outlined" style="color:#d17d39;">video_library</span>
+                                <input type="text" id="hero-video-url" class="form-control" value="${slide.videoUrl || slide.youtubeId || ''}" placeholder="Lim inn lenke (YouTube eller MP4)">
+                            </div>
+                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Støtter YouTube-ID, YouTube-lenke eller direkte MP4-URL.</p>
+                        </div>
+                        <div class="form-group">
+                            <label>Visningstid i sekunder</label>
+                            <input type="number" id="hero-duration" class="form-control" value="${slideDuration}" min="1" step="1">
+                            <p style="font-size:11px; color:#64748b; margin-top:4px;">Hvor lenge denne sliden skal vises før den bytter automatisk (Standard er 4 sekunder). Hvis det er en video, kan du sette den høyere (f.eks. 15 eller 30).</p>
                         </div>
                         <div class="form-group">
                             <label>Knapptekst</label>
@@ -8158,12 +8180,18 @@ class AdminManager {
             saveBtn.disabled = true;
             saveBtn.textContent = 'Lagrer...';
 
+            const rawVideo = modal.querySelector('#hero-video-url').value;
+            const ytId = this.extractYoutubeId(rawVideo);
+            
             const updatedSlide = {
                 imageUrl: imgInput.value,
+                youtubeId: ytId || '',
+                videoUrl: !ytId ? rawVideo : '', // Store as generic video if not YT
                 title: modal.querySelector('#hero-title').value,
                 subtitle: modal.querySelector('#hero-subtitle').value,
                 btnText: modal.querySelector('#hero-btn-text').value,
-                btnLink: modal.querySelector('#hero-btn-link').value
+                btnLink: modal.querySelector('#hero-btn-link').value,
+                duration: parseFloat(modal.querySelector('#hero-duration').value) || 4
             };
 
             if (isNew) {

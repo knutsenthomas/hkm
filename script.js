@@ -490,10 +490,16 @@ class HeroSlider {
         const currentSlide = this.slides[this.currentIndex];
         currentSlide.classList.remove('active');
         
-        // Handle video in current slide
+        // Handle video in current slide (MP4)
         const currentVideo = currentSlide.querySelector('video');
         if (currentVideo) {
             currentVideo.pause();
+        }
+        
+        // Handle YouTube in current slide
+        const currentIframe = currentSlide.querySelector('.hero-youtube-iframe');
+        if (currentIframe && currentIframe.contentWindow) {
+            currentIframe.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
         }
 
         // Update index
@@ -503,29 +509,50 @@ class HeroSlider {
         const nextSlide = this.slides[this.currentIndex];
         nextSlide.classList.add('active');
         
-        // Handle video in next slide
+        // Handle video in next slide (MP4)
         const nextVideo = nextSlide.querySelector('video');
         if (nextVideo) {
             nextVideo.play().catch(e => console.warn('[HeroSlider] Video play failed:', e));
+        }
+        
+        // Handle YouTube in next slide
+        const nextIframe = nextSlide.querySelector('.hero-youtube-iframe');
+        if (nextIframe && nextIframe.contentWindow) {
+            nextIframe.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
         }
     }
     next() {
         const nextIndex = (this.currentIndex + 1) % this.slides.length;
         this.goTo(nextIndex);
+        if (this.interval) {
+            this.startAutoPlay();
+        }
     }
 
     prev() {
         const prevIndex = (this.currentIndex - 1 + this.slides.length) % this.slides.length;
         this.goTo(prevIndex);
+        if (this.interval) {
+            this.startAutoPlay();
+        }
     }
 
     startAutoPlay() {
         this.stopAutoPlay();
-        this.interval = setInterval(() => this.next(), 4000); // 4 seconds per slide (reduced from 6s)
+        let duration = 4000; // Default 4 seconds
+        if (this.slides.length > 0 && this.slides[this.currentIndex]) {
+            const slideDuration = this.slides[this.currentIndex].getAttribute('data-duration');
+            if (slideDuration) {
+                duration = parseFloat(slideDuration) * 1000;
+            }
+        }
+        this.interval = setTimeout(() => {
+            this.next();
+        }, duration);
     }
 
     stopAutoPlay() {
-        if (this.interval) clearInterval(this.interval);
+        if (this.interval) clearTimeout(this.interval);
         this.interval = null;
     }
 }
@@ -649,11 +676,44 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     const isMatch = (text) => {
         if (!effectiveWords.length) return false;
         const t = (text || '').toLowerCase();
-        return effectiveWords.every(word => t.includes(word));
+        
+        let matchCount = 0;
+        let requiredMatches = effectiveWords.length;
+        
+        for (const word of effectiveWords) {
+            if (t.includes(word)) {
+                matchCount++;
+                continue;
+            }
+            
+            // Håndter vanlige skrivefeil
+            if (word === 'omm' || word === 'om') { matchCount++; continue; } // ignorer typo av stoppord
+            if (word.includes('podas') || word.includes('podkast')) { if (t.includes('podcast')) matchCount++; continue; }
+            if (word.includes('bøn') || word === 'bønn') { if (t.includes('bønn') || t.includes('be')) matchCount++; continue; }
+            if (word.includes('møte') || word.includes('arrang')) { if (t.includes('arrangement')) matchCount++; continue; }
+            
+            // Enkel fuzzy for lengre ord: sjekk om 80% av ordet finnes i teksten
+            if (word.length >= 5) {
+                const subWord = word.substring(0, word.length - 1);
+                if (t.includes(subWord)) {
+                    matchCount++;
+                    continue;
+                }
+            }
+            
+            // Hvis det er et veldig kort ord som ikke matcher, kan vi kanskje tillate at det feiler hvis andre viktige ord matcher
+            if (word.length <= 3) {
+                requiredMatches--; // Krever ikke at små ord må matche perfekt
+            }
+        }
+        
+        // Returner true hvis vi har nok treff (tillater 1 feil for søk med >= 3 ord)
+        const threshold = effectiveWords.length >= 3 ? requiredMatches - 1 : requiredMatches;
+        return matchCount >= threshold && matchCount > 0;
     };
 
     try {
-        // 1) Faste sider
+        // 1) Faste sider (Parallell henting)
         const pages = [
             { id: 'index', label: 'Forside', url: 'index' },
             { id: 'om-oss', label: 'Om oss', url: 'om-oss' },
@@ -669,22 +729,25 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             { id: 'podcast', label: 'Podcast', url: 'podcast' }
         ];
 
-        for (const page of pages) {
+        const pagePromises = pages.map(async (page) => {
             const data = await firebaseService.getPageContent(page.id);
-            if (!data) continue;
-
+            if (!data) return null;
             const entries = collectTextEntries(data);
             const hit = entries.find(entry => entry.text && isMatch(entry.text));
             if (hit) {
-                results.push({
+                return {
                     type: 'Side',
                     title: page.label,
                     meta: hit.path,
                     url: page.url,
                     snippet: makeSnippet(hit.text, q)
-                });
+                };
             }
-        }
+            return null;
+        });
+        
+        const pageResults = (await Promise.all(pagePromises)).filter(Boolean);
+        results.push(...pageResults);
 
         // 2) Samlinger: blogg, arrangementer, undervisning
         const collections = [
@@ -693,9 +756,10 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             { id: 'teaching', docId: 'collection_teaching', label: 'Undervisning', url: 'undervisningsserier' }
         ];
 
-        for (const col of collections) {
+        const collectionPromises = collections.map(async (col) => {
             const raw = await firebaseService.getPageContent(col.docId);
             const items = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.items) ? raw.items : []);
+            const colResults = [];
 
             items.forEach((item) => {
                 const combined = [
@@ -713,7 +777,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 ].filter(Boolean).join(' ').toLowerCase();
 
                 if (isMatch(combined)) {
-                    results.push({
+                    colResults.push({
                         type: col.label,
                         title: item.title || '(uten tittel)',
                         meta: formatDate(item.date) || item.category || '',
@@ -722,7 +786,12 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                     });
                 }
             });
-        }
+            return colResults;
+        });
+        
+        const allCollectionResults = await Promise.all(collectionPromises);
+        allCollectionResults.forEach(res => results.push(...res));
+
         // 3) Podcast-episoder (via felles RSS-proxy)
         const podcastEpisodes = await fetchPodcasts();
 
@@ -761,7 +830,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             youtubeVideos.forEach(v => {
                 const title = v.title;
                 const description = v.description || '';
-                const combined = ['video', 'youtube', 'film', title, description].filter(Boolean).join(' ').toLowerCase();
+                const combined = ['video', 'youtube', 'film', 'podcast', 'lyd', 'undervisning', title, description].filter(Boolean).join(' ').toLowerCase();
                 if (isMatch(combined)) {
                     results.push({
                         type: 'YouTube',
@@ -839,22 +908,27 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             { id: 'reisevirksomhet', label: 'Reisevirksomhet', url: '/reisevirksomhet' }
         ];
 
-        for (const sp of specialPages) {
+        const specialPagePromises = specialPages.map(async (sp) => {
             const data = await firebaseService.getPageContent(sp.id);
             if (data) {
                 const entries = collectTextEntries(data);
                 const hit = entries.find(e => e.text && isMatch(e.text));
                 if (hit) {
-                    results.push({
+                    return {
                         type: 'Side',
                         title: sp.label,
                         meta: 'Informasjon',
                         url: sp.url,
                         snippet: makeSnippet(hit.text, q)
-                    });
+                    };
                 }
             }
-        }
+            return null;
+        });
+        
+        const specialPageResults = (await Promise.all(specialPagePromises)).filter(Boolean);
+        results.push(...specialPageResults);
+
 
 
     } catch (err) {
@@ -888,11 +962,13 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
 async function fetchPodcasts() {
     if (window._siteSearchPodcasts) return window._siteSearchPodcasts;
     try {
+        // Bruk den mer robuste proxyen som ikke har 10-items grense
         const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+        const proxyUrl = 'https://getpodcast-42bhgdjkcq-uc.a.run.app';
         const resp = await fetch(proxyUrl);
         const data = await resp.json();
-        const items = data?.items;
+        const channel = Array.isArray(data?.rss?.channel) ? data.rss.channel[0] : data?.rss?.channel;
+        const items = channel?.item;
         if (items) {
             const episodes = Array.isArray(items) ? items : [items];
             window._siteSearchPodcasts = episodes.map(ep => ({

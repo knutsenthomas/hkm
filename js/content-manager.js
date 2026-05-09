@@ -2856,6 +2856,7 @@ class ContentManager {
                 subtitle: (slide.subtitle || '').trim(),
                 imageUrl: (slide.imageUrl || '').trim(),
                 videoUrl: (slide.videoUrl || '').trim(),
+                youtubeId: (slide.youtubeId || '').trim(),
                 btnText: (slide.btnText || '').trim(),
                 btnLink: (slide.btnLink || '').trim()
             }));
@@ -2870,6 +2871,7 @@ class ContentManager {
                 subtitle: s.querySelector('.hero-subtitle')?.textContent?.trim() || '',
                 imageUrl: (s.querySelector('.hero-bg')?.style.backgroundImage || '').replace(/url\(["']?(.*?)["']?\)/, '$1') || '',
                 videoUrl: s.querySelector('.hero-video source')?.getAttribute('src') || '',
+                youtubeId: s.querySelector('.hero-youtube-iframe')?.getAttribute('data-youtube-id') || '',
                 btnText: s.querySelector('.btn')?.textContent?.trim() || '',
                 btnLink: s.querySelector('.btn')?.getAttribute('href') || ''
             }));
@@ -2891,11 +2893,14 @@ class ContentManager {
 
                 const currentVideo = (current.videoUrl || '').trim();
                 const incomingVideo = (slide.videoUrl || '').trim();
+                const currentYoutube = (current.youtubeId || '').trim();
+                const incomingYoutube = (slide.youtubeId || '').trim();
 
                 return title !== current.title ||
                     subtitle !== current.subtitle ||
                     currentImg !== incomingImg ||
                     currentVideo !== incomingVideo ||
+                    currentYoutube !== incomingYoutube ||
                     btnText !== current.btnText ||
                     btnLink !== current.btnLink;
             });
@@ -2906,17 +2911,34 @@ class ContentManager {
 
                 const heroMarkup = slides.map((slide, index) => {
                     const videoUrl = (slide.videoUrl || '').trim();
-                    const hasVideo = !!videoUrl;
+                    const youtubeId = (slide.youtubeId || '').trim();
+                    const hasYoutube = !!youtubeId;
+                    const hasVideo = !!videoUrl && !hasYoutube;
+
+                    const duration = slide.duration || 4;
 
                     return `
-                    <div class="hero-slide ${index === 0 ? 'active' : ''}">
-                        ${hasVideo ? `
+                    <div class="hero-slide ${index === 0 ? 'active' : ''}" data-duration="${duration}">
+                        ${hasYoutube ? `
+                            <div class="hero-video-wrapper">
+                                <iframe 
+                                    class="hero-youtube-iframe"
+                                    data-youtube-id="${youtubeId}"
+                                    src="https://www.youtube.com/embed/${youtubeId}?autoplay=${index === 0 ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&enablejsapi=1" 
+                                    frameborder="0" 
+                                    allow="autoplay; encrypted-media" 
+                                    allowfullscreen
+                                    style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); pointer-events: none;">
+                                </iframe>
+                                <div class="hero-video-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2);"></div>
+                            </div>
+                        ` : (hasVideo ? `
                             <video class="hero-video" ${index === 0 ? 'autoplay' : ''} muted loop playsinline poster="${slide.imageUrl}">
                                 <source src="${videoUrl}" type="video/mp4">
                             </video>
                         ` : `
                             <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
-                        `}
+                        `)}
                         <div class="container hero-container">
                             <div class="hero-content">
                                 <h1 class="hero-title">${slide.title}</h1>
