@@ -4328,7 +4328,13 @@ class AdminManager {
                         </div>
                     </div>
                     <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px;">Her kan du manuelt overstyre kategorien for hver episode. Hvis ingen er valgt, brukes automatisk kategorisering.</p>
+                        <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                            <label style="font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Faste Kategorier (Hurtigvalg)</label>
+                            <input type="text" id="podcast-global-categories-sync" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie" style="font-size: 13px; border-radius: 8px; border: 1px solid #cbd5e1;">
+                            <p style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">Kategorier her vises som knapper på alle episoder. Nye kategorier du skriver inn på enkeltepisoder blir også lagret her automatisk når du lagrer.</p>
+                        </div>
+
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; font-weight: 500;">Overstyr kategorier for hver episode:</p>
                         <div id="podcast-overrides-list">
                             <div class="loader">Henter episoder...</div>
                         </div>
@@ -4396,7 +4402,12 @@ class AdminManager {
                 if (settings.podcastRssUrl) document.getElementById('podcast-rss-url').value = settings.podcastRssUrl;
                 if (settings.spotifyUrl) document.getElementById('podcast-spotify-url').value = settings.spotifyUrl;
                 if (settings.appleUrl) document.getElementById('podcast-apple-url').value = settings.appleUrl;
-                if (settings.podcastCustomCategories) document.getElementById('podcast-custom-categories').value = settings.podcastCustomCategories;
+                if (settings.podcastCustomCategories) {
+                    const val = settings.podcastCustomCategories;
+                    document.getElementById('podcast-custom-categories').value = val;
+                    const syncInput = document.getElementById('podcast-global-categories-sync');
+                    if (syncInput) syncInput.value = val;
+                }
             }
         } catch (e) {
             console.error("Load media settings error:", e);
@@ -4575,6 +4586,13 @@ class AdminManager {
         const btn = document.getElementById('save-podcast-overrides');
         const rows = document.querySelectorAll('.podcast-override-item');
         const overrides = {};
+        
+        // Collect current global categories from sync input
+        const syncInput = document.getElementById('podcast-global-categories-sync');
+        const currentGlobalStr = syncInput?.value || '';
+        const globalCats = new Set(
+            currentGlobalStr.split(',').map(s => s.trim()).filter(Boolean)
+        );
 
         rows.forEach((row) => {
             const encodedId = row.getAttribute('data-episode-key') || '';
@@ -4586,7 +4604,13 @@ class AdminManager {
                 .filter(Boolean);
 
             const customInput = row.querySelector('.custom-podcast-categories');
-            const customCategories = this.parsePodcastOverrideCategories(customInput?.value || '');
+            const customValue = customInput?.value || '';
+            const customCategories = this.parsePodcastOverrideCategories(customValue);
+
+            // Add any NEW custom categories to the global set
+            customCategories.forEach(cat => {
+                if (cat) globalCats.add(cat);
+            });
 
             const merged = Array.from(new Set([...selected, ...customCategories]));
 
@@ -4601,11 +4625,31 @@ class AdminManager {
         btn.disabled = true;
 
         try {
+            // 1. Save episode overrides
             await firebaseService.savePageContent('settings_podcast_overrides', {
                 overrides: overrides,
                 updatedAt: new Date().toISOString()
             });
-            this.showToast('✅ Podcast-overstyringer er lagret!', 'success', 5000);
+
+            // 2. Save updated global categories to media settings
+            const updatedGlobalStr = Array.from(globalCats).join(', ');
+            const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
+            
+            await firebaseService.savePageContent('settings_media', {
+                ...mediaSettings,
+                podcastCustomCategories: updatedGlobalStr,
+                updatedAt: new Date().toISOString()
+            });
+
+            // Sync inputs and reload UI
+            if (syncInput) syncInput.value = updatedGlobalStr;
+            const mainCustomInput = document.getElementById('podcast-custom-categories');
+            if (mainCustomInput) mainCustomInput.value = updatedGlobalStr;
+
+            this.showToast('✅ Podcast-overstyringer og nye kategorier er lagret!', 'success', 5000);
+            
+            // Reload the list to show the new chips
+            await this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save overrides error:", err);
             this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
