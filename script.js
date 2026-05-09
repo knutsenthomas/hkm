@@ -770,17 +770,26 @@ async function performSiteSearch(query, resultsEl) {
                 console.warn('Kunne ikke hente kalender-hendelser for søk:', e);
             }
         }
-
+        if (Array.isArray(calendarEvents) && calendarEvents.length) {
+            calendarEvents.forEach(ev => {
+                const summary = ev.summary || '';
+                const description = ev.description || '';
+                const location = ev.location || '';
+                const combined = [summary, description, location].filter(Boolean).join(' ').toLowerCase();
+                if (combined.includes(qLower)) {
+                    const start = ev.start && (ev.start.dateTime || ev.start.date);
+                    const dateLabel = start ? new Date(start).toLocaleString('no-NO') : '';
                     results.push({
                         type: 'Kalender',
                         title: summary || '(uten tittel)',
                         meta: dateLabel,
-                        url: '/arrangementer', // Lenker til kalender-seksjonen
+                        url: '/arrangementer',
                         snippet: makeSnippet(description || location || '', q)
                     });
                 }
             });
         }
+
 
         // 6) Kurs & Undervisning (Dypere søk)
         const courseData = await firebaseService.getPageContent('collection_courses');
