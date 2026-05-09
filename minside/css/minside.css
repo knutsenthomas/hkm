@@ -1932,3 +1932,62 @@ body {
 .ms-modal-actions-top {
     margin-top: 20px;
 }
+
+/* ──────────────────────────────────────────────────────────
+   MOBILE OPTIMIZATION — Fullscreen Notes
+   ────────────────────────────────────────────────────────── */
+@media (max-width: 600px) {
+    .hkm-modal-container.ms-note-modal-wide {
+        width: 100vw !important;
+        height: 100dvh !important;
+        max-width: none !important;
+        max-height: none !important;
+        border-radius: 0 !important;
+        padding: 24px 20px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        margin: 0 !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        border: none !important;
+    }
+    
+    .ms-note-modal-wide .ms-note-modal-header {
+        margin-bottom: 20px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .ms-note-modal-wide .form-group {
+        display: flex !important;
+        flex-direction: column !important;
+        flex-shrink: 0 !important;
+    }
+    
+    .ms-note-modal-wide .form-group.ms-form-group-gap-12 {
+        flex: 1 !important;
+        min-height: 0 !important;
+        margin-top: 20px !important;
+    }
+    
+    .ms-note-modal-wide .rte-wrapper {
+        flex: 1 !important;
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 0 !important;
+        border-radius: 12px !important;
+    }
+    
+    .ms-note-modal-wide .rte-editor {
+        flex: 1 !important;
+        min-height: 0 !important;
+        height: auto !important;
+    }
+    
+    .ms-note-modal-wide .hkm-modal-actions {
+        margin-top: 20px !important;
+        padding-top: 15px !important;
+        border-top: 1px solid var(--border-color);
+        flex-shrink: 0 !important;
+    }
+}
