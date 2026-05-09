@@ -207,8 +207,7 @@ const mapGaDimensionMetricRows = (report) => (
 function extractWixViewerBlocksAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
 
-  const imageFigures = extractWixArticleImagesAsHtml(pageHtml);
-  const blockRegex = /<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
+  const blockRegex = /<(h[1-6]|p|li|div)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
   const seen = new Set();
   const blocks = [];
   let match;
@@ -216,6 +215,40 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
   while ((match = blockRegex.exec(pageHtml)) !== null) {
     const tag = String(match[1] || "p").toLowerCase();
     const rawInner = String(match[2] || "");
+
+    if (tag === "div" && /<wow-image\b/i.test(rawInner)) {
+      const wowMatch = rawInner.match(/<wow-image\b([^>]*)>/i);
+      const wowAttrs = wowMatch && wowMatch[1] ? wowMatch[1] : "";
+      const infoRaw = readHtmlAttr(wowAttrs, "data-image-info");
+      let info = null;
+      if (infoRaw) {
+        try {
+          info = JSON.parse(infoRaw);
+        } catch (error) {
+          info = null;
+        }
+      }
+
+      const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
+      const src = wixMediaUrlFromUri(imageData.uri || readHtmlAttr(wowAttrs, "src"));
+      if (!src) continue;
+
+      const imgMatch = rawInner.match(/<img\b([^>]*)>/i);
+      const imgAttrs = imgMatch && imgMatch[1] ? imgMatch[1] : "";
+      const alt = readHtmlAttr(imgAttrs, "alt") || readHtmlAttr(wowAttrs, "alt");
+
+      const imageKey = `img:${src.toLowerCase()}`;
+      if (seen.has(imageKey)) continue;
+      seen.add(imageKey);
+
+      blocks.push({
+        tag: "figure",
+        text: "",
+        html: renderImageFigure(src, alt || ""),
+      });
+      continue;
+    }
+
     const inlineHtml = sanitizeWixInlineHtml(rawInner);
     const text = decodeCommonHtmlEntities(
       rawInner
@@ -239,7 +272,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
     });
   }
 
-  if (blocks.length < 4) return "";
+  if (blocks.length < 2) return "";
 
   const parts = [];
   const listLikeParagraph = /^([A-Za-z0-9\u00C0-\u024F\u0400-\u04FF\u0370-\u03FF][^:]{1,48}):\s+.+/;
@@ -247,6 +280,11 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
   for (let i = 0; i < blocks.length; i += 1) {
     const block = blocks[i];
     if (!block) continue;
+
+    if (block.tag === "figure") {
+      parts.push(block.html || "");
+      continue;
+    }
 
     if (/^h[1-6]$/.test(block.tag)) {
       parts.push(`<${block.tag}>${block.html || escapeHtml(block.text)}</${block.tag}>`);
@@ -287,9 +325,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
   }
 
   const bodyHtml = parts.join("\n");
-  if (!imageFigures) return bodyHtml;
-  if (/<figure\b|<img\b/i.test(bodyHtml)) return bodyHtml;
-  return `${imageFigures}\n${bodyHtml}`;
+  return bodyHtml;
 }
 
 function decodeHtmlAttribute(value) {
