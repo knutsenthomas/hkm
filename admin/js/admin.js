@@ -1391,6 +1391,8 @@ class AdminManager {
         if (alreadyRendered) {
             if (sectionId === 'overview') {
                 this.renderOverview();
+            } else if (sectionId === 'podcast') {
+                this.loadCollection('podcast_transcripts');
             } else if (['blog', 'events', 'teaching', 'comments'].includes(sectionId)) {
                 if (sectionId === 'comments') {
                     this.loadComments();
@@ -3177,6 +3179,64 @@ class AdminManager {
         return '...';
     }
 
+    _extractPodcastText(value) {
+        if (Array.isArray(value)) {
+            return this._extractPodcastText(value[0]);
+        }
+        if (value && typeof value === 'object') {
+            if (typeof value._ === 'string') return value._;
+            if (typeof value['#text'] === 'string') return value['#text'];
+            if (typeof value.$?.href === 'string') return value.$.href;
+            if (typeof value.$?.url === 'string') return value.$.url;
+            return '';
+        }
+        return typeof value === 'string' ? value : '';
+    }
+
+    _normalizePodcastDate(value) {
+        const raw = typeof value === 'string' ? value.trim() : '';
+        if (!raw) return '';
+        const parsed = new Date(raw);
+        if (Number.isNaN(parsed.getTime())) {
+            return raw.split('T')[0] || raw;
+        }
+        return parsed.toISOString().split('T')[0];
+    }
+
+    async fetchPodcastEpisodesForAdmin() {
+        try {
+            const response = await fetch('https://getpodcast-42bhgdjkcq-uc.a.run.app');
+            const data = await response.json();
+            const rawItems = data?.rss?.channel?.[0]?.item;
+            const items = Array.isArray(rawItems) ? rawItems : [];
+
+            return items.map((episode) => {
+                const guid = this._extractPodcastText(episode?.guid);
+                const link = this._extractPodcastText(episode?.link);
+                const title = this._extractPodcastText(episode?.title) || 'Uten tittel';
+                const date = this._normalizePodcastDate(this._extractPodcastText(episode?.pubDate));
+
+                const imageNode = Array.isArray(episode?.['itunes:image'])
+                    ? episode['itunes:image'][0]
+                    : episode?.['itunes:image'];
+                const imageUrl = imageNode?.$?.href || '';
+
+                const id = guid || link || title;
+
+                return {
+                    id,
+                    title,
+                    date,
+                    imageUrl,
+                    source: 'feed'
+                };
+            }).filter((ep) => ep.id);
+        } catch (error) {
+            console.error('Error fetching podcast episodes for admin:', error);
+            return [];
+        }
+    }
+
 
     async fetchAnalyticsData() {
         try {
@@ -3466,8 +3526,8 @@ class AdminManager {
     /**
      * Render Collection Editor (Blog/Events) with Add/Delete support
      */
-    async renderCollectionEditor(collectionId, title) {
-        const section = document.getElementById(`${collectionId}-section`);
+    async renderCollectionEditor(collectionId, title, sectionId = collectionId) {
+        const section = document.getElementById(`${sectionId}-section`);
         if (!section) return;
 
         section.innerHTML = `
@@ -3645,12 +3705,46 @@ class AdminManager {
             let items = [];
 
             if (collectionId === 'podcast_transcripts') {
-                // For podcast transcripts, fetch directly from Firestore collection
-                const snapshots = await firebase.firestore().collection('podcast_transcripts').get();
-                items = snapshots.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
+                const [snapshots, feedEpisodes] = await Promise.all([
+                    firebase.firestore().collection('podcast_transcripts').get(),
+                    this.fetchPodcastEpisodesForAdmin()
+                ]);
+
+                const transcriptById = new Map(
+                    snapshots.docs.map((doc) => [doc.id, {
+                        id: doc.id,
+                        ...doc.data(),
+                        isFirestore: true
+                    }])
+                );
+
+                const merged = [];
+
+                feedEpisodes.forEach((episode) => {
+                    const existingTranscript = transcriptById.get(episode.id);
+                    if (existingTranscript) {
+                        merged.push({
+                            ...episode,
+                            ...existingTranscript,
+                            id: existingTranscript.id,
+                            isFirestore: true
+                        });
+                        transcriptById.delete(episode.id);
+                    } else {
+                        merged.push({
+                            ...episode,
+                            text: '',
+                            content: '',
+                            isFirestore: false
+                        });
+                    }
+                });
+
+                transcriptById.forEach((docItem) => {
+                    merged.push(docItem);
+                });
+
+                items = merged;
             } else {
                 const dataRes = await this._promiseWithTimeout(
                     firebaseService.getPageContent(`collection_${collectionId}`),
@@ -3676,8 +3770,18 @@ class AdminManager {
 
             if (!isCurrentRequest()) return;
 
-            // Mark items that exist in Firestore so we can delete them
-            items.forEach(it => it.isFirestore = true);
+            if (collectionId !== 'podcast_transcripts') {
+                // Mark items that exist in Firestore so we can delete them
+                items.forEach(it => it.isFirestore = true);
+            }
+
+            if (collectionId === 'podcast_transcripts') {
+                const toTimestamp = (dateValue) => {
+                    const parsed = new Date(dateValue || '');
+                    return Number.isNaN(parsed.getTime()) ? 0 : parsed.getTime();
+                };
+                items.sort((a, b) => toTimestamp(b.date) - toTimestamp(a.date));
+            }
 
             this._collectionItemsCache[collectionId] = items;
             this.currentItems = items;
@@ -6343,7 +6447,7 @@ class AdminManager {
     }
 
     async renderPodcastManager() {
-        this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon');
+        this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon', 'podcast');
     }
 
     async renderCoursesManager() {

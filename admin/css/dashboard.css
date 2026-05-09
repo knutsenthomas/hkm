@@ -6185,3 +6185,85 @@ body.admin-body .section-container {
         padding: 18px;
     }
 }
+
+/* Neutral admin palette: keep color only on the profile box in the topbar */
+body.admin-body .main-content {
+    background: #f8fafc !important;
+}
+
+body.admin-body .nav-link.active {
+    background: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-color: #e2e8f0 !important;
+}
+
+body.admin-body .nav-link.active span:first-child {
+    color: #0f172a !important;
+}
+
+body.admin-body .notification-btn:hover {
+    background: #f3f4f6 !important;
+    color: #374151 !important;
+}
+
+body.admin-body .notification-dot {
+    background: #94a3b8 !important;
+    border-color: #ffffff !important;
+}
+
+#overview-section .overview-hero-card {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06) !important;
+}
+
+#overview-section .overview-hero-card::before,
+#overview-section .overview-hero-card::after {
+    display: none !important;
+}
+
+#overview-section .overview-hero-eyebrow,
+#overview-section .overview-hero-title,
+#overview-section .overview-hero-text {
+    color: #0f172a !important;
+}
+
+#overview-section .overview-hero-action {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+}
+
+#overview-section .section-header-row .btn-secondary,
+#overview-section .section-header-row .btn-accent {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    border: 1px solid #d1d5db !important;
+    box-shadow: none !important;
+}
+
+#overview-section .section-header-row .btn-secondary .material-symbols-outlined,
+#overview-section .section-header-row .btn-accent .material-symbols-outlined {
+    color: #0f172a !important;
+}
+
+#overview-section .stat-icon-wrap {
+    background: #f1f5f9 !important;
+    color: #334155 !important;
+}
+
+#overview-section .stat-icon-wrap .material-symbols-outlined {
+    color: #334155 !important;
+}
+
+#overview-section .bar,
+#overview-section .bar:nth-child(odd),
+#overview-section .bar:nth-child(even) {
+    background: #cbd5e1 !important;
+}
+
+#overview-section .progress-bar {
+    background: #94a3b8 !important;
+}
