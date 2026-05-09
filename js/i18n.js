@@ -30,7 +30,33 @@ const i18nManager = {
 
     init() {
         this.detectLanguage();
+        this.fixLocalizedHeaderLogoPath();
         this.bindEvents();
+    },
+
+    fixLocalizedHeaderLogoPath() {
+        const path = window.location.pathname || '';
+        const inLangFolder = path.includes('/en/') || path.includes('/es/');
+        if (!inLangFolder) return;
+
+        const headerLogo = document.querySelector('.logo img');
+        if (!headerLogo) return;
+
+        const src = headerLogo.getAttribute('src') || '';
+        if (src.startsWith('img/')) {
+            headerLogo.setAttribute('src', `../${src}`);
+        }
+    },
+
+    inferLanguageFromElement(el) {
+        if (!el) return this.defaultLang;
+        const text = String(el.textContent || '').trim().toLowerCase();
+
+        if (text.includes('english') || text.includes('en') || text.includes('🇺🇸')) return 'en';
+        if (text.includes('español') || text.includes('espanol') || text.includes('es') || text.includes('🇪🇸')) return 'es';
+        if (text.includes('norsk') || text.includes('no') || text.includes('🇳🇴')) return 'no';
+
+        return this.defaultLang;
     },
 
     /**
@@ -186,7 +212,7 @@ const i18nManager = {
             const langBtn = e.target.closest('.lang-switch-btn');
             if (langBtn) {
                 e.preventDefault();
-                const lang = langBtn.getAttribute('data-lang');
+                const lang = langBtn.getAttribute('data-lang') || this.inferLanguageFromElement(langBtn);
                 this.setLanguage(lang);
                 return;
             }
