@@ -288,6 +288,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchInput = document.getElementById('site-search-input-v2');
     const suggestionsContainer = document.getElementById('site-search-suggestions');
     const resultsContainer = document.getElementById('site-search-results-v2');
+    
+    // Start pre-fetching podcast/youtube data immediately on load
+    fetchPodcasts();
+    fetchYouTubeVideos();
 
     if (!searchModal) return;
 
@@ -304,6 +308,10 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
 
     function openSearch() {
+        // Start pre-fetching podcast/youtube data early if not already loaded
+        if (!window._siteSearchPodcasts) fetchPodcasts();
+        if (!window._siteSearchYouTubeVideos) fetchYouTubeVideos();
+
         if (window.HKM_UI?.isMegaMenuOpen?.()) {
             window.HKM_UI.closeMegaMenu();
         }
@@ -710,33 +718,57 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             });
         }
 
-        // 3) Podcast-episoder (via felles RSS-proxy)
-        let podcastEpisodes = window._siteSearchPodcasts;
-        if (!podcastEpisodes) {
-            try {
-                const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
-                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
-                const resp = await fetch(proxyUrl);
-                const data = await resp.json();
-                const items = data?.items;
-                if (items) {
-                    const episodes = Array.isArray(items) ? items : [items];
-                    podcastEpisodes = episodes.map(ep => ({
-                        title: ep.title,
-                        description: typeof ep.description === 'string' ? ep.description : (ep.content || ''),
-                        pubDate: ep.pubDate,
-                        link: ep.link
-                    }));
-                } else {
-                    podcastEpisodes = [];
-                }
-                window._siteSearchPodcasts = podcastEpisodes;
-            } catch (e) {
-                console.warn('Kunne ikke hente podcast for søk:', e);
-                podcastEpisodes = [];
-                window._siteSearchPodcasts = podcastEpisodes;
-            }
+async function fetchPodcasts() {
+    if (window._siteSearchPodcasts) return window._siteSearchPodcasts;
+    try {
+        const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+        const resp = await fetch(proxyUrl);
+        const data = await resp.json();
+        const items = data?.items;
+        if (items) {
+            const episodes = Array.isArray(items) ? items : [items];
+            window._siteSearchPodcasts = episodes.map(ep => ({
+                title: ep.title,
+                description: typeof ep.description === 'string' ? ep.description : (ep.content || ''),
+                pubDate: ep.pubDate,
+                link: ep.link
+            }));
+        } else {
+            window._siteSearchPodcasts = [];
         }
+    } catch (e) {
+        console.warn('Kunne ikke hente podcast for søk:', e);
+        window._siteSearchPodcasts = [];
+    }
+    return window._siteSearchPodcasts;
+}
+
+async function fetchYouTubeVideos() {
+    if (window._siteSearchYouTubeVideos) return window._siteSearchYouTubeVideos;
+    try {
+        const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
+        const rssFeedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+        const resp = await fetch(proxyUrl);
+        const data = await resp.json();
+        const items = (data && Array.isArray(data.items)) ? data.items : (data && data.items ? [data.items] : []);
+        window._siteSearchYouTubeVideos = items.map(v => ({
+            title: v.title,
+            description: v.description || '',
+            pubDate: v.pubDate,
+            link: v.link
+        }));
+    } catch (e) {
+        console.warn('Kunne ikke hente YouTube-videoer for søk:', e);
+        window._siteSearchYouTubeVideos = [];
+    }
+    return window._siteSearchYouTubeVideos;
+}
+
+// ... (in performSiteSearch)
+        // 3) Podcast-episoder (via felles RSS-proxy)
+        const podcastEpisodes = await fetchPodcasts();
 
         if (Array.isArray(podcastEpisodes) && podcastEpisodes.length) {
             podcastEpisodes.forEach(ep => {
@@ -753,23 +785,8 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             });
         }
 
-        // 4) YouTube-videoer (kanal-feed via RSS2JSON)
-        let youtubeVideos = window._siteSearchYouTubeVideos;
-        if (!youtubeVideos) {
-            try {
-                const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
-                const rssFeedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
-                const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
-                const resp = await fetch(proxyUrl);
-                const data = await resp.json();
-                youtubeVideos = (data && Array.isArray(data.items)) ? data.items : (data && data.items ? [data.items] : []);
-                window._siteSearchYouTubeVideos = youtubeVideos;
-            } catch (e) {
-                console.warn('Kunne ikke hente YouTube-videoer for søk:', e);
-                youtubeVideos = [];
-                window._siteSearchYouTubeVideos = youtubeVideos;
-            }
-        }
+        // 4) YouTube-videoer
+        const youtubeVideos = await fetchYouTubeVideos();
 
         if (Array.isArray(youtubeVideos) && youtubeVideos.length) {
             youtubeVideos.forEach(v => {
