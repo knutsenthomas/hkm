@@ -4003,6 +4003,12 @@ class AdminManager {
                             </div>
                             <div class="editor-paper">
                                 <input type="text" id="col-item-title-v2" placeholder="Skriv din tittel her..." value="${item.title || ''}">
+                                ${collectionId === 'podcast_transcripts' ? `
+                                <div style="margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #e2e8f0;">
+                                    <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 12px;">Oppsummering</h4>
+                                    <textarea id="col-item-summary" style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;" placeholder="Kort oppsummering av episoden...">${podcastSummary}</textarea>
+                                </div>
+                                ` : ''}
                                 <div id="editorjs-container-v2"></div>
                             </div>
                         </div>
@@ -4016,10 +4022,6 @@ class AdminManager {
                              <div class="sidebar-group">
                                  <label>Episode-tittel</label>
                                  <input type="text" id="col-item-title-sidebar" class="sidebar-control" value="${item.title || ''}" placeholder="Skriv episodetittel">
-                             </div>
-                             <div class="sidebar-group">
-                                 <label>Oppsummering</label>
-                                 <textarea id="col-item-summary" class="sidebar-control" style="height: 120px;" placeholder="Kort oppsummering av episoden...">${podcastSummary}</textarea>
                              </div>
                              <div class="sidebar-group">
                                  <label>Publiseringsdato</label>
