@@ -621,7 +621,6 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
     const results = [];
     const qLower = q.toLowerCase();
 
-    // Helper for dato-formatering
     const formatDate = (dateStr) => {
         if (!dateStr) return '';
         try {
@@ -629,6 +628,14 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             if (isNaN(d.getTime())) return dateStr;
             return d.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
         } catch (e) { return dateStr; }
+    };
+
+    // Smart-match hjelper: Sjekker om ALLE ord i søket finnes i teksten
+    const qWords = qLower.split(/\s+/).filter(w => w.length > 1);
+    const isMatch = (text) => {
+        if (!qWords.length) return false;
+        const t = (text || '').toLowerCase();
+        return qWords.every(word => t.includes(word));
     };
 
     try {
@@ -653,7 +660,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             if (!data) continue;
 
             const entries = collectTextEntries(data);
-            const hit = entries.find(entry => entry.text && entry.text.toLowerCase().includes(qLower));
+            const hit = entries.find(entry => entry.text && isMatch(entry.text));
             if (hit) {
                 results.push({
                     type: 'Side',
@@ -691,7 +698,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                     item.seoDescription
                 ].filter(Boolean).join(' ').toLowerCase();
 
-                if (combined.includes(qLower)) {
+                if (isMatch(combined)) {
                     results.push({
                         type: col.label,
                         title: item.title || '(uten tittel)',
@@ -734,7 +741,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         if (Array.isArray(podcastEpisodes) && podcastEpisodes.length) {
             podcastEpisodes.forEach(ep => {
                 const combined = ['podcast', 'lyd', 'episode', ep.title, ep.description].filter(Boolean).join(' ').toLowerCase();
-                if (combined.includes(qLower)) {
+                if (isMatch(combined)) {
                     results.push({
                         type: 'Podcast',
                         title: ep.title || '(uten tittel)',
@@ -769,7 +776,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 const title = v.title;
                 const description = v.description || '';
                 const combined = ['video', 'youtube', 'film', title, description].filter(Boolean).join(' ').toLowerCase();
-                if (combined.includes(qLower)) {
+                if (isMatch(combined)) {
                     results.push({
                         type: 'YouTube',
                         title: title || '(uten tittel)',
@@ -808,7 +815,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 const description = ev.description || '';
                 const location = ev.location || '';
                 const combined = ['kalender', 'arrangement', 'event', 'møte', summary, description, location].filter(Boolean).join(' ').toLowerCase();
-                if (combined.includes(qLower)) {
+                if (isMatch(combined)) {
                     const start = ev.start && (ev.start.dateTime || ev.start.date);
                     results.push({
                         type: 'Kalender',
@@ -828,7 +835,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         const courses = Array.isArray(courseData) ? courseData : (courseData && Array.isArray(courseData.items) ? courseData.items : []);
         courses.forEach(course => {
             const combined = ['kurs', 'undervisning', 'serie', course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
-            if (combined.includes(qLower)) {
+            if (isMatch(combined)) {
                 results.push({
                     type: 'Kurs',
                     title: course.title || 'Kurs',
@@ -850,7 +857,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
             const data = await firebaseService.getPageContent(sp.id);
             if (data) {
                 const entries = collectTextEntries(data);
-                const hit = entries.find(e => e.text && e.text.toLowerCase().includes(qLower));
+                const hit = entries.find(e => e.text && isMatch(e.text));
                 if (hit) {
                     results.push({
                         type: 'Side',
@@ -862,6 +869,7 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 }
             }
         }
+
 
     } catch (err) {
         console.error('Feil ved søk:', err);
