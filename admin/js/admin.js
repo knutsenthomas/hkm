@@ -622,12 +622,20 @@ class AdminManager {
         return updatedPost;
     }
 
+    _getCollectionItems(raw) {
+        if (Array.isArray(raw)) return raw;
+        if (!raw || typeof raw !== 'object') return [];
+        if (Array.isArray(raw.items)) return raw.items;
+        if (raw.items && typeof raw.items === 'object') return Object.values(raw.items);
+        return [];
+    }
+
     async translateAllExistingBlogPosts({ force = false, silent = false } = {}) {
         if (this._blogTranslationBackfillRunning) return;
         this._blogTranslationBackfillRunning = true;
         try {
             const blogData = await firebaseService.getPageContent('collection_blog');
-            const items = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+            const items = this._getCollectionItems(blogData);
             if (!items.length) {
                 return;
             }
@@ -3941,7 +3949,7 @@ class AdminManager {
                 }
 
                 const data = dataRes.value;
-                items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
+                items = this._getCollectionItems(data);
             }
 
             if (!isCurrentRequest()) return;
