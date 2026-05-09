@@ -207,7 +207,6 @@ const mapGaDimensionMetricRows = (report) => (
 function extractWixViewerBlocksAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
 
-  const imageFigures = extractWixArticleImagesAsHtml(pageHtml);
   const blockRegex = /<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
   const seen = new Set();
   const blocks = [];
@@ -287,9 +286,7 @@ function extractWixViewerBlocksAsHtml(pageHtml) {
   }
 
   const bodyHtml = parts.join("\n");
-  if (!imageFigures) return bodyHtml;
-  if (/<figure\b|<img\b/i.test(bodyHtml)) return bodyHtml;
-  return `${imageFigures}\n${bodyHtml}`;
+  return bodyHtml;
 }
 
 function decodeHtmlAttribute(value) {
@@ -321,27 +318,36 @@ function wixMediaUrlFromUri(uri) {
 
 function extractWixArticleImagesAsHtml(pageHtml) {
   if (typeof pageHtml !== "string" || !pageHtml) return "";
-
-  // Extract only the main article viewer area to avoid related posts images
-  const viewerMatch = pageHtml.match(/<(h[1-6]|p|li)\b[^>]*id="viewer-[^"]*"[\s\S]*?(?=<[^>]*(?:id="[^"]*related|class="[^"]*recommended|class="[^"]*reciprocal)[^>]*>|$)/i);
-  const articleHtml = viewerMatch ? viewerMatch[0] : pageHtml;
-
-  // Find the approximate boundary before "related posts" / "recommendations" section
-  const relatedMatch = pageHtml.search(/(?:relaterte|recommended|du kan ogs|inspiration from|other posts)/i);
-  const contentBoundary = relatedMatch > 0 ? Math.min(relatedMatch, pageHtml.length) : pageHtml.length;
-  const limitedHtml = pageHtml.substring(0, contentBoundary);
-
+  // Extract ALL viewer block content to get accurate article boundaries
+  const viewerBlockRegex = /<(h[1-6]|p|li|div)\b[^>]*id="viewer-[^"]*"[\s\S]*?<\/\1>/gi;
+  const viewerBlocks = [];
+  let blockMatch;
+  let articleStartPos = pageHtml.length;
+  let articleEndPos = 0;
+  while ((blockMatch = viewerBlockRegex.exec(pageHtml)) !== null) {
+    viewerBlocks.push({
+      start: blockMatch.index,
+      end: blockMatch.index + blockMatch[0].length,
+      content: blockMatch[0],
+    });
+    articleStartPos = Math.min(articleStartPos, blockMatch.index);
+    articleEndPos = Math.max(articleEndPos, blockMatch.index + blockMatch[0].length);
+  }
+  // If we found viewer blocks, only search images within the article area
+  // Otherwise search the first half of the page (before related posts)
+  const searchBoundary = articleEndPos > 0 
+    ? articleEndPos 
+    : pageHtml.length / 2;
+  const searchHtml = pageHtml.substring(0, searchBoundary);
   const figures = [];
   const seen = new Set();
   const wowImageRegex = /<wow-image\b([^>]*)>/gi;
   let match;
-
-  while ((match = wowImageRegex.exec(limitedHtml)) !== null) {
+  while ((match = wowImageRegex.exec(searchHtml)) !== null) {
     const attrs = match[1] || "";
     const alt = readHtmlAttr(attrs, "alt");
     const infoRaw = readHtmlAttr(attrs, "data-image-info");
     let info = null;
-
     if (infoRaw) {
       try {
         info = JSON.parse(infoRaw);
@@ -349,26 +355,21 @@ function extractWixArticleImagesAsHtml(pageHtml) {
         info = null;
       }
     }
-
     const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
     const targetWidth = Number(info && info.targetWidth);
     const targetHeight = Number(info && info.targetHeight);
     const imageWidth = Number(imageData.width);
     const imageHeight = Number(imageData.height);
-
     // Skip avatars/icons; keep actual article media.
     const likelyIcon = (targetWidth > 0 && targetWidth <= 80) && (targetHeight > 0 && targetHeight <= 80);
     const likelySmallImage = (imageWidth > 0 && imageWidth <= 120) && (imageHeight > 0 && imageHeight <= 120);
     if (likelyIcon || likelySmallImage || /forfatterens bilde/i.test(alt)) continue;
-
     const src = wixMediaUrlFromUri(imageData.uri || readHtmlAttr(attrs, "src"));
     if (!src || seen.has(src)) continue;
     seen.add(src);
-
     figures.push(renderImageFigure(src, alt || ""));
     if (figures.length >= 6) break;
   }
-
   return figures.join("\n");
 }
 
