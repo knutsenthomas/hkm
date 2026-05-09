@@ -29,7 +29,7 @@ const streamPipeline = promisify(pipeline);
 const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
 const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
 const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 2;
-const PODCAST_AUTO_TRANSCRIPTION_ENABLED = false;
+const PODCAST_AUTO_TRANSCRIPTION_ENABLED = true;
 
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
