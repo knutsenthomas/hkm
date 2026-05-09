@@ -1138,9 +1138,8 @@ function createPlayerBar() {
                 <span class="time-total">0:00</span>
             </div>
             <div class="player-extra">
-                <button class="player-control-btn player-expand" title="Fullskjerm"><i class="fas fa-expand"></i></button>
+                <button class="player-control-btn player-expand" title="Fullskjerm lesing"><i class="fas fa-expand"></i></button>
                 <button class="player-control-btn player-speed" title="${t('playbackSpeed')}">1x</button>
-                <button class="player-control-btn player-close"><i class="fas fa-times"></i></button>
             </div>
         </div>
         <div id="podcast-fullscreen-overlay" class="podcast-fullscreen-overlay">
@@ -1184,6 +1183,14 @@ function createPlayerBar() {
     const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
 
     function openFs() {
+        // Hide everything except the player bar and fullscreen overlay
+        document.querySelectorAll('header, nav, aside, .sidebar, [role="navigation"], .chat-widget, .chatbot, .fab').forEach(el => {
+            if (el && el !== bar && !el.closest('#podcast-player-bar')) {
+                el.style.display = 'none';
+                el.setAttribute('data-fs-hidden', 'true');
+            }
+        });
+
         // Keep the regular player bar visible above the fullscreen transcript view.
         Object.assign(playerContainer.style, {
             position: 'fixed',
@@ -1200,9 +1207,18 @@ function createPlayerBar() {
         bar.classList.add('active');
         fsOverlay.classList.add('active');
         fsOverlay.style.top = '0';
+        fsOverlay.style.zIndex = '26002';
         document.body.style.overflow = 'hidden';
+        document.documentElement.style.overflow = 'hidden';
     }
+    
     function closeFs() {
+        // Restore hidden elements
+        document.querySelectorAll('[data-fs-hidden="true"]').forEach(el => {
+            el.style.display = '';
+            el.removeAttribute('data-fs-hidden');
+        });
+
         playerContainer.style.position = '';
         playerContainer.style.left = '';
         playerContainer.style.right = '';
@@ -1216,12 +1232,23 @@ function createPlayerBar() {
         fsOverlay.classList.remove('active');
         fsOverlay.style.top = '100vh';
         document.body.style.overflow = '';
+        document.documentElement.style.overflow = '';
     }
 
     infoToggle.addEventListener('click', openFs);
-    if(expandBtn) expandBtn.addEventListener('click', openFs);
+    if(expandBtn) expandBtn.addEventListener('click', () => {
+        if (fsOverlay.classList.contains('active')) closeFs();
+        else openFs();
+    });
     fsCloseBtn.addEventListener('click', closeFs);
     if (fsXCloseBtn) fsXCloseBtn.addEventListener('click', closeFs);
+
+    // Keyboard escape to close fullscreen
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && fsOverlay.classList.contains('active')) {
+            closeFs();
+        }
+    });
 
     playBtn.addEventListener('click', () => {
         if (audio.paused) { audio.play(); updatePlayIcons(true); }
@@ -1263,14 +1290,6 @@ function createPlayerBar() {
 
     audio.addEventListener('loadedmetadata', () => {
         bar.querySelector('.time-total').textContent = formatTime(audio.duration);
-    });
-
-    bar.querySelector('.player-close').addEventListener('click', () => {
-        audio.pause();
-        if (!window.location.pathname.includes('/podcast')) {
-            bar.classList.remove('active');
-        }
-        updatePlayIcons(false);
     });
 }
 
