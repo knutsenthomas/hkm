@@ -472,6 +472,33 @@ class AdminManager {
         return 'MyMemory dagskvote er brukt opp. Prøv igjen senere eller bytt til Gemini i integrasjonsinnstillinger.';
     }
 
+    _getCallableErrorMessage(error, fallbackMessage = 'Ukjent feil.') {
+        const detailMessage = typeof error?.details === 'string' ? error.details.trim() : '';
+        const rawMessage = typeof error?.message === 'string' ? error.message.trim() : '';
+        const code = typeof error?.code === 'string' ? error.code.trim() : '';
+
+        const cleanedRawMessage = rawMessage
+            .replace(/^(functions\/)?[a-z-]+:\s*/i, '')
+            .trim();
+
+        if (detailMessage) return detailMessage;
+        if (cleanedRawMessage && !/^internal$/i.test(cleanedRawMessage)) return cleanedRawMessage;
+
+        if (code === 'resource-exhausted') {
+            return 'Gemini API-kvoten er brukt opp akkurat nå. Vent litt og prøv igjen.';
+        }
+
+        if (code === 'unauthenticated') {
+            return 'Du må være logget inn for å bruke denne funksjonen.';
+        }
+
+        if (code === 'invalid-argument') {
+            return 'Det mangler nødvendig data for å kjøre AI-genereringen.';
+        }
+
+        return fallbackMessage;
+    }
+
     async _diagnoseTranslationProviders() {
         const sample = 'Gud er god';
         const out = {
@@ -5431,10 +5458,10 @@ class AdminManager {
                             }
                         } catch (error) {
                             console.error('AI-transkripsjon feilet:', error);
-                            const errorMessage = error?.message ? ` ${error.message}` : '';
-                            this.showToast(`Kunne ikke generere AI-tekst.${errorMessage}`, 'error', 7000);
+                            const reason = this._getCallableErrorMessage(error, 'Kunne ikke generere AI-tekst.');
+                            this.showToast(`Kunne ikke generere AI-tekst. ${reason}`, 'error', 7000);
                             if (aiStatus) {
-                                aiStatus.textContent = 'AI-generering feilet. Prøv igjen om litt.';
+                                aiStatus.textContent = `AI-generering feilet: ${reason}`;
                                 aiStatus.style.color = '#b91c1c';
                             }
                         } finally {
@@ -5512,9 +5539,10 @@ class AdminManager {
                                     aiStatus.style.color = '#92400e';
                                 }
                             } else {
-                                this.showToast('Kunne ikke lage oppsummering fra teksten.', 'error', 7000);
+                                const reason = this._getCallableErrorMessage(error, 'Kunne ikke lage oppsummering fra teksten.');
+                                this.showToast(reason, 'error', 7000);
                                 if (aiStatus) {
-                                    aiStatus.textContent = 'Kunne ikke lage oppsummering nå.';
+                                    aiStatus.textContent = `Kunne ikke lage oppsummering: ${reason}`;
                                     aiStatus.style.color = '#b91c1c';
                                 }
                             }
