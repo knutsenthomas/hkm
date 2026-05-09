@@ -112,6 +112,10 @@
 
             <!-- Right Actions: Donate + Language + Hamburger -->
             <div class="header-actions">
+                <button id="global-search-opener" class="text-white hover:text-primary-orange transition-colors" aria-label="Søk i nettsiden">
+                    <span class="material-symbols-outlined text-2xl">search</span>
+                </button>
+
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
@@ -1007,6 +1011,32 @@
         })();
     </script>
 
+
+    <!-- Global Search Modal -->
+    <div id="site-search-modal" class="search-overlay">
+        <div class="search-modal-container">
+            <button class="close-search-btn" id="close-site-search" aria-label="Lukk søk">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="search-modal-title" data-content-doc="settings_global" data-content-key="search.modalTitle">Søk i His Kingdom Ministry</div>
+            <div class="search-input-group">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" id="site-search-input-v2" class="search-input-field" placeholder="Søk i blogg, podcast, events..." autocomplete="off">
+            </div>
+            
+            <!-- Live Suggestions Container -->
+            <div id="site-search-suggestions" class="search-suggestions-container hidden"></div>
+            
+            <!-- Full Results Container (When Enter is pressed) -->
+            <div id="site-search-results-v2" class="search-suggestions-container hidden"></div>
+            
+            <div class="search-help-text">
+                <span data-content-doc="settings_global" data-content-key="search.helpText">Skriv for å se forslag, eller trykk Enter for alle resultater.</span>
+            </div>
+        </div>
+    </div>
+
 </body>
+
 
 </html>

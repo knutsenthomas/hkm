@@ -277,120 +277,153 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 });
 
+
 // ===================================
-// Global Site Search (magnifying glass in header)
+// Global Site Search (Premium Edition)
 // ===================================
 document.addEventListener('DOMContentLoaded', () => {
-    const headerActions = document.querySelector('.header-actions');
+    const searchTrigger = document.getElementById('global-search-opener');
+    const searchModal = document.getElementById('site-search-modal');
+    const closeSearch = document.getElementById('close-site-search');
+    const searchInput = document.getElementById('site-search-input-v2');
+    const suggestionsContainer = document.getElementById('site-search-suggestions');
+    const resultsContainer = document.getElementById('site-search-results-v2');
 
-    // Only initialize if header actions exist
-    if (headerActions) {
-        // Check if search button already exists to avoid duplicates
-        if (headerActions.querySelector('.header-search-btn')) return;
+    if (!searchModal) return;
 
-        // Create search toggle button
-        const searchBtn = document.createElement('button');
-        searchBtn.type = 'button';
-        searchBtn.className = 'header-search-btn';
-        searchBtn.innerHTML = '<i class="fas fa-search"></i>';
+    // Definerte forslag (Smarte snarveier)
+    const siteSearchSuggestions = [
+        { label: 'Blogg & Nyheter', type: 'SIDER', url: '/blogg', icon: 'article' },
+        { label: 'Podcast (Lyd & Video)', type: 'MEDIA', url: '/podcast', icon: 'podcasts' },
+        { label: 'Kommende Arrangementer', type: 'EVENT', url: '/arrangementer', icon: 'event' },
+        { label: 'Gi Gave (Donasjoner)', type: 'GIVING', url: '/donasjoner', icon: 'volunteer_activism' },
+        { label: 'Om His Kingdom Ministry', type: 'INFO', url: '/om-oss', icon: 'info' },
+        { label: 'Kontakt oss', type: 'INFO', url: '/kontakt', icon: 'mail' },
+        { label: 'Undervisning', type: 'STUDIE', url: '/undervisning', icon: 'school' },
+        { label: 'Bibelstudier', type: 'STUDIE', url: '/bibelstudier', icon: 'menu_book' }
+    ];
 
-        // Insert before main CTA button (if exists), otherwise first
-        const firstChild = headerActions.firstElementChild;
-        if (firstChild) {
-            headerActions.insertBefore(searchBtn, firstChild);
-        } else {
-            headerActions.appendChild(searchBtn);
+    function openSearch() {
+        if (window.HKM_UI?.isMegaMenuOpen?.()) {
+            window.HKM_UI.closeMegaMenu();
         }
-
-        // Create overlay for search UI
-        const overlay = document.createElement('div');
-        overlay.className = 'site-search-overlay';
-        overlay.innerHTML = `
-    <div class="site-search-dialog">
-        <div class="site-search-header">
-            <div class="site-search-input-wrapper">
-                <i class="fas fa-search"></i>
-                <input type="text" id="site-search-input" placeholder="Søk i innhold..." autocomplete="off" />
-            </div>
-            <button class="site-search-close" id="site-search-close" type="button" aria-label="Lukk søk">
-                <span>&times;</span>
-            </button>
-        </div>
-        <div class="site-search-results" id="site-search-results">
-            <p class="site-search-helper">Skriv inn et søkeord og trykk Enter.</p>
-        </div>
-    </div>`;
-
-        document.body.appendChild(overlay);
-
-        const searchInput = document.getElementById('site-search-input');
-        const searchResults = document.getElementById('site-search-results');
-        const searchClose = document.getElementById('site-search-close');
-
-        function openSearch() {
-            if (window.HKM_UI?.isMegaMenuOpen?.()) {
-                window.HKM_UI.closeMegaMenu();
-            }
-            overlay.classList.add('active');
-            lockBodyScroll('site-search');
-            if (searchInput) {
-                searchInput.value = '';
-                searchResults.innerHTML = '<p class="site-search-helper">Skriv inn et søkeord og trykk Enter.</p>';
-                setTimeout(() => searchInput.focus(), 50);
-            }
-        }
-
-        function closeSearch() {
-            overlay.classList.remove('active');
-            unlockBodyScroll('site-search');
-        }
-
-        searchBtn.addEventListener('click', openSearch);
-
-        if (searchClose) {
-            searchClose.addEventListener('click', closeSearch);
-        }
-
-        // Handle search on input
-        searchInput?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                const query = searchInput.value;
-                performSiteSearch(query, searchResults);
-            }
-        });
-
-        // Close on escape
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && overlay.classList.contains('active')) {
-                closeSearch();
-            }
-        });
-
-        // Close on clicking outside dialog
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) {
-                closeSearch();
-            }
-        });
-
-        // Also handle the search input that's already in the mega-menu HTML
-        const megaMenuSearchInput = document.querySelector('#mega-menu input[type="text"]');
-        if (megaMenuSearchInput) {
-            megaMenuSearchInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    const query = megaMenuSearchInput.value;
-                    if (query.trim()) {
-                        openSearch();
-                        if (searchInput) {
-                            searchInput.value = query;
-                            performSiteSearch(query, searchResults);
-                        }
-                    }
-                }
-            });
+        searchModal.classList.add('active');
+        lockBodyScroll('site-search-v2');
+        if (searchInput) {
+            searchInput.value = '';
+            if (suggestionsContainer) suggestionsContainer.classList.add('hidden');
+            if (resultsContainer) resultsContainer.classList.add('hidden');
+            setTimeout(() => searchInput.focus(), 100);
         }
     }
+
+    function closeSearchModal() {
+        searchModal.classList.remove('active');
+        unlockBodyScroll('site-search-v2');
+    }
+
+    if (searchTrigger) {
+        searchTrigger.addEventListener('click', (e) => {
+            e.preventDefault();
+            openSearch();
+        });
+    }
+
+    if (closeSearch) {
+        closeSearch.addEventListener('click', closeSearchModal);
+    }
+
+    // Lukk ved klikk utenfor container
+    searchModal.addEventListener('click', (e) => {
+        if (e.target === searchModal) closeSearchModal();
+    });
+
+    // Lukk med ESC
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && searchModal.classList.contains('active')) {
+            closeSearchModal();
+        }
+    });
+
+    // Sanntids-forslag mens brukeren skriver
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.trim().toLowerCase();
+            updateSiteSearchSuggestions(query);
+        });
+
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = searchInput.value.trim();
+                if (query) {
+                    if (suggestionsContainer) suggestionsContainer.classList.add('hidden');
+                    if (resultsContainer) {
+                        resultsContainer.classList.remove('hidden');
+                        performSiteSearch(query, resultsContainer);
+                    }
+                }
+            }
+        });
+    }
+
+    function updateSiteSearchSuggestions(query) {
+        if (!suggestionsContainer) return;
+
+        if (query.length < 1) {
+            suggestionsContainer.classList.add('hidden');
+            return;
+        }
+
+        const filtered = siteSearchSuggestions.filter(item => 
+            item.label.toLowerCase().includes(query) || 
+            item.type.toLowerCase().includes(query)
+        ).slice(0, 5);
+
+        if (filtered.length > 0) {
+            suggestionsContainer.innerHTML = filtered.map(item => `
+                <div class="search-suggestion-item" onclick="window.location.href='${item.url}'">
+                    <div class="search-suggestion-icon">
+                        <span class="material-symbols-outlined">${item.icon}</span>
+                    </div>
+                    <div class="search-suggestion-content">
+                        <span class="search-suggestion-label">${item.label}</span>
+                        <span class="search-suggestion-type">${item.type}</span>
+                    </div>
+                    <span class="material-symbols-outlined" style="font-size: 18px; color: #cbd5e1;">north_east</span>
+                </div>
+            `).join('');
+            suggestionsContainer.classList.remove('hidden');
+            if (resultsContainer) resultsContainer.classList.add('hidden');
+        } else {
+            suggestionsContainer.classList.add('hidden');
+        }
+    }
+
+    // Eksponer til globalt scope for bruk i f.eks. mega-meny
+    window.HKM_SEARCH = {
+        open: openSearch,
+        close: closeSearchModal
+    };
+
+    // Støtt søk fra mega-meny
+    const megaMenuSearch = document.querySelector('#mega-menu input[type="text"]');
+    if (megaMenuSearch) {
+        megaMenuSearch.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const query = megaMenuSearch.value.trim();
+                if (query) {
+                    openSearch();
+                    searchInput.value = query;
+                    if (resultsContainer) {
+                        resultsContainer.classList.remove('hidden');
+                        performSiteSearch(query, resultsContainer);
+                    }
+                }
+            }
+        });
+    }
 });
+
 
 // ===================================
 // Hero Slider
