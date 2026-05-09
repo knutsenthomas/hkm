@@ -33,10 +33,57 @@ const i18nManager = {
         this.fixLocalizedHeaderLogoPath();
         this.syncCurrentLanguageBadge(currentLang);
         this.bindEvents();
+        this.startLanguageBadgeGuard();
 
         // Some pages hydrate header labels after i18n init; resync shortly after.
         setTimeout(() => this.syncCurrentLanguageBadge(), 300);
         setTimeout(() => this.syncCurrentLanguageBadge(), 1200);
+    },
+
+    startLanguageBadgeGuard() {
+        if (this._langBadgeGuardStarted) return;
+        this._langBadgeGuardStarted = true;
+
+        let queued = false;
+        const scheduleSync = () => {
+            if (queued) return;
+            queued = true;
+            requestAnimationFrame(() => {
+                queued = false;
+                this.syncCurrentLanguageBadge();
+            });
+        };
+
+        const observer = new MutationObserver((mutations) => {
+            for (const m of mutations) {
+                const targetEl = m.target && m.target.nodeType === 1
+                    ? m.target
+                    : m.target?.parentElement;
+                if (targetEl && targetEl.closest && targetEl.closest('.lang-switcher')) {
+                    scheduleSync();
+                    return;
+                }
+            }
+        });
+
+        const startObserve = () => {
+            if (!document.body) return;
+            observer.observe(document.body, {
+                subtree: true,
+                childList: true,
+                characterData: true
+            });
+            scheduleSync();
+        };
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', startObserve, { once: true });
+        } else {
+            startObserve();
+        }
+
+        window.addEventListener('pageshow', () => this.syncCurrentLanguageBadge());
+        window.addEventListener('focus', () => this.syncCurrentLanguageBadge());
     },
 
     fixLocalizedHeaderLogoPath() {
