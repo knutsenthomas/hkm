@@ -518,11 +518,15 @@ body {
     margin-left: var(--sidebar-w);
     width: calc(100% - var(--sidebar-w));
     box-sizing: border-box;
-    padding: 32px 40px;
+    padding: 0; /* Header handled here */
     min-height: 100vh;
     background: var(--main-bg);
     transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1),
         width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#view-container {
+    padding: 32px 40px;
 }
 
 /* ── Loading State ─────────────────────────────────────────────── */
@@ -1677,6 +1681,10 @@ body {
     }
 
     .main-content {
+        padding: 0;
+    }
+
+    #view-container {
         padding: 20px 16px;
     }
 

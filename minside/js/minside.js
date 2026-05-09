@@ -52,7 +52,7 @@ class MinSideManager {
                 }
             } catch (error) {
                 console.error('Init Error:', error);
-                const area = document.getElementById('content-area');
+                const area = document.getElementById('view-container') || document.getElementById('content-area');
                 if (area) {
                     area.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Feil ved oppstart</h3><p>${error.message}</p></div>`;
                 }
@@ -123,7 +123,7 @@ class MinSideManager {
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active');
 
-        const container = document.getElementById('content-area');
+        const container = document.getElementById('view-container') || document.getElementById('content-area');
         container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Laster...</p></div>`;
 
         setTimeout(async () => {
