@@ -31,6 +31,7 @@ const i18nManager = {
     init() {
         const currentLang = this.detectLanguage();
         this.fixLocalizedHeaderLogoPath();
+        this.fixLocalizedLogoLinks(currentLang);
         this.syncCurrentLanguageBadge(currentLang);
         this.bindEvents();
         this.startLanguageBadgeGuard();
@@ -38,6 +39,18 @@ const i18nManager = {
         // Some pages hydrate header labels after i18n init; resync shortly after.
         setTimeout(() => this.syncCurrentLanguageBadge(), 300);
         setTimeout(() => this.syncCurrentLanguageBadge(), 1200);
+    },
+
+    fixLocalizedLogoLinks(lang = null) {
+        const activeLang = (lang || document.documentElement.lang || this.defaultLang).toLowerCase();
+        const isSupported = this.languages.includes(activeLang);
+        const targetHref = (!isSupported || activeLang === 'no')
+            ? '/'
+            : `/${activeLang}/`;
+
+        document.querySelectorAll('a.logo').forEach((anchor) => {
+            anchor.setAttribute('href', targetHref);
+        });
     },
 
     startLanguageBadgeGuard() {
@@ -152,6 +165,7 @@ const i18nManager = {
 
         localStorage.setItem(this.storageKey, lang);
         document.documentElement.lang = lang;
+        this.fixLocalizedLogoLinks(lang);
         this.syncCurrentLanguageBadge(lang);
 
         if (redirect) {
@@ -166,21 +180,18 @@ const i18nManager = {
         const currentPath = window.location.pathname;
         // Strip leading/trailing slashes and .html extension
         let currentFile = currentPath.split('/').pop().replace(/\.html$/, '') || 'index';
+        if (!currentFile || currentFile === '/') currentFile = 'index';
         
         const mappedFile = this.mapFileName(currentFile, lang);
-        const insideLangFolder = currentPath.includes('/en/') || currentPath.includes('/es/');
         let newPath = '';
 
         if (lang === 'no') {
-            newPath = insideLangFolder ? `../${mappedFile}` : mappedFile;
+            newPath = mappedFile === 'index' ? '/' : `/${mappedFile}`;
         } else {
             const safeTargetFile = this.knownFiles[lang].has(mappedFile) ? mappedFile : 'index';
-            newPath = insideLangFolder ? `../${lang}/${safeTargetFile}` : `${lang}/${safeTargetFile}`;
+            newPath = safeTargetFile === 'index' ? `/${lang}/` : `/${lang}/${safeTargetFile}`;
         }
 
-        // Final safety: if newPath is 'index' or './index', use '/'
-        if (newPath === 'index' || newPath === './index') newPath = '/';
-        
         window.location.href = newPath;
     },
 
