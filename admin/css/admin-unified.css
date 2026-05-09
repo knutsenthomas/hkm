@@ -4502,11 +4502,14 @@ body.builder-active .user-avatar,
 }
 
 /* Suppress any child nodes (icons/images) to guarantee initials visibility */
-/* Suppress any icons/images but allow text nodes/initials */
+/* Allow images but ensure they fill the container */
 .user-avatar img,
 [id="admin-avatar"] img,
 [id="ph-avatar"] img {
-    display: none !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 10px !important;
 }
 
 /* 4. Content Spacing Fixes - Universal consistency */
@@ -4559,15 +4562,30 @@ body.builder-active .section-subtitle {
 }
 
 body.admin-body .notification-btn,
+body.minside-body .notification-btn,
 body.crm-body .notification-btn,
 body.builder-active .notification-btn,
-body.builder-active .top-icon-btn,
+body.builder-active .top-icon-btn {
+    width: 42px !important;
+    height: 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(0, 0, 0, 0.05) !important;
+    color: #64748b !important;
+    transition: all 0.2s ease !important;
+    margin-left: 12px !important;
+}
+
 body.admin-body .mobile-nav-toggle,
+body.minside-body .mobile-nav-toggle,
 body.crm-body .mobile-nav-toggle,
 body.builder-active .mobile-nav-toggle {
     width: 42px !important;
     height: 42px !important;
-    display: flex !important;
+    display: none !important; /* Hidden on desktop */
     align-items: center !important;
     justify-content: center !important;
     border-radius: 12px !important;
@@ -4615,10 +4633,15 @@ body.builder-active .user-role {
 @media (max-width: 800px) {
 
     body.admin-body .main-header,
+    body.minside-body .main-header,
     body.crm-body .main-header,
     body.builder-active .main-header {
         height: 64px !important;
         padding: 0 16px !important;
+    }
+    
+    .mobile-nav-toggle {
+        display: flex !important;
     }
 
     .user-info-text,
