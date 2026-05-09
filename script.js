@@ -638,12 +638,18 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         } catch (e) { return dateStr; }
     };
 
-    // Smart-match hjelper: Sjekker om ALLE ord i søket finnes i teksten
-    const qWords = qLower.split(/\s+/).filter(w => w.length > 1);
+    // Smart-match hjelper: Sjekker om ord i søket finnes i teksten
+    // Ignorerer vanlige norske "stoppord" for å gjøre søket smartere
+    const stopWords = new Set(['om', 'i', 'på', 'og', 'det', 'et', 'en', 'den', 'til', 'fra', 'med', 'for', 'at', 'er', 'var']);
+    const qWords = qLower.split(/\s+/).filter(w => w.length > 1 && !stopWords.has(w));
+    
+    // Hvis alle ordene var stoppord, bruk det originale søket som fallback
+    const effectiveWords = qWords.length > 0 ? qWords : qLower.split(/\s+/).filter(w => w.length > 0);
+
     const isMatch = (text) => {
-        if (!qWords.length) return false;
+        if (!effectiveWords.length) return false;
         const t = (text || '').toLowerCase();
-        return qWords.every(word => t.includes(word));
+        return effectiveWords.every(word => t.includes(word));
     };
 
     try {
@@ -721,15 +727,28 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
         const podcastEpisodes = await fetchPodcasts();
 
         if (Array.isArray(podcastEpisodes) && podcastEpisodes.length) {
-            podcastEpisodes.forEach(ep => {
-                const combined = ['podcast', 'lyd', 'episode', ep.title, ep.description].filter(Boolean).join(' ').toLowerCase();
+            // Hent transkripsjoner i parallell for å søke i selve innholdet
+            const transcriptPromises = podcastEpisodes.map(ep => {
+                const epId = ep.guid || ep.link || ep.title;
+                return fetchPodcastTranscript(epId).then(t => ({ ep, transcript: t }));
+            });
+            const podcastWithTranscripts = await Promise.all(transcriptPromises);
+
+            podcastWithTranscripts.forEach(({ ep, transcript }) => {
+                const combined = [
+                    'podcast', 'lyd', 'episode', 
+                    ep.title, 
+                    ep.description, 
+                    transcript // Søker nå også i den fulle transkriberte teksten!
+                ].filter(Boolean).join(' ').toLowerCase();
+
                 if (isMatch(combined)) {
                     results.push({
                         type: 'Podcast',
                         title: ep.title || '(uten tittel)',
                         meta: formatDate(ep.pubDate),
                         url: ep.link || 'podcast',
-                        snippet: makeSnippet(ep.description || '', q)
+                        snippet: makeSnippet(transcript || ep.description || '', q)
                     });
                 }
             });
@@ -880,7 +899,8 @@ async function fetchPodcasts() {
                 title: ep.title,
                 description: typeof ep.description === 'string' ? ep.description : (ep.content || ''),
                 pubDate: ep.pubDate,
-                link: ep.link
+                link: ep.link,
+                guid: ep.guid
             }));
         } else {
             window._siteSearchPodcasts = [];
@@ -912,6 +932,37 @@ async function fetchYouTubeVideos() {
         window._siteSearchYouTubeVideos = [];
     }
     return window._siteSearchYouTubeVideos;
+}
+
+/**
+ * Henter transkripsjon fra Firestore for en spesifikk episode
+ */
+async function fetchPodcastTranscript(episodeId) {
+    if (!episodeId) return null;
+    // Cache for å unngå doble kall i samme søkesesjon
+    if (!window._transcriptCache) window._transcriptCache = {};
+    if (window._transcriptCache[episodeId]) return window._transcriptCache[episodeId];
+
+    try {
+        const doc = await firebase.firestore().collection('podcast_transcripts').doc(episodeId).get();
+        if (doc.exists) {
+            const data = doc.data();
+            let text = '';
+            if (data.transcriptHtml) {
+                text = data.transcriptHtml;
+            } else if (data.blocks) {
+                // Håndterer Editor.js format hvis det er brukt
+                text = data.blocks.map(b => b.data?.text || '').join(' ');
+            } else if (data.text) {
+                text = data.text;
+            }
+            window._transcriptCache[episodeId] = text;
+            return text;
+        }
+    } catch (e) {
+        console.warn('Kunne ikke hente transkripsjon for', episodeId, e);
+    }
+    return null;
 }
 
 function collectTextEntries(obj, path = '') {
