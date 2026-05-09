@@ -30,6 +30,7 @@ const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
 const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
 const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 2;
 const PODCAST_AUTO_TRANSCRIPTION_ENABLED = true;
+const WIX_API_ENABLED = false;
 const WIX_BLOG_API_ENABLED = false;
 const WIX_BLOG_PUBLIC_PAGE_ENRICHMENT_ENABLED = true;
 
@@ -760,6 +761,10 @@ async function deleteVisitorChatById(chatId) {
 }
 
 function getWixClient() {
+  if (!WIX_API_ENABLED) {
+    throw new Error("Wix API is disabled.");
+  }
+
   const clientId = process.env.WIX_CLIENT_ID;
   const apiKey = process.env.WIX_API_KEY;
   const siteId = process.env.WIX_SITE_ID;
@@ -2161,6 +2166,26 @@ async function loadFromStorageCache(path) {
 }
 
 async function fetchAndCacheWixProducts(req = { query: {} }) {
+  if (!WIX_API_ENABLED) {
+    const cachedData = await loadFromStorageCache("cache/wix_products_v2.json");
+    if (cachedData && Array.isArray(cachedData.items)) {
+      return {
+        ...cachedData,
+        apiDisabled: true,
+        source: "wix-api-disabled-storage-cache",
+      };
+    }
+
+    return {
+      updatedAt: new Date().toISOString(),
+      count: 0,
+      total: 0,
+      items: [],
+      apiDisabled: true,
+      source: "wix-api-disabled",
+    };
+  }
+
   const wixClient = getWixClient();
   let authMode = (process.env.WIX_API_KEY && process.env.WIX_SITE_ID) ? "api-key" : "oauth";
 
@@ -3555,6 +3580,17 @@ exports.onBlogCommentCreatedSyncToWixFirestore = onDocumentCreated({
   const snapshot = event.data;
   if (!snapshot) return;
 
+  if (!WIX_API_ENABLED) {
+    await snapshot.ref.set({
+      wixSync: {
+        status: "skipped",
+        reason: "wix-api-disabled",
+        skippedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+    }, { merge: true });
+    return;
+  }
+
   const commentData = snapshot.data() || {};
   const postId = event.params && typeof event.params.postId === "string" ? event.params.postId : "";
   const commentId = event.params && typeof event.params.commentId === "string" ? event.params.commentId : "";
@@ -3640,6 +3676,29 @@ exports.wixProducts = onRequest({ cors: true, invoker: "public", memory: "512MiB
     try {
       const forceSync = req.method === "POST" || req.query.force === "true";
 
+      if (!WIX_API_ENABLED) {
+        const cachedData = await loadFromStorageCache("cache/wix_products_v2.json");
+        if (cachedData && cachedData.items && cachedData.items.length >= 0) {
+          return res.status(200).json({
+            ok: true,
+            ...cachedData,
+            apiDisabled: true,
+            source: "wix-api-disabled-storage-cache",
+            manuallySynced: false,
+          });
+        }
+
+        return res.status(200).json({
+          ok: true,
+          items: [],
+          count: 0,
+          total: 0,
+          apiDisabled: true,
+          source: "wix-api-disabled",
+          fallbackUrl: "https://www.hiskingdomministry.no/butikk",
+        });
+      }
+
       // 1. Try to load from Storage cache first
       if (!forceSync) {
         const cachedData = await loadFromStorageCache("cache/wix_products_v2.json");
@@ -3716,6 +3775,11 @@ exports.wixBlogSync = onRequest({ cors: true, invoker: "public" }, (req, res) =>
  * Kjører hver 5. time for å holde butikken oppdatert.
  */
 exports.scheduledWixSync = onSchedule({ schedule: "0 */5 * * *", memory: "512MiB", timeoutSeconds: 300 }, async (event) => {
+  if (!WIX_API_ENABLED) {
+    console.log("Skipping scheduled Wix product synchronization because Wix API is disabled.");
+    return;
+  }
+
   console.log("Starting scheduled Wix product synchronization...");
   try {
     const cacheData = await fetchAndCacheWixProducts({ query: {} });
