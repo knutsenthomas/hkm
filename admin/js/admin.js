@@ -371,6 +371,26 @@ class AdminManager {
         return new Promise((resolve) => setTimeout(resolve, ms));
     }
 
+    _isTranslationQuotaExceededMessage(value) {
+        const text = String(value || '').toLowerCase();
+        return text.includes('used all available free translations for today')
+            || text.includes('next available in');
+    }
+
+    _buildMyMemoryQuotaErrorMessage(details) {
+        const raw = String(details || '');
+        const nextMatch = raw.match(/NEXT AVAILABLE IN\s+(.+?)\s+VISIT/i);
+        const nextWindow = nextMatch && nextMatch[1]
+            ? nextMatch[1].trim()
+            : null;
+
+        if (nextWindow) {
+            return `MyMemory dagskvote er brukt opp. Neste tilgjengelige vindu er om ca. ${nextWindow}.`;
+        }
+
+        return 'MyMemory dagskvote er brukt opp. Prøv igjen senere eller bytt til Gemini i integrasjonsinnstillinger.';
+    }
+
     async _fetchWithTimeout(url, options = {}, timeoutMs = 30000) {
         const controller = new AbortController();
         const timer = setTimeout(() => controller.abort(), Math.max(1000, Number(timeoutMs) || 30000));
@@ -437,6 +457,12 @@ class AdminManager {
                 }
 
                 const data = await res.json();
+                const warningText = String(data?.responseDetails || data?.responseData?.translatedText || '');
+                if (this._isTranslationQuotaExceededMessage(warningText)) {
+                    this._myMemoryBlockedUntil = Date.now() + 60 * 60 * 1000;
+                    throw new Error(this._buildMyMemoryQuotaErrorMessage(warningText));
+                }
+
                 const translated = data?.responseData?.translatedText;
                 return (typeof translated === 'string' && translated.trim())
                     ? translated
