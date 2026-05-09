@@ -1046,27 +1046,8 @@ class ContentManager {
         };
 
         if (isWixReferencePost) {
-            // Remove cover image injected at top by rebuildWixViewerStructure (wrong position for this post)
-            container.querySelector('figure.wix-inline-image')?.remove();
-
-            // Inject church image (same as cover) before "Praktiske steg" heading
-            const h2s = Array.from(container.querySelectorAll('h2'));
-            const praktiskeH2 = h2s.find(h => /praktiske steg/i.test(h.textContent));
-            if (praktiskeH2) {
-                praktiskeH2.insertAdjacentHTML('beforebegin',
-                    `<figure class="wix-inline-image"><img src="https://static.wixstatic.com/media/db4f96_c04f9a73499b4f189e58ae158d9a9a1a~mv2.png/v1/fit/w_1000,h_1000,al_c,q_80/file.png" alt="En liten kirke i en rolig landsby" loading="lazy"><figcaption>En liten kirke i en rolig landsby</figcaption></figure>`
-                );
-            }
-
-            // Inject Bible image before "his kingdom ministry kan støtte deg" heading
-            const hkmH2 = h2s.find(h => /kingdom ministry/i.test(h.textContent));
-            if (hkmH2) {
-                hkmH2.insertAdjacentHTML('beforebegin',
-                    `<figure class="wix-inline-image"><img src="https://static.wixstatic.com/media/db4f96_78871106685e410f840146ed8723c2ff~mv2.png/v1/fit/w_1000,h_1000,al_c,q_80/file.png" alt="En åpen Bibel med uthevet vers" loading="lazy"><figcaption>En åpen Bibel med uthevet vers</figcaption></figure>`
-                );
-            }
-
-            // Author info is now shown in the hero — skip injecting it here.
+            // Keep reference post styling only. Inline media is now sourced directly
+            // from synced Wix content to avoid manual duplicate insertions.
         }
 
         normalizeTopSpacingForMobile(container);
