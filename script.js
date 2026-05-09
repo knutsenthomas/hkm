@@ -346,10 +346,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Sanntids-forslag mens brukeren skriver
+    let searchDebounce;
     if (searchInput) {
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.trim().toLowerCase();
-            updateSiteSearchSuggestions(query);
+            const query = e.target.value.trim();
+            
+            // Vis shortcuts hvis veldig kort søk
+            if (query.length < 2) {
+                updateSiteSearchSuggestions(query.toLowerCase());
+                if (resultsContainer) resultsContainer.classList.add('hidden');
+                return;
+            }
+
+            // Live Søk med Debounce
+            clearTimeout(searchDebounce);
+            searchDebounce = setTimeout(() => {
+                if (suggestionsContainer) suggestionsContainer.classList.add('hidden');
+                performSiteSearch(query, resultsContainer, true);
+            }, 300);
         });
 
         searchInput.addEventListener('keypress', (e) => {
@@ -584,7 +598,7 @@ window.addEventListener('scroll', () => {
 // Site-wide search helpers
 // ===================================
 
-async function performSiteSearch(query, resultsEl) {
+async function performSiteSearch(query, resultsEl, isLive = false) {
     if (!resultsEl) return;
 
     const q = (query || '').trim();
@@ -593,16 +607,29 @@ async function performSiteSearch(query, resultsEl) {
         return;
     }
 
-    resultsEl.innerHTML = '<p class="site-search-helper">Søker i innhold...</p>';
+    if (!isLive) {
+        resultsEl.innerHTML = '<p class="site-search-helper">Søker i innhold...</p>';
+    }
+    resultsEl.classList.remove('hidden');
 
     if (!window.firebaseService || !window.firebaseService.isInitialized) {
-        resultsEl.innerHTML = '<p class="site-search-helper">Innhold kan ikke søkes akkurat nå. Prøv igjen senere.</p>';
+        resultsEl.innerHTML = '<p class="site-search-helper">Innhold kan ikke søkes akkurat nå.</p>';
         return;
     }
 
     const firebaseService = window.firebaseService;
     const results = [];
     const qLower = q.toLowerCase();
+
+    // Helper for dato-formatering
+    const formatDate = (dateStr) => {
+        if (!dateStr) return '';
+        try {
+            const d = new Date(dateStr);
+            if (isNaN(d.getTime())) return dateStr;
+            return d.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        } catch (e) { return dateStr; }
+    };
 
     try {
         // 1) Faste sider
@@ -668,7 +695,7 @@ async function performSiteSearch(query, resultsEl) {
                     results.push({
                         type: col.label,
                         title: item.title || '(uten tittel)',
-                        meta: item.date || item.category || '',
+                        meta: formatDate(item.date) || item.category || '',
                         url: col.url,
                         snippet: makeSnippet(item.content || item.seoDescription || '', q)
                     });
@@ -711,7 +738,7 @@ async function performSiteSearch(query, resultsEl) {
                     results.push({
                         type: 'Podcast',
                         title: ep.title || '(uten tittel)',
-                        meta: ep.pubDate ? new Date(ep.pubDate).toLocaleDateString('no-NO') : '',
+                        meta: formatDate(ep.pubDate),
                         url: ep.link || 'podcast',
                         snippet: makeSnippet(ep.description || '', q)
                     });
@@ -746,7 +773,7 @@ async function performSiteSearch(query, resultsEl) {
                     results.push({
                         type: 'YouTube',
                         title: title || '(uten tittel)',
-                        meta: v.pubDate ? new Date(v.pubDate).toLocaleDateString('no-NO') : '',
+                        meta: formatDate(v.pubDate),
                         url: v.link || 'youtube',
                         snippet: makeSnippet(description, q)
                     });
@@ -783,11 +810,11 @@ async function performSiteSearch(query, resultsEl) {
                 const combined = ['kalender', 'arrangement', 'event', 'møte', summary, description, location].filter(Boolean).join(' ').toLowerCase();
                 if (combined.includes(qLower)) {
                     const start = ev.start && (ev.start.dateTime || ev.start.date);
-                    const dateLabel = start ? new Date(start).toLocaleString('no-NO') : '';
                     results.push({
                         type: 'Kalender',
                         title: summary || '(uten tittel)',
-                        meta: dateLabel,
+                        meta: formatDate(start),
+
                         url: '/arrangementer',
                         snippet: makeSnippet(description || location || '', q)
                     });
@@ -881,23 +908,27 @@ function collectTextEntries(obj, path = '') {
 
 function makeSnippet(text, query) {
     if (!text) return '';
-    const str = String(text).replace(/\s+/g, ' ').trim();
-    if (str.length <= 160) return str;
+    
+    // Strip HTML tags and clean up whitespace
+    const cleanText = String(text).replace(/<[^>]*>?/gm, '').replace(/\s+/g, ' ').trim();
+    
+    if (cleanText.length <= 160) return cleanText;
 
-    const lower = str.toLowerCase();
-    const qLower = query.toLowerCase();
+    const lower = cleanText.toLowerCase();
+    const qLower = (query || '').toLowerCase();
     const idx = lower.indexOf(qLower);
 
     if (idx === -1) {
-        return str.substring(0, 157) + '...';
+        return cleanText.substring(0, 157) + '...';
     }
 
     const start = Math.max(0, idx - 40);
-    const end = Math.min(str.length, idx + qLower.length + 60);
+    const end = Math.min(cleanText.length, idx + qLower.length + 60);
     const prefix = start > 0 ? '...' : '';
-    const suffix = end < str.length ? '...' : '';
-    return prefix + str.substring(start, end) + suffix;
+    const suffix = end < cleanText.length ? '...' : '';
+    return prefix + cleanText.substring(start, end) + suffix;
 }
+
 
 function escapeHtml(str) {
     if (str == null) return '';
