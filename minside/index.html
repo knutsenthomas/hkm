@@ -54,22 +54,49 @@
     </script>
 </head>
 
-<body class="minside-body cms-loading">
+<body class="admin-body minside-body cms-loading">
     <div id="app">
         <div class="body-layout">
-            <nav class="sidebar" id="sidebar">
-                <ul class="nav-list">
-                    <li><a href="/" target="_blank" class="nav-link"><span class="material-symbols-outlined">visibility</span><span>Se nettside</span></a></li>
-                    <li><a href="#overview" class="nav-link active" data-view="overview"><span class="material-symbols-outlined">home</span><span>Oversikt</span></a></li>
-                    <li><a href="#profile" class="nav-link" data-view="profile"><span class="material-symbols-outlined">person</span><span>Profil</span></a></li>
-                    <li><a href="#activity" class="nav-link" data-view="activity"><span class="material-symbols-outlined">history</span><span>Aktivitet</span></a></li>
-                    <li><a href="#notifications" class="nav-link" data-view="notifications"><span class="material-symbols-outlined">notifications</span><span>Varslinger</span><span id="notif-badge" class="nav-badge" style="display:none">0</span></a></li>
-                    <li><a href="#giving" class="nav-link" data-view="giving"><span class="material-symbols-outlined">volunteer_activism</span><span>Gaver & Betalinger</span></a></li>
-                    <li><a href="#courses" class="nav-link" data-view="courses"><span class="material-symbols-outlined">school</span><span>Kurs & Undervisning</span></a></li>
-                    <li><a href="#notes" class="nav-link" data-view="notes"><span class="material-symbols-outlined">notes</span><span>Notater</span></a></li>
-                    <li><a href="/admin/index.html" class="nav-link is-hidden" id="sidebar-admin-link"><span class="material-symbols-outlined">dashboard_customize</span><span>Tilbake til admin</span></a></li>
-                </ul>
-            </nav>
+            <!-- Sidebar Navigation (Matching Admin Style) -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div class="logo" style="margin-bottom: 0;">
+                        <img src="/img/logo-hkm.png" alt="HKM Logo">
+                        <h1 class="logo-text">His Kingdom</h1>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <div class="nav-group">
+                        <ul class="nav-list">
+                            <li class="nav-item visible"><a href="/" target="_blank" class="nav-link"><span class="material-symbols-outlined">visibility</span><span>Se nettside</span></a></li>
+                            <li class="nav-item visible"><a href="#overview" class="nav-link active" data-view="overview"><span class="material-symbols-outlined">home</span><span>Oversikt</span></a></li>
+                            
+                            <li class="nav-category-header"><span>MITT MEDLEMSKAP</span></li>
+                            <li class="nav-item visible"><a href="#profile" class="nav-link" data-view="profile"><span class="material-symbols-outlined">person</span><span>Profil</span></a></li>
+                            <li class="nav-item visible"><a href="#courses" class="nav-link" data-view="courses"><span class="material-symbols-outlined">school</span><span>Kurs & Undervisning</span></a></li>
+                            <li class="nav-item visible"><a href="#giving" class="nav-link" data-view="giving"><span class="material-symbols-outlined">volunteer_activism</span><span>Gaver & Betalinger</span></a></li>
+                            
+                            <li class="nav-category-header"><span>AKTIVITET</span></li>
+                            <li class="nav-item visible"><a href="#notifications" class="nav-link" data-view="notifications"><span class="material-symbols-outlined">notifications</span><span>Varslinger</span><span id="notif-badge" class="nav-badge" style="display:none">0</span></a></li>
+                            <li class="nav-item visible"><a href="#activity" class="nav-link" data-view="activity"><span class="material-symbols-outlined">history</span><span>Logg</span></a></li>
+                            <li class="nav-item visible"><a href="#notes" class="nav-link" data-view="notes"><span class="material-symbols-outlined">notes</span><span>Notater</span></a></li>
+                        </ul>
+                    </div>
+
+                    <div class="nav-group bottom">
+                        <ul class="nav-list">
+                            <li class="nav-item visible"><a href="/admin/index.html" class="nav-link is-hidden" id="sidebar-admin-link"><span class="material-symbols-outlined">dashboard_customize</span><span>Administrasjon</span></a></li>
+                            <li class="nav-item visible">
+                                <button id="sidebar-logout-btn" class="nav-link logout" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left;">
+                                    <span class="material-symbols-outlined">logout</span>
+                                    <span>Logg ut</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
             <main class="main-content" id="content-area">
                 <!-- ── Profile Header (Identical to Admin Style) ────────────────────────── -->
                 <div id="dashboard-main-header" class="main-header">

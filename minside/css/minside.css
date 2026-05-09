@@ -63,13 +63,7 @@ body {
 }
 
 body {
-    font-family: 'Inter', sans-serif;
-    background: var(--main-bg);
-    color: var(--text-main);
-    overflow-x: hidden;
-    overflow-y: auto;
-    font-size: 14px;
-    line-height: 1.5;
+    /* Styles now inherited from admin-unified.css via .admin-body class */
 }
 
 #app {
@@ -77,23 +71,7 @@ body {
     width: 100%;
 }
 
-/* ── Scrollbar ─────────────────────────────────────────────────── */
-::-webkit-scrollbar {
-    width: 6px;
-}
-
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-    background: #cbd5e1;
-    border-radius: 10px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-}
+/* Scrollbars now inherited from admin-unified.css */
 
 /* ══════════════════════════════════════════════════════════════════
    HEADER SYNCING — Using admin-unified.css

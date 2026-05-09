@@ -78,6 +78,9 @@ class MinSideManager {
         document.getElementById('logout-btn')?.addEventListener('click', () => {
             firebase.auth().signOut().then(() => window.location.href = '/');
         });
+        document.getElementById('sidebar-logout-btn')?.addEventListener('click', () => {
+            firebase.auth().signOut().then(() => window.location.href = '/');
+        });
 
         // Actions dropdown
         const actionsBtn = document.getElementById('actions-btn');
