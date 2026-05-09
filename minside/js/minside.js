@@ -218,8 +218,7 @@ class MinSideManager {
                 .slice(0, 2)
                 .join('');
             
-            el.textContent = initials || '?';
-            el.style.color = '#ffffff'; // Extra safety for visibility
+            el.innerHTML = `<span style="color: white !important; font-weight: 900 !important; visibility: visible !important; opacity: 1 !important; display: block !important;">${initials || '?'}</span>`;
         }
     }
 

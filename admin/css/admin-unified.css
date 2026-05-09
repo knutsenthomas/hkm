@@ -4502,9 +4502,10 @@ body.builder-active .user-avatar,
 }
 
 /* Suppress any child nodes (icons/images) to guarantee initials visibility */
-.user-avatar *,
-[id="admin-avatar"] *,
-[id="ph-avatar"] * {
+/* Suppress any icons/images but allow text nodes/initials */
+.user-avatar img,
+[id="admin-avatar"] img,
+[id="ph-avatar"] img {
     display: none !important;
 }
 
@@ -4817,10 +4818,11 @@ body.builder-active .main-header [id="admin-avatar"] {
     background: #b85f23 !important;
     color: #ffffff !important;
     box-shadow: 0 2px 5px rgba(15, 23, 42, 0.08) !important;
-    font-size: 15px !important;
-    font-weight: 800 !important;
-    line-height: 1 !important;
-    overflow: hidden !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    line-height: 42px !important;
+    text-align: center !important;
+    text-transform: uppercase !important;
 }
 
 @media (min-width: 801px) {
