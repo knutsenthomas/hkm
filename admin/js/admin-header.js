@@ -190,6 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Automatisering', icon: 'auto_awesome', section: 'automation', category: 'administrasjon' },
             { label: 'SEO & Meta', icon: 'search_insights', section: 'seo', category: 'administrasjon' },
             { label: 'Innstillinger', icon: 'settings', section: 'settings', category: 'administrasjon' },
+            { label: 'Integrasjoner', icon: 'hub', section: 'integrations', category: 'administrasjon' },
             { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
         ];
 
