@@ -532,11 +532,30 @@ function getEpisodeId(episode) {
     return guid || asText(episode.link) || asText(episode.title);
 }
 
-function getEpisodeCategory(episode) {
+function normalizePodcastOverrideCategories(value) {
+    if (Array.isArray(value)) {
+        return value
+            .map((entry) => String(entry || '').trim())
+            .filter(Boolean);
+    }
+
+    const normalized = String(value || '').trim();
+    if (!normalized) return [];
+
+    return normalized
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+function getEpisodeCategories(episode) {
     // 1. Sjekk manuell overstyring først
     const id = getEpisodeId(episode);
-    if (podcastOverrides && podcastOverrides[id]) {
-        return podcastOverrides[id];
+    if (podcastOverrides && Object.prototype.hasOwnProperty.call(podcastOverrides, id)) {
+        const overrideCategories = normalizePodcastOverrideCategories(podcastOverrides[id]);
+        if (overrideCategories.length) {
+            return overrideCategories;
+        }
     }
 
     // 2. Bruk nøkkelord hvis ingen overstyring finnes
@@ -544,12 +563,19 @@ function getEpisodeCategory(episode) {
     const description = asText(episode.description) || asText(episode["itunes:summary"]);
     const text = (title + " " + description).toLowerCase();
 
+    const matched = [];
     for (const [category, keywords] of Object.entries(PODCAST_KEYWORDS)) {
         if (keywords.some(keyword => text.includes(keyword))) {
-            return category;
+            matched.push(category);
         }
     }
-    return 'other';
+
+    return matched.length ? matched : ['other'];
+}
+
+function getEpisodeCategory(episode) {
+    const categories = getEpisodeCategories(episode);
+    return categories[0] || 'other';
 }
 
 function getEpisodeSummaryHtml(episodeData, storedData) {
@@ -837,6 +863,7 @@ async function initPodcastRSS() {
                 thumbnail: getChannelImage(channel) || getItunesImage(episode),
                 audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
                 episodeNumber: episodes.length - index,
+                categories: getEpisodeCategories(episode),
                 category: getEpisodeCategory(episode)
             };
         });
@@ -901,7 +928,12 @@ function renderPodcastEpisodes() {
 
     // Filtrering
     if (currentPodcastFilter !== 'all') {
-        filtered = filtered.filter(ep => ep.category === currentPodcastFilter);
+        filtered = filtered.filter((ep) => {
+            const categories = Array.isArray(ep.categories)
+                ? ep.categories
+                : (ep.category ? [ep.category] : []);
+            return categories.includes(currentPodcastFilter);
+        });
     }
 
     // Sortering

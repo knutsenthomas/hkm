@@ -5,12 +5,21 @@
 
 // --- Global Error Handling ---
 window.onerror = function (msg, url, lineNo, columnNo, error) {
+    const rawMessage = msg ? msg.toString() : '';
+
     // Ignore benign ResizeObserver error
-    if (msg && msg.toString().includes('ResizeObserver loop completed with undelivered notifications')) {
+    if (rawMessage.includes('ResizeObserver loop completed with undelivered notifications')) {
         return false;
     }
+
+    // Ignore opaque cross-origin/extension errors with no actionable stack.
+    if (rawMessage.trim() === 'Script error.' || rawMessage.trim() === 'Script error') {
+        console.warn('Ignored opaque script error from browser context:', { url, lineNo, columnNo });
+        return false;
+    }
+
     console.error('Global Error Caught:', msg, url, lineNo, columnNo, error);
-    showErrorUI('En uventet feil oppstod: ' + msg);
+    showErrorUI('En uventet feil oppstod: ' + rawMessage);
     return false;
 };
 
@@ -20,6 +29,12 @@ window.onunhandledrejection = function (event) {
     if (reason.includes('ResizeObserver loop completed with undelivered notifications')) {
         return false;
     }
+
+    if (reason.trim() === 'Script error.' || reason.trim() === 'Script error') {
+        console.warn('Ignored opaque unhandled rejection from browser context.');
+        return false;
+    }
+
     console.error('Unhandled Promise Rejection:', event.reason);
     showErrorUI('En asynkron feil oppstod: ' + (event.reason ? event.reason.message : 'Ukjent feil'));
 };
@@ -3931,15 +3946,49 @@ class AdminManager {
         return merged;
     }
 
+    _hasMeaningfulEditorContent(editorData) {
+        const blocks = Array.isArray(editorData?.blocks) ? editorData.blocks : [];
+        if (!blocks.length) return false;
+
+        const stripText = (value) => String(value || '')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+
+        return blocks.some((block) => {
+            const type = String(block?.type || '').toLowerCase();
+            const data = block?.data || {};
+
+            if (type === 'header' || type === 'paragraph' || type === 'quote') {
+                return stripText(data.text).length > 0;
+            }
+
+            if (type === 'list') {
+                const items = Array.isArray(data.items) ? data.items : [];
+                return items.some((item) => stripText(typeof item === 'string' ? item : (item?.content || item?.text || '')).length > 0);
+            }
+
+            if (type === 'image') {
+                const url = data?.file?.url || data?.url || '';
+                return String(url).trim().length > 0;
+            }
+
+            if (type === 'youtubevideo') {
+                return String(data?.url || '').trim().length > 0;
+            }
+
+            return stripText(data.text).length > 0;
+        });
+    }
+
     hasPodcastTranscriptText(item) {
         const text = typeof item?.text === 'string' ? item.text.trim() : '';
         if (text) return true;
 
         const content = item?.content;
         if (typeof content === 'string' && content.trim()) return true;
-        if (content && typeof content === 'object' && Array.isArray(content.blocks) && content.blocks.length > 0) {
-            return true;
-        }
+        if (this._hasMeaningfulEditorContent(content)) return true;
 
         return false;
     }
@@ -4378,6 +4427,22 @@ class AdminManager {
         }
     }
 
+    parsePodcastOverrideCategories(rawValue) {
+        if (Array.isArray(rawValue)) {
+            return rawValue
+                .map((value) => String(value || '').trim())
+                .filter(Boolean);
+        }
+
+        const asString = String(rawValue || '').trim();
+        if (!asString) return [];
+
+        return asString
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean);
+    }
+
     async loadPodcastOverrides() {
         const listContainer = document.getElementById('podcast-overrides-list');
         if (!listContainer) return;
@@ -4395,22 +4460,24 @@ class AdminManager {
             if (episodes.length > 0) {
                 listContainer.innerHTML = episodes.map((ep) => {
                     const id = ep.id;
-                    const currentCat = overrides[id] || '';
+                    const currentCats = this.parsePodcastOverrideCategories(overrides[id]);
                     const title = this.escapeHtml(ep.title || 'Uten tittel');
 
                     return `
                         <div class="podcast-override-item" style="padding: 12px; border-bottom: 1px solid #eee; display: flex; flex-direction: column; gap: 8px;">
                             <div style="font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${title}">${title}</div>
                             <div style="display: flex; align-items: center; gap: 10px; justify-content: space-between; width: 100%;">
-                                <div style="display:flex; align-items:center; gap:10px;">
-                                    <select class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 4px 8px; height: auto; max-width: 150px;">
-                                    <option value="">Auto (Nøkkelord)</option>
-                                    <option value="tro" ${currentCat === 'tro' ? 'selected' : ''}>Tro</option>
-                                    <option value="bibel" ${currentCat === 'bibel' ? 'selected' : ''}>Bibel</option>
-                                    <option value="bønn" ${currentCat === 'bønn' ? 'selected' : ''}>Bønn</option>
-                                    <option value="undervisning" ${currentCat === 'undervisning' ? 'selected' : ''}>Undervisning</option>
+                                <div style="display:flex; align-items:center; gap:10px; width:100%;">
+                                    <select multiple class="override-select form-control" data-id="${id}" style="font-size: 12px; padding: 6px 8px; min-height: 96px; max-width: 220px;">
+                                        <option value="tro" ${currentCats.includes('tro') ? 'selected' : ''}>Tro</option>
+                                        <option value="bibel" ${currentCats.includes('bibel') ? 'selected' : ''}>Bibel</option>
+                                        <option value="bønn" ${currentCats.includes('bønn') ? 'selected' : ''}>Bønn</option>
+                                        <option value="undervisning" ${currentCats.includes('undervisning') ? 'selected' : ''}>Undervisning</option>
                                     </select>
-                                    <button type="button" class="btn-secondary btn-sm" data-open-podcast-id="${this.escapeHtml(id)}">Rediger tekst</button>
+                                    <div style="display:flex; flex-direction:column; gap:6px;">
+                                        <button type="button" class="btn-secondary btn-sm" data-open-podcast-id="${this.escapeHtml(id)}">Rediger tekst</button>
+                                        <span style="font-size:11px; color:#94a3b8;">Ingen valg = Auto (nøkkelord)</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -4430,9 +4497,15 @@ class AdminManager {
         const selects = document.querySelectorAll('.override-select');
         const overrides = {};
 
-        selects.forEach(select => {
-            if (select.value) {
-                overrides[select.getAttribute('data-id')] = select.value;
+        selects.forEach((select) => {
+            const selected = Array.from(select.selectedOptions || [])
+                .map((option) => String(option.value || '').trim())
+                .filter(Boolean);
+
+            if (selected.length === 1) {
+                overrides[select.getAttribute('data-id')] = selected[0];
+            } else if (selected.length > 1) {
+                overrides[select.getAttribute('data-id')] = selected;
             }
         });
 
@@ -5135,7 +5208,9 @@ class AdminManager {
             // --- Editor.js Data Prep ---
             let editorData = {};
             if (typeof item.content === 'object' && item.content !== null && item.content.blocks) {
-                editorData = item.content;
+                if (collectionId !== 'podcast_transcripts' || this._hasMeaningfulEditorContent(item.content)) {
+                    editorData = item.content;
+                }
             } else if (typeof item.content === 'string' && item.content.trim().length > 0) {
                 if (collectionId === 'podcast_transcripts' || collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'events') {
                     // Legacy HTML content: convert to Editor.js blocks so content is visible and editable.
@@ -5145,9 +5220,9 @@ class AdminManager {
                 }
             }
 
-            // For podcast transkripsjon, bruk 'text' feltet hvis 'content' ikke finnes
-            if (collectionId === 'podcast_transcripts' && (!item.content || Object.keys(editorData).length === 0)) {
-                if (typeof item.text === 'string' && item.text.trim().length > 0) {
+            // For podcast transkripsjon, foretrekk 'text' dersom content er tom eller ikke meningsfull.
+            if (collectionId === 'podcast_transcripts' && typeof item.text === 'string' && item.text.trim().length > 0) {
+                if (!this._hasMeaningfulEditorContent(editorData)) {
                     editorData = this.htmlToEditorJsBlocks(item.text);
                 }
             }
@@ -5682,6 +5757,15 @@ class AdminManager {
                         nextContent = previousContent;
                     }
                 }
+
+                if (collectionId === 'podcast_transcripts') {
+                    const hasSaved = this._hasMeaningfulEditorContent(savedData);
+                    const hasPrevious = this._hasMeaningfulEditorContent(previousContent);
+                    if (!hasSaved && hasPrevious) {
+                        nextContent = previousContent;
+                    }
+                }
+
                 item.content = nextContent;
                 item.date = document.getElementById('col-item-date')?.value || '';
 
@@ -5717,7 +5801,8 @@ class AdminManager {
 
                 if (collectionId === 'podcast_transcripts') {
                     item.description = document.getElementById('col-item-summary')?.value || item.description || '';
-                    item.text = this.editorJsBlocksToHtml(savedData.blocks || []);
+                    const htmlFromBlocks = this.editorJsBlocksToHtml((nextContent?.blocks) || []);
+                    item.text = htmlFromBlocks || (typeof item.text === 'string' ? item.text : '');
                 }
 
                 if (item.isSynced && item.id && !item.gcalId) {
