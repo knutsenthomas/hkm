@@ -1976,12 +1976,22 @@ body {
         flex-direction: column !important;
         min-height: 0 !important;
         border-radius: 12px !important;
+        overflow: hidden !important;
+    }
+    
+    .ms-note-modal-wide .rte-toolbar {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 20 !important;
+        background: #f8fafc !important;
+        width: 100% !important;
     }
     
     .ms-note-modal-wide .rte-editor {
         flex: 1 !important;
         min-height: 0 !important;
         height: auto !important;
+        padding-top: 20px !important;
     }
     
     .ms-note-modal-wide .hkm-modal-actions {
