@@ -4587,12 +4587,25 @@ class AdminManager {
         const rows = document.querySelectorAll('.podcast-override-item');
         const overrides = {};
         
-        // Collect current global categories from sync input
+        // 1. Start with categories from the global sync input
         const syncInput = document.getElementById('podcast-global-categories-sync');
         const currentGlobalStr = syncInput?.value || '';
-        const globalCats = new Set(
-            currentGlobalStr.split(',').map(s => s.trim()).filter(Boolean)
-        );
+        
+        // Use a Map to keep track of categories case-insensitively (key is lowercase, value is original casing)
+        const globalCatsMap = new Map();
+        
+        // Helper to add to map safely
+        const addToGlobal = (cat) => {
+            const trimmed = String(cat || '').trim();
+            if (!trimmed) return;
+            const key = trimmed.toLowerCase();
+            if (!globalCatsMap.has(key)) {
+                globalCatsMap.set(key, trimmed);
+            }
+        };
+
+        // Add initial global ones
+        currentGlobalStr.split(',').forEach(addToGlobal);
 
         rows.forEach((row) => {
             const encodedId = row.getAttribute('data-episode-key') || '';
@@ -4607,11 +4620,10 @@ class AdminManager {
             const customValue = customInput?.value || '';
             const customCategories = this.parsePodcastOverrideCategories(customValue);
 
-            // Add any NEW custom categories to the global set
-            customCategories.forEach(cat => {
-                if (cat) globalCats.add(cat);
-            });
+            // Add any NEW custom categories from this episode to the global list
+            customCategories.forEach(addToGlobal);
 
+            // Merge selected chips and new text input for this episode
             const merged = Array.from(new Set([...selected, ...customCategories]));
 
             if (merged.length === 1) {
@@ -4625,30 +4637,37 @@ class AdminManager {
         btn.disabled = true;
 
         try {
-            // 1. Save episode overrides
-            await firebaseService.savePageContent('settings_podcast_overrides', {
-                overrides: overrides,
-                updatedAt: new Date().toISOString()
-            });
-
-            // 2. Save updated global categories to media settings
-            const updatedGlobalStr = Array.from(globalCats).join(', ');
+            // 1. Fetch latest media settings to avoid overwriting other changes (like Spotify URL)
             const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
             
+            // Also merge in categories that might already be in the database
+            const dbGlobalStr = mediaSettings.podcastCustomCategories || '';
+            dbGlobalStr.split(',').forEach(addToGlobal);
+
+            // Final string of all global categories
+            const updatedGlobalStr = Array.from(globalCatsMap.values()).join(', ');
+
+            // 2. Save updated global categories
             await firebaseService.savePageContent('settings_media', {
                 ...mediaSettings,
                 podcastCustomCategories: updatedGlobalStr,
                 updatedAt: new Date().toISOString()
             });
 
-            // Sync inputs and reload UI
+            // 3. Save episode overrides
+            await firebaseService.savePageContent('settings_podcast_overrides', {
+                overrides: overrides,
+                updatedAt: new Date().toISOString()
+            });
+
+            // Update UI inputs
             if (syncInput) syncInput.value = updatedGlobalStr;
             const mainCustomInput = document.getElementById('podcast-custom-categories');
             if (mainCustomInput) mainCustomInput.value = updatedGlobalStr;
 
-            this.showToast('✅ Podcast-overstyringer og nye kategorier er lagret!', 'success', 5000);
+            this.showToast('✅ Lagret! Alle kategorier er nå faste.', 'success', 3000);
             
-            // Reload the list to show the new chips
+            // Reload the list to convert text inputs into chips
             await this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save overrides error:", err);
