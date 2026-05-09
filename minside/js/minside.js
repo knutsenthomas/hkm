@@ -217,7 +217,9 @@ class MinSideManager {
                 .map(n => n[0].toUpperCase())
                 .slice(0, 2)
                 .join('');
+            
             el.textContent = initials || '?';
+            el.style.color = '#ffffff'; // Extra safety for visibility
         }
     }
 

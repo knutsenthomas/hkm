@@ -4695,6 +4695,7 @@ body.builder-active .main-header .section-header-content {
 }
 
 body.admin-body .main-header .section-header-icon,
+body.minside-body .main-header .section-header-icon,
 body.crm-body .main-header .section-header-icon,
 body.builder-active .main-header .section-header-icon {
     width: 36px !important;
