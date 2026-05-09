@@ -2678,12 +2678,12 @@ class AdminManager {
     }
 
     initSearch() {
-        const searchOpener = document.getElementById('global-search-opener');
         const searchModal = document.getElementById('search-modal');
-        const closeSearchModal = document.getElementById('close-search-modal');
         const modalSearchInput = document.getElementById('global-modal-search-input');
+        const closeSearchModal = document.getElementById('close-search-modal');
+        const searchOpener = document.getElementById('global-search-opener');
 
-        if (!searchOpener || !searchModal || !modalSearchInput) return;
+        if (!searchModal || !modalSearchInput) return;
 
         // Open search modal
         const openModal = () => {
@@ -2691,10 +2691,12 @@ class AdminManager {
             setTimeout(() => modalSearchInput.focus(), 100);
         };
 
-        searchOpener.addEventListener('click', openModal);
-        
         // Expose to window for FAB and other access
         window.openGlobalSearch = openModal;
+
+        if (searchOpener) {
+            searchOpener.addEventListener('click', openModal);
+        }
 
         // Close search modal
         const closeModal = () => {
