@@ -3904,6 +3904,273 @@ class AdminManager {
         return merged;
     }
 
+    hasPodcastTranscriptText(item) {
+        const text = typeof item?.text === 'string' ? item.text.trim() : '';
+        if (text) return true;
+
+        const content = item?.content;
+        if (typeof content === 'string' && content.trim()) return true;
+        if (content && typeof content === 'object' && Array.isArray(content.blocks) && content.blocks.length > 0) {
+            return true;
+        }
+
+        return false;
+    }
+
+    hasPodcastTranscriptSummary(item) {
+        const description = typeof item?.description === 'string' ? item.description.trim() : '';
+        const summary = typeof item?.summary === 'string' ? item.summary.trim() : '';
+        return Boolean(description || summary);
+    }
+
+    getPodcastTranscriptAudit(item) {
+        const hasTranscript = this.hasPodcastTranscriptText(item);
+        const hasSummary = this.hasPodcastTranscriptSummary(item);
+
+        return {
+            hasTranscript,
+            hasSummary,
+            isComplete: hasTranscript && hasSummary
+        };
+    }
+
+    getPodcastTranscriptOverview(items) {
+        const list = Array.isArray(items) ? items : [];
+        const stats = {
+            total: list.length,
+            missingTranscript: 0,
+            missingSummary: 0,
+            complete: 0
+        };
+
+        list.forEach((item) => {
+            const audit = this.getPodcastTranscriptAudit(item);
+            if (!audit.hasTranscript) stats.missingTranscript += 1;
+            if (!audit.hasSummary) stats.missingSummary += 1;
+            if (audit.isComplete) stats.complete += 1;
+        });
+
+        return stats;
+    }
+
+    podcastBlocksToPlainText(blocks) {
+        const list = Array.isArray(blocks) ? blocks : [];
+        return list
+            .map((block) => {
+                const type = String(block?.type || '').toLowerCase();
+                const data = block?.data || {};
+
+                if (type === 'header' || type === 'quote' || type === 'paragraph') {
+                    return String(data.text || '').trim();
+                }
+
+                if (type === 'list') {
+                    const items = Array.isArray(data.items) ? data.items : [];
+                    return items
+                        .map((item) => {
+                            if (typeof item === 'string') return item;
+                            if (item && typeof item === 'object') return item.content || item.text || '';
+                            return '';
+                        })
+                        .filter(Boolean)
+                        .join(' ');
+                }
+
+                return String(data.text || '').trim();
+            })
+            .filter(Boolean)
+            .join(' ')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    podcastHtmlToPlainText(value) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(String(value || ''), 'text/html');
+        return String(doc.body?.textContent || '')
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
+    getPodcastTranscriptPlainText(item) {
+        const content = item?.content;
+        if (content && typeof content === 'object' && Array.isArray(content.blocks)) {
+            const blockText = this.podcastBlocksToPlainText(content.blocks);
+            if (blockText) return blockText;
+        }
+
+        if (typeof item?.text === 'string' && item.text.trim()) {
+            return this.podcastHtmlToPlainText(item.text);
+        }
+
+        if (typeof content === 'string' && content.trim()) {
+            return this.podcastHtmlToPlainText(content);
+        }
+
+        return '';
+    }
+
+    buildPodcastLocalSummarySuggestion(title, transcriptText) {
+        const cleaned = String(transcriptText || '')
+            .replace(/\s+/g, ' ')
+            .replace(/\b\d{1,3}[.:]\s*/g, '')
+            .trim();
+
+        if (!cleaned) return '';
+
+        const sentences = cleaned
+            .split(/(?<=[.!?])\s+/)
+            .map((s) => s.trim())
+            .filter((s) => s.length >= 35)
+            .slice(0, 3);
+
+        const core = sentences.join(' ').trim();
+        if (!core) return '';
+
+        if (!title) return core;
+
+        return `I denne episoden ${title.toLowerCase().includes('lydbok') ? 'får du en lydboklesning' : 'får du undervisning'} som tar deg gjennom sentrale poeng i teksten. ${core}`;
+    }
+
+    async generatePodcastTranscriptForItem(item) {
+        const episodeId = String(item?.id || '').trim();
+        const audioUrl = String(item?.audioUrl || '').trim();
+
+        if (!episodeId || !audioUrl) {
+            throw new Error('Mangler episode-ID eller lydfil.');
+        }
+
+        const callable = firebase.functions().httpsCallable('transcribePodcast');
+        await callable({
+            episodeId,
+            audioUrl,
+            episodeTitle: String(item?.title || '')
+        });
+
+        const refreshedDoc = await firebase.firestore().collection('podcast_transcripts').doc(episodeId).get();
+        return refreshedDoc.exists ? { id: episodeId, ...refreshedDoc.data() } : item;
+    }
+
+    async generatePodcastSummaryForItem(item) {
+        const episodeId = String(item?.id || '').trim();
+        if (!episodeId) {
+            throw new Error('Mangler episode-ID for oppsummering.');
+        }
+
+        const transcriptText = this.getPodcastTranscriptPlainText(item);
+        if (transcriptText.length < 120) {
+            throw new Error('For lite tekstgrunnlag til å lage oppsummering.');
+        }
+
+        let summary = '';
+
+        try {
+            const callable = firebase.functions().httpsCallable('generatePodcastSummary');
+            const response = await callable({
+                episodeTitle: String(item?.title || '').trim(),
+                transcriptText
+            });
+            summary = String(response?.data?.summary || '').trim();
+        } catch (error) {
+            console.warn('AI-oppsummering feilet i bulk, bruker lokal fallback:', error);
+        }
+
+        if (!summary) {
+            summary = this.buildPodcastLocalSummarySuggestion(String(item?.title || ''), transcriptText);
+        }
+
+        if (!summary) {
+            throw new Error('Kunne ikke lage oppsummering.');
+        }
+
+        await firebase.firestore().collection('podcast_transcripts').doc(episodeId).set({
+            description: summary,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        return {
+            ...item,
+            description: summary
+        };
+    }
+
+    async runPodcastBulkAiFillMissing(triggerBtn = null) {
+        const collectionId = 'podcast_transcripts';
+
+        if (!Array.isArray(this._collectionItemsCache[collectionId]) || this._collectionItemsCache[collectionId].length === 0) {
+            await this.loadCollection(collectionId);
+        }
+
+        const items = Array.isArray(this._collectionItemsCache[collectionId])
+            ? [...this._collectionItemsCache[collectionId]]
+            : [];
+
+        const targets = items.filter((item) => {
+            const audit = this.getPodcastTranscriptAudit(item);
+            return !audit.hasTranscript || !audit.hasSummary;
+        });
+
+        if (!targets.length) {
+            this.showToast('Alle podcast-episoder har allerede tekst og oppsummering.', 'success', 5000);
+            return;
+        }
+
+        const confirmed = window.confirm(`Dette vil generere manglende tekst og oppsummering for ${targets.length} podcast-episoder. Vil du fortsette?`);
+        if (!confirmed) return;
+
+        const originalBtnHtml = triggerBtn ? triggerBtn.innerHTML : '';
+        if (triggerBtn) {
+            triggerBtn.disabled = true;
+            triggerBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Kjører...';
+        }
+
+        let processed = 0;
+        let failed = 0;
+
+        try {
+            for (const target of targets) {
+                const title = String(target?.title || 'Uten tittel');
+                this.showToast(`Jobber med podcast: ${title}`, 'info', 2500);
+
+                try {
+                    let workingItem = { ...target };
+                    const auditBefore = this.getPodcastTranscriptAudit(workingItem);
+
+                    if (!auditBefore.hasTranscript) {
+                        workingItem = await this.generatePodcastTranscriptForItem(workingItem);
+                    }
+
+                    const auditAfterTranscript = this.getPodcastTranscriptAudit(workingItem);
+                    if (!auditAfterTranscript.hasSummary) {
+                        workingItem = await this.generatePodcastSummaryForItem(workingItem);
+                    }
+
+                    this._collectionItemsCache[collectionId] = (this._collectionItemsCache[collectionId] || []).map((entry) =>
+                        entry?.id === workingItem.id ? { ...entry, ...workingItem } : entry
+                    );
+
+                    processed += 1;
+                } catch (error) {
+                    failed += 1;
+                    console.error('Bulk podcast AI-generering feilet for episode:', target?.id, error);
+                }
+            }
+
+            await this.loadCollection(collectionId);
+
+            if (failed === 0) {
+                this.showToast(`Ferdig. Oppdaterte ${processed} podcast-episoder.`, 'success', 6000);
+            } else {
+                this.showToast(`Ferdig med feil. Oppdaterte ${processed} episoder, ${failed} feilet.`, 'warning', 7000);
+            }
+        } finally {
+            if (triggerBtn) {
+                triggerBtn.disabled = false;
+                triggerBtn.innerHTML = originalBtnHtml;
+            }
+        }
+    }
+
 
     async fetchAnalyticsData() {
         try {
@@ -4233,6 +4500,23 @@ class AdminManager {
         const section = document.getElementById(`${sectionId}-section`);
         if (!section) return;
 
+        const actionsHtml = collectionId === 'podcast_transcripts'
+            ? `
+                <div style="display:flex !important; align-items:center !important; gap:12px !important; flex-shrink:0 !important; margin-left:20px !important;">
+                    <button class="btn btn-secondary" id="bulk-fill-${collectionId}" style="background:#fff !important; border:1px solid #e2e8f0 !important; padding:14px 20px !important; font-weight:700 !important; border-radius:10px !important; display:flex !important; align-items:center !important; gap:10px !important; color:#1e293b !important; cursor:pointer !important; white-space:nowrap !important;">
+                        <span class="material-symbols-outlined" style="font-size:22px !important;">auto_awesome</span> Fyll manglende tekst og oppsummering
+                    </button>
+                    <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316 !important; border: none !important; padding: 14px 28px !important; font-weight: 700 !important; border-radius: 10px !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3) !important; color: white !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; white-space: nowrap !important; flex-shrink: 0 !important;">
+                        <span class="material-symbols-outlined" style="font-size: 22px !important;">add</span> Legg til ny
+                    </button>
+                </div>
+            `
+            : `
+                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316 !important; border: none !important; padding: 14px 28px !important; font-weight: 700 !important; border-radius: 10px !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3) !important; color: white !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; white-space: nowrap !important; flex-shrink: 0 !important; margin-left: 20px !important;">
+                    <span class="material-symbols-outlined" style="font-size: 22px !important;">add</span> Legg til ny
+                </button>
+            `;
+
         section.innerHTML = `
             <div class="card kinetic-header-card" style="margin-bottom: 24px !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 32px 40px !important; background: white !important; border-radius: 20px !important; border: 1px solid #f1f5f9 !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; flex-wrap: nowrap !important;">
                 <div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 28px !important; min-width: 0 !important; flex: 1 !important;">
@@ -4244,9 +4528,7 @@ class AdminManager {
                         <p style="margin: 6px 0 0 !important; font-size: 15px !important; color: #94a3b8 !important; font-weight: 500 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">Administrer dine ${title.toLowerCase()}.</p>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316 !important; border: none !important; padding: 14px 28px !important; font-weight: 700 !important; border-radius: 10px !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3) !important; color: white !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; white-space: nowrap !important; flex-shrink: 0 !important; margin-left: 20px !important;">
-                    <span class="material-symbols-outlined" style="font-size: 22px !important;">add</span> Legg til ny
-                </button>
+                ${actionsHtml}
             </div>
             <div class="card" style="padding: 0 !important; overflow: hidden !important; border-radius: 20px !important; border: 1px solid #f1f5f9 !important; background: white !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; box-sizing: border-box !important;">
                 <div id="${collectionId}-list" class="table-container full-bleed">
@@ -4257,6 +4539,10 @@ class AdminManager {
         section.setAttribute('data-rendered', 'true');
 
         document.getElementById(`add-new-${collectionId}`).addEventListener('click', () => this.addNewItem(collectionId));
+        if (collectionId === 'podcast_transcripts') {
+            const bulkBtn = document.getElementById(`bulk-fill-${collectionId}`);
+            bulkBtn?.addEventListener('click', () => this.runPodcastBulkAiFillMissing(bulkBtn));
+        }
         this._ensureCollectionRealtimeSubscription(collectionId);
         this.loadCollection(collectionId);
     }
@@ -4467,18 +4753,38 @@ class AdminManager {
             return;
         }
 
+        const isPodcastTranscriptCollection = collectionId === 'podcast_transcripts';
+        const podcastOverview = isPodcastTranscriptCollection
+            ? this.getPodcastTranscriptOverview(items)
+            : null;
+
         const rowsHtml = items.map((item, index) => {
             const rawTitle = item.title || 'Uten tittel';
             const title = this.escapeHtml(rawTitle);
             const category = item.category ? this.escapeHtml(item.category) : '';
             const author = item.author ? this.escapeHtml(item.author) : '';
             const dateText = item.date ? this.escapeHtml(String(item.date).split('T')[0]) : '—';
-            const statusPill = item.isSynced
-                ? '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">SYNKRONISERT</span>'
-                : '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">LOKAL/FIRESTORE</span>';
+            const podcastAudit = isPodcastTranscriptCollection ? this.getPodcastTranscriptAudit(item) : null;
+            const statusPill = isPodcastTranscriptCollection
+                ? `
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <span style="background:${podcastAudit.hasTranscript ? '#ecfdf5' : '#fef2f2'}; color:${podcastAudit.hasTranscript ? '#047857' : '#b91c1c'}; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:0.03em;">${podcastAudit.hasTranscript ? 'TEKST OK' : 'MANGLER TEKST'}</span>
+                        <span style="background:${podcastAudit.hasSummary ? '#eff6ff' : '#fff7ed'}; color:${podcastAudit.hasSummary ? '#1d4ed8' : '#c2410c'}; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:0.03em;">${podcastAudit.hasSummary ? 'OPPSUMMERING OK' : 'MANGLER OPPSUMMERING'}</span>
+                    </div>
+                `
+                : (item.isSynced
+                    ? '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">SYNKRONISERT</span>'
+                    : '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">LOKAL/FIRESTORE</span>');
             const imageCell = item.imageUrl
                 ? `<img src="${this.escapeHtml(item.imageUrl)}" alt="" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid #f1f5f9;">`
                 : '<div style="width:48px;height:48px;border-radius:12px;background:#f8fafc;color:#94a3b8;display:flex;align-items:center;justify-content:center;border:1px solid #f1f5f9;"><span class="material-symbols-outlined" style="font-size:24px;">image</span></div>';
+            const subline = isPodcastTranscriptCollection
+                ? (podcastAudit.isComplete
+                    ? 'Klar for publisering'
+                    : (!podcastAudit.hasTranscript
+                        ? 'Mangler transkripsjonstekst'
+                        : 'Mangler oppsummering'))
+                : (category || 'Blogg');
 
             return `
                 <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.2s;">
@@ -4487,7 +4793,7 @@ class AdminManager {
                             ${imageCell}
                             <div>
                                 <div style="font-weight: 700; font-size: 15px; color: #1e293b; margin-bottom: 2px;">${title}</div>
-                                <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${category || 'Blogg'}</div>
+                                <div style="font-size: 12px; color: #94a3b8; font-weight: 500;">${this.escapeHtml(subline)}</div>
                             </div>
                         </div>
                     </td>
@@ -4511,7 +4817,31 @@ class AdminManager {
             `;
         }).join('');
 
+        const overviewHtml = isPodcastTranscriptCollection && podcastOverview
+            ? `
+                <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px;">
+                    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:12px 16px; min-width:140px;">
+                        <div style="font-size:11px; font-weight:800; letter-spacing:0.08em; color:#94a3b8; text-transform:uppercase;">Totalt</div>
+                        <div style="font-size:24px; font-weight:800; color:#0f172a;">${podcastOverview.total}</div>
+                    </div>
+                    <div style="background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:12px 16px; min-width:140px;">
+                        <div style="font-size:11px; font-weight:800; letter-spacing:0.08em; color:#b91c1c; text-transform:uppercase;">Mangler tekst</div>
+                        <div style="font-size:24px; font-weight:800; color:#991b1b;">${podcastOverview.missingTranscript}</div>
+                    </div>
+                    <div style="background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; padding:12px 16px; min-width:160px;">
+                        <div style="font-size:11px; font-weight:800; letter-spacing:0.08em; color:#c2410c; text-transform:uppercase;">Mangler oppsummering</div>
+                        <div style="font-size:24px; font-weight:800; color:#9a3412;">${podcastOverview.missingSummary}</div>
+                    </div>
+                    <div style="background:#ecfdf5; border:1px solid #a7f3d0; border-radius:12px; padding:12px 16px; min-width:140px;">
+                        <div style="font-size:11px; font-weight:800; letter-spacing:0.08em; color:#047857; text-transform:uppercase;">Komplette</div>
+                        <div style="font-size:24px; font-weight:800; color:#065f46;">${podcastOverview.complete}</div>
+                    </div>
+                </div>
+            `
+            : '';
+
         container.innerHTML = `
+            ${overviewHtml}
             <div style="width: 100%; overflow-x: auto;">
                 <table style="width: 100%; border-collapse: collapse; text-align: left;">
                     <thead style="background: #fafbfc; border-bottom: 1px solid #f1f5f9;">
