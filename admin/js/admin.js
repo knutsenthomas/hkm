@@ -4157,8 +4157,8 @@ class AdminManager {
             if (typeof item.content === 'object' && item.content !== null && item.content.blocks) {
                 editorData = item.content;
             } else if (typeof item.content === 'string' && item.content.trim().length > 0) {
-                if (collectionId === 'podcast_transcripts') {
-                    // For podcast transkripsjon lagret som HTML, konverter til Editor.js blocks
+                if (collectionId === 'podcast_transcripts' || collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'events') {
+                    // Legacy HTML content: convert to Editor.js blocks so content is visible and editable.
                     editorData = this.htmlToEditorJsBlocks(item.content);
                 } else {
                     console.warn("Legacy HTML content detected. Editor.js works best with JSON.");

@@ -2635,8 +2635,8 @@ function buildBlogItemDedupKey(item, index = 0) {
     if (wixGuid) return `wix-guid:${wixGuid}`;
     if (urlPath) return `wix-url:${urlPath}`;
     if (slug) return `wix-slug:${slug}`;
-    if (title && dateKey) return `wix-title-date:${title}:${dateKey}`;
     if (stable) return `wix-stable:${stable}`;
+    return `wix-fallback:${index}`;
   }
 
   if (stable) return `stable:${stable}`;
@@ -2782,6 +2782,10 @@ function detectBlogItemLanguage(item) {
 
 function buildBlogTitleDateKey(item, index = 0) {
   if (!item || typeof item !== "object") return `fallback-${index}`;
+  const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
+  if (source === "wix") {
+    return buildBlogItemDedupKey(item, index);
+  }
   const title = normalizeKeyFragment(item.title || "");
   const dateIso = parseDateIso(item.date || "");
   const dateKey = dateIso ? dateIso.slice(0, 10) : "";
