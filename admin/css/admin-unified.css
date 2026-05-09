@@ -4650,13 +4650,22 @@ body.builder-active .user-role {
         padding: 0 16px !important;
     }
     
-    .mobile-nav-toggle {
+    body.admin-body .mobile-nav-toggle,
+    body.minside-body .mobile-nav-toggle,
+    body.crm-body .mobile-nav-toggle,
+    body.builder-active .mobile-nav-toggle {
         display: flex !important;
     }
 
-    .user-info-text,
-    .section-header-icon,
-    .section-subtitle,
+    body.admin-body .user-info-text,
+    body.minside-body .user-info-text,
+    body.crm-body .user-info-text,
+    body.admin-body .section-header-icon,
+    body.minside-body .section-header-icon,
+    body.crm-body .section-header-icon,
+    body.admin-body .section-subtitle,
+    body.minside-body .section-subtitle,
+    body.crm-body .section-subtitle,
     .breadcrumb-divider,
     .breadcrumb-item {
         display: none !important;
