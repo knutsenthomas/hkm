@@ -431,8 +431,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const hasActiveLink = document.querySelector(`.nav-item[data-nav-category="${cat}"] .nav-link.active`) !== null;
             const savedState = sessionStorage.getItem(`nav_cat_${cat}`);
             
-            // Priority: 1. Active Link, 2. URL Match, 3. Saved State, 4. Default (Nettsted open)
-            let shouldBeOpen = (cat === 'nettsted');
+            // Priority: 1. Active Link, 2. URL Match, 3. Saved State, 4. Default (Nettsted & Administrasjon open)
+            let shouldBeOpen = (cat === 'nettsted' || cat === 'administrasjon');
             if (savedState) shouldBeOpen = (savedState === 'open');
             if (hasActiveLink) shouldBeOpen = true; 
 
