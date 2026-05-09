@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hkm-admin-v4';
+const CACHE_NAME = 'hkm-admin-v5';
 const STATIC_ASSETS = [
     '/admin/css/dashboard.css',
     '/admin/css/admin-unified.css',
@@ -86,6 +86,25 @@ self.addEventListener('fetch', (event) => {
     }
 
     if (!shouldCacheStatic(request, url)) {
+        return;
+    }
+
+    // Scripts/styles should be network-first to avoid stale i18n/menu logic.
+    if (request.destination === 'script' || request.destination === 'style') {
+        event.respondWith((async () => {
+            const cache = await caches.open(CACHE_NAME);
+            try {
+                const fresh = await fetch(request, { cache: 'no-store' });
+                if (fresh && fresh.ok) {
+                    cache.put(request, fresh.clone()).catch(() => { });
+                }
+                return fresh;
+            } catch (error) {
+                const cached = await cache.match(request);
+                if (cached) return cached;
+                throw error;
+            }
+        })());
         return;
     }
 
