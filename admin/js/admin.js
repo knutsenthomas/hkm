@@ -2732,6 +2732,71 @@ class AdminManager {
                 }
             }
         });
+
+        // Live suggestions
+        const suggestionsContainer = document.getElementById('search-suggestions');
+        modalSearchInput.addEventListener('input', () => {
+            const query = modalSearchInput.value.trim();
+            this.updateSearchSuggestions(query, suggestionsContainer);
+        });
+    }
+
+    async updateSearchSuggestions(query, container) {
+        const q = (query || '').trim().toLowerCase();
+        if (!q || q.length < 1) {
+            container.style.display = 'none';
+            container.innerHTML = '';
+            return;
+        }
+
+        // Fast match on common nav items and system areas
+        const staticItems = [
+            { label: 'Oversikt', type: 'Navigasjon', icon: 'grid_view' },
+            { label: 'Blogg / Nyheter', type: 'Side', icon: 'rss_feed' },
+            { label: 'Arrangementer', type: 'Side', icon: 'event' },
+            { label: 'Mediebibliotek', type: 'Filer', icon: 'folder_open' },
+            { label: 'Gavehåndtering', type: 'Økonomi', icon: 'volunteer_activism' },
+            { label: 'Brukerliste', type: 'Medlemmer', icon: 'group' },
+            { label: 'Ny bruker', type: 'Handling', icon: 'person_add' },
+            { label: 'Podcast', type: 'Side', icon: 'podcasts' },
+            { label: 'Om oss', type: 'Side', icon: 'info' },
+            { label: 'Kontaktinformasjon', type: 'Side', icon: 'mail' },
+            { label: 'Bibelstudier', type: 'Innhold', icon: 'menu_book' },
+            { label: 'Systemlogger', type: 'Admin', icon: 'assignment' },
+            { label: 'Hjem / Forside', type: 'Side', icon: 'home' }
+        ];
+
+        const matches = staticItems.filter(item => 
+            item.label.toLowerCase().includes(q) || 
+            item.type.toLowerCase().includes(q)
+        ).slice(0, 6);
+
+        if (matches.length > 0) {
+            container.innerHTML = matches.map(m => `
+                <div class="search-suggestion-item" onclick="window.adminManager.handleSuggestionClick('${m.label}')">
+                    <div class="search-suggestion-icon">
+                        <span class="material-symbols-outlined">${m.icon}</span>
+                    </div>
+                    <div class="search-suggestion-content">
+                        <span class="search-suggestion-label">${m.label}</span>
+                        <span class="search-suggestion-type">${m.type}</span>
+                    </div>
+                </div>
+            `).join('');
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    }
+
+    handleSuggestionClick(label) {
+        const input = document.getElementById('global-modal-search-input');
+        if (input) input.value = label;
+        const modal = document.getElementById('search-modal');
+        if (modal) modal.style.display = 'none';
+        const suggestionsContainer = document.getElementById('search-suggestions');
+        if (suggestionsContainer) suggestionsContainer.style.display = 'none';
+        this.performSearch(label);
     }
 
     async performSearch(query) {
