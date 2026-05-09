@@ -1415,6 +1415,9 @@ class AdminManager {
                 case 'events':
                     this.renderCollectionEditor('events', 'Arrangementer');
                     break;
+                case 'podcast':
+                    this.renderPodcastManager();
+                    break;
 
                 case 'media':
                     this.renderMediaManager();
@@ -3639,26 +3642,39 @@ class AdminManager {
         }
 
         try {
-            const dataRes = await this._promiseWithTimeout(
-                firebaseService.getPageContent(`collection_${collectionId}`),
-                5000
-            );
+            let items = [];
 
-            if (!isCurrentRequest()) return;
+            if (collectionId === 'podcast_transcripts') {
+                // For podcast transcripts, fetch directly from Firestore collection
+                const snapshots = await firebase.firestore().collection('podcast_transcripts').get();
+                items = snapshots.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+            } else {
+                const dataRes = await this._promiseWithTimeout(
+                    firebaseService.getPageContent(`collection_${collectionId}`),
+                    5000
+                );
 
-            if (dataRes.timedOut) {
-                const cachedItems = this._collectionItemsCache[collectionId];
-                if (Array.isArray(cachedItems) && cachedItems.length > 0) {
-                    this.renderItems(collectionId, cachedItems);
-                    this.showToast('Viser sist lastede data. Henting tok for lang tid.', 'warning', 4000);
-                } else {
-                    this._renderCollectionLoadMessage(collectionId, 'Lasting tok for lang tid. Prøv igjen.', 'warning');
+                if (!isCurrentRequest()) return;
+
+                if (dataRes.timedOut) {
+                    const cachedItems = this._collectionItemsCache[collectionId];
+                    if (Array.isArray(cachedItems) && cachedItems.length > 0) {
+                        this.renderItems(collectionId, cachedItems);
+                        this.showToast('Viser sist lastede data. Henting tok for lang tid.', 'warning', 4000);
+                    } else {
+                        this._renderCollectionLoadMessage(collectionId, 'Lasting tok for lang tid. Prøv igjen.', 'warning');
+                    }
+                    return;
                 }
-                return;
+
+                const data = dataRes.value;
+                items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
             }
 
-            const data = dataRes.value;
-            let items = Array.isArray(data) ? data : (data && data.items ? data.items : []);
+            if (!isCurrentRequest()) return;
 
             // Mark items that exist in Firestore so we can delete them
             items.forEach(it => it.isFirestore = true);
@@ -3791,7 +3807,7 @@ class AdminManager {
                              </button>
                              <span style="color: #94a3b8; margin: 0 8px;">|</span>
                              <span style="font-weight: 600; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">
-                                ${collectionId === 'blog' ? 'Blogginnlegg' : (collectionId === 'events' ? 'Arrangement' : (collectionId === 'teaching' ? 'Undervisning' : 'Rediger innhold'))}
+                                ${collectionId === 'blog' ? 'Blogginnlegg' : (collectionId === 'events' ? 'Arrangement' : (collectionId === 'teaching' ? 'Undervisning' : (collectionId === 'podcast_transcripts' ? 'Podcast Transkripsjon' : 'Rediger innhold')))}
                              </span>
                         </div>
                         <div class="editor-header-right">
@@ -3812,6 +3828,20 @@ class AdminManager {
                         </div>
                         <aside class="editor-sidebar-v2">
                              <h4 class="sidebar-section-title">DETALJER</h4>
+                             ${collectionId === 'podcast_transcripts' ? `
+                             <div class="sidebar-group">
+                                 <label>Episode-ID</label>
+                                 <input type="text" id="col-item-id" class="sidebar-control" value="${item.id || ''}" disabled style="background: #f1f5f9; color: #64748b; cursor: not-allowed;">
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Episode-tittel</label>
+                                 <input type="text" id="col-item-title-readonly" class="sidebar-control" value="${item.title || ''}" disabled style="background: #f1f5f9; color: #64748b; cursor: not-allowed;">
+                             </div>
+                             <div class="sidebar-group">
+                                 <label>Publiseringsdato</label>
+                                 <input type="date" id="col-item-date" class="sidebar-control" value="${safeDate}" disabled style="background: #f1f5f9; color: #64748b; cursor: not-allowed;">
+                             </div>
+                             ` : `
                              <div class="sidebar-group">
                                  <label>Publiseringsdato</label>
                                  <input type="date" id="col-item-date" class="sidebar-control" value="${safeDate}">
@@ -3820,6 +3850,7 @@ class AdminManager {
                                  <label>Forfatter</label>
                                  <input type="text" id="col-item-author" class="sidebar-control" value="${item.author || ''}" placeholder="Navn">
                              </div>
+                             `}
                              ${isTeachingCollection ? `
                              <div class="sidebar-group">
                                  <label>Type undervisning</label>
@@ -3837,13 +3868,14 @@ class AdminManager {
                                  </select>
                                  <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Hold Cmd/Ctrl nede for å velge flere undervisninger i serien.</p>
                              </div>
-                             ` : `
+                             ` : (collectionId !== 'podcast_transcripts' ? `
                              <div class="sidebar-group">
                                  <label>Kategori</label>
                                  <input type="text" id="col-item-cat" class="sidebar-control" value="${item.category || ''}" placeholder="Eks: Undervisning">
                              </div>
-                             `}
+                             ` : '')}
                              
+                              ${collectionId !== 'podcast_transcripts' ? `
                               <h4 class="sidebar-section-title">OMSLAGSBILDE</h4>
                               <div class="sidebar-group">
                                   <div class="sidebar-img-preview" id="sidebar-img-trigger" style="cursor: pointer; position: relative; overflow: hidden; border: 2px dashed #e2e8f0; border-radius: 12px; height: 160px; display: flex; align-items: center; justify-content: center; background: #f8fafc; transition: all 0.2s;">
@@ -3872,6 +3904,7 @@ class AdminManager {
                                  <label>Meta-beskrivelse</label>
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
+                             ` : ''}
                              ${collectionId === 'blog' ? `
                              <h4 class="sidebar-section-title">RELATERTE INNLEGG</h4>
                              <div class="sidebar-group">
@@ -3885,8 +3918,7 @@ class AdminManager {
                                  </select>
                                  <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Hold Cmd/Ctrl nede for å velge flere.</p>
                              </div>
-                             ` : ''
-                }
+                             ` : ''}
                         </aside>
                     </div>
                 </div>
@@ -3911,7 +3943,19 @@ class AdminManager {
             if (typeof item.content === 'object' && item.content !== null && item.content.blocks) {
                 editorData = item.content;
             } else if (typeof item.content === 'string' && item.content.trim().length > 0) {
-                console.warn("Legacy HTML content detected. Editor.js works best with JSON.");
+                if (collectionId === 'podcast_transcripts') {
+                    // For podcast transkripsjon lagret som HTML, konverter til Editor.js blocks
+                    editorData = this.htmlToEditorJsBlocks(item.content);
+                } else {
+                    console.warn("Legacy HTML content detected. Editor.js works best with JSON.");
+                }
+            }
+
+            // For podcast transkripsjon, bruk 'text' feltet hvis 'content' ikke finnes
+            if (collectionId === 'podcast_transcripts' && (!item.content || Object.keys(editorData).length === 0)) {
+                if (typeof item.text === 'string' && item.text.trim().length > 0) {
+                    editorData = this.htmlToEditorJsBlocks(item.text);
+                }
             }
 
             // --- Initialize Editor.js ---
@@ -4456,8 +4500,12 @@ class AdminManager {
                             item.content = savedData; // Store as JSON object
 
                             item.date = document.getElementById('col-item-date')?.value || '';
-                            item.imageUrl = document.getElementById('col-item-img')?.value || '';
-                            item.author = document.getElementById('col-item-author')?.value || '';
+                            
+                            if (collectionId !== 'podcast_transcripts') {
+                                item.imageUrl = document.getElementById('col-item-img')?.value || '';
+                                item.author = document.getElementById('col-item-author')?.value || '';
+                            }
+                            
                             if (isTeachingCollection) {
                                 const typeValue = document.getElementById('col-item-type')?.value || 'Bibelstudier';
                                 const seriesSelect = document.getElementById('col-item-series-items');
@@ -4466,18 +4514,26 @@ class AdminManager {
                                 item.seriesItems = typeValue === 'Undervisningsserier' && seriesSelect
                                     ? Array.from(seriesSelect.selectedOptions).map(opt => opt.value)
                                     : [];
-                            } else {
+                            } else if (collectionId !== 'podcast_transcripts') {
                                 item.category = document.getElementById('col-item-cat')?.value || '';
                             }
-                            item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
-                            item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
-                            item.tags = currentTags;
+                            
+                            if (collectionId !== 'podcast_transcripts') {
+                                item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
+                                item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
+                                item.tags = currentTags;
+                            }
 
                             if (collectionId === 'blog') {
                                 const relatedSelect = document.getElementById('col-item-related');
                                 if (relatedSelect) {
                                     item.relatedPosts = Array.from(relatedSelect.selectedOptions).map(opt => opt.value);
                                 }
+                            }
+
+                            // For podcast, convert savedData to HTML for backwards compatibility (media.js expects 'text' field)
+                            if (collectionId === 'podcast_transcripts') {
+                                item.text = this.editorJsBlocksToHtml(savedData.blocks || []);
                             }
 
                             // Ensure gcalId is preserved if this was a synced item
@@ -4497,49 +4553,54 @@ class AdminManager {
                             let safeItem = normalizedItem.value;
 
                             try {
-                                const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                                const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+                                if (collectionId === 'podcast_transcripts') {
+                                    // For podcast transcripts, save directly to Firestore collection
+                                    await firebase.firestore().collection('podcast_transcripts').doc(safeItem.id).set(safeItem, { merge: true });
+                                } else {
+                                    const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                                    const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
 
-                                if (collectionId === 'blog') {
-                                    safeItem = await this.ensureBlogPostTranslations(safeItem, { force: false });
-                                }
+                                    if (collectionId === 'blog') {
+                                        safeItem = await this.ensureBlogPostTranslations(safeItem, { force: false });
+                                    }
 
-                                // Use ID-based matching if available (most reliable)
-                                let existingIdx = -1;
-                                if (safeItem.id) {
-                                    existingIdx = list.findIndex(fi => fi.id === safeItem.id);
-                                }
+                                    // Use ID-based matching if available (most reliable)
+                                    let existingIdx = -1;
+                                    if (safeItem.id) {
+                                        existingIdx = list.findIndex(fi => fi.id === safeItem.id);
+                                    }
 
-                                // Fallback to "Smart Matching" for legacy items or events without ID
-                                if (existingIdx === -1) {
-                                    if (collectionId === 'events') {
-                                        existingIdx = list.findIndex(fi =>
-                                            (safeItem.gcalId && fi.gcalId === safeItem.gcalId) ||
-                                            (fi.title === safeItem.title && fi.date?.split('T')[0] === safeItem.date?.split('T')[0])
-                                        );
-                                    } else if (safeItem.isFirestore) {
-                                        // Only use index-based fallback for items that we know were already in Firestore
-                                        if (typeof index === 'number' && index >= 0 && !safeItem.isSynced) {
-                                            existingIdx = index;
+                                    // Fallback to "Smart Matching" for legacy items or events without ID
+                                    if (existingIdx === -1) {
+                                        if (collectionId === 'events') {
+                                            existingIdx = list.findIndex(fi =>
+                                                (safeItem.gcalId && fi.gcalId === safeItem.gcalId) ||
+                                                (fi.title === safeItem.title && fi.date?.split('T')[0] === safeItem.date?.split('T')[0])
+                                            );
+                                        } else if (safeItem.isFirestore) {
+                                            // Only use index-based fallback for items that we know were already in Firestore
+                                            if (typeof index === 'number' && index >= 0 && !safeItem.isSynced) {
+                                                existingIdx = index;
+                                            }
                                         }
                                     }
-                                }
 
-                                if (existingIdx >= 0) {
-                                    list[existingIdx] = safeItem;
-                                } else {
-                                    list.unshift(safeItem); // Push to top if truly new
-                                }
+                                    if (existingIdx >= 0) {
+                                        list[existingIdx] = safeItem;
+                                    } else {
+                                        list.unshift(safeItem); // Push to top if truly new
+                                    }
 
-                                await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+                                    await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
 
-                                // Force clear the public visitor cache if we modified events
-                                if (collectionId === 'events') {
-                                    this.clearPublicEventCache();
+                                    // Force clear the public visitor cache if we modified events
+                                    if (collectionId === 'events') {
+                                        this.clearPublicEventCache();
 
-                                    // If connected to Google, sync back
-                                    if (this.googleAccessToken && safeItem.gcalId) {
-                                        await this.updateGoogleCalendarEvent(safeItem, 'PATCH');
+                                        // If connected to Google, sync back
+                                        if (this.googleAccessToken && safeItem.gcalId) {
+                                            await this.updateGoogleCalendarEvent(safeItem, 'PATCH');
+                                        }
                                     }
                                 }
 
@@ -4616,9 +4677,6 @@ class AdminManager {
         await this._runWriteLocked(`collection-delete:${collectionId}`, async () => {
             await this._withButtonLoading(btn, async () => {
                 try {
-                    const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                    const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
-
                     // Get the actual item we want to delete from the displayed list
                     const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
                     const itemToDelete = collectionItems[index] || null;
@@ -4628,30 +4686,40 @@ class AdminManager {
                         return;
                     }
 
-                    // Find match in Firestore
-                    const matchIdx = list.findIndex(fi => {
-                        if (itemToDelete.id && fi.id === itemToDelete.id) return true;
-                        return (itemToDelete.gcalId && fi.gcalId === itemToDelete.gcalId) ||
-                            (fi.title === itemToDelete.title && fi.date?.split('T')[0] === itemToDelete.date?.split('T')[0]);
-                    });
-
-                    if (matchIdx >= 0) {
-                        list.splice(matchIdx, 1);
-                        await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
-
-                        // Force clear public cache
-                        if (collectionId === 'events') {
-                            this.clearPublicEventCache();
-
-                            // If connected to Google, delete from there too
-                            if (this.googleAccessToken && itemToDelete.gcalId) {
-                                await this.updateGoogleCalendarEvent(itemToDelete, 'DELETE');
-                            }
+                    if (collectionId === 'podcast_transcripts') {
+                        // For podcast transcripts, delete directly from Firestore collection
+                        if (itemToDelete.id) {
+                            await firebase.firestore().collection('podcast_transcripts').doc(itemToDelete.id).delete();
                         }
                     } else {
-                        // If it's not in Firestore, we can't delete it (it's a pure GCal item)
-                        this.showToast('Dette elementet kan ikke slettes da det hentes direkte fra Google Calendar.', 'error');
-                        return;
+                        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                        const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+
+                        // Find match in Firestore
+                        const matchIdx = list.findIndex(fi => {
+                            if (itemToDelete.id && fi.id === itemToDelete.id) return true;
+                            return (itemToDelete.gcalId && fi.gcalId === itemToDelete.gcalId) ||
+                                (fi.title === itemToDelete.title && fi.date?.split('T')[0] === itemToDelete.date?.split('T')[0]);
+                        });
+
+                        if (matchIdx >= 0) {
+                            list.splice(matchIdx, 1);
+                            await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+
+                            // Force clear public cache
+                            if (collectionId === 'events') {
+                                this.clearPublicEventCache();
+
+                                // If connected to Google, delete from there too
+                                if (this.googleAccessToken && itemToDelete.gcalId) {
+                                    await this.updateGoogleCalendarEvent(itemToDelete, 'DELETE');
+                                }
+                            }
+                        } else {
+                            // If it's not in Firestore, we can't delete it (it's a pure GCal item)
+                            this.showToast('Dette elementet kan ikke slettes da det hentes direkte fra Google Calendar.', 'error');
+                            return;
+                        }
                     }
 
                     await this.loadCollection(collectionId);
@@ -6272,6 +6340,10 @@ class AdminManager {
 
     async renderTeachingManager() {
         this.renderCollectionEditor('teaching', 'Undervisning');
+    }
+
+    async renderPodcastManager() {
+        this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon');
     }
 
     async renderCoursesManager() {
@@ -10064,6 +10136,126 @@ class AdminManager {
         } catch (err) {
             console.warn("Failed to create admin notification:", err);
         }
+    }
+
+    // Helper method to convert HTML to Editor.js blocks (for legacy podcast transcripts)
+    htmlToEditorJsBlocks(html) {
+        if (!html || typeof html !== 'string') {
+            return { blocks: [], time: Date.now(), version: '2.29.0' };
+        }
+
+        const blocks = [];
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
+        const elements = doc.body.firstChild.childNodes;
+
+        for (let elem of elements) {
+            if (elem.nodeType === Node.TEXT_NODE) {
+                const text = elem.textContent.trim();
+                if (text.length > 0) {
+                    blocks.push({
+                        type: 'paragraph',
+                        data: { text: text }
+                    });
+                }
+            } else if (elem.nodeType === Node.ELEMENT_NODE) {
+                const tagName = elem.tagName.toLowerCase();
+
+                if (tagName === 'p' || tagName === 'div') {
+                    const text = elem.innerHTML;
+                    if (text.trim().length > 0) {
+                        blocks.push({
+                            type: 'paragraph',
+                            data: { text: text }
+                        });
+                    }
+                } else if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'h4') {
+                    const level = parseInt(tagName.charAt(1)) || 2;
+                    blocks.push({
+                        type: 'header',
+                        data: {
+                            text: elem.textContent,
+                            level: Math.min(level, 4)
+                        }
+                    });
+                } else if (tagName === 'ul' || tagName === 'ol') {
+                    const items = [];
+                    for (let li of elem.querySelectorAll('li')) {
+                        items.push(li.textContent);
+                    }
+                    if (items.length > 0) {
+                        blocks.push({
+                            type: 'list',
+                            data: {
+                                style: tagName === 'ol' ? 'ordered' : 'unordered',
+                                items: items
+                            }
+                        });
+                    }
+                } else if (tagName === 'blockquote') {
+                    blocks.push({
+                        type: 'quote',
+                        data: {
+                            text: elem.textContent,
+                            caption: '',
+                            alignment: 'left'
+                        }
+                    });
+                } else if (tagName === 'hr') {
+                    blocks.push({ type: 'delimiter', data: {} });
+                } else if (tagName === 'img') {
+                    blocks.push({
+                        type: 'image',
+                        data: {
+                            file: { url: elem.src || '' },
+                            caption: elem.alt || '',
+                            withBorder: false,
+                            stretched: false,
+                            withBackground: false
+                        }
+                    });
+                }
+            }
+        }
+
+        return {
+            blocks: blocks.length > 0 ? blocks : [{ type: 'paragraph', data: { text: '' } }],
+            time: Date.now(),
+            version: '2.29.0'
+        };
+    }
+
+    // Helper method to convert Editor.js blocks to HTML
+    editorJsBlocksToHtml(blocks) {
+        if (!Array.isArray(blocks)) return '';
+
+        return blocks.map(block => {
+            switch (block.type) {
+                case 'paragraph':
+                    return `<p>${block.data?.text || ''}</p>`;
+                case 'header':
+                    const level = Math.min(Math.max(block.data?.level || 2, 1), 6);
+                    return `<h${level}>${block.data?.text || ''}</h${level}>`;
+                case 'list': {
+                    const tag = block.data?.style === 'ordered' ? 'ol' : 'ul';
+                    const items = (block.data?.items || []).map(i => `<li>${i}</li>`).join('');
+                    return `<${tag}>${items}</${tag}>`;
+                }
+                case 'quote':
+                    return `<blockquote><p>${block.data?.text || ''}</p>${block.data?.caption ? `<cite>— ${block.data.caption}</cite>` : ''}</blockquote>`;
+                case 'delimiter':
+                    return '<hr>';
+                case 'image':
+                    const url = block.data?.file?.url || block.data?.url || '';
+                    const alt = block.data?.caption || '';
+                    return url ? `<figure><img src="${url}" alt="${alt}"><figcaption>${alt}</figcaption></figure>` : '';
+                case 'youtubeVideo':
+                    const ytUrl = block.data?.url || '';
+                    return ytUrl ? `<p><a href="${ytUrl}">YouTube Video: ${ytUrl}</a></p>` : '';
+                default:
+                    return '';
+            }
+        }).join('\n');
     }
 }
 
