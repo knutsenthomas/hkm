@@ -416,20 +416,26 @@ async function enrichWixItemsWithPublicPageContent(items = []) {
       const enrichedContent = extractWixViewerBlocksAsHtml(html);
       if (!enrichedContent) continue;
 
+      const hasInlineImage = /<img\b|<figure\b/i.test(enrichedContent);
+      const fallbackImageUrl = typeof item.imageUrl === "string" ? item.imageUrl.trim() : "";
+      const contentWithFallbackImage = (!hasInlineImage && fallbackImageUrl)
+        ? `${renderImageFigure(fallbackImageUrl, item.title || "")}` + "\n" + enrichedContent
+        : enrichedContent;
+
       const currentLen = typeof item.content === "string" ? item.content.trim().length : 0;
-      const enrichedLen = enrichedContent.trim().length;
+      const enrichedLen = contentWithFallbackImage.trim().length;
       // If we already have richContent nodes, we should be VERY careful about overwriting content
       // with scraped HTML, unless the scraped HTML is significantly better.
       const hasRichContent = !!(item.richContent && item.richContent.nodes && item.richContent.nodes.length > 0);
       if (hasRichContent && enrichedLen < currentLen * 0.5) continue;
       if (enrichedLen < currentLen && !(enrichedHasStructure && !currentHasStructure)) continue;
 
-      const enrichedText = stripHtmlTags(enrichedContent);
+      const enrichedText = stripHtmlTags(contentWithFallbackImage);
       const enrichedMinutesToRead = Math.max(1, Math.ceil((enrichedText.split(/\s+/).filter(Boolean).length || 0) / 225));
 
       updates.set(index, {
         ...item,
-        content: enrichedContent,
+        content: contentWithFallbackImage,
         excerpt: clampText(decodeHtmlEntities(enrichedText), 360),
         minutesToRead: Math.max(Number(item.minutesToRead) || 1, enrichedMinutesToRead),
       });
