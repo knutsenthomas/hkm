@@ -591,6 +591,35 @@ class AdminManager {
         return translation;
     }
 
+    _normalizeTranslationCompareText(value) {
+        return String(value || '')
+            .replace(/<[^>]*>/g, ' ')
+            .replace(/&nbsp;/gi, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
+            .toLowerCase();
+    }
+
+    _isMeaningfullyTranslatedField(sourceValue, translatedValue) {
+        const source = this._normalizeTranslationCompareText(sourceValue);
+        const translated = this._normalizeTranslationCompareText(translatedValue);
+        if (!source || !translated) return false;
+        return source !== translated;
+    }
+
+    _hasMeaningfulBlogTranslation(sourcePost, translatedPost) {
+        if (!translatedPost || typeof translatedPost !== 'object') return false;
+
+        const titleTranslated = this._isMeaningfullyTranslatedField(sourcePost?.title, translatedPost?.title);
+        const contentTranslated = this._isMeaningfullyTranslatedField(sourcePost?.content, translatedPost?.content);
+        const seoTitleTranslated = this._isMeaningfullyTranslatedField(sourcePost?.seoTitle, translatedPost?.seoTitle);
+        const seoDescriptionTranslated = this._isMeaningfullyTranslatedField(sourcePost?.seoDescription, translatedPost?.seoDescription);
+
+        // Title and content are the most important fields for blog output.
+        // Allow SEO-only posts as a weak fallback if both SEO fields changed.
+        return titleTranslated || contentTranslated || (seoTitleTranslated && seoDescriptionTranslated);
+    }
+
     async ensureBlogPostTranslations(post, { force = false } = {}) {
         if (!post || typeof post !== 'object') return post;
 
@@ -604,14 +633,32 @@ class AdminManager {
             const existing = (existingTranslations[lang] && typeof existingTranslations[lang] === 'object')
                 ? existingTranslations[lang]
                 : null;
-            const isUpToDate = !!existing && existing._sourceHash === sourceHash && existing.title && existing.content;
+            const isUpToDate = !!existing
+                && !existing._translationFailed
+                && existing._sourceHash === sourceHash
+                && existing.title
+                && existing.content;
             if (!force && isUpToDate) continue;
 
             const translated = await this._buildBlogTranslation(updatedPost, lang);
+            const hasMeaningfulTranslation = this._hasMeaningfulBlogTranslation(updatedPost, translated);
+
+            if (!hasMeaningfulTranslation) {
+                existingTranslations[lang] = {
+                    ...(existing || {}),
+                    ...translated,
+                    _translationFailed: true,
+                    _updatedAt: new Date().toISOString()
+                };
+                delete existingTranslations[lang]._sourceHash;
+                continue;
+            }
+
             existingTranslations[lang] = {
                 ...(existing || {}),
                 ...translated,
                 _sourceHash: sourceHash,
+                _translationFailed: false,
                 _updatedAt: new Date().toISOString()
             };
         }
