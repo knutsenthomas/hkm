@@ -771,25 +771,57 @@ async function performSiteSearch(query, resultsEl) {
             }
         }
 
-        if (Array.isArray(calendarEvents) && calendarEvents.length) {
-            calendarEvents.forEach(ev => {
-                const summary = ev.summary || '';
-                const description = ev.description || '';
-                const location = ev.location || '';
-                const combined = [summary, description, location].filter(Boolean).join(' ').toLowerCase();
-                if (combined.includes(qLower)) {
-                    const start = ev.start && (ev.start.dateTime || ev.start.date);
-                    const dateLabel = start ? new Date(start).toLocaleString('no-NO') : '';
                     results.push({
                         type: 'Kalender',
                         title: summary || '(uten tittel)',
                         meta: dateLabel,
-                        url: 'kalender',
+                        url: '/arrangementer', // Lenker til kalender-seksjonen
                         snippet: makeSnippet(description || location || '', q)
                     });
                 }
             });
         }
+
+        // 6) Kurs & Undervisning (Dypere søk)
+        const courseData = await firebaseService.getPageContent('collection_courses');
+        const courses = Array.isArray(courseData) ? courseData : (courseData && Array.isArray(courseData.items) ? courseData.items : []);
+        courses.forEach(course => {
+            const combined = [course.title, course.description, course.category, course.instructor].filter(Boolean).join(' ').toLowerCase();
+            if (combined.includes(qLower)) {
+                results.push({
+                    type: 'Kurs',
+                    title: course.title || 'Kurs',
+                    meta: course.category || 'Undervisning',
+                    url: '/kurs',
+                    snippet: makeSnippet(course.description || '', q)
+                });
+            }
+        });
+
+        // 7) Spesialsider (Menigheter & Bedrifter)
+        const specialPages = [
+            { id: 'for-menigheter', label: 'For menigheter', url: '/for-menigheter' },
+            { id: 'for-bedrifter', label: 'For bedrifter', url: '/for-bedrifter' },
+            { id: 'reisevirksomhet', label: 'Reisevirksomhet', url: '/reisevirksomhet' }
+        ];
+
+        for (const sp of specialPages) {
+            const data = await firebaseService.getPageContent(sp.id);
+            if (data) {
+                const entries = collectTextEntries(data);
+                const hit = entries.find(e => e.text && e.text.toLowerCase().includes(qLower));
+                if (hit) {
+                    results.push({
+                        type: 'Side',
+                        title: sp.label,
+                        meta: 'Informasjon',
+                        url: sp.url,
+                        snippet: makeSnippet(hit.text, q)
+                    });
+                }
+            }
+        }
+
     } catch (err) {
         console.error('Feil ved søk:', err);
         resultsEl.innerHTML = '<p class="site-search-helper">Det oppstod en feil ved søk. Prøv igjen senere.</p>';
