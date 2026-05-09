@@ -4520,8 +4520,38 @@ body {
         display: none;
     }
 
+    /* On mobile: hide the inline progress row but show a thin strip at top of player bar */
     .player-progress-container {
         display: none;
+    }
+
+    #podcast-player-bar {
+        padding-top: 19px; /* room for the progress strip */
+    }
+
+    /* Thin progress strip at top of player bar */
+    .player-progress-bar-mobile {
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: #eee;
+        border-radius: 0;
+        cursor: pointer;
+        z-index: 1;
+    }
+
+    .player-progress-fill-mobile {
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        background: var(--primary-orange);
+        border-radius: 0;
+        width: 0%;
+        pointer-events: none;
     }
 }
 
@@ -4546,7 +4576,7 @@ body {
 }
 
 .fs-x-close-btn {
-    position: fixed;
+    position: absolute;
     top: max(16px, env(safe-area-inset-top));
     right: max(16px, env(safe-area-inset-right));
     width: 44px;
