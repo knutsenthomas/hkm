@@ -5005,8 +5005,15 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     }
 
     .editor-sidebar-v2 {
-        display: none !important;
-        /* Hide sidebar by default on tablet to give space to editor */
+        display: block !important;
+        /* Show sidebar on mobile below editor */
+        width: 100% !important;
+        border-left: none !important;
+        border-top: 1px solid var(--border-color) !important;
+        order: 2;
+        /* Stack below editor content */
+        max-width: 100%;
+        padding: 20px !important;
     }
 
     .editor-paper {
@@ -5021,6 +5028,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     /* Fix mobile scroll context and layout */
     .editor-content-wrapper {
         overflow: auto !important;
+        flex-direction: column !important;
         /* Allow wrapper to handle scrolling properly */
     }
 
