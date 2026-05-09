@@ -1146,9 +1146,6 @@ function createPlayerBar() {
             <button class="fs-x-close-btn" type="button" aria-label="Lukk fullskjerm">
                 <i class="fas fa-times" aria-hidden="true"></i>
             </button>
-            <div class="fs-header">
-                <button class="fs-close-btn"><i class="fas fa-chevron-down"></i> Lukk</button>
-            </div>
             <div class="fs-scrollable-content">
                 <div class="fs-artwork-container">
                     <img src="" class="fullscreen-artwork">
@@ -1179,7 +1176,6 @@ function createPlayerBar() {
     const infoToggle = bar.querySelector('#player-info-toggle');
     const playerContainer = bar.querySelector('.player-container');
     const fsOverlay = bar.querySelector('#podcast-fullscreen-overlay');
-    const fsCloseBtn = bar.querySelector('.fs-close-btn');
     const fsXCloseBtn = bar.querySelector('.fs-x-close-btn');
 
     function openFs() {
@@ -1240,7 +1236,6 @@ function createPlayerBar() {
         if (fsOverlay.classList.contains('active')) closeFs();
         else openFs();
     });
-    fsCloseBtn.addEventListener('click', closeFs);
     if (fsXCloseBtn) fsXCloseBtn.addEventListener('click', closeFs);
 
     // Keyboard escape to close fullscreen
