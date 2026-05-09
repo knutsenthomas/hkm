@@ -62,7 +62,7 @@ class ContentManager {
         // Strip .html for cleanUrls support (Vercel/Firebase cleanUrls removes extension from pathname)
         const path = window.location.pathname.replace(/\.html$/, '');
         const p = (s) => new RegExp('(?:^|/)' + s + '$').test(path);
-        if (path === '/' || path.endsWith('/') || p('index')) return 'index';
+        if (path === '/' || /^\/(en|es)$/.test(path) || path.endsWith('/') || p('index')) return 'index';
         if (p('arrangementer') || p('events') || p('eventos')) return 'arrangementer';
         if (p('kalender') || p('calendar') || p('calendario')) return 'kalender';
         if (p('arrangement-detaljer') || p('event-details') || p('detalles-evento')) return 'arrangement-detaljer';
