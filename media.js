@@ -489,16 +489,6 @@ const PODCAST_KEYWORDS = {
     undervisning: ["undervisning", "lære", "serie", "studie", "disippel", "lærling"]
 };
 
-const PODCAST_SUMMARY_OVERRIDES = {
-    "7b7726b7-1b5b-4aa1-9d2e-a27cde5ef48e": `
-        <div class="podcast-summary-rich" style="display:flex; flex-direction:column; gap:10px; line-height:1.75; color:var(--text-dark);">
-            <p><strong>Episode 47</strong> er en rolig og sammenhengende lydboklesning av <strong>2. Petersbrev</strong>, med musikk i bakgrunnen som gir rom for refleksjon.</p>
-            <p>Fokuset i teksten er å <em>stå fast i troen</em>, vokse i åndelig modenhet og holde blikket festet på Jesus i en tid med press og villfarelse.</p>
-            <p style="margin:0;"><strong>Passer godt for:</strong> personlig andakt, stillhet med Bibelen og fordypning i Det nye testamentet.</p>
-        </div>
-    `
-};
-
 function asText(value) {
     if (Array.isArray(value)) {
         return asText(value[0]);
@@ -562,14 +552,18 @@ function getEpisodeCategory(episode) {
     return 'other';
 }
 
-function getEpisodeSummaryHtml(episodeData) {
-    if (!episodeData) {
-        return '<p>Ingen oppsummering tilgjengelig.</p>';
+function getEpisodeSummaryHtml(episodeData, storedData) {
+    if (storedData && Object.prototype.hasOwnProperty.call(storedData, 'description')) {
+        const adminSummary = String(storedData.description || '').trim();
+        if (!adminSummary) {
+            return '<p>Ingen oppsummering tilgjengelig.</p>';
+        }
+
+        return `<p style="line-height:1.75;">${adminSummary}</p>`;
     }
 
-    const episodeId = String(episodeData.id || '').trim();
-    if (episodeId && PODCAST_SUMMARY_OVERRIDES[episodeId]) {
-        return PODCAST_SUMMARY_OVERRIDES[episodeId];
+    if (!episodeData) {
+        return '<p>Ingen oppsummering tilgjengelig.</p>';
     }
 
     const summaryText = String(episodeData.description || '').trim();
@@ -1005,8 +999,8 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex, episodeData) {
 
         fetchPodcastTranscriptData(transcriptEpisode.id)
             .then(stored => {
-                if (fsSummaryNode && stored && typeof stored.description === 'string' && stored.description.trim()) {
-                    fsSummaryNode.innerHTML = `<p style="line-height:1.75;">${stored.description.trim()}</p>`;
+                if (fsSummaryNode) {
+                    fsSummaryNode.innerHTML = getEpisodeSummaryHtml(transcriptEpisode, stored);
                 }
 
                 const htmlText = stored && typeof stored.text === 'string' ? stored.text.trim() : '';
