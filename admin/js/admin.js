@@ -5016,7 +5016,7 @@ class AdminManager {
                     await this._withButtonLoading(translateBtn, async () => {
                         try {
                             const safeItem = await buildSafeItemFromForm();
-                            const translatedItem = await this.ensureBlogPostTranslations(safeItem, { force: true });
+                            const translatedItem = await this.ensureBlogPostTranslations(safeItem, { force: false });
 
                             const currentData = await firebaseService.getPageContent('collection_blog');
                             const list = this._getCollectionItems(currentData);
