@@ -1892,6 +1892,7 @@ body.admin-body .welcome-subtitle {
     }
 
     body.admin-body,
+    body.minside-body,
     body.crm-body,
     body.builder-active {
         height: 100vh !important;
