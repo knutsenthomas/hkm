@@ -4679,9 +4679,11 @@ body.builder-active .builder-workspace {
 */
 
 body.admin-body .main-header,
+body.minside-body .main-header,
 body.crm-body .main-header,
 body.builder-active .main-header,
 body.admin-body #dashboard-main-header,
+body.minside-body #dashboard-main-header,
 body.crm-body #dashboard-main-header,
 body.builder-active #dashboard-main-header {
     height: 72px !important;
@@ -4871,26 +4873,31 @@ body.builder-active .main-header [id="admin-avatar"] {
 @media (max-width: 800px) {
 
     body.admin-body .main-header,
+    body.minside-body .main-header,
     body.crm-body .main-header,
     body.builder-active .main-header,
     body.admin-body #dashboard-main-header,
+    body.minside-body #dashboard-main-header,
     body.crm-body #dashboard-main-header,
     body.builder-active #dashboard-main-header {
         height: 64px !important;
         min-height: 64px !important;
-        padding: 0 10px !important;
+        padding: 0 20px !important; /* Increased from 10px for more "air" */
     }
 
     body.admin-body .main-header .section-header-icon,
+    body.minside-body .main-header .section-header-icon,
     body.crm-body .main-header .section-header-icon,
     body.builder-active .main-header .section-header-icon,
     body.admin-body .main-header .user-info-text,
+    body.minside-body .main-header .user-info-text,
     body.crm-body .main-header .user-info-text,
     body.builder-active .main-header .user-info-text {
         display: none !important;
     }
 
     body.admin-body .main-header .user-profile-link,
+    body.minside-body .main-header .user-profile-link,
     body.crm-body .main-header .user-profile-link,
     body.builder-active .main-header .user-profile-link {
         border: none !important;
