@@ -4017,6 +4017,10 @@ class AdminManager {
                                             <span class="material-symbols-outlined" style="font-size: 18px;">smart_toy</span>
                                             Generer AI-tekst
                                         </button>
+                                        <button type="button" id="generate-podcast-ai-summary" class="btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
+                                            Generer AI-oppsummering
+                                        </button>
                                         <span id="podcast-ai-status" style="font-size: 12px; color: #64748b;">Genererer transkripsjon fra lydfilen for denne episoden.</span>
                                     </div>
                                 </div>
@@ -4362,7 +4366,60 @@ class AdminManager {
 
             if (collectionId === 'podcast_transcripts') {
                 const generateAiBtn = document.getElementById('generate-podcast-ai-transcript');
+                const generateAiSummaryBtn = document.getElementById('generate-podcast-ai-summary');
                 const aiStatus = document.getElementById('podcast-ai-status');
+                const summaryField = document.getElementById('col-item-summary');
+
+                const blockToPlainText = (block) => {
+                    const type = String(block?.type || '').toLowerCase();
+                    const data = block?.data || {};
+
+                    if (type === 'header') return String(data.text || '').trim();
+                    if (type === 'list') {
+                        const items = Array.isArray(data.items) ? data.items : [];
+                        return items
+                            .map(item => {
+                                if (typeof item === 'string') return item;
+                                if (item && typeof item === 'object') return item.content || item.text || '';
+                                return '';
+                            })
+                            .filter(Boolean)
+                            .join(' ');
+                    }
+                    if (type === 'quote') return String(data.text || '').trim();
+                    if (type === 'paragraph') return String(data.text || '').trim();
+                    return String(data.text || '').trim();
+                };
+
+                const htmlToPlainText = (value) => {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(String(value || ''), 'text/html');
+                    return String(doc.body?.textContent || '')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                };
+
+                const buildLocalSummarySuggestion = (title, transcriptText) => {
+                    const cleaned = String(transcriptText || '')
+                        .replace(/\s+/g, ' ')
+                        .replace(/\b\d{1,3}[.:]\s*/g, '')
+                        .trim();
+
+                    if (!cleaned) return '';
+
+                    const sentences = cleaned
+                        .split(/(?<=[.!?])\s+/)
+                        .map(s => s.trim())
+                        .filter(s => s.length >= 35)
+                        .slice(0, 3);
+
+                    const core = sentences.join(' ').trim();
+                    if (!core) return '';
+
+                    if (!title) return core;
+
+                    return `I denne episoden ${title.toLowerCase().includes('lydbok') ? 'får du en lydboklesning' : 'får du undervisning'} som tar deg gjennom sentrale poeng i teksten. ${core}`;
+                };
 
                 if (generateAiBtn) {
                     generateAiBtn.onclick = async () => {
@@ -4430,6 +4487,87 @@ class AdminManager {
                         } finally {
                             generateAiBtn.disabled = false;
                             generateAiBtn.innerHTML = originalBtnHtml;
+                        }
+                    };
+                }
+
+                if (generateAiSummaryBtn) {
+                    generateAiSummaryBtn.onclick = async () => {
+                        if (!summaryField) {
+                            this.showToast('Fant ikke oppsummeringsfeltet.', 'error', 5000);
+                            return;
+                        }
+
+                        let transcriptText = '';
+                        try {
+                            const saved = await editor.save();
+                            const blocks = Array.isArray(saved?.blocks) ? saved.blocks : [];
+                            transcriptText = blocks
+                                .map(blockToPlainText)
+                                .filter(Boolean)
+                                .join(' ')
+                                .replace(/\s+/g, ' ')
+                                .trim();
+                        } catch (err) {
+                            console.warn('Kunne ikke lese editorinnhold for AI-oppsummering:', err);
+                        }
+
+                        if (!transcriptText && typeof item?.text === 'string') {
+                            transcriptText = htmlToPlainText(item.text);
+                        }
+
+                        if (transcriptText.length < 120) {
+                            this.showToast('For lite tekstgrunnlag. Generer eller skriv mer tekst først.', 'warning', 5000);
+                            return;
+                        }
+
+                        const originalBtnHtml = generateAiSummaryBtn.innerHTML;
+                        generateAiSummaryBtn.disabled = true;
+                        generateAiSummaryBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Lager forslag...';
+
+                        if (aiStatus) {
+                            aiStatus.textContent = 'Lager AI-oppsummering fra teksten...';
+                            aiStatus.style.color = '#334155';
+                        }
+
+                        try {
+                            const callable = firebase.functions().httpsCallable('generatePodcastSummary');
+                            const response = await callable({
+                                episodeTitle: String(item?.title || '').trim(),
+                                transcriptText
+                            });
+
+                            const aiSummary = String(response?.data?.summary || '').trim();
+                            if (!aiSummary) {
+                                throw new Error('Tomt svar fra AI-oppsummering.');
+                            }
+
+                            summaryField.value = aiSummary;
+                            this.showToast('AI-oppsummering satt inn. Du kan redigere før lagring.', 'success', 5000);
+                            if (aiStatus) {
+                                aiStatus.textContent = 'AI-oppsummering klar. Husk å klikke Lagre og publiser.';
+                                aiStatus.style.color = '#166534';
+                            }
+                        } catch (error) {
+                            console.warn('AI-oppsummering feilet, bruker lokal fallback:', error);
+                            const fallbackSummary = buildLocalSummarySuggestion(String(item?.title || ''), transcriptText);
+                            if (fallbackSummary) {
+                                summaryField.value = fallbackSummary;
+                                this.showToast('AI-oppsummering var ikke tilgjengelig. Et forslag ble laget lokalt.', 'warning', 6000);
+                                if (aiStatus) {
+                                    aiStatus.textContent = 'Lokal oppsummering satt inn. Du kan redigere og lagre.';
+                                    aiStatus.style.color = '#92400e';
+                                }
+                            } else {
+                                this.showToast('Kunne ikke lage oppsummering fra teksten.', 'error', 7000);
+                                if (aiStatus) {
+                                    aiStatus.textContent = 'Kunne ikke lage oppsummering nå.';
+                                    aiStatus.style.color = '#b91c1c';
+                                }
+                            }
+                        } finally {
+                            generateAiSummaryBtn.disabled = false;
+                            generateAiSummaryBtn.innerHTML = originalBtnHtml;
                         }
                     };
                 }

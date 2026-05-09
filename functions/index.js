@@ -5870,6 +5870,77 @@ function isGeminiZeroLimitError(error) {
   return /free[_ -]?tier/i.test(message) && /limit:\s*0/i.test(message);
 }
 
+function normalizePodcastSummaryText(value) {
+  return String(value || '')
+    .replace(/\s+/g, ' ')
+    .replace(/^['"`]+|['"`]+$/g, '')
+    .trim();
+}
+
+async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptText = '' }) {
+  const geminiKey = getGeminiApiKey();
+  if (!geminiKey) {
+    throw new Error('Gemini API-nøkkel mangler på serveren.');
+  }
+
+  const cleanTranscript = normalizePodcastSummaryText(transcriptText);
+  if (!cleanTranscript || cleanTranscript.length < 120) {
+    throw new Error('Transkripsjonen er for kort til å lage en god oppsummering.');
+  }
+
+  const prompt = [
+    {
+      text: [
+        'Du er en norsk redaktør for kristent innhold.',
+        'Lag en kort, varm og tydelig oppsummering av podcast-episoden under.',
+        'Krav:',
+        '- Skriv på norsk bokmål.',
+        '- 2-3 setninger, maks 320 tegn.',
+        '- Ingen punktliste, ingen emojis, ingen markdown.',
+        '- Ikke finn opp detaljer som ikke finnes i teksten.',
+        '- Avslutt med en naturlig setning, ikke call-to-action.',
+        '',
+        `Tittel: ${String(episodeTitle || '').trim() || 'Uten tittel'}`,
+        'Transkripsjon:',
+        cleanTranscript,
+      ].join('\n')
+    }
+  ];
+
+  const genAI = new GoogleGenerativeAI(geminiKey);
+  const modelCandidates = [
+    'gemini-2.5-flash',
+    'gemini-2.0-flash',
+    'gemini-2.0-flash-lite',
+  ];
+
+  let result = null;
+  let lastModelError = null;
+
+  for (const modelName of modelCandidates) {
+    const model = genAI.getGenerativeModel({ model: modelName });
+    try {
+      result = await model.generateContent(prompt);
+      if (result) break;
+    } catch (error) {
+      lastModelError = error;
+      console.error(`Oppsummering feilet med ${modelName}:`, error);
+      if (!isGeminiRateLimitError(error)) break;
+    }
+  }
+
+  if (!result) {
+    throw lastModelError || new Error('Ingen Gemini-modell kunne lage oppsummering.');
+  }
+
+  const summary = normalizePodcastSummaryText(result.response.text());
+  if (!summary) {
+    throw new Error('AI returnerte tom oppsummering.');
+  }
+
+  return summary;
+}
+
 exports.transcribePodcast = onCall({
   cors: true,
   secrets: [geminiApiKeyParam],
@@ -5898,6 +5969,41 @@ exports.transcribePodcast = onCall({
     throw new HttpsError(
       isGeminiRateLimitError(error) ? 'resource-exhausted' : 'internal',
       getTranscriptionErrorMessage(error)
+    );
+  }
+});
+
+exports.generatePodcastSummary = onCall({
+  cors: true,
+  secrets: [geminiApiKeyParam],
+  timeoutSeconds: 120,
+  memory: '512MiB'
+}, async (request) => {
+  if (!request.auth) {
+    throw new HttpsError('unauthenticated', 'Må være innlogget for å bruke AI-oppsummering.');
+  }
+
+  const transcriptText = typeof request.data?.transcriptText === 'string' ? request.data.transcriptText : '';
+  const episodeTitle = typeof request.data?.episodeTitle === 'string' ? request.data.episodeTitle : '';
+
+  if (!transcriptText || transcriptText.trim().length < 120) {
+    throw new HttpsError('invalid-argument', 'Transkripsjonen er for kort til å oppsummere.');
+  }
+
+  try {
+    const summary = await generatePodcastSummaryWithGemini({
+      episodeTitle,
+      transcriptText
+    });
+
+    return { summary };
+  } catch (error) {
+    console.error('Feil under generering av podcast-oppsummering:', error);
+    throw new HttpsError(
+      isGeminiRateLimitError(error) ? 'resource-exhausted' : 'internal',
+      isGeminiRateLimitError(error)
+        ? 'Gemini API-kvoten er brukt opp akkurat nå. Prøv igjen senere.'
+        : (error?.message || 'Kunne ikke generere oppsummering.')
     );
   }
 });
