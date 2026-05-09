@@ -54,6 +54,8 @@ class AdminManager {
         this._collectionLoadRequestIds = {};
         this._initialOverviewRenderComplete = false;
         this._activityLogItems = [];
+        this._editorRestoreStateKey = 'hkm_admin_open_editor_state';
+        this._restoringEditorState = false;
 
         // User Detail View State
         this.currentUserDetailId = null;
@@ -239,6 +241,85 @@ class AdminManager {
             hash |= 0;
         }
         return String(hash);
+    }
+
+    _persistOpenEditorState(collectionId, item) {
+        try {
+            if (!collectionId || !item || typeof item !== 'object') return;
+            const payload = {
+                collectionId: String(collectionId),
+                itemId: item.id ? String(item.id) : '',
+                itemTitle: item.title ? String(item.title) : '',
+                savedAt: Date.now()
+            };
+            sessionStorage.setItem(this._editorRestoreStateKey, JSON.stringify(payload));
+        } catch (error) {
+            console.warn('[AdminManager] Could not persist editor state', error);
+        }
+    }
+
+    _clearOpenEditorState(collectionId = null) {
+        try {
+            if (!collectionId) {
+                sessionStorage.removeItem(this._editorRestoreStateKey);
+                return;
+            }
+
+            const raw = sessionStorage.getItem(this._editorRestoreStateKey);
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (parsed?.collectionId === collectionId) {
+                sessionStorage.removeItem(this._editorRestoreStateKey);
+            }
+        } catch (error) {
+            sessionStorage.removeItem(this._editorRestoreStateKey);
+        }
+    }
+
+    _getOpenEditorState() {
+        try {
+            const raw = sessionStorage.getItem(this._editorRestoreStateKey);
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed || typeof parsed !== 'object') return null;
+            return parsed;
+        } catch (error) {
+            return null;
+        }
+    }
+
+    _attemptRestoreOpenEditor(collectionId, items) {
+        if (this._restoringEditorState) return;
+        const saved = this._getOpenEditorState();
+        if (!saved || saved.collectionId !== collectionId) return;
+
+        if (saved.savedAt && (Date.now() - Number(saved.savedAt) > 12 * 60 * 60 * 1000)) {
+            this._clearOpenEditorState(collectionId);
+            return;
+        }
+
+        const list = Array.isArray(items) ? items : [];
+        if (!list.length) return;
+
+        let targetIndex = -1;
+        if (saved.itemId) {
+            targetIndex = list.findIndex((entry) => String(entry?.id || '') === String(saved.itemId));
+        }
+
+        if (targetIndex === -1 && saved.itemTitle) {
+            targetIndex = list.findIndex((entry) => String(entry?.title || '') === String(saved.itemTitle));
+        }
+
+        if (targetIndex === -1) return;
+
+        this._restoringEditorState = true;
+        setTimeout(() => {
+            Promise.resolve(this.editCollectionItem(collectionId, targetIndex))
+                .catch((error) => console.warn('[AdminManager] Could not restore open editor', error))
+                .finally(() => {
+                    this._restoringEditorState = false;
+                });
+        }, 120);
     }
 
     _buildBlogTranslationSourceHash(post) {
@@ -4284,6 +4365,7 @@ class AdminManager {
             this._collectionItemsCache[collectionId] = items;
             this.currentItems = items;
             this.renderItems(collectionId, items);
+            this._attemptRestoreOpenEditor(collectionId, items);
 
             // Enrich events in background so UI never blocks on external Google Calendar fetch.
             if (collectionId === 'events') {
@@ -4377,6 +4459,7 @@ class AdminManager {
             // Use the already merged item from currentItems
             const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
             const item = collectionItems[index] ? { ...collectionItems[index] } : {};
+            this._persistOpenEditorState(collectionId, item);
 
             let safeDate = new Date().toISOString().split('T')[0];
             if (item.date && typeof item.date === 'string') {
@@ -5128,7 +5211,12 @@ class AdminManager {
             }
 
             const closeBtn = document.getElementById('close-col-modal');
-            if (closeBtn) closeBtn.onclick = () => modal.remove();
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    this._clearOpenEditorState(collectionId);
+                    modal.remove();
+                };
+            }
 
             const buildSafeItemFromForm = async () => {
                 let savedData;
@@ -5585,6 +5673,7 @@ class AdminManager {
                                 }
 
                                 modal.remove();
+                                this._clearOpenEditorState(collectionId);
                                 this.loadCollection(collectionId);
                                 this.showToast('✅ Lagret!', 'success');
                             } catch (err) {
