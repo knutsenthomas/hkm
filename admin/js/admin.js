@@ -546,8 +546,9 @@ class AdminManager {
         }
 
         const translationSettings = await this._getTranslationSettings();
+        const hasGeminiKey = !!translationSettings.geminiApiKey;
 
-        if (translationSettings.provider === 'gemini' && translationSettings.geminiApiKey) {
+        if (translationSettings.provider === 'gemini' && hasGeminiKey) {
             try {
                 const translatedByGemini = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
                 const finalGeminiText = (typeof translatedByGemini === 'string' && translatedByGemini.trim())
@@ -568,6 +569,24 @@ class AdminManager {
             this._translationCache.set(cacheKey, finalText);
             return finalText;
         } catch (error) {
+            const quotaExceeded = this._isTranslationQuotaExceededMessage(error?.message);
+            if (quotaExceeded && hasGeminiKey) {
+                try {
+                    const translatedByGemini = await this._translateTextChunkWithGemini(raw, targetLang, sourceLang);
+                    const finalGeminiText = (typeof translatedByGemini === 'string' && translatedByGemini.trim())
+                        ? translatedByGemini
+                        : raw;
+                    this._translationCache.set(cacheKey, finalGeminiText);
+                    return finalGeminiText;
+                } catch (geminiError) {
+                    console.warn(`[AdminManager] Gemini fallback failed after MyMemory quota hit (${targetLang})`, geminiError);
+                }
+            }
+
+            if (quotaExceeded) {
+                throw error;
+            }
+
             console.warn(`[AdminManager] Translation failed (${targetLang})`, error);
             return raw;
         }
