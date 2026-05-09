@@ -653,7 +653,22 @@ class AdminManager {
     }
 
     _normalizeTranslationCompareText(value) {
-        return String(value || '')
+        let rawText = '';
+        if (typeof value === 'string') {
+            rawText = value;
+        } else if (typeof value === 'number' || typeof value === 'boolean') {
+            rawText = String(value);
+        } else if (value && typeof value === 'object') {
+            try {
+                rawText = JSON.stringify(value);
+            } catch (error) {
+                rawText = String(value);
+            }
+        } else {
+            rawText = String(value || '');
+        }
+
+        return rawText
             .replace(/<[^>]*>/g, ' ')
             .replace(/&nbsp;/gi, ' ')
             .replace(/\s+/g, ' ')
