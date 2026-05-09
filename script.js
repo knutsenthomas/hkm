@@ -717,56 +717,6 @@ async function performSiteSearch(query, resultsEl, isLive = false) {
                 }
             });
         }
-
-async function fetchPodcasts() {
-    if (window._siteSearchPodcasts) return window._siteSearchPodcasts;
-    try {
-        const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
-        const resp = await fetch(proxyUrl);
-        const data = await resp.json();
-        const items = data?.items;
-        if (items) {
-            const episodes = Array.isArray(items) ? items : [items];
-            window._siteSearchPodcasts = episodes.map(ep => ({
-                title: ep.title,
-                description: typeof ep.description === 'string' ? ep.description : (ep.content || ''),
-                pubDate: ep.pubDate,
-                link: ep.link
-            }));
-        } else {
-            window._siteSearchPodcasts = [];
-        }
-    } catch (e) {
-        console.warn('Kunne ikke hente podcast for søk:', e);
-        window._siteSearchPodcasts = [];
-    }
-    return window._siteSearchPodcasts;
-}
-
-async function fetchYouTubeVideos() {
-    if (window._siteSearchYouTubeVideos) return window._siteSearchYouTubeVideos;
-    try {
-        const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
-        const rssFeedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
-        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
-        const resp = await fetch(proxyUrl);
-        const data = await resp.json();
-        const items = (data && Array.isArray(data.items)) ? data.items : (data && data.items ? [data.items] : []);
-        window._siteSearchYouTubeVideos = items.map(v => ({
-            title: v.title,
-            description: v.description || '',
-            pubDate: v.pubDate,
-            link: v.link
-        }));
-    } catch (e) {
-        console.warn('Kunne ikke hente YouTube-videoer for søk:', e);
-        window._siteSearchYouTubeVideos = [];
-    }
-    return window._siteSearchYouTubeVideos;
-}
-
-// ... (in performSiteSearch)
         // 3) Podcast-episoder (via felles RSS-proxy)
         const podcastEpisodes = await fetchPodcasts();
 
@@ -911,6 +861,57 @@ async function fetchYouTubeVideos() {
     `).join('');
 
     resultsEl.innerHTML = html;
+}
+
+/**
+ * Hjelpefunksjoner for søk (Flyttet ut for å unngå syntaksfeil)
+ */
+async function fetchPodcasts() {
+    if (window._siteSearchPodcasts) return window._siteSearchPodcasts;
+    try {
+        const rssFeedUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+        const resp = await fetch(proxyUrl);
+        const data = await resp.json();
+        const items = data?.items;
+        if (items) {
+            const episodes = Array.isArray(items) ? items : [items];
+            window._siteSearchPodcasts = episodes.map(ep => ({
+                title: ep.title,
+                description: typeof ep.description === 'string' ? ep.description : (ep.content || ''),
+                pubDate: ep.pubDate,
+                link: ep.link
+            }));
+        } else {
+            window._siteSearchPodcasts = [];
+        }
+    } catch (e) {
+        console.warn('Kunne ikke hente podcast for søk:', e);
+        window._siteSearchPodcasts = [];
+    }
+    return window._siteSearchPodcasts;
+}
+
+async function fetchYouTubeVideos() {
+    if (window._siteSearchYouTubeVideos) return window._siteSearchYouTubeVideos;
+    try {
+        const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
+        const rssFeedUrl = `https://www.youtube.com/feeds/videos.xml?channel_id=${channelId}`;
+        const proxyUrl = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(rssFeedUrl)}`;
+        const resp = await fetch(proxyUrl);
+        const data = await resp.json();
+        const items = (data && Array.isArray(data.items)) ? data.items : (data && data.items ? [data.items] : []);
+        window._siteSearchYouTubeVideos = items.map(v => ({
+            title: v.title,
+            description: v.description || '',
+            pubDate: v.pubDate,
+            link: v.link
+        }));
+    } catch (e) {
+        console.warn('Kunne ikke hente YouTube-videoer for søk:', e);
+        window._siteSearchYouTubeVideos = [];
+    }
+    return window._siteSearchYouTubeVideos;
 }
 
 function collectTextEntries(obj, path = '') {
