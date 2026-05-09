@@ -1036,14 +1036,16 @@ function applyFullscreenPlayerLayout(bar) {
         boxShadow: '0 10px 28px rgba(15, 23, 42, 0.16)'
     });
 
-    Object.assign(fsHeader.style, {
-        display: 'flex',
-        justifyContent: 'flex-end',
-        padding: '18px 20px',
-        background: '#f8f9fa',
-        borderBottom: '1px solid #eee',
-        flex: '0 0 auto'
-    });
+    if (fsHeader) {
+        Object.assign(fsHeader.style, {
+            display: 'flex',
+            justifyContent: 'flex-end',
+            padding: '18px 20px',
+            background: '#f8f9fa',
+            borderBottom: '1px solid #eee',
+            flex: '0 0 auto'
+        });
+    }
 
     Object.assign(fsContent.style, {
         flex: '1 1 auto',
