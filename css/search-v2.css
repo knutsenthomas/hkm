@@ -23,9 +23,9 @@
     left: 0 !important;
     width: 100vw !important;
     height: 100vh !important;
-    background: rgba(15, 23, 42, 0.4) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
+    background: rgba(15, 23, 42, 0.6) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
     z-index: 999999 !important;
     display: none !important;
     align-items: flex-start !important;
@@ -36,6 +36,7 @@
     opacity: 1 !important;
     visibility: visible !important;
 }
+
 
 .search-overlay.active {
     display: flex !important;
