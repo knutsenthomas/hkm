@@ -400,7 +400,16 @@ class AdminManager {
             throw new Error('MyMemory er midlertidig rate-limitet. Prøv igjen om et par minutter.');
         }
 
-        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=${encodeURIComponent(sourceLang)}|${encodeURIComponent(targetLang)}`;
+        const mapMyMemoryLang = (lang) => {
+            const normalized = String(lang || '').trim().toLowerCase();
+            if (normalized === 'no') return 'nb';
+            return normalized;
+        };
+
+        const mmSourceLang = mapMyMemoryLang(sourceLang) || 'nb';
+        const mmTargetLang = mapMyMemoryLang(targetLang) || 'en';
+
+        const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(raw)}&langpair=${encodeURIComponent(mmSourceLang)}|${encodeURIComponent(mmTargetLang)}`;
         const maxAttempts = 3;
 
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
