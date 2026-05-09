@@ -30,6 +30,7 @@ const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
 const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
 const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 2;
 const PODCAST_AUTO_TRANSCRIPTION_ENABLED = true;
+const WIX_BLOG_PUBLIC_PAGE_ENRICHMENT_ENABLED = false;
 
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
@@ -3257,7 +3258,9 @@ async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
     importSource = "wix-rss-fallback";
   }
 
-  wixItems = await enrichWixItemsWithPublicPageContent(wixItems);
+  if (WIX_BLOG_PUBLIC_PAGE_ENRICHMENT_ENABLED) {
+    wixItems = await enrichWixItemsWithPublicPageContent(wixItems);
+  }
 
   const existingSnap = await db.collection("content").doc("collection_blog").get();
   const existingData = existingSnap.exists ? existingSnap.data() : {};
