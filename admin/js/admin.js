@@ -5428,38 +5428,60 @@ class AdminManager {
                     </header>
                     <div class="editor-content-wrapper">
                         <div class="editor-main-canvas">
-                            <div class="desktop-richtools" id="desktop-richtools">
-                                <div class="desktop-richtools-title">Blokkverktøy</div>
-                                <button type="button" class="desktop-richtools-btn" data-tool="paragraph">
-                                    <span class="material-symbols-outlined">notes</span>
-                                    <span>Tekst</span>
-                                </button>
-                                <button type="button" class="desktop-richtools-btn" data-tool="header">
-                                    <span class="material-symbols-outlined">title</span>
-                                    <span>Heading</span>
-                                </button>
-                                <button type="button" class="desktop-richtools-btn" data-tool="list">
-                                    <span class="material-symbols-outlined">format_list_bulleted</span>
-                                    <span>Liste</span>
-                                </button>
-                                <button type="button" class="desktop-richtools-btn" data-tool="image">
-                                    <span class="material-symbols-outlined">image</span>
-                                    <span>Bilde</span>
-                                </button>
-                                <button type="button" class="desktop-richtools-btn" data-tool="quote">
-                                    <span class="material-symbols-outlined">format_quote</span>
-                                    <span>Sitat</span>
-                                </button>
-                                <button type="button" class="desktop-richtools-btn" data-tool="delimiter">
-                                    <span class="material-symbols-outlined">horizontal_rule</span>
-                                    <span>Skillelinje</span>
-                                </button>
-                                <button type="button" class="desktop-richtools-btn" data-tool="youtubeVideo">
-                                    <span class="material-symbols-outlined">smart_display</span>
-                                    <span>YouTube</span>
-                                </button>
+                            <div class="docs-workspace-shell">
+                            <div class="desktop-richtools docs-toolbar" id="desktop-richtools">
+                                <div class="docs-toolbar-group">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="paragraph" title="Brødtekst">
+                                        <span class="material-symbols-outlined">notes</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="header" title="Overskrift">
+                                        <span class="material-symbols-outlined">title</span>
+                                    </button>
+                                </div>
+                                <div class="docs-toolbar-divider"></div>
+                                <div class="docs-toolbar-group">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="bold" title="Fet">
+                                        <span class="material-symbols-outlined">format_bold</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="italic" title="Kursiv">
+                                        <span class="material-symbols-outlined">format_italic</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="underline" title="Understreket">
+                                        <span class="material-symbols-outlined">format_underlined</span>
+                                    </button>
+                                </div>
+                                <div class="docs-toolbar-divider"></div>
+                                <div class="docs-toolbar-group">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="alignLeft" title="Venstre">
+                                        <span class="material-symbols-outlined">format_align_left</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="alignCenter" title="Senter">
+                                        <span class="material-symbols-outlined">format_align_center</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="alignRight" title="Høyre">
+                                        <span class="material-symbols-outlined">format_align_right</span>
+                                    </button>
+                                </div>
+                                <div class="docs-toolbar-divider"></div>
+                                <div class="docs-toolbar-group">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="list" title="Punktliste">
+                                        <span class="material-symbols-outlined">format_list_bulleted</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="orderedList" title="Nummerert liste">
+                                        <span class="material-symbols-outlined">format_list_numbered</span>
+                                    </button>
+                                </div>
+                                <div class="docs-toolbar-divider"></div>
+                                <div class="docs-toolbar-group">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="image" title="Bilde">
+                                        <span class="material-symbols-outlined">image</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="quote" title="Sitat">
+                                        <span class="material-symbols-outlined">format_quote</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="editor-paper">
+                            <div class="editor-paper docs-page-paper">
                                 <input type="text" id="col-item-title-v2" placeholder="Skriv din tittel her..." value="${item.title || ''}">
                                 ${collectionId === 'podcast_transcripts' ? `
                                 <div style="margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #e2e8f0;">
@@ -5479,6 +5501,7 @@ class AdminManager {
                                 </div>
                                 ` : ''}
                                 <div id="${editorHolderId}"></div>
+                            </div>
                             </div>
                         </div>
                         <aside class="editor-sidebar-v2">
@@ -5874,6 +5897,12 @@ class AdminManager {
                 };
 
                 const toolHandlers = {
+                    bold: () => document.execCommand && document.execCommand('bold'),
+                    italic: () => document.execCommand && document.execCommand('italic'),
+                    underline: () => document.execCommand && document.execCommand('underline'),
+                    alignLeft: () => document.execCommand && document.execCommand('justifyLeft'),
+                    alignCenter: () => document.execCommand && document.execCommand('justifyCenter'),
+                    alignRight: () => document.execCommand && document.execCommand('justifyRight'),
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                     header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
                     list: () => {
@@ -5891,6 +5920,21 @@ class AdminManager {
                         const items = selectedItems.length ? selectedItems : [''];
                         editor.blocks.insert('list', { style: 'unordered', items }, undefined, undefined, true);
                     },
+                    orderedList: () => {
+                        const selectedItems = getSelectedListItems();
+                        const selectedRange = getSelectionRangeInHolder();
+                        if (selectedRange) {
+                            try {
+                                selectedRange.deleteContents();
+                                const selection = window.getSelection ? window.getSelection() : null;
+                                if (selection) selection.removeAllRanges();
+                            } catch (error) {
+                                console.warn('Could not remove selected text before ordered list conversion:', error);
+                            }
+                        }
+                        const items = selectedItems.length ? selectedItems : [''];
+                        editor.blocks.insert('list', { style: 'ordered', items }, undefined, undefined, true);
+                    },
                     image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
                     delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
@@ -5899,7 +5943,7 @@ class AdminManager {
 
                 desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
                     const tool = btn.getAttribute('data-tool');
-                    const needsConfig = ['header', 'list', 'image', 'quote', 'delimiter', 'youtubeVideo'];
+                    const needsConfig = ['header', 'list', 'orderedList', 'image', 'quote', 'delimiter', 'youtubeVideo'];
                     const isAvailable = tool === 'paragraph' || !needsConfig.includes(tool) || !!toolsConfig[tool];
 
                     if (!isAvailable) {
