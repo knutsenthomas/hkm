@@ -5738,20 +5738,186 @@ class AdminManager {
 
             console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
 
-            const editor = new EditorJS({
-                holder: editorHolderId,
-                data: editorData,
-                placeholder: 'Trykk "/" for å velge blokker...',
-                tools: toolsConfig,
-                logLevel: 'ERROR',
-                onReady: () => {
-                    this._activeEditorInstance = editor;
-                    this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
-                }
-            });
+            const shouldUseDocsLikeEditor = ['blog', 'teaching', 'podcast_transcripts'].includes(collectionId);
+            let docsSurface = null;
+            let editor;
+
+            if (shouldUseDocsLikeEditor) {
+                const holder = document.getElementById(editorHolderId);
+                const initialBlocks = Array.isArray(editorData?.blocks) ? editorData.blocks : [];
+                const initialHtml = this.editorJsBlocksToHtml(initialBlocks)
+                    || (typeof item.content === 'string' ? item.content : '')
+                    || (collectionId === 'podcast_transcripts' ? String(item.text || '') : '');
+
+                holder.innerHTML = '<div class="docs-rte-surface" contenteditable="true" spellcheck="true"></div>';
+                docsSurface = holder.querySelector('.docs-rte-surface');
+                docsSurface.style.minHeight = '480px';
+                docsSurface.style.outline = 'none';
+                docsSurface.style.lineHeight = '1.65';
+                docsSurface.style.fontSize = '18px';
+                docsSurface.style.color = '#0f172a';
+                docsSurface.innerHTML = String(initialHtml || '').trim() || '<p><br></p>';
+
+                const normalizeHtml = (html) => String(html || '')
+                    .replace(/<div><br><\/div>/gi, '<p><br></p>')
+                    .replace(/<div>/gi, '<p>')
+                    .replace(/<\/div>/gi, '</p>')
+                    .trim();
+
+                editor = {
+                    save: async () => {
+                        const html = normalizeHtml(docsSurface?.innerHTML || '');
+                        return this.htmlToEditorJsBlocks(html);
+                    },
+                    render: async (nextData) => {
+                        const blocks = Array.isArray(nextData?.blocks) ? nextData.blocks : [];
+                        const html = this.editorJsBlocksToHtml(blocks);
+                        docsSurface.innerHTML = normalizeHtml(html) || '<p><br></p>';
+                    },
+                    destroy: () => {
+                        if (docsSurface) docsSurface.removeAttribute('contenteditable');
+                    }
+                };
+
+                this._activeEditorInstance = editor;
+            } else {
+                editor = new EditorJS({
+                    holder: editorHolderId,
+                    data: editorData,
+                    placeholder: 'Trykk "/" for å velge blokker...',
+                    tools: toolsConfig,
+                    logLevel: 'ERROR',
+                    onReady: () => {
+                        this._activeEditorInstance = editor;
+                        this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
+                    }
+                });
+            }
 
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
+                if (shouldUseDocsLikeEditor && docsSurface) {
+                    const splitTextToItems = (rawText) => {
+                        const text = String(rawText || '')
+                            .replace(/\r\n/g, '\n')
+                            .replace(/[\u2028\u2029]/g, '\n')
+                            .replace(/\u00A0/g, ' ')
+                            .trim();
+                        if (!text) return [];
+
+                        const clean = (line) => String(line || '')
+                            .replace(/^[-*•]\s+/, '')
+                            .trim();
+
+                        const lines = text
+                            .split(/\n+/)
+                            .map(clean)
+                            .filter(Boolean);
+                        if (lines.length > 1) return lines;
+
+                        const sentenceMatches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+                        const sentences = sentenceMatches
+                            .map(clean)
+                            .filter(Boolean);
+                        if (sentences.length > 1) return sentences;
+
+                        return [clean(text)];
+                    };
+
+                    const focusSurface = () => {
+                        if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
+                    };
+
+                    const exec = (command, value = null) => {
+                        focusSurface();
+                        document.execCommand(command, false, value);
+                    };
+
+                    const selectionInsideSurface = () => {
+                        const sel = window.getSelection ? window.getSelection() : null;
+                        if (!sel || sel.rangeCount === 0) return null;
+                        const range = sel.getRangeAt(0);
+                        const node = range.commonAncestorContainer;
+                        const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                        if (!el || !docsSurface.contains(el)) return null;
+                        return { sel, range };
+                    };
+
+                    const replaceSelectionWithList = (ordered) => {
+                        const ctx = selectionInsideSurface();
+                        if (!ctx || ctx.sel.isCollapsed) {
+                            exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
+                            return;
+                        }
+
+                        const selectedText = String(ctx.sel.toString() || '').trim();
+                        const items = splitTextToItems(selectedText);
+                        if (items.length <= 1) {
+                            exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
+                            return;
+                        }
+
+                        const listEl = document.createElement(ordered ? 'ol' : 'ul');
+                        items.forEach((text) => {
+                            const li = document.createElement('li');
+                            li.textContent = text;
+                            listEl.appendChild(li);
+                        });
+
+                        ctx.range.deleteContents();
+                        ctx.range.insertNode(listEl);
+
+                        const after = document.createRange();
+                        after.setStartAfter(listEl);
+                        after.collapse(true);
+                        ctx.sel.removeAllRanges();
+                        ctx.sel.addRange(after);
+                    };
+
+                    const escapeHtml = (value) => String(value || '')
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+
+                    const toolHandlers = {
+                        paragraph: () => exec('formatBlock', 'p'),
+                        header: () => exec('formatBlock', 'h2'),
+                        list: () => replaceSelectionWithList(false),
+                        orderedList: () => replaceSelectionWithList(true),
+                        image: () => {
+                            const url = window.prompt('Lim inn bilde-URL');
+                            if (!url) return;
+                            const safeUrl = escapeHtml(url.trim());
+                            if (!safeUrl) return;
+                            focusSurface();
+                            document.execCommand('insertHTML', false, `<p><img src="${safeUrl}" alt="Innsatt bilde" style="max-width:100%;height:auto;border-radius:10px;" /></p><p><br></p>`);
+                        },
+                        quote: () => exec('formatBlock', 'blockquote')
+                    };
+
+                    desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
+                        const tool = btn.getAttribute('data-tool');
+                        if (!toolHandlers[tool]) {
+                            btn.disabled = true;
+                            btn.classList.add('is-disabled');
+                            return;
+                        }
+
+                        btn.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
+                        });
+
+                        btn.addEventListener('click', () => {
+                            try {
+                                toolHandlers[tool]();
+                            } catch (error) {
+                                console.error(`Could not apply toolbar action '${tool}':`, error);
+                            }
+                        });
+                    });
+                } else {
                 const holder = document.getElementById(editorHolderId);
                 let cachedActiveBlockIndex = -1;
                 let cachedSelectedText = '';
@@ -6009,6 +6175,7 @@ class AdminManager {
                         }
                     });
                 });
+                }
             }
 
             if (collectionId === 'podcast_transcripts') {
