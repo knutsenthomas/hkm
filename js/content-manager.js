@@ -1254,6 +1254,11 @@ class ContentManager {
             }
             this._currentInteractionsManager = new InteractionsManager('blog-interactions', postId);
         }
+        } catch (error) {
+            console.error('[ContentManager] renderSingleBlogPost failed:', error);
+            container.innerHTML = '<p>Kunne ikke laste innlegget akkurat nå.</p>';
+            revealPostContainer();
+        }
     }
 
     async loadEvents(forceRefresh = false) {
@@ -1287,11 +1292,6 @@ class ContentManager {
                 if (!eventDate) return false;
                 return eventDate >= rangeStart && eventDate <= rangeEnd;
             });
-
-            let finalEvents = [];
-
-            // 2. Prefer direct GCal fetch when configured
-            const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
             const gcal = integrations?.googleCalendar || {};
             const apiKey = gcal.apiKey || '';
             const calendarListRaw = Array.isArray(integrations?.googleCalendars)
@@ -2978,11 +2978,6 @@ class ContentManager {
                 this._renderHtmlSignatures.set('__hero-slides-data', incomingSignature);
                 console.log("[ContentManager] Hero content matches DOM, skipping re-render to prevent flicker.");
             }
-        }
-        } catch (error) {
-            console.error('[ContentManager] renderSingleBlogPost failed:', error);
-            container.innerHTML = '<p>Kunne ikke laste innlegget akkurat nå.</p>';
-            revealPostContainer();
         }
     }
 
