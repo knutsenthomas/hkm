@@ -12266,6 +12266,60 @@ class AdminManager {
         const doc = parser.parseFromString(`<div>${html}</div>`, 'text/html');
         const elements = doc.body.firstChild.childNodes;
 
+        // Helper: push an <img> element as an image block
+        const pushImageBlock = (imgEl) => {
+            const url = imgEl.src || imgEl.getAttribute('src') || '';
+            if (!url) return;
+            blocks.push({
+                type: 'image',
+                data: {
+                    file: { url },
+                    caption: imgEl.alt || '',
+                    withBorder: false,
+                    stretched: false,
+                    withBackground: false
+                }
+            });
+        };
+
+        // Helper: process a <p> or <div> — split around any <img> children
+        const pushParagraphOrImages = (elem) => {
+            const imgs = elem.querySelectorAll('img');
+            if (imgs.length === 0) {
+                // No images — push as paragraph if non-empty
+                // Strip any remaining tags that EditorJS can't handle (only keep inline)
+                const clone = elem.cloneNode(true);
+                clone.querySelectorAll('img, video, iframe').forEach(n => n.remove());
+                const text = clone.innerHTML.trim();
+                if (text.length > 0) {
+                    blocks.push({ type: 'paragraph', data: { text } });
+                }
+                return;
+            }
+
+            // Walk child nodes: accumulate text/inline nodes, flush as paragraph before each <img>
+            let pendingHTML = '';
+            const flushPending = () => {
+                const trimmed = pendingHTML.trim();
+                if (trimmed.length > 0) {
+                    blocks.push({ type: 'paragraph', data: { text: trimmed } });
+                }
+                pendingHTML = '';
+            };
+
+            for (const child of elem.childNodes) {
+                if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'img') {
+                    flushPending();
+                    pushImageBlock(child);
+                } else {
+                    pendingHTML += child.nodeType === Node.TEXT_NODE
+                        ? child.textContent
+                        : child.outerHTML || '';
+                }
+            }
+            flushPending();
+        };
+
         for (let elem of elements) {
             if (elem.nodeType === Node.TEXT_NODE) {
                 const text = elem.textContent.trim();
@@ -12279,13 +12333,7 @@ class AdminManager {
                 const tagName = elem.tagName.toLowerCase();
 
                 if (tagName === 'p' || tagName === 'div') {
-                    const text = elem.innerHTML;
-                    if (text.trim().length > 0) {
-                        blocks.push({
-                            type: 'paragraph',
-                            data: { text: text }
-                        });
-                    }
+                    pushParagraphOrImages(elem);
                 } else if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'h4') {
                     const level = parseInt(tagName.charAt(1)) || 2;
                     blocks.push({
@@ -12321,16 +12369,7 @@ class AdminManager {
                 } else if (tagName === 'hr') {
                     blocks.push({ type: 'delimiter', data: {} });
                 } else if (tagName === 'img') {
-                    blocks.push({
-                        type: 'image',
-                        data: {
-                            file: { url: elem.src || '' },
-                            caption: elem.alt || '',
-                            withBorder: false,
-                            stretched: false,
-                            withBackground: false
-                        }
-                    });
+                    pushImageBlock(elem);
                 }
             }
         }
