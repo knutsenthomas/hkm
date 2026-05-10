@@ -2193,8 +2193,35 @@ class ContentManager {
                     case 'paragraph':
                         return `<p class="block-paragraph">${block.data.text}</p>`;
                     case 'list': {
+                        const extractListItemText = (item) => {
+                            if (typeof item === 'string') return item;
+                            if (item && typeof item === 'object') {
+                                return item.content || item.text || '';
+                            }
+                            return '';
+                        };
+
+                        const renderNestedItems = (items) => {
+                            const safeItems = Array.isArray(items) ? items : [];
+                            return safeItems.map((item) => {
+                                if (typeof item === 'string') {
+                                    return `<li>${item}</li>`;
+                                }
+
+                                if (item && typeof item === 'object') {
+                                    const text = extractListItemText(item);
+                                    const children = Array.isArray(item.items) && item.items.length > 0
+                                        ? `<ul>${renderNestedItems(item.items)}</ul>`
+                                        : '';
+                                    return `<li>${text}${children}</li>`;
+                                }
+
+                                return '';
+                            }).join('');
+                        };
+
                         const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
-                        const items = block.data.items.map(item => `<li>${item}</li>`).join('');
+                        const items = renderNestedItems(block.data.items);
                         return `<${listTag} class="block-list">${items}</${listTag}>`;
                     }
                     case 'quote':
