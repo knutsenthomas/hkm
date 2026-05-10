@@ -6104,11 +6104,11 @@ class AdminManager {
 
             const closeBtn = document.getElementById('close-col-modal');
             if (closeBtn) {
-                closeBtn.onclick = async () => {
+                closeBtn.onclick = () => {
                     this._clearOpenEditorState(collectionId);
-                    try { await editor.destroy(); } catch (e) {}
-                    this._activeEditorJsInstance = null;
                     modal.remove();
+                    try { editor.destroy(); } catch (e) {}
+                    this._activeEditorJsInstance = null;
                 };
             }
 
@@ -6598,10 +6598,10 @@ class AdminManager {
                                     }
                                 }
 
-                                try { await editor.destroy(); } catch (e) {}
-                                this._activeEditorJsInstance = null;
                                 modal.remove();
                                 this._clearOpenEditorState(collectionId);
+                                try { editor.destroy(); } catch (e) {}
+                                this._activeEditorJsInstance = null;
                                 this.loadCollection(collectionId);
                                 this.showToast('✅ Lagret!', 'success');
                             } catch (err) {
