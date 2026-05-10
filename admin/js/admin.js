@@ -5483,43 +5483,12 @@ class AdminManager {
                             </div>
                             <div class="editor-paper docs-page-paper">
                                 <input type="text" id="col-item-title-v2" placeholder="Skriv din tittel her..." value="${item.title || ''}">
-                                ${collectionId === 'podcast_transcripts' ? `
-                                <div style="margin-bottom: 40px; padding-bottom: 24px; border-bottom: 1px solid #e2e8f0;">
-                                    <h4 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; margin-bottom: 12px;">Oppsummering</h4>
-                                    <textarea id="col-item-summary" style="width: 100%; min-height: 100px; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; resize: vertical;" placeholder="Kort oppsummering av episoden...">${podcastSummary}</textarea>
-                                    <div style="margin-top: 12px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                        <button type="button" id="generate-podcast-ai-transcript" class="btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">smart_toy</span>
-                                            Generer AI-tekst
-                                        </button>
-                                        <button type="button" id="generate-podcast-ai-summary" class="btn-secondary btn-sm" style="display: inline-flex; align-items: center; gap: 6px;">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">auto_awesome</span>
-                                            Generer AI-oppsummering
-                                        </button>
-                                        <span id="podcast-ai-status" style="font-size: 12px; color: #64748b;">Genererer transkripsjon fra lydfilen for denne episoden.</span>
-                                    </div>
-                                </div>
-                                ` : ''}
                                 <div id="${editorHolderId}"></div>
                             </div>
                             </div>
                         </div>
                         <aside class="editor-sidebar-v2">
                              <h4 class="sidebar-section-title">DETALJER</h4>
-                             ${collectionId === 'podcast_transcripts' ? `
-                             <div class="sidebar-group">
-                                 <label>Episode-ID</label>
-                                 <input type="text" id="col-item-id" class="sidebar-control" value="${item.id || ''}" disabled style="background: #f1f5f9; color: #64748b; cursor: not-allowed;">
-                             </div>
-                             <div class="sidebar-group">
-                                 <label>Episode-tittel</label>
-                                 <input type="text" id="col-item-title-sidebar" class="sidebar-control" value="${item.title || ''}" placeholder="Skriv episodetittel">
-                             </div>
-                             <div class="sidebar-group">
-                                 <label>Publiseringsdato</label>
-                                 <input type="date" id="col-item-date" class="sidebar-control" value="${safeDate}" disabled style="background: #f1f5f9; color: #64748b; cursor: not-allowed;">
-                             </div>
-                             ` : `
                              <div class="sidebar-group">
                                  <label>Publiseringsdato</label>
                                  <input type="date" id="col-item-date" class="sidebar-control" value="${safeDate}">
@@ -5528,7 +5497,10 @@ class AdminManager {
                                  <label>Forfatter</label>
                                  <input type="text" id="col-item-author" class="sidebar-control" value="${item.author || ''}" placeholder="Navn">
                              </div>
-                             `}
+                             <div class="sidebar-group">
+                                 <label>Kategori</label>
+                                 <input type="text" id="col-item-cat" class="sidebar-control" value="${item.category || ''}" placeholder="Eks: Undervisning">
+                             </div>
                              ${isTeachingCollection ? `
                              <div class="sidebar-group">
                                  <label>Type undervisning</label>
@@ -5546,14 +5518,8 @@ class AdminManager {
                                  </select>
                                  <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Hold Cmd/Ctrl nede for å velge flere undervisninger i serien.</p>
                              </div>
-                             ` : (collectionId !== 'podcast_transcripts' ? `
-                             <div class="sidebar-group">
-                                 <label>Kategori</label>
-                                 <input type="text" id="col-item-cat" class="sidebar-control" value="${item.category || ''}" placeholder="Eks: Undervisning">
-                             </div>
-                             ` : '')}
+                             ` : ''}
                              
-                              ${collectionId !== 'podcast_transcripts' ? `
                               <h4 class="sidebar-section-title">OMSLAGSBILDE</h4>
                               <div class="sidebar-group">
                                   <div class="sidebar-img-preview" id="sidebar-img-trigger" style="cursor: pointer; position: relative; overflow: hidden; border: 2px dashed #e2e8f0; border-radius: 12px; height: 160px; display: flex; align-items: center; justify-content: center; background: #f8fafc; transition: all 0.2s;">
@@ -5582,7 +5548,6 @@ class AdminManager {
                                  <label>Meta-beskrivelse</label>
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
-                             ` : ''}
                              ${collectionId === 'blog' ? `
                              <h4 class="sidebar-section-title">RELATERTE INNLEGG</h4>
                              <div class="sidebar-group">
