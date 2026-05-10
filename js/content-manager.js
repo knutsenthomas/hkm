@@ -205,6 +205,35 @@ class ContentManager {
         return Array.from(ids);
     }
 
+    normalizeLookupToken(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+            .trim()
+            .toLowerCase()
+            .replace(/^\/+|\/+$/g, '');
+    }
+
+    extractIdFromLinkValue(value) {
+        if (typeof value !== 'string' || !value.trim()) return '';
+        const raw = value.trim();
+
+        try {
+            const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://example.local${raw.startsWith('/') ? '' : '/'}${raw}`;
+            const parsed = new URL(withScheme);
+            const idFromQuery = parsed.searchParams.get('id');
+            if (idFromQuery && idFromQuery.trim()) return idFromQuery.trim();
+        } catch (error) {
+            // Fall through to regex parsing for non-standard strings.
+        }
+
+        const queryMatch = raw.match(/[?&]id=([^&#]+)/i);
+        if (queryMatch && queryMatch[1]) {
+            return queryMatch[1].trim();
+        }
+
+        return '';
+    }
+
     normalizeBlogKeyValue(value) {
         if (typeof value !== 'string') return '';
         return value
@@ -415,16 +444,51 @@ class ContentManager {
         const targetRaw = String(itemId).trim();
         if (!targetRaw) return null;
 
-        const targetVariants = new Set([targetRaw, encodeURIComponent(targetRaw)]);
+        const targetIdFromLink = this.extractIdFromLinkValue(targetRaw);
+
+        const targetVariants = new Set([
+            targetRaw,
+            encodeURIComponent(targetRaw),
+            targetIdFromLink
+        ].filter(Boolean));
         try {
             targetVariants.add(decodeURIComponent(targetRaw));
         } catch (error) {
             // Ignore invalid URI sequences.
         }
+        if (targetIdFromLink) {
+            try {
+                targetVariants.add(decodeURIComponent(targetIdFromLink));
+            } catch (error) {
+                // Ignore invalid URI sequences.
+            }
+        }
+
+        const normalizedTargets = Array.from(targetVariants)
+            .map((value) => this.normalizeLookupToken(value))
+            .filter(Boolean);
 
         return items.find((item) => {
             const candidates = this.getContentItemLookupIds(item);
-            return candidates.some((candidate) => targetVariants.has(candidate));
+            const linkIdCandidates = [item?.url, item?.link]
+                .map((value) => this.extractIdFromLinkValue(value))
+                .filter(Boolean);
+            const allCandidates = [...candidates, ...linkIdCandidates];
+
+            const hasExact = allCandidates.some((candidate) => targetVariants.has(candidate));
+            if (hasExact) return true;
+
+            const normalizedCandidates = allCandidates
+                .map((candidate) => this.normalizeLookupToken(candidate))
+                .filter(Boolean);
+
+            return normalizedCandidates.some((candidate) =>
+                normalizedTargets.some((target) =>
+                    candidate === target
+                    || (target.length >= 8 && candidate.includes(target))
+                    || (candidate.length >= 8 && target.includes(candidate))
+                )
+            );
         }) || null;
     }
 
