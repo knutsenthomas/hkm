@@ -183,8 +183,15 @@ class ContentManager {
             item._id,
             item.wixGuid,
             item.postId,
+            item.postID,
+            item.referenceId,
+            item.commentResourceId,
+            item.commentContextId,
+            item.guid,
             item.legacyId,
             item.slug,
+            item.url,
+            item.link,
             item.title
         ];
 
@@ -217,18 +224,38 @@ class ContentManager {
         if (typeof value !== 'string' || !value.trim()) return '';
         const raw = value.trim();
 
+        const pickFromSearch = (searchParams) => {
+            if (!searchParams || typeof searchParams.get !== 'function') return '';
+            const keys = ['id', 'postId', 'postid', 'blogId', 'blogid'];
+            for (const key of keys) {
+                const found = searchParams.get(key);
+                if (found && String(found).trim()) return String(found).trim();
+            }
+            return '';
+        };
+
         try {
             const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://example.local${raw.startsWith('/') ? '' : '/'}${raw}`;
             const parsed = new URL(withScheme);
-            const idFromQuery = parsed.searchParams.get('id');
+            const idFromQuery = pickFromSearch(parsed.searchParams);
             if (idFromQuery && idFromQuery.trim()) return idFromQuery.trim();
+
+            const pathSegments = parsed.pathname.split('/').filter(Boolean);
+            if (pathSegments.length > 0) {
+                return pathSegments[pathSegments.length - 1].trim();
+            }
         } catch (error) {
             // Fall through to regex parsing for non-standard strings.
         }
 
-        const queryMatch = raw.match(/[?&]id=([^&#]+)/i);
+        const queryMatch = raw.match(/[?&](?:id|postId|postid|blogId|blogid)=([^&#]+)/i);
         if (queryMatch && queryMatch[1]) {
             return queryMatch[1].trim();
+        }
+
+        const pathMatch = raw.match(/\/([^/?#]+)(?:[?#]|$)/);
+        if (pathMatch && pathMatch[1]) {
+            return pathMatch[1].trim();
         }
 
         return '';
