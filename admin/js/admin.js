@@ -5844,12 +5844,32 @@ class AdminManager {
                 };
 
                 const replaceActiveBlockWithList = async (style, items) => {
-                    const snapshot = await getActiveBlockSnapshot();
-                    if (!snapshot) return false;
                     try {
-                        if (!editor?.blocks?.delete || !editor?.blocks?.insert) return false;
-                        editor.blocks.delete(snapshot.idx);
-                        editor.blocks.insert('list', { style, items: toEditorListItems(items) }, undefined, snapshot.idx, true);
+                        const saved = await editor.save();
+                        const blocks = Array.isArray(saved?.blocks) ? [...saved.blocks] : [];
+                        if (!blocks.length) return false;
+
+                        let idx = -1;
+                        if (editor?.blocks?.getCurrentBlockIndex) {
+                            idx = editor.blocks.getCurrentBlockIndex();
+                        }
+                        if (!Number.isInteger(idx) || idx < 0) idx = cachedActiveBlockIndex;
+                        if (!Number.isInteger(idx) || idx < 0 || idx >= blocks.length) idx = 0;
+
+                        blocks.splice(idx, 1, {
+                            type: 'list',
+                            data: {
+                                style,
+                                items: toEditorListItems(items)
+                            }
+                        });
+
+                        await editor.render({
+                            time: saved?.time || Date.now(),
+                            version: saved?.version,
+                            blocks
+                        });
+                        cachedActiveBlockIndex = idx;
                         return true;
                     } catch (error) {
                         console.warn('Could not replace active block with list:', error);
