@@ -5351,6 +5351,13 @@ class AdminManager {
 
     async editCollectionItem(collectionId, index) {
         try {
+            // Hard cleanup: ensure only one editor modal exists.
+            document.querySelectorAll('.dashboard-modal').forEach((existingModal) => {
+                if (existingModal.querySelector('.editor-layout-v2')) {
+                    existingModal.remove();
+                }
+            });
+
             // Destroy any previous EditorJS instance before opening a new one.
             // Fire-and-forget so we never block or hang on a detached DOM element.
             if (this._activeEditorInstance) {
@@ -5779,7 +5786,7 @@ class AdminManager {
                 }
             });
 
-            const desktopTools = document.getElementById('desktop-richtools');
+            const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 const holder = document.getElementById(editorHolderId);
                 let cachedEditorSelectionText = '';
@@ -5796,7 +5803,7 @@ class AdminManager {
                     if (byLines.length > 1) return byLines;
 
                     return selectedText
-                        .split(/(?<=[.!?])\s+/)
+                        .split(/[.!?]\s+/)
                         .map((line) => line.trim())
                         .filter(Boolean);
                 };
@@ -6202,13 +6209,24 @@ class AdminManager {
                 };
             }
 
-            const closeBtn = document.getElementById('close-col-modal');
+            const closeBtn = modal.querySelector('#close-col-modal');
             if (closeBtn) {
                 closeBtn.onclick = () => {
                     this._clearOpenEditorState(collectionId);
+                    document.removeEventListener('keydown', escHandler);
                     modal.remove();
                 };
             }
+
+            // Escape key fallback: always allow closing the current editor modal.
+            const escHandler = (evt) => {
+                if (evt.key === 'Escape' && document.body.contains(modal)) {
+                    this._clearOpenEditorState(collectionId);
+                    modal.remove();
+                    document.removeEventListener('keydown', escHandler);
+                }
+            };
+            document.addEventListener('keydown', escHandler);
 
             const buildSafeItemFromForm = async ({ preserveExistingContentIfEmpty = false } = {}) => {
                 let savedData;
@@ -6315,7 +6333,7 @@ class AdminManager {
                 }
             };
 
-            const translateBtn = document.getElementById('translate-col-item');
+            const translateBtn = modal.querySelector('#translate-col-item');
             if (translateBtn && collectionId === 'blog') {
                 translateBtn.onclick = async () => {
                     await this._withButtonLoading(translateBtn, async () => {
@@ -6391,7 +6409,7 @@ class AdminManager {
             }
 
             // --- Print Button ---
-            const printBtn = document.getElementById('print-col-item');
+            const printBtn = modal.querySelector('#print-col-item');
             if (printBtn) {
                 printBtn.onclick = async () => {
                     printBtn.disabled = true;
@@ -6652,10 +6670,10 @@ class AdminManager {
                 };
             }
 
-            const saveBtn = document.getElementById('save-col-item');
+            const saveBtn = modal.querySelector('#save-col-item');
             if (saveBtn) {
                 saveBtn.onclick = async () => {
-                    const btn = document.getElementById('save-col-item');
+                    const btn = modal.querySelector('#save-col-item');
                     if (!btn) return;
 
                     // Clear immediately — before the Firestore write — so the realtime
