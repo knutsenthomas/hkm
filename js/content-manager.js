@@ -858,11 +858,27 @@ class ContentManager {
 
         if (!container) return;
 
+        const revealPostContainer = () => {
+            const skeleton = document.getElementById('post-skeleton');
+            if (skeleton) skeleton.style.display = 'none';
+            container.style.display = 'block';
+            if (!container.style.transition) {
+                requestAnimationFrame(() => {
+                    container.style.opacity = '0';
+                    container.style.transition = 'opacity 0.4s ease';
+                    requestAnimationFrame(() => { container.style.opacity = '1'; });
+                });
+            }
+        };
+
+        try {
+
         const urlParams = new URLSearchParams(window.location.search);
         const itemId = urlParams.get('id');
 
         if (!itemId) {
             container.innerHTML = '<p>Fant ikke innlegget.</p>';
+            revealPostContainer();
             return;
         }
 
@@ -883,6 +899,7 @@ class ContentManager {
 
         if (!item) {
             container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
+            revealPostContainer();
             return;
         }
 
@@ -1110,15 +1127,7 @@ class ContentManager {
         }
 
         // Hide skeleton, reveal real content with fade-in
-        const skeleton = document.getElementById('post-skeleton');
-        if (skeleton) skeleton.style.display = 'none';
-        container.style.display = 'block';
-        // Small rAF so display:block takes effect before opacity transition
-        requestAnimationFrame(() => {
-            container.style.opacity = '0';
-            container.style.transition = 'opacity 0.4s ease';
-            requestAnimationFrame(() => { container.style.opacity = '1'; });
-        });
+        revealPostContainer();
         // Fade in hero title and meta row
         const heroTitle = document.getElementById('single-post-title');
         const metaRow = document.getElementById('blog-meta-row');
@@ -2969,6 +2978,11 @@ class ContentManager {
                 this._renderHtmlSignatures.set('__hero-slides-data', incomingSignature);
                 console.log("[ContentManager] Hero content matches DOM, skipping re-render to prevent flicker.");
             }
+        }
+        } catch (error) {
+            console.error('[ContentManager] renderSingleBlogPost failed:', error);
+            container.innerHTML = '<p>Kunne ikke laste innlegget akkurat nå.</p>';
+            revealPostContainer();
         }
     }
 
