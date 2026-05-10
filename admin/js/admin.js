@@ -5434,9 +5434,41 @@ class AdminManager {
                                     <button type="button" class="desktop-richtools-btn" data-tool="paragraph" title="Brødtekst">
                                         <span class="material-symbols-outlined">notes</span>
                                     </button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="header" title="Overskrift">
-                                        <span class="material-symbols-outlined">title</span>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="h1" title="Overskrift 1">H1</button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="h2" title="Overskrift 2">H2</button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="h3" title="Overskrift 3">H3</button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="h4" title="Overskrift 4">H4</button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="h5" title="Overskrift 5">H5</button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="h6" title="Overskrift 6">H6</button>
+                                </div>
+                                <div class="docs-toolbar-divider"></div>
+                                <div class="docs-toolbar-group">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="bold" title="Fet">
+                                        <span class="material-symbols-outlined">format_bold</span>
                                     </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="italic" title="Kursiv">
+                                        <span class="material-symbols-outlined">format_italic</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="underline" title="Understreket">
+                                        <span class="material-symbols-outlined">format_underlined</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="strike" title="Gjennomstreket">
+                                        <span class="material-symbols-outlined">format_strikethrough</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="link" title="Lenke">
+                                        <span class="material-symbols-outlined">link</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="removeFormat" title="Fjern formatering">
+                                        <span class="material-symbols-outlined">format_clear</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="textColor" title="Tekstfarge">
+                                        <span class="material-symbols-outlined">format_color_text</span>
+                                    </button>
+                                    <input type="color" class="docs-color-input" data-color-input="text" value="#1f2937" title="Velg tekstfarge" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" aria-hidden="true">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="highlightColor" title="Fremhevingsfarge">
+                                        <span class="material-symbols-outlined">format_color_fill</span>
+                                    </button>
+                                    <input type="color" class="docs-color-input" data-color-input="highlight" value="#fde68a" title="Velg fremhevingsfarge" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" aria-hidden="true">
                                 </div>
                                 <div class="docs-toolbar-divider"></div>
                                 <div class="docs-toolbar-group">
@@ -5445,6 +5477,12 @@ class AdminManager {
                                     </button>
                                     <button type="button" class="desktop-richtools-btn" data-tool="orderedList" title="Nummerert liste">
                                         <span class="material-symbols-outlined">format_list_numbered</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="outdent" title="Reduser innrykk">
+                                        <span class="material-symbols-outlined">format_indent_decrease</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="indent" title="Øk innrykk">
+                                        <span class="material-symbols-outlined">format_indent_increase</span>
                                     </button>
                                 </div>
                                 <div class="docs-toolbar-divider"></div>
@@ -5684,7 +5722,7 @@ class AdminManager {
                 toolsConfig.header = {
                     class: Header,
                     inlineToolbar: true,
-                    config: { placeholder: 'Overskrift', levels: [2, 3, 4], defaultLevel: 2 }
+                    config: { placeholder: 'Overskrift', levels: [1, 2, 3, 4, 5, 6], defaultLevel: 2 }
                 };
             }
 
@@ -5797,6 +5835,8 @@ class AdminManager {
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 if (shouldUseDocsLikeEditor && docsSurface) {
+                    let lastDocsSelectionRange = null;
+
                     const splitTextToItems = (rawText) => {
                         const text = String(rawText || '')
                             .replace(/\r\n/g, '\n')
@@ -5828,9 +5868,30 @@ class AdminManager {
                         if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
                     };
 
+                    const saveSelectionRange = () => {
+                        const sel = window.getSelection ? window.getSelection() : null;
+                        if (!sel || sel.rangeCount === 0) return;
+                        const range = sel.getRangeAt(0);
+                        const node = range.commonAncestorContainer;
+                        const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                        if (!el || !docsSurface.contains(el)) return;
+                        lastDocsSelectionRange = range.cloneRange();
+                    };
+
+                    const restoreSelectionRange = () => {
+                        if (!lastDocsSelectionRange) return false;
+                        const sel = window.getSelection ? window.getSelection() : null;
+                        if (!sel) return false;
+                        sel.removeAllRanges();
+                        sel.addRange(lastDocsSelectionRange);
+                        return true;
+                    };
+
                     const exec = (command, value = null) => {
                         focusSurface();
+                        restoreSelectionRange();
                         document.execCommand(command, false, value);
+                        saveSelectionRange();
                     };
 
                     const selectionInsideSurface = () => {
@@ -5883,7 +5944,39 @@ class AdminManager {
 
                     const toolHandlers = {
                         paragraph: () => exec('formatBlock', 'p'),
-                        header: () => exec('formatBlock', 'h2'),
+                        h1: () => exec('formatBlock', 'h1'),
+                        h2: () => exec('formatBlock', 'h2'),
+                        h3: () => exec('formatBlock', 'h3'),
+                        h4: () => exec('formatBlock', 'h4'),
+                        h5: () => exec('formatBlock', 'h5'),
+                        h6: () => exec('formatBlock', 'h6'),
+                        bold: () => exec('bold'),
+                        italic: () => exec('italic'),
+                        underline: () => exec('underline'),
+                        strike: () => exec('strikeThrough'),
+                        link: () => {
+                            const ctx = selectionInsideSurface();
+                            if (!ctx || !ctx.sel || ctx.sel.isCollapsed) {
+                                window.alert('Marker tekst før du legger til lenke.');
+                                return;
+                            }
+                            const url = window.prompt('Lim inn URL (https://...)');
+                            if (!url) return;
+                            const trimmed = String(url || '').trim();
+                            if (!trimmed) return;
+                            exec('createLink', trimmed);
+                        },
+                        removeFormat: () => exec('removeFormat'),
+                        outdent: () => exec('outdent'),
+                        indent: () => exec('indent'),
+                        textColor: () => {
+                            const input = desktopTools.querySelector('[data-color-input="text"]');
+                            if (input) input.click();
+                        },
+                        highlightColor: () => {
+                            const input = desktopTools.querySelector('[data-color-input="highlight"]');
+                            if (input) input.click();
+                        },
                         list: () => replaceSelectionWithList(false),
                         orderedList: () => replaceSelectionWithList(true),
                         image: () => {
@@ -5906,6 +5999,7 @@ class AdminManager {
                         }
 
                         btn.addEventListener('mousedown', (e) => {
+                            saveSelectionRange();
                             e.preventDefault();
                         });
 
@@ -5917,6 +6011,24 @@ class AdminManager {
                             }
                         });
                     });
+
+                    const textColorInput = desktopTools.querySelector('[data-color-input="text"]');
+                    if (textColorInput) {
+                        textColorInput.addEventListener('input', () => {
+                            if (!textColorInput.value) return;
+                            exec('styleWithCSS', true);
+                            exec('foreColor', textColorInput.value);
+                        });
+                    }
+
+                    const highlightColorInput = desktopTools.querySelector('[data-color-input="highlight"]');
+                    if (highlightColorInput) {
+                        highlightColorInput.addEventListener('input', () => {
+                            if (!highlightColorInput.value) return;
+                            exec('styleWithCSS', true);
+                            exec('hiliteColor', highlightColorInput.value);
+                        });
+                    }
                 } else {
                 const holder = document.getElementById(editorHolderId);
                 let cachedActiveBlockIndex = -1;
@@ -6150,8 +6262,9 @@ class AdminManager {
 
                 desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
                     const tool = btn.getAttribute('data-tool');
+                    const handler = toolHandlers[tool];
                     const needsConfig = ['header', 'list', 'orderedList', 'image', 'quote', 'delimiter', 'youtubeVideo'];
-                    const isAvailable = tool === 'paragraph' || !needsConfig.includes(tool) || !!toolsConfig[tool];
+                    const isAvailable = !!handler && (tool === 'paragraph' || !needsConfig.includes(tool) || !!toolsConfig[tool]);
 
                     if (!isAvailable) {
                         btn.disabled = true;
@@ -6168,7 +6281,6 @@ class AdminManager {
 
                     btn.addEventListener('click', async () => {
                         try {
-                            const handler = toolHandlers[tool];
                             if (handler) await handler();
                         } catch (err) {
                             console.error(`Could not insert block for tool '${tool}':`, err);
@@ -12727,13 +12839,13 @@ class AdminManager {
 
                 if (tagName === 'p' || tagName === 'div') {
                     pushParagraphOrImages(elem);
-                } else if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'h4') {
+                } else if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
                     const level = parseInt(tagName.charAt(1)) || 2;
                     blocks.push({
                         type: 'header',
                         data: {
                             text: elem.textContent,
-                            level: Math.min(level, 4)
+                            level: Math.min(level, 6)
                         }
                     });
                 } else if (tagName === 'ul' || tagName === 'ol') {
