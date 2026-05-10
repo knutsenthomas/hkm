@@ -3882,11 +3882,8 @@ class AdminManager {
                     </div>
 `;
 
-        // Load content lists
-        this.loadContentList('collection_blog', 'blog-posts-list', 'blog');
-        this.loadContentList('collection_teaching', 'teaching-series-list', 'teaching');
-        this.loadContentList('collection_pages', 'pages-list', 'page');
-
+        // Load content lists (Removed undefined loadContentList calls)
+        
         // Add event listeners for new content buttons
         document.getElementById('new-blog-post').addEventListener('click', () => this.openContentModal('blog'));
         document.getElementById('new-teaching-series').addEventListener('click', () => this.openContentModal('teaching'));
@@ -5193,7 +5190,7 @@ class AdminManager {
 
             if (collectionId !== 'podcast_transcripts') {
                 // Mark items that exist in Firestore so we can delete them
-                items.forEach(it => it.isFirestore = true);
+                items.forEach(it => { if (it) it.isFirestore = true; });
             }
 
             this._collectionItemsCache[collectionId] = items;

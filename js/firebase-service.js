@@ -186,7 +186,20 @@ class FirebaseService {
         } catch (error) {
             console.error("❌ Firebase initialization failed:", error);
         }
+    async waitForInitialization(timeoutMs = 5000) {
+        if (this.isInitialized) return true;
+        
+        let count = 0;
+        const interval = 100;
+        const maxCounts = timeoutMs / interval;
+        
+        while (!this.isInitialized && count < maxCounts) {
+            await new Promise(r => setTimeout(r, interval));
+            count++;
+        }
+        return this.isInitialized;
     }
+}
 
     _decodeFirestoreRestFields(fields = {}) {
         const out = {};
@@ -454,6 +467,9 @@ class FirebaseService {
     }
 
     async getPageContent(pageId, options = {}) {
+        if (!this.isInitialized) {
+            await this.waitForInitialization();
+        }
         if (!this.isInitialized) return null;
         if (!pageId) return null;
 

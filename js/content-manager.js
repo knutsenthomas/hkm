@@ -60,8 +60,8 @@ class ContentManager {
 
     detectPageId() {
         // Strip .html for cleanUrls support (Vercel/Firebase cleanUrls removes extension from pathname)
-        const path = window.location.pathname.replace(/\.html$/, '');
-        const p = (s) => new RegExp('(?:^|/)' + s + '$').test(path);
+        const path = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+        const p = (s) => new RegExp('(?:^|/)' + s + '(?:/|$)').test(path);
         if (path === '/' || /^\/(en|es)$/.test(path) || path.endsWith('/') || p('index')) return 'index';
         if (p('arrangementer') || p('events') || p('eventos')) return 'arrangementer';
         if (p('kalender') || p('calendar') || p('calendario')) return 'kalender';
@@ -675,9 +675,9 @@ class ContentManager {
 
         let service = window.firebaseService;
         if (!service || !service.isInitialized) {
-            // Wait for firebase module (reduced timeout to 1s total)
+            // Wait for firebase module (increased timeout to 4s total)
             let count = 0;
-            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 20) {
+            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 80) {
                 await new Promise(r => setTimeout(r, 50));
                 count++;
             }
@@ -686,7 +686,7 @@ class ContentManager {
         service = window.firebaseService;
         try {
             if (!service || !service.isInitialized) {
-                console.warn("⚠️ Firebase failed to initialize in time. Content may be limited.");
+                console.warn("⚠️ Firebase failed to initialize in time (4s). Content may be limited.");
             }
 
             // 1. Parallel Initial Load (Firestore defaults to cache if enabled)
@@ -1020,12 +1020,24 @@ class ContentManager {
             return;
         }
 
+        console.log(`[ContentManager] Fetching data for single post (ID: ${itemId})...`);
         const blogData = await window.firebaseService.getPageContent('collection_blog');
         const teachingData = await window.firebaseService.getPageContent('collection_teaching');
+        
+        console.log(`[ContentManager] Data received. Blog items: ${blogData?.items?.length || 0}, Teaching items: ${teachingData?.items?.length || 0}`);
         const blogItems = this.getDedupedBlogItems(blogData);
         const teachingItems = this.getCollectionItems(teachingData);
-        const blogItem = this.findContentItemById(blogItems, itemId);
-        const teachingItem = this.findContentItemById(teachingItems, itemId);
+        let blogItem = this.findContentItemById(blogItems, itemId);
+        let teachingItem = this.findContentItemById(teachingItems, itemId);
+        
+        // Fallback: If not found in deduped items, check raw items
+        if (!blogItem && blogData && Array.isArray(blogData.items)) {
+            blogItem = this.findContentItemById(blogData.items, itemId);
+        }
+        if (!teachingItem && teachingData && Array.isArray(teachingData.items)) {
+            teachingItem = this.findContentItemById(teachingData.items, itemId);
+        }
+        
         const sourceItem = blogItem || teachingItem;
         const item = sourceItem ? this.getLocalizedContentItem(sourceItem) : null;
         const isTeaching = !!teachingItem;
