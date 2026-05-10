@@ -2149,6 +2149,17 @@ class ContentManager {
 
         // Handle Editor.js JSON
         if (typeof content === 'object' && content.blocks) {
+            const isIgnorableParagraph = (block) => {
+                if (!block || block.type !== 'paragraph') return false;
+                const html = String(block?.data?.text || '')
+                    .replace(/&nbsp;/gi, ' ')
+                    .replace(/<br\s*\/?>/gi, ' ')
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                return html.length === 0;
+            };
+
             // Group consecutive image blocks so they can be rendered as a gallery
             const groups = [];
             let currentImageGroup = null;
@@ -2159,6 +2170,9 @@ class ContentManager {
                         groups.push(currentImageGroup);
                     }
                     currentImageGroup.blocks.push(block);
+                } else if (currentImageGroup && isIgnorableParagraph(block)) {
+                    // Keep image grouping intact even if editor inserted blank spacer paragraphs.
+                    continue;
                 } else {
                     currentImageGroup = null;
                     groups.push(block);
@@ -2191,6 +2205,7 @@ class ContentManager {
                     case 'header':
                         return `<h${block.data.level} class="block-header">${block.data.text}</h${block.data.level}>`;
                     case 'paragraph':
+                        if (isIgnorableParagraph(block)) return '';
                         return `<p class="block-paragraph">${block.data.text}</p>`;
                     case 'list': {
                         const extractListItemText = (item) => {
