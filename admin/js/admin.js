@@ -5440,30 +5440,6 @@ class AdminManager {
                                 </div>
                                 <div class="docs-toolbar-divider"></div>
                                 <div class="docs-toolbar-group">
-                                    <button type="button" class="desktop-richtools-btn" data-tool="bold" title="Fet">
-                                        <span class="material-symbols-outlined">format_bold</span>
-                                    </button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="italic" title="Kursiv">
-                                        <span class="material-symbols-outlined">format_italic</span>
-                                    </button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="underline" title="Understreket">
-                                        <span class="material-symbols-outlined">format_underlined</span>
-                                    </button>
-                                </div>
-                                <div class="docs-toolbar-divider"></div>
-                                <div class="docs-toolbar-group">
-                                    <button type="button" class="desktop-richtools-btn" data-tool="alignLeft" title="Venstre">
-                                        <span class="material-symbols-outlined">format_align_left</span>
-                                    </button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="alignCenter" title="Senter">
-                                        <span class="material-symbols-outlined">format_align_center</span>
-                                    </button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="alignRight" title="Høyre">
-                                        <span class="material-symbols-outlined">format_align_right</span>
-                                    </button>
-                                </div>
-                                <div class="docs-toolbar-divider"></div>
-                                <div class="docs-toolbar-group">
                                     <button type="button" class="desktop-richtools-btn" data-tool="list" title="Punktliste">
                                         <span class="material-symbols-outlined">format_list_bulleted</span>
                                     </button>
@@ -5914,12 +5890,6 @@ class AdminManager {
                 }
 
                 const toolHandlers = {
-                    bold: () => document.execCommand && document.execCommand('bold'),
-                    italic: () => document.execCommand && document.execCommand('italic'),
-                    underline: () => document.execCommand && document.execCommand('underline'),
-                    alignLeft: () => document.execCommand && document.execCommand('justifyLeft'),
-                    alignCenter: () => document.execCommand && document.execCommand('justifyCenter'),
-                    alignRight: () => document.execCommand && document.execCommand('justifyRight'),
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                     header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
                     list: async () => {

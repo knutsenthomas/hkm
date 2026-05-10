@@ -3132,7 +3132,7 @@ input[type="range"] {
     box-shadow: 0 1px 3px rgba(60, 64, 67, 0.22);
     border: 1px solid #dadce0;
     border-radius: 0;
-    padding: 96px;
+    padding: 72px;
     margin: 0 auto 64px;
     align-self: center;
     flex-grow: 0;
@@ -3172,12 +3172,12 @@ div[id^="editorjs-holder-"] {
 
 .editor-paper .ce-block__content,
 .editor-paper .ce-toolbar__content {
-    max-width: 720px !important;
+    max-width: 100% !important;
 }
 
 .editor-paper .ce-paragraph {
-    font-size: 16.5px !important;
-    line-height: 1.75 !important;
+    font-size: 15px !important;
+    line-height: 1.6 !important;
     color: #27364d !important;
     letter-spacing: 0.003em;
 }
@@ -3188,8 +3188,8 @@ div[id^="editorjs-holder-"] {
 }
 
 .editor-paper .ce-block {
-    padding-top: 0.22em;
-    padding-bottom: 0.22em;
+    padding-top: 0.08em;
+    padding-bottom: 0.08em;
 }
 
 .editor-paper .codex-editor {
