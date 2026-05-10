@@ -6234,6 +6234,10 @@ class AdminManager {
                     await this._withButtonLoading(translateBtn, async () => {
                         let slowNoticeTimer = null;
                         try {
+                            // Clear editor restore state before writing to Firestore, so the
+                            // realtime onSnapshot that fires mid-write cannot re-open the editor.
+                            this._clearOpenEditorState(collectionId);
+
                             slowNoticeTimer = setTimeout(() => {
                                 this.showToast('Oversettelse pågår fortsatt. Dette kan ta litt tid ved store innlegg.', 'warning', 4500);
                             }, 6000);
