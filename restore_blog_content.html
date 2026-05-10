@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Gjenopprett blogginnhold</title>
+    <style>
+        body { font-family: sans-serif; max-width: 700px; margin: 40px auto; padding: 20px; }
+        button { background: #6366f1; color: white; padding: 12px 28px; border: none; border-radius: 8px; font-size: 16px; cursor: pointer; }
+        button:disabled { opacity: 0.5; }
+        #log { margin-top: 24px; background: #f8fafc; border-radius: 8px; padding: 16px; font-family: monospace; font-size: 13px; white-space: pre-wrap; min-height: 100px; }
+        .ok { color: #166534; } .err { color: #b91c1c; } .info { color: #1d4ed8; }
+    </style>
+</head>
+<body>
+    <h2>Gjenopprett innhold: "Sann ydmykhet" og "Lys - kilden til liv"</h2>
+    <p>Dette skriptet henter gjeldende blogg-liste fra Firestore og oppdaterer kun de to berørte innleggene med originaltekst. Alle andre innlegg forblir urørt.</p>
+    <button id="startBtn" onclick="run()">Start gjenoppretting</button>
+    <div id="log"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="script.js"></script>
+    <script>
+        const log = (msg, cls = 'info') => {
+            const el = document.getElementById('log');
+            el.innerHTML += `<span class="${cls}">${msg}</span>\n`;
+        };
+
+        const originalContent = {
+            'sann-ydmykhet': `Når du tenker på ydmykhet, hva kommer til tankene?\n\n"Ydmyk dere derfor under Guds veldige hånd, for at han kan opphøye dere i sin tid." (1 Peter 5:6)\n\nI vår verden blir ydmykhet ofte sett på som et selvnedverdigende konsept som avslører våre usikkerheter og hindrer oss i å bli vårt beste. Men sann ydmykhet fører aldri til usikkerhet, fordi usikkerhet er en form for stolthet.\n\nStolthet enten blåser oss opp eller river oss ned. Stolthet er selvtilstrekkelig, men også selvdestruktivt. Hvis vi gjør det bra, får stolthet selvtilliten vår til å skyte i været. Men hvis vi går gjennom en tøff periode, gjør stolthet oss følsomme for våre feil. Stolthet knytter vår verdi til våre prestasjoner og hindrer oss i å se hvem vi virkelig er.\n\nStolthet får oss til å tro at hvis vi prøver hardt nok, kan vi bli gode nok. Ydmykhet hjelper oss å innse at vi ikke er nok – men Gud er nok for oss. Ydmykhet vil ofte be oss om å risikere noe. Det kan bety å legge ned vår sosiale status, vårt rykte, vår økonomiske sikkerhet eller vår følelse av autoritet.\n\nMen å overgi vår selvtilstrekkelighet lar oss omfavne Guds autoritet. Når vi overgir oss til Gud, lar vi Ham bli æret gjennom oss. Ydmykhet kan koste oss noe – men det fører til et overflod av liv.`,
+            'lys-kilden-til-liv': `Lys er selve kilden til liv. Tenk på det: Uten solen ville det ikke vært liv på jorden. Alt hadde vært mørkt, kaldt og ubeboelig. På samme måte er det åndelig. Jesus sier om seg selv at han er "Verdens lys". Når vi slipper lyset inn i livene våre, driver det ut mørket, gir varme og viser oss veien vi skal gå. Uten dette lyset vandrer vi i blinde, men med Ham har vi livets lys.`
+        };
+
+        async function run() {
+            const btn = document.getElementById('startBtn');
+            btn.disabled = true;
+            document.getElementById('log').innerHTML = '';
+
+            try {
+                const db = firebase.firestore();
+                log('Henter gjeldende blogg-liste fra Firestore...', 'info');
+
+                const doc = await db.collection('content').doc('collection_blog').get();
+                if (!doc.exists) {
+                    log('❌ Fant ikke collection_blog i Firestore.', 'err');
+                    return;
+                }
+
+                const data = doc.data();
+                const items = Array.isArray(data.items) ? data.items : [];
+                log(`Fant ${items.length} innlegg totalt.`, 'info');
+
+                let changed = 0;
+                const updated = items.map(item => {
+                    if (originalContent[item.id]) {
+                        // Only restore if content looks empty or broken (blocks with no text, or empty object)
+                        const hasContent = (() => {
+                            if (!item.content) return false;
+                            if (typeof item.content === 'string') return item.content.trim().length > 50;
+                            if (typeof item.content === 'object' && Array.isArray(item.content.blocks)) {
+                                return item.content.blocks.some(b => {
+                                    const text = b?.data?.text || b?.data?.file?.url || '';
+                                    return String(text).trim().length > 5;
+                                });
+                            }
+                            return false;
+                        })();
+
+                        if (!hasContent) {
+                            log(`🔧 Gjenoppretter innhold for: "${item.title}" (${item.id})`, 'info');
+                            changed++;
+                            return { ...item, content: originalContent[item.id] };
+                        } else {
+                            log(`✅ "${item.title}" har innhold – ingen endring nødvendig.`, 'ok');
+                        }
+                    }
+                    return item;
+                });
+
+                if (changed === 0) {
+                    log('\n✅ Ingen innlegg trengte gjenoppretting — innholdet er allerede intakt.', 'ok');
+                    return;
+                }
+
+                log(`\nLagrer ${changed} gjenopprettet innlegg til Firestore...`, 'info');
+                await db.collection('content').doc('collection_blog').update({ items: updated });
+                log(`✅ Ferdig! ${changed} innlegg gjenopprettet.`, 'ok');
+                log('Du kan nå åpne disse innleggene i admin og verifisere innholdet.', 'ok');
+
+            } catch (e) {
+                log(`❌ Feil: ${e.message}`, 'err');
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
