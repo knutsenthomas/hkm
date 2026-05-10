@@ -5581,12 +5581,9 @@ class AdminManager {
                     editorData = item.content;
                 }
             } else if (typeof item.content === 'string' && item.content.trim().length > 0) {
-                if (collectionId === 'podcast_transcripts' || collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'events') {
-                    // Legacy HTML content: convert to Editor.js blocks so content is visible and editable.
-                    editorData = this.htmlToEditorJsBlocks(item.content);
-                } else {
-                    console.warn("Legacy HTML content detected. Editor.js works best with JSON.");
-                }
+                // Always convert legacy HTML strings to Editor.js blocks regardless of collection ID format
+                // (collectionId may be 'collection_blog', 'blog', 'collection_teaching', 'teaching', etc.)
+                editorData = this.htmlToEditorJsBlocks(item.content);
             }
 
             // For podcast transkripsjon, foretrekk 'text' dersom content er tom eller ikke meningsfull.
