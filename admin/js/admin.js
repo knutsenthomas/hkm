@@ -6590,9 +6590,10 @@ class AdminManager {
                                     }
                                 }
 
-                                modal.remove();
-                                this.loadCollection(collectionId);
+                                // Stay in the editor after saving — just show confirmation
                                 this.showToast('✅ Lagret!', 'success');
+                                // Refresh the background list silently without closing the editor
+                                this.loadCollection(collectionId);
                             } catch (err) {
                                 console.error('Error saving item:', err);
                                 this.showToast(err?.message || 'Kunne ikke lagre. Sjekk konsollen for detaljer.', 'error', 5000);
