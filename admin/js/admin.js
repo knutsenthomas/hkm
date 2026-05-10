@@ -5858,11 +5858,36 @@ class AdminManager {
                     }
                 };
 
+                const getSelectionRangeInHolder = () => {
+                    try {
+                        if (!holder) return null;
+                        const selection = window.getSelection ? window.getSelection() : null;
+                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
+                        const range = selection.getRangeAt(0);
+                        const commonNode = range.commonAncestorContainer;
+                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
+                        if (!containerNode || !holder.contains(containerNode)) return null;
+                        return range;
+                    } catch (error) {
+                        return null;
+                    }
+                };
+
                 const toolHandlers = {
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                     header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
                     list: () => {
                         const selectedItems = getSelectedListItems();
+                        const selectedRange = getSelectionRangeInHolder();
+                        if (selectedRange) {
+                            try {
+                                selectedRange.deleteContents();
+                                const selection = window.getSelection ? window.getSelection() : null;
+                                if (selection) selection.removeAllRanges();
+                            } catch (error) {
+                                console.warn('Could not remove selected text before list conversion:', error);
+                            }
+                        }
                         const items = selectedItems.length ? selectedItems : [''];
                         editor.blocks.insert('list', { style: 'unordered', items }, undefined, undefined, true);
                     },
