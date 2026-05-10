@@ -77,6 +77,10 @@ class FirebaseService {
         return !this._isAdminLikeRoute();
     }
 
+    canReadPublicContent() {
+        return this._shouldPreferRestPublicReads() && this._isValidFirebaseConfig(this._getReadableConfig());
+    }
+
     _getReadableConfig() {
         if (this._isValidFirebaseConfig(this._activeConfig)) return this._activeConfig;
         if (this._isValidFirebaseConfig(window.firebaseConfig)) return window.firebaseConfig;
@@ -86,6 +90,11 @@ class FirebaseService {
     tryAutoInit() {
         if (this.isInitialized) return true;
 
+        const bundledConfig = this._isValidFirebaseConfig(window.firebaseConfig) ? this._normalizeFirebaseConfig(window.firebaseConfig) : null;
+        if (bundledConfig && !this._isValidFirebaseConfig(this._activeConfig)) {
+            this._activeConfig = { ...bundledConfig };
+        }
+
         // Check if firebase is available globally (from script tag)
         if (typeof firebase === 'undefined') {
             return false;
@@ -93,7 +102,6 @@ class FirebaseService {
 
         const storedConfigRaw = this.getStoredConfig();
         const storedConfig = this._isValidFirebaseConfig(storedConfigRaw) ? this._normalizeFirebaseConfig(storedConfigRaw) : null;
-        const bundledConfig = this._isValidFirebaseConfig(window.firebaseConfig) ? this._normalizeFirebaseConfig(window.firebaseConfig) : null;
         const isAdminRoute = this._isAdminLikeRoute();
 
         // Public pages should prefer bundled config so a stale admin override in localStorage
@@ -467,10 +475,6 @@ class FirebaseService {
     }
 
     async getPageContent(pageId, options = {}) {
-        if (!this.isInitialized) {
-            await this.waitForInitialization();
-        }
-        if (!this.isInitialized) return null;
         if (!pageId) return null;
 
         // Return memoized result if available to prevent redundant SDK processing
@@ -486,10 +490,20 @@ class FirebaseService {
         const requestPromise = (async () => {
             try {
                 if (this._shouldPreferRestPublicReads()) {
+                    const bundledConfig = this._isValidFirebaseConfig(window.firebaseConfig) ? this._normalizeFirebaseConfig(window.firebaseConfig) : null;
+                    if (bundledConfig && !this._isValidFirebaseConfig(this._activeConfig)) {
+                        this._activeConfig = { ...bundledConfig };
+                    }
+
                     const restData = await this._fetchDocViaRest('content', pageId);
                     this._setCachedContent(pageId, restData ?? null);
                     return restData ?? null;
                 }
+
+                if (!this.isInitialized) {
+                    await this.waitForInitialization();
+                }
+                if (!this.isInitialized) return null;
 
                 // Use cache-first intelligence
                 const docRef = this.db.collection("content").doc(pageId);

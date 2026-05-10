@@ -674,10 +674,18 @@ class ContentManager {
         }
 
         let service = window.firebaseService;
-        if (!service || !service.isInitialized) {
+        const canReadPublicContent = () => Boolean(
+            window.firebaseService
+            && typeof window.firebaseService.canReadPublicContent === 'function'
+            && window.firebaseService.canReadPublicContent()
+        );
+        if (!service || (!service.isInitialized && !canReadPublicContent())) {
             // Wait for firebase module (increased timeout to 4s total)
             let count = 0;
-            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 80) {
+            while (
+                (!window.firebaseService || (!window.firebaseService.isInitialized && !canReadPublicContent()))
+                && count < 80
+            ) {
                 await new Promise(r => setTimeout(r, 50));
                 count++;
             }
@@ -685,7 +693,7 @@ class ContentManager {
 
         service = window.firebaseService;
         try {
-            if (!service || !service.isInitialized) {
+            if (!service || (!service.isInitialized && !canReadPublicContent())) {
                 console.warn("⚠️ Firebase failed to initialize in time (4s). Content may be limited.");
             }
 
@@ -694,7 +702,7 @@ class ContentManager {
             if (this.pageId === 'index') {
                 docIds.push('settings_facebook_feed');
             }
-            const docs = service && service.isInitialized
+            const docs = service && (service.isInitialized || canReadPublicContent())
                 ? await this.getContentDocs(docIds)
                 : {};
             const content = docs[this.pageId] ?? null;
