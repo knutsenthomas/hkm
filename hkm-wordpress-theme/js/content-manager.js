@@ -2160,10 +2160,55 @@ class ContentManager {
                 return html.length === 0;
             };
 
+            const hasMeaningfulText = (block) => {
+                if (!block) return false;
+                const type = String(block.type || '').toLowerCase();
+                const data = block.data || {};
+
+                if (type === 'header' || type === 'paragraph' || type === 'quote') {
+                    const text = String(data.text || '')
+                        .replace(/<[^>]*>/g, ' ')
+                        .replace(/&nbsp;/gi, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                    return text.length > 0;
+                }
+
+                if (type === 'list') {
+                    const items = Array.isArray(data.items) ? data.items : [];
+                    return items.some((item) => {
+                        const txt = typeof item === 'string' ? item : (item?.content || item?.text || '');
+                        return String(txt).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().length > 0;
+                    });
+                }
+
+                return false;
+            };
+
+            const rawBlocks = Array.isArray(content.blocks) ? content.blocks : [];
+
+            // Guard against legacy imports where multiple uncaptioned images were accidentally
+            // prepended before the real text body. Keep intentional single lead images intact.
+            let startIndex = 0;
+            while (startIndex < rawBlocks.length && (rawBlocks[startIndex]?.type === 'image' || isIgnorableParagraph(rawBlocks[startIndex]))) {
+                startIndex += 1;
+            }
+
+            const leadingSlice = rawBlocks.slice(0, startIndex);
+            const leadingImages = leadingSlice.filter((b) => b?.type === 'image');
+            const leadingHasOnlyImagesAndBlankParas = leadingSlice.every((b) => b?.type === 'image' || isIgnorableParagraph(b));
+            const leadingImagesHaveNoCaption = leadingImages.every((img) => String(img?.data?.caption || '').trim().length === 0);
+            const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => hasMeaningfulText(b));
+
+            const blocksForRender =
+                leadingHasOnlyImagesAndBlankParas && leadingImages.length >= 2 && leadingImagesHaveNoCaption && hasTextAfterLeading
+                    ? rawBlocks.slice(startIndex)
+                    : rawBlocks;
+
             // Group consecutive image blocks so they can be rendered as a gallery
             const groups = [];
             let currentImageGroup = null;
-            for (const block of content.blocks) {
+            for (const block of blocksForRender) {
                 if (block.type === 'image') {
                     if (!currentImageGroup) {
                         currentImageGroup = { type: 'imageGroup', blocks: [] };
