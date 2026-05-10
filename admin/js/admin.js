@@ -6098,6 +6098,7 @@ class AdminManager {
             if (closeBtn) {
                 closeBtn.onclick = () => {
                     this._clearOpenEditorState(collectionId);
+                    try { editor.destroy(); } catch (e) {}
                     modal.remove();
                 };
             }
@@ -6588,6 +6589,7 @@ class AdminManager {
                                     }
                                 }
 
+                                try { editor.destroy(); } catch (e) {}
                                 modal.remove();
                                 this._clearOpenEditorState(collectionId);
                                 this.loadCollection(collectionId);
