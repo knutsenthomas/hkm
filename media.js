@@ -474,6 +474,7 @@ function createYouTubeCard(video, videoId) {
 let currentAudio = null;
 let allPodcastEpisodes = [];
 let podcastOverrides = {};
+let podcastTranscriptDataById = new Map();
 let currentPodcastFilter = 'all';
 let currentPodcastSort = 'newest';
 
@@ -640,6 +641,10 @@ function ensureDynamicPodcastCategoryButtons() {
 }
 
 function getEpisodeSummaryHtml(episodeData, storedData) {
+    if (!storedData && episodeData?.id) {
+        storedData = getStoredPodcastData(episodeData.id);
+    }
+
     if (storedData && Object.prototype.hasOwnProperty.call(storedData, 'description')) {
         const adminSummary = String(storedData.description || '').trim();
         if (!adminSummary) {
@@ -659,6 +664,27 @@ function getEpisodeSummaryHtml(episodeData, storedData) {
     }
 
     return `<p style="line-height:1.75;">${summaryText}</p>`;
+}
+
+function getStoredPodcastData(episodeId) {
+    const id = String(episodeId || '').trim();
+    return id ? podcastTranscriptDataById.get(id) || null : null;
+}
+
+function getEpisodeCardDescription(episode) {
+    const stored = getStoredPodcastData(episode?.id);
+    const storedSummary = stored && typeof stored.description === 'string'
+        ? stored.description.trim()
+        : '';
+    const source = storedSummary || String(episode?.description || '').trim();
+
+    if (!source) return '';
+
+    return source
+        .replace(/<[^>]*>/g, '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .substring(0, 120) + '...';
 }
 
 function getFormattedTranscriptHtml(rawTranscriptHtml) {
@@ -741,6 +767,9 @@ async function fetchPodcastTranscriptData(episodeId) {
     const id = String(episodeId || '').trim();
     if (!id) return null;
 
+    const cached = getStoredPodcastData(id);
+    if (cached) return cached;
+
     const svc = window.firebaseService;
     if (svc && !svc.isInitialized && typeof svc.tryAutoInit === 'function') {
         const maybePromise = svc.tryAutoInit();
@@ -759,10 +788,38 @@ async function fetchPodcastTranscriptData(episodeId) {
 
     try {
         const doc = await firebase.firestore().collection('podcast_transcripts').doc(id).get();
-        return doc.exists ? doc.data() : null;
+        const data = doc.exists ? doc.data() : null;
+        if (data) podcastTranscriptDataById.set(id, data);
+        return data;
     } catch (err) {
         console.error('Feil ved henting av podcastdata:', err);
         return null;
+    }
+}
+
+async function loadPodcastTranscriptDataMap() {
+    podcastTranscriptDataById = new Map();
+
+    const svc = window.firebaseService;
+    if (svc && !svc.isInitialized && typeof svc.tryAutoInit === 'function') {
+        try {
+            await svc.tryAutoInit();
+        } catch (err) {
+            console.warn('[Podcast] Firebase auto-init feilet:', err);
+        }
+    }
+
+    if (!(window.firebaseService?.isInitialized && typeof firebase !== 'undefined')) {
+        return;
+    }
+
+    try {
+        const snapshot = await firebase.firestore().collection('podcast_transcripts').get();
+        snapshot.docs.forEach((doc) => {
+            podcastTranscriptDataById.set(doc.id, doc.data());
+        });
+    } catch (err) {
+        console.warn('[Podcast] Kunne ikke hente lagret podcasttekst:', err);
     }
 }
 
@@ -943,6 +1000,8 @@ async function initPodcastRSS() {
             };
         });
 
+        await loadPodcastTranscriptDataMap();
+
         initPodcastControls();
         renderPodcastEpisodes();
     } catch (error) {
@@ -1047,11 +1106,7 @@ function createPodcastCard(episode, indexInView) {
     const pubDate = new Date(episode.pubDate).toLocaleDateString('no-NO');
     const thumbnail = episode.thumbnail || 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?w=400&h=400&fit=crop';
 
-    // Rens beskrivelse
-    let descText = "";
-    if (episode.description) {
-        descText = episode.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...';
-    }
+    const descText = getEpisodeCardDescription(episode);
 
     card.innerHTML = `
         <div class="podcast-artwork">

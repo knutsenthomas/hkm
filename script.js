@@ -1026,6 +1026,8 @@ async function fetchPodcastTranscript(episodeId) {
             let text = '';
             if (data.transcriptHtml) {
                 text = data.transcriptHtml;
+            } else if (data.content?.blocks) {
+                text = data.content.blocks.map(b => b.data?.text || '').join(' ');
             } else if (data.blocks) {
                 // Håndterer Editor.js format hvis det er brukt
                 text = data.blocks.map(b => b.data?.text || '').join(' ');
