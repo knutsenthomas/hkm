@@ -6107,8 +6107,7 @@ class AdminManager {
                 closeBtn.onclick = () => {
                     this._clearOpenEditorState(collectionId);
                     modal.remove();
-                    try { editor.destroy(); } catch (e) {}
-                    this._activeEditorJsInstance = null;
+                    // editor.destroy() will be awaited at the start of the next editCollectionItem call
                 };
             }
 
@@ -6600,8 +6599,7 @@ class AdminManager {
 
                                 modal.remove();
                                 this._clearOpenEditorState(collectionId);
-                                try { editor.destroy(); } catch (e) {}
-                                this._activeEditorJsInstance = null;
+                                // editor.destroy() will be awaited at the start of the next editCollectionItem call
                                 this.loadCollection(collectionId);
                                 this.showToast('✅ Lagret!', 'success');
                             } catch (err) {
