@@ -5434,12 +5434,18 @@ class AdminManager {
                                     <button type="button" class="desktop-richtools-btn" data-tool="paragraph" title="Brødtekst">
                                         <span class="material-symbols-outlined">notes</span>
                                     </button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="h1" title="Overskrift 1">H1</button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="h2" title="Overskrift 2">H2</button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="h3" title="Overskrift 3">H3</button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="h4" title="Overskrift 4">H4</button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="h5" title="Overskrift 5">H5</button>
-                                    <button type="button" class="desktop-richtools-btn" data-tool="h6" title="Overskrift 6">H6</button>
+                                    <label class="docs-toolbar-select-wrap" title="Overskriftsnivå">
+                                        <span class="material-symbols-outlined">title</span>
+                                        <select class="docs-toolbar-select" data-tool-select="headingLevel" aria-label="Overskriftsnivå">
+                                            <option value="p" selected>Brødtekst</option>
+                                            <option value="h1">H1</option>
+                                            <option value="h2">H2</option>
+                                            <option value="h3">H3</option>
+                                            <option value="h4">H4</option>
+                                            <option value="h5">H5</option>
+                                            <option value="h6">H6</option>
+                                        </select>
+                                    </label>
                                 </div>
                                 <div class="docs-toolbar-divider"></div>
                                 <div class="docs-toolbar-group">
@@ -6149,6 +6155,15 @@ class AdminManager {
                                 block.style.marginBottom = `${val}em`;
                             });
                             saveSelectionRange();
+                        });
+                    }
+
+                    const headingLevelSelect = desktopTools.querySelector('[data-tool-select="headingLevel"]');
+                    if (headingLevelSelect) {
+                        headingLevelSelect.addEventListener('change', () => {
+                            const val = String(headingLevelSelect.value || 'p').trim().toLowerCase();
+                            if (!val) return;
+                            exec('formatBlock', val === 'p' ? 'p' : val);
                         });
                     }
                 } else {
