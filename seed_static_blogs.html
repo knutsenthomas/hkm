@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Migrer statiske bloggposter til CMS</title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; max-width: 700px; margin: 0 auto; line-height: 1.6; }
+        #log { padding: 16px; border-radius: 8px; margin-top: 20px; background: #f8fafc; border: 1px solid #e2e8f0; white-space: pre-wrap; font-family: monospace; font-size: 13px; }
+        button { padding: 12px 28px; background: #f39c12; color: #fff; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+    </style>
+</head>
+<body>
+    <h1>Migrer statiske bloggposter → CMS</h1>
+    <p>Klikk knappen for å legge til de 5 hardkodede bloggpostene i Firestore som redigerbare Editor.js-innlegg. Eksisterende poster beholdes.</p>
+    <button id="seed-btn" onclick="runSeed()">Start migrering</button>
+    <div id="log">Klar.</div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
+
+    <script>
+        const log = document.getElementById('log');
+        function msg(text) { log.textContent += '\n' + text; }
+
+        function makeBlocks(...items) {
+            return {
+                time: Date.now(),
+                version: '2.29.0',
+                blocks: items.filter(Boolean)
+            };
+        }
+
+        function p(text) { return { type: 'paragraph', data: { text } }; }
+        function h(level, text) { return { type: 'header', data: { level, text } }; }
+        function img(url, caption = '') { return { type: 'image', data: { file: { url }, caption, withBorder: false, stretched: false, withBackground: false } }; }
+        function quote(text, caption = '') { return { type: 'quote', data: { text, caption, alignment: 'left' } }; }
+        function list(items, style = 'unordered') { return { type: 'list', data: { style, items } }; }
+
+        const posts = [
+            {
+                id: 'bevare-troen-travel-hverdag',
+                title: 'Hvordan bevare troen i en travel hverdag',
+                author: 'Thomas Knutsen',
+                date: '2024-02-05',
+                category: 'Undervisning',
+                imageUrl: 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80',
+                published: true,
+                content: makeBlocks(
+                    img('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?auto=format&fit=crop&w=1200&q=80', 'Bevare troen i hverdagen'),
+                    p('I dagens hektiske samfunn kan det være utfordrende å opprettholde en nær relasjon med Gud. Vi utforsker praktiske tips og bibelske prinsipper for å bevare troen midt i en travel hverdag.'),
+                    h(2, 'Utfordringen med en travel hverdag'),
+                    p('Mange av oss opplever at dagene er fulle av forpliktelser - jobb, familie, venner, og utallige andre aktiviteter. I dette kaoset kan det være lett å glemme det viktigste: vår relasjon med Gud. Men Bibelen minner oss om at vi skal søke Ham først (Matt 6:33).'),
+                    h(2, 'Praktiske tips for å bevare troen'),
+                    h(3, '1. Start dagen med Gud'),
+                    p('Selv om det kan være fristende å hoppe rett ut av sengen og inn i dagens gjøremål, er det viktig å prioritere tid med Gud om morgenen. Dette kan være så enkelt som 10-15 minutter med bønn og bibellesning. "Men de som venter på Herren, skal få ny kraft" (Jes 40:31).'),
+                    h(3, '2. Bønn gjennom dagen'),
+                    p('Bønn trenger ikke alltid å være lange, formelle stunder. Vi kan be korte bønner gjennom hele dagen - på vei til jobb, i lunsjpausen, eller mens vi gjør husarbeid. "Be uten opphør" (1 Tess 5:17).'),
+                    h(3, '3. Fellesskap med andre kristne'),
+                    p('Det er viktig å ikke isolere seg. Å være del av et kristent fellesskap gir oss støtte, oppmuntring og ansvarliggjøring. "La oss ikke forsømme våre egne samlinger, slik som noen har for vane" (Heb 10:25).'),
+                    h(3, '4. Prioriter det viktigste'),
+                    p('Noen ganger må vi si nei til gode ting for å si ja til de beste tingene. Evaluer dine prioriteringer og sørg for at din åndelige vekst ikke blir nedprioritert.'),
+                    h(2, 'Guds nåde er nok'),
+                    p('Det viktigste å huske er at vår relasjon med Gud ikke er basert på vår egen innsats, men på Hans nåde. Selv når vi feiler, er Han trofast. "Min nåde er nok for deg, for kraften fullendes i svakhet" (2 Kor 12:9).')
+                )
+            },
+            {
+                id: 'rapport-misjonstur-kenya',
+                title: 'Rapport fra misjonsturen til Kenya',
+                author: 'Thomas Knutsen',
+                date: '2024-01-28',
+                category: 'Reise',
+                imageUrl: 'https://images.unsplash.com/photo-1544333335-96739cc4235d?auto=format&fit=crop&w=1200&q=80',
+                published: true,
+                content: makeBlocks(
+                    img('https://images.unsplash.com/photo-1544333335-96739cc4235d?auto=format&fit=crop&w=1200&q=80', 'Misjonstur til Kenya'),
+                    p('Bli med på reisen gjennom våre opplevelser i Kenya. Vi så Guds godhet i aksjon gjennom helbredelse, omsorg og glede.'),
+                    h(2, 'En reise fylt med Guds nærvær'),
+                    p('I januar 2024 dro et team fra His Kingdom Ministry til Kenya for å tjene det lokale fellesskapet. Det vi opplevde overgikk alle forventninger. Guds kjærlighet og kraft var tydelig i hver eneste dag.'),
+                    h(2, 'Møter med lokale menigheter'),
+                    p('Vi besøkte flere menigheter i Nairobi og omegn. Fellesskapet med våre søsken i Kristus var dypt og meningsfullt. Vi delte undervisning om Guds ord og opplevde kraftfulle bønnemøter hvor mange fikk oppleve helbredelse og frigjøring.'),
+                    h(3, 'Vitnesbyrd om helbredelse'),
+                    p('Under et av møtene ba vi for en kvinne som hadde hatt kroniske smerter i flere år. Etter bønn vitnet hun om at smertene var borte! "Jeg føler meg som et nytt menneske," sa hun med tårer i øynene. Dette er bare ett av mange vitnesbyrd vi fikk oppleve.'),
+                    h(2, 'Tjeneste blant barn'),
+                    p('En av høydepunktene var å besøke et barnehjem utenfor Nairobi. Vi delte mat, klær og leker, men viktigst av alt - vi delte Jesu kjærlighet. Barnas smil og latter var uvurderlig. Vi underviste dem om Guds kjærlighet og at de er verdifulle i Hans øyne.'),
+                    h(2, 'Takk for støtten'),
+                    p('Denne turen hadde ikke vært mulig uten støtten fra vårt fellesskap hjemme. Deres bønner og økonomiske bidrag gjorde at vi kunne tjene effektivt. Vi er dypt takknemlige for hver eneste som bidro.')
+                )
+            },
+            {
+                id: 'ny-podcast-tro-tvil-vekst',
+                title: 'Ny Podcast Episode: Tro, tvil og vekst',
+                author: 'Thomas Knutsen',
+                date: '2024-01-15',
+                category: 'Podcast',
+                imageUrl: 'https://images.unsplash.com/photo-1475483768296-6163e08872a1?auto=format&fit=crop&w=1200&q=80',
+                published: true,
+                content: makeBlocks(
+                    img('https://images.unsplash.com/photo-1475483768296-6163e08872a1?auto=format&fit=crop&w=1200&q=80', 'Tro, tvil og vekst'),
+                    p('Lytt til vår nyeste episode hvor vi diskuterer de ærlige sidene ved troslivet og hvordan vi kan finne hvile i Guds løfter.'),
+                    h(2, 'En ærlig samtale om tro'),
+                    p('I denne episoden tar vi opp temaer som mange kristne sliter med, men som det ofte ikke snakkes åpent om. Tvil er en naturlig del av troslivet, og det er viktig at vi kan være ærlige om våre kamper.'),
+                    h(2, 'Hva dekker vi?'),
+                    list([
+                        'Hvordan håndtere tvil på en sunn måte',
+                        'Bibelske eksempler på mennesker som tvilte',
+                        'Hvordan vokse gjennom vanskelige perioder',
+                        'Guds trofasthet selv når vi tviler'
+                    ]),
+                    h(2, 'Lytt til episoden'),
+                    p('Du finner episoden på alle store podcast-plattformer, inkludert Spotify, Apple Podcasts og Google Podcasts. Eller lytt direkte på vår <a href="/media">Media-side</a>.')
+                )
+            },
+            {
+                id: 'viktigheten-av-a-sta-sammen',
+                title: 'Viktigheten av å stå sammen',
+                author: 'Thomas Knutsen',
+                date: '2024-01-10',
+                category: 'Fellesskap',
+                imageUrl: 'https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1200&q=80',
+                published: true,
+                content: makeBlocks(
+                    img('https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?auto=format&fit=crop&w=1200&q=80', 'Fellesskap'),
+                    p('Hvorfor fellesskapet er essensielt for den kristne vandringen og hvordan vi kan støtte hverandre gjennom livets ulike sesonger.'),
+                    h(2, 'Vi er skapt for fellesskap'),
+                    p('Helt fra begynnelsen sa Gud: "Det er ikke godt for mennesket å være alene" (1 Mos 2:18). Dette prinsippet gjelder ikke bare for ekteskap, men for hele vårt liv. Vi er skapt for fellesskap.'),
+                    h(2, 'Bibelens undervisning om fellesskap'),
+                    p('Gjennom hele Bibelen ser vi viktigheten av fellesskap. Hebreerbrevet oppfordrer oss til å "ikke forsømme våre egne samlinger" (Heb 10:25). Apostlenes gjerninger beskriver hvordan den tidlige kirken "holdt fast ved apostlenes lære og ved fellesskapet" (Apg 2:42).'),
+                    h(2, 'Praktiske måter å bygge fellesskap'),
+                    h(3, '1. Vær tilstede'),
+                    p('Det viktigste er ganske enkelt å møte opp. Enten det er på søndagsmøter, smågrupper eller sosiale sammenkomster - din tilstedeværelse betyr noe.'),
+                    h(3, '2. Vær sårbar'),
+                    p('Ekte fellesskap krever ærlighet. Når vi deler våre kamper og utfordringer, åpner vi opp for at andre kan støtte oss.'),
+                    h(3, '3. Tjen hverandre'),
+                    p('"Tjen hverandre i kjærlighet" (Gal 5:13). Fellesskap handler ikke bare om å motta, men også om å gi.')
+                )
+            },
+            {
+                id: 'min-reise-fra-morke-til-lys',
+                title: 'Min reise fra mørke til lys',
+                author: 'Thomas Knutsen',
+                date: '2024-01-02',
+                category: 'Vitnesbyrd',
+                imageUrl: 'https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=1200&q=80',
+                published: true,
+                content: makeBlocks(
+                    img('https://images.unsplash.com/photo-1507413245164-6160d8298b31?auto=format&fit=crop&w=1200&q=80', 'Fra mørke til lys'),
+                    p('Et sterkt vitnesbyrd om hvordan Gud forandret et liv preget av håpløshet til et liv fylt med mening, fred og fremtidstro.'),
+                    h(2, 'Livet før Jesus'),
+                    p('For noen år siden var livet mitt preget av tomhet og håpløshet. Selv om jeg utad så ut til å ha alt sammen, følte jeg meg innerst inne tom. Jeg søkte etter mening i karriere, relasjoner og materiell suksess, men ingenting fylte det tomrommet i hjertet mitt.'),
+                    h(2, 'Møtet med Jesus'),
+                    p('Alt endret seg da jeg møtte Jesus. Gjennom en venn ble jeg invitert til et møte i His Kingdom Ministry. Jeg var skeptisk, men noe trakk meg dit. Under møtet følte jeg for første gang Guds kjærlighet på en reell måte. Det var som om Han talte direkte til mitt hjerte.'),
+                    h(3, 'En transformasjon'),
+                    quote('"Derfor, er noen i Kristus, da er han en ny skapning. Det gamle er forbi, se, det nye er kommet!"', '2 Kor 5:17'),
+                    p('Dette verset beskriver perfekt det som skjedde i mitt liv. Jeg opplevde en total transformasjon - ikke over natten, men gradvis og kraftfullt.'),
+                    h(2, 'Livet i dag'),
+                    p('I dag lever jeg et liv fylt med mening og formål. Jeg har fred i hjertet, selv når omstendighetene er utfordrende. Jeg har funnet et fellesskap hvor jeg blir elsket og akseptert. Viktigst av alt - jeg har funnet min identitet i Kristus.'),
+                    h(2, 'Mitt budskap til deg'),
+                    p('Hvis du leser dette og kjenner deg igjen i min historie - vit at det finnes håp. Uansett hvor mørkt det måtte være, kan Guds lys skinne inn. Han venter på deg med åpne armer. Alt du trenger å gjøre er å ta imot.'),
+                    quote('"For Gud elsket verden så høyt at han ga sin Sønn, den enbårne, for at hver den som tror på ham, ikke skal gå fortapt, men ha evig liv."', 'Johannes 3:16')
+                )
+            }
+        ];
+
+        async function runSeed() {
+            const btn = document.getElementById('seed-btn');
+            btn.disabled = true;
+            log.textContent = 'Starter migrering...';
+
+            try {
+                const db = firebase.firestore();
+
+                msg('Henter eksisterende bloggposter fra Firestore...');
+                const docRef = db.collection('content').doc('collection_blog');
+                const snap = await docRef.get();
+                const existing = snap.exists ? (snap.data().items || []) : [];
+                msg(`Fant ${existing.length} eksisterende poster.`);
+
+                // Merge: skip posts that already have the same id
+                const existingIds = new Set(existing.map(p => p.id).filter(Boolean));
+                const toAdd = posts.filter(p => !existingIds.has(p.id));
+
+                if (toAdd.length === 0) {
+                    msg('Alle 5 postene er allerede i Firestore. Ingen nye ble lagt til.');
+                    btn.disabled = false;
+                    return;
+                }
+
+                msg(`Legger til ${toAdd.length} nye poster: ${toAdd.map(p => p.title).join(', ')}`);
+
+                const merged = [...existing, ...toAdd];
+
+                await docRef.set({
+                    items: merged,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                msg(`\n✅ Ferdig! ${toAdd.length} poster er nå i Firestore med Editor.js-blokker.`);
+                msg('Du kan nå redigere dem via Admin → Innholdsredigering → Blogginnlegg.');
+                msg('\nDu kan trygt slette denne filen etterpå.');
+
+            } catch (e) {
+                msg(`\n❌ Feil: ${e.message}`);
+                console.error(e);
+            } finally {
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>
