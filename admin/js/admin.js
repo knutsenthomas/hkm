@@ -5781,37 +5781,73 @@ class AdminManager {
 
             const desktopTools = document.getElementById('desktop-richtools');
             if (desktopTools) {
-                const getSelectedListItems = () => {
-                    try {
-                        const holder = document.getElementById(editorHolderId);
-                        if (!holder) return [];
+                const holder = document.getElementById(editorHolderId);
+                let cachedEditorSelectionText = '';
 
+                const splitSelectionToItems = (rawText) => {
+                    const selectedText = String(rawText || '').trim();
+                    if (!selectedText) return [];
+
+                    const byLines = selectedText
+                        .split(/\n+/)
+                        .map((line) => line.trim())
+                        .filter(Boolean);
+
+                    if (byLines.length > 1) return byLines;
+
+                    return selectedText
+                        .split(/(?<=[.!?])\s+/)
+                        .map((line) => line.trim())
+                        .filter(Boolean);
+                };
+
+                const updateCachedSelection = () => {
+                    try {
+                        if (!holder) return;
                         const selection = window.getSelection ? window.getSelection() : null;
-                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return [];
+                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
 
                         const range = selection.getRangeAt(0);
                         const commonNode = range.commonAncestorContainer;
                         const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
-                        if (!containerNode || !holder.contains(containerNode)) return [];
+                        if (!containerNode || !holder.contains(containerNode)) return;
+
+                        const text = String(selection.toString() || '').trim();
+                        if (text) cachedEditorSelectionText = text;
+                    } catch (error) {
+                        console.warn('Could not cache current editor selection:', error);
+                    }
+                };
+
+                if (holder) {
+                    holder.addEventListener('mouseup', updateCachedSelection);
+                    holder.addEventListener('keyup', updateCachedSelection);
+                }
+
+                const getSelectedListItems = () => {
+                    try {
+                        if (!holder) return [];
+
+                        const selection = window.getSelection ? window.getSelection() : null;
+                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
+                            return splitSelectionToItems(cachedEditorSelectionText);
+                        }
+
+                        const range = selection.getRangeAt(0);
+                        const commonNode = range.commonAncestorContainer;
+                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
+                        if (!containerNode || !holder.contains(containerNode)) {
+                            return splitSelectionToItems(cachedEditorSelectionText);
+                        }
 
                         const selectedText = String(selection.toString() || '').trim();
-                        if (!selectedText) return [];
+                        if (!selectedText) return splitSelectionToItems(cachedEditorSelectionText);
 
-                        // Prefer one item per line; if there are no line breaks, split by sentence boundaries.
-                        const byLines = selectedText
-                            .split(/\n+/)
-                            .map((line) => line.trim())
-                            .filter(Boolean);
-
-                        if (byLines.length > 1) return byLines;
-
-                        return selectedText
-                            .split(/(?<=[.!?])\s+/)
-                            .map((line) => line.trim())
-                            .filter(Boolean);
+                        cachedEditorSelectionText = selectedText;
+                        return splitSelectionToItems(selectedText);
                     } catch (error) {
                         console.warn('Could not read current text selection for list conversion:', error);
-                        return [];
+                        return splitSelectionToItems(cachedEditorSelectionText);
                     }
                 };
 
@@ -5840,6 +5876,12 @@ class AdminManager {
                         btn.title = 'Verktøyet er ikke tilgjengelig akkurat nå';
                         return;
                     }
+
+                    btn.addEventListener('mousedown', (e) => {
+                        // Prevent focus from leaving editor before we read selection.
+                        e.preventDefault();
+                        updateCachedSelection();
+                    });
 
                     btn.addEventListener('click', () => {
                         try {
