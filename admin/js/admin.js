@@ -5781,10 +5781,48 @@ class AdminManager {
 
             const desktopTools = document.getElementById('desktop-richtools');
             if (desktopTools) {
+                const getSelectedListItems = () => {
+                    try {
+                        const holder = document.getElementById(editorHolderId);
+                        if (!holder) return [];
+
+                        const selection = window.getSelection ? window.getSelection() : null;
+                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return [];
+
+                        const range = selection.getRangeAt(0);
+                        const commonNode = range.commonAncestorContainer;
+                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
+                        if (!containerNode || !holder.contains(containerNode)) return [];
+
+                        const selectedText = String(selection.toString() || '').trim();
+                        if (!selectedText) return [];
+
+                        // Prefer one item per line; if there are no line breaks, split by sentence boundaries.
+                        const byLines = selectedText
+                            .split(/\n+/)
+                            .map((line) => line.trim())
+                            .filter(Boolean);
+
+                        if (byLines.length > 1) return byLines;
+
+                        return selectedText
+                            .split(/(?<=[.!?])\s+/)
+                            .map((line) => line.trim())
+                            .filter(Boolean);
+                    } catch (error) {
+                        console.warn('Could not read current text selection for list conversion:', error);
+                        return [];
+                    }
+                };
+
                 const toolHandlers = {
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                     header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
-                    list: () => editor.blocks.insert('list', { style: 'unordered', items: [] }, undefined, undefined, true),
+                    list: () => {
+                        const selectedItems = getSelectedListItems();
+                        const items = selectedItems.length ? selectedItems : [''];
+                        editor.blocks.insert('list', { style: 'unordered', items }, undefined, undefined, true);
+                    },
                     image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
                     delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
