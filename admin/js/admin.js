@@ -6550,6 +6550,10 @@ class AdminManager {
                     const btn = document.getElementById('save-col-item');
                     if (!btn) return;
 
+                    // Clear immediately — before the Firestore write — so the realtime
+                    // onSnapshot that fires during the write cannot re-open the editor.
+                    this._clearOpenEditorState(collectionId);
+
                     await this._runWriteLocked(`collection-save:${collectionId}`, async () => {
                         await this._withButtonLoading(btn, async () => {
                             try {
@@ -6587,7 +6591,6 @@ class AdminManager {
                                 }
 
                                 modal.remove();
-                                this._clearOpenEditorState(collectionId);
                                 this.loadCollection(collectionId);
                                 this.showToast('✅ Lagret!', 'success');
                             } catch (err) {
