@@ -3736,43 +3736,10 @@ exports.wixBlogSync = onRequest({ cors: true, invoker: "public" }, (req, res) =>
       return res.status(204).send("");
     }
 
-    if (req.method !== "GET" && req.method !== "POST") {
-      return res.status(405).json({ error: "Method not allowed. Use GET or POST." });
-    }
-
-    try {
-      if (req.method === "POST" || req.query.force === "true") {
-        if (req.query.clean === "true") {
-          console.log("Cleanup requested: Clearing collection_blog cache...");
-          await db.collection("content").doc("collection_blog").delete();
-        }
-        const result = await fetchAndCacheWixBlogPosts(req);
-        return res.status(200).json({ ...result, manuallySynced: true, cleaned: req.query.clean === "true" });
-      }
-
-      const doc = await db.collection("content").doc("collection_blog").get();
-      if (doc.exists && doc.data() && Array.isArray(doc.data().items) && doc.data().items.length > 0) {
-        const data = doc.data();
-        return res.status(200).json({
-          ok: true,
-          source: "firestore-cache",
-          count: data.items.length,
-          items: data.items,
-          lastUpdated: data.lastUpdated || null,
-          wixSync: data.wixSync || null,
-        });
-      }
-
-      const result = await fetchAndCacheWixBlogPosts(req);
-      return res.status(200).json({ ...result, newlyCached: true });
-    } catch (error) {
-      console.error("Error syncing Wix blog posts:", error);
-      return res.status(500).json({
-        ok: false,
-        error: "Could not sync Wix blog posts.",
-        details: error && error.message ? error.message : String(error),
-      });
-    }
+    return res.status(410).json({
+      ok: false,
+      error: "Wix blog sync is disabled. Blog content is managed only in Firestore/admin.",
+    });
   });
 });
 

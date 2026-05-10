@@ -34,10 +34,6 @@
         "source": "/api/wix-products",
         "function": "wixProducts"
       },
-      {
-        "source": "/api/wix-blog",
-        "function": "wixBlogSync"
-      }
     ]
   }
 }
