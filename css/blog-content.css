@@ -23,12 +23,14 @@
 .blog-post-content h4,
 .blog-post-content h5,
 .blog-post-content h6,
+.blog-post-content .block-header,
 #single-post-content h1,
 #single-post-content h2,
 #single-post-content h3,
 #single-post-content h4,
 #single-post-content h5,
-#single-post-content h6 {
+#single-post-content h6,
+#single-post-content .block-header {
   margin: 1.4em 0 0.55em;
   line-height: 1.3;
   color: var(--text-dark);
@@ -37,33 +39,54 @@
   letter-spacing: 0;
 }
 
+.blog-post-content > .block-header:first-child,
+.blog-post-content > h1:first-child,
+.blog-post-content > h2:first-child,
+#single-post-content > .block-header:first-child,
+#single-post-content > h1:first-child,
+#single-post-content > h2:first-child {
+  display: block;
+}
+
 .blog-post-content h1,
-#single-post-content h1 {
+#single-post-content h1,
+.blog-post-content h1.block-header,
+#single-post-content h1.block-header {
   font-size: 2.35rem;
 }
 
 .blog-post-content h2,
-#single-post-content h2 {
+#single-post-content h2,
+.blog-post-content h2.block-header,
+#single-post-content h2.block-header {
   font-size: 1.75rem;
 }
 
 .blog-post-content h3,
-#single-post-content h3 {
+#single-post-content h3,
+.blog-post-content h3.block-header,
+#single-post-content h3.block-header {
   font-size: 1.45rem;
 }
 
 .blog-post-content h4,
-#single-post-content h4 {
+#single-post-content h4,
+.blog-post-content h4.block-header,
+#single-post-content h4.block-header {
   font-size: 1.2rem;
 }
 
 .blog-post-content h5,
-#single-post-content h5 {
+#single-post-content h5,
+.blog-post-content h5.block-header,
+#single-post-content h5.block-header {
   font-size: 1.05rem;
 }
 
 .blog-post-content h6,
-#single-post-content h6 {
+#single-post-content h6,
+.blog-post-content h6.block-header,
+#single-post-content h6.block-header {
   font-size: 0.95rem;
 }
 
