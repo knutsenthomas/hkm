@@ -5359,7 +5359,8 @@ class AdminManager {
                 setTimeout(() => { try { stale.destroy(); } catch (e) {} }, 0);
             }
 
-            // Use the already merged item from currentItems
+            // Unique holder ID per open — prevents EditorJS internal registry collisions
+            const editorHolderId = `editorjs-holder-${Date.now()}`;
             const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
             const item = collectionItems[index] ? { ...collectionItems[index] } : {};
             this._persistOpenEditorState(collectionId, item);
@@ -5470,7 +5471,7 @@ class AdminManager {
                                     </div>
                                 </div>
                                 ` : ''}
-                                <div id="editorjs-container-v2"></div>
+                                <div id="${editorHolderId}"></div>
                             </div>
                         </div>
                         <aside class="editor-sidebar-v2">
@@ -5767,14 +5768,14 @@ class AdminManager {
             console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
 
             const editor = new EditorJS({
-                holder: 'editorjs-container-v2',
+                holder: editorHolderId,
                 data: editorData,
                 placeholder: 'Trykk "/" for å velge blokker...',
                 tools: toolsConfig,
                 logLevel: 'ERROR',
                 onReady: () => {
                     this._activeEditorInstance = editor;
-                    this._initImageReplaceBehavior(editor, 'editorjs-container-v2', collectionId);
+                    this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
                 }
             });
 
