@@ -5777,6 +5777,7 @@ class AdminManager {
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 const holder = document.getElementById(editorHolderId);
+                let cachedActiveBlockIndex = -1;
                 const stripHtml = (value) => String(value || '')
                     .replace(/<[^>]*>/g, ' ')
                     .replace(/&nbsp;/gi, ' ')
@@ -5801,8 +5802,7 @@ class AdminManager {
 
                 const toEditorListItems = (items) => (Array.isArray(items) ? items : [])
                     .map((t) => String(t || '').trim())
-                    .filter(Boolean)
-                    .map((content) => ({ content, items: [] }));
+                    .filter(Boolean);
 
                 const getSelectedTextInEditor = () => {
                     try {
@@ -5822,7 +5822,10 @@ class AdminManager {
                 const getActiveBlockSnapshot = async () => {
                     try {
                         if (!editor?.blocks?.getCurrentBlockIndex) return null;
-                        const idx = editor.blocks.getCurrentBlockIndex();
+                        let idx = editor.blocks.getCurrentBlockIndex();
+                        if (!Number.isInteger(idx) || idx < 0) {
+                            idx = cachedActiveBlockIndex;
+                        }
                         if (!Number.isInteger(idx) || idx < 0) return null;
 
                         const saved = await editor.save();
@@ -5875,6 +5878,23 @@ class AdminManager {
                     return [];
                 };
 
+                const updateCachedActiveBlock = () => {
+                    try {
+                        if (!editor?.blocks?.getCurrentBlockIndex) return;
+                        const idx = editor.blocks.getCurrentBlockIndex();
+                        if (Number.isInteger(idx) && idx >= 0) cachedActiveBlockIndex = idx;
+                    } catch (error) {
+                        // no-op
+                    }
+                };
+
+                if (holder) {
+                    holder.addEventListener('click', updateCachedActiveBlock);
+                    holder.addEventListener('keyup', updateCachedActiveBlock);
+                    holder.addEventListener('mouseup', updateCachedActiveBlock);
+                    holder.addEventListener('focusin', updateCachedActiveBlock);
+                }
+
                 const toolHandlers = {
                     bold: () => document.execCommand && document.execCommand('bold'),
                     italic: () => document.execCommand && document.execCommand('italic'),
@@ -5923,10 +5943,10 @@ class AdminManager {
                         e.preventDefault();
                     });
 
-                    btn.addEventListener('click', () => {
+                    btn.addEventListener('click', async () => {
                         try {
                             const handler = toolHandlers[tool];
-                            if (handler) handler();
+                            if (handler) await handler();
                         } catch (err) {
                             console.error(`Could not insert block for tool '${tool}':`, err);
                         }
