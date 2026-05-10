@@ -186,6 +186,7 @@ class FirebaseService {
         } catch (error) {
             console.error("❌ Firebase initialization failed:", error);
         }
+    }
     async waitForInitialization(timeoutMs = 5000) {
         if (this.isInitialized) return true;
         
