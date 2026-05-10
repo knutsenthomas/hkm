@@ -5785,19 +5785,37 @@ class AdminManager {
                     .trim();
 
                 const splitTextToItems = (rawText) => {
-                    const text = String(rawText || '').trim();
+                    const text = String(rawText || '')
+                        .replace(/\r\n/g, '\n')
+                        .replace(/[\u2028\u2029]/g, '\n')
+                        .replace(/\u00A0/g, ' ')
+                        .trim();
                     if (!text) return [];
+
+                    const clean = (line) => String(line || '')
+                        .replace(/^[-*•]\s+/, '')
+                        .trim();
 
                     const lines = text
                         .split(/\n+/)
-                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
+                        .map(clean)
                         .filter(Boolean);
                     if (lines.length > 1) return lines;
 
-                    const sentences = (text.match(/[^.!?\n]+[.!?]?/g) || [])
-                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
+                    // Sentence split that works even when punctuation has no trailing space.
+                    const sentenceMatches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
+                    const sentences = sentenceMatches
+                        .map(clean)
                         .filter(Boolean);
-                    return sentences.length ? sentences : [text];
+                    if (sentences.length > 1) return sentences;
+
+                    const semi = text
+                        .split(/;\s*/)
+                        .map(clean)
+                        .filter(Boolean);
+                    if (semi.length > 1) return semi;
+
+                    return [clean(text)];
                 };
 
                 const toEditorListItems = (items) => (Array.isArray(items) ? items : [])
