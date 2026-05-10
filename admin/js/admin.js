@@ -5785,7 +5785,7 @@ class AdminManager {
 
                     const byLines = selectedText
                         .split(/\n+/)
-                        .map((line) => line.trim())
+                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
                         .filter(Boolean);
 
                     if (byLines.length > 1) return byLines;
@@ -5793,10 +5793,18 @@ class AdminManager {
                     // Split single-paragraph selection into sentences while keeping punctuation.
                     const bySentences = selectedText.match(/[^.!?\n]+[.!?]?/g) || [];
                     const cleaned = bySentences
-                        .map((line) => line.trim())
+                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
                         .filter(Boolean);
 
                     return cleaned.length > 0 ? cleaned : [selectedText];
+                };
+
+                const toEditorListItems = (items) => {
+                    const safeItems = Array.isArray(items) ? items : [];
+                    return safeItems
+                        .map((text) => String(text || '').trim())
+                        .filter(Boolean)
+                        .map((text) => ({ content: text, items: [] }));
                 };
 
                 const updateCachedSelection = () => {
@@ -5886,7 +5894,8 @@ class AdminManager {
                             }
                         }
                         const items = selectedItems.length ? selectedItems : [''];
-                        editor.blocks.insert('list', { style: 'unordered', items }, undefined, undefined, true);
+                        const editorItems = toEditorListItems(items);
+                        editor.blocks.insert('list', { style: 'unordered', items: editorItems }, undefined, undefined, true);
                     },
                     orderedList: () => {
                         const selectedItems = getSelectedListItems();
@@ -5901,7 +5910,8 @@ class AdminManager {
                             }
                         }
                         const items = selectedItems.length ? selectedItems : [''];
-                        editor.blocks.insert('list', { style: 'ordered', items }, undefined, undefined, true);
+                        const editorItems = toEditorListItems(items);
+                        editor.blocks.insert('list', { style: 'ordered', items: editorItems }, undefined, undefined, true);
                     },
                     image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
