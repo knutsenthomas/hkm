@@ -1098,4 +1098,5 @@ class FirebaseService {
 window.firebaseService = new FirebaseService();
 
 // ESM Export for Vite/Rollup bundling support
+export const firebaseService = window.firebaseService;
 export default window.firebaseService;
