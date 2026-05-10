@@ -71,6 +71,7 @@ class AdminManager {
         this._activityLogItems = [];
         this._editorRestoreStateKey = 'hkm_admin_open_editor_state';
         this._restoringEditorState = false;
+        this._activeEditorJsInstance = null;
         this.analyticsRangeDays = this._getSavedAnalyticsRangeDays();
 
         // User Detail View State
@@ -5332,6 +5333,12 @@ class AdminManager {
 
     async editCollectionItem(collectionId, index) {
         try {
+            // Destroy any existing EditorJS instance before opening a new editor
+            if (this._activeEditorJsInstance) {
+                try { await this._activeEditorJsInstance.destroy(); } catch (e) {}
+                this._activeEditorJsInstance = null;
+            }
+
             // Use the already merged item from currentItems
             const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
             const item = collectionItems[index] ? { ...collectionItems[index] } : {};
@@ -5747,6 +5754,7 @@ class AdminManager {
                 logLevel: 'ERROR',
                 onReady: () => {
                     console.log('Editor.js is ready for work!');
+                    this._activeEditorJsInstance = editor;
                     this._initImageReplaceBehavior(editor, 'editorjs-container-v2', collectionId);
                 }
             });
@@ -6096,9 +6104,10 @@ class AdminManager {
 
             const closeBtn = document.getElementById('close-col-modal');
             if (closeBtn) {
-                closeBtn.onclick = () => {
+                closeBtn.onclick = async () => {
                     this._clearOpenEditorState(collectionId);
-                    try { editor.destroy(); } catch (e) {}
+                    try { await editor.destroy(); } catch (e) {}
+                    this._activeEditorJsInstance = null;
                     modal.remove();
                 };
             }
@@ -6589,7 +6598,8 @@ class AdminManager {
                                     }
                                 }
 
-                                try { editor.destroy(); } catch (e) {}
+                                try { await editor.destroy(); } catch (e) {}
+                                this._activeEditorJsInstance = null;
                                 modal.remove();
                                 this._clearOpenEditorState(collectionId);
                                 this.loadCollection(collectionId);
