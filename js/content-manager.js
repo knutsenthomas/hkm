@@ -4225,11 +4225,66 @@ class ContentManager {
 
         // Handle Editor.js JSON
         if (typeof content === 'object' && content.blocks) {
-            return content.blocks.map(block => {
+            const isIgnorableParagraph = (block) => {
+                if (!block || block.type !== 'paragraph') return false;
+                const html = String(block?.data?.text || '')
+                    .replace(/&nbsp;/gi, ' ')
+                    .replace(/<br\s*\/?>/gi, ' ')
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                return html.length === 0;
+            };
+
+            const hasMeaningfulText = (block) => {
+                if (!block) return false;
+                const type = String(block.type || '').toLowerCase();
+                const data = block.data || {};
+
+                if (type === 'header' || type === 'paragraph' || type === 'quote') {
+                    const text = String(data.text || '')
+                        .replace(/<[^>]*>/g, ' ')
+                        .replace(/&nbsp;/gi, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                    return text.length > 0;
+                }
+
+                if (type === 'list') {
+                    const items = Array.isArray(data.items) ? data.items : [];
+                    return items.some((item) => {
+                        const txt = typeof item === 'string' ? item : (item?.content || item?.text || '');
+                        return String(txt).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().length > 0;
+                    });
+                }
+
+                return false;
+            };
+
+            const rawBlocks = Array.isArray(content.blocks) ? content.blocks : [];
+
+            let startIndex = 0;
+            while (startIndex < rawBlocks.length && (rawBlocks[startIndex]?.type === 'image' || isIgnorableParagraph(rawBlocks[startIndex]))) {
+                startIndex += 1;
+            }
+
+            const leadingSlice = rawBlocks.slice(0, startIndex);
+            const leadingImages = leadingSlice.filter((b) => b?.type === 'image');
+            const leadingHasOnlyImagesAndBlankParas = leadingSlice.every((b) => b?.type === 'image' || isIgnorableParagraph(b));
+            const leadingImagesHaveNoCaption = leadingImages.every((img) => String(img?.data?.caption || '').trim().length === 0);
+            const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => hasMeaningfulText(b));
+
+            const blocksForRender =
+                leadingHasOnlyImagesAndBlankParas && leadingImages.length >= 2 && leadingImagesHaveNoCaption && hasTextAfterLeading
+                    ? rawBlocks.slice(startIndex)
+                    : rawBlocks;
+
+            return blocksForRender.map(block => {
                 switch (block.type) {
                     case 'header':
                         return `<h${block.data.level} class="block-header">${block.data.text}</h${block.data.level}>`;
                     case 'paragraph':
+                        if (isIgnorableParagraph(block)) return '';
                         return `<p class="block-paragraph">${block.data.text}</p>`;
                     case 'list':
                         const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
