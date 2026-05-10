@@ -1378,6 +1378,8 @@ class ContentManager {
             const { startIso, endIso } = this.getMonthRangeIso(this.currentDate);
             const cacheKey = `hkm_events_v2_${startIso}_${endIso}`;
             const isLocalDev = ['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase());
+            const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
+            let finalEvents = [];
 
             // 1. Check Cache (Use localStorage for better persistence)
             if (!forceRefresh && !isLocalDev) {
