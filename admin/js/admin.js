@@ -5469,6 +5469,38 @@ class AdminManager {
                                         <span class="material-symbols-outlined">format_color_fill</span>
                                     </button>
                                     <input type="color" class="docs-color-input" data-color-input="highlight" value="#fde68a" title="Velg fremhevingsfarge" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" aria-hidden="true">
+                                    <label class="docs-toolbar-select-wrap" title="Skriftstørrelse">
+                                        <span class="material-symbols-outlined">format_size</span>
+                                        <select class="docs-toolbar-select" data-tool-select="fontSize" aria-label="Skriftstørrelse">
+                                            <option value="14">14</option>
+                                            <option value="16">16</option>
+                                            <option value="18" selected>18</option>
+                                            <option value="20">20</option>
+                                            <option value="24">24</option>
+                                            <option value="28">28</option>
+                                            <option value="32">32</option>
+                                        </select>
+                                    </label>
+                                    <label class="docs-toolbar-select-wrap" title="Linjeavstand">
+                                        <span class="material-symbols-outlined">format_line_spacing</span>
+                                        <select class="docs-toolbar-select" data-tool-select="lineHeight" aria-label="Linjeavstand">
+                                            <option value="1.35">1.35</option>
+                                            <option value="1.5">1.5</option>
+                                            <option value="1.65">1.65</option>
+                                            <option value="1.75" selected>1.75</option>
+                                            <option value="2">2.0</option>
+                                        </select>
+                                    </label>
+                                    <label class="docs-toolbar-select-wrap" title="Avsnittsavstand">
+                                        <span class="material-symbols-outlined">notes</span>
+                                        <select class="docs-toolbar-select" data-tool-select="paragraphSpacing" aria-label="Avsnittsavstand">
+                                            <option value="0.6">0.6</option>
+                                            <option value="0.9">0.9</option>
+                                            <option value="1.2" selected>1.2</option>
+                                            <option value="1.6">1.6</option>
+                                            <option value="2">2.0</option>
+                                        </select>
+                                    </label>
                                 </div>
                                 <div class="docs-toolbar-divider"></div>
                                 <div class="docs-toolbar-group">
@@ -5483,6 +5515,9 @@ class AdminManager {
                                     </button>
                                     <button type="button" class="desktop-richtools-btn" data-tool="indent" title="Øk innrykk">
                                         <span class="material-symbols-outlined">format_indent_increase</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="checklist" title="Kontrollliste">
+                                        <span class="material-symbols-outlined">checklist</span>
                                     </button>
                                 </div>
                                 <div class="docs-toolbar-divider"></div>
@@ -5904,6 +5939,41 @@ class AdminManager {
                         return { sel, range };
                     };
 
+                    const textBlockSelector = 'p, li, h1, h2, h3, h4, h5, h6, blockquote';
+
+                    const getSelectedBlocks = () => {
+                        const ctx = selectionInsideSurface();
+                        if (!ctx) return [];
+
+                        if (ctx.sel.isCollapsed) {
+                            const anchor = ctx.sel.anchorNode;
+                            const anchorElement = anchor?.nodeType === Node.TEXT_NODE ? anchor.parentElement : anchor;
+                            const block = anchorElement?.closest ? anchorElement.closest(textBlockSelector) : null;
+                            return block ? [block] : [];
+                        }
+
+                        const blocks = Array.from(docsSurface.querySelectorAll(textBlockSelector));
+                        return blocks.filter((block) => {
+                            try {
+                                return ctx.range.intersectsNode(block);
+                            } catch (_) {
+                                return false;
+                            }
+                        });
+                    };
+
+                    const applyStyleToSelectedBlocks = (styler) => {
+                        const blocks = getSelectedBlocks();
+                        if (!blocks.length) return;
+                        blocks.forEach((block) => {
+                            try {
+                                styler(block);
+                            } catch (_) {
+                                // no-op
+                            }
+                        });
+                    };
+
                     const replaceSelectionWithList = (ordered) => {
                         const ctx = selectionInsideSurface();
                         if (!ctx || ctx.sel.isCollapsed) {
@@ -5933,6 +6003,21 @@ class AdminManager {
                         after.collapse(true);
                         ctx.sel.removeAllRanges();
                         ctx.sel.addRange(after);
+                    };
+
+                    const insertChecklist = () => {
+                        const ctx = selectionInsideSurface();
+                        let items = [];
+
+                        if (ctx && !ctx.sel.isCollapsed) {
+                            const selectedText = String(ctx.sel.toString() || '').trim();
+                            items = splitTextToItems(selectedText);
+                        }
+
+                        if (!items.length) items = ['Ny oppgave'];
+
+                        const checklistHtml = `<ul>${items.map((t) => `<li>${escapeHtml(`☐ ${t}`)}</li>`).join('')}</ul>`;
+                        exec('insertHTML', checklistHtml);
                     };
 
                     const escapeHtml = (value) => String(value || '')
@@ -5969,6 +6054,7 @@ class AdminManager {
                         removeFormat: () => exec('removeFormat'),
                         outdent: () => exec('outdent'),
                         indent: () => exec('indent'),
+                        checklist: () => insertChecklist(),
                         textColor: () => {
                             const input = desktopTools.querySelector('[data-color-input="text"]');
                             if (input) input.click();
@@ -6027,6 +6113,42 @@ class AdminManager {
                             if (!highlightColorInput.value) return;
                             exec('styleWithCSS', true);
                             exec('hiliteColor', highlightColorInput.value);
+                        });
+                    }
+
+                    const fontSizeSelect = desktopTools.querySelector('[data-tool-select="fontSize"]');
+                    if (fontSizeSelect) {
+                        fontSizeSelect.addEventListener('change', () => {
+                            const px = String(fontSizeSelect.value || '').trim();
+                            if (!px) return;
+                            applyStyleToSelectedBlocks((block) => {
+                                block.style.fontSize = `${px}px`;
+                            });
+                            saveSelectionRange();
+                        });
+                    }
+
+                    const lineHeightSelect = desktopTools.querySelector('[data-tool-select="lineHeight"]');
+                    if (lineHeightSelect) {
+                        lineHeightSelect.addEventListener('change', () => {
+                            const val = String(lineHeightSelect.value || '').trim();
+                            if (!val) return;
+                            applyStyleToSelectedBlocks((block) => {
+                                block.style.lineHeight = val;
+                            });
+                            saveSelectionRange();
+                        });
+                    }
+
+                    const paragraphSpacingSelect = desktopTools.querySelector('[data-tool-select="paragraphSpacing"]');
+                    if (paragraphSpacingSelect) {
+                        paragraphSpacingSelect.addEventListener('change', () => {
+                            const val = String(paragraphSpacingSelect.value || '').trim();
+                            if (!val) return;
+                            applyStyleToSelectedBlocks((block) => {
+                                block.style.marginBottom = `${val}em`;
+                            });
+                            saveSelectionRange();
                         });
                     }
                 } else {
@@ -12787,6 +12909,20 @@ class AdminManager {
             });
         };
 
+        const wrapPersistedInlineStyles = (elem, innerHtml) => {
+            const styles = [];
+            const fontSize = elem?.style?.fontSize;
+            const lineHeight = elem?.style?.lineHeight;
+            const marginBottom = elem?.style?.marginBottom;
+
+            if (fontSize) styles.push(`font-size:${fontSize}`);
+            if (lineHeight) styles.push(`line-height:${lineHeight}`);
+            if (marginBottom) styles.push(`margin-bottom:${marginBottom}`, 'display:inline-block', 'width:100%');
+
+            if (!styles.length) return innerHtml;
+            return `<span style="${styles.join(';')}">${innerHtml}</span>`;
+        };
+
         // Helper: process a <p> or <div> — split around any <img> children
         const pushParagraphOrImages = (elem) => {
             const imgs = elem.querySelectorAll('img');
@@ -12795,7 +12931,7 @@ class AdminManager {
                 // Strip any remaining tags that EditorJS can't handle (only keep inline)
                 const clone = elem.cloneNode(true);
                 clone.querySelectorAll('img, video, iframe').forEach(n => n.remove());
-                const text = clone.innerHTML.trim();
+                const text = wrapPersistedInlineStyles(elem, clone.innerHTML.trim());
                 if (text.length > 0) {
                     blocks.push({ type: 'paragraph', data: { text } });
                 }
@@ -12841,10 +12977,11 @@ class AdminManager {
                     pushParagraphOrImages(elem);
                 } else if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
                     const level = parseInt(tagName.charAt(1)) || 2;
+                    const text = wrapPersistedInlineStyles(elem, elem.innerHTML || elem.textContent || '');
                     blocks.push({
                         type: 'header',
                         data: {
-                            text: elem.textContent,
+                            text,
                             level: Math.min(level, 6)
                         }
                     });

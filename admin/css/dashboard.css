@@ -3245,6 +3245,38 @@ div[id^="editorjs-holder-"] {
     flex-shrink: 0;
 }
 
+.docs-toolbar-select-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 0 6px;
+    height: 32px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #3c4043;
+}
+
+.docs-toolbar-select-wrap:hover {
+    background: #f1f3f4;
+}
+
+.docs-toolbar-select-wrap .material-symbols-outlined {
+    font-size: 16px;
+    color: #3c4043;
+}
+
+.docs-toolbar-select {
+    border: none;
+    background: transparent;
+    color: #3c4043;
+    font-size: 12px;
+    font-weight: 600;
+    outline: none;
+    cursor: pointer;
+    padding: 0 2px;
+    height: 100%;
+}
+
 /* Click-to-replace overlay on image blocks */
 .image-tool__image {
     position: relative;
