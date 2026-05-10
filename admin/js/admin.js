@@ -5285,7 +5285,7 @@ class AdminManager {
                             </div>
                         </div>
                     </td>
-                    <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600;">${dateText}</td>
+                    <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600; white-space: nowrap; min-width: 120px;">${dateText}</td>
                     <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600;">${author || '<span style="color: #cbd5e1;">—</span>'}</td>
                     <td style="padding: 24px;">${statusPill}</td>
                     <td style="padding: 24px; text-align: right;">
