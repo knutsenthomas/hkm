@@ -5807,6 +5807,63 @@ class AdminManager {
                         .map((text) => ({ content: text, items: [] }));
                 };
 
+                const stripHtml = (value) => String(value || '')
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/&nbsp;/gi, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                const getCurrentBlockItems = async () => {
+                    try {
+                        if (!editor?.blocks?.getCurrentBlockIndex) return [];
+                        const idx = editor.blocks.getCurrentBlockIndex();
+                        if (!Number.isInteger(idx) || idx < 0) return [];
+
+                        const saved = await editor.save();
+                        const blocks = Array.isArray(saved?.blocks) ? saved.blocks : [];
+                        const block = blocks[idx];
+                        if (!block) return [];
+
+                        const type = String(block.type || '').toLowerCase();
+                        const data = block.data || {};
+
+                        if (type === 'list') {
+                            const listItems = Array.isArray(data.items) ? data.items : [];
+                            const extracted = listItems
+                                .map((it) => typeof it === 'string' ? it : (it?.content || it?.text || ''))
+                                .map((t) => stripHtml(t))
+                                .filter(Boolean);
+                            return extracted;
+                        }
+
+                        if (type === 'paragraph' || type === 'header' || type === 'quote') {
+                            return splitSelectionToItems(stripHtml(data.text || ''));
+                        }
+
+                        return [];
+                    } catch (error) {
+                        console.warn('Could not read current block for list conversion:', error);
+                        return [];
+                    }
+                };
+
+                const replaceCurrentBlockWithList = async (style, editorItems) => {
+                    try {
+                        if (!editor?.blocks?.getCurrentBlockIndex || !editor?.blocks?.delete || !editor?.blocks?.insert) {
+                            return false;
+                        }
+                        const idx = editor.blocks.getCurrentBlockIndex();
+                        if (!Number.isInteger(idx) || idx < 0) return false;
+
+                        editor.blocks.delete(idx);
+                        editor.blocks.insert('list', { style, items: editorItems }, undefined, idx, true);
+                        return true;
+                    } catch (error) {
+                        console.warn('Could not replace current block with list:', error);
+                        return false;
+                    }
+                };
+
                 const updateCachedSelection = () => {
                     try {
                         if (!holder) return;
@@ -5881,8 +5938,11 @@ class AdminManager {
                     alignRight: () => document.execCommand && document.execCommand('justifyRight'),
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                     header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
-                    list: () => {
-                        const selectedItems = getSelectedListItems();
+                    list: async () => {
+                        let selectedItems = getSelectedListItems();
+                        if (selectedItems.length < 2) {
+                            selectedItems = await getCurrentBlockItems();
+                        }
                         const selectedRange = getSelectionRangeInHolder();
                         if (selectedRange) {
                             try {
@@ -5895,10 +5955,16 @@ class AdminManager {
                         }
                         const items = selectedItems.length ? selectedItems : [''];
                         const editorItems = toEditorListItems(items);
-                        editor.blocks.insert('list', { style: 'unordered', items: editorItems }, undefined, undefined, true);
+                        const replaced = await replaceCurrentBlockWithList('unordered', editorItems);
+                        if (!replaced) {
+                            editor.blocks.insert('list', { style: 'unordered', items: editorItems }, undefined, undefined, true);
+                        }
                     },
-                    orderedList: () => {
-                        const selectedItems = getSelectedListItems();
+                    orderedList: async () => {
+                        let selectedItems = getSelectedListItems();
+                        if (selectedItems.length < 2) {
+                            selectedItems = await getCurrentBlockItems();
+                        }
                         const selectedRange = getSelectionRangeInHolder();
                         if (selectedRange) {
                             try {
@@ -5911,7 +5977,10 @@ class AdminManager {
                         }
                         const items = selectedItems.length ? selectedItems : [''];
                         const editorItems = toEditorListItems(items);
-                        editor.blocks.insert('list', { style: 'ordered', items: editorItems }, undefined, undefined, true);
+                        const replaced = await replaceCurrentBlockWithList('ordered', editorItems);
+                        if (!replaced) {
+                            editor.blocks.insert('list', { style: 'ordered', items: editorItems }, undefined, undefined, true);
+                        }
                     },
                     image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
