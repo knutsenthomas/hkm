@@ -71,6 +71,7 @@ class AdminManager {
         this._activityLogItems = [];
         this._editorRestoreStateKey = 'hkm_admin_open_editor_state';
         this._restoringEditorState = false;
+        this._activeEditorInstance = null;
         this.analyticsRangeDays = this._getSavedAnalyticsRangeDays();
 
         // User Detail View State
@@ -5350,6 +5351,14 @@ class AdminManager {
 
     async editCollectionItem(collectionId, index) {
         try {
+            // Destroy any previous EditorJS instance before opening a new one.
+            // Fire-and-forget so we never block or hang on a detached DOM element.
+            if (this._activeEditorInstance) {
+                const stale = this._activeEditorInstance;
+                this._activeEditorInstance = null;
+                setTimeout(() => { try { stale.destroy(); } catch (e) {} }, 0);
+            }
+
             // Use the already merged item from currentItems
             const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
             const item = collectionItems[index] ? { ...collectionItems[index] } : {};
@@ -5764,7 +5773,7 @@ class AdminManager {
                 tools: toolsConfig,
                 logLevel: 'ERROR',
                 onReady: () => {
-                    console.log('Editor.js is ready for work!');
+                    this._activeEditorInstance = editor;
                     this._initImageReplaceBehavior(editor, 'editorjs-container-v2', collectionId);
                 }
             });
