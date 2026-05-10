@@ -71,7 +71,6 @@ class AdminManager {
         this._activityLogItems = [];
         this._editorRestoreStateKey = 'hkm_admin_open_editor_state';
         this._restoringEditorState = false;
-        this._activeEditorJsInstance = null;
         this.analyticsRangeDays = this._getSavedAnalyticsRangeDays();
 
         // User Detail View State
@@ -5333,12 +5332,6 @@ class AdminManager {
 
     async editCollectionItem(collectionId, index) {
         try {
-            // Destroy any existing EditorJS instance before opening a new editor
-            if (this._activeEditorJsInstance) {
-                try { await this._activeEditorJsInstance.destroy(); } catch (e) {}
-                this._activeEditorJsInstance = null;
-            }
-
             // Use the already merged item from currentItems
             const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
             const item = collectionItems[index] ? { ...collectionItems[index] } : {};
@@ -5754,7 +5747,6 @@ class AdminManager {
                 logLevel: 'ERROR',
                 onReady: () => {
                     console.log('Editor.js is ready for work!');
-                    this._activeEditorJsInstance = editor;
                     this._initImageReplaceBehavior(editor, 'editorjs-container-v2', collectionId);
                 }
             });
@@ -6107,7 +6099,6 @@ class AdminManager {
                 closeBtn.onclick = () => {
                     this._clearOpenEditorState(collectionId);
                     modal.remove();
-                    // editor.destroy() will be awaited at the start of the next editCollectionItem call
                 };
             }
 
@@ -6578,9 +6569,7 @@ class AdminManager {
                                     const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                                     const list = this._getCollectionItems(currentData);
 
-                                    if (collectionId === 'blog') {
-                                        safeItem = await this.ensureBlogPostTranslations(safeItem, { force: false });
-                                    }
+                                    // Translation is only done via the explicit "Oversett"-button, not on every save
 
                                     upsertItemInList(list, safeItem);
 
@@ -6599,7 +6588,6 @@ class AdminManager {
 
                                 modal.remove();
                                 this._clearOpenEditorState(collectionId);
-                                // editor.destroy() will be awaited at the start of the next editCollectionItem call
                                 this.loadCollection(collectionId);
                                 this.showToast('✅ Lagret!', 'success');
                             } catch (err) {
