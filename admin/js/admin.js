@@ -5777,156 +5777,102 @@ class AdminManager {
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 const holder = document.getElementById(editorHolderId);
-                let cachedEditorSelectionText = '';
-
-                const splitSelectionToItems = (rawText) => {
-                    const selectedText = String(rawText || '').trim();
-                    if (!selectedText) return [];
-
-                    const byLines = selectedText
-                        .split(/\n+/)
-                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
-                        .filter(Boolean);
-
-                    if (byLines.length > 1) return byLines;
-
-                    // Split single-paragraph selection into sentences while keeping punctuation.
-                    const bySentences = selectedText.match(/[^.!?\n]+[.!?]?/g) || [];
-                    const cleaned = bySentences
-                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
-                        .filter(Boolean);
-
-                    return cleaned.length > 0 ? cleaned : [selectedText];
-                };
-
-                const toEditorListItems = (items) => {
-                    const safeItems = Array.isArray(items) ? items : [];
-                    return safeItems
-                        .map((text) => String(text || '').trim())
-                        .filter(Boolean)
-                        .map((text) => ({ content: text, items: [] }));
-                };
-
                 const stripHtml = (value) => String(value || '')
                     .replace(/<[^>]*>/g, ' ')
                     .replace(/&nbsp;/gi, ' ')
                     .replace(/\s+/g, ' ')
                     .trim();
 
-                const getCurrentBlockItems = async () => {
+                const splitTextToItems = (rawText) => {
+                    const text = String(rawText || '').trim();
+                    if (!text) return [];
+
+                    const lines = text
+                        .split(/\n+/)
+                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
+                        .filter(Boolean);
+                    if (lines.length > 1) return lines;
+
+                    const sentences = (text.match(/[^.!?\n]+[.!?]?/g) || [])
+                        .map((line) => line.replace(/^[-*•]\s+/, '').trim())
+                        .filter(Boolean);
+                    return sentences.length ? sentences : [text];
+                };
+
+                const toEditorListItems = (items) => (Array.isArray(items) ? items : [])
+                    .map((t) => String(t || '').trim())
+                    .filter(Boolean)
+                    .map((content) => ({ content, items: [] }));
+
+                const getSelectedTextInEditor = () => {
                     try {
-                        if (!editor?.blocks?.getCurrentBlockIndex) return [];
+                        if (!holder) return '';
+                        const selection = window.getSelection ? window.getSelection() : null;
+                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return '';
+                        const range = selection.getRangeAt(0);
+                        const commonNode = range.commonAncestorContainer;
+                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
+                        if (!containerNode || !holder.contains(containerNode)) return '';
+                        return String(selection.toString() || '').trim();
+                    } catch (error) {
+                        return '';
+                    }
+                };
+
+                const getActiveBlockSnapshot = async () => {
+                    try {
+                        if (!editor?.blocks?.getCurrentBlockIndex) return null;
                         const idx = editor.blocks.getCurrentBlockIndex();
-                        if (!Number.isInteger(idx) || idx < 0) return [];
+                        if (!Number.isInteger(idx) || idx < 0) return null;
 
                         const saved = await editor.save();
                         const blocks = Array.isArray(saved?.blocks) ? saved.blocks : [];
                         const block = blocks[idx];
-                        if (!block) return [];
-
-                        const type = String(block.type || '').toLowerCase();
-                        const data = block.data || {};
-
-                        if (type === 'list') {
-                            const listItems = Array.isArray(data.items) ? data.items : [];
-                            const extracted = listItems
-                                .map((it) => typeof it === 'string' ? it : (it?.content || it?.text || ''))
-                                .map((t) => stripHtml(t))
-                                .filter(Boolean);
-                            return extracted;
-                        }
-
-                        if (type === 'paragraph' || type === 'header' || type === 'quote') {
-                            return splitSelectionToItems(stripHtml(data.text || ''));
-                        }
-
-                        return [];
+                        if (!block) return null;
+                        return { idx, block };
                     } catch (error) {
-                        console.warn('Could not read current block for list conversion:', error);
-                        return [];
+                        console.warn('Could not read active block snapshot:', error);
+                        return null;
                     }
                 };
 
-                const replaceCurrentBlockWithList = async (style, editorItems) => {
+                const replaceActiveBlockWithList = async (style, items) => {
+                    const snapshot = await getActiveBlockSnapshot();
+                    if (!snapshot) return false;
                     try {
-                        if (!editor?.blocks?.getCurrentBlockIndex || !editor?.blocks?.delete || !editor?.blocks?.insert) {
-                            return false;
-                        }
-                        const idx = editor.blocks.getCurrentBlockIndex();
-                        if (!Number.isInteger(idx) || idx < 0) return false;
-
-                        editor.blocks.delete(idx);
-                        editor.blocks.insert('list', { style, items: editorItems }, undefined, idx, true);
+                        if (!editor?.blocks?.delete || !editor?.blocks?.insert) return false;
+                        editor.blocks.delete(snapshot.idx);
+                        editor.blocks.insert('list', { style, items: toEditorListItems(items) }, undefined, snapshot.idx, true);
                         return true;
                     } catch (error) {
-                        console.warn('Could not replace current block with list:', error);
+                        console.warn('Could not replace active block with list:', error);
                         return false;
                     }
                 };
 
-                const updateCachedSelection = () => {
-                    try {
-                        if (!holder) return;
-                        const selection = window.getSelection ? window.getSelection() : null;
-                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return;
+                const collectListItems = async () => {
+                    const selectedText = getSelectedTextInEditor();
+                    if (selectedText) return splitTextToItems(selectedText);
 
-                        const range = selection.getRangeAt(0);
-                        const commonNode = range.commonAncestorContainer;
-                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
-                        if (!containerNode || !holder.contains(containerNode)) return;
+                    const snapshot = await getActiveBlockSnapshot();
+                    if (!snapshot) return [];
 
-                        const text = String(selection.toString() || '').trim();
-                        if (text) cachedEditorSelectionText = text;
-                    } catch (error) {
-                        console.warn('Could not cache current editor selection:', error);
+                    const type = String(snapshot.block?.type || '').toLowerCase();
+                    const data = snapshot.block?.data || {};
+
+                    if (type === 'list') {
+                        const listItems = Array.isArray(data.items) ? data.items : [];
+                        return listItems
+                            .map((it) => typeof it === 'string' ? it : (it?.content || it?.text || ''))
+                            .map((txt) => stripHtml(txt))
+                            .filter(Boolean);
                     }
-                };
 
-                if (holder) {
-                    holder.addEventListener('mouseup', updateCachedSelection);
-                    holder.addEventListener('keyup', updateCachedSelection);
-                }
-
-                const getSelectedListItems = () => {
-                    try {
-                        if (!holder) return [];
-
-                        const selection = window.getSelection ? window.getSelection() : null;
-                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) {
-                            return splitSelectionToItems(cachedEditorSelectionText);
-                        }
-
-                        const range = selection.getRangeAt(0);
-                        const commonNode = range.commonAncestorContainer;
-                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
-                        if (!containerNode || !holder.contains(containerNode)) {
-                            return splitSelectionToItems(cachedEditorSelectionText);
-                        }
-
-                        const selectedText = String(selection.toString() || '').trim();
-                        if (!selectedText) return splitSelectionToItems(cachedEditorSelectionText);
-
-                        cachedEditorSelectionText = selectedText;
-                        return splitSelectionToItems(selectedText);
-                    } catch (error) {
-                        console.warn('Could not read current text selection for list conversion:', error);
-                        return splitSelectionToItems(cachedEditorSelectionText);
+                    if (type === 'paragraph' || type === 'header' || type === 'quote') {
+                        return splitTextToItems(stripHtml(data.text || ''));
                     }
-                };
 
-                const getSelectionRangeInHolder = () => {
-                    try {
-                        if (!holder) return null;
-                        const selection = window.getSelection ? window.getSelection() : null;
-                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return null;
-                        const range = selection.getRangeAt(0);
-                        const commonNode = range.commonAncestorContainer;
-                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
-                        if (!containerNode || !holder.contains(containerNode)) return null;
-                        return range;
-                    } catch (error) {
-                        return null;
-                    }
+                    return [];
                 };
 
                 const toolHandlers = {
@@ -5939,47 +5885,19 @@ class AdminManager {
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                     header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
                     list: async () => {
-                        let selectedItems = getSelectedListItems();
-                        if (selectedItems.length < 2) {
-                            selectedItems = await getCurrentBlockItems();
-                        }
-                        const selectedRange = getSelectionRangeInHolder();
-                        if (selectedRange) {
-                            try {
-                                selectedRange.deleteContents();
-                                const selection = window.getSelection ? window.getSelection() : null;
-                                if (selection) selection.removeAllRanges();
-                            } catch (error) {
-                                console.warn('Could not remove selected text before list conversion:', error);
-                            }
-                        }
-                        const items = selectedItems.length ? selectedItems : [''];
-                        const editorItems = toEditorListItems(items);
-                        const replaced = await replaceCurrentBlockWithList('unordered', editorItems);
+                        const items = await collectListItems();
+                        const safeItems = items.length ? items : [''];
+                        const replaced = await replaceActiveBlockWithList('unordered', safeItems);
                         if (!replaced) {
-                            editor.blocks.insert('list', { style: 'unordered', items: editorItems }, undefined, undefined, true);
+                            editor.blocks.insert('list', { style: 'unordered', items: toEditorListItems(safeItems) }, undefined, undefined, true);
                         }
                     },
                     orderedList: async () => {
-                        let selectedItems = getSelectedListItems();
-                        if (selectedItems.length < 2) {
-                            selectedItems = await getCurrentBlockItems();
-                        }
-                        const selectedRange = getSelectionRangeInHolder();
-                        if (selectedRange) {
-                            try {
-                                selectedRange.deleteContents();
-                                const selection = window.getSelection ? window.getSelection() : null;
-                                if (selection) selection.removeAllRanges();
-                            } catch (error) {
-                                console.warn('Could not remove selected text before ordered list conversion:', error);
-                            }
-                        }
-                        const items = selectedItems.length ? selectedItems : [''];
-                        const editorItems = toEditorListItems(items);
-                        const replaced = await replaceCurrentBlockWithList('ordered', editorItems);
+                        const items = await collectListItems();
+                        const safeItems = items.length ? items : [''];
+                        const replaced = await replaceActiveBlockWithList('ordered', safeItems);
                         if (!replaced) {
-                            editor.blocks.insert('list', { style: 'ordered', items: editorItems }, undefined, undefined, true);
+                            editor.blocks.insert('list', { style: 'ordered', items: toEditorListItems(safeItems) }, undefined, undefined, true);
                         }
                     },
                     image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
@@ -6001,9 +5919,8 @@ class AdminManager {
                     }
 
                     btn.addEventListener('mousedown', (e) => {
-                        // Prevent focus from leaving editor before we read selection.
+                        // Keep editor focus stable while toolbar actions run.
                         e.preventDefault();
-                        updateCachedSelection();
                     });
 
                     btn.addEventListener('click', () => {
