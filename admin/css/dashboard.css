@@ -3173,6 +3173,35 @@ input[type="range"] {
     max-width: 100% !important;
 }
 
+/* Click-to-replace overlay on image blocks */
+.image-tool__image {
+    position: relative;
+    cursor: pointer;
+}
+
+.image-tool__image::after {
+    content: '🔄  Klikk for å erstatte';
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.55);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    border-radius: 6px;
+    opacity: 0;
+    transition: opacity 0.18s;
+    pointer-events: none;
+}
+
+.image-tool__image:hover::after {
+    opacity: 1;
+}
+
+
 /* Sidebar Section Headers */
 .sidebar-section-title {
     font-size: 11px;

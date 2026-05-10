@@ -2149,25 +2149,54 @@ class ContentManager {
 
         // Handle Editor.js JSON
         if (typeof content === 'object' && content.blocks) {
-            return content.blocks.map(block => {
+            // Group consecutive image blocks so they can be rendered as a gallery
+            const groups = [];
+            let currentImageGroup = null;
+            for (const block of content.blocks) {
+                if (block.type === 'image') {
+                    if (!currentImageGroup) {
+                        currentImageGroup = { type: 'imageGroup', blocks: [] };
+                        groups.push(currentImageGroup);
+                    }
+                    currentImageGroup.blocks.push(block);
+                } else {
+                    currentImageGroup = null;
+                    groups.push(block);
+                }
+            }
+
+            const renderImageBlock = (block, inGallery = false) => {
+                const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
+                const classes = [
+                    'block-image',
+                    block.data.withBorder ? 'with-border' : '',
+                    block.data.withBackground ? 'with-background' : '',
+                    (!inGallery && block.data.stretched) ? 'stretched' : ''
+                ].filter(Boolean).join(' ');
+                return `<figure class="${classes}"><img src="${block.data.file.url}" alt="${block.data.caption || ''}">${caption}</figure>`;
+            };
+
+            return groups.map(group => {
+                if (group.type === 'imageGroup') {
+                    if (group.blocks.length === 1) {
+                        return renderImageBlock(group.blocks[0]);
+                    }
+                    // Multiple consecutive images → gallery grid
+                    const cols = Math.min(group.blocks.length, 3);
+                    return `<div class="block-image-gallery block-image-gallery--${cols}col">${group.blocks.map(b => renderImageBlock(b, true)).join('')}</div>`;
+                }
+
+                const block = group;
                 switch (block.type) {
                     case 'header':
                         return `<h${block.data.level} class="block-header">${block.data.text}</h${block.data.level}>`;
                     case 'paragraph':
                         return `<p class="block-paragraph">${block.data.text}</p>`;
-                    case 'list':
+                    case 'list': {
                         const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
                         const items = block.data.items.map(item => `<li>${item}</li>`).join('');
                         return `<${listTag} class="block-list">${items}</${listTag}>`;
-                    case 'image':
-                        const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
-                        const classes = [
-                            'block-image',
-                            block.data.withBorder ? 'with-border' : '',
-                            block.data.withBackground ? 'with-background' : '',
-                            block.data.stretched ? 'stretched' : ''
-                        ].join(' ');
-                        return `<figure class="${classes}"><img src="${block.data.file.url}" alt="${block.data.caption || ''}">${caption}</figure>`;
+                    }
                     case 'quote':
                         return `<blockquote class="block-quote"><p>${block.data.text}</p><cite>${block.data.caption}</cite></blockquote>`;
                     case 'delimiter':

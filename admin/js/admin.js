@@ -4084,6 +4084,85 @@ class AdminManager {
         return merged;
     }
 
+    _initImageReplaceBehavior(editor, containerId, collectionId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+
+        // Delegate click handler on the editor container
+        container.addEventListener('click', async (e) => {
+            const imageWrapper = e.target.closest('.image-tool__image');
+            if (!imageWrapper) return;
+
+            // Don't interfere if the click is on a native file input already
+            if (e.target.tagName === 'INPUT') return;
+
+            // Find the .ce-block ancestor to get the block ID
+            const ceBlock = imageWrapper.closest('.ce-block');
+            const blockId = ceBlock?.dataset?.id;
+
+            // Create a temporary file input
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+
+            fileInput.onchange = async (evt) => {
+                const file = evt.target.files[0];
+                fileInput.remove();
+                if (!file) return;
+
+                // Show loading state on the image
+                const picture = imageWrapper.querySelector('.image-tool__image-picture');
+                const preloader = imageWrapper.querySelector('.image-tool__image-preloader');
+                if (picture) { picture.style.opacity = '0.35'; picture.style.transition = 'opacity 0.2s'; }
+                if (preloader) preloader.style.display = 'block';
+
+                try {
+                    const path = `editor/${collectionId}/${Date.now()}_${file.name}`;
+                    const url = await firebaseService.uploadImage(file, path);
+
+                    // Update the visible <img> immediately so user sees the change
+                    if (picture) {
+                        picture.src = url;
+                        picture.style.opacity = '1';
+                    }
+                    if (preloader) preloader.style.display = 'none';
+
+                    // Update the internal Editor.js block data so the new URL is saved
+                    if (blockId && editor?.blocks) {
+                        try {
+                            const savedOutput = await editor.save();
+                            const allBlockEls = container.querySelectorAll('.ce-block');
+                            const blockIndex = Array.from(allBlockEls).indexOf(ceBlock);
+
+                            if (blockIndex >= 0 && savedOutput.blocks[blockIndex]?.type === 'image') {
+                                const updatedData = {
+                                    ...savedOutput.blocks[blockIndex].data,
+                                    file: { url }
+                                };
+                                editor.blocks.update(blockId, updatedData);
+                            }
+                        } catch (updateErr) {
+                            // Block update API may not be available in all EditorJS versions –
+                            // the visual update already happened, and save() will pick up the src.
+                            console.warn('[ImageReplace] Could not call blocks.update():', updateErr);
+                        }
+                    }
+
+                    this.showToast('Bilde oppdatert!', 'success');
+                } catch (err) {
+                    console.error('[ImageReplace] Upload failed:', err);
+                    if (picture) picture.style.opacity = '1';
+                    if (preloader) preloader.style.display = 'none';
+                    this.showToast('Kunne ikke laste opp bilde.', 'error');
+                }
+            };
+
+            fileInput.click();
+        });
+    }
+
     _hasMeaningfulEditorContent(editorData) {
         const blocks = Array.isArray(editorData?.blocks) ? editorData.blocks : [];
         if (!blocks.length) return false;
@@ -5671,6 +5750,7 @@ class AdminManager {
                 logLevel: 'ERROR',
                 onReady: () => {
                     console.log('Editor.js is ready for work!');
+                    this._initImageReplaceBehavior(editor, 'editorjs-container-v2', collectionId);
                 }
             });
 
@@ -6090,7 +6170,7 @@ class AdminManager {
                 }
 
                 if (collectionId === 'podcast_transcripts') {
-                    item.description = document.getElementById('col-item-summary')?.value || item.description || '';
+                    item.description = document.getElementById('col-item-summary')?.value?.trim() || '';
                     const htmlFromBlocks = this.editorJsBlocksToHtml((nextContent?.blocks) || []);
                     item.text = htmlFromBlocks || (typeof item.text === 'string' ? item.text : '');
                 }
@@ -6480,7 +6560,14 @@ class AdminManager {
 
                                 if (collectionId === 'podcast_transcripts') {
                                     // For podcast transcripts, save directly to Firestore collection
-                                    await firebase.firestore().collection('podcast_transcripts').doc(safeItem.id).set(safeItem, { merge: true });
+                                    const podcastPayload = { ...safeItem };
+                                    const summaryValue = document.getElementById('col-item-summary')?.value?.trim() || '';
+                                    if (summaryValue) {
+                                        podcastPayload.description = summaryValue;
+                                    } else {
+                                        podcastPayload.description = firebase.firestore.FieldValue.delete();
+                                    }
+                                    await firebase.firestore().collection('podcast_transcripts').doc(safeItem.id).set(podcastPayload, { merge: true });
                                 } else {
                                     const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                                     const list = this._getCollectionItems(currentData);
