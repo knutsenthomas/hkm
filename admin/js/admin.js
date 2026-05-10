@@ -5241,9 +5241,26 @@ class AdminManager {
                         <span style="background:${podcastAudit.hasSummary ? '#eff6ff' : '#fff7ed'}; color:${podcastAudit.hasSummary ? '#1d4ed8' : '#c2410c'}; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:0.03em;">${podcastAudit.hasSummary ? 'OPPSUMMERING OK' : 'MANGLER OPPSUMMERING'}</span>
                     </div>
                 `
-                : (item.isSynced
-                    ? '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">SYNKRONISERT</span>'
-                    : '<span style="background: #f1f5f9; color: #64748b; padding: 4px 12px; border-radius: 6px; font-size: 11px; font-weight: 800; letter-spacing: 0.05em;">LOKAL/FIRESTORE</span>');
+                : (() => {
+                    if (collectionId === 'blog') {
+                        const translationStats = this._getBlogTranslationStatus(item);
+                        const publishedPill = item.published === false
+                            ? '<span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">UTKAST</span>'
+                            : '<span style="background:#ecfdf5;color:#047857;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">PUBLISERT</span>';
+                        let translationPill = '';
+                        if (translationStats.level === 'ok') {
+                            translationPill = `<span style="background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
+                        } else if (translationStats.level === 'partial') {
+                            translationPill = `<span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">DELVIS OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
+                        } else {
+                            translationPill = '<span style="background:#f1f5f9;color:#94a3b8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">IKKE OVERSATT</span>';
+                        }
+                        return `<div style="display:flex;gap:6px;flex-wrap:wrap;">${publishedPill}${translationPill}</div>`;
+                    }
+                    return item.isSynced
+                        ? '<span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.05em;">SYNKRONISERT</span>'
+                        : '';
+                })();
             const imageCell = item.imageUrl
                 ? `<img src="${this.escapeHtml(item.imageUrl)}" alt="" style="width:48px;height:48px;border-radius:12px;object-fit:cover;border:1px solid #f1f5f9;">`
                 : '<div style="width:48px;height:48px;border-radius:12px;background:#f8fafc;color:#94a3b8;display:flex;align-items:center;justify-content:center;border:1px solid #f1f5f9;"><span class="material-symbols-outlined" style="font-size:24px;">image</span></div>';
