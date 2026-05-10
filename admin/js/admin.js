@@ -5754,6 +5754,7 @@ class AdminManager {
             if (desktopTools) {
                 const holder = document.getElementById(editorHolderId);
                 let cachedActiveBlockIndex = -1;
+                let cachedSelectedText = '';
                 const stripHtml = (value) => String(value || '')
                     .replace(/<[^>]*>/g, ' ')
                     .replace(/&nbsp;/gi, ' ')
@@ -5813,6 +5814,15 @@ class AdminManager {
                     }
                 };
 
+                const cacheSelectionSnapshot = () => {
+                    try {
+                        const text = getSelectedTextInEditor();
+                        if (text) cachedSelectedText = text;
+                    } catch (error) {
+                        // no-op
+                    }
+                };
+
                 const getActiveBlockSnapshot = async () => {
                     try {
                         if (!editor?.blocks?.getCurrentBlockIndex) return null;
@@ -5849,7 +5859,14 @@ class AdminManager {
 
                 const collectListItems = async () => {
                     const selectedText = getSelectedTextInEditor();
-                    if (selectedText) return splitTextToItems(selectedText);
+                    if (selectedText) {
+                        cachedSelectedText = selectedText;
+                        return splitTextToItems(selectedText);
+                    }
+
+                    if (cachedSelectedText) {
+                        return splitTextToItems(cachedSelectedText);
+                    }
 
                     const snapshot = await getActiveBlockSnapshot();
                     if (!snapshot) return [];
@@ -5887,6 +5904,8 @@ class AdminManager {
                     holder.addEventListener('keyup', updateCachedActiveBlock);
                     holder.addEventListener('mouseup', updateCachedActiveBlock);
                     holder.addEventListener('focusin', updateCachedActiveBlock);
+                    holder.addEventListener('mouseup', cacheSelectionSnapshot);
+                    holder.addEventListener('keyup', cacheSelectionSnapshot);
                 }
 
                 const toolHandlers = {
@@ -5928,6 +5947,7 @@ class AdminManager {
 
                     btn.addEventListener('mousedown', (e) => {
                         // Keep editor focus stable while toolbar actions run.
+                        cacheSelectionSnapshot();
                         e.preventDefault();
                     });
 
