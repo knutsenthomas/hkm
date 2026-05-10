@@ -62,7 +62,7 @@ class ContentManager {
         // Strip .html for cleanUrls support (Vercel/Firebase cleanUrls removes extension from pathname)
         const path = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
         const p = (s) => new RegExp('(?:^|/)' + s + '(?:/|$)').test(path);
-        if (path === '/' || /^\/(en|es)$/.test(path) || path.endsWith('/') || p('index')) return 'index';
+        if (path === '' || path === '/' || /^\/(en|es)$/.test(path) || path.endsWith('/') || p('index')) return 'index';
         if (p('arrangementer') || p('events') || p('eventos')) return 'arrangementer';
         if (p('kalender') || p('calendar') || p('calendario')) return 'kalender';
         if (p('arrangement-detaljer') || p('event-details') || p('detalles-evento')) return 'arrangement-detaljer';
@@ -565,7 +565,11 @@ class ContentManager {
 
     async getContentDoc(pageId, { silent = false } = {}) {
         const service = window.firebaseService;
-        if (!service || !service.isInitialized || typeof service.getPageContent !== 'function') {
+        const canReadPublicContent = service
+            && typeof service.canReadPublicContent === 'function'
+            && service.canReadPublicContent();
+
+        if (!service || (!service.isInitialized && !canReadPublicContent) || typeof service.getPageContent !== 'function') {
             if (!silent) {
                 this.reportError('firebase-unavailable', new Error(`Firebase not initialized for ${pageId}`), {
                     notifyUser: true,
@@ -590,7 +594,10 @@ class ContentManager {
 
     async getContentDocs(pageIds, { silent = false } = {}) {
         const service = window.firebaseService;
-        if (!service || !service.isInitialized || typeof service.getPageContent !== 'function') return {};
+        const canReadPublicContent = service
+            && typeof service.canReadPublicContent === 'function'
+            && service.canReadPublicContent();
+        if (!service || (!service.isInitialized && !canReadPublicContent) || typeof service.getPageContent !== 'function') return {};
 
         try {
             if (typeof service.getManyPageContents === 'function') {
