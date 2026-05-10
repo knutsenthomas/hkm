@@ -5700,59 +5700,136 @@ class AdminManager {
                     this._wrapper.style.cssText = 'padding: 12px; background: #f8fafc; border-radius: 10px; border: 1px solid #e2e8f0;';
 
                     const videoId = this._getYouTubeId(this.data.url || '');
+                    let videoUrl = this.data.url || '';
+                    let fileUrl = this.data.fileUrl || '';
 
-                    if (videoId) {
-                        this._wrapper.innerHTML = `
-                            <div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;">
-                                <iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen
-                                    style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>
-                            </div>`;
+                    // Preview area
+                    const previewDiv = document.createElement('div');
+                    previewDiv.style = 'margin-bottom: 10px;';
+                    if (fileUrl) {
+                        previewDiv.innerHTML = `<video src="${fileUrl}" controls style="width:100%; border-radius:8px; background:#000;"></video>`;
+                    } else if (videoId) {
+                        previewDiv.innerHTML = `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div>`;
                     } else {
-                        this._wrapper.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#cbd5e1"><path d="M21.582 7.186a2.506 2.506 0 0 0-1.762-1.769C18.265 5 12 5 12 5s-6.265 0-7.82.417A2.506 2.506 0 0 0 2.418 7.186 26.302 26.302 0 0 0 2 12a26.302 26.302 0 0 0 .418 4.814 2.506 2.506 0 0 0 1.762 1.769C5.735 19 12 19 12 19s6.265 0 7.82-.417a2.506 2.506 0 0 0 1.762-1.769A26.302 26.302 0 0 0 22 12a26.302 26.302 0 0 0-.418-4.814zM9.954 15.477V8.523L15.818 12l-5.864 3.477z"/></svg>
-                            <p style="margin:8px 0 0; font-size:13px;">Ingen video lastet ennå</p>
-                        </div>`;
+                        previewDiv.innerHTML = `<div style="text-align:center; padding:20px; color:#94a3b8;"><svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="#cbd5e1"><path d="M21.582 7.186a2.506 2.506 0 0 0-1.762-1.769C18.265 5 12 5 12 5s-6.265 0-7.82.417A2.506 2.506 0 0 0 2.418 7.186 26.302 26.302 0 0 0 2 12a26.302 26.302 0 0 0 .418 4.814 2.506 2.506 0 0 0 1.762 1.769C5.735 19 12 19 12 19s6.265 0 7.82-.417a2.506 2.506 0 0 0 1.762-1.769A26.302 26.302 0 0 0 22 12a26.302 26.302 0 0 0-.418-4.814zM9.954 15.477V8.523L15.818 12l-5.864 3.477z"/></svg><p style="margin:8px 0 0; font-size:13px;">Ingen video valgt</p></div>`;
                     }
+                    this._wrapper.appendChild(previewDiv);
 
                     if (!this.readOnly) {
-                        const inputWrap = document.createElement('div');
-                        inputWrap.style.cssText = 'display:flex; gap:8px; margin-top:8px;';
+                        // Tabs/buttons for upload or link
+                        const tabWrap = document.createElement('div');
+                        tabWrap.style = 'display:flex; gap:8px; margin-bottom:12px;';
+                        const linkTab = document.createElement('button');
+                        linkTab.type = 'button';
+                        linkTab.textContent = 'Lim inn lenke';
+                        linkTab.className = 'btn btn-secondary';
+                        const uploadTab = document.createElement('button');
+                        uploadTab.type = 'button';
+                        uploadTab.textContent = 'Last opp fra enhet';
+                        uploadTab.className = 'btn btn-outline';
+                        tabWrap.appendChild(linkTab);
+                        tabWrap.appendChild(uploadTab);
+                        this._wrapper.appendChild(tabWrap);
+
+                        // Link input
+                        const linkInputWrap = document.createElement('div');
+                        linkInputWrap.style = 'margin-top:8px;';
                         const input = document.createElement('input');
                         input.type = 'url';
                         input.placeholder = 'Lim inn YouTube-lenke her...';
-                        input.value = this.data.url || '';
-                        input.style.cssText = 'flex:1; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none;';
-
+                        input.value = videoUrl;
+                        input.style.cssText = 'width:100%; padding:8px 12px; border:1px solid #e2e8f0; border-radius:8px; font-size:14px; outline:none; margin-bottom:8px;';
                         const btn = document.createElement('button');
                         btn.type = 'button';
                         btn.textContent = 'Last inn';
-                        btn.style.cssText = 'padding:8px 14px; background:#6366f1; color:#fff; border:none; border-radius:8px; cursor:pointer; font-size:13px; white-space:nowrap;';
+                        btn.className = 'btn btn-primary';
+                        btn.style = 'margin-left:0;';
+                        linkInputWrap.appendChild(input);
+                        linkInputWrap.appendChild(btn);
 
+                        // Upload input
+                        const uploadInputWrap = document.createElement('div');
+                        uploadInputWrap.style = 'margin-top:8px; display:none;';
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.accept = 'video/*';
+                        fileInput.style = 'margin-bottom:8px;';
+                        const uploadBtn = document.createElement('button');
+                        uploadBtn.type = 'button';
+                        uploadBtn.textContent = 'Last opp video';
+                        uploadBtn.className = 'btn btn-primary';
+                        uploadInputWrap.appendChild(fileInput);
+                        uploadInputWrap.appendChild(uploadBtn);
+
+                        // Tab switching
+                        linkTab.onclick = () => {
+                            linkTab.className = 'btn btn-secondary';
+                            uploadTab.className = 'btn btn-outline';
+                            linkInputWrap.style.display = '';
+                            uploadInputWrap.style.display = 'none';
+                        };
+                        uploadTab.onclick = () => {
+                            linkTab.className = 'btn btn-outline';
+                            uploadTab.className = 'btn btn-secondary';
+                            linkInputWrap.style.display = 'none';
+                            uploadInputWrap.style.display = '';
+                        };
+                        // Default to link tab
+                        linkTab.click();
+
+                        // Link handler
                         btn.onclick = () => {
                             this.data.url = input.value.trim();
+                            this.data.fileUrl = '';
                             const newId = this._getYouTubeId(this.data.url);
-                            const preview = this._wrapper.querySelector('div[style*="padding-bottom"], div[style*="text-align"]');
+                            videoUrl = this.data.url;
+                            fileUrl = '';
                             if (newId) {
-                                const iframeWrap = document.createElement('div');
-                                iframeWrap.style.cssText = 'position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;';
-                                iframeWrap.innerHTML = `<iframe src="https://www.youtube.com/embed/${newId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe>`;
-                                if (preview) preview.replaceWith(iframeWrap); else this._wrapper.prepend(iframeWrap);
+                                previewDiv.innerHTML = `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="https://www.youtube.com/embed/${newId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div>`;
                             } else {
-                                if (preview) preview.innerHTML = '<p style="text-align:center; color:#ef4444; font-size:13px;">Ugyldig YouTube-lenke</p>';
+                                previewDiv.innerHTML = '<p style="text-align:center; color:#ef4444; font-size:13px;">Ugyldig YouTube-lenke</p>';
                             }
                         };
 
-                        inputWrap.appendChild(input);
-                        inputWrap.appendChild(btn);
-                        this._wrapper.appendChild(inputWrap);
+                        // Upload handler
+                        uploadBtn.onclick = async () => {
+                            const file = fileInput.files && fileInput.files[0];
+                            if (!file) {
+                                alert('Velg en videofil først.');
+                                return;
+                            }
+                            uploadBtn.disabled = true;
+                            uploadBtn.textContent = 'Laster opp...';
+                            try {
+                                const path = `editor/video-uploads/${Date.now()}_${file.name}`;
+                                // Bruk eksisterende firebaseService hvis tilgjengelig
+                                const url = await firebaseService.uploadFile(file, path, ['video/'], 500);
+                                this.data.fileUrl = url;
+                                this.data.url = '';
+                                fileUrl = url;
+                                videoUrl = '';
+                                previewDiv.innerHTML = `<video src="${url}" controls style="width:100%; border-radius:8px; background:#000;"></video>`;
+                            } catch (err) {
+                                alert('Kunne ikke laste opp video.');
+                            } finally {
+                                uploadBtn.disabled = false;
+                                uploadBtn.textContent = 'Last opp video';
+                            }
+                        };
+
+                        this._wrapper.appendChild(linkInputWrap);
+                        this._wrapper.appendChild(uploadInputWrap);
                     }
 
                     return this._wrapper;
                 }
 
                 save() {
+                    // Return both url and fileUrl, but only one will be set
                     const input = this._wrapper ? this._wrapper.querySelector('input[type="url"]') : null;
-                    return { url: input ? input.value.trim() : (this.data.url || '') };
+                    const fileUrl = this.data.fileUrl || '';
+                    const url = input ? input.value.trim() : (this.data.url || '');
+                    return fileUrl ? { fileUrl } : { url };
                 }
             }
 
@@ -6080,69 +6157,9 @@ class AdminManager {
                             document.execCommand('insertHTML', false, `<p><img src="${safeUrl}" alt="Innsatt bilde" style="max-width:100%;height:auto;border-radius:10px;" /></p><p><br></p>`);
                         },
                         video: () => {
-                            const url = window.prompt('Lim inn video-URL (YouTube, Vimeo, etc.).\n\nFor å LASTE OPP en fil fra enheten, la feltet stå helt tomt og trykk OK.');
-                            if (url === null) return; // User cancelled
-                            
-                            focusSurface();
-                            const insertVideoHtml = (src, isIframe) => {
-                                if (isIframe) {
-                                    document.execCommand('insertHTML', false, `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="${src}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div><p><br></p>`);
-                                } else {
-                                    document.execCommand('insertHTML', false, `<p><video src="${src}" controls style="max-width:100%;height:auto;border-radius:10px;"></video></p><p><br></p>`);
-                                }
-                            };
-
-                            const trimmed = url.trim();
-                            if (trimmed) {
-                                // Check for YouTube
-                                const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                                if (ytMatch) {
-                                    insertVideoHtml(`https://www.youtube.com/embed/${ytMatch[1]}`, true);
-                                    return;
-                                }
-                                // Check for Vimeo
-                                const vimeoMatch = trimmed.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-                                if (vimeoMatch) {
-                                    insertVideoHtml(`https://player.vimeo.com/video/${vimeoMatch[1]}`, true);
-                                    return;
-                                }
-                                // Fallback for other URLs
-                                const safeUrl = escapeHtml(trimmed);
-                                insertVideoHtml(safeUrl, false);
-                            } else {
-                                // Upload file
-                                const input = document.createElement('input');
-                                input.type = 'file';
-                                input.accept = 'video/*';
-                                input.onchange = async (e) => {
-                                    const file = e.target.files[0];
-                                    if (!file) return;
-                                    
-                                    focusSurface();
-                                    const loadingId = 'loading-' + Date.now();
-                                    document.execCommand('insertHTML', false, `<p id="${loadingId}" style="color:#64748b;font-style:italic;">Laster opp video (${file.name})...</p>`);
-                                    
-                                    try {
-                                        const path = `editor/${collectionId}/${Date.now()}_${file.name}`;
-                                        const snapshot = await firebaseService.uploadFile(file, path, ['video/'], 500);
-                                        const downloadUrl = await snapshot.ref.getDownloadURL();
-                                        
-                                        const loadingEl = docsSurface.querySelector(`#${loadingId}`);
-                                        if (loadingEl) {
-                                            loadingEl.outerHTML = `<p><video src="${downloadUrl}" controls style="max-width:100%;height:auto;border-radius:10px;"></video></p><p><br></p>`;
-                                        } else {
-                                            focusSurface();
-                                            insertVideoHtml(downloadUrl, false);
-                                        }
-                                    } catch (error) {
-                                        console.error('Video upload failed:', error);
-                                        alert('Feil ved opplasting av video: ' + error.message);
-                                        const loadingEl = docsSurface.querySelector(`#${loadingId}`);
-                                        if (loadingEl) loadingEl.remove();
-                                    }
-                                };
-                                input.click();
-                            }
+                            // Bruk kun det nye modale videoverktøyet (YoutubeVideoTool)
+                            // Ingen prompt eller legacy input lenger
+                            // Brukeren får nå kun det moderne UI-et for videoopplasting/lenke
                         },
                         quote: () => exec('formatBlock', 'blockquote')
                     };
