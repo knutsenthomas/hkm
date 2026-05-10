@@ -5898,57 +5898,18 @@ class AdminManager {
             let docsSurface = null;
             let editor;
 
-            if (shouldUseDocsLikeEditor) {
-                const holder = document.getElementById(editorHolderId);
-                const initialBlocks = Array.isArray(editorData?.blocks) ? editorData.blocks : [];
-                const initialHtml = this.editorJsBlocksToHtml(initialBlocks)
-                    || (typeof item.content === 'string' ? item.content : '')
-                    || (collectionId === 'podcast_transcripts' ? String(item.text || '') : '');
-
-                holder.innerHTML = '<div class="docs-rte-surface" contenteditable="true" spellcheck="true"></div>';
-                docsSurface = holder.querySelector('.docs-rte-surface');
-                docsSurface.style.minHeight = '480px';
-                docsSurface.style.outline = 'none';
-                docsSurface.style.lineHeight = '1.65';
-                docsSurface.style.fontSize = '18px';
-                docsSurface.style.color = '#0f172a';
-                docsSurface.innerHTML = String(initialHtml || '').trim() || '<p><br></p>';
-
-                const normalizeHtml = (html) => String(html || '')
-                    .replace(/<div><br><\/div>/gi, '<p><br></p>')
-                    .replace(/<div>/gi, '<p>')
-                    .replace(/<\/div>/gi, '</p>')
-                    .trim();
-
-                editor = {
-                    save: async () => {
-                        const html = normalizeHtml(docsSurface?.innerHTML || '');
-                        return this.htmlToEditorJsBlocks(html);
-                    },
-                    render: async (nextData) => {
-                        const blocks = Array.isArray(nextData?.blocks) ? nextData.blocks : [];
-                        const html = this.editorJsBlocksToHtml(blocks);
-                        docsSurface.innerHTML = normalizeHtml(html) || '<p><br></p>';
-                    },
-                    destroy: () => {
-                        if (docsSurface) docsSurface.removeAttribute('contenteditable');
-                    }
-                };
-
-                this._activeEditorInstance = editor;
-            } else {
-                editor = new EditorJS({
-                    holder: editorHolderId,
-                    data: editorData,
-                    placeholder: 'Trykk "/" for å velge blokker...',
-                    tools: toolsConfig,
-                    logLevel: 'ERROR',
-                    onReady: () => {
-                        this._activeEditorInstance = editor;
-                        this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
-                    }
-                });
-            }
+            // Tving EditorJS-modus for blogg, undervisning og podcast
+            editor = new EditorJS({
+                holder: editorHolderId,
+                data: editorData,
+                placeholder: 'Trykk "/" for å velge blokker...',
+                tools: toolsConfig,
+                logLevel: 'ERROR',
+                onReady: () => {
+                    this._activeEditorInstance = editor;
+                    this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
+                }
+            });
 
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
@@ -6777,45 +6738,70 @@ class AdminManager {
                 });
             }
 
-            const imgTrigger = document.getElementById('sidebar-img-trigger');
-            const imgFile = document.getElementById('col-item-img-file');
-            if (imgTrigger && imgFile) {
-                imgTrigger.onclick = () => imgFile.click();
-                imgTrigger.onmouseenter = () => {
-                    const overlay = imgTrigger.querySelector('.upload-overlay');
-                    if (overlay) overlay.style.opacity = '1';
-                };
-                imgTrigger.onmouseleave = () => {
-                    const overlay = imgTrigger.querySelector('.upload-overlay');
-                    if (overlay) overlay.style.opacity = '0';
-                };
-
-                imgFile.onchange = async (e) => {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    imgTrigger.style.opacity = '0.5';
-                    imgTrigger.style.pointerEvents = 'none';
-                    const originalHTML = imgTrigger.innerHTML;
-                    imgTrigger.innerHTML = '<span class="loader-sm"></span>';
-
-                    try {
-                        const path = `covers/${collectionId}/${Date.now()}_${file.name}`;
-                        const url = await firebaseService.uploadImage(file, path);
-                        imgInput.value = url;
-                        // Trigger input event manually to update preview
-                        imgInput.dispatchEvent(new Event('input'));
-                        this.showToast('Bilde lastet opp!', 'success');
-                    } catch (err) {
-                        console.error("Upload error:", err);
-                        this.showToast('Kunne ikke laste opp bilde.', 'error');
-                        imgTrigger.innerHTML = originalHTML;
-                    } finally {
-                        imgTrigger.style.opacity = '1';
-                        imgTrigger.style.pointerEvents = 'auto';
-                    }
-                };
-            }
+                        const imgTrigger = document.getElementById('sidebar-img-trigger');
+                        const imgFile = document.getElementById('col-item-img-file');
+                        if (imgTrigger && imgFile) {
+                                // Nytt design: drag/drop, knapp og forhåndsvisning
+                                imgTrigger.innerHTML = `
+                                    <div class="design-ui-upload-card" style="width:100%;height:120px;cursor:pointer;align-items:center;justify-content:center;">
+                                        <div class="design-ui-upload-card-preview" id="sidebar-img-preview">
+                                            <span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>
+                                        </div>
+                                        <div class="design-ui-upload-card-body">
+                                            <div class="design-ui-upload-card-label">Last opp bilde</div>
+                                            <div class="design-ui-upload-card-hint">Klikk eller slipp fil her</div>
+                                            <div class="design-ui-upload-card-actions">
+                                                <button type="button" class="btn btn-secondary" id="sidebar-img-upload-btn">Velg bilde</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                                const preview = document.getElementById('sidebar-img-preview');
+                                const uploadBtn = document.getElementById('sidebar-img-upload-btn');
+                                // Drag/drop
+                                imgTrigger.ondragover = (e) => { e.preventDefault(); imgTrigger.style.opacity = '0.7'; };
+                                imgTrigger.ondragleave = (e) => { e.preventDefault(); imgTrigger.style.opacity = '1'; };
+                                imgTrigger.ondrop = async (e) => {
+                                    e.preventDefault();
+                                    imgTrigger.style.opacity = '1';
+                                    const file = e.dataTransfer.files[0];
+                                    if (file) await handleImageUpload(file);
+                                };
+                                // Knapp
+                                uploadBtn.onclick = () => imgFile.click();
+                                // File input
+                                imgFile.onchange = async (e) => {
+                                    const file = e.target.files[0];
+                                    if (file) await handleImageUpload(file);
+                                };
+                                // Preview oppdatering
+                                imgInput.addEventListener('input', (e) => {
+                                    const url = e.target.value;
+                                    if (preview) {
+                                        if (url && url.length > 10) {
+                                            preview.innerHTML = `<img src="${url}" style="max-width:100%;max-height:100px;object-fit:contain;border-radius:6px;">`;
+                                        } else {
+                                            preview.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
+                                        }
+                                    }
+                                });
+                                // Felles opplaster
+                                const handleImageUpload = async (file) => {
+                                    if (!file) return;
+                                    preview.innerHTML = '<span class="loader-sm"></span>';
+                                    try {
+                                        const path = `covers/${collectionId}/${Date.now()}_${file.name}`;
+                                        const url = await firebaseService.uploadImage(file, path);
+                                        imgInput.value = url;
+                                        imgInput.dispatchEvent(new Event('input'));
+                                        this.showToast('Bilde lastet opp!', 'success');
+                                    } catch (err) {
+                                        console.error("Upload error:", err);
+                                        this.showToast('Kunne ikke laste opp bilde.', 'error');
+                                        preview.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
+                                    }
+                                };
+                        }
 
             const closeBtn = modal.querySelector('#close-col-modal');
             if (closeBtn) {
