@@ -164,7 +164,45 @@ class ContentManager {
 
     getContentItemStableId(item) {
         if (!item || typeof item !== 'object') return '';
-        return item.id || item.slug || item.title || '';
+        return item.id
+            || item._id
+            || item.wixGuid
+            || item.postId
+            || item.legacyId
+            || item.slug
+            || item.title
+            || '';
+    }
+
+    getContentItemLookupIds(item) {
+        if (!item || typeof item !== 'object') return [];
+
+        const rawValues = [
+            this.getContentItemStableId(item),
+            item.id,
+            item._id,
+            item.wixGuid,
+            item.postId,
+            item.legacyId,
+            item.slug,
+            item.title
+        ];
+
+        const ids = new Set();
+        rawValues.forEach((value) => {
+            if (value === null || value === undefined) return;
+            const str = String(value).trim();
+            if (!str) return;
+            ids.add(str);
+            ids.add(encodeURIComponent(str));
+            try {
+                ids.add(decodeURIComponent(str));
+            } catch (error) {
+                // Keep going for malformed URI fragments.
+            }
+        });
+
+        return Array.from(ids);
     }
 
     normalizeBlogKeyValue(value) {
@@ -374,10 +412,19 @@ class ContentManager {
 
     findContentItemById(items, itemId) {
         if (!Array.isArray(items) || !itemId) return null;
-        const target = String(itemId);
+        const targetRaw = String(itemId).trim();
+        if (!targetRaw) return null;
+
+        const targetVariants = new Set([targetRaw, encodeURIComponent(targetRaw)]);
+        try {
+            targetVariants.add(decodeURIComponent(targetRaw));
+        } catch (error) {
+            // Ignore invalid URI sequences.
+        }
+
         return items.find((item) => {
-            const stableId = this.getContentItemStableId(item);
-            return stableId === target || encodeURIComponent(stableId) === target;
+            const candidates = this.getContentItemLookupIds(item);
+            return candidates.some((candidate) => targetVariants.has(candidate));
         }) || null;
     }
 
@@ -963,50 +1010,51 @@ class ContentManager {
         const postId = this.getContentItemStableId(sourceItem || item);
         const wixViewsRaw = Number(sourceItem?.views ?? item.views ?? 0);
         const wixViews = Number.isFinite(wixViewsRaw) ? Math.max(0, Math.floor(wixViewsRaw)) : 0;
-        let localViewsAfterIncrement = 1;
-
-        if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
-            try {
-                // Determine doc reference based on a secure collection pattern.
-                // In an ideal world we don't spam get/set. If cache works, rely on it. Just trigger an increment.
-                const docRef = window.firebaseService.db.collection('blog_stats').doc(postId);
-
-                // Read current stats (if exists) before incrementing, allows immediate update while updating remote.
-                const docSnap = await docRef.get();
-                if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
-                    const existingLocalViews = Number(docSnap.data().views);
-                    localViewsAfterIncrement = Number.isFinite(existingLocalViews) ? Math.max(0, Math.floor(existingLocalViews)) + 1 : 1;
-                }
-
-                // Increment view asynchronously
-                docRef.set({
-                    views: window.firebase.firestore.FieldValue.increment(1)
-                }, { merge: true }).catch(err => {
-                    console.warn('[ContentManager] Kunne ikke oppdatere visninger, kanskje manglende tilgang:', err);
-                });
-            } catch (err) {
-                console.warn('[ContentManager] Feil ved henting av visninger:', err);
-            }
-        }
-
-        const viewCount = wixViews + localViewsAfterIncrement;
-
+        
         let viewsEl = document.getElementById('single-post-views');
         if (!viewsEl && document.querySelector('.blog-meta')) {
             viewsEl = document.createElement('span');
             viewsEl.id = 'single-post-views';
-
-            // Insert after readingTimeEl if we can, otherwise just append to meta box
             if (readingTimeEl && readingTimeEl.parentNode) {
                 readingTimeEl.parentNode.appendChild(viewsEl);
             } else {
                 document.querySelector('.blog-meta').appendChild(viewsEl);
             }
         }
-        if (viewsEl) {
+        
+        const updateViewsUI = (localViews) => {
+            if (!viewsEl) return;
+            const viewCount = wixViews + localViews;
             const viewsLabel = this.getTranslation('views') || 'visninger';
             viewsEl.innerHTML = `<i class="far fa-eye"></i> ${viewCount} ${viewsLabel}`;
             viewsEl.style.display = 'inline-block';
+        };
+
+        // Render initial view count synchronously to not block UI
+        updateViewsUI(1);
+
+        if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
+            (async () => {
+                try {
+                    const docRef = window.firebaseService.db.collection('blog_stats').doc(postId);
+                    const docSnap = await Promise.race([
+                        docRef.get(),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+                    ]);
+                    if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
+                        const existingLocalViews = Number(docSnap.data().views);
+                        const finalViews = Number.isFinite(existingLocalViews) ? Math.max(0, Math.floor(existingLocalViews)) + 1 : 1;
+                        updateViewsUI(finalViews);
+                    }
+                    docRef.set({
+                        views: window.firebase.firestore.FieldValue.increment(1)
+                    }, { merge: true }).catch(err => {
+                        console.warn('[ContentManager] Kunne ikke oppdatere visninger:', err);
+                    });
+                } catch (err) {
+                    console.warn('[ContentManager] Feil ved henting av visninger:', err);
+                }
+            })();
         }
 
         container.classList.toggle('wix-html-content', usesWixViewerHtml);
