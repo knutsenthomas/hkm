@@ -6135,20 +6135,11 @@ class AdminManager {
                     || document.getElementById('col-item-title-sidebar')?.value
                     || '';
                 let nextContent = savedData;
-                if (preserveExistingContentIfEmpty && collectionId === 'blog') {
-                    const savedBlocks = Array.isArray(savedData?.blocks) ? savedData.blocks : [];
-                    const previousBlocks = Array.isArray(previousContent?.blocks) ? previousContent.blocks : [];
-                    if (!savedBlocks.length && previousBlocks.length) {
-                        nextContent = previousContent;
-                    }
-                }
 
-                if (collectionId === 'podcast_transcripts') {
-                    const hasSaved = this._hasMeaningfulEditorContent(savedData);
-                    const hasPrevious = this._hasMeaningfulEditorContent(previousContent);
-                    if (!hasSaved && hasPrevious) {
-                        nextContent = previousContent;
-                    }
+                // Safety: never overwrite existing content with empty editor output.
+                // If the editor returns no blocks but we had content before, keep the old content.
+                if (!this._hasMeaningfulEditorContent(savedData) && this._hasMeaningfulEditorContent(previousContent)) {
+                    nextContent = previousContent;
                 }
 
                 item.content = nextContent;
