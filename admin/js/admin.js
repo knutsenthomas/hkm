@@ -5755,6 +5755,7 @@ class AdminManager {
                 const holder = document.getElementById(editorHolderId);
                 let cachedActiveBlockIndex = -1;
                 let cachedSelectedText = '';
+                let cachedSelectionAt = 0;
                 const stripHtml = (value) => String(value || '')
                     .replace(/<[^>]*>/g, ' ')
                     .replace(/&nbsp;/gi, ' ')
@@ -5817,19 +5818,50 @@ class AdminManager {
                 const cacheSelectionSnapshot = () => {
                     try {
                         const text = getSelectedTextInEditor();
-                        if (text) cachedSelectedText = text;
+                        if (text) {
+                            cachedSelectedText = text;
+                            cachedSelectionAt = Date.now();
+                        }
                     } catch (error) {
                         // no-op
                     }
                 };
 
+                const resolveCurrentBlockIndex = () => {
+                    try {
+                        if (editor?.blocks?.getCurrentBlockIndex) {
+                            const idx = editor.blocks.getCurrentBlockIndex();
+                            if (Number.isInteger(idx) && idx >= 0) return idx;
+                        }
+                    } catch (error) {
+                        // no-op
+                    }
+
+                    try {
+                        if (holder) {
+                            const selection = window.getSelection ? window.getSelection() : null;
+                            const anchor = selection?.anchorNode;
+                            const anchorElement = anchor?.nodeType === Node.TEXT_NODE ? anchor.parentElement : anchor;
+                            const blockEl = anchorElement?.closest ? anchorElement.closest('.ce-block') : null;
+                            if (blockEl) {
+                                const allBlocks = Array.from(holder.querySelectorAll('.ce-block'));
+                                const domIdx = allBlocks.indexOf(blockEl);
+                                if (domIdx >= 0) return domIdx;
+                            }
+                        }
+                    } catch (error) {
+                        // no-op
+                    }
+
+                    if (Number.isInteger(cachedActiveBlockIndex) && cachedActiveBlockIndex >= 0) {
+                        return cachedActiveBlockIndex;
+                    }
+                    return -1;
+                };
+
                 const getActiveBlockSnapshot = async () => {
                     try {
-                        if (!editor?.blocks?.getCurrentBlockIndex) return null;
-                        let idx = editor.blocks.getCurrentBlockIndex();
-                        if (!Number.isInteger(idx) || idx < 0) {
-                            idx = cachedActiveBlockIndex;
-                        }
+                        let idx = resolveCurrentBlockIndex();
                         if (!Number.isInteger(idx) || idx < 0) return null;
 
                         const saved = await editor.save();
@@ -5849,12 +5881,8 @@ class AdminManager {
                         const blocks = Array.isArray(saved?.blocks) ? [...saved.blocks] : [];
                         if (!blocks.length) return false;
 
-                        let idx = -1;
-                        if (editor?.blocks?.getCurrentBlockIndex) {
-                            idx = editor.blocks.getCurrentBlockIndex();
-                        }
-                        if (!Number.isInteger(idx) || idx < 0) idx = cachedActiveBlockIndex;
-                        if (!Number.isInteger(idx) || idx < 0 || idx >= blocks.length) idx = 0;
+                        let idx = resolveCurrentBlockIndex();
+                        if (!Number.isInteger(idx) || idx < 0 || idx >= blocks.length) return false;
 
                         blocks.splice(idx, 1, {
                             type: 'list',
@@ -5881,10 +5909,11 @@ class AdminManager {
                     const selectedText = getSelectedTextInEditor();
                     if (selectedText) {
                         cachedSelectedText = selectedText;
+                        cachedSelectionAt = Date.now();
                         return splitTextToItems(selectedText);
                     }
 
-                    if (cachedSelectedText) {
+                    if (cachedSelectedText && (Date.now() - cachedSelectionAt) < 3000) {
                         return splitTextToItems(cachedSelectedText);
                     }
 
