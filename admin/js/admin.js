@@ -6133,10 +6133,15 @@ class AdminManager {
             const buildSafeItemFromForm = async ({ preserveExistingContentIfEmpty = false } = {}) => {
                 let savedData;
                 try {
-                    savedData = await editor.save();
+                    // Race editor.save() against a 5s timeout so a broken instance never freezes the UI
+                    savedData = await Promise.race([
+                        editor.save(),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+                    ]);
                 } catch (error) {
-                    console.error('Saving failed', error);
-                    throw new Error('Kunne ikke hente innhold fra editor.');
+                    // On timeout or error, fall back to the item's existing content
+                    console.warn('editor.save() failed or timed out, using existing content:', error);
+                    savedData = null;
                 }
 
                 const previousContent = item.content;
