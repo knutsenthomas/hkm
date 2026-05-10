@@ -340,15 +340,16 @@ class AdminManager {
 
     _buildBlogTranslationSourceHash(post) {
         if (!post || typeof post !== 'object') return this._hashString('');
-        const payload = {
-            title: post.title || '',
-            category: post.category || '',
-            content: post.content || '',
-            seoTitle: post.seoTitle || '',
-            seoDescription: post.seoDescription || '',
-            tags: Array.isArray(post.tags) ? post.tags : []
-        };
-        return this._hashString(JSON.stringify(payload));
+        // Only hash stable text fields — content is an EditorJS object whose `time`
+        // field changes on every open, which would make the hash unstable.
+        const payload = [
+            post.title || '',
+            post.category || '',
+            post.seoTitle || '',
+            post.seoDescription || '',
+            (Array.isArray(post.tags) ? post.tags : []).join(',')
+        ].join('|');
+        return this._hashString(payload);
     }
 
     _isLikelyNonTranslatableToken(value) {
