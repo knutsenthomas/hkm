@@ -5528,6 +5528,9 @@ class AdminManager {
                                     <button type="button" class="desktop-richtools-btn" data-tool="image" title="Bilde">
                                         <span class="material-symbols-outlined">image</span>
                                     </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="video" title="Video">
+                                        <span class="material-symbols-outlined">smart_display</span>
+                                    </button>
                                     <button type="button" class="desktop-richtools-btn" data-tool="quote" title="Sitat">
                                         <span class="material-symbols-outlined">format_quote</span>
                                     </button>
@@ -6075,6 +6078,71 @@ class AdminManager {
                             if (!safeUrl) return;
                             focusSurface();
                             document.execCommand('insertHTML', false, `<p><img src="${safeUrl}" alt="Innsatt bilde" style="max-width:100%;height:auto;border-radius:10px;" /></p><p><br></p>`);
+                        },
+                        video: () => {
+                            const url = window.prompt('Lim inn video-URL (YouTube, Vimeo, etc.).\n\nFor å LASTE OPP en fil fra enheten, la feltet stå helt tomt og trykk OK.');
+                            if (url === null) return; // User cancelled
+                            
+                            focusSurface();
+                            const insertVideoHtml = (src, isIframe) => {
+                                if (isIframe) {
+                                    document.execCommand('insertHTML', false, `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="${src}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div><p><br></p>`);
+                                } else {
+                                    document.execCommand('insertHTML', false, `<p><video src="${src}" controls style="max-width:100%;height:auto;border-radius:10px;"></video></p><p><br></p>`);
+                                }
+                            };
+
+                            const trimmed = url.trim();
+                            if (trimmed) {
+                                // Check for YouTube
+                                const ytMatch = trimmed.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                                if (ytMatch) {
+                                    insertVideoHtml(`https://www.youtube.com/embed/${ytMatch[1]}`, true);
+                                    return;
+                                }
+                                // Check for Vimeo
+                                const vimeoMatch = trimmed.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+                                if (vimeoMatch) {
+                                    insertVideoHtml(`https://player.vimeo.com/video/${vimeoMatch[1]}`, true);
+                                    return;
+                                }
+                                // Fallback for other URLs
+                                const safeUrl = escapeHtml(trimmed);
+                                insertVideoHtml(safeUrl, false);
+                            } else {
+                                // Upload file
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'video/*';
+                                input.onchange = async (e) => {
+                                    const file = e.target.files[0];
+                                    if (!file) return;
+                                    
+                                    focusSurface();
+                                    const loadingId = 'loading-' + Date.now();
+                                    document.execCommand('insertHTML', false, `<p id="${loadingId}" style="color:#64748b;font-style:italic;">Laster opp video (${file.name})...</p>`);
+                                    
+                                    try {
+                                        const path = `editor/${collectionId}/${Date.now()}_${file.name}`;
+                                        const snapshot = await firebaseService.uploadFile(file, path, ['video/'], 500);
+                                        const downloadUrl = await snapshot.ref.getDownloadURL();
+                                        
+                                        const loadingEl = docsSurface.querySelector(`#${loadingId}`);
+                                        if (loadingEl) {
+                                            loadingEl.outerHTML = `<p><video src="${downloadUrl}" controls style="max-width:100%;height:auto;border-radius:10px;"></video></p><p><br></p>`;
+                                        } else {
+                                            focusSurface();
+                                            insertVideoHtml(downloadUrl, false);
+                                        }
+                                    } catch (error) {
+                                        console.error('Video upload failed:', error);
+                                        alert('Feil ved opplasting av video: ' + error.message);
+                                        const loadingEl = docsSurface.querySelector(`#${loadingId}`);
+                                        if (loadingEl) loadingEl.remove();
+                                    }
+                                };
+                                input.click();
+                            }
                         },
                         quote: () => exec('formatBlock', 'blockquote')
                     };
@@ -12555,6 +12623,24 @@ class AdminManager {
             });
         };
 
+        const pushVideoBlock = (vidEl) => {
+            const url = vidEl.src || vidEl.getAttribute('src') || '';
+            if (!url) return;
+            blocks.push({
+                type: 'video',
+                data: { file: { url }, url }
+            });
+        };
+
+        const pushIframeBlock = (iframeEl) => {
+            const url = iframeEl.src || iframeEl.getAttribute('src') || '';
+            if (!url) return;
+            blocks.push({
+                type: 'youtubeVideo',
+                data: { url }
+            });
+        };
+
         const wrapPersistedInlineStyles = (elem, innerHtml) => {
             const styles = [];
             const fontSize = elem?.style?.fontSize;
@@ -12569,14 +12655,11 @@ class AdminManager {
             return `<span style="${styles.join(';')}">${innerHtml}</span>`;
         };
 
-        // Helper: process a <p> or <div> — split around any <img> children
-        const pushParagraphOrImages = (elem) => {
-            const imgs = elem.querySelectorAll('img');
-            if (imgs.length === 0) {
-                // No images — push as paragraph if non-empty
-                // Strip any remaining tags that EditorJS can't handle (only keep inline)
+        // Helper: process a <p> or <div> — split around any media children
+        const pushParagraphOrMedia = (elem) => {
+            const medias = elem.querySelectorAll('img, video, iframe');
+            if (medias.length === 0) {
                 const clone = elem.cloneNode(true);
-                clone.querySelectorAll('img, video, iframe').forEach(n => n.remove());
                 const text = wrapPersistedInlineStyles(elem, clone.innerHTML.trim());
                 if (text.length > 0) {
                     blocks.push({ type: 'paragraph', data: { text } });
@@ -12584,7 +12667,6 @@ class AdminManager {
                 return;
             }
 
-            // Walk child nodes: accumulate text/inline nodes, flush as paragraph before each <img>
             let pendingHTML = '';
             const flushPending = () => {
                 const trimmed = pendingHTML.trim();
@@ -12595,14 +12677,31 @@ class AdminManager {
             };
 
             for (const child of elem.childNodes) {
-                if (child.nodeType === Node.ELEMENT_NODE && child.tagName.toLowerCase() === 'img') {
-                    flushPending();
-                    pushImageBlock(child);
-                } else {
-                    pendingHTML += child.nodeType === Node.TEXT_NODE
-                        ? child.textContent
-                        : child.outerHTML || '';
+                if (child.nodeType === Node.ELEMENT_NODE) {
+                    const tag = child.tagName.toLowerCase();
+                    if (tag === 'img') {
+                        flushPending();
+                        pushImageBlock(child);
+                        continue;
+                    } else if (tag === 'video') {
+                        flushPending();
+                        pushVideoBlock(child);
+                        continue;
+                    } else if (tag === 'iframe') {
+                        flushPending();
+                        pushIframeBlock(child);
+                        continue;
+                    } else if (tag === 'div' && child.querySelector('iframe')) {
+                        const iframe = child.querySelector('iframe');
+                        flushPending();
+                        pushIframeBlock(iframe);
+                        continue;
+                    }
                 }
+                
+                pendingHTML += child.nodeType === Node.TEXT_NODE
+                    ? child.textContent
+                    : child.outerHTML || '';
             }
             flushPending();
         };
@@ -12620,7 +12719,7 @@ class AdminManager {
                 const tagName = elem.tagName.toLowerCase();
 
                 if (tagName === 'p' || tagName === 'div') {
-                    pushParagraphOrImages(elem);
+                    pushParagraphOrMedia(elem);
                 } else if (tagName === 'h1' || tagName === 'h2' || tagName === 'h3' || tagName === 'h4' || tagName === 'h5' || tagName === 'h6') {
                     const level = parseInt(tagName.charAt(1)) || 2;
                     const text = wrapPersistedInlineStyles(elem, elem.innerHTML || elem.textContent || '');
@@ -12658,6 +12757,10 @@ class AdminManager {
                     blocks.push({ type: 'delimiter', data: {} });
                 } else if (tagName === 'img') {
                     pushImageBlock(elem);
+                } else if (tagName === 'video') {
+                    pushVideoBlock(elem);
+                } else if (tagName === 'iframe') {
+                    pushIframeBlock(elem);
                 }
             }
         }
@@ -12695,7 +12798,19 @@ class AdminManager {
                     return url ? `<figure><img src="${url}" alt="${alt}"><figcaption>${alt}</figcaption></figure>` : '';
                 case 'youtubeVideo':
                     const ytUrl = block.data?.url || '';
-                    return ytUrl ? `<p><a href="${ytUrl}">YouTube Video: ${ytUrl}</a></p>` : '';
+                    if (!ytUrl) return '';
+                    const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                    if (ytMatch) {
+                        return `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div>`;
+                    }
+                    const vimeoMatch = ytUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+                    if (vimeoMatch) {
+                        return `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div>`;
+                    }
+                    return `<p><a href="${ytUrl}">${ytUrl}</a></p>`;
+                case 'video':
+                    const vidUrl = block.data?.file?.url || block.data?.url || '';
+                    return vidUrl ? `<p><video src="${vidUrl}" controls style="max-width:100%;height:auto;border-radius:10px;"></video></p>` : '';
                 default:
                     return '';
             }
