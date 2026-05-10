@@ -4279,63 +4279,80 @@ class ContentManager {
                     ? rawBlocks.slice(startIndex)
                     : rawBlocks;
 
-            return blocksForRender.map(block => {
-                switch (block.type) {
-                    case 'header':
-                        return `<h${block.data.level} class="block-header">${block.data.text}</h${block.data.level}>`;
-                    case 'paragraph':
-                        if (isIgnorableParagraph(block)) return '';
-                        return `<p class="block-paragraph">${block.data.text}</p>`;
-                    case 'list':
-                        const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
-                        const items = (Array.isArray(block.data.items) ? block.data.items : [])
-                            .map(item => this.formatEditorListItem(item))
-                            .join('');
-                        return `<${listTag} class="block-list">${items}</${listTag}>`;
-                    case 'image':
-                        const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
-                        const classes = [
-                            'block-image',
-                            block.data.withBorder ? 'with-border' : '',
-                            block.data.withBackground ? 'with-background' : '',
-                            block.data.stretched ? 'stretched' : ''
-                        ].join(' ');
-                        return `<figure class="${classes}"><img src="${block.data.file.url}" alt="${block.data.caption || ''}">${caption}</figure>`;
-                    case 'quote':
-                        return `<blockquote class="block-quote"><p>${block.data.text}</p><cite>${block.data.caption}</cite></blockquote>`;
-                    case 'delimiter':
-                        return `<div class="block-delimiter">***</div>`;
-                    case 'youtubeVideo': {
-                        const ytUrl = block.data?.url || '';
-                        const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                        const ytId = ytMatch ? ytMatch[1] : null;
-                        if (!ytId) return '';
-                        return `
-                            <div class="block-embed-wrapper cms-yt-embed-wrapper">
-                                <div class="block-embed cms-yt-embed">
-                                    <iframe
-                                        src="https://www.youtube.com/embed/${ytId}"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen
-                                        class="cms-yt-embed-frame">
-                                    </iframe>
+            return blocksForRender.map((block) => {
+                try {
+                    if (!block || typeof block !== 'object') return '';
+
+                    const type = String(block.type || '').toLowerCase();
+                    const data = block.data || {};
+
+                    switch (type) {
+                        case 'header': {
+                            const level = Math.min(Math.max(Number(data.level) || 2, 1), 6);
+                            return `<h${level} class="block-header">${data.text || ''}</h${level}>`;
+                        }
+                        case 'paragraph':
+                            if (isIgnorableParagraph(block)) return '';
+                            return `<p class="block-paragraph">${data.text || ''}</p>`;
+                        case 'list': {
+                            const listTag = data.style === 'ordered' ? 'ol' : 'ul';
+                            const items = (Array.isArray(data.items) ? data.items : [])
+                                .map(item => this.formatEditorListItem(item))
+                                .join('');
+                            return `<${listTag} class="block-list">${items}</${listTag}>`;
+                        }
+                        case 'image': {
+                            const imageUrl = data?.file?.url || data?.url || '';
+                            if (!imageUrl) return '';
+                            const caption = data.caption ? `<figcaption>${data.caption}</figcaption>` : '';
+                            const classes = [
+                                'block-image',
+                                data.withBorder ? 'with-border' : '',
+                                data.withBackground ? 'with-background' : '',
+                                data.stretched ? 'stretched' : ''
+                            ].filter(Boolean).join(' ');
+                            return `<figure class="${classes}"><img src="${imageUrl}" alt="${data.caption || ''}">${caption}</figure>`;
+                        }
+                        case 'quote':
+                            return `<blockquote class="block-quote"><p>${data.text || ''}</p>${data.caption ? `<cite>${data.caption}</cite>` : ''}</blockquote>`;
+                        case 'delimiter':
+                            return `<div class="block-delimiter">***</div>`;
+                        case 'youtubevideo': {
+                            const ytUrl = data?.url || '';
+                            const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                            const ytId = ytMatch ? ytMatch[1] : null;
+                            if (!ytId) return '';
+                            return `
+                                <div class="block-embed-wrapper cms-yt-embed-wrapper">
+                                    <div class="block-embed cms-yt-embed">
+                                        <iframe
+                                            src="https://www.youtube.com/embed/${ytId}"
+                                            frameborder="0"
+                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen
+                                            class="cms-yt-embed-frame">
+                                        </iframe>
+                                    </div>
                                 </div>
-                            </div>
-                        `;
+                            `;
+                        }
+                        case 'embed':
+                        case 'video':
+                            if (!data.embed) return '';
+                            return `
+                                <div class="block-embed-wrapper">
+                                    <div class="block-embed">
+                                        <iframe src="${data.embed}" width="${data.width || ''}" height="${data.height || ''}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                                    </div>
+                                    ${data.caption ? `<div class="block-embed-caption">${data.caption}</div>` : ''}
+                                </div>
+                            `;
+                        default:
+                            return '';
                     }
-                    case 'embed': // Keep for backward compatibility
-                    case 'video': // Legacy key
-                        return `
-                            <div class="block-embed-wrapper">
-                                <div class="block-embed">
-                                    <iframe src="${block.data.embed}" width="${block.data.width}" height="${block.data.height}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                                </div>
-                                ${block.data.caption ? `<div class="block-embed-caption">${block.data.caption}</div>` : ''}
-                            </div>
-                        `;
-                    default:
-                        return '';
+                } catch (blockError) {
+                    console.warn('[ContentManager] Skipping malformed block:', blockError);
+                    return '';
                 }
             }).join('');
         }
