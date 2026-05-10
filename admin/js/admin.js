@@ -5790,10 +5790,13 @@ class AdminManager {
 
                     if (byLines.length > 1) return byLines;
 
-                    return selectedText
-                        .split(/[.!?]\s+/)
+                    // Split single-paragraph selection into sentences while keeping punctuation.
+                    const bySentences = selectedText.match(/[^.!?\n]+[.!?]?/g) || [];
+                    const cleaned = bySentences
                         .map((line) => line.trim())
                         .filter(Boolean);
+
+                    return cleaned.length > 0 ? cleaned : [selectedText];
                 };
 
                 const updateCachedSelection = () => {
