@@ -6141,7 +6141,7 @@ class AdminManager {
                         return { sel, range };
                     };
 
-                    const textBlockSelector = 'p, li, h1, h2, h3, h4, h5, h6, blockquote';
+                    const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
 
                     const getSelectedBlocks = () => {
                         const ctx = selectionInsideSurface();
@@ -6171,8 +6171,13 @@ class AdminManager {
 
                         const selected = [];
                         for (let i = startIndex; i <= endIndex; i++) {
-                            const content = allBlocks[i].querySelector(textBlockSelector);
-                            if (content) selected.push(content);
+                            let content = allBlocks[i].querySelector(textBlockSelector);
+                            if (content) {
+                                selected.push(content);
+                            } else if (allBlocks[i].innerText.trim()) {
+                                // Fallback: use innerText if no specific content element is found
+                                selected.push({ textContent: allBlocks[i].innerText, closest: () => allBlocks[i] });
+                            }
                         }
                         return selected;
                     };
