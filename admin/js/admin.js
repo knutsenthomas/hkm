@@ -6224,16 +6224,35 @@ class AdminManager {
                 if (!this._lastDocsSelectionRange) return false;
                 const sel = window.getSelection ? window.getSelection() : null;
                 if (!sel) return false;
-                sel.removeAllRanges();
-                sel.addRange(this._lastDocsSelectionRange);
-                return true;
+                
+                try {
+                    sel.removeAllRanges();
+                    sel.addRange(this._lastDocsSelectionRange);
+                    
+                    // Force focus on the container element to ensure execCommand works
+                    const container = this._lastDocsSelectionRange.commonAncestorContainer;
+                    const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
+                    if (el && typeof el.focus === 'function') {
+                        el.focus();
+                    }
+                    return true;
+                } catch (e) {
+                    console.warn('Selection restoration failed:', e);
+                    return false;
+                }
             };
 
             const exec = (command, value = null) => {
-                if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
-                restoreSelectionRange();
+                const restored = restoreSelectionRange();
+                if (!restored && docsSurface) {
+                    docsSurface.focus();
+                }
+                
+                // Extra safety: ensure document focus is correct
                 document.execCommand(command, false, value);
-                saveSelectionRange();
+                
+                // Immediately save the new selection after command
+                setTimeout(() => saveSelectionRange(), 10);
             };
 
             const selectionInsideSurface = () => {
