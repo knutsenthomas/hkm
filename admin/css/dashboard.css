@@ -2331,23 +2331,40 @@ textarea.form-control {
     z-index: 10;
 }
 
-/* Editor.js Clean UI: Fjern prikker og flytt pluss-tegn */
+/* Editor.js Clean UI: Gjenopprett innstillinger (prikker) for funksjonalitet, men gjør dem diskrete */
 .ce-toolbar__settings-btn {
-    display: none !important;
+    display: flex !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    opacity: 0.3;
+    transition: all 0.2s ease;
+    margin-left: 4px;
+}
+
+.ce-toolbar__settings-btn:hover {
+    opacity: 1;
+    background-color: #f1f5f9 !important;
+    color: #1B4965 !important;
 }
 
 .ce-toolbar__plus {
-    left: -6px !important;
+    left: -10px !important;
     transition: all 0.2s ease;
+    opacity: 0.6;
 }
 
 .ce-toolbar__plus:hover {
+    opacity: 1;
     background-color: #f1f5f9 !important;
     color: #1B4965 !important;
 }
 
 .ce-toolbar__actions {
     padding-right: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
 }
 
 .codex-editor__redactor {
