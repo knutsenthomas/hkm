@@ -6311,7 +6311,19 @@ class AdminManager {
                     h4: () => exec('formatBlock', 'h4'),
                     h5: () => exec('formatBlock', 'h5'),
                     h6: () => exec('formatBlock', 'h6'),
-                    removeFormat: () => exec('removeFormat'),
+                    removeFormat: () => {
+                        exec('removeFormat');
+                        // Extra deep cleaning: strip all style attributes from selection
+                        const ctx = selectionInsideSurface();
+                        if (ctx && !ctx.sel.isCollapsed) {
+                            const range = ctx.sel.getRangeAt(0);
+                            const fragment = range.cloneContents();
+                            const div = document.createElement('div');
+                            div.appendChild(fragment);
+                            div.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
+                            exec('insertHTML', div.innerHTML);
+                        }
+                    },
                     outdent: () => exec('outdent'),
                     indent: () => exec('indent'),
                     checklist: () => insertChecklist(),
@@ -6454,6 +6466,27 @@ class AdminManager {
 
                 docsSurface.addEventListener('keyup', () => {
                     if (typeof updateActiveStates === 'function') updateActiveStates();
+                });
+
+                // Wix/External Paste Sanitizer
+                docsSurface.addEventListener('paste', (e) => {
+                    const html = e.clipboardData.getData('text/html');
+                    if (html && (html.includes('wix-') || html.includes('mso-') || html.includes('style='))) {
+                        e.preventDefault();
+                        const doc = new DOMParser().parseFromString(html, 'text/html');
+                        
+                        // Strip all styles, classes, and meta tags
+                        doc.querySelectorAll('*').forEach(el => {
+                            el.removeAttribute('style');
+                            el.removeAttribute('class');
+                            el.removeAttribute('id');
+                        });
+                        
+                        // Remove non-essential tags but keep structure
+                        const cleanHtml = doc.body.innerHTML;
+                        exec('insertHTML', cleanHtml);
+                        console.log('Sanitized paste from external source (Wix/Word/etc)');
+                    }
                 });
             }
 
