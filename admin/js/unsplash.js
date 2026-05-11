@@ -142,6 +142,7 @@ class UnsplashManager {
                     // men inkluderer krediterings-informasjon i alt-teksten hvis ønskelig
                     this.onSelectCallback({
                         url: img.urls.regular,
+                        caption: `Foto av ${img.user.name} på Unsplash`,
                         attribution: `Foto av ${img.user.name} på Unsplash`,
                         downloadLocation: img.links.download_location
                     });

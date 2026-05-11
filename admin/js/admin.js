@@ -5636,18 +5636,40 @@ class AdminManager {
                              
                               <h4 class="sidebar-section-title">OMSLAGSBILDE</h4>
                               <div class="sidebar-group">
-                                  <div class="sidebar-img-preview" id="sidebar-img-trigger" style="cursor: pointer; position: relative; overflow: hidden; border: 2px dashed #e2e8f0; border-radius: 12px; height: 160px; display: flex; align-items: center; justify-content: center; background: #f8fafc; transition: all 0.2s;">
-                                      ${item.imageUrl ? `<img src="${item.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>'}
-                                      <div class="upload-overlay" style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(15, 23, 42, 0.7); color: #fff; font-size: 11px; padding: 6px; text-align: center; opacity: 0; transition: opacity 0.2s;">KLIKK FOR Å ENDRE</div>
+                                  <div class="premium-media-card" style="background: white; border: 1px solid #e2e8f0; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); transition: all 0.3s ease;">
+                                      <!-- Preview Area -->
+                                      <div id="sidebar-img-trigger" style="aspect-ratio: 16/9; background: #f8fafc; display: flex; align-items: center; justify-content: center; position: relative; cursor: pointer; border-bottom: 1px solid #f1f5f9; overflow: hidden;">
+                                          <div id="sidebar-img-preview" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">
+                                              ${item.imageUrl ? `<img src="${item.imageUrl}" style="width: 100%; height: 100%; object-fit: cover;">` : `
+                                                  <div style="text-align: center; color: #94a3b8;">
+                                                      <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 8px; opacity: 0.5;">add_a_photo</span>
+                                                      <div style="font-size: 12px; font-weight: 500;">Klikk for å laste opp</div>
+                                                  </div>
+                                              `}
+                                          </div>
+                                          <div class="upload-overlay" style="position: absolute; inset: 0; background: rgba(15, 23, 42, 0.4); display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;">
+                                              <span style="color: white; font-size: 12px; font-weight: 700; background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 20px; backdrop-filter: blur(4px);">ENDRE BILDE</span>
+                                          </div>
+                                      </div>
+                                      
+                                      <!-- Actions Area -->
+                                      <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+                                          <div style="display: flex; gap: 8px;">
+                                              <button type="button" id="sidebar-img-upload-btn" class="btn-ghost" style="flex: 1; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #475569;">
+                                                  <span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp
+                                              </button>
+                                              <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="flex: 1; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #1B4965;">
+                                                  <span class="material-symbols-outlined" style="font-size: 20px;">image_search</span> Unsplash
+                                              </button>
+                                          </div>
+                                          
+                                          <div style="position: relative;">
+                                              <input type="text" id="col-item-img" class="sidebar-control" style="padding-right: 40px; font-size: 12px; height: 38px; background: #f1f5f9; border: 1px solid transparent;" placeholder="Eller lim inn URL..." value="${item.imageUrl || ''}">
+                                              <span class="material-symbols-outlined" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 18px; color: #94a3b8;">link</span>
+                                          </div>
+                                      </div>
                                   </div>
                                   <input type="file" id="col-item-img-file" style="display: none;" accept="image/*">
-                                  <input type="text" id="col-item-img" class="sidebar-control" style="margin-top:8px;" placeholder="Eller lim inn bilde-URL" value="${item.imageUrl || ''}">
-                                  
-                                  <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="width: 100%; margin-top: 12px; justify-content: center; gap: 8px; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; font-weight: 600; color: #1B4965; display: flex; align-items: center;">
-                                      <span class="material-symbols-outlined">image_search</span> Hent fra Unsplash
-                                  </button>
-
-                                  <p style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Tips: Last opp fra maskinen, lim inn URL eller søk på Unsplash.</p>
                               </div>
 
                              <h4 class="sidebar-section-title">TAGGER</h4>
@@ -5897,6 +5919,61 @@ class AdminManager {
                 }
             }
 
+            class UnsplashImageTool {
+                static get toolbox() {
+                    return {
+                        title: 'Unsplash',
+                        icon: '<span class="material-symbols-outlined">image_search</span>'
+                    };
+                }
+
+                constructor({ api }) {
+                    this.api = api;
+                }
+
+                render() {
+                    const btn = document.createElement('div');
+                    btn.style.cssText = 'padding: 24px; border: 2px dashed #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; color: #1B4965; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s ease;';
+                    btn.innerHTML = `
+                        <span class="material-symbols-outlined" style="font-size: 32px;">image_search</span>
+                        <span>Klikk for å hente bilde fra Unsplash</span>
+                    `;
+                    
+                    btn.onmouseover = () => {
+                        btn.style.background = '#f0f9ff';
+                        btn.style.borderColor = '#1B4965';
+                    };
+                    btn.onmouseout = () => {
+                        btn.style.background = 'transparent';
+                        btn.style.borderColor = '#e2e8f0';
+                    };
+
+                    btn.onclick = () => {
+                        if (window.unsplashManager) {
+                            window.unsplashManager.open((selection) => {
+                                if (selection && selection.url) {
+                                    const index = this.api.blocks.getCurrentBlockIndex();
+                                    this.api.blocks.insert('image', {
+                                        file: { url: selection.url },
+                                        caption: selection.caption || '',
+                                        withBorder: false,
+                                        withBackground: false,
+                                        stretched: false
+                                    });
+                                    this.api.blocks.delete(index);
+                                }
+                            });
+                        }
+                    };
+
+                    return btn;
+                }
+
+                save() {
+                    return {};
+                }
+            }
+
             // Defines tools conditionally to prevent crashes if scripts fail to load
             const toolsConfig = {};
 
@@ -5954,6 +6031,11 @@ class AdminManager {
             // Video tool – custom YoutubeVideoTool (defined above, always available)
             toolsConfig.youtubeVideo = {
                 class: YoutubeVideoTool
+            };
+
+            // Unsplash tool – custom UnsplashImageTool
+            toolsConfig.unsplash = {
+                class: UnsplashImageTool
             };
 
             console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
@@ -6786,105 +6868,95 @@ class AdminManager {
                 });
             }
 
-            // Image Preview Listener
+            // --- Image Management Logic (Premium UI) ---
             const imgInput = document.getElementById('col-item-img');
-            if (imgInput) {
-                imgInput.addEventListener('input', (e) => {
-                    const url = e.target.value;
-                    const box = document.getElementById('sidebar-img-trigger');
-                    if (box) {
-                        if (url && url.length > 10) {
-                            box.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
-                        } else {
-                            box.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
+            const imgTrigger = document.getElementById('sidebar-img-trigger');
+            const preview = document.getElementById('sidebar-img-preview');
+            const imgFile = document.getElementById('col-item-img-file');
+            const uploadBtn = document.getElementById('sidebar-img-upload-btn');
+            const unsplashBtn = document.getElementById('unsplash-trigger-btn');
+
+            if (imgTrigger && imgFile) {
+                // Drag & Drop Listeners
+                imgTrigger.ondragover = (e) => { 
+                    e.preventDefault(); 
+                    imgTrigger.style.borderColor = '#1B4965';
+                    imgTrigger.style.background = '#f0f9ff';
+                };
+                imgTrigger.ondragleave = (e) => { 
+                    e.preventDefault(); 
+                    imgTrigger.style.borderColor = '#f1f5f9';
+                    imgTrigger.style.background = '#f8fafc';
+                };
+                imgTrigger.ondrop = async (e) => {
+                    e.preventDefault();
+                    imgTrigger.style.borderColor = '#f1f5f9';
+                    imgTrigger.style.background = '#f8fafc';
+                    const file = e.dataTransfer.files[0];
+                    if (file) await handleImageUpload(file);
+                };
+
+                // Upload Actions
+                if (uploadBtn) uploadBtn.onclick = (e) => { e.stopPropagation(); imgFile.click(); };
+                imgTrigger.onclick = (e) => { if (e.target.closest('#sidebar-img-trigger')) imgFile.click(); };
+
+                imgFile.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (file) await handleImageUpload(file);
+                };
+
+                // Real-time Preview Update
+                if (imgInput) {
+                    imgInput.addEventListener('input', (e) => {
+                        const url = e.target.value;
+                        if (preview) {
+                            if (url && url.length > 10) {
+                                preview.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
+                            } else {
+                                preview.innerHTML = `
+                                    <div style="text-align: center; color: #94a3b8;">
+                                        <span class="material-symbols-outlined" style="font-size: 40px; margin-bottom: 8px; opacity: 0.5;">add_a_photo</span>
+                                        <div style="font-size: 12px; font-weight: 500;">Klikk for å laste opp</div>
+                                    </div>`;
+                            }
                         }
-                    }
-                });
-            }
+                    });
+                }
 
-                        const imgTrigger = document.getElementById('sidebar-img-trigger');
-                        const imgFile = document.getElementById('col-item-img-file');
-                        if (imgTrigger && imgFile) {
-                                // Nytt design: drag/drop, knapp og forhåndsvisning
-                                imgTrigger.innerHTML = `
-                                    <div class="design-ui-upload-card" style="width:100%;height:120px;cursor:pointer;align-items:center;justify-content:center;">
-                                        <div class="design-ui-upload-card-preview" id="sidebar-img-preview">
-                                            <span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>
-                                        </div>
-                                        <div class="design-ui-upload-card-body">
-                                            <div class="design-ui-upload-card-label">Last opp bilde</div>
-                                            <div class="design-ui-upload-card-hint">Klikk eller slipp fil her</div>
-                                            <div class="design-ui-upload-card-actions">
-                                                <button type="button" class="btn btn-secondary" id="sidebar-img-upload-btn">Velg bilde</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                                const preview = document.getElementById('sidebar-img-preview');
-                                const uploadBtn = document.getElementById('sidebar-img-upload-btn');
-                                // Drag/drop
-                                imgTrigger.ondragover = (e) => { e.preventDefault(); imgTrigger.style.opacity = '0.7'; };
-                                imgTrigger.ondragleave = (e) => { e.preventDefault(); imgTrigger.style.opacity = '1'; };
-                                imgTrigger.ondrop = async (e) => {
-                                    e.preventDefault();
-                                    imgTrigger.style.opacity = '1';
-                                    const file = e.dataTransfer.files[0];
-                                    if (file) await handleImageUpload(file);
-                                };
-                                // Knapp
-                                uploadBtn.onclick = () => imgFile.click();
-                                // File input
-                                imgFile.onchange = async (e) => {
-                                    const file = e.target.files[0];
-                                    if (file) await handleImageUpload(file);
-                                };
-                                // Preview oppdatering
-                                imgInput.addEventListener('input', (e) => {
-                                    const url = e.target.value;
-                                    if (preview) {
-                                        if (url && url.length > 10) {
-                                            preview.innerHTML = `<img src="${url}" style="max-width:100%;max-height:100px;object-fit:contain;border-radius:6px;">`;
-                                        } else {
-                                            preview.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
-                                        }
-                                    }
-                                });
-
-                                // --- Unsplash Listener ---
-                                const unsplashBtn = document.getElementById('unsplash-trigger-btn');
-                                if (unsplashBtn) {
-                                    unsplashBtn.onclick = () => {
-                                        if (window.unsplashManager) {
-                                            window.unsplashManager.open((selection) => {
-                                                if (selection && selection.url) {
-                                                    imgInput.value = selection.url;
-                                                    // Trigger input event for å oppdatere preview
-                                                    imgInput.dispatchEvent(new Event('input'));
-                                                }
-                                            });
-                                        } else {
-                                            console.error('UnsplashManager ikke initialisert');
-                                        }
-                                    };
+                // --- Unsplash Listener ---
+                if (unsplashBtn) {
+                    unsplashBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (window.unsplashManager) {
+                            window.unsplashManager.open((selection) => {
+                                if (selection && selection.url) {
+                                    imgInput.value = selection.url;
+                                    imgInput.dispatchEvent(new Event('input'));
                                 }
-                                // Felles opplaster
-                                const handleImageUpload = async (file) => {
-                                    if (!file) return;
-                                    preview.innerHTML = '<span class="loader-sm"></span>';
-                                    try {
-                                        const path = `covers/${collectionId}/${Date.now()}_${file.name}`;
-                                        const url = await firebaseService.uploadImage(file, path);
-                                        imgInput.value = url;
-                                        imgInput.dispatchEvent(new Event('input'));
-                                        this.showToast('Bilde lastet opp!', 'success');
-                                    } catch (err) {
-                                        console.error("Upload error:", err);
-                                        this.showToast('Kunne ikke laste opp bilde.', 'error');
-                                        preview.innerHTML = '<span class="material-symbols-outlined" style="opacity:0.3; font-size:48px;">add_a_photo</span>';
-                                    }
-                                };
+                            });
                         }
+                    };
+                }
 
+                // Shared Upload Handler
+                const handleImageUpload = async (file) => {
+                    if (!file) return;
+                    const originalContent = preview.innerHTML;
+                    preview.innerHTML = '<div class="loader-sm"></div>';
+                    try {
+                        const compressed = await this.compressImage(file, 1200, 0.8);
+                        const fileName = `blog/${Date.now()}_${file.name}`;
+                        const url = await firebaseService.uploadFile(compressed, fileName);
+                        imgInput.value = url;
+                        imgInput.dispatchEvent(new Event('input'));
+                        this.showToast('Bilde lastet opp!', 'success');
+                    } catch (error) {
+                        console.error('Upload error:', error);
+                        preview.innerHTML = originalContent;
+                        this.showToast('Kunne ikke laste opp bilde.', 'error');
+                    }
+                };
+            }
             const closeBtn = modal.querySelector('#close-col-modal');
             if (closeBtn) {
                 closeBtn.onclick = () => {
