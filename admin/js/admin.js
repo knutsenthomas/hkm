@@ -6179,37 +6179,84 @@ class AdminManager {
                 return contact;
             };
 
-            // Tving EditorJS-modus for blogg, undervisning og podcast
-            editor = new EditorJS({
-                holder: editorHolderId,
-                data: editorData,
-                placeholder: 'Trykk "/" for å velge blokker...',
-                tools: toolsConfig,
-                logLevel: 'ERROR',
-                onReady: () => {
+            // --- Editor Initialization ---
+            if (shouldUseDocsLikeEditor) {
+                console.log("[AdminManager] Initializing Single Surface (Docs-like) Editor for:", collectionId);
+                const holder = getEditorHolder();
+                if (holder) {
+                    holder.classList.add('docs-rte-surface');
+                    holder.setAttribute('contenteditable', 'true');
+                    holder.setAttribute('spellcheck', 'true');
+                    holder.style.outline = 'none';
+                    holder.style.minHeight = '600px';
+                    
+                    // Convert blocks to HTML for the single surface
+                    const initialHtml = this.editorJsBlocksToHtml(editorData?.blocks || []);
+                    holder.innerHTML = initialHtml || '<p><br></p>';
+                    
+                    // Mock EditorJS instance for compatibility with save/tools
+                    editor = {
+                        save: async () => {
+                            const html = holder.innerHTML;
+                            return this.htmlToEditorJsBlocks(html);
+                        },
+                        destroy: () => {
+                            holder.removeAttribute('contenteditable');
+                            holder.innerHTML = '';
+                        },
+                        blocks: {
+                            insert: (type, data) => {
+                                // Fallback for programmatic inserts
+                                const html = type === 'header' ? `<h${data.level || 2}>${data.text || ''}</h${data.level || 2}>` : `<p>${data.text || ''}</p>`;
+                                document.execCommand('insertHTML', false, html);
+                            }
+                        }
+                    };
+                    
+                    // Ensure focus works on the whole paper
+                    const paper = modal.querySelector('.editor-paper');
+                    if (paper) {
+                        paper.onclick = (e) => {
+                            if (e.target === paper) holder.focus();
+                        };
+                    }
+
+                    // Expose for toolbar handlers
                     this._activeEditorInstance = editor;
-                    assertEditorContact('onReady');
-                    this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
-                    if (typeof Undo !== 'undefined') {
-                        try {
-                            editorUndo = new Undo({
-                                editor,
-                                maxLength: 100,
-                                config: {
-                                    debounceTimer: 150,
-                                    shortcuts: {
-                                        undo: ['CMD+Z'],
-                                        redo: ['CMD+SHIFT+Z', 'CMD+Y']
+                }
+            } else {
+                // Standard Block-based EditorJS
+                editor = new EditorJS({
+                    holder: editorHolderId,
+                    data: editorData,
+                    placeholder: 'Trykk "/" for å velge blokker...',
+                    tools: toolsConfig,
+                    logLevel: 'ERROR',
+                    onReady: () => {
+                        this._activeEditorInstance = editor;
+                        assertEditorContact('onReady');
+                        this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
+                        if (typeof Undo !== 'undefined') {
+                            try {
+                                editorUndo = new Undo({
+                                    editor,
+                                    maxLength: 100,
+                                    config: {
+                                        debounceTimer: 150,
+                                        shortcuts: {
+                                            undo: ['CMD+Z'],
+                                            redo: ['CMD+SHIFT+Z', 'CMD+Y']
+                                        }
                                     }
-                                }
-                            });
-                            editorUndo.initialize(editorData || { blocks: [] });
-                        } catch (error) {
-                            console.warn('Could not initialize editor undo history:', error);
+                                });
+                                editorUndo.initialize(editorData || { blocks: [] });
+                            } catch (error) {
+                                console.warn('Could not initialize editor undo history:', error);
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
 
             // Common editor surface utilities
             const getDocsSurface = () => getEditorHolder();
@@ -6656,24 +6703,29 @@ class AdminManager {
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 const updateActiveStates = async () => {
+                    const isDocs = !!modal.querySelector('.docs-rte-surface[contenteditable="true"]');
                     const states = {
                         bold: document.queryCommandState('bold'),
                         italic: document.queryCommandState('italic'),
                         underline: document.queryCommandState('underline'),
                         strike: document.queryCommandState('strikeThrough'),
+                        list: document.queryCommandState('insertUnorderedList'),
+                        orderedList: document.queryCommandState('insertOrderedList'),
                         link: !!document.getSelection()?.anchorNode?.parentElement?.closest('a')
                     };
 
-                    // Check list state
-                    const activeIndex = currentEditor?.blocks?.getCurrentBlockIndex();
-                    if (typeof activeIndex === 'number' && activeIndex >= 0) {
-                        const block = currentEditor.blocks.getBlockByIndex(activeIndex);
-                        const type = (block?.name || block?.type || '').toLowerCase();
-                        if (type === 'list') {
-                            const data = await block.save();
-                            const style = data?.data?.style || data?.style;
-                            states.list = style !== 'ordered';
-                            states.orderedList = style === 'ordered';
+                    if (!isDocs) {
+                        // Check list state for EditorJS mode
+                        const activeIndex = currentEditor?.blocks?.getCurrentBlockIndex();
+                        if (typeof activeIndex === 'number' && activeIndex >= 0) {
+                            const block = currentEditor.blocks.getBlockByIndex(activeIndex);
+                            const type = (block?.name || block?.type || '').toLowerCase();
+                            if (type === 'list') {
+                                const data = await block.save();
+                                const style = data?.data?.style || data?.style;
+                                states.list = style !== 'ordered';
+                                states.orderedList = style === 'ordered';
+                            }
                         }
                     }
 
@@ -6737,40 +6789,22 @@ class AdminManager {
 
                 const toolHandlers = shouldUseDocsLikeEditor ? {
                     ...commonHandlers,
-                    paragraph: () => convertSelectionToParagraphs(),
+                    paragraph: () => exec('formatBlock', 'p'),
                     h1: () => exec('formatBlock', 'h1'),
                     h2: () => exec('formatBlock', 'h2'),
                     h3: () => exec('formatBlock', 'h3'),
                     h4: () => exec('formatBlock', 'h4'),
                     h5: () => exec('formatBlock', 'h5'),
                     h6: () => exec('formatBlock', 'h6'),
+                    list: () => exec('insertUnorderedList'),
+                    orderedList: () => exec('insertOrderedList'),
                     removeFormat: () => {
-                        const ctx = selectionInsideSurface();
-                        if (!ctx || ctx.sel.isCollapsed) {
-                            exec('removeFormat');
-                            return;
+                        exec('removeFormat');
+                        // Also clear styles for full cleanup
+                        const sel = window.getSelection();
+                        if (sel && !sel.isCollapsed) {
+                            exec('formatBlock', 'p');
                         }
-                        
-                        const range = ctx.sel.getRangeAt(0);
-                        const fragment = range.cloneContents();
-                        const div = document.createElement('div');
-                        div.appendChild(fragment);
-                        
-                        // Deep strip: Remove ALL attributes from ALL tags
-                        div.querySelectorAll('*').forEach(el => {
-                            while (el.attributes.length > 0) {
-                                el.removeAttribute(el.attributes[0].name);
-                            }
-                            // Convert non-standard tags to spans or just keep content
-                            if (['SPAN', 'FONT', 'CENTER'].includes(el.tagName)) {
-                                const parent = el.parentNode;
-                                while (el.firstChild) parent.insertBefore(el.firstChild, el);
-                                parent.removeChild(el);
-                            }
-                        });
-                        
-                        // Replace the selection with the "naked" HTML
-                        exec('insertHTML', div.innerHTML);
                     },
                     outdent: () => exec('outdent'),
                     indent: () => exec('indent'),
@@ -6787,7 +6821,7 @@ class AdminManager {
                         if (window.unsplashManager) {
                             window.unsplashManager.open((selection) => {
                                 if (selection && selection.url) {
-                                    const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0;">`;
+                                    const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
                                     exec('insertHTML', imgHtml);
                                 }
                             });
@@ -6798,6 +6832,8 @@ class AdminManager {
                     ...commonHandlers,
                     paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                     header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
+                    list: () => replaceSelectionWithList(false),
+                    orderedList: () => replaceSelectionWithList(true),
                     image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
                     delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
