@@ -6210,49 +6210,68 @@ class AdminManager {
                 }
             };
 
+            const saveSelectionRange = () => {
+                const sel = window.getSelection ? window.getSelection() : null;
+                if (!sel || sel.rangeCount === 0) return;
+                const range = sel.getRangeAt(0);
+                const node = range.commonAncestorContainer;
+                const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                if (!el || !docsSurface.contains(el)) return;
+                this._lastDocsSelectionRange = range.cloneRange();
+            };
+
+            const restoreSelectionRange = () => {
+                if (!this._lastDocsSelectionRange) return false;
+                const sel = window.getSelection ? window.getSelection() : null;
+                if (!sel) return false;
+                sel.removeAllRanges();
+                sel.addRange(this._lastDocsSelectionRange);
+                return true;
+            };
+
+            const exec = (command, value = null) => {
+                if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
+                restoreSelectionRange();
+                document.execCommand(command, false, value);
+                saveSelectionRange();
+            };
+
+            const selectionInsideSurface = () => {
+                const sel = window.getSelection ? window.getSelection() : null;
+                if (!sel || sel.rangeCount === 0) return null;
+                const range = sel.getRangeAt(0);
+                const node = range.commonAncestorContainer;
+                const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                if (!el || !docsSurface.contains(el)) return null;
+                return { sel, range };
+            };
+
+            docsSurface.addEventListener('mouseup', () => {
+                saveSelectionRange();
+            });
+
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
-                if (shouldUseDocsLikeEditor && docsSurface) {
-                    const saveSelectionRange = () => {
-                        const sel = window.getSelection ? window.getSelection() : null;
-                        if (!sel || sel.rangeCount === 0) return;
-                        const range = sel.getRangeAt(0);
-                        const node = range.commonAncestorContainer;
-                        const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
-                        if (!el || !docsSurface.contains(el)) return;
-                        this._lastDocsSelectionRange = range.cloneRange();
-                    };
+                // Common handlers for both modes
+                const commonHandlers = {
+                    bold: () => exec('bold'),
+                    italic: () => exec('italic'),
+                    underline: () => exec('underline'),
+                    strike: () => exec('strikeThrough'),
+                    list: () => replaceSelectionWithList(false),
+                    orderedList: () => replaceSelectionWithList(true),
+                    link: () => {
+                        const ctx = selectionInsideSurface();
+                        if (!ctx || !ctx.sel || ctx.sel.isCollapsed) {
+                            window.alert('Marker tekst før du legger til lenke.');
+                            return;
+                        }
+                        const url = window.prompt('Skriv inn URL:', 'https://');
+                        if (url) exec('createLink', url);
+                    }
+                };
 
-                    const restoreSelectionRange = () => {
-                        if (!this._lastDocsSelectionRange) return false;
-                        const sel = window.getSelection ? window.getSelection() : null;
-                        if (!sel) return false;
-                        sel.removeAllRanges();
-                        sel.addRange(this._lastDocsSelectionRange);
-                        return true;
-                    };
-
-                    const exec = (command, value = null) => {
-                        if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
-                        restoreSelectionRange();
-                        document.execCommand(command, false, value);
-                        saveSelectionRange();
-                    };
-
-                    const selectionInsideSurface = () => {
-                        const sel = window.getSelection ? window.getSelection() : null;
-                        if (!sel || sel.rangeCount === 0) return null;
-                        const range = sel.getRangeAt(0);
-                        const node = range.commonAncestorContainer;
-                        const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
-                        if (!el || !docsSurface.contains(el)) return null;
-                        return { sel, range };
-                    };
-
-                    docsSurface.addEventListener('mouseup', () => {
-                        saveSelectionRange();
-                    });
-
+                if (shouldUseDocsLikeEditor) {
                     const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
                     const insertChecklist = () => {
                         const ctx = selectionInsideSurface();
@@ -6269,14 +6288,8 @@ class AdminManager {
                         exec('insertHTML', checklistHtml);
                     };
 
-                    const escapeHtml = (value) => String(value || '')
-                        .replace(/&/g, '&amp;')
-                        .replace(/</g, '&lt;')
-                        .replace(/>/g, '&gt;')
-                        .replace(/"/g, '&quot;')
-                        .replace(/'/g, '&#39;');
-
                     const toolHandlers = {
+                        ...commonHandlers,
                         paragraph: () => exec('formatBlock', 'p'),
                         h1: () => exec('formatBlock', 'h1'),
                         h2: () => exec('formatBlock', 'h2'),
@@ -6284,22 +6297,6 @@ class AdminManager {
                         h4: () => exec('formatBlock', 'h4'),
                         h5: () => exec('formatBlock', 'h5'),
                         h6: () => exec('formatBlock', 'h6'),
-                        bold: () => exec('bold'),
-                        italic: () => exec('italic'),
-                        underline: () => exec('underline'),
-                        strike: () => exec('strikeThrough'),
-                        link: () => {
-                            const ctx = selectionInsideSurface();
-                            if (!ctx || !ctx.sel || ctx.sel.isCollapsed) {
-                                window.alert('Marker tekst før du legger til lenke.');
-                                return;
-                            }
-                            const url = window.prompt('Lim inn URL (https://...)');
-                            if (!url) return;
-                            const trimmed = String(url || '').trim();
-                            if (!trimmed) return;
-                            exec('createLink', trimmed);
-                        },
                         removeFormat: () => exec('removeFormat'),
                         outdent: () => exec('outdent'),
                         indent: () => exec('indent'),
@@ -6312,20 +6309,15 @@ class AdminManager {
                             const input = desktopTools.querySelector('[data-color-input="highlight"]');
                             if (input) input.click();
                         },
-                        list: () => replaceSelectionWithList(false),
-                        orderedList: () => replaceSelectionWithList(true),
                         image: () => {
-                            const url = window.prompt('Lim inn bilde-URL');
-                            if (!url) return;
-                            const safeUrl = escapeHtml(url.trim());
-                            if (!safeUrl) return;
-                            focusSurface();
-                            document.execCommand('insertHTML', false, `<p><img src="${safeUrl}" alt="Innsatt bilde" style="max-width:100%;height:auto;border-radius:10px;" /></p><p><br></p>`);
-                        },
-                        video: () => {
-                            // Bruk kun det nye modale videoverktøyet (YoutubeVideoTool)
-                            // Ingen prompt eller legacy input lenger
-                            // Brukeren får nå kun det moderne UI-et for videoopplasting/lenke
+                            if (window.unsplashManager) {
+                                window.unsplashManager.open((selection) => {
+                                    if (selection && selection.url) {
+                                        const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0;">`;
+                                        exec('insertHTML', imgHtml);
+                                    }
+                                });
+                            }
                         },
                         quote: () => exec('formatBlock', 'blockquote')
                     };
@@ -6443,10 +6435,9 @@ class AdminManager {
                 } else {
                     // Standard non-docs editor: Link unified logic to toolbar
                     const toolHandlers = {
+                        ...commonHandlers,
                         paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
                         header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
-                        list: () => replaceSelectionWithList(false),
-                        orderedList: () => replaceSelectionWithList(true),
                         image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
                         quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
                         delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
