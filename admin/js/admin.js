@@ -6253,11 +6253,7 @@ class AdminManager {
                         saveSelectionRange();
                     });
 
-                    if (shouldUseDocsLikeEditor) {
-                        const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
-
-
-
+                    const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
                     const insertChecklist = () => {
                         const ctx = selectionInsideSurface();
                         let items = [];
@@ -6357,9 +6353,7 @@ class AdminManager {
                         saveSelectionRange();
                         if (shouldUseDocsLikeEditor) updateActiveStates();
                     });
-                    if (shouldUseDocsLikeEditor) {
-                        docsSurface.addEventListener('keyup', updateActiveStates);
-                    }
+                    docsSurface.addEventListener('keyup', updateActiveStates);
 
                     desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
                         const tool = btn.getAttribute('data-tool');
