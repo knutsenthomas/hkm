@@ -1091,90 +1091,92 @@
                 });
             }
 
-            const navLinks = document.querySelectorAll('.nav-link[data-section], .mobile-nav-item[data-section]');
+            // Navigation logic with event delegation to handle dynamic sidebar replacement
+            function handleSectionSwitch(targetSectionId, sourceLink = null) {
+                if (!targetSectionId) return;
 
-            navLinks.forEach(link => {
-                link.addEventListener('click', (e) => {
-                    const targetSectionId = link.getAttribute('data-section');
-                    if (!targetSectionId) return;
-
-                    e.preventDefault();
-                    sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, targetSectionId);
+                console.log(`Navigating to section: ${targetSectionId}`);
+                sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, targetSectionId);
+                
+                // Update URL hash if needed (without triggering a second switch)
+                if (window.location.hash !== `#${targetSectionId}`) {
                     try {
-                        history.replaceState(null, '', `#${targetSectionId}`);
+                        history.pushState(null, '', `#${targetSectionId}`);
                     } catch (_) {
-                        // noop
+                        window.location.hash = targetSectionId;
                     }
+                }
 
-                    // Close sidebar on mobile
-                    sidebar.classList.remove('active');
-                    const overlay = document.querySelector('.sidebar-overlay');
-                    if (overlay) {
-                        overlay.classList.remove('active');
-                        overlay.style.removeProperty('display');
-                        overlay.style.removeProperty('opacity');
-                        overlay.style.removeProperty('pointer-events');
+                // Update Visible Section
+                const sections = document.querySelectorAll('.section-content');
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === `${targetSectionId}-section`) {
+                        section.classList.add('active');
                     }
-
-                    // Update Active Link UI
-                    document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => l.classList.remove('active'));
-                    link.classList.add('active');
-
-                    // Sync desktop/mobile active states
-                    const sameSectionLinks = document.querySelectorAll(`[data-section="${targetSectionId}"]`);
-                    sameSectionLinks.forEach(l => l.classList.add('active'));
-
-                    // Trigger module-based rendering if available
-                    if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
-                        window.adminManager.onSectionSwitch(targetSectionId);
-                    }
-
-                    // Update Visible Section
-                    const sections = document.querySelectorAll('.section-content');
-                    sections.forEach(section => {
-                        section.classList.remove('active');
-                        if (section.id === `${targetSectionId}-section`) {
-                            section.classList.add('active');
-                        }
-                    });
-
-                    syncTopbarForSection(targetSectionId, link);
                 });
-            });
 
-            // Sidebar logic now managed by admin-header.js
-            
-            const hash = window.location.hash.substring(1);
-            const rememberedSection = sessionStorage.getItem(ADMIN_LAST_DASHBOARD_SECTION_KEY);
-            const initialSection = hash || rememberedSection || '';
-            if (initialSection) {
-                const targetLink = document.querySelector(`.nav-link[data-section="${initialSection}"]`);
-                if (targetLink) {
-                    setTimeout(() => targetLink.click(), 100); // Small delay to ensure render
+                // Trigger module-based rendering if available
+                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
+                    window.adminManager.onSectionSwitch(targetSectionId);
                 }
 
-                const pendingBtnId = sessionStorage.getItem('pendingFabAction');
-                if (pendingBtnId) {
-                    sessionStorage.removeItem('pendingFabAction');
-                    setTimeout(() => {
-                        const btn = document.getElementById(pendingBtnId);
-                        if (btn) {
-                            if (btn.tagName === 'INPUT' || btn.tagName === 'TEXTAREA') {
-                                btn.focus();
-                            } else {
-                                btn.click();
-                            }
-                        }
-                    }, 600);
-                }
-            } else {
-                const overviewLink = document.querySelector('.nav-link[data-section="overview"]');
-                if (overviewLink) {
-                    overviewLink.classList.add('active');
-                    sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, 'overview');
-                    syncTopbarForSection('overview', overviewLink);
+                // Update Active Link UI
+                document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => {
+                    const isMatch = l.getAttribute('data-section') === targetSectionId;
+                    l.classList.toggle('active', isMatch);
+                });
+
+                // Sync topbar
+                const activeLink = sourceLink || document.querySelector(`.nav-link[data-section="${targetSectionId}"], .mobile-nav-item[data-section="${targetSectionId}"]`);
+                syncTopbarForSection(targetSectionId, activeLink);
+
+                // Close sidebar on mobile
+                sidebar?.classList.remove('active');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (overlay) {
+                    overlay.classList.remove('active');
                 }
             }
+
+            // Global click delegation
+            document.addEventListener('click', (e) => {
+                const link = e.target.closest('.nav-link[data-section], .mobile-nav-item[data-section]');
+                if (link) {
+                    e.preventDefault();
+                    const targetSectionId = link.getAttribute('data-section');
+                    handleSectionSwitch(targetSectionId, link);
+                }
+            });
+
+            // Handle browser back/forward and direct hash changes
+            window.addEventListener('hashchange', () => {
+                const hash = window.location.hash.substring(1);
+                if (hash) {
+                    handleSectionSwitch(hash);
+                }
+            });
+
+            // Initial load
+            const hash = window.location.hash.substring(1);
+            const rememberedSection = sessionStorage.getItem(ADMIN_LAST_DASHBOARD_SECTION_KEY);
+            const initialSection = hash || rememberedSection || 'overview';
+            
+            // Wait slightly for AdminManager to be ready before initial switch
+            setTimeout(() => {
+                handleSectionSwitch(initialSection);
+            }, 200);
+
+            // FAB Action Restoration
+            const pendingBtnId = sessionStorage.getItem('pendingFabAction');
+            if (pendingBtnId) {
+                sessionStorage.removeItem('pendingFabAction');
+                setTimeout(() => {
+                    const btn = document.getElementById(pendingBtnId);
+                    if (btn) btn.click();
+                }, 800);
+            }
+
 
             // FAB Menu Logic
             const mainFab = document.getElementById('main-fab');

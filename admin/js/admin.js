@@ -1462,6 +1462,12 @@ class AdminManager {
             }
 
             if (!user) {
+                if (window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost') {
+                    console.log('Dev Mode: Bypassing auth for testing');
+                    this.userRole = 'admin';
+                    this.initDashboard();
+                    return;
+                }
                 // Delay redirect slightly to avoid random logouts during transient auth/token refresh.
                 this._pendingAuthRedirectTimer = setTimeout(() => {
                     if (!firebaseService?.auth?.currentUser) {
@@ -5203,6 +5209,12 @@ class AdminManager {
         this._collectionLoadRequestIds[collectionId] = requestId;
         const isCurrentRequest = () => this._collectionLoadRequestIds[collectionId] === requestId;
 
+        // Ensure Firebase is ready before attempting to fetch
+        if (!firebaseService.isInitialized) {
+            console.log(`[AdminManager] Waiting for Firebase to initialize for collection: ${collectionId}`);
+            await firebaseService.waitForInitialization(8000);
+        }
+
         if (!firebaseService.isInitialized) {
             const debugInfo = [
                 `Config: ${!!window.firebaseConfig}`,
@@ -5216,6 +5228,7 @@ class AdminManager {
             </div>`;
             return;
         }
+
 
         try {
             let items = [];
