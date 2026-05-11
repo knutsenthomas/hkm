@@ -167,6 +167,7 @@ class ContentManager {
         return item.id
             || item._id
             || item.externalGuid
+            || item.wixGuid
             || item.postId
             || item.legacyId
             || item.slug

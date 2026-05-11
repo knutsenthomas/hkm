@@ -2073,6 +2073,7 @@ function buildBlogItemStableId(item, fallback = "") {
     item.__stableId,
     item.id,
     item.externalGuid,
+    item.wixGuid,
     item.slug,
     item.url,
     item.link,
@@ -2120,7 +2121,7 @@ function buildBlogItemDedupKey(item, index = 0) {
 
   const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
   const stable = normalizeKeyFragment(buildBlogItemStableId(item, ""));
-  const externalGuid = normalizeKeyFragment(item.externalGuid || item.id || "");
+  const externalGuid = normalizeKeyFragment(item.externalGuid || item.wixGuid || item.id || "");
   const slug = normalizeKeyFragment(item.slug || "");
   const urlPath = normalizeUrlPath(item.url || item.link || "");
   const title = normalizeKeyFragment(item.title || "");
@@ -2156,7 +2157,7 @@ function buildBlogItemLookupKeys(item, index = 0) {
   };
 
   const stableId = buildBlogItemStableId(item, "");
-  const externalGuid = typeof item.externalGuid === "string" ? item.externalGuid : "";
+  const externalGuid = typeof item.externalGuid === "string" ? item.externalGuid : (typeof item.wixGuid === "string" ? item.wixGuid : "");
   const slug = typeof item.slug === "string" ? item.slug : "";
   const urlPath = normalizeUrlPath(item.url || item.link || "");
   const dedupKey = buildBlogItemDedupKey(item, index);
