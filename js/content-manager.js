@@ -3594,8 +3594,14 @@ class ContentManager {
 
     getImageFromHtml(html) {
         if (typeof html !== 'string' || !html.trim()) return '';
-        const match = html.match(/<img\b[^>]*\bsrc=["']([^"']+)["']/i);
-        return match && match[1] ? match[1].trim() : '';
+        // Try src first, then data-src as fallback
+        const srcMatch = html.match(/<img\b[^>]*\bsrc=["']([^"']+)["']/i);
+        if (srcMatch && srcMatch[1]) return srcMatch[1].trim();
+        
+        const dataSrcMatch = html.match(/<img\b[^>]*\bdata-src=["']([^"']+)["']/i);
+        if (dataSrcMatch && dataSrcMatch[1]) return dataSrcMatch[1].trim();
+        
+        return '';
     }
 
     getContentItemImage(item, fallbackItem = null, articleHtml = '') {
@@ -3610,7 +3616,7 @@ class ContentManager {
         }
 
         // Try to extract from content if not found in metadata
-        const content = articleHtml || candidates[0]?.content || candidates[0]?.contentHtml || candidates[0]?.html || '';
+        const content = articleHtml || candidates[0]?.content || candidates[0]?.contentHtml || candidates[0]?.html || candidates[0]?.body || candidates[0]?.excerpt || '';
         const htmlImage = this.normalizePublicImageUrl(this.getImageFromHtml(content));
         if (this.isRenderableImageUrl(htmlImage)) return htmlImage;
 
