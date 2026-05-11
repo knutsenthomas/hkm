@@ -5993,6 +5993,52 @@ class AdminManager {
                 }
             }
 
+            class SimpleListTool {
+                static get toolbox() {
+                    return {
+                        title: 'Liste',
+                        icon: '<span class="material-symbols-outlined">format_list_bulleted</span>'
+                    };
+                }
+
+                constructor({ data }) {
+                    this.data = {
+                        style: data?.style === 'ordered' ? 'ordered' : 'unordered',
+                        items: Array.isArray(data?.items) && data.items.length ? data.items : ['']
+                    };
+                    this.wrapper = null;
+                }
+
+                escape(value) {
+                    return String(value || '')
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#039;');
+                }
+
+                render() {
+                    const tag = this.data.style === 'ordered' ? 'ol' : 'ul';
+                    this.wrapper = document.createElement(tag);
+                    this.wrapper.className = `cdx-list cdx-list--${this.data.style}`;
+                    this.wrapper.contentEditable = 'true';
+                    this.wrapper.innerHTML = this.data.items
+                        .map((item) => `<li class="cdx-list__item">${this.escape(item)}</li>`)
+                        .join('');
+                    return this.wrapper;
+                }
+
+                save(blockContent) {
+                    return {
+                        style: this.data.style,
+                        items: Array.from(blockContent.querySelectorAll('li'))
+                            .map((li) => li.innerHTML.trim())
+                            .filter(Boolean)
+                    };
+                }
+            }
+
             // Defines tools conditionally to prevent crashes if scripts fail to load
             const toolsConfig = {};
 
@@ -6010,6 +6056,12 @@ class AdminManager {
                     inlineToolbar: true,
                     shortcut: 'CMD+SHIFT+L',
                     config: { defaultStyle: 'unordered' }
+                };
+            } else {
+                toolsConfig.list = {
+                    class: SimpleListTool,
+                    inlineToolbar: true,
+                    shortcut: 'CMD+SHIFT+L'
                 };
             }
 
@@ -6089,6 +6141,7 @@ class AdminManager {
 
             // Common editor surface utilities
             const getDocsSurface = () => document.getElementById(editorHolderId);
+            let lastSelectionSnapshot = null;
 
             const splitTextToItems = (rawText) => {
                 const text = String(rawText || '')
@@ -6139,6 +6192,29 @@ class AdminManager {
                 const surface = getDocsSurface();
                 const el = getRangeElement(range);
                 return !!(range && surface && el && surface.contains(el));
+            };
+
+            const buildSelectionSnapshot = (range) => {
+                if (!selectionRangeStillValid(range)) return null;
+                const surface = getDocsSurface();
+                const allBlocks = Array.from(surface?.querySelectorAll('.ce-block') || []);
+                const startBlock = getBlockElementFromNode(range.startContainer);
+                const endBlock = getBlockElementFromNode(range.endContainer);
+                let startIndex = allBlocks.indexOf(startBlock);
+                let endIndex = allBlocks.indexOf(endBlock);
+
+                if (startIndex === -1 && startBlock) startIndex = getBlockIndexFromElement(startBlock);
+                if (endIndex === -1 && endBlock) endIndex = getBlockIndexFromElement(endBlock);
+                if (startIndex !== -1 && endIndex !== -1 && startIndex > endIndex) {
+                    [startIndex, endIndex] = [endIndex, startIndex];
+                }
+
+                return {
+                    range: range.cloneRange(),
+                    text: String(range.toString() || '').trim(),
+                    startIndex,
+                    endIndex
+                };
             };
 
             const htmlToPlainText = (html) => {
@@ -6206,6 +6282,10 @@ class AdminManager {
                 if (!currentEditor || !currentEditor.blocks) return;
 
                 try {
+                    if (currentEditor.isReady && typeof currentEditor.isReady.then === 'function') {
+                        await currentEditor.isReady;
+                    }
+
                     const sel = window.getSelection();
                     if ((!sel || sel.rangeCount === 0 || sel.isCollapsed) && selectionRangeStillValid(this._lastDocsSelectionRange)) {
                         sel.removeAllRanges();
@@ -6213,22 +6293,19 @@ class AdminManager {
                     }
 
                     const liveRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
-                    const activeRange = selectionRangeStillValid(liveRange) ? liveRange : this._lastDocsSelectionRange;
-                    const selectedText = activeRange ? String(activeRange.toString() || '').trim() : '';
+                    const liveSnapshot = buildSelectionSnapshot(liveRange);
+                    const savedSnapshot = buildSelectionSnapshot(this._lastDocsSelectionRange) || lastSelectionSnapshot;
+                    const activeSnapshot = liveSnapshot?.text ? liveSnapshot : savedSnapshot;
+                    const selectedText = activeSnapshot?.text || '';
                     let items = [];
                     let targetIndex = -1;
                     let blocksToRemove = 0;
 
                     if (selectedText) {
                         items = splitTextToItems(selectedText);
-                        const startBlock = getBlockElementFromNode(activeRange.startContainer);
-                        const endBlock = getBlockElementFromNode(activeRange.endContainer);
-                        const allBlocks = Array.from(getDocsSurface()?.querySelectorAll('.ce-block') || []);
-                        targetIndex = getBlockIndexFromElement(startBlock);
-                        if (startBlock && endBlock && targetIndex !== -1) {
-                            let endIndex = allBlocks.indexOf(endBlock);
-                            if (endIndex === -1) endIndex = targetIndex;
-                            if (targetIndex > endIndex) [targetIndex, endIndex] = [endIndex, targetIndex];
+                        targetIndex = activeSnapshot?.startIndex ?? -1;
+                        const endIndex = activeSnapshot?.endIndex ?? targetIndex;
+                        if (targetIndex !== -1 && endIndex !== -1) {
                             blocksToRemove = (endIndex - targetIndex) + 1;
                         }
                     }
@@ -6274,6 +6351,12 @@ class AdminManager {
                     }
                 } catch (err) {
                     console.error("Critical List Error:", err);
+                    const listTag = ordered ? 'ol' : 'ul';
+                    const fallbackItems = splitTextToItems(lastSelectionSnapshot?.text || '');
+                    if (fallbackItems.length) {
+                        const html = `<${listTag}>${fallbackItems.map((item) => `<li>${escapeEditorHtml(item)}</li>`).join('')}</${listTag}>`;
+                        exec('insertHTML', html);
+                    }
                 }
             };
 
@@ -6303,6 +6386,7 @@ class AdminManager {
                 const ctx = selectionInsideSurface();
                 if (!ctx) return;
                 this._lastDocsSelectionRange = ctx.range.cloneRange();
+                lastSelectionSnapshot = buildSelectionSnapshot(ctx.range);
             };
 
             const restoreSelectionRange = () => {
@@ -6570,6 +6654,12 @@ class AdminManager {
                     desktopTools.addEventListener('click', async (e) => {
                         const btn = e.target.closest('.desktop-richtools-btn');
                         if (!btn || btn.disabled || btn.classList.contains('is-disabled')) return;
+                        if (btn.dataset.pointerHandled === 'true') {
+                            delete btn.dataset.pointerHandled;
+                            e.preventDefault();
+                            e.stopPropagation();
+                            return;
+                        }
 
                         // Always get the latest toolHandlers from the current editor context
                         // We store the current handlers on the element itself for easy access
@@ -6600,10 +6690,27 @@ class AdminManager {
                 
                 desktopTools.querySelectorAll('.desktop-richtools-btn').forEach(btn => {
                     btn.style.pointerEvents = 'auto';
-                    btn.onmousedown = (e) => { 
-                        saveSelectionRange(); 
+                    btn.onmousedown = async (e) => { 
+                        saveSelectionRange();
                         e.preventDefault(); 
-                        e.stopPropagation(); 
+                        e.stopPropagation();
+
+                        const tool = btn.getAttribute('data-tool');
+                        if (tool !== 'list' && tool !== 'orderedList') return;
+
+                        const handler = desktopTools._currentHandlers ? desktopTools._currentHandlers[tool] : null;
+                        if (!handler) return;
+
+                        btn.dataset.pointerHandled = 'true';
+                        btn.style.transform = 'scale(0.95)';
+                        setTimeout(() => btn.style.transform = '', 100);
+
+                        try {
+                            await handler();
+                            if (typeof updateActiveStates === 'function') updateActiveStates();
+                        } catch (err) {
+                            console.error(`Toolbar pointer error [${tool}]:`, err);
+                        }
                     };
                 });
 
@@ -6671,6 +6778,15 @@ class AdminManager {
                     }
 
                 // Global listeners for the editor surface
+                const selectionChangeHandler = () => {
+                    if (!document.body.contains(modal)) {
+                        document.removeEventListener('selectionchange', selectionChangeHandler);
+                        return;
+                    }
+                    saveSelectionRange();
+                };
+                document.addEventListener('selectionchange', selectionChangeHandler);
+
                 docsSurface.addEventListener('mouseup', () => {
                     saveSelectionRange();
                     if (typeof updateActiveStates === 'function') updateActiveStates();
