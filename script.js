@@ -3022,7 +3022,7 @@ window.addEventListener('load', () => {
             .hkm-chat-header {
                 margin: 0 !important;
                 flex-shrink: 0 !important;
-                background: #1B4965 !important;
+                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
                 color: #fff !important;
                 padding: 16px 20px !important;
                 display: flex !important;
