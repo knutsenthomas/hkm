@@ -5642,7 +5642,12 @@ class AdminManager {
                                   </div>
                                   <input type="file" id="col-item-img-file" style="display: none;" accept="image/*">
                                   <input type="text" id="col-item-img" class="sidebar-control" style="margin-top:8px;" placeholder="Eller lim inn bilde-URL" value="${item.imageUrl || ''}">
-                                  <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Tips: Klikk på boksen over for å laste opp bilde fra maskinen.</p>
+                                  
+                                  <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="width: 100%; margin-top: 12px; justify-content: center; gap: 8px; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px; font-weight: 600; color: #1B4965; display: flex; align-items: center;">
+                                      <span class="material-symbols-outlined">image_search</span> Hent fra Unsplash
+                                  </button>
+
+                                  <p style="font-size: 11px; color: #94a3b8; margin-top: 8px;">Tips: Last opp fra maskinen, lim inn URL eller søk på Unsplash.</p>
                               </div>
 
                              <h4 class="sidebar-section-title">TAGGER</h4>
@@ -6844,6 +6849,24 @@ class AdminManager {
                                         }
                                     }
                                 });
+
+                                // --- Unsplash Listener ---
+                                const unsplashBtn = document.getElementById('unsplash-trigger-btn');
+                                if (unsplashBtn) {
+                                    unsplashBtn.onclick = () => {
+                                        if (window.unsplashManager) {
+                                            window.unsplashManager.open((selection) => {
+                                                if (selection && selection.url) {
+                                                    imgInput.value = selection.url;
+                                                    // Trigger input event for å oppdatere preview
+                                                    imgInput.dispatchEvent(new Event('input'));
+                                                }
+                                            });
+                                        } else {
+                                            console.error('UnsplashManager ikke initialisert');
+                                        }
+                                    };
+                                }
                                 // Felles opplaster
                                 const handleImageUpload = async (file) => {
                                     if (!file) return;
@@ -8309,7 +8332,12 @@ class AdminManager {
                                 </div>
                                 <div class="form-group">
                                     <label>Bildekilde (URL)</label>
-                                    <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/...">
+                                    <div style="display: flex; gap: 8px;">
+                                        <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/..." style="flex: 1;">
+                                        <button type="button" id="cause-unsplash-btn" class="btn btn-secondary" style="padding: 0 12px; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 13px;">
+                                            <span class="material-symbols-outlined" style="font-size: 18px;">image_search</span> Unsplash
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                             <div class="modal-footer">
@@ -8333,6 +8361,21 @@ class AdminManager {
             document.getElementById('cause-form-modal').dataset.editId = '';
             document.getElementById('cause-form-modal').style.display = 'flex';
         });
+
+        // --- Unsplash Listener for Causes ---
+        const causeUnsplashBtn = document.getElementById('cause-unsplash-btn');
+        if (causeUnsplashBtn) {
+            causeUnsplashBtn.onclick = () => {
+                if (window.unsplashManager) {
+                    window.unsplashManager.open((selection) => {
+                        const input = document.getElementById('cause-image');
+                        if (input && selection && selection.url) {
+                            input.value = selection.url;
+                        }
+                    });
+                }
+            };
+        }
 
         document.getElementById('save-cause-btn').addEventListener('click', () => this.saveCause());
     }
@@ -9253,8 +9296,13 @@ class AdminManager {
                             </div>
                             <div style="grid-column:span 2;">
                                 <label style="display:block;font-weight:600;margin-bottom:6px;">Forsidebilde URL</label>
-                                <input id="course-image" type="url" placeholder="https://..."
-                                    style="width:100%;padding:12px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:1rem;">
+                                <div style="display: flex; gap: 10px;">
+                                    <input id="course-image" type="url" placeholder="https://..."
+                                        style="flex: 1; padding:12px 16px; border:1.5px solid #e2e8f0; border-radius:10px; font-size:1rem;">
+                                    <button type="button" id="course-unsplash-btn" class="btn btn-secondary" style="padding: 10px 16px; border-radius: 10px; display: flex; align-items: center; gap: 8px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer;">
+                                        <span class="material-symbols-outlined">image_search</span> Unsplash
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
@@ -9436,6 +9484,21 @@ class AdminManager {
         }
 
         modal.style.display = 'block';
+
+        // --- Unsplash Listener for Kurs ---
+        const unsplashBtn = document.getElementById('course-unsplash-btn');
+        const imgInput = document.getElementById('course-image');
+        if (unsplashBtn && imgInput) {
+            unsplashBtn.onclick = () => {
+                if (window.unsplashManager) {
+                    window.unsplashManager.open((selection) => {
+                        if (selection && selection.url) {
+                            imgInput.value = selection.url;
+                        }
+                    });
+                }
+            };
+        }
     }
 
     _closeCourseModal() {
