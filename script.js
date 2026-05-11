@@ -3418,33 +3418,53 @@ window.addEventListener('load', () => {
                 .hkm-chat-email-form {
                     display: block !important;
                 }
-                .hkm-chat-field {
-                    display: block !important;
-                    margin-bottom: 16px !important;
-                }
                 .hkm-chat-field label {
                     display: block !important;
                     font-size: 13px !important;
                     font-weight: 700 !important;
-                    color: #334155 !important;
+                    color: #1e293b !important;
                     margin-bottom: 8px !important;
+                    padding-left: 4px !important;
                 }
                 .hkm-chat-field input, .hkm-chat-field textarea {
                     display: block !important;
                     width: 100% !important;
-                    border: 1px solid #E2E8F0 !important;
-                    border-radius: 10px !important;
-                    padding: 12px 14px !important;
+                    padding: 14px 18px !important;
+                    border: 2px solid #e2e8f0 !important;
+                    border-radius: 14px !important;
                     font-size: 15px !important;
-                    background: #F8FAFC !important;
-                    color: #1E293B !important;
-                    outline: none !important;
+                    font-family: inherit !important;
+                    transition: all 0.2s ease !important;
+                    background: #f8fafc !important;
+                    box-sizing: border-box !important;
                     transform: translateZ(0) !important;
+                    backface-visibility: hidden !important;
                 }
                 .hkm-chat-field input:focus, .hkm-chat-field textarea:focus {
                     border-color: #d17d39 !important;
                     background: #fff !important;
                 }
+            .hkm-chat-panel {
+                position: fixed !important;
+                bottom: 100px !important;
+                right: 30px !important;
+                width: 420px !important;
+                height: calc(100% - 140px) !important;
+                max-height: 780px !important;
+                background: white !important;
+                border-radius: 28px !important;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 40px rgba(0,0,0,0.05) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+                transform: translateY(30px) scale(0.95) translateZ(0) !important;
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+                z-index: 999999 !important;
+                overflow: hidden !important;
+                border: 1px solid rgba(255,255,255,0.8) !important;
+                backface-visibility: hidden !important;
+            }
             .hkm-chat-email-submit {
                 margin-top: 10px !important;
                 background: #d17d39 !important;
@@ -3496,6 +3516,18 @@ window.addEventListener('load', () => {
                 margin: 8px 0 !important;
                 font-size: 12px !important;
                 color: #64748B !important;
+            }
+            .hkm-chat-body {
+                flex: 1 !important;
+                padding: 24px !important;
+                overflow-y: auto !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 20px !important;
+                background: #f8fafc !important;
+                scroll-behavior: smooth !important;
+                position: relative !important;
+                transform: translateZ(0) !important;
             }
             .hkm-chat-privacy-label {
                 display: flex !important;

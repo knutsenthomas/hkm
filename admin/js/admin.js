@@ -2099,12 +2099,17 @@ class AdminManager {
      * Called by the inline navigation script in index.html
      */
     onSectionSwitch(sectionId) {
+        console.log(`[AdminManager] 🚀 Switching to section: ${sectionId}`);
         this.currentSection = sectionId;
-        console.log(`🚀 Switching to section: ${sectionId}`);
 
-        // Initialize section the first time it's visited
         const section = document.getElementById(`${sectionId}-section`);
-        const alreadyRendered = section && section.getAttribute('data-rendered') === 'true';
+        if (!section) {
+            console.warn(`[AdminManager] ⚠️ Section element not found: ${sectionId}-section`);
+            return;
+        }
+
+        const alreadyRendered = section.getAttribute('data-rendered') === 'true';
+        console.log(`[AdminManager] Section ${sectionId} alreadyRendered: ${alreadyRendered}`);
 
         if (alreadyRendered) {
             if (sectionId === 'overview') {
@@ -2124,7 +2129,8 @@ class AdminManager {
             }
         }
 
-        if (section && section.getAttribute('data-rendered') !== 'true') {
+        if (section.getAttribute('data-rendered') !== 'true') {
+            console.log(`[AdminManager] Initializing first-time render for: ${sectionId}`);
             switch (sectionId) {
                 case 'content':
                     this.renderContentEditor();
@@ -6111,39 +6117,139 @@ class AdminManager {
                 return items;
             };
 
+            const getRangeElement = (range) => {
+                if (!range) return null;
+                const node = range.commonAncestorContainer;
+                return node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+            };
+
+            const getBlockElementFromNode = (node) => {
+                if (!node) return null;
+                const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                return el?.closest?.('.ce-block') || null;
+            };
+
+            const getBlockIndexFromElement = (blockEl) => {
+                const surface = getDocsSurface();
+                if (!surface || !blockEl) return -1;
+                return Array.from(surface.querySelectorAll('.ce-block')).indexOf(blockEl);
+            };
+
+            const selectionRangeStillValid = (range) => {
+                const surface = getDocsSurface();
+                const el = getRangeElement(range);
+                return !!(range && surface && el && surface.contains(el));
+            };
+
+            const htmlToPlainText = (html) => {
+                const doc = new DOMParser().parseFromString(String(html || ''), 'text/html');
+                return String(doc.body?.textContent || '').replace(/\s+/g, ' ').trim();
+            };
+
+            const escapeEditorHtml = (value) => this.escapeHtml(String(value || ''));
+
+            const blockSaveToPlainText = (saved) => {
+                const type = String(saved?.name || saved?.type || '').toLowerCase();
+                const data = saved?.data || saved || {};
+                if (type === 'list' || Array.isArray(data.items)) {
+                    return (data.items || [])
+                        .map((item) => typeof item === 'string' ? item : (item?.content || item?.text || ''))
+                        .filter(Boolean)
+                        .join('\n');
+                }
+                if (type === 'quote') return String(data.text || '').trim();
+                return htmlToPlainText(data.text || data.caption || '');
+            };
+
+            const convertSelectionToParagraphs = async () => {
+                const currentEditor = this._activeEditorInstance;
+                if (!currentEditor?.blocks) return;
+
+                const selectedBlocks = getSelectedBlocks();
+                let targetIndex = -1;
+                let count = 0;
+
+                if (selectedBlocks.length) {
+                    const firstBlock = selectedBlocks[0].closest('.ce-block');
+                    targetIndex = getBlockIndexFromElement(firstBlock);
+                    count = selectedBlocks.length;
+                } else {
+                    targetIndex = currentEditor.blocks.getCurrentBlockIndex();
+                    count = targetIndex >= 0 ? 1 : 0;
+                }
+
+                if (targetIndex < 0 || count < 1) {
+                    exec('formatBlock', 'p');
+                    return;
+                }
+
+                const paragraphs = [];
+                for (let i = 0; i < count; i++) {
+                    const block = currentEditor.blocks.getBlockByIndex(targetIndex + i);
+                    const saved = await block?.save?.();
+                    const text = blockSaveToPlainText(saved) || String(block?.holder?.textContent || '').trim();
+                    const lines = String(text || '').split(/\n+/).map((line) => line.trim()).filter(Boolean);
+                    paragraphs.push(...(lines.length ? lines : ['']));
+                }
+
+                for (let i = 0; i < paragraphs.length; i++) {
+                    await currentEditor.blocks.insert('paragraph', { text: escapeEditorHtml(paragraphs[i]) }, {}, targetIndex + i);
+                }
+                for (let i = 0; i < count; i++) {
+                    await currentEditor.blocks.delete(targetIndex + paragraphs.length);
+                }
+                currentEditor.caret.setToBlock(targetIndex);
+            };
 
             const replaceSelectionWithList = async (ordered) => {
                 const currentEditor = this._activeEditorInstance;
                 if (!currentEditor || !currentEditor.blocks) return;
 
                 try {
-                    // Attempt to restore selection if we have a saved range
                     const sel = window.getSelection();
-                    if ((!sel || sel.rangeCount === 0 || sel.isCollapsed) && this._lastDocsSelectionRange) {
+                    if ((!sel || sel.rangeCount === 0 || sel.isCollapsed) && selectionRangeStillValid(this._lastDocsSelectionRange)) {
                         sel.removeAllRanges();
                         sel.addRange(this._lastDocsSelectionRange);
                     }
 
-                    const selectedBlocks = getSelectedBlocks();
+                    const liveRange = sel && sel.rangeCount > 0 ? sel.getRangeAt(0) : null;
+                    const activeRange = selectionRangeStillValid(liveRange) ? liveRange : this._lastDocsSelectionRange;
+                    const selectedText = activeRange ? String(activeRange.toString() || '').trim() : '';
                     let items = [];
                     let targetIndex = -1;
                     let blocksToRemove = 0;
 
-                    if (selectedBlocks.length > 0) {
+                    if (selectedText) {
+                        items = splitTextToItems(selectedText);
+                        const startBlock = getBlockElementFromNode(activeRange.startContainer);
+                        const endBlock = getBlockElementFromNode(activeRange.endContainer);
+                        const allBlocks = Array.from(getDocsSurface()?.querySelectorAll('.ce-block') || []);
+                        targetIndex = getBlockIndexFromElement(startBlock);
+                        if (startBlock && endBlock && targetIndex !== -1) {
+                            let endIndex = allBlocks.indexOf(endBlock);
+                            if (endIndex === -1) endIndex = targetIndex;
+                            if (targetIndex > endIndex) [targetIndex, endIndex] = [endIndex, targetIndex];
+                            blocksToRemove = (endIndex - targetIndex) + 1;
+                        }
+                    }
+
+                    const selectedBlocks = items.length ? [] : getSelectedBlocks();
+                    if (!items.length && selectedBlocks.length > 0) {
                         const combinedText = selectedBlocks.map(b => b.textContent).join('\n');
                         items = splitTextToItems(combinedText);
                         blocksToRemove = selectedBlocks.length;
                         const firstBlockEl = selectedBlocks[0].closest('.ce-block');
-                        targetIndex = Array.from(getDocsSurface().querySelectorAll('.ce-block')).indexOf(firstBlockEl);
+                        targetIndex = getBlockIndexFromElement(firstBlockEl);
                     }
 
                     if (targetIndex === -1) {
                         targetIndex = currentEditor.blocks.getCurrentBlockIndex();
                         if (targetIndex < 0) return;
                         const block = currentEditor.blocks.getBlockByIndex(targetIndex);
-                        if (block.name === 'list') {
+                        if ((block.name || block.type) === 'list') {
                             const data = await block.save();
-                            const listItems = data.data.items || [];
+                            const listData = data?.data || data || {};
+                            const listItems = listData.items || [];
                             for (let i = 0; i < listItems.length; i++) {
                                 await currentEditor.blocks.insert('paragraph', { text: listItems[i] }, {}, targetIndex + i);
                             }
@@ -6175,7 +6281,9 @@ class AdminManager {
             const getActiveSurface = () => {
                 // IMPORTANT: Search strictly WITHIN the current modal to avoid hitting stale editors in the background
                 if (!modal) return null;
-                return modal.querySelector(`[id^="editor-holder-"]`) || 
+                return modal.querySelector(`#${CSS.escape(editorHolderId)}`) ||
+                       modal.querySelector(`[id^="editorjs-holder-"]`) ||
+                       modal.querySelector(`[id^="editor-holder-"]`) || 
                        modal.querySelector('.ce-editorjs') || 
                        modal.querySelector('[contenteditable="true"]');
             };
@@ -6202,7 +6310,7 @@ class AdminManager {
                 if (ctx && !this._lastDocsSelectionRange) return true;
                 
                 const sel = window.getSelection();
-                const range = this._lastDocsSelectionRange;
+                const range = selectionRangeStillValid(this._lastDocsSelectionRange) ? this._lastDocsSelectionRange : null;
                 const surface = getActiveSurface();
                 
                 if (range && sel) {
@@ -6216,14 +6324,14 @@ class AdminManager {
                 }
                 
                 if (surface) {
-                    surface.focus();
+                    surface.focus({ preventScroll: true });
                     return true;
                 }
                 return false;
             };
 
             const exec = (command, value = null) => {
-                let range = this._lastDocsSelectionRange;
+                let range = selectionRangeStillValid(this._lastDocsSelectionRange) ? this._lastDocsSelectionRange : null;
                 const sel = window.getSelection();
                 const surface = getActiveSurface();
                 
@@ -6248,8 +6356,9 @@ class AdminManager {
                     } catch (err) {
                         console.warn('Exec: selection restore failed:', err);
                     }
-                } else if (surface) {
-                    surface.focus();
+                } else {
+                    const editable = surface?.querySelector?.('[contenteditable="true"]');
+                    if (editable) editable.focus({ preventScroll: true });
                 }
                 
                 try {
@@ -6266,7 +6375,7 @@ class AdminManager {
                 let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
                 
                 // Fallback to last known range if live selection is lost (e.g. on button click)
-                if ((!range || range.collapsed) && this._lastDocsSelectionRange) {
+                if ((!range || range.collapsed) && selectionRangeStillValid(this._lastDocsSelectionRange)) {
                     range = this._lastDocsSelectionRange;
                 }
 
@@ -6311,6 +6420,21 @@ class AdminManager {
                     } catch (e) {}
                 });
                 return selected;
+            };
+
+            const applyStyleToSelectedBlocks = (mutator) => {
+                const selectedBlocks = getSelectedBlocks();
+                if (selectedBlocks.length) {
+                    selectedBlocks.forEach(mutator);
+                    return;
+                }
+
+                const activeIndex = editor?.blocks?.getCurrentBlockIndex?.();
+                if (typeof activeIndex === 'number' && activeIndex >= 0) {
+                    const block = editor.blocks.getBlockByIndex(activeIndex);
+                    const target = block?.holder?.querySelector?.('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block');
+                    if (target) mutator(target);
+                }
             };
 
             const desktopTools = modal.querySelector('#desktop-richtools');
@@ -6364,27 +6488,13 @@ class AdminManager {
 
                     if (!items.length) items = ['Ny oppgave'];
 
-                    const checklistHtml = `<ul>${items.map((t) => `<li>${escapeHtml(`☐ ${t}`)}</li>`).join('')}</ul>`;
+                    const checklistHtml = `<ul>${items.map((t) => `<li>${escapeEditorHtml(`☐ ${t}`)}</li>`).join('')}</ul>`;
                     exec('insertHTML', checklistHtml);
                 };
 
                 const toolHandlers = shouldUseDocsLikeEditor ? {
                     ...commonHandlers,
-                    paragraph: () => {
-                        const ctx = selectionInsideSurface();
-                        if (ctx && !ctx.sel.isCollapsed) {
-                            const range = ctx.sel.getRangeAt(0);
-                            const fragment = range.cloneContents();
-                            const div = document.createElement('div');
-                            div.appendChild(fragment);
-                            
-                            // Transform all headers/divs inside selection into paragraphs
-                            const content = div.innerHTML.replace(/<(h[1-6]|div|section|article|blockquote)[^>]*>(.*?)<\/\1>/gi, '<p>$2</p>');
-                            exec('insertHTML', content);
-                        } else {
-                            exec('formatBlock', 'p');
-                        }
-                    },
+                    paragraph: () => convertSelectionToParagraphs(),
                     h1: () => exec('formatBlock', 'h1'),
                     h2: () => exec('formatBlock', 'h2'),
                     h3: () => exec('formatBlock', 'h3'),

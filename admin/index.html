@@ -966,7 +966,6 @@
             </div>
 
 
-            </div>
         </section>
     </main>
 
@@ -1095,7 +1094,7 @@
             function handleSectionSwitch(targetSectionId, sourceLink = null) {
                 if (!targetSectionId) return;
 
-                console.log(`Navigating to section: ${targetSectionId}`);
+                console.log(`[Navigation] Navigating to section: ${targetSectionId}`);
                 sessionStorage.setItem(ADMIN_LAST_DASHBOARD_SECTION_KEY, targetSectionId);
                 
                 // Update URL hash if needed (without triggering a second switch)
@@ -1109,10 +1108,12 @@
 
                 // Update Visible Section
                 const sections = document.querySelectorAll('.section-content');
+                console.log(`[Navigation] Found ${sections.length} sections. Hiding all, showing ${targetSectionId}-section.`);
                 sections.forEach(section => {
                     section.classList.remove('active');
                     if (section.id === `${targetSectionId}-section`) {
                         section.classList.add('active');
+                        console.log(`[Navigation] Activated section: ${section.id}`);
                     }
                 });
 
