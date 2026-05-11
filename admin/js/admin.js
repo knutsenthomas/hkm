@@ -5985,9 +5985,46 @@ class AdminManager {
                 };
             }
 
-            if (typeof NestedList !== 'undefined') {
+            // --- Fix for NestedList conversion (prevents 'undefined' text) ---
+            let WordLikeList = typeof NestedList !== 'undefined' ? NestedList : null;
+            if (WordLikeList) {
+                try {
+                    // Extend NestedList to fix import/export conversion issues
+                    WordLikeList = class extends NestedList {
+                        static get conversionConfig() {
+                            return {
+                                export: (data) => {
+                                    const flatten = (items) => {
+                                        return items.map(item => {
+                                            let text = item.content;
+                                            if (item.items && item.items.length > 0) {
+                                                text += ' ' + flatten(item.items);
+                                            }
+                                            return text;
+                                        }).join('. ');
+                                    };
+                                    return flatten(data.items || []);
+                                },
+                                import: (content) => {
+                                    return {
+                                        items: [{
+                                            content: content || '',
+                                            items: []
+                                        }],
+                                        style: 'unordered'
+                                    };
+                                }
+                            };
+                        }
+                    };
+                } catch (e) {
+                    console.error("Could not extend NestedList:", e);
+                }
+            }
+
+            if (WordLikeList) {
                 toolsConfig.list = {
-                    class: NestedList,
+                    class: WordLikeList,
                     inlineToolbar: true,
                     config: { defaultStyle: 'unordered' }
                 };
