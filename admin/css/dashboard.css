@@ -3387,11 +3387,12 @@ div[id^="editorjs-holder-"] {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 0 6px;
-    height: 32px;
+    padding: 0 8px;
+    height: 36px;
     border: 1px solid transparent;
-    border-radius: 6px;
+    border-radius: 8px;
     color: #3c4043;
+    transition: all 0.2s ease;
 }
 
 .docs-toolbar-select-wrap:hover {
@@ -3407,12 +3408,14 @@ div[id^="editorjs-holder-"] {
     border: none;
     background: transparent;
     color: #3c4043;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 600;
     outline: none;
     cursor: pointer;
     padding: 0 2px;
     height: 100%;
+    display: flex;
+    align-items: center;
 }
 
 /* Click-to-replace overlay on image blocks */
