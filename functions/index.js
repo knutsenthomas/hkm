@@ -17,10 +17,6 @@ const { pipeline } = require("stream");
 const { promisify } = require("util");
 require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
 require("dotenv").config({ path: path.join(__dirname, ".env.local"), override: true, quiet: true });
-const { createClient, OAuthStrategy, ApiKeyStrategy } = require("@wix/sdk");
-const { products, collections } = require("@wix/stores");
-const { posts } = require("@wix/blog");
-const { comments } = require("@wix/comments");
 const { GoogleAIFileManager } = require("@google/generative-ai/server");
 
 admin.initializeApp();
@@ -30,9 +26,6 @@ const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
 const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
 const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 2;
 const PODCAST_AUTO_TRANSCRIPTION_ENABLED = true;
-const WIX_API_ENABLED = false;
-const WIX_BLOG_API_ENABLED = false;
-const WIX_BLOG_PUBLIC_PAGE_ENRICHMENT_ENABLED = true;
 
 // Stripe is initialized inside the function to avoid build-time errors
 const stripeInit = require("stripe");
@@ -78,43 +71,6 @@ function decodeCommonHtmlEntities(value) {
   );
 }
 
-function sanitizeWixInlineHtml(rawInner) {
-  if (typeof rawInner !== "string" || !rawInner) return "";
-
-  let html = rawInner
-    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
-    .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
-    .replace(/\s*data-[a-z0-9_-]+="[^"]*"/gi, "");
-
-  // Keep only safe tags to preserve emphasis/links/images from Wix content.
-  html = html.replace(/<(?!\/?(?:strong|b|em|i|u|s|br|a|img|figure|figcaption|ul|ol|li|blockquote|div|span)\b)[^>]*>/gi, "");
-
-  // Normalize anchors and strip unsafe protocols.
-  html = html.replace(/<a\b([^>]*)>/gi, (_match, attrs) => {
-    const hrefMatch = String(attrs || "").match(/href\s*=\s*(["'])(.*?)\1/i);
-    const href = hrefMatch && hrefMatch[2] ? hrefMatch[2].trim() : "";
-    if (!href || /^javascript:/i.test(href)) return "";
-    return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">`;
-  });
-
-  // Normalize images
-  html = html.replace(/<img\b([^>]*)>/gi, (_match, attrs) => {
-    const srcMatch = String(attrs || "").match(/src\s*=\s*(["'])(.*?)\1/i);
-    const altMatch = String(attrs || "").match(/alt\s*=\s*(["'])(.*?)\1/i);
-    const src = srcMatch && srcMatch[2] ? srcMatch[2].trim() : "";
-    const alt = altMatch && altMatch[2] ? altMatch[2].trim() : "";
-    if (!src) return "";
-    return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" style="max-width:100%; height:auto; margin:20px 0; border-radius:8px;">`;
-  });
-
-  html = html
-    .replace(/<\/a\s*>/gi, "</a>")
-    .replace(/<(strong|b|em|i|u|s)\b[^>]*>/gi, "<$1>")
-    .replace(/<br\s*\/?\s*>/gi, "<br>")
-    .trim();
-
-  return html;
-}
 
 function readCssBackgroundImageUrl(styleValue) {
   if (typeof styleValue !== "string" || !styleValue) return "";
@@ -212,151 +168,6 @@ const mapGaDimensionMetricRows = (report) => (
 );
 
 
-function extractWixViewerBlocksAsHtml(pageHtml) {
-  if (typeof pageHtml !== "string" || !pageHtml) return "";
-
-  const blockRegex = /<(h[1-6]|p|li|div)\b[^>]*id="viewer-[^"]*"[^>]*>([\s\S]*?)<\/\1>/gi;
-  const seen = new Set();
-  const blocks = extractWixFigureBlocks(pageHtml);
-  let match;
-
-  while ((match = blockRegex.exec(pageHtml)) !== null) {
-    const tag = String(match[1] || "p").toLowerCase();
-    const rawInner = String(match[2] || "");
-
-    if (tag === "div" && /<wow-image\b/i.test(rawInner)) {
-      const wowMatch = rawInner.match(/<wow-image\b([^>]*)>/i);
-      const wowAttrs = wowMatch && wowMatch[1] ? wowMatch[1] : "";
-      const infoRaw = readHtmlAttr(wowAttrs, "data-image-info");
-      let info = null;
-      if (infoRaw) {
-        try {
-          info = JSON.parse(infoRaw);
-        } catch (error) {
-          info = null;
-        }
-      }
-
-      const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
-      const src = wixMediaUrlFromUri(imageData.uri || readHtmlAttr(wowAttrs, "src"));
-      if (!src) continue;
-
-      const imgMatch = rawInner.match(/<img\b([^>]*)>/i);
-      const imgAttrs = imgMatch && imgMatch[1] ? imgMatch[1] : "";
-      const alt = readHtmlAttr(imgAttrs, "alt") || readHtmlAttr(wowAttrs, "alt");
-
-      const imageKey = `img:${src.toLowerCase()}`;
-      if (seen.has(imageKey)) continue;
-      seen.add(imageKey);
-
-      blocks.push({
-        index: match.index,
-        tag: "figure",
-        text: "",
-        html: renderImageFigure(src, alt || ""),
-      });
-      continue;
-    }
-
-    const inlineHtml = sanitizeWixInlineHtml(rawInner);
-    const text = decodeCommonHtmlEntities(
-      rawInner
-        .replace(/<br\s*\/?>/gi, "\n")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim()
-    );
-
-    if (/ja,?\s*jeg ønsker å abonnere på .*nyhetsbrev/i.test(text) || /subscribe to .*newsletter/i.test(text)) {
-      continue;
-    }
-
-    const minLen = /^h[1-6]$/.test(tag) ? 1 : (tag === "li" ? 1 : 1);
-    if (text.length < minLen) continue;
-
-    const normalizedTag = (() => {
-      const trimmedHtml = inlineHtml.trim();
-      if (tag === "div" && /^<blockquote\b/i.test(trimmedHtml)) return "blockquote";
-      if (tag === "div" && /^<figure\b/i.test(trimmedHtml)) return "figure";
-      if (/^h[1-6]$/.test(tag)) return tag;
-      if (tag === "li") return "li";
-      return "p";
-    })();
-
-    const dedupKey = `${normalizedTag}:${text.toLowerCase()}`;
-    if (seen.has(dedupKey)) continue;
-    seen.add(dedupKey);
-
-    blocks.push({
-      index: match.index,
-      tag: normalizedTag,
-      text,
-      html: inlineHtml,
-    });
-  }
-
-  if (blocks.length < 2) return "";
-
-  blocks.sort((a, b) => (a.index || 0) - (b.index || 0));
-
-  const parts = [];
-  const listLikeParagraph = /^([A-Za-z0-9\u00C0-\u024F\u0400-\u04FF\u0370-\u03FF][^:]{1,48}):\s+.+/;
-
-  for (let i = 0; i < blocks.length; i += 1) {
-    const block = blocks[i];
-    if (!block) continue;
-
-    if (block.tag === "figure") {
-      parts.push(block.html || "");
-      continue;
-    }
-
-    if (/^h[1-6]$/.test(block.tag)) {
-      parts.push(`<${block.tag}>${block.html || escapeHtml(block.text)}</${block.tag}>`);
-      continue;
-    }
-
-    if (block.tag === "blockquote") {
-      parts.push(block.html || `<blockquote>${escapeHtml(block.text)}</blockquote>`);
-      continue;
-    }
-
-    if (block.tag === "li") {
-      const listItems = [block];
-      while (i + 1 < blocks.length && blocks[i + 1].tag === "li") {
-        listItems.push(blocks[i + 1]);
-        i += 1;
-      }
-      parts.push(`<ul>${listItems.map((item) => `<li>${item.html || escapeHtml(item.text)}</li>`).join("")}</ul>`);
-      continue;
-    }
-
-    if (listLikeParagraph.test(block.text) && block.text.length <= 140) {
-      const run = [block];
-      let j = i + 1;
-      while (
-        j < blocks.length &&
-        blocks[j].tag === "p" &&
-        listLikeParagraph.test(blocks[j].text) &&
-        blocks[j].text.length <= 140
-      ) {
-        run.push(blocks[j]);
-        j += 1;
-      }
-
-      if (run.length >= 2) {
-        parts.push(`<ul>${run.map((item) => `<li>${item.html || escapeHtml(item.text)}</li>`).join("")}</ul>`);
-        i = j - 1;
-        continue;
-      }
-    }
-
-    parts.push(`<p>${block.html || escapeHtml(block.text)}</p>`);
-  }
-
-  const bodyHtml = parts.join("\n");
-  return bodyHtml;
-}
 
 function decodeHtmlAttribute(value) {
   if (typeof value !== "string" || !value) return "";
@@ -375,105 +186,18 @@ function readHtmlAttr(attrs, name) {
   return match && match[2] ? decodeHtmlAttribute(match[2]) : "";
 }
 
-function extractWixFigureBlocks(pageHtml) {
-  if (typeof pageHtml !== "string" || !pageHtml) return [];
 
-  const recentPostsIndex = pageHtml.search(/data-hook\s*=\s*["']recent-posts["']/i);
-  const searchHtml = recentPostsIndex >= 0 ? pageHtml.slice(0, recentPostsIndex) : pageHtml;
-  const blocks = [];
-  const figureRegex = /<figure\b[^>]*data-hook=("|')(figure-IMAGE|figure-VIDEO)\1[^>]*>[\s\S]*?<\/figure>/gi;
-  let match;
-
-  while ((match = figureRegex.exec(searchHtml)) !== null) {
-    const figureHtml = match[0] || "";
-    const hook = match[2] || "";
-    const wowMatch = figureHtml.match(/<wow-image\b([^>]*)>/i);
-    const wowAttrs = wowMatch && wowMatch[1] ? wowMatch[1] : "";
-    const imgMatch = figureHtml.match(/<img\b([^>]*)>/i);
-    const imgAttrs = imgMatch && imgMatch[1] ? imgMatch[1] : "";
-    const infoRaw = readHtmlAttr(wowAttrs, "data-image-info");
-
-    let info = null;
-    if (infoRaw) {
-      try {
-        info = JSON.parse(infoRaw);
-      } catch (error) {
-        info = null;
-      }
-    }
-
-    const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
-    const alt = readHtmlAttr(imgAttrs, "alt") || readHtmlAttr(wowAttrs, "alt") || (hook === "figure-VIDEO" ? "Video" : "");
-    let src = wixPickFirstString(
-      readHtmlAttr(imgAttrs, "data-pin-media"),
-      wixMediaUrlFromUri(imageData.uri || readHtmlAttr(wowAttrs, "src")),
-      readHtmlAttr(imgAttrs, "src"),
-    );
-
-    if (hook === "figure-VIDEO") {
-      const previewButtonMatch = figureHtml.match(/<button\b([^>]*)class=("|')[^"']*react-player__preview[^"']*\2([^>]*)>/i);
-      const previewAttrs = `${previewButtonMatch && previewButtonMatch[1] ? previewButtonMatch[1] : ""} ${previewButtonMatch && previewButtonMatch[3] ? previewButtonMatch[3] : ""}`;
-      const previewStyle = readHtmlAttr(previewAttrs, "style");
-      const previewImage = readCssBackgroundImageUrl(previewStyle);
-      if (previewImage) src = previewImage;
-
-      if (!src) continue;
-
-      const youtubeIdMatch = src.match(/\/vi\/([^\/?]+)/i);
-      const youtubeUrl = youtubeIdMatch && youtubeIdMatch[1] ? `https://www.youtube.com/watch?v=${youtubeIdMatch[1]}` : "";
-      const previewFigure = renderImageFigure(src, alt || "Video");
-      blocks.push({
-        index: match.index,
-        tag: "figure",
-        text: alt || "Video",
-        html: youtubeUrl ? `${previewFigure}\n${renderMediaAnchor(youtubeUrl, "Se video")}` : previewFigure,
-      });
-      continue;
-    }
-
-    if (!src) continue;
-    blocks.push({
-      index: match.index,
-      tag: "figure",
-      text: alt || "",
-      html: renderImageFigure(src, alt || ""),
-    });
-  }
-
-  return blocks;
-}
-
-function wixMediaUrlFromUri(uri) {
-  const clean = typeof uri === "string" ? uri.trim() : "";
-  if (!clean) return "";
-  if (/^https?:\/\//i.test(clean)) return clean;
-
-  const extensionMatch = clean.match(/\.([a-z0-9]+)(?:$|[?#])/i);
-  const extension = extensionMatch && extensionMatch[1] ? extensionMatch[1].toLowerCase() : "jpg";
-  return `https://static.wixstatic.com/media/${clean}/v1/fit/w_1000,h_1000,al_c,q_85/file.${extension}`;
-}
-
-function extractWixMediaIdentity(url) {
-  if (typeof url !== "string" || !url) return "";
-  const normalized = url.trim();
-  if (!normalized) return "";
-
-  const mediaMatch = normalized.match(/\/media\/([^\/\?]+)\//i);
-  if (mediaMatch && mediaMatch[1]) return mediaMatch[1].toLowerCase();
-
-  return normalized.toLowerCase();
-}
 
 function contentHasEquivalentImage(content, imageUrl) {
   if (typeof content !== "string" || !content || typeof imageUrl !== "string" || !imageUrl) return false;
-  const targetIdentity = extractWixMediaIdentity(imageUrl);
+  const targetIdentity = extractMediaIdentity(imageUrl);
   if (!targetIdentity) return false;
 
   const imgRegex = /<img\b[^>]*src=("|')([^"']+)\1/gi;
   let match;
   while ((match = imgRegex.exec(content)) !== null) {
     const existingUrl = match[2] || "";
-    if (extractWixMediaIdentity(existingUrl) === targetIdentity) return true;
+    if (extractMediaIdentity(existingUrl) === targetIdentity) return true;
   }
   return false;
 }
@@ -486,7 +210,7 @@ function dedupeFigureImagesInHtml(content) {
     const imgMatch = figureHtml.match(/<img\b[^>]*src=("|')([^"']+)\1/i);
     if (!imgMatch || !imgMatch[2]) return figureHtml;
 
-    const identity = extractWixMediaIdentity(imgMatch[2]);
+    const identity = extractMediaIdentity(imgMatch[2]);
     if (!identity) return figureHtml;
     if (seen.has(identity)) return "";
 
@@ -495,143 +219,7 @@ function dedupeFigureImagesInHtml(content) {
   });
 }
 
-function extractWixArticleImagesAsHtml(pageHtml) {
-  if (typeof pageHtml !== "string" || !pageHtml) return "";
 
-  // Hard filter to article-owned images only:
-  // - must carry a Wix rich-content containerId
-  // - that containerId must also exist as a viewer-* element on the page
-  // This excludes avatars and "Siste innlegg" thumbnails.
-  const searchHtml = pageHtml;
-  const figures = [];
-  const seen = new Set();
-  const wowImageRegex = /<wow-image\b([^>]*)>/gi;
-  const recentPostsIndex = pageHtml.search(/data-hook\s*=\s*["']recent-posts["']/i);
-  let match;
-
-  while ((match = wowImageRegex.exec(searchHtml)) !== null) {
-    const attrs = match[1] || "";
-    const matchIndex = match.index;
-    const cssClass = readHtmlAttr(attrs, "class");
-    if (/fluid-avatar-image/i.test(cssClass)) continue;
-
-    const alt = readHtmlAttr(attrs, "alt");
-    const infoRaw = readHtmlAttr(attrs, "data-image-info");
-    let info = null;
-    if (infoRaw) {
-      try {
-        info = JSON.parse(infoRaw);
-      } catch (error) {
-        info = null;
-      }
-    }
-
-    const containerId = info && typeof info.containerId === "string" ? info.containerId.trim() : "";
-    const hasViewerAnchor = containerId && (
-      pageHtml.includes(`id="viewer-${containerId}"`) ||
-      pageHtml.includes(`id='viewer-${containerId}'`)
-    );
-
-    const imageData = info && info.imageData && typeof info.imageData === "object" ? info.imageData : {};
-    const targetWidth = Number(info && info.targetWidth);
-    const targetHeight = Number(info && info.targetHeight);
-    const imageWidth = Number(imageData.width);
-    const imageHeight = Number(imageData.height);
-
-    // Primary allow rule: image is explicitly anchored to a viewer-* block.
-    // Fallback allow rule: some Wix pages emit article images without containerId.
-    // In those cases, only allow if the image appears before the recent-posts section
-    // and has article-like dimensions.
-    const beforeRecentPosts = recentPostsIndex < 0 || matchIndex < recentPostsIndex;
-    const articleLikeSize =
-      (targetWidth > 0 && targetWidth >= 300 && targetHeight > 0 && targetHeight >= 150) ||
-      (imageWidth > 0 && imageWidth >= 300 && imageHeight > 0 && imageHeight >= 150);
-    const allowByFallback = !hasViewerAnchor && beforeRecentPosts && articleLikeSize;
-    if (!hasViewerAnchor && !allowByFallback) continue;
-
-    // Skip avatars/icons; keep actual article media.
-    const likelyIcon = (targetWidth > 0 && targetWidth <= 80) && (targetHeight > 0 && targetHeight <= 80);
-    const likelySmallImage = (imageWidth > 0 && imageWidth <= 120) && (imageHeight > 0 && imageHeight <= 120);
-    if (likelyIcon || likelySmallImage || /forfatterens bilde/i.test(alt)) continue;
-    const src = wixMediaUrlFromUri(imageData.uri || readHtmlAttr(attrs, "src"));
-    if (!src || seen.has(src)) continue;
-    seen.add(src);
-    figures.push(renderImageFigure(src, alt || ""));
-    if (figures.length >= 6) break;
-  }
-  return figures.join("\n");
-}
-
-async function enrichWixItemsWithPublicPageContent(items = []) {
-  if (!Array.isArray(items) || !items.length) return items;
-
-  const candidates = items
-    .map((item, index) => ({ item, index }))
-    .filter(({ item }) => {
-      if (!item || typeof item !== "object") return false;
-      if (String(item.source || "").toLowerCase() !== "wix") return false;
-
-      const url = String(item.url || "").trim();
-      if (!url || !/\/post\//i.test(url)) return false;
-      return true;
-    });
-
-  if (!candidates.length) return items;
-
-  const updates = new Map();
-
-  for (const candidate of candidates) {
-    const { item, index } = candidate;
-    const url = String(item.url || "").trim();
-
-    try {
-      const response = await fetch(url);
-      if (!response.ok) continue;
-
-      const html = await response.text();
-      const enrichedContent = extractWixViewerBlocksAsHtml(html);
-      if (!enrichedContent) continue;
-
-      const hasInlineImage = /<img\b|<figure\b/i.test(enrichedContent);
-      const fallbackImageUrl = typeof item.imageUrl === "string" ? item.imageUrl.trim() : "";
-      const shouldAddFallbackImage =
-        !hasInlineImage &&
-        !!fallbackImageUrl &&
-        !contentHasEquivalentImage(enrichedContent, fallbackImageUrl);
-
-      const contentWithFallbackImage = shouldAddFallbackImage
-        ? `${renderImageFigure(fallbackImageUrl, item.title || "")}` + "\n" + enrichedContent
-        : enrichedContent;
-
-      const sanitizedContent = dedupeFigureImagesInHtml(contentWithFallbackImage);
-
-      const currentLen = typeof item.content === "string" ? item.content.trim().length : 0;
-      const enrichedLen = sanitizedContent.trim().length;
-      // If we already have richContent nodes, we should be VERY careful about overwriting content
-      // with scraped HTML, unless the scraped HTML is significantly better.
-      const hasRichContent = !!(item.richContent && item.richContent.nodes && item.richContent.nodes.length > 0);
-      const currentHasStructure = /<(figure|blockquote|ul|ol|h[1-6])\b/i.test(item.content || "");
-      const enrichedHasStructure = /<(figure|blockquote|ul|ol|h[1-6])\b/i.test(sanitizedContent);
-      if (hasRichContent && enrichedLen < currentLen * 0.5) continue;
-      if (enrichedLen < currentLen && !(enrichedHasStructure && !currentHasStructure)) continue;
-
-      const enrichedText = stripHtmlTags(sanitizedContent);
-      const enrichedMinutesToRead = Math.max(1, Math.ceil((enrichedText.split(/\s+/).filter(Boolean).length || 0) / 225));
-
-      updates.set(index, {
-        ...item,
-        content: sanitizedContent,
-        excerpt: clampText(decodeHtmlEntities(enrichedText), 360),
-        minutesToRead: Math.max(Number(item.minutesToRead) || 1, enrichedMinutesToRead),
-      });
-    } catch (error) {
-      console.warn("Wix public page enrichment failed:", error && error.message ? error.message : error);
-    }
-  }
-
-  if (!updates.size) return items;
-  return items.map((item, index) => updates.get(index) || item);
-}
 
 function getStripeSecretKey() {
   return getSecretOrEnv(
@@ -671,26 +259,32 @@ function getGeminiApiKey() {
   );
 }
 
-function parseWixApiKeyMetadata(apiKey) {
-  if (!apiKey || typeof apiKey !== "string") return {};
 
-  try {
-    const parts = apiKey.split(".");
-    if (parts.length < 2) return {};
-    const payloadJson = Buffer.from(parts[1], "base64url").toString("utf8");
-    const payload = JSON.parse(payloadJson);
-    const rawData = typeof payload.data === "string" ? payload.data : null;
-    if (!rawData) return {};
-    const data = JSON.parse(rawData);
-    return {
-      accountId: data && data.tenant && data.tenant.type === "account" ? data.tenant.id : undefined,
-      apiKeyId: data && data.id ? data.id : undefined,
-      appId: data && data.identity ? data.identity.id : undefined,
-    };
-  } catch (error) {
-    return {};
+function pickFirstString(...values) {
+  for (const value of values) {
+    if (typeof value === "string" && value.trim()) return value.trim();
   }
+  return "";
 }
+
+function pickFirstNumber(...values) {
+  for (const value of values) {
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+    if (typeof value === "string" && value.trim()) {
+      const parsed = Number(value.replace(",", "."));
+      if (Number.isFinite(parsed)) return parsed;
+    }
+  }
+  return null;
+}
+
+function extractMediaIdentity(url) {
+  if (typeof url !== "string") return null;
+  const match = url.match(/\/media\/([^\/#\?]+)/);
+  if (match && match[1]) return match[1].split("~")[0].split(".")[0];
+  return url;
+}
+
 
 const VISITOR_CHAT_RETENTION_DAYS = 7;
 
@@ -760,79 +354,10 @@ async function deleteVisitorChatById(chatId) {
   };
 }
 
-function getWixClient() {
-  if (!WIX_API_ENABLED) {
-    throw new Error("Wix API is disabled.");
-  }
 
-  const clientId = process.env.WIX_CLIENT_ID;
-  const apiKey = process.env.WIX_API_KEY;
-  const siteId = process.env.WIX_SITE_ID;
-  const parsedApiKeyMeta = parseWixApiKeyMetadata(apiKey);
-  const accountId = process.env.WIX_ACCOUNT_ID || parsedApiKeyMeta.accountId;
 
-  if (apiKey && (siteId || accountId)) {
-    return createClient({
-      modules: { products, collections, posts, comments },
-      auth: siteId ?
-        ApiKeyStrategy({
-          apiKey,
-          siteId,
-          ...(accountId ? { accountId } : {}),
-        }) :
-        ApiKeyStrategy({
-          apiKey,
-          accountId,
-        }),
-    });
-  }
 
-  if (!clientId) throw new Error("Missing WIX_CLIENT_ID.");
 
-  return createClient({
-    modules: { products, collections, posts, comments },
-    auth: OAuthStrategy({ clientId }),
-  });
-}
-
-function getWixCommentsAppId() {
-  const configured = wixPickFirstString(process.env.WIX_COMMENTS_APP_ID, process.env.WIX_APP_ID);
-  if (configured) return configured;
-
-  const parsedApiKeyMeta = parseWixApiKeyMetadata(process.env.WIX_API_KEY || "");
-  return wixPickFirstString(parsedApiKeyMeta.appId || "");
-}
-
-function wixPickFirstString(...values) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim()) return value.trim();
-  }
-  return "";
-}
-
-function wixPickFirstNumber(...values) {
-  for (const value of values) {
-    if (typeof value === "number" && Number.isFinite(value)) return value;
-    if (typeof value === "string" && value.trim()) {
-      const parsed = Number(value.replace(",", "."));
-      if (Number.isFinite(parsed)) return parsed;
-    }
-  }
-  return null;
-}
-
-function formatWixPrice(amount, currency = "NOK", locale = "no-NO") {
-  if (amount == null) return "Se pris på Wix";
-  try {
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency,
-      maximumFractionDigits: 2,
-    }).format(amount);
-  } catch (error) {
-    return `${amount} ${currency}`;
-  }
-}
 
 function clampText(value, maxLen = 800) {
   if (typeof value !== "string") return "";
@@ -1246,140 +771,9 @@ function chooseGeminiModel(modelNames = []) {
 }
 
 /**
- * Konverterer Wix' interne bildeformat (wix:image://v1/...) til en offentlig URL.
+ * Konverterer Ekstern' interne bildeformat (ekstern:image://v1/...) til en offentlig URL.
  */
-function getWixImageUrl(wixUrl) {
-  if (!wixUrl || typeof wixUrl !== "string") return "";
-  if (wixUrl.startsWith("http")) return wixUrl;
 
-  // Format: wix:image://v1/c9f56a_...~mv2.jpg/filename.jpg#originWidth=100&originHeight=100
-  if (wixUrl.startsWith("wix:image://v1/")) {
-    const parts = wixUrl.replace("wix:image://v1/", "").split("/");
-    if (parts.length > 0) {
-      const imageId = parts[0];
-      return `https://static.wixstatic.com/media/${imageId}`;
-    }
-  }
-
-  // Format: wix:image://v1/c9f56a_...~mv2.jpg#originWidth=100&originHeight=100
-  if (wixUrl.includes("wix:image")) {
-    const match = wixUrl.match(/wix:image:\/\/v1\/([^\/#\?]+)/);
-    if (match && match[1]) {
-      return `https://static.wixstatic.com/media/${match[1]}`;
-    }
-  }
-
-  return wixUrl;
-}
-
-function normalizeWixProduct(item, req, collectionMap = {}) {
-  const locale = req.query.locale || "no-NO";
-  const fallbackBaseUrl = req.query.storeBaseUrl || "https://www.hiskingdomministry.no";
-  const fallbackStoreUrl = req.query.externalStoreBaseUrl || "https://www.hiskingdomministry.no/butikk";
-  const productPathPrefix = String(req.query.productPathPrefix || "/product-page/").replace(/^\/+|\/+$/g, "");
-
-  const slug = wixPickFirstString(
-    item.slug,
-    item.handle,
-    item.seoData && item.seoData.slug,
-  );
-
-  const directUrl = wixPickFirstString(
-    item.productUrl,
-    item.url,
-    item.productPageUrl,
-    item.onlineStoreUrl,
-    item.link,
-    item.seoData && item.seoData.canonicalUrl,
-    item.seoData && item.seoData.url,
-  );
-
-  let productUrl = fallbackStoreUrl;
-  if (directUrl) {
-    productUrl = /^https?:\/\//i.test(directUrl) ?
-      directUrl :
-      `${fallbackBaseUrl.replace(/\/+$/, "")}/${String(directUrl).replace(/^\/+/, "")}`;
-  } else if (slug) {
-    productUrl = `${fallbackBaseUrl.replace(/\/+$/, "")}/${productPathPrefix}/${encodeURIComponent(slug)}`;
-  }
-
-  const rawImageUrl = wixPickFirstString(
-    item.imageUrl,
-    item.image && item.image.url,
-    item.mainImage,
-    item.mainImage && item.mainImage.url,
-    item.mainMedia && item.mainMedia.url,
-    item.mainMedia && item.mainMedia.image && item.mainMedia.image.url,
-    item.mainMedia && item.mainMedia.image && item.mainMedia.image.imageUrl,
-    item.media && item.media.mainMedia && item.media.mainMedia.image && item.media.mainMedia.image.url,
-    item.mediaItems && item.mediaItems[0] && item.mediaItems[0].url,
-    item.mediaItems && item.mediaItems[0] && item.mediaItems[0].image && item.mediaItems[0].image.url,
-    item.images && item.images[0] && item.images[0].url,
-  );
-
-  const imageUrl = getWixImageUrl(rawImageUrl);
-
-  const priceValue = wixPickFirstNumber(
-    item.priceValue,
-    item.price,
-    item.price && item.price.amount,
-    item.price && item.price.value,
-    item.price && item.price.price,
-    item.priceData && item.priceData.price,
-    item.priceData && item.priceData.amount,
-    item.discountedPrice && item.discountedPrice.amount,
-  );
-
-  const currency = wixPickFirstString(
-    item.currency,
-    item.currencyCode,
-    item.price && item.price.currency,
-    item.price && item.price.currencyCode,
-    item.priceData && item.priceData.currency,
-    "NOK",
-  ) || "NOK";
-
-  const formattedPrice = wixPickFirstString(
-    item.formattedPrice,
-    item.priceFormatted,
-    item.price && item.price.formatted,
-    item.price && item.price.formattedPrice,
-    item.priceData && item.priceData.formatted,
-  ) || formatWixPrice(priceValue, currency, locale);
-
-  const rawDescription = item.description || "";
-  // Truncate description to keep payload small but still usable for search/previews
-  const description = rawDescription.length > 800 ? `${rawDescription.slice(0, 797)}...` : rawDescription;
-
-  return {
-    id: wixPickFirstString(item.id, item._id, item.productId),
-    name: wixPickFirstString(item.name, item.title, item.productName),
-    slug,
-    productUrl,
-    imageUrl,
-    priceValue,
-    currency,
-    formattedPrice,
-    ribbon: item.ribbon || "",
-    // Triple-Safety Category Detection:
-    // 1. Check embedded collections (from .include("collections"))
-    // 2. Check embedded categories (some versions of the API use this)
-    // 3. Fallback to mapping IDs from collectionMap
-    categories: [
-      ...(item.collections || []).map(c => c.name || c.title),
-      ...(item.categories || []).map(c => c.name || c.title),
-      ...(item.collectionIds || []).map(id => collectionMap[id])
-    ].filter((val, index, self) => val && self.indexOf(val) === index), // Unique non-empty names
-    collectionIds: item.collectionIds || [],
-    productOptions: item.productOptions || [],
-    variants: item.variants || [],
-    mediaItems: item.mediaItems || [],
-    description: item.description || "",
-    priceData: item.priceData || {},
-    // Capture any available date for sorting, fallback to a fixed old date for stability
-    createdAt: item._createdDate || item.createdDate || item._updatedDate || item.lastUpdated || "1970-01-01T00:00:00Z",
-  };
-}
 
 exports.getPodcast = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
   const rssUrl = PODCAST_RSS_URL;
@@ -1768,8 +1162,8 @@ exports.getAnalyticsOverview = onRequest({
 
 
 /**
- * Henter produkter fra Wix Stores via Wix SDK og returnerer et frontend-vennlig JSON-format.
- * Frontend (`js/wix-store.js`) leser `items` direkte.
+ * Henter produkter fra Ekstern Stores via Ekstern SDK og returnerer et frontend-vennlig JSON-format.
+ * Frontend (`js/ekstern-store.js`) leser `items` direkte.
  */
 const cors = require("cors")({ origin: true });
 const DEFAULT_FACEBOOK_PAGE_ID = "hiskingdomministry777";
@@ -2171,151 +1565,8 @@ async function loadFromStorageCache(path) {
   }
 }
 
-async function fetchAndCacheWixProducts(req = { query: {} }) {
-  if (!WIX_API_ENABLED) {
-    const cachedData = await loadFromStorageCache("cache/wix_products_v2.json");
-    if (cachedData && Array.isArray(cachedData.items)) {
-      return {
-        ...cachedData,
-        apiDisabled: true,
-        source: "wix-api-disabled-storage-cache",
-      };
-    }
 
-    return {
-      updatedAt: new Date().toISOString(),
-      count: 0,
-      total: 0,
-      items: [],
-      apiDisabled: true,
-      source: "wix-api-disabled",
-    };
-  }
 
-  const wixClient = getWixClient();
-  let authMode = (process.env.WIX_API_KEY && process.env.WIX_SITE_ID) ? "api-key" : "oauth";
-
-  if (authMode === "oauth" && wixClient.auth && typeof wixClient.auth.generateVisitorTokens === "function") {
-    try {
-      await wixClient.auth.generateVisitorTokens();
-    } catch (authError) {
-      console.warn("Wix visitor token generation failed:", authError && authError.message ? authError.message : authError);
-    }
-  }
-
-  // 1. Fetch Collections to map IDs to Names
-  const collectionMap = {};
-  try {
-    const colls = await wixClient.collections.queryCollections().limit(100).find();
-    if (colls && colls.items) {
-      colls.items.forEach((c) => {
-        const id = c._id || c.id;
-        if (id && c.name) collectionMap[id] = c.name;
-      });
-      console.log(`[HKM SYNC] Mapped ${Object.keys(collectionMap).length} collections for fallback.`);
-    }
-  } catch (collError) {
-    console.warn("[HKM SYNC] Could not fetch Wix collections:", collError);
-  }
-
-  // 2. Fetch all products with pagination
-  let allItems = [];
-  let skip = 0;
-  const limit = 100;
-  let totalCountFromWix = 0;
-  let hasMore = true;
-
-  try {
-    console.log("Starting Wix product fetch...");
-    
-    // Quick diagnostic check for visibility counts
-    let visibleCount = 0;
-    let hiddenCount = 0;
-    try {
-        const vRes = await wixClient.products.queryProducts().eq("visible", true).limit(1).find();
-        visibleCount = vRes.totalCount || 0;
-        const hRes = await wixClient.products.queryProducts().eq("visible", false).limit(1).find();
-        hiddenCount = hRes.totalCount || 0;
-        console.log(`Diagnostic: Visible=${visibleCount}, Hidden=${hiddenCount}`);
-    } catch (diagErr) {
-        console.warn("Visibility diagnostic failed:", diagErr);
-    }
-
-    while (hasMore) {
-      console.log(`Fetching Wix products batch: skip=${skip}, limit=${limit}`);
-      
-      // Include collections to get names directly in the product object
-      const result = await wixClient.products.queryProducts()
-        .limit(limit)
-        .skip(skip)
-        .include("collections")
-        .find();
-
-      const rawItems = Array.isArray(result.items) ? result.items : [];
-      totalCountFromWix = typeof result.totalCount === "number" ? result.totalCount : totalCountFromWix;
-      
-      console.log(`Batch Received: ${rawItems.length} items. Wix Total Count: ${totalCountFromWix}`);
-
-      const items = rawItems
-        .map((item) => normalizeWixProduct(item, req, collectionMap))
-        .filter((item) => item && item.name);
-
-      allItems.push(...items);
-
-      if (rawItems.length === 0 || rawItems.length < limit || allItems.length >= totalCountFromWix) {
-        hasMore = false;
-      } else {
-        skip += rawItems.length;
-      }
-
-      if (skip >= 10000) break;
-    }
-  } catch (productError) {
-    console.error("Wix products fetch failed during loop:", productError);
-  }
-
-  // 3. Sort by Newest First (descending)
-  allItems.sort((a, b) => {
-    const timeA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
-    const timeB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
-    return timeB - timeA;
-  });
-
-  console.log(`[HKM SYNC] Finished: Fetched ${allItems.length} items. Sorted by newest first.`);
-
-  const cacheData = {
-    updatedAt: new Date().toISOString(),
-    count: allItems.length,
-    total: Math.max(totalCountFromWix, allItems.length),
-    items: allItems,
-    authMode,
-    source: "wix-sdk-storage-cached-sorted",
-  };
-
-  // 3. Save to Cloud Storage (No size limit!)
-  await saveToStorageCache("cache/wix_products_v2.json", cacheData);
-
-  // Also save a minimal metadata doc in Firestore for quick checks
-  try {
-    await db.collection("content").doc("wix_products_metadata").set({
-      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      count: allItems.length,
-      total: Math.max(totalCountFromWix, allItems.length),
-      storagePath: "cache/wix_products_v2.json",
-    });
-  } catch (e) {
-    console.warn("Metadata update failed, but storage cache is saved.");
-  }
-
-  return cacheData;
-}
-
-const DEFAULT_WIX_BLOG_FEED_URL = "https://www.hiskingdomministry.no/blog-feed.xml";
-
-function getWixBlogFeedUrl(req = { query: {} }) {
-  const override = req && req.query && typeof req.query.feedUrl === "string" ? req.query.feedUrl.trim() : "";
-  return override || process.env.WIX_BLOG_RSS_URL || DEFAULT_WIX_BLOG_FEED_URL;
-}
 
 function toArray(value) {
   if (Array.isArray(value)) return value;
@@ -2414,7 +1665,7 @@ function applyTextDecorations(html, decorations) {
     if (type === "LINK") {
       const linkData = decoration.linkData && typeof decoration.linkData === "object" ? decoration.linkData : {};
       const linkObj = linkData.link && typeof linkData.link === "object" ? linkData.link : {};
-      const href = wixPickFirstString(linkObj.url, linkObj.href, linkData.url, "");
+      const href = pickFirstString(linkObj.url, linkObj.href, linkData.url, "");
       return renderInlineLink(href, acc);
     }
 
@@ -2446,7 +1697,7 @@ function renderRichInlineNodes(nodes) {
     if (type === "LINK") {
       const linkData = node.linkData && typeof node.linkData === "object" ? node.linkData : {};
       const linkObj = linkData.link && typeof linkData.link === "object" ? linkData.link : {};
-      const href = wixPickFirstString(linkObj.url, linkObj.href, linkData.url, "");
+      const href = pickFirstString(linkObj.url, linkObj.href, linkData.url, "");
       const inner = renderRichInlineNodes(childNodes);
       return renderInlineLink(href, inner);
     }
@@ -2466,7 +1717,7 @@ function pickRichMediaUrl(media) {
   if (!media || typeof media !== "object") return "";
   const source = media.src && typeof media.src === "object" ? media.src : {};
 
-  return wixPickFirstString(
+  return pickFirstString(
     media.url,
     source.url,
     media.fileUrl,
@@ -2492,7 +1743,7 @@ function extractVideoLikeUrl(videoData) {
   const primary = pickRichMediaUrl(videoData.video || {});
   if (primary) return primary;
 
-  return wixPickFirstString(
+  return pickFirstString(
     videoData.url,
     pickRichMediaUrl(videoData.thumbnail || {}),
   );
@@ -2553,8 +1804,8 @@ function renderRichContentNodes(nodes, options = {}) {
       const src = pickRichMediaUrl(image);
       if (!src) return "";
 
-      const alt = wixPickFirstString(imageData.altText, "");
-      const caption = wixPickFirstString(imageData.caption, "");
+      const alt = pickFirstString(imageData.altText, "");
+      const caption = pickFirstString(imageData.caption, "");
       return renderImageFigure(src, alt, caption);
     }
 
@@ -2568,7 +1819,7 @@ function renderRichContentNodes(nodes, options = {}) {
         const imageMedia = imageData.media && typeof imageData.media === "object" ? imageData.media : {};
         const imageUrl = pickRichMediaUrl(imageMedia);
         if (imageUrl) {
-          const alt = wixPickFirstString(item.altText, item.title, "");
+          const alt = pickFirstString(item.altText, item.title, "");
           return renderImageFigure(imageUrl, alt, item.title || "");
         }
 
@@ -2585,7 +1836,7 @@ function renderRichContentNodes(nodes, options = {}) {
         return "";
       }).filter(Boolean).join("");
 
-      return renderedItems ? `<div class="wix-gallery">${renderedItems}</div>` : "";
+      return renderedItems ? `<div class="rich-content-gallery">${renderedItems}</div>` : "";
     }
 
     if (type === "VIDEO") {
@@ -2613,13 +1864,13 @@ function renderRichContentNodes(nodes, options = {}) {
       const fileData = node.fileData && typeof node.fileData === "object" ? node.fileData : {};
       const src = fileData.src && typeof fileData.src === "object" ? fileData.src : {};
       const fileUrl = pickRichMediaUrl(src);
-      const label = wixPickFirstString(fileData.name, fileData.type, "Last ned fil");
+      const label = pickFirstString(fileData.name, fileData.type, "Last ned fil");
       return renderMediaAnchor(fileUrl, label);
     }
 
     if (type === "GIF") {
       const gifData = node.gifData && typeof node.gifData === "object" ? node.gifData : {};
-      const gifUrl = wixPickFirstString(gifData.gif, gifData.mp4, gifData.still);
+      const gifUrl = pickFirstString(gifData.gif, gifData.mp4, gifData.still);
       if (!gifUrl) return "";
 
       if (/\.mp4($|\?)/i.test(gifUrl)) {
@@ -2632,7 +1883,7 @@ function renderRichContentNodes(nodes, options = {}) {
     if (type === "EMBED") {
       const embedData = node.embedData && typeof node.embedData === "object" ? node.embedData : {};
       const oembed = embedData.oembed && typeof embedData.oembed === "object" ? embedData.oembed : {};
-      const embedUrl = wixPickFirstString(oembed.url, oembed.videoUrl, embedData.src);
+      const embedUrl = pickFirstString(oembed.url, oembed.videoUrl, embedData.src);
       if (!embedUrl) return "";
       return renderMediaAnchor(embedUrl, "Åpne innhold");
     }
@@ -2640,21 +1891,21 @@ function renderRichContentNodes(nodes, options = {}) {
     if (type === "LINK_PREVIEW") {
       const linkPreviewData = node.linkPreviewData && typeof node.linkPreviewData === "object" ? node.linkPreviewData : {};
       const link = linkPreviewData.link && typeof linkPreviewData.link === "object" ? linkPreviewData.link : {};
-      const url = wixPickFirstString(link.url, "");
-      const title = wixPickFirstString(linkPreviewData.title, "Lenke");
+      const url = pickFirstString(link.url, "");
+      const title = pickFirstString(linkPreviewData.title, "Lenke");
       const description = typeof linkPreviewData.description === "string" ? linkPreviewData.description.trim() : "";
-      const thumbnail = wixPickFirstString(linkPreviewData.thumbnailUrl, "");
+      const thumbnail = pickFirstString(linkPreviewData.thumbnailUrl, "");
       if (!url && !thumbnail) return "";
 
       const imagePart = thumbnail ? renderImageFigure(thumbnail, title) : "";
       const textPart = `${renderMediaAnchor(url, title)}${description ? `<p>${escapeHtml(description)}</p>` : ""}`;
-      return `<div class="wix-link-preview">${imagePart}${textPart}</div>`;
+      return `<div class="rich-content-link-preview">${imagePart}${textPart}</div>`;
     }
 
     if (type === "APP_EMBED") {
       const appEmbedData = node.appEmbedData && typeof node.appEmbedData === "object" ? node.appEmbedData : {};
-      const url = wixPickFirstString(appEmbedData.url, "");
-      const name = wixPickFirstString(appEmbedData.name, "Åpne innhold");
+      const url = pickFirstString(appEmbedData.url, "");
+      const name = pickFirstString(appEmbedData.name, "Åpne innhold");
       const image = appEmbedData.image && typeof appEmbedData.image === "object" ? appEmbedData.image : {};
       const imageUrl = pickRichMediaUrl(image);
 
@@ -2665,7 +1916,7 @@ function renderRichContentNodes(nodes, options = {}) {
 
     if (type === "HTML") {
       const htmlData = node.htmlData && typeof node.htmlData === "object" ? node.htmlData : {};
-      const embedUrl = wixPickFirstString(htmlData.url, "");
+      const embedUrl = pickFirstString(htmlData.url, "");
       if (!embedUrl) return "";
       return renderMediaAnchor(embedUrl, "Åpne innebygd innhold");
     }
@@ -2778,12 +2029,12 @@ function extractFirstImageFromRichContent(richContent) {
     }
 
     if (type === "LINK_PREVIEW" && node.linkPreviewData && typeof node.linkPreviewData === "object") {
-      const thumb = wixPickFirstString(node.linkPreviewData.thumbnailUrl, "");
+      const thumb = pickFirstString(node.linkPreviewData.thumbnailUrl, "");
       if (thumb) return thumb;
     }
 
     if (type === "GIF" && node.gifData && typeof node.gifData === "object") {
-      const gifImage = wixPickFirstString(node.gifData.still, node.gifData.gif, "");
+      const gifImage = pickFirstString(node.gifData.still, node.gifData.gif, "");
       if (gifImage) return gifImage;
     }
 
@@ -2821,7 +2072,7 @@ function buildBlogItemStableId(item, fallback = "") {
   const candidates = [
     item.__stableId,
     item.id,
-    item.wixGuid,
+    item.externalGuid,
     item.slug,
     item.url,
     item.link,
@@ -2869,19 +2120,19 @@ function buildBlogItemDedupKey(item, index = 0) {
 
   const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
   const stable = normalizeKeyFragment(buildBlogItemStableId(item, ""));
-  const wixGuid = normalizeKeyFragment(item.wixGuid || item.id || "");
+  const externalGuid = normalizeKeyFragment(item.externalGuid || item.id || "");
   const slug = normalizeKeyFragment(item.slug || "");
   const urlPath = normalizeUrlPath(item.url || item.link || "");
   const title = normalizeKeyFragment(item.title || "");
   const dateIso = parseDateIso(item.date || "");
   const dateKey = dateIso ? dateIso.slice(0, 10) : "";
 
-  if (source === "wix") {
-    if (wixGuid) return `wix-guid:${wixGuid}`;
-    if (urlPath) return `wix-url:${urlPath}`;
-    if (slug) return `wix-slug:${slug}`;
-    if (stable) return `wix-stable:${stable}`;
-    return `wix-fallback:${index}`;
+  if (source === "ekstern") {
+    if (externalGuid) return `ekstern-guid:${externalGuid}`;
+    if (urlPath) return `ekstern-url:${urlPath}`;
+    if (slug) return `ekstern-slug:${slug}`;
+    if (stable) return `ekstern-stable:${stable}`;
+    return `ekstern-fallback:${index}`;
   }
 
   if (stable) return `stable:${stable}`;
@@ -2905,13 +2156,13 @@ function buildBlogItemLookupKeys(item, index = 0) {
   };
 
   const stableId = buildBlogItemStableId(item, "");
-  const wixGuid = typeof item.wixGuid === "string" ? item.wixGuid : "";
+  const externalGuid = typeof item.externalGuid === "string" ? item.externalGuid : "";
   const slug = typeof item.slug === "string" ? item.slug : "";
   const urlPath = normalizeUrlPath(item.url || item.link || "");
   const dedupKey = buildBlogItemDedupKey(item, index);
 
   addKey(stableId);
-  addKey(wixGuid);
+  addKey(externalGuid);
   addKey(slug);
   addKey(urlPath);
   addKey(dedupKey);
@@ -2919,94 +2170,14 @@ function buildBlogItemLookupKeys(item, index = 0) {
   return keys;
 }
 
-async function resolveWixCommentTarget(interactionPostId) {
-  const interactionId = typeof interactionPostId === "string" ? interactionPostId.trim() : "";
-  if (!interactionId) return null;
-
-  const lookupKeys = new Set([
-    interactionId.toLowerCase(),
-    interactionId.replace(/\//g, "_").toLowerCase(),
-  ]);
-
-  const contentSnap = await db.collection("content").doc("collection_blog").get();
-  const contentData = contentSnap.exists ? contentSnap.data() : {};
-  const items = Array.isArray(contentData && contentData.items) ? contentData.items : [];
-
-  const wixItem = items.find((item, index) => {
-    if (!item || typeof item !== "object") return false;
-    const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
-    if (source !== "wix") return false;
-
-    const itemKeys = buildBlogItemLookupKeys(item, index);
-    for (const key of lookupKeys) {
-      if (itemKeys.has(key)) return true;
-    }
-    return false;
-  });
-
-  if (!wixItem) return null;
-
-  const wixGuid = wixPickFirstString(wixItem.wixGuid, wixItem.id);
-  const referenceId = wixPickFirstString(wixItem.referenceId);
-  const resourceId = wixPickFirstString(
-    wixItem.commentResourceId,
-    wixItem.resourceId,
-    referenceId,
-    wixGuid,
-  );
-  const contextId = wixPickFirstString(
-    wixItem.commentContextId,
-    wixItem.contextId,
-    referenceId,
-    wixGuid,
-    resourceId,
-  );
-
-  const appId = getWixCommentsAppId();
-  if (!appId || !contextId || !resourceId) return null;
-
-  return {
-    appId,
-    contextId,
-    resourceId,
-    wixGuid,
-    referenceId,
-    title: wixPickFirstString(wixItem.title, "Blogginnlegg"),
-  };
-}
-
-function buildWixCommentRichContent(text) {
-  const clean = clampText(typeof text === "string" ? text : "", 5000);
-  if (!clean) return null;
-
-  const paragraphId = `p-${crypto.randomBytes(4).toString("hex")}`;
-  const textId = `t-${crypto.randomBytes(4).toString("hex")}`;
-  return {
-    nodes: [
-      {
-        id: paragraphId,
-        type: "PARAGRAPH",
-        nodes: [
-          {
-            id: textId,
-            type: "TEXT",
-            textData: {
-              text: clean,
-            },
-          },
-        ],
-      },
-    ],
-  };
-}
 
 function getBlogItemQualityScore(item) {
   if (!item || typeof item !== "object") return 0;
   const contentLen = typeof item.content === "string" ? item.content.trim().length : 0;
   const excerptLen = typeof item.excerpt === "string" ? item.excerpt.trim().length : 0;
-  const imageBonus = wixPickFirstString(item.imageUrl, item.image, item.dashboardImage) ? 120 : 0;
+  const imageBonus = pickFirstString(item.imageUrl, item.image, item.dashboardImage) ? 120 : 0;
   const dateBonus = parseDateIso(item.date || "") ? 40 : 0;
-  const sourceBonus = String(item.source || "").toLowerCase() === "wix" ? 220 : 0;
+  const sourceBonus = String(item.source || "").toLowerCase() === "ekstern" ? 220 : 0;
   const structureBonus = typeof item.content === "string" && hasStructuralHtmlMarkup(item.content) ? 120 : 0;
   const languageBonus = detectBlogItemLanguage(item) === "no" ? 25 : 0;
   return contentLen + Math.min(excerptLen, 300) + imageBonus + dateBonus + sourceBonus + structureBonus + languageBonus;
@@ -3028,7 +2199,7 @@ function detectBlogItemLanguage(item) {
 function buildBlogTitleDateKey(item, index = 0) {
   if (!item || typeof item !== "object") return `fallback-${index}`;
   const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
-  if (source === "wix") {
+  if (source === "ekstern") {
     return buildBlogItemDedupKey(item, index);
   }
   const title = normalizeKeyFragment(item.title || "");
@@ -3118,7 +2289,7 @@ function mergeCanonicalBlogItems(existingItem, nextItem) {
       ...base,
       content: typeof base.content === "string" && base.content.trim() ? base.content : (variant.content || ""),
       excerpt: typeof base.excerpt === "string" && base.excerpt.trim() ? base.excerpt : (variant.excerpt || ""),
-      imageUrl: wixPickFirstString(base.imageUrl, variant.imageUrl, base.image, variant.image),
+      imageUrl: pickFirstString(base.imageUrl, variant.imageUrl, base.image, variant.image),
       translations: mergedTranslations,
     };
 
@@ -3169,93 +2340,10 @@ function mergeBlogItemsPreferred(existingItem, nextItem) {
     ...winner,
     content: contentA.length >= contentB.length ? contentA : contentB,
     excerpt: excerptA.length >= excerptB.length ? excerptA : excerptB,
-    imageUrl: wixPickFirstString(winner.imageUrl, loser.imageUrl, winner.image, loser.image),
+    imageUrl: pickFirstString(winner.imageUrl, loser.imageUrl, winner.image, loser.image),
   };
 }
 
-function normalizeWixBlogRssItem(item, index = 0) {
-  if (!item || typeof item !== "object") return null;
-
-  const title = decodeHtmlEntities(readXmlText(item.title));
-  const link = readXmlText(item.link);
-  const guid = readXmlText(item.guid);
-  const pubDate = readXmlText(item.pubDate);
-  const author = decodeHtmlEntities(readXmlText(item["dc:creator"]) || readXmlText(item.author)) || "HKM";
-
-  const categories = toArray(item.category)
-    .map((category) => decodeHtmlEntities(readXmlText(category)))
-    .filter(Boolean);
-
-  const category = categories[0] || "Blogg";
-
-  const htmlContent = readXmlText(item["content:encoded"]) || readXmlText(item.description);
-  const excerptPlain = stripHtmlTags(htmlContent);
-  const excerpt = clampText(decodeHtmlEntities(excerptPlain), 360);
-
-  const mediaContent = toArray(item["media:content"])[0] || {};
-  const mediaThumbnail = toArray(item["media:thumbnail"])[0] || {};
-  const enclosure = item.enclosure && typeof item.enclosure === "object" ? item.enclosure : {};
-  const imageUrl = wixPickFirstString(
-    mediaContent.url,
-    mediaContent.href,
-    mediaThumbnail.url,
-    enclosure.url,
-    extractFirstImageFromHtml(htmlContent),
-  );
-
-  let slug = "";
-  if (link) {
-    try {
-      const urlObj = new URL(link);
-      const segments = urlObj.pathname.split("/").filter(Boolean);
-      slug = segments.length > 0 ? segments[segments.length - 1] : "";
-    } catch (error) {
-      slug = "";
-    }
-  }
-
-  const stableId = buildBlogItemStableId({
-    id: guid,
-    wixGuid: guid,
-    slug,
-    link,
-    title,
-  }, `wix-blog-${index}`);
-
-  const contentHtml = typeof htmlContent === "string" && htmlContent.trim() ? htmlContent.trim() : `<p>${excerpt}</p>`;
-
-  if (!title && !contentHtml) return null;
-
-  return {
-    id: stableId,
-    title: title || "Blogginnlegg",
-    content: contentHtml,
-    date: parseDateIso(pubDate) || new Date().toISOString(),
-    author,
-    category,
-    imageUrl,
-    source: "wix",
-    wixGuid: guid || "",
-    url: link || "",
-    slug: slug || "",
-    excerpt,
-    featured: false,
-    pinned: false,
-    commentingEnabled: true,
-    minutesToRead: 1,
-    likes: 0,
-    comments: 0,
-    views: 0,
-    categoryIds: [],
-    tagIds: [],
-    hashtags: [],
-    relatedPostIds: [],
-    pricingPlanIds: [],
-    memberId: "",
-    contactId: "",
-    language: "no",
-  };
-}
 
 function hasStructuralHtmlMarkup(html) {
   if (typeof html !== "string" || !html.trim()) return false;
@@ -3273,7 +2361,7 @@ function sanitizeBlogHtmlForDisplay(html) {
     .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, "")
     .replace(/\r\n?/g, "\n");
 
-  // Remove common newsletter artifacts scraped from Wix post footers.
+  // Remove common newsletter artifacts scraped from Ekstern post footers.
   output = output.replace(
     /<p>\s*(?:Ja,\s*jeg\s*ønsker\s*å\s*abonnere\s*på\s*deres\s*nyhetsbrev\s*\*?|Meld\s*deg\s*på\s*nyhetsbrev[^<]*)\s*<\/p>/gi,
     ""
@@ -3305,472 +2393,12 @@ function normalizeBlogItemForDisplay(item) {
   };
 }
 
-function normalizeWixBlogApiPost(post, index = 0) {
-  if (!post || typeof post !== "object") return null;
-
-  const title = typeof post.title === "string" ? post.title.trim() : "";
-  const url = (post.url && typeof post.url === "object" && typeof post.url.path === "string") 
-    ? post.url.path.trim() 
-    : (typeof post.url === "string" ? post.url.trim() : "");
-  const slug = typeof post.slug === "string" ? post.slug.trim() : "";
-  const id = typeof post._id === "string" ? post._id.trim() : (typeof post.id === "string" ? post.id.trim() : "");
-  const referenceId = typeof post.referenceId === "string" ? post.referenceId.trim() : "";
-  const author = "HKM";
-  const category = "Blogg";
-  const date = parseDateIso(post.firstPublishedDate || post.lastPublishedDate || post._createdDate || post._updatedDate);
-
-  const richContent = post.richContent || (post.content && typeof post.content === 'object' ? post.content : null);
-  const richContentHtml = renderRichContentToHtml(richContent);
-  const richContentText = extractTextFromRichContent(richContent);
-  const directContentText = typeof post.contentText === "string" ? post.contentText.trim() : "";
-  const contentText = directContentText.length >= richContentText.length ? directContentText : richContentText;
-  
-  // Direct HTML from Wix (contains <img> and <ul> tags natively)
-  const directHtml = typeof post.content === "string" ? post.content.trim() : "";
-  
-  // Fallback auto-generated HTML
-  const plainContentHtml = plainTextToHtml(contentText);
-
-  // Content Selection Hierarchy:
-  // 1. Rich Content (authoritative structured JSON)
-  // 2. Direct HTML (native Wix HTML output)
-  // 3. Plain Text Fallback (auto-generated <p> tags)
-  const contentHtml = richContentHtml || directHtml || plainContentHtml;
-
-  const excerptSource = typeof post.excerpt === "string" && post.excerpt.trim() ? post.excerpt : (stripHtmlTags(contentHtml) || contentText);
-  const excerpt = clampText(decodeHtmlEntities(excerptSource || ""), 360);
-
-  const media = post.media && typeof post.media === "object" ? post.media : {};
-  const heroImage = post.heroImage && typeof post.heroImage === "object" ? post.heroImage : {};
-  const heroImageUrl = (heroImage.image && typeof heroImage.image === "object") 
-    ? pickRichMediaUrl(heroImage.image) 
-    : null;
-  const imageUrl = wixPickFirstString(
-    heroImageUrl,
-    media.image,
-    media.url,
-    extractFirstImageFromRichContent(richContent),
-  );
-
-  const stableId = buildBlogItemStableId({
-    id,
-    slug,
-    url,
-    title,
-  }, `wix-blog-api-${index}`);
-
-  const finalHtml = contentHtml || `<p>${escapeHtml(excerpt || "")}</p>`;
-  if (!title && !finalHtml) return null;
-
-  const metrics = post.metrics && typeof post.metrics === "object" ? post.metrics : {};
-  const likes = typeof metrics.likes === "number" ? Math.max(0, metrics.likes) : 0;
-  const comments = typeof metrics.comments === "number" ? Math.max(0, metrics.comments) : 0;
-  const views = typeof metrics.views === "number" ? Math.max(0, metrics.views) : 0;
-
-  const categoryIds = Array.isArray(post.categoryIds) ? post.categoryIds.filter(c => typeof c === "string") : [];
-  const tagIds = Array.isArray(post.tagIds) ? post.tagIds.filter(t => typeof t === "string") : [];
-  const hashtags = Array.isArray(post.hashtags) ? post.hashtags.filter(h => typeof h === "string") : [];
-  const relatedPostIds = Array.isArray(post.relatedPostIds) ? post.relatedPostIds.filter(r => typeof r === "string") : [];
-  const pricingPlanIds = Array.isArray(post.pricingPlanIds) ? post.pricingPlanIds.filter(p => typeof p === "string") : [];
-
-  return {
-    id: stableId,
-    title: title || "Blogginnlegg",
-    content: finalHtml,
-    date: date || new Date().toISOString(),
-    author,
-    category,
-    imageUrl,
-    source: "wix",
-    wixGuid: id || "",
-    url,
-    slug,
-    excerpt,
-    featured: typeof post.featured === "boolean" ? post.featured : false,
-    pinned: typeof post.pinned === "boolean" ? post.pinned : false,
-    commentingEnabled: typeof post.commentingEnabled === "boolean" ? post.commentingEnabled : true,
-    minutesToRead: typeof post.minutesToRead === "number" ? Math.max(1, post.minutesToRead) : 1,
-    likes,
-    comments,
-    views,
-    categoryIds,
-    tagIds,
-    hashtags,
-    relatedPostIds,
-    pricingPlanIds,
-    memberId: typeof post.memberId === "string" ? post.memberId : "",
-    contactId: typeof post.contactId === "string" ? post.contactId : "",
-    language: typeof post.language === "string" ? post.language : "no",
-    referenceId,
-    commentResourceId: referenceId || id || "",
-    commentContextId: referenceId || id || "",
-    richContent,
-  };
-}
-
-async function fetchWixBlogItemsViaApi() {
-  const wixClient = getWixClient();
-  let offset = 0;
-  const limit = 50;
-  const fieldsets = ["CONTENT_TEXT", "URL", "RICH_CONTENT", "FEED", "REFERENCE_ID"];
-  const listPosts = [];
-
-  while (true) {
-    const response = await wixClient.posts.listPosts({
-      paging: { limit, offset },
-      fieldsets,
-    });
-    const pagePosts = Array.isArray(response && response.posts) ? response.posts : [];
-    if (!pagePosts.length) break;
-
-    listPosts.push(...pagePosts);
-    if (pagePosts.length < limit) break;
-    offset += limit;
-  }
-
-  const detailedPosts = [];
-  for (const post of listPosts) {
-    const postId = post && typeof post._id === "string" ? post._id : (post && typeof post.id === "string" ? post.id : "");
-    if (!postId) continue;
-
-    try {
-      const fullPost = await wixClient.posts.getPost(postId, { fieldsets });
-      if (fullPost) detailedPosts.push(fullPost);
-    } catch (error) {
-      detailedPosts.push(post);
-    }
-  }
-
-  return detailedPosts
-    .map((post, index) => normalizeWixBlogApiPost(post, index))
-    .filter((item) => item && (item.title || item.content));
-}
-
-async function fetchWixBlogItemsViaRss(req = { query: {} }) {
-  const feedUrl = getWixBlogFeedUrl(req);
-  if (!feedUrl) {
-    throw new Error("Missing Wix blog feed URL. Set WIX_BLOG_RSS_URL.");
-  }
-
-  const response = await fetch(feedUrl);
-  if (!response.ok) {
-    throw new Error(`Wix blog feed request failed with status ${response.status}`);
-  }
-
-  const xml = await response.text();
-  const parsed = await parseStringPromise(xml, {
-    explicitArray: false,
-    trim: true,
-    mergeAttrs: true,
-  });
-
-  const rss = parsed && parsed.rss ? parsed.rss : {};
-  const channel = rss && rss.channel ? rss.channel : {};
-  const rawItems = toArray(channel.item);
-
-  const items = rawItems
-    .map((item, index) => normalizeWixBlogRssItem(item, index))
-    .filter((item) => item && (item.title || item.content));
-
-  return { feedUrl, items };
-}
-
-async function fetchAndCacheWixBlogPosts(req = { query: {} }) {
-  let wixItems = [];
-  let rssItems = [];
-  let importSource = WIX_BLOG_API_ENABLED ? "wix-api" : "wix-rss-only";
-  let feedUrl = "";
-
-  try {
-    if (WIX_BLOG_API_ENABLED) {
-      wixItems = await fetchWixBlogItemsViaApi();
-    }
-
-    try {
-      const rssResult = await fetchWixBlogItemsViaRss(req);
-      rssItems = Array.isArray(rssResult && rssResult.items) ? rssResult.items : [];
-      feedUrl = rssResult && typeof rssResult.feedUrl === "string" ? rssResult.feedUrl : "";
-      if (rssItems.length > 0) {
-        importSource = WIX_BLOG_API_ENABLED ? "wix-api-rss-merged" : "wix-rss-only";
-      }
-    } catch (rssError) {
-      if (WIX_BLOG_API_ENABLED) {
-        console.warn("Wix Blog RSS enrichment failed, continuing with API only:", rssError && rssError.message ? rssError.message : rssError);
-      } else {
-        throw rssError;
-      }
-    }
-
-  } catch (apiError) {
-    console.warn("Wix Blog API sync failed, falling back to RSS:", apiError && apiError.message ? apiError.message : apiError);
-    const rssResult = await fetchWixBlogItemsViaRss(req);
-    wixItems = rssResult.items;
-    feedUrl = rssResult.feedUrl;
-    importSource = "wix-rss-fallback";
-  }
-
-  if (WIX_BLOG_PUBLIC_PAGE_ENRICHMENT_ENABLED) {
-    wixItems = await enrichWixItemsWithPublicPageContent(wixItems);
-  }
-
-  const existingSnap = await db.collection("content").doc("collection_blog").get();
-  const existingData = existingSnap.exists ? existingSnap.data() : {};
-  const existingItems = Array.isArray(existingData && existingData.items) ? existingData.items : [];
-  const nonWixItems = existingItems.filter((item) => {
-    const source = typeof item.source === "string" ? item.source.toLowerCase() : "";
-    return source !== "wix";
-  });
-
-  const mergedMap = new Map();
-  nonWixItems.forEach((item, index) => {
-    const key = buildBlogItemDedupKey(item, index);
-    const existing = mergedMap.get(key);
-    mergedMap.set(key, mergeBlogItemsPreferred(existing, item));
-  });
-
-  wixItems.forEach((item, index) => {
-    const key = buildBlogItemDedupKey(item, nonWixItems.length + index);
-    const existing = mergedMap.get(key);
-    mergedMap.set(key, mergeBlogItemsPreferred(existing, item));
-  });
-
-  rssItems.forEach((item, index) => {
-    const key = buildBlogItemDedupKey(item, nonWixItems.length + wixItems.length + index);
-    const existing = mergedMap.get(key);
-    mergedMap.set(key, mergeBlogItemsPreferred(existing, item));
-  });
-
-  const mergedItems = Array.from(mergedMap.values()).sort((a, b) => {
-    const dateA = new Date(a && a.date ? a.date : 0).getTime();
-    const dateB = new Date(b && b.date ? b.date : 0).getTime();
-    return dateB - dateA;
-  });
-
-  const consolidatedItems = consolidateDuplicateBlogItems(mergedItems).sort((a, b) => {
-    const dateA = new Date(a && a.date ? a.date : 0).getTime();
-    const dateB = new Date(b && b.date ? b.date : 0).getTime();
-    return dateB - dateA;
-  });
-
-  const displayReadyItems = consolidatedItems.map((item) => normalizeBlogItemForDisplay(item));
-
-  const payload = {
-    items: displayReadyItems,
-    lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
-    wixSync: {
-      feedUrl,
-      source: importSource,
-      syncedAt: admin.firestore.FieldValue.serverTimestamp(),
-      wixItemCount: wixItems.length,
-      rssItemCount: rssItems.length,
-      totalItemCount: displayReadyItems.length,
-    },
-  };
-
-  await db.collection("content").doc("collection_blog").set(payload, { merge: true });
-
-  return {
-    ok: true,
-    feedUrl,
-    source: importSource,
-    wixItemCount: wixItems.length,
-    rssItemCount: rssItems.length,
-    totalItemCount: displayReadyItems.length,
-    items: displayReadyItems,
-  };
-}
-
-exports.onBlogCommentCreatedSyncToWixFirestore = onDocumentCreated({
-  document: "interactions/{postId}/comments/{commentId}",
-}, async (event) => {
-  const snapshot = event.data;
-  if (!snapshot) return;
-
-  if (!WIX_API_ENABLED) {
-    await snapshot.ref.set({
-      wixSync: {
-        status: "skipped",
-        reason: "wix-api-disabled",
-        skippedAt: admin.firestore.FieldValue.serverTimestamp(),
-      },
-    }, { merge: true });
-    return;
-  }
-
-  const commentData = snapshot.data() || {};
-  const postId = event.params && typeof event.params.postId === "string" ? event.params.postId : "";
-  const commentId = event.params && typeof event.params.commentId === "string" ? event.params.commentId : "";
-
-  const text = typeof commentData.text === "string" ? commentData.text.trim() : "";
-  if (!text) {
-    await snapshot.ref.set({
-      wixSync: {
-        status: "skipped",
-        reason: "empty-text",
-        skippedAt: admin.firestore.FieldValue.serverTimestamp(),
-      },
-    }, { merge: true });
-    return;
-  }
-
-  try {
-    const target = await resolveWixCommentTarget(postId);
-    if (!target) {
-      await snapshot.ref.set({
-        wixSync: {
-          status: "failed",
-          reason: "missing-wix-target",
-          failedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-      }, { merge: true });
-      return;
-    }
-
-    const richContent = buildWixCommentRichContent(text);
-    if (!richContent) {
-      await snapshot.ref.set({
-        wixSync: {
-          status: "skipped",
-          reason: "invalid-rich-content",
-          skippedAt: admin.firestore.FieldValue.serverTimestamp(),
-        },
-      }, { merge: true });
-      return;
-    }
-
-    const wixClient = getWixClient();
-    const wixComment = await wixClient.comments.createComment({
-      appId: target.appId,
-      contextId: target.contextId,
-      resourceId: target.resourceId,
-      content: {
-        richContent,
-      },
-    });
-
-    await snapshot.ref.set({
-      wixSync: {
-        status: "synced",
-        syncedAt: admin.firestore.FieldValue.serverTimestamp(),
-        wixCommentId: wixComment && wixComment._id ? wixComment._id : "",
-        postId,
-        commentId,
-        appId: target.appId,
-        contextId: target.contextId,
-        resourceId: target.resourceId,
-      },
-    }, { merge: true });
-  } catch (error) {
-    console.error("Failed to sync local comment to Wix:", error && error.message ? error.message : error);
-    await snapshot.ref.set({
-      wixSync: {
-        status: "failed",
-        failedAt: admin.firestore.FieldValue.serverTimestamp(),
-        error: clampText(error && error.message ? error.message : String(error), 900),
-      },
-    }, { merge: true });
-  }
-});
 
 
-exports.wixProducts = onRequest({ cors: true, invoker: "public", memory: "512MiB", timeoutSeconds: 300 }, (req, res) => {
-  return cors(req, res, async () => {
-    if (req.method === "OPTIONS") {
-      return res.status(204).send("");
-    }
 
-    try {
-      const forceSync = req.method === "POST" || req.query.force === "true";
 
-      if (!WIX_API_ENABLED) {
-        const cachedData = await loadFromStorageCache("cache/wix_products_v2.json");
-        if (cachedData && cachedData.items && cachedData.items.length >= 0) {
-          return res.status(200).json({
-            ok: true,
-            ...cachedData,
-            apiDisabled: true,
-            source: "wix-api-disabled-storage-cache",
-            manuallySynced: false,
-          });
-        }
 
-        return res.status(200).json({
-          ok: true,
-          items: [],
-          count: 0,
-          total: 0,
-          apiDisabled: true,
-          source: "wix-api-disabled",
-          fallbackUrl: "https://www.hiskingdomministry.no/butikk",
-        });
-      }
 
-      // 1. Try to load from Storage cache first
-      if (!forceSync) {
-        const cachedData = await loadFromStorageCache("cache/wix_products_v2.json");
-        if (cachedData && cachedData.items && cachedData.items.length > 0) {
-          return res.status(200).json({ ok: true, ...cachedData, source: "storage-cache" });
-        }
-      }
-
-      // 2. If force sync or no cache, run full sync
-      if (forceSync) console.log("Manual Wix sync triggered.");
-      const cacheData = await fetchAndCacheWixProducts(req);
-      return res.status(200).json({ ok: true, ...cacheData, manuallySynced: forceSync });
-
-    } catch (error) {
-      console.error("Wix products fetch failed:", error);
-      return res.status(500).json({
-        ok: false,
-        error: "Could not load products from Wix.",
-        details: error.message,
-        fallbackUrl: "https://www.hiskingdomministry.no/butikk",
-      });
-    }
-  });
-});
-
-exports.wixBlogSync = onRequest({ cors: true, invoker: "public" }, (req, res) => {
-  return cors(req, res, async () => {
-    if (req.method === "OPTIONS") {
-      return res.status(204).send("");
-    }
-
-    return res.status(410).json({
-      ok: false,
-      error: "Wix blog sync is disabled. Blog content is managed only in Firestore/admin.",
-    });
-  });
-});
-
-/**
- * Automatisert synkronisering av Wix-produkter.
- * Kjører hver 5. time for å holde butikken oppdatert.
- */
-exports.scheduledWixSync = onSchedule({ schedule: "0 */5 * * *", memory: "512MiB", timeoutSeconds: 300 }, async (event) => {
-  if (!WIX_API_ENABLED) {
-    console.log("Skipping scheduled Wix product synchronization because Wix API is disabled.");
-    return;
-  }
-
-  console.log("Starting scheduled Wix product synchronization...");
-  try {
-    const cacheData = await fetchAndCacheWixProducts({ query: {} });
-    console.log(`Successfully synced ${cacheData.count} products via scheduler.`);
-  } catch (error) {
-    console.error("Scheduled Wix sync failed:", error);
-  }
-});
-
-exports.scheduledWixBlogSync = onSchedule("15 */3 * * *", async () => {
-  console.log("Starting scheduled Wix blog synchronization...");
-  try {
-    const result = await fetchAndCacheWixBlogPosts({ query: {} });
-    console.log(`Successfully synced ${result.wixItemCount} Wix blog posts.`);
-  } catch (error) {
-    console.error("Scheduled Wix blog sync failed:", error);
-  }
-});
 
 /**
  * Sletter gamle visitor chats for å begrense lagringstid av samtaler.
@@ -5753,7 +4381,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold
     const firestoreReads = [
       db.collection("siteContent").doc("settings_seo").get(),
-      db.collection("content").doc("wix_products").get(),
+      db.collection("content").doc("ekstern_products").get(),
       db.collection("content").doc("collection_events").get(),
       db.collection("content").doc("collection_blog").get(),
       db.collection("content").doc("collection_teaching").get(),
@@ -6036,16 +4664,16 @@ exports.cleanupBlogDuplicates = onRequest(async (req, res) => {
       });
     }
 
-    // Keep the one from Wix if available, otherwise keep the most complete one
+    // Keep the one from Ekstern if available, otherwise keep the most complete one
     let toKeep = matches[0];
     for (const item of matches) {
       const itemSource = String(item.source || '').toLowerCase();
       const keepSource = String(toKeep.source || '').toLowerCase();
       
-      if (itemSource === 'wix' && keepSource !== 'wix') {
+      if (itemSource === 'ekstern' && keepSource !== 'ekstern') {
         toKeep = item;
-      } else if (itemSource === keepSource && itemSource !== 'wix') {
-        // Both non-Wix: keep the one with more fields
+      } else if (itemSource === keepSource && itemSource !== 'ekstern') {
+        // Both non-Ekstern: keep the one with more fields
         const itemFieldCount = Object.keys(item).length;
         const keepFieldCount = Object.keys(toKeep).length;
         if (itemFieldCount > keepFieldCount) {

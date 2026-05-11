@@ -447,7 +447,7 @@
                                 </h2>
                                 <p class="text-base md:text-lg text-slate-200 leading-relaxed max-w-lg mx-auto"
                                     data-content-key="heroFallback.subtitle">
-                                    Produktene hentes automatisk fra Wix. Hvis de ikke vises med en gang kan du fortsatt
+                                    Produktene hentes automatisk fra vårt lager. Hvis de ikke vises med en gang kan du fortsatt
                                     handle trygt i den eksterne butikken.
                                 </p>
                                 <div class="flex flex-wrap justify-center gap-4 pt-2">
@@ -455,7 +455,7 @@
                                         rel="noopener noreferrer"
                                         class="shop-hero-cta w-full md:w-auto px-8 py-4 rounded-full font-black transition-all shadow-xl"
                                         data-content-key="heroFallback.ctaExternal">
-                                        Åpne Wix-butikken
+                                        Se alle produkter
                                     </a>
                                 </div>
                             </div>
@@ -486,13 +486,13 @@
                         <p class="mt-5 text-lg text-slate-600 leading-relaxed max-w-2xl"
                             data-content-key="aboutStore.description">
                             Her finner du klær, kopper, klistermerker, gavekort og andre ressurser med design som
-                            peker på tro, håp og kjærlighet. Produktene synkroniseres fra Wix-butikken og oppdateres
+                            peker på tro, håp og kjærlighet. Produktene synkroniseres fra butikken og oppdateres
                             fortløpende.
                         </p>
                         <p class="mt-4 text-base text-slate-500 leading-relaxed max-w-2xl"
                             data-content-key="aboutStore.description2">
                             Du kan bruke filterpanelet for å finne riktig kategori, størrelse, farge og prisnivå. Vi
-                            viser produktene direkte her, men du handler trygt via den eksterne Wix-butikken.
+                            viser produktene direkte her, men du handler trygt i butikken.
                         </p>
 
                         <div class="mt-7 flex flex-col sm:flex-row gap-4">
@@ -503,7 +503,7 @@
                             </a>
                             <a href="https://www.hiskingdomministry.no/butikk" target="_blank" rel="noopener noreferrer"
                                 class="inline-flex items-center justify-center gap-2 px-7 py-4 rounded-full border-2 border-slate-200 text-slate-900 font-black hover:border-slate-900 transition-colors">
-                                <span data-content-key="aboutStore.ctaExternal">Åpne Wix-butikken</span>
+                                <span data-content-key="aboutStore.ctaExternal">Se alle produkter</span>
                                 <i class="fas fa-external-link-alt text-sm"></i>
                             </a>
                         </div>
@@ -556,7 +556,7 @@
                                     data-content-key="aboutStore.features.secureLabel">Trygg handel</h3>
                                 <p class="mt-2 font-semibold text-slate-900 leading-snug"
                                     data-content-key="aboutStore.features.secureText">Bestillingen fullføres trygt i
-                                    Wix-butikken</p>
+                                    butikken</p>
                             </div>
                         </div>
                     </div>
@@ -1050,7 +1050,7 @@
                                 data-content-key="productBrowser.moreFiltersLabel">Flere filtre</p>
                         </div>
                         <div id="dynamic-filters" class="filter-scroll overflow-x-auto pb-2">
-                            <!-- Populated by window.renderFilters() in wix-store.js -->
+                            <!-- Populated by StoreManager -->
                         </div>
                     </div>
 
@@ -1128,11 +1128,11 @@
                     <p class="text-slate-600 mb-8 max-w-md mx-auto" data-content-key="productBrowser.error.description">
                         Vi har for øyeblikket problemer med å hente katalogen. Du kan se alle våre produkter
                         direkte i
-                        Wix-butikken.
+                        butikken.
                     </p>
                     <a href="https://www.hiskingdomministry.no/butikk"
                         class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-orange-500 text-white font-bold hover:bg-orange-600 transition-colors shadow-lg shadow-orange-500/20">
-                        <span data-content-key="productBrowser.error.cta">Besøk Wix-butikken nå</span> <i
+                        <span data-content-key="productBrowser.error.cta">Besøk butikken nå</span> <i
                             class="fas fa-external-link-alt"></i>
                     </a>
                 </div>
@@ -1310,17 +1310,6 @@
     <!-- Firebase Config & Notifications -->
     <script type="module" src="js/notifications.js"></script>
 
-    <script>
-        // API Config
-        window.HKM_WIX_STORE_CONFIG = {
-            clientId: '', // Add Client ID if using direct SDK mode
-            useProxy: true,
-            localProxyUrl: 'http://127.0.0.1:5001/his-kingdom-ministry/us-central1/wixProducts',
-            remoteProxyUrl: 'https://wixproducts-42bhgdjkcq-uc.a.run.app',
-            limit: 100
-        };
-    </script>
-    <script type="module" src="js/wix-store.js"></script>
     <!-- Swiper JS -->
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script type="module" src="js/i18n.js"></script>

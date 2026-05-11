@@ -10,16 +10,14 @@
         "build:css": "tailwindcss -i ./input.css -o ./styles.css --minify",
         "watch:css": "tailwindcss -i ./input.css -o ./styles.css --watch",
         "preview": "vite preview",
-        "emulators:wix": "firebase emulators:start --only functions",
-        "dev:butikk": "npm run watch:css & npm run dev:vite & npm run emulators:wix"
+        "emulators": "firebase emulators:start --only functions",
+        "dev:local": "npm run watch:css & npm run dev:vite & npm run emulators"
     },
     "devDependencies": {
         "tailwindcss": "^3.4.1",
         "vite": "^5.0.0"
     },
     "dependencies": {
-        "@wix/sdk": "^1.21.3",
-        "@wix/stores": "^1.0.702",
         "jsdom": "^28.1.0"
     }
 }

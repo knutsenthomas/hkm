@@ -166,7 +166,7 @@ class ContentManager {
         if (!item || typeof item !== 'object') return '';
         return item.id
             || item._id
-            || item.wixGuid
+            || item.externalGuid
             || item.postId
             || item.legacyId
             || item.slug
@@ -180,9 +180,7 @@ class ContentManager {
         const rawValues = [
             this.getContentItemStableId(item),
             item.id,
-            item._id,
-            item.wixGuid,
-            item.postId,
+            item.title,
             item.postID,
             item.referenceId,
             item.commentResourceId,
@@ -297,8 +295,7 @@ class ContentManager {
             return `title:${title}`;
         }
 
-        const wixGuid = this.normalizeBlogKeyValue(item.wixGuid || item.id || '');
-        if (wixGuid) return `guid:${wixGuid}`;
+        return `id:${item.id || ''}`;
 
         const urlPath = this.getBlogUrlPath(item.url || item.link || '');
         if (urlPath) return `url:${urlPath}`;
@@ -1056,11 +1053,6 @@ class ContentManager {
         const sourceItem = blogItem || teachingItem;
         const item = sourceItem ? this.getLocalizedContentItem(sourceItem) : null;
         const isTeaching = !!teachingItem;
-        const isWixReferencePost = this.isWixReferenceBlogPost(itemId, item, sourceItem);
-
-        if (document.body) {
-            document.body.classList.toggle('wix-reference-post-page', isWixReferencePost);
-        }
 
         if (!item) {
             container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
@@ -1104,7 +1096,6 @@ class ContentManager {
             heroEl.style.backgroundPosition = 'center center';
             heroEl.style.backgroundRepeat = 'no-repeat';
         }
-        const usesWixViewerHtml = this.isWixViewerHtml(articleHtml);
 
         // --- Calculate Reading Time ---
         let readingTime = Number(item?.minutesToRead ?? sourceItem?.minutesToRead ?? 0);
@@ -1124,11 +1115,6 @@ class ContentManager {
             readingTimeEl.style.display = 'inline-block';
         }
 
-        // --- View Counter (Wix + local) ---
-        const postId = this.getContentItemStableId(sourceItem || item);
-        const wixViewsRaw = Number(sourceItem?.views ?? item.views ?? 0);
-        const wixViews = Number.isFinite(wixViewsRaw) ? Math.max(0, Math.floor(wixViewsRaw)) : 0;
-        
         let viewsEl = document.getElementById('single-post-views');
         if (!viewsEl && document.querySelector('.blog-meta')) {
             viewsEl = document.createElement('span');
@@ -1139,17 +1125,17 @@ class ContentManager {
                 document.querySelector('.blog-meta').appendChild(viewsEl);
             }
         }
-        
+
         const updateViewsUI = (localViews) => {
             if (!viewsEl) return;
-            const viewCount = wixViews + localViews;
+            const viewCount = localViews;
             const viewsLabel = this.getTranslation('views') || 'visninger';
             viewsEl.innerHTML = `<i class="far fa-eye"></i> ${viewCount} ${viewsLabel}`;
             viewsEl.style.display = 'inline-block';
         };
 
-        // Render initial view count synchronously to not block UI
-        updateViewsUI(1);
+        // Render initial view count
+        updateViewsUI(0);
 
         if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
             (async () => {
@@ -1175,148 +1161,16 @@ class ContentManager {
             })();
         }
 
-        container.classList.toggle('wix-html-content', usesWixViewerHtml);
-        container.classList.toggle('wix-reference-post', isWixReferencePost);
-        container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
-
-        // Mobile cleanup and Gallery wrapping
-        const processContentStructure = (root) => {
-            if (!root) return;
-
-            // 2. Mobile Spacing Cleanup
-            if (!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches)) return;
-
-            const isSpacerLike = (el) => {
-                if (!el || el.nodeType !== 1) return false;
-                const tag = (el.tagName || '').toLowerCase();
-                const cls = ((el.className || '') + '').toLowerCase();
-                const text = (el.textContent || '').replace(/\u00a0/g, '').trim();
-                const hasMedia = !!el.querySelector('img,video,iframe,svg,blockquote');
-                const isEmptyBlock = !text && !hasMedia;
-                return tag === 'br' || tag === 'hr' || cls.includes('spacer') || (isEmptyBlock && (tag === 'p' || tag === 'div'));
-            };
-
-            let removed = 0;
-            while (root.firstElementChild && isSpacerLike(root.firstElementChild) && removed < 8) {
-                root.firstElementChild.remove();
-                removed += 1;
+        if (container) {
+            try {
+                container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+            } catch (err) {
+                console.error('[ContentManager] Render error:', err);
             }
-        };
-
-        processContentStructure(container);
-
-        // Mobile cleanup: remove leading spacer/empty blocks that can create a large gap above first paragraph.
-        const normalizeTopSpacingForMobile = (root) => {
-            if (!root || !(window.matchMedia && window.matchMedia('(max-width: 768px)').matches)) return;
-
-            const isSpacerLike = (el) => {
-                if (!el || el.nodeType !== 1) return false;
-
-                const tag = (el.tagName || '').toLowerCase();
-                const cls = ((el.className || '') + '').toLowerCase();
-                const styleAttr = (el.getAttribute('style') || '').toLowerCase();
-                const text = (el.textContent || '').replace(/\u00a0/g, '').trim();
-                const hasMedia = !!el.querySelector('img,video,iframe,svg,canvas,audio,table,blockquote,pre');
-
-                let declaredHeight = 0;
-                const hMatch = styleAttr.match(/(?:min-)?height\s*:\s*(\d+)px/);
-                if (hMatch) declaredHeight = Number(hMatch[1]) || 0;
-
-                const classSuggestsSpacer = /spacer|separator|empty|placeholder/.test(cls);
-                const tagSuggestsSpacer = tag === 'br' || tag === 'hr';
-                const isEmptyBlock = !text && !hasMedia;
-
-                return tagSuggestsSpacer || classSuggestsSpacer || (isEmptyBlock && declaredHeight >= 40) || (isEmptyBlock && (tag === 'div' || tag === 'section' || tag === 'p'));
-            };
-
-            let removed = 0;
-            while (root.firstElementChild && isSpacerLike(root.firstElementChild) && removed < 8) {
-                root.firstElementChild.remove();
-                removed += 1;
-            }
-
-            // For the Wix reference post on mobile, trim everything before first meaningful text block.
-            if (root.classList.contains('wix-reference-post')) {
-                const topChildren = Array.from(root.children);
-                const firstTextIndex = topChildren.findIndex((child) => {
-                    const text = (child.textContent || '').replace(/\u00a0/g, ' ').replace(/\s+/g, ' ').trim();
-                    return text.length >= 40 && /[a-zA-ZæøåÆØÅ0-9]/.test(text);
-                });
-
-                if (firstTextIndex > 0) {
-                    topChildren.slice(0, firstTextIndex).forEach((node) => node.remove());
-                }
-            }
-
-            const firstVisible = Array.from(root.children).find((child) => {
-                const computed = window.getComputedStyle(child);
-                return computed.display !== 'none' && computed.visibility !== 'hidden';
-            });
-
-            if (firstVisible) {
-                firstVisible.style.marginTop = '0';
-                firstVisible.style.paddingTop = '0';
-
-                // Some Wix payloads wrap content in a first container with nested top spacing.
-                const firstBranch = firstVisible.firstElementChild;
-                if (firstBranch) {
-                    firstBranch.style.marginTop = '0';
-                    firstBranch.style.paddingTop = '0';
-                    firstBranch.style.minHeight = '0';
-                }
-
-                const candidates = [firstVisible, firstBranch].filter(Boolean);
-                candidates.forEach((node) => {
-                    const styleAttr = (node.getAttribute('style') || '').trim();
-                    if (!styleAttr) return;
-
-                    const normalized = styleAttr
-                        .replace(/(?:^|;)\s*margin-top\s*:[^;]*/gi, '')
-                        .replace(/(?:^|;)\s*padding-top\s*:[^;]*/gi, '')
-                        .replace(/(?:^|;)\s*min-height\s*:[^;]*/gi, '')
-                        .replace(/^\s*;|;\s*$/g, '')
-                        .trim();
-
-                    if (normalized) {
-                        node.setAttribute('style', normalized);
-                    } else {
-                        node.removeAttribute('style');
-                    }
-                });
-            }
-        };
-
-        if (isWixReferencePost) {
-            // Keep reference post styling only. Inline media is now sourced directly
-            // from synced Wix content to avoid manual duplicate insertions.
         }
 
-        normalizeTopSpacingForMobile(container);
+        // Reveal content
 
-        // --- Debug Info (only if ?debug=true) ---
-        if (urlParams.get('debug') === 'true') {
-            const debugEl = document.createElement('div');
-            debugEl.style.cssText = 'background:#f8f9fa; border:1px solid #dee2e6; padding:20px; margin:20px 0; font-family:monospace; font-size:12px; overflow:auto; max-height:400px; color:#333;';
-            debugEl.innerHTML = `
-                <h4 style="margin-top:0">Debug Info</h4>
-                <p><strong>Item ID:</strong> ${itemId}</p>
-                <p><strong>Stable ID:</strong> ${postId}</p>
-                <p><strong>Has richContent:</strong> ${!!(item.richContent || sourceItem?.richContent)}</p>
-                <p><strong>richContent Nodes:</strong> ${(item.richContent?.nodes || sourceItem?.richContent?.nodes || []).length}</p>
-                <p><strong>Content Length:</strong> ${articleHtml.length}</p>
-                <p><strong>Source:</strong> ${sourceItem?.source || item.source || 'unknown'}</p>
-                <hr>
-                <details>
-                    <summary>Raw Item Keys</summary>
-                    <pre>${JSON.stringify(Object.keys(item), null, 2)}</pre>
-                </details>
-                <details>
-                    <summary>Raw SourceItem Keys</summary>
-                    <pre>${JSON.stringify(Object.keys(sourceItem || {}), null, 2)}</pre>
-                </details>
-            `;
-            container.prepend(debugEl);
-        }
 
         // Hide skeleton, reveal real content with fade-in
         revealPostContainer();
@@ -3670,33 +3524,6 @@ class ContentManager {
         return /<(p|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(trimmed);
     }
 
-    isWixViewerHtml(html) {
-        return typeof html === 'string' && /\b(?:WhDDP|mHxYK|KS6-G|viewer-[a-z0-9_-]+)\b/i.test(html);
-    }
-
-    normalizeWixViewerHtml(html, item = null) {
-        if (typeof html !== 'string' || !html.trim()) return '';
-
-        let output = html
-            .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, '')
-            .replace(/<style[\s\S]*?>[\s\S]*?<\/style>/gi, '')
-            .replace(/\sdata-[a-z0-9_-]+=(["']).*?\1/gi, '')
-            .replace(/\sclass=(["'])(?:KS6-G|HFpF6t)\1/gi, '');
-
-        // The public Wix page scraper can accidentally capture the newsletter form label
-        // as article text. It is UI chrome, not post content.
-        output = output.replace(
-            /<p\b[^>]*>\s*<span\b[^>]*>\s*<span>\s*Ja,\s*jeg\s*ønsker\s*å\s*abonnere\s*på\s*deres\s*nyhetsbrev[\s\S]*?<\/p>/gi,
-            ''
-        );
-
-        output = output
-            .replace(/<p>\s*(?:&nbsp;|\s|<br\s*\/?>)*<\/p>/gi, '')
-            .replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>')
-            .trim();
-
-        return this.rebuildWixViewerStructure(output, item);
-    }
 
     getElementPlainText(el) {
         return (el && el.textContent ? el.textContent : '').replace(/\s+/g, ' ').trim();
@@ -3716,111 +3543,7 @@ class ContentManager {
         return strongText && text.startsWith(strongText);
     }
 
-    makeListElement(doc, tag, items) {
-        const list = doc.createElement(tag);
-        items.forEach((html) => {
-            const li = doc.createElement('li');
-            li.innerHTML = html;
-            list.appendChild(li);
-        });
-        return list;
-    }
 
-    rebuildWixViewerStructure(html, item = null) {
-        if (typeof DOMParser === 'undefined') return html;
-
-        const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html');
-        const root = doc.body.firstElementChild;
-        if (!root) return html;
-
-        const children = () => Array.from(root.children);
-        const replaceRunWithList = (startIndex, count, tag, htmlItems) => {
-            const current = children();
-            const list = this.makeListElement(doc, tag, htmlItems);
-            root.insertBefore(list, current[startIndex]);
-            for (let i = 0; i < count; i += 1) {
-                current[startIndex + i]?.remove();
-            }
-        };
-
-        let changed = true;
-        while (changed) {
-            changed = false;
-            const current = children();
-
-            for (let i = 0; i < current.length; i += 1) {
-                const el = current[i];
-                if (!this.isParagraphElement(el)) continue;
-
-                const text = this.getElementPlainText(el);
-
-                if (/\?$/.test(text)) {
-                    const run = [];
-                    let j = i + 1;
-                    while (
-                        j < current.length &&
-                        this.isParagraphElement(current[j]) &&
-                        !this.isBoldLeadParagraph(current[j])
-                    ) {
-                        const itemText = this.getElementPlainText(current[j]);
-                        if (!itemText || itemText.length > 90 || /[?!]$/.test(itemText)) break;
-                        if (!/[.!]$/.test(itemText)) break;
-                        run.push(current[j]);
-                        j += 1;
-                    }
-                    if (run.length >= 3) {
-                        replaceRunWithList(i + 1, run.length, 'ul', run.map((node) => node.innerHTML));
-                        changed = true;
-                        break;
-                    }
-                }
-
-                if (/konkrete tips:?$/i.test(text)) {
-                    const items = [];
-                    let consumed = 0;
-                    let j = i + 1;
-                    while (
-                        j + 1 < current.length &&
-                        this.isBoldLeadParagraph(current[j]) &&
-                        this.isParagraphElement(current[j + 1]) &&
-                        !this.isBoldLeadParagraph(current[j + 1])
-                    ) {
-                        items.push(`${current[j].innerHTML} ${current[j + 1].innerHTML}`);
-                        consumed += 2;
-                        j += 2;
-                    }
-                    if (items.length >= 2) {
-                        replaceRunWithList(i + 1, consumed, 'ol', items);
-                        changed = true;
-                        break;
-                    }
-                }
-
-                if (/motivasjonen oppe/i.test(text) || /viktig å finne måter/i.test(text)) {
-                    const items = [];
-                    let consumed = 0;
-                    let j = i + 1;
-                    while (
-                        j + 1 < current.length &&
-                        this.isBoldLeadParagraph(current[j]) &&
-                        this.isParagraphElement(current[j + 1]) &&
-                        !this.isBoldLeadParagraph(current[j + 1])
-                    ) {
-                        items.push(`${current[j].innerHTML} ${current[j + 1].innerHTML}`);
-                        consumed += 2;
-                        j += 2;
-                    }
-                    if (items.length >= 2) {
-                        replaceRunWithList(i + 1, consumed, 'ul', items);
-                        changed = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        return root.innerHTML.trim();
-    }
 
     resolveArticleHtml(item, sourceItem) {
         const candidates = [
@@ -3828,88 +3551,20 @@ class ContentManager {
             sourceItem?.content,
             item?.contentHtml,
             sourceItem?.contentHtml,
-            item?.wixContentHtml,
-            sourceItem?.wixContentHtml,
             item?.html,
             sourceItem?.html,
             item?.body,
             sourceItem?.body,
             item?.contentText,
-            sourceItem?.contentText,
-            item?.excerpt,
-            sourceItem?.excerpt
+            sourceItem?.contentText
         ];
 
-        // Pass 1: Look for ACTUAL rich HTML or Editor.js blocks (PREFERRED)
         for (const candidate of candidates) {
-            let parsed = this.parseBlocks(candidate);
-            if (this.isMeaningfulHtml(parsed)) {
-                // If it contains block-level elements, it's rich content!
-                if (/<(p|div|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(parsed)) {
-                    if (this.isWixViewerHtml(parsed)) {
-                        parsed = this.normalizeWixViewerHtml(parsed, item || sourceItem);
-                    } else {
-                        // Standard EditorJS or plain HTML
-                        parsed = this.rebuildWixViewerStructure(parsed, item || sourceItem);
-                    }
-                    return parsed;
-                }
-            }
-        }
-
-        // Pass 2: Try to render from raw Wix richContent if available (FALLBACK)
-        let richContent = item?.richContent || sourceItem?.richContent;
-        if (typeof richContent === 'string' && richContent.trim().startsWith('{')) {
-            try { richContent = JSON.parse(richContent); } catch (e) {}
-        }
-        if (richContent && typeof richContent === 'object' && Array.isArray(richContent.nodes)) {
-            const rendered = this.renderWixRichContent(richContent);
-            if (rendered && rendered.length > 50) return rendered;
-        }
-
-        // Pass 3: Fallback to plain text, and format it nicely
-        for (const candidate of candidates) {
-            let parsed = this.parseBlocks(candidate);
-            if (this.isMeaningfulHtml(parsed)) {
-                if (parsed.includes('\n')) {
-                    parsed = parsed.split(/\n\s*\n/).filter(p => p.trim()).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
-                } else {
-                    parsed = `<p>${parsed}</p>`;
-                }
-                return parsed;
-            }
+            const parsed = this.parseBlocks(candidate);
+            if (this.isMeaningfulHtml(parsed)) return parsed;
         }
 
         return '';
-    }
-
-    /**
-     * Client-side renderer for Wix RichContent (nodes structure)
-     * @param {object} richContent 
-     * @returns {string}
-     */
-    renderWixRichContent(richContent) {
-        if (!richContent || !Array.isArray(richContent.nodes)) return '';
-        
-        // Remove leading images/galleries that duplicate the hero image
-        let nodes = [...richContent.nodes];
-        let startIndex = 0;
-        const isImageNode = (node) => {
-            if (!node) return false;
-            const type = (node.type || '').toUpperCase();
-            return type === 'IMAGE' || type === 'GALLERY' || type === 'VIDEO' || type === 'GIF';
-        };
-
-        while (startIndex < nodes.length && isImageNode(nodes[startIndex])) {
-            startIndex++;
-        }
-        
-        // Only strip if there is content after the images
-        if (startIndex > 0 && startIndex < nodes.length) {
-            nodes = nodes.slice(startIndex);
-        }
-
-        return this._renderRichNodes(nodes);
     }
 
     firstString(...values) {
@@ -3923,17 +3578,6 @@ class ContentManager {
         if (typeof value !== 'string') return '';
         const url = value.trim();
         if (!url) return '';
-
-        if (url.startsWith('wix:image://v1/')) {
-            const imageId = url.replace('wix:image://v1/', '').split('/')[0];
-            return imageId ? `https://static.wixstatic.com/media/${imageId}` : '';
-        }
-
-        const wixImageMatch = url.match(/wix:image:\/\/v1\/([^\/#\?]+)/i);
-        if (wixImageMatch && wixImageMatch[1]) {
-            return `https://static.wixstatic.com/media/${wixImageMatch[1]}`;
-        }
-
         return url;
     }
 
@@ -3941,17 +3585,9 @@ class ContentManager {
         if (typeof value !== 'string') return false;
         const url = value.trim();
         if (!url) return false;
-
         const invalid = ['[object Object]', 'undefined', 'null', 'about:blank'];
         if (invalid.includes(url)) return false;
-
-        if (/^data:image\//i.test(url)) return true;
-        if (/^https?:\/\//i.test(url)) return true;
-        if (/^\/\//.test(url)) return true;
-        if (/^\//.test(url)) return true;
-        if (/^(?:\.\.?\/)?img\//i.test(url)) return true;
-
-        return false;
+        return /^https?:\/\/|^\/|^data:image\//i.test(url);
     }
 
     getImageFromHtml(html) {
@@ -3960,79 +3596,15 @@ class ContentManager {
         return match && match[1] ? match[1].trim() : '';
     }
 
-    getFirstImageFromRichContent(richContent) {
-        if (!richContent || !Array.isArray(richContent.nodes)) return '';
-
-        const stack = [...richContent.nodes];
-        while (stack.length > 0) {
-            const node = stack.shift();
-            if (!node || typeof node !== 'object') continue;
-
-            const type = (node.type || '').toUpperCase();
-
-            if (type === 'IMAGE') {
-                const imageData = node.imageData || {};
-                const imageUrl = this.getRichMediaUrl(imageData.image || {});
-                if (imageUrl) return imageUrl;
-            }
-
-            if (type === 'GALLERY') {
-                const items = Array.isArray(node.galleryData?.items) ? node.galleryData.items : [];
-                for (const item of items) {
-                    const imageUrl = this.getRichMediaUrl(item?.image?.media || {});
-                    if (imageUrl) return imageUrl;
-                }
-            }
-
-            if (type === 'LINK_PREVIEW') {
-                const thumb = this.firstString(node.linkPreviewData?.thumbnailUrl);
-                if (thumb) return thumb;
-            }
-
-            if (Array.isArray(node.nodes) && node.nodes.length > 0) {
-                stack.push(...node.nodes);
-            }
-        }
-
-        return '';
-    }
-
     getContentItemImage(item, fallbackItem = null, articleHtml = '') {
         const candidates = [item, fallbackItem].filter(Boolean);
-
         for (const current of candidates) {
             if (!current || typeof current !== 'object') continue;
-
-            const heroImage = current.heroImage && typeof current.heroImage === 'object' ? current.heroImage : {};
-            const mainImage = current.mainImage && typeof current.mainImage === 'object' ? current.mainImage : {};
-
-            const imageCandidates = [
-                current.imageUrl,
-                current.image,
-                current.dashboardImage,
-                current.coverImage,
-                current.featuredImage,
-                current.heroImageUrl,
-                current.mainImageUrl,
-                current.thumbnail,
-                current.thumbnailUrl,
-                this.getRichMediaUrl(current.media),
-                this.getRichMediaUrl(current.mainMedia),
-                this.getRichMediaUrl(mainImage),
-                this.getRichMediaUrl(heroImage.image),
-                this.getRichMediaUrl(heroImage),
-                this.getRichMediaUrl(current.coverMedia),
-                current.coverMedia?.imageUrl,
-                current.coverMedia?.url
-            ];
-
-            for (const candidate of imageCandidates) {
-                const normalized = this.normalizePublicImageUrl(candidate);
-                if (this.isRenderableImageUrl(normalized)) return normalized;
-            }
-
-            const richImage = this.normalizePublicImageUrl(this.getFirstImageFromRichContent(current.richContent));
-            if (this.isRenderableImageUrl(richImage)) return richImage;
+            
+            // Standard image fields
+            const img = current.imageUrl || current.image || current.coverImage || current.featuredImage || current.thumbnail;
+            const normalized = this.normalizePublicImageUrl(img);
+            if (this.isRenderableImageUrl(normalized)) return normalized;
         }
 
         const htmlImage = this.normalizePublicImageUrl(this.getImageFromHtml(articleHtml));
@@ -4041,44 +3613,36 @@ class ContentManager {
         return '';
     }
 
-    isWixReferenceBlogPost(itemId, item, sourceItem) {
-        const targetId = '69707d33267e9ce8b5a862b7';
-        if (String(itemId || '') === targetId) return true;
-
-        const url = this.firstString(item?.url, sourceItem?.url).toLowerCase();
-        const slug = this.firstString(item?.slug, sourceItem?.slug).toLowerCase();
-        const title = this.firstString(item?.title, sourceItem?.title).toLowerCase();
-
-        return url.includes('/post/hvordan-leve-et-liv-i-tjeneste-for-hans-rike')
-            || slug === 'hvordan-leve-et-liv-i-tjeneste-for-hans-rike'
-            || title === 'hvordan leve et liv i tjeneste for hans rike';
+    getTranslation(key) {
+        if (window.i18n && typeof window.i18n.t === 'function') {
+            return window.i18n.t(key);
+        }
+        const dict = {
+            'reading_time': 'min lesing',
+            'views': 'visninger'
+        };
+        return dict[key] || key;
     }
 
-    renderWixReferenceAuthorHeader(item, sourceItem) {
-        const authorName = this.firstString(item?.author, sourceItem?.author) || 'Hilde Karin Knutsen';
-        const authorProfileUrl = 'https://www.hiskingdomministry.no/members-area/hildekarin/profile';
-        const authorImageUrl = 'https://images-wixmp-7ef3383b5fd80a9f5a5cc686.wixmp.com/3a1544f7-8319-4a6c-9833-6a4723d7bdbe/1733008750689/v1/fill/w_320,h_320/file.jpg';
+    stripHtml(html) {
+        if (!html) return '';
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        return doc.body.textContent || '';
+    }
 
-        const dateValue = this.firstString(item?.date, sourceItem?.date);
-        const formattedDate = dateValue ? this.formatDate(dateValue) : '';
-        const minutesToRead = Number(item?.minutesToRead ?? sourceItem?.minutesToRead ?? 0);
-        const minuteLabel = this.getTranslation('reading_time') || 'min lesing';
-        const readMeta = Number.isFinite(minutesToRead) && minutesToRead > 0 ? `${minutesToRead} ${minuteLabel}` : '';
+    formatDate(date) {
+        if (!date) return '';
+        try {
+            const d = (typeof date.toDate === 'function') ? date.toDate() : new Date(date);
+            return d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch (e) {
+            return '';
+        }
+    }
 
-        const metaParts = [formattedDate, readMeta].filter(Boolean);
-        const metaHtml = metaParts.length > 0
-            ? `<div class="wix-reference-author-meta">${metaParts.join(' · ')}</div>`
-            : '';
-
-        return `
-            <section class="wix-reference-author-box" aria-label="Forfatter">
-                <img class="wix-reference-author-avatar" src="${this.escapeHtml(authorImageUrl)}" alt="${this.escapeHtml(`Forfatterens bilde: ${authorName}`)}" loading="lazy">
-                <div class="wix-reference-author-content">
-                    <a class="wix-reference-author-name" href="${this.escapeHtml(authorProfileUrl)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(authorName)}</a>
-                    ${metaHtml}
-                </div>
-            </section>
-        `;
+    escapeHtml(str) {
+        if (typeof str !== 'string') return '';
+        return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
     }
 
     getRichMediaUrl(media) {
@@ -4128,7 +3692,7 @@ class ContentManager {
     }
 
     getRichTextStyleAttr(data = {}) {
-        const textStyle = data.textStyle && typeof data.textStyle === 'object' ? data.textStyle : {};
+        const textStyle = data.textStyle && typeof textStyle === 'object' ? data.textStyle : {};
         const styles = [];
         const align = this.firstString(textStyle.textAlignment).toUpperCase();
         const lineHeight = this.firstString(textStyle.lineHeight);
@@ -4214,194 +3778,6 @@ class ContentManager {
     }
 
     renderRichImageFigure(src, alt = '', caption = '', className = '') {
-        if (!src) return '';
-        const normalizedSrc = this.normalizePublicImageUrl(src);
-        const finalClasses = ['block-image', className].filter(Boolean).join(' ');
-        const classAttr = ` class="${this.escapeHtml(finalClasses)}"`;
-        const captionHtml = caption ? `<figcaption>${this.escapeHtml(caption)}</figcaption>` : '';
-        return `<figure${classAttr}><img src="${this.escapeHtml(normalizedSrc)}" alt="${this.escapeHtml(alt)}" loading="lazy">${captionHtml}</figure>`;
-    }
-
-    _renderRichNodes(nodes, options = {}) {
-        if (!Array.isArray(nodes)) return '';
-        const { inListItem = false } = options;
-
-        return nodes.map(node => {
-            if (!node || typeof node !== 'object') return '';
-            const type = (node.type || '').toUpperCase();
-            const children = Array.isArray(node.nodes) ? node.nodes : [];
-
-            switch (type) {
-                case 'TEXT': {
-                    const textData = node.textData || {};
-                    let text = textData.text || '';
-                    text = this.escapeHtml(text);
-                    text = text.replace(/\n/g, '<br>');
-                    return this.applyRichTextDecorations(text, textData.decorations);
-                }
-                case 'PARAGRAPH': {
-                    const inner = this._renderRichNodes(children, { inListItem: true });
-                    if (!inner.trim()) return '';
-                    if (inListItem) return inner;
-                    const styleAttr = this.getRichTextStyleAttr(node.paragraphData || {}) + this.getRichNodeStyleAttr(node);
-                    return `<p class="block-paragraph"${styleAttr}>${inner}</p>`;
-                }
-                case 'HEADING': {
-                    const level = Math.min(6, Math.max(1, Number(node.headingData?.renderedLevel || node.headingData?.level || 2)));
-                    const inner = this._renderRichNodes(children, { inListItem: true });
-                    if (!inner.trim()) return '';
-                    const styleAttr = this.getRichTextStyleAttr(node.headingData || {}) + this.getRichNodeStyleAttr(node);
-                    return `<h${level} class="block-header"${styleAttr}>${inner}</h${level}>`;
-                }
-                case 'BULLETED_LIST':
-                case 'ORDERED_LIST':
-                case 'NUMBERED_LIST': {
-                    const tag = type === 'BULLETED_LIST' ? 'ul' : 'ol';
-                    const listData = type === 'BULLETED_LIST' ? (node.bulletedListData || {}) : (node.orderedListData || {});
-                    const start = tag === 'ol' && Number(listData.start) > 1 ? ` start="${Number(listData.start)}"` : '';
-                    const items = children.map(itemNode => {
-                        const itemHtml = this._renderRichNodes([itemNode], { inListItem: true });
-                        const cleaned = this.stripOuterParagraph(itemHtml);
-                        return cleaned ? `<li>${cleaned}</li>` : '';
-                    }).join('');
-                    return items ? `<${tag}${start} class="block-list">${items}</${tag}>` : '';
-                }
-                case 'LIST_ITEM':
-                    return this._renderRichNodes(children, { inListItem: true });
-                case 'IMAGE': {
-                    const img = node.imageData?.image || {};
-                    const src = this.normalizePublicImageUrl(this.getRichMediaUrl(img));
-                    if (!src) return '';
-                    const alt = node.imageData?.altText || '';
-                    const captionFromChild = children
-                        .filter(child => (child?.type || '').toUpperCase() === 'CAPTION')
-                        .map(child => this.stripHtml(this._renderRichNodes(child.nodes || [], { inListItem: true })))
-                        .filter(Boolean)
-                        .join(' ');
-                    const cap = node.imageData?.caption || captionFromChild;
-                    const figure = this.renderRichImageFigure(src, alt, cap, 'wix-image');
-                    const href = this.getRichLinkUrl(node.imageData?.link || {});
-                    return href ? `<a class="wix-image-link" href="${this.escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${figure}</a>` : figure;
-                }
-                case 'CAPTION':
-                    return this._renderRichNodes(children, { inListItem: true });
-                case 'VIDEO': {
-                    const videoData = node.videoData || {};
-                    const src = this.getRichMediaUrl(videoData.video || {});
-                    if (!src) return '';
-                    const embed = this.renderRichIframe(src, videoData.title || 'Video');
-                    if (embed) return embed;
-                    if (/\.mp4($|\?)/i.test(src)) {
-                        return `<figure><video controls preload="metadata" src="${this.escapeHtml(src)}"></video></figure>`;
-                    }
-                    return this.renderRichMediaLink(src, videoData.title || 'Se video');
-                }
-                case 'AUDIO': {
-                    const audioData = node.audioData || {};
-                    const src = this.getRichMediaUrl(audioData.audio || {});
-                    return src ? `<figure class="wix-audio"><audio controls preload="none" src="${this.escapeHtml(src)}"></audio></figure>` : '';
-                }
-                case 'GALLERY': {
-                    const galleryData = node.galleryData || {};
-                    const items = Array.isArray(galleryData.items) ? galleryData.items : [];
-                    const rendered = items.map(item => {
-                        const imageUrl = this.normalizePublicImageUrl(this.getRichMediaUrl(item?.image?.media || {}));
-                        if (imageUrl) return this.renderRichImageFigure(imageUrl, item.altText || item.title || '', item.title || '', 'wix-gallery-item');
-
-                        const videoUrl = this.getRichMediaUrl(item?.video?.media || {});
-                        if (!videoUrl) return '';
-                        const embed = this.renderRichIframe(videoUrl, item.title || 'Video');
-                        if (embed) return embed;
-                        if (/\.mp4($|\?)/i.test(videoUrl)) {
-                            return `<figure class="wix-gallery-item"><video controls preload="metadata" src="${this.escapeHtml(videoUrl)}"></video></figure>`;
-                        }
-                        return this.renderRichMediaLink(videoUrl, item.title || 'Se video');
-                    }).filter(Boolean).join('');
-                    return rendered ? `<div class="wix-gallery">${rendered}</div>` : '';
-                }
-                case 'GIF': {
-                    const gifData = node.gifData || {};
-                    const gif = gifData.original || gifData.downsized || gifData;
-                    const src = this.firstString(gif.gif, gif.mp4, gif.still);
-                    if (!src) return '';
-                    if (/\.mp4($|\?)/i.test(src)) {
-                        return `<figure><video autoplay loop muted playsinline preload="metadata" src="${this.escapeHtml(src)}"></video></figure>`;
-                    }
-                    return this.renderRichImageFigure(src, 'GIF', '', 'wix-gif');
-                }
-                case 'EMBED': {
-                    const embedData = node.embedData || {};
-                    const oembed = embedData.oembed || {};
-                    const url = this.firstString(oembed.url, oembed.videoUrl, embedData.src);
-                    const iframe = this.renderRichIframe(url, oembed.title || 'Innebygd innhold');
-                    return iframe || this.renderRichMediaLink(url, oembed.title || 'Åpne innhold');
-                }
-                case 'HTML': {
-                    const htmlData = node.htmlData || {};
-                    const url = this.firstString(htmlData.url);
-                    const iframe = this.renderRichIframe(url, 'Innebygd innhold');
-                    return iframe || this.renderRichMediaLink(url, 'Åpne innebygd innhold');
-                }
-                case 'FILE': {
-                    const fileData = node.fileData || {};
-                    const src = this.getRichMediaUrl(fileData.src || {});
-                    return this.renderRichMediaLink(src, fileData.name || 'Last ned fil');
-                }
-                case 'LINK_PREVIEW': {
-                    const data = node.linkPreviewData || {};
-                    const url = this.getRichLinkUrl(data.link || data);
-                    const thumb = this.firstString(data.thumbnailUrl);
-                    const title = data.title || 'Lenke';
-                    const description = data.description || '';
-                    const image = thumb ? this.renderRichImageFigure(thumb, title, '', '') : '';
-                    return `<div class="wix-link-preview">${image}<div>${this.renderRichMediaLink(url, title)}${description ? `<p>${this.escapeHtml(description)}</p>` : ''}</div></div>`;
-                }
-                case 'BUTTON': {
-                    const buttonData = node.buttonData || {};
-                    const href = this.getRichLinkUrl(buttonData.link || {});
-                    const label = buttonData.text || this.stripHtml(this._renderRichNodes(children, { inListItem: true })) || 'Les mer';
-                    if (!href) return '';
-                    return `<p><a class="wix-button" href="${this.escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(label)}</a></p>`;
-                }
-                case 'CODE_BLOCK':
-                    return `<pre><code>${this._renderRichNodes(children, { inListItem: true })}</code></pre>`;
-                case 'DIVIDER':
-                    return '<hr>';
-                case 'BLOCKQUOTE':
-                    return `<blockquote${this.getRichTextStyleAttr(node.blockquoteData || {})}${this.getRichNodeStyleAttr(node)}>${this._renderRichNodes(children, { inListItem: true })}</blockquote>`;
-                case 'TABLE': {
-                    const rows = children.map(row => this._renderRichNodes([row], { inListItem: true })).join('');
-                    return rows ? `<div class="wix-table-wrap"><table>${rows}</table></div>` : '';
-                }
-                case 'TABLE_ROW':
-                    return `<tr>${children.map(child => this._renderRichNodes([child], { inListItem: true })).join('')}</tr>`;
-                case 'TABLE_CELL': {
-                    const data = node.tableCellData || {};
-                    const colspan = Number(data.colspan) > 1 ? ` colspan="${Number(data.colspan)}"` : '';
-                    const rowspan = Number(data.rowspan) > 1 ? ` rowspan="${Number(data.rowspan)}"` : '';
-                    const inner = this._renderRichNodes(children, { inListItem: false });
-                    return `<td${colspan}${rowspan}>${inner}</td>`;
-                }
-                case 'COLLAPSIBLE_LIST':
-                    return `<div class="wix-collapsible">${this._renderRichNodes(children, { inListItem })}</div>`;
-                case 'COLLAPSIBLE_ITEM':
-                    return `<details class="wix-collapsible-item">${this._renderRichNodes(children, { inListItem })}</details>`;
-                case 'COLLAPSIBLE_ITEM_TITLE':
-                    return `<summary>${this._renderRichNodes(children, { inListItem: true })}</summary>`;
-                case 'COLLAPSIBLE_ITEM_BODY':
-                    return this._renderRichNodes(children, { inListItem: false });
-                default:
-                    return this._renderRichNodes(children, { inListItem });
-            }
-        }).join('');
-    }
-
-    /**
-     * Generate a relevant image URL from Unsplash based on event title
-     * @param {string} title - Event title
-     * @returns {string} - Unsplash image URL
-     */
-    // --- Editor.js Helper ---
     parseBlocks(content) {
         if (!content) return '';
 
@@ -4416,7 +3792,6 @@ class ContentManager {
                 content.html,
                 content.content,
                 content.contentHtml,
-                content.wixContentHtml,
                 content.body,
                 content.contentText
             ].find((value) => typeof value === 'string' && value.trim());
@@ -4439,48 +3814,22 @@ class ContentManager {
                 return html.length === 0;
             };
 
-            const hasMeaningfulText = (block) => {
-                if (!block) return false;
-                const type = String(block.type || '').toLowerCase();
-                const data = block.data || {};
-
-                if (type === 'header' || type === 'paragraph' || type === 'quote') {
-                    const text = String(data.text || '')
-                        .replace(/<[^>]*>/g, ' ')
-                        .replace(/&nbsp;/gi, ' ')
-                        .replace(/\s+/g, ' ')
-                        .trim();
-                    return text.length > 0;
-                }
-
-                if (type === 'list') {
-                    const items = Array.isArray(data.items) ? data.items : [];
-                    return items.some((item) => {
-                        const txt = typeof item === 'string' ? item : (item?.content || item?.text || '');
-                        return String(txt).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().length > 0;
-                    });
-                }
-
-                return false;
-            };
-
             const rawBlocks = Array.isArray(content.blocks) ? content.blocks : [];
 
+            // Intelligent image filtering for leading hero images
             let startIndex = 0;
             while (startIndex < rawBlocks.length && (rawBlocks[startIndex]?.type === 'image' || isIgnorableParagraph(rawBlocks[startIndex]))) {
                 startIndex += 1;
             }
 
-            const leadingSlice = rawBlocks.slice(0, startIndex);
-            const leadingImages = leadingSlice.filter((b) => b?.type === 'image');
-            const leadingHasOnlyImagesAndBlankParas = leadingSlice.every((b) => b?.type === 'image' || isIgnorableParagraph(b));
-            const leadingImagesHaveNoCaption = leadingImages.every((img) => String(img?.data?.caption || '').trim().length === 0);
-            const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => hasMeaningfulText(b));
+            // Only strip leading images if there is actual content following them
+            const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => {
+                if (!b) return false;
+                const type = String(b.type || '').toLowerCase();
+                return type === 'paragraph' || type === 'header' || type === 'list';
+            });
 
-            const blocksForRender =
-                leadingHasOnlyImagesAndBlankParas && leadingImages.length >= 1 && leadingImagesHaveNoCaption && hasTextAfterLeading
-                    ? rawBlocks.slice(startIndex)
-                    : rawBlocks;
+            const blocksForRender = (startIndex > 0 && hasTextAfterLeading) ? rawBlocks.slice(startIndex) : rawBlocks;
 
             return blocksForRender.map((block) => {
                 try {
@@ -4500,66 +3849,36 @@ class ContentManager {
                         case 'list': {
                             const listTag = data.style === 'ordered' ? 'ol' : 'ul';
                             const items = (Array.isArray(data.items) ? data.items : [])
-                                .map(item => this.formatEditorListItem(item))
+                                .map(item => `<li>${typeof item === 'string' ? item : (item?.content || item?.text || '')}</li>`)
                                 .join('');
                             return `<${listTag} class="block-list">${items}</${listTag}>`;
                         }
                         case 'image': {
-                            const imageUrl = this.normalizePublicImageUrl(data?.file?.url || data?.url || '');
+                            const imageUrl = data?.file?.url || data?.url || '';
                             if (!imageUrl) return '';
                             const caption = data.caption ? `<figcaption>${data.caption}</figcaption>` : '';
-                            const classes = [
-                                'block-image',
-                                data.withBorder ? 'with-border' : '',
-                                data.withBackground ? 'with-background' : '',
-                                data.stretched ? 'stretched' : ''
-                            ].filter(Boolean).join(' ');
-                            return `<figure class="${classes}"><img src="${imageUrl}" alt="${data.caption || ''}">${caption}</figure>`;
+                            return `<figure class="block-image"><img src="${imageUrl}" alt="${data.caption || ''}">${caption}</figure>`;
                         }
                         case 'quote':
                             return `<blockquote class="block-quote"><p>${data.text || ''}</p>${data.caption ? `<cite>${data.caption}</cite>` : ''}</blockquote>`;
                         case 'delimiter':
                             return `<div class="block-delimiter">***</div>`;
-                        case 'youtubevideo': {
-                            const ytUrl = data?.url || '';
-                            const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                            const ytId = ytMatch ? ytMatch[1] : null;
-                            if (!ytId) return '';
-                            return `
-                                <div class="block-embed-wrapper cms-yt-embed-wrapper">
-                                    <div class="block-embed cms-yt-embed">
-                                        <iframe
-                                            src="https://www.youtube.com/embed/${ytId}"
-                                            frameborder="0"
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowfullscreen
-                                            class="cms-yt-embed-frame">
-                                        </iframe>
-                                    </div>
-                                </div>
-                            `;
+                        case 'youtubevideo':
+                        case 'video': {
+                            const url = data?.url || data?.embed || '';
+                            if (!url) return '';
+                            const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                            const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
+                            return `<div class="block-embed"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
                         }
-                        case 'embed':
-                        case 'video':
-                            if (!data.embed) return '';
-                            return `
-                                <div class="block-embed-wrapper">
-                                    <div class="block-embed">
-                                        <iframe src="${data.embed}" width="${data.width || ''}" height="${data.height || ''}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                                    </div>
-                                    ${data.caption ? `<div class="block-embed-caption">${data.caption}</div>` : ''}
-                                </div>
-                            `;
                         default:
                             return '';
                     }
-                } catch (blockError) {
-                    console.warn('[ContentManager] Skipping malformed block:', blockError);
+                } catch (err) {
                     return '';
                 }
             }).join('');
         }
-
         return '';
     }
 

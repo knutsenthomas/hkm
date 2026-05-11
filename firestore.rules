@@ -167,7 +167,7 @@ service cloud.firestore {
     // Public CMS content (website pages + collections)
     match /content/{docId} {
       allow read: if true;
-      allow write: if isAdmin() || docId == 'wix_products';
+      allow write: if isAdmin();
     }
 
     // Public site content storage (e.g. courses)

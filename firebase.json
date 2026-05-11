@@ -29,11 +29,7 @@
       {
         "source": "/api/facebook-feed",
         "function": "facebookFeed"
-      },
-      {
-        "source": "/api/wix-products",
-        "function": "wixProducts"
-      },
+      }
     ]
   }
 }
