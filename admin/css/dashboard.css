@@ -3133,7 +3133,13 @@ input[type="range"] {
     align-items: center;
     gap: 8px;
     overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     transition: all 0.3s ease;
+}
+
+.desktop-richtools::-webkit-scrollbar {
+    display: none;
 }
 
 .desktop-richtools-btn {
