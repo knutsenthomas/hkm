@@ -7,10 +7,10 @@
 :root {
     --rte-font-family: 'Inter', system-ui, -apple-system, sans-serif;
     --rte-title-font: 'Inter', system-ui, -apple-system, sans-serif;
-    --rte-text-color: #2d3748;
-    --rte-header-color: #1a202c;
-    --rte-line-height: 1.75;
-    --rte-paragraph-spacing: 2rem;
+    --rte-text-color: #1a202c;
+    --rte-header-color: #000000;
+    --rte-line-height: 1.85;
+    --rte-paragraph-spacing: 2.5rem;
     --rte-max-width: 840px;
 }
 
@@ -43,10 +43,11 @@ h4.block-header { font-size: 1.25rem; }
 
 .block-paragraph {
     margin-bottom: var(--rte-paragraph-spacing);
-    font-size: 1.125rem;
+    font-size: 1.25rem;
     font-weight: 400;
-    color: #334155;
+    color: var(--rte-text-color);
     word-break: break-word;
+    letter-spacing: -0.011em;
 }
 
 /* First paragraph treatment */
@@ -64,10 +65,10 @@ h4.block-header { font-size: 1.25rem; }
 }
 
 .block-list li {
-    margin-bottom: 0.85rem;
+    margin-bottom: 1rem;
     padding-left: 0.5rem;
-    font-size: 1.15rem;
-    line-height: 1.75;
+    font-size: 1.25rem;
+    line-height: var(--rte-line-height);
 }
 
 ul.block-list { list-style-type: disc; }
@@ -112,8 +113,8 @@ ol.block-list { list-style-type: decimal; }
 
 /* Image & Media Styling */
 .block-image {
-    margin: 3rem 0;
-    border-radius: 12px;
+    margin: 4rem 0;
+    border-radius: 8px;
     overflow: hidden;
 }
 
