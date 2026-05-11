@@ -121,42 +121,19 @@ class AdminManager {
                 this.toastContainer.className = 'toast-container';
                 document.body.appendChild(this.toastContainer);
             }
+        } else {
+            this.toastContainer = window.hkm_notifications.toastContainer;
         }
 
-        // Listen for authentication changes
-        firebaseService.onAuthChange(async (user) => {
-            if (user) {
-                console.log("User logged in:", user.email);
-                
-                // Clear any pending redirect timers
-                if (this._pendingAuthRedirectTimer) {
-                    clearTimeout(this._pendingAuthRedirectTimer);
-                    this._pendingAuthRedirectTimer = null;
-                }
+        this.initAuth();
+        this.initDashboard();
+        this.initMessageListener();
+        this.initWidgetConfig();
 
-                // Wait for the full admin check and metadata from Firestore
-                try {
-                    const isAdmin = await firebaseService.checkIsAdmin(user.uid);
-                    if (isAdmin) {
-                        this.initDashboard();
-                    } else {
-                        console.warn("User is not an admin, redirecting...");
-                        window.location.href = '/admin/login.html';
-                    }
-                } catch (error) {
-                    console.error("Error checking admin status:", error);
-                    window.location.href = '/admin/login.html';
-                }
-            } else {
-                console.log("No user logged in, redirecting to login...");
-                // Brief delay to allow Firebase to settle
-                this._pendingAuthRedirectTimer = setTimeout(() => {
-                    window.location.href = '/admin/login.html';
-                }, 1000);
-            }
-        });
-
-        // Fail-safe for initial load UI cloak
+        // Expose to window for the inline navigation script
+        window.adminManager = this;
+        console.log("AdminManager initialized successfully.");
+        // Safety fallback: never reveal seeded HTML; show a neutral loading state instead.
         setTimeout(() => {
             if (!document.body.classList.contains('cloak')) return;
             if (this._initialOverviewRenderComplete) {
@@ -219,7 +196,7 @@ class AdminManager {
      */
     async _runWriteLocked(lockKey, callback) {
         if (this._pendingWriteLocks.has(lockKey)) {
-            console.warn(`[AdminManager] Action already in progress: ${lockKey}`);
+            this.showToast('En lagringsoperasjon pågår allerede. Vent et øyeblikk.', 'warning', 3500);
             return;
         }
         this._pendingWriteLocks.add(lockKey);
