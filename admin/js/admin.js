@@ -6287,84 +6287,101 @@ class AdminManager {
                     }
                 };
 
-                if (shouldUseDocsLikeEditor) {
-                    const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
-                    const insertChecklist = () => {
-                        const ctx = selectionInsideSurface();
-                        let items = [];
+                const insertChecklist = () => {
+                    const ctx = selectionInsideSurface();
+                    let items = [];
 
-                        if (ctx && !ctx.sel.isCollapsed) {
-                            const selectedText = String(ctx.sel.toString() || '').trim();
-                            items = splitTextToItems(selectedText);
+                    if (ctx && !ctx.sel.isCollapsed) {
+                        const selectedText = String(ctx.sel.toString() || '').trim();
+                        items = splitTextToItems(selectedText);
+                    }
+
+                    if (!items.length) items = ['Ny oppgave'];
+
+                    const checklistHtml = `<ul>${items.map((t) => `<li>${escapeHtml(`☐ ${t}`)}</li>`).join('')}</ul>`;
+                    exec('insertHTML', checklistHtml);
+                };
+
+                const toolHandlers = shouldUseDocsLikeEditor ? {
+                    ...commonHandlers,
+                    paragraph: () => exec('formatBlock', 'p'),
+                    h1: () => exec('formatBlock', 'h1'),
+                    h2: () => exec('formatBlock', 'h2'),
+                    h3: () => exec('formatBlock', 'h3'),
+                    h4: () => exec('formatBlock', 'h4'),
+                    h5: () => exec('formatBlock', 'h5'),
+                    h6: () => exec('formatBlock', 'h6'),
+                    removeFormat: () => exec('removeFormat'),
+                    outdent: () => exec('outdent'),
+                    indent: () => exec('indent'),
+                    checklist: () => insertChecklist(),
+                    textColor: () => {
+                        const input = desktopTools.querySelector('[data-color-input="text"]');
+                        if (input) input.click();
+                    },
+                    highlightColor: () => {
+                        const input = desktopTools.querySelector('[data-color-input="highlight"]');
+                        if (input) input.click();
+                    },
+                    image: () => {
+                        if (window.unsplashManager) {
+                            window.unsplashManager.open((selection) => {
+                                if (selection && selection.url) {
+                                    const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0;">`;
+                                    exec('insertHTML', imgHtml);
+                                }
+                            });
                         }
+                    },
+                    quote: () => exec('formatBlock', 'blockquote')
+                } : {
+                    ...commonHandlers,
+                    paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
+                    header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
+                    image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
+                    quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
+                    delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
+                    youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
+                };
 
-                        if (!items.length) items = ['Ny oppgave'];
+                // Initialize/Update toolbar buttons
+                desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
+                    const tool = btn.getAttribute('data-tool');
+                    const handler = toolHandlers[tool];
 
-                        const checklistHtml = `<ul>${items.map((t) => `<li>${escapeHtml(`☐ ${t}`)}</li>`).join('')}</ul>`;
-                        exec('insertHTML', checklistHtml);
+                    // Use onmousedown to prevent focus loss and save selection
+                    btn.onmousedown = (e) => {
+                        saveSelectionRange();
+                        e.preventDefault();
+                        e.stopPropagation();
                     };
 
-                    const toolHandlers = {
-                        ...commonHandlers,
-                        paragraph: () => exec('formatBlock', 'p'),
-                        h1: () => exec('formatBlock', 'h1'),
-                        h2: () => exec('formatBlock', 'h2'),
-                        h3: () => exec('formatBlock', 'h3'),
-                        h4: () => exec('formatBlock', 'h4'),
-                        h5: () => exec('formatBlock', 'h5'),
-                        h6: () => exec('formatBlock', 'h6'),
-                        removeFormat: () => exec('removeFormat'),
-                        outdent: () => exec('outdent'),
-                        indent: () => exec('indent'),
-                        checklist: () => insertChecklist(),
-                        textColor: () => {
-                            const input = desktopTools.querySelector('[data-color-input="text"]');
-                            if (input) input.click();
-                        },
-                        highlightColor: () => {
-                            const input = desktopTools.querySelector('[data-color-input="highlight"]');
-                            if (input) input.click();
-                        },
-                        image: () => {
-                            if (window.unsplashManager) {
-                                window.unsplashManager.open((selection) => {
-                                    if (selection && selection.url) {
-                                        const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0;">`;
-                                        exec('insertHTML', imgHtml);
-                                    }
-                                });
-                            }
-                        },
-                        quote: () => exec('formatBlock', 'blockquote')
-                    };
-
-
-                    docsSurface.addEventListener('keyup', () => {
-                        if (typeof updateActiveStates === 'function') updateActiveStates();
-                    });
-
-                    desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
-                        const tool = btn.getAttribute('data-tool');
-                        if (!toolHandlers[tool]) {
-                            btn.disabled = true;
-                            btn.classList.add('is-disabled');
-                            return;
-                        }
-
-                        btn.addEventListener('mousedown', (e) => {
-                            saveSelectionRange();
+                    // Use onclick to execute the handler
+                    if (handler) {
+                        btn.classList.remove('is-disabled');
+                        btn.disabled = false;
+                        btn.onclick = async (e) => {
                             e.preventDefault();
-                        });
-
-                        btn.addEventListener('click', () => {
                             try {
-                                toolHandlers[tool]();
+                                // Force focus back to surface before executing
+                                if (docsSurface) {
+                                    const activeEl = document.activeElement;
+                                    if (!docsSurface.contains(activeEl)) {
+                                        docsSurface.focus();
+                                    }
+                                }
+                                await handler();
                                 updateActiveStates();
-                            } catch (error) {
-                                console.error(`Could not apply toolbar action '${tool}':`, error);
+                            } catch (err) {
+                                console.error(`Toolbar error [${tool}]:`, err);
                             }
-                        });
-                    });
+                        };
+                    } else {
+                        btn.classList.add('is-disabled');
+                        btn.disabled = true;
+                        btn.onclick = null;
+                    }
+                });
 
                     const textColorInput = desktopTools.querySelector('[data-color-input="text"]');
                     if (textColorInput) {
@@ -6428,37 +6445,6 @@ class AdminManager {
                             exec('formatBlock', val === 'p' ? 'p' : val);
                         });
                     }
-                } else {
-                    // Standard non-docs editor: Link unified logic to toolbar
-                    const toolHandlers = {
-                        ...commonHandlers,
-                        paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
-                        header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
-                        image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
-                        quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
-                        delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
-                        youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
-                    };
-
-                    desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
-                        const tool = btn.getAttribute('data-tool');
-                        const handler = toolHandlers[tool];
-                        if (!handler) return;
-
-                        btn.addEventListener('mousedown', (e) => {
-                            saveSelectionRange();
-                            e.preventDefault();
-                        });
-
-                        btn.addEventListener('click', async () => {
-                            try {
-                                await handler();
-                            } catch (err) {
-                                console.error(`Unified tool '${tool}' error:`, err);
-                            }
-                        });
-                    });
-                }
 
                 // Global listeners for the editor surface
                 docsSurface.addEventListener('mouseup', () => {
