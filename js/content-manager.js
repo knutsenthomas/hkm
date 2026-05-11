@@ -1054,6 +1054,7 @@ class ContentManager {
         const sourceItem = blogItem || teachingItem;
         const item = sourceItem ? this.getLocalizedContentItem(sourceItem) : null;
         const isTeaching = !!teachingItem;
+        const postId = sourceItem ? (sourceItem.__stableId || this.getContentItemStableId(sourceItem)) : null;
 
         if (!item) {
             container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
