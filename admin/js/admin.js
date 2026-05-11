@@ -6407,36 +6407,38 @@ class AdminManager {
                     youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
                 };
 
-                // Initialize/Update toolbar buttons
-                desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
+                // --- High-Reliability Event Delegation for Toolbar ---
+                desktopTools.style.pointerEvents = 'auto';
+                desktopTools.querySelectorAll('.desktop-richtools-btn').forEach(btn => {
+                    btn.style.pointerEvents = 'auto';
+                    btn.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
+                    btn.onclick = null; // Clear old individual listeners
+                });
+
+                desktopTools.onclick = async (e) => {
+                    const btn = e.target.closest('.desktop-richtools-btn');
+                    if (!btn || btn.disabled || btn.classList.contains('is-disabled')) return;
+
                     const tool = btn.getAttribute('data-tool');
                     const handler = toolHandlers[tool];
-
-                    // Use onmousedown to prevent focus loss
-                    btn.onmousedown = (e) => {
+                    
+                    if (handler) {
                         e.preventDefault();
                         e.stopPropagation();
-                    };
+                        
+                        // Visual feedback pulse
+                        btn.style.transform = 'scale(0.95)';
+                        setTimeout(() => btn.style.transform = '', 100);
 
-                    // Use onclick to execute the handler
-                    if (handler) {
-                        btn.classList.remove('is-disabled');
-                        btn.disabled = false;
-                        btn.onclick = async (e) => {
-                            e.preventDefault();
-                            try {
-                                await handler();
-                                updateActiveStates();
-                            } catch (err) {
-                                console.error(`Toolbar error [${tool}]:`, err);
-                            }
-                        };
-                    } else {
-                        btn.classList.add('is-disabled');
-                        btn.disabled = true;
-                        btn.onclick = null;
+                        try {
+                            console.log(`Executing tool: ${tool}`);
+                            await handler();
+                            updateActiveStates();
+                        } catch (err) {
+                            console.error(`Toolbar delegation error [${tool}]:`, err);
+                        }
                     }
-                });
+                };
 
                     const textColorInput = desktopTools.querySelector('[data-color-input="text"]');
                     if (textColorInput) {
