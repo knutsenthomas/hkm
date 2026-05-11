@@ -6203,21 +6203,24 @@ class AdminManager {
                             let targetIndex = -1;
                             let blocksToRemove = 0;
 
-                            if (selectedBlocks.length > 1) {
-                                // CASE 1: Multiple blocks selected (e.g. dragging across paragraphs)
-                                items = selectedBlocks.map(b => b.textContent.trim()).filter(Boolean);
+                            // Aggressively extract text to split into items
+                            let textToSplit = "";
+                            if (selectedBlocks.length > 0) {
+                                // Join text from all selected blocks to ensure we find all sentences
+                                textToSplit = selectedBlocks.map(b => b.textContent).join("\n");
                                 blocksToRemove = selectedBlocks.length;
                                 targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(selectedBlocks[0].closest('.ce-block'));
                             } else if (ctx && !ctx.sel.isCollapsed) {
-                                // CASE 2: Text selection within one block (or potentially spanning but detected as one)
-                                const selectedText = ctx.sel.toString().trim();
-                                items = splitTextToItems(selectedText);
-                                blocksToRemove = selectedBlocks.length || 1;
-                                
-                                const blockEl = selectedBlocks[0]?.closest('.ce-block') || ctx.sel.anchorNode?.parentElement?.closest('.ce-block');
+                                textToSplit = ctx.sel.toString();
+                                blocksToRemove = 1;
+                                const blockEl = ctx.sel.anchorNode?.parentElement?.closest('.ce-block');
                                 if (blockEl) {
                                     targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(blockEl);
                                 }
+                            }
+
+                            if (textToSplit.trim()) {
+                                items = splitTextToItems(textToSplit);
                             }
 
                             // Fallback: Current cursor position
