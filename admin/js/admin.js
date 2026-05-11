@@ -6183,52 +6183,58 @@ class AdminManager {
                         }
 
                         try {
-                            const blocks = getSelectedBlocks();
-                            if (!blocks.length) {
-                                const index = editor.blocks.getCurrentBlockIndex();
-                                if (index >= 0) {
-                                    const block = editor.blocks.getBlockByIndex(index);
-                                    if (block.name === 'list') {
-                                        // UNWRAP: Convert list back to paragraphs
-                                        const items = block.save?.data?.items || [];
-                                        for (let i = 0; i < items.length; i++) {
-                                            await editor.blocks.insert('paragraph', { text: items[i] }, {}, index + i);
-                                        }
-                                        await editor.blocks.delete(index + items.length);
-                                    } else {
-                                        const text = block?.holder?.textContent?.trim() || '';
-                                        await editor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items: [text] }, {}, index);
-                                        await editor.blocks.delete(index + 1);
+                            const ctx = selectionInsideSurface();
+                            let items = [];
+                            let targetIndex = -1;
+                            let blocksToRemove = 0;
+
+                            if (ctx && !ctx.sel.isCollapsed) {
+                                // Use the smarter split logic for the selected text
+                                items = splitTextToItems(ctx.sel.toString());
+                                const selectedBlocks = getSelectedBlocks();
+                                blocksToRemove = selectedBlocks.length;
+                                
+                                if (selectedBlocks.length > 0) {
+                                    const firstBlock = selectedBlocks[0].closest('.ce-block');
+                                    targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(firstBlock);
+                                }
+                            }
+
+                            // Fallback to current block if no selection or selection logic failed
+                            if (targetIndex === -1) {
+                                targetIndex = editor.blocks.getCurrentBlockIndex();
+                                if (targetIndex < 0) return;
+                                
+                                const block = editor.blocks.getBlockByIndex(targetIndex);
+                                if (block.name === 'list') {
+                                    // Toggle off: Convert list to paragraphs
+                                    const data = await block.save();
+                                    const listItems = data.data.items || [];
+                                    for (let i = 0; i < listItems.length; i++) {
+                                        await editor.blocks.insert('paragraph', { text: listItems[i] }, {}, targetIndex + i);
                                     }
+                                    await editor.blocks.delete(targetIndex + listItems.length);
+                                    return;
                                 }
-                                return;
+                                
+                                items = splitTextToItems(block?.holder?.textContent || '');
+                                blocksToRemove = 1;
                             }
 
-                            // If selection is already inside a list, unwrap it
-                            const firstBlock = blocks[0].closest('.ce-block');
-                            const blockIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(firstBlock);
-                            const blockData = editor.blocks.getBlockByIndex(blockIndex);
-                            
-                            if (blockData && blockData.name === 'list') {
-                                // Unwrap selected list
-                                const items = blockData.save?.data?.items || [];
-                                for (let i = 0; i < items.length; i++) {
-                                    await editor.blocks.insert('paragraph', { text: items[i] }, {}, blockIndex + i);
+                            if (items.length > 0) {
+                                // Insert the new list
+                                await editor.blocks.insert('list', { 
+                                    style: ordered ? 'ordered' : 'unordered', 
+                                    items: items 
+                                }, {}, targetIndex);
+                                
+                                // Remove original blocks (they are now shifted down by 1)
+                                for (let i = 0; i < blocksToRemove; i++) {
+                                    await editor.blocks.delete(targetIndex + 1);
                                 }
-                                await editor.blocks.delete(blockIndex + items.length);
-                                return;
+                                
+                                editor.caret.setToBlock(targetIndex);
                             }
-
-                            const items = blocks.map(b => b.textContent.trim()).filter(t => t);
-                            if (items.length === 0) return;
-
-                            const firstBlockIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(blocks[0].closest('.ce-block'));
-                            await editor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items: items }, {}, firstBlockIndex);
-                            for (let i = 0; i < blocks.length; i++) {
-                                await editor.blocks.delete(firstBlockIndex + 1);
-                            }
-                            editor.caret.setToBlock(firstBlockIndex);
-
                         } catch (err) {
                             console.error("Manual list conversion failed:", err);
                             exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
