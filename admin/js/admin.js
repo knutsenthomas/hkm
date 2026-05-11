@@ -6249,6 +6249,25 @@ class AdminManager {
 
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
+                const updateActiveStates = () => {
+                    const states = {
+                        bold: document.queryCommandState('bold'),
+                        italic: document.queryCommandState('italic'),
+                        underline: document.queryCommandState('underline'),
+                        strike: document.queryCommandState('strikeThrough'),
+                        link: !!document.getSelection()?.anchorNode?.parentElement?.closest('a')
+                    };
+
+                    desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
+                        const tool = btn.getAttribute('data-tool');
+                        if (states[tool]) {
+                            btn.classList.add('is-active');
+                        } else {
+                            btn.classList.remove('is-active');
+                        }
+                    });
+                };
+
                 // Common handlers for both modes
                 const commonHandlers = {
                     bold: () => exec('bold'),
@@ -6319,24 +6338,6 @@ class AdminManager {
                         quote: () => exec('formatBlock', 'blockquote')
                     };
 
-                    const updateActiveStates = () => {
-                        const states = {
-                            bold: document.queryCommandState('bold'),
-                            italic: document.queryCommandState('italic'),
-                            underline: document.queryCommandState('underline'),
-                            strike: document.queryCommandState('strikeThrough'),
-                            link: !!document.getSelection()?.anchorNode?.parentElement?.closest('a')
-                        };
-
-                        desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
-                            const tool = btn.getAttribute('data-tool');
-                            if (states[tool]) {
-                                btn.classList.add('is-active');
-                            } else {
-                                btn.classList.remove('is-active');
-                            }
-                        });
-                    };
 
                     docsSurface.addEventListener('keyup', () => {
                         if (typeof updateActiveStates === 'function') updateActiveStates();
