@@ -3232,9 +3232,31 @@ div[id^="editorjs-holder-"] {
     min-height: 400px;
 }
 
-.editor-paper .ce-block__content,
-.editor-paper .ce-toolbar__content {
+.editor-paper .ce-block {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin: 0 !important;
+    transition: none;
+    border-left: none !important;
+}
+
+.editor-paper .ce-block:hover {
+    background-color: transparent !important;
+}
+
+.editor-paper .ce-block--focused {
+    background-color: transparent !important;
+}
+
+/* Make selection look continuous across blocks like Google Docs */
+.editor-paper .ce-block--selected {
+    background: rgba(37, 99, 235, 0.1) !important;
+}
+
+.editor-paper .ce-block__content {
     max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
 .editor-paper .ce-paragraph {
@@ -3242,26 +3264,13 @@ div[id^="editorjs-holder-"] {
     line-height: 1.6 !important;
     color: #27364d !important;
     letter-spacing: 0.003em;
+    margin: 0 0 1em 0 !important; /* Docs-style paragraph spacing */
 }
 
 .editor-paper .ce-header {
     line-height: 1.3 !important;
     color: #0f172a !important;
-}
-
-.editor-paper .ce-block {
-    padding-top: 0.1em;
-    padding-bottom: 0.1em;
-    transition: background-color 0.2s ease;
-    border-left: 2px solid transparent;
-}
-
-.editor-paper .ce-block:hover {
-    background-color: #fbfcfe;
-}
-
-.editor-paper .ce-block--focused {
-    border-left-color: #bfdbfe;
+    margin: 1.2em 0 0.5em 0 !important;
 }
 
 .editor-paper .codex-editor {
