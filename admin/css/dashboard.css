@@ -2510,6 +2510,20 @@ h3.ce-header {
     display: inline-block;
 }
 
+/* Loader Small for buttons and previews */
+.loader-sm {
+    width: 20px;
+    height: 20px;
+    border: 2px solid #e2e8f0;
+    border-top: 2px solid #1B4965;
+    border-radius: 50%;
+    animation: rotate 0.8s linear infinite;
+}
+
+.unsplash-icon-color {
+    color: #1B4965 !important;
+}
+
 
 /* Range Inputs */
 .range-group {

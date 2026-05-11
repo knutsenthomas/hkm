@@ -6941,19 +6941,32 @@ class AdminManager {
                 // Shared Upload Handler
                 const handleImageUpload = async (file) => {
                     if (!file) return;
+                    console.log("[Admin] Starting upload for:", file.name, "Size:", file.size);
+                    
                     const originalContent = preview.innerHTML;
-                    preview.innerHTML = '<div class="loader-sm"></div>';
+                    preview.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; gap:10px;"><div class="loader-sm"></div><span style="font-size:11px; color:#64748b;">Laster opp...</span></div>';
+                    
                     try {
+                        // Komprimer bildet
+                        console.log("[Admin] Compressing image...");
                         const compressed = await this.compressImage(file, 1200, 0.8);
-                        const fileName = `blog/${Date.now()}_${file.name}`;
+                        console.log("[Admin] Compression done. New size:", compressed.size);
+                        
+                        const fileName = `${collectionId}/${Date.now()}_${file.name}`;
+                        console.log("[Admin] Uploading to Firebase:", fileName);
+                        
                         const url = await firebaseService.uploadFile(compressed, fileName);
-                        imgInput.value = url;
-                        imgInput.dispatchEvent(new Event('input'));
+                        console.log("[Admin] Upload success! URL:", url);
+                        
+                        if (imgInput) {
+                            imgInput.value = url;
+                            imgInput.dispatchEvent(new Event('input'));
+                        }
                         this.showToast('Bilde lastet opp!', 'success');
                     } catch (error) {
-                        console.error('Upload error:', error);
+                        console.error('[Admin] Upload failed:', error);
                         preview.innerHTML = originalContent;
-                        this.showToast('Kunne ikke laste opp bilde.', 'error');
+                        this.showToast('Kunne ikke laste opp bilde: ' + (error.message || 'Ukjent feil'), 'error');
                     }
                 };
             }
