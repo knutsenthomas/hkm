@@ -5985,9 +5985,9 @@ class AdminManager {
                 };
             }
 
-            if (typeof List !== 'undefined') {
+            if (typeof NestedList !== 'undefined') {
                 toolsConfig.list = {
-                    class: List,
+                    class: NestedList,
                     inlineToolbar: true,
                     config: { defaultStyle: 'unordered' }
                 };
