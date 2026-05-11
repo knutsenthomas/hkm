@@ -6355,7 +6355,21 @@ class AdminManager {
 
                 const toolHandlers = shouldUseDocsLikeEditor ? {
                     ...commonHandlers,
-                    paragraph: () => exec('formatBlock', 'p'),
+                    paragraph: () => {
+                        const ctx = selectionInsideSurface();
+                        if (ctx && !ctx.sel.isCollapsed) {
+                            const range = ctx.sel.getRangeAt(0);
+                            const fragment = range.cloneContents();
+                            const div = document.createElement('div');
+                            div.appendChild(fragment);
+                            
+                            // Transform all headers/divs inside selection into paragraphs
+                            const content = div.innerHTML.replace(/<(h[1-6]|div|section|article|blockquote)[^>]*>(.*?)<\/\1>/gi, '<p>$2</p>');
+                            exec('insertHTML', content);
+                        } else {
+                            exec('formatBlock', 'p');
+                        }
+                    },
                     h1: () => exec('formatBlock', 'h1'),
                     h2: () => exec('formatBlock', 'h2'),
                     h3: () => exec('formatBlock', 'h3'),
@@ -6363,17 +6377,32 @@ class AdminManager {
                     h5: () => exec('formatBlock', 'h5'),
                     h6: () => exec('formatBlock', 'h6'),
                     removeFormat: () => {
-                        exec('removeFormat');
-                        // Extra deep cleaning: strip all style attributes from selection
                         const ctx = selectionInsideSurface();
-                        if (ctx && !ctx.sel.isCollapsed) {
-                            const range = ctx.sel.getRangeAt(0);
-                            const fragment = range.cloneContents();
-                            const div = document.createElement('div');
-                            div.appendChild(fragment);
-                            div.querySelectorAll('*').forEach(el => el.removeAttribute('style'));
-                            exec('insertHTML', div.innerHTML);
+                        if (!ctx || ctx.sel.isCollapsed) {
+                            exec('removeFormat');
+                            return;
                         }
+                        
+                        const range = ctx.sel.getRangeAt(0);
+                        const fragment = range.cloneContents();
+                        const div = document.createElement('div');
+                        div.appendChild(fragment);
+                        
+                        // Deep strip: Remove ALL attributes from ALL tags
+                        div.querySelectorAll('*').forEach(el => {
+                            while (el.attributes.length > 0) {
+                                el.removeAttribute(el.attributes[0].name);
+                            }
+                            // Convert non-standard tags to spans or just keep content
+                            if (['SPAN', 'FONT', 'CENTER'].includes(el.tagName)) {
+                                const parent = el.parentNode;
+                                while (el.firstChild) parent.insertBefore(el.firstChild, el);
+                                parent.removeChild(el);
+                            }
+                        });
+                        
+                        // Replace the selection with the "naked" HTML
+                        exec('insertHTML', div.innerHTML);
                     },
                     outdent: () => exec('outdent'),
                     indent: () => exec('indent'),
