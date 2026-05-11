@@ -6246,9 +6246,6 @@ class AdminManager {
                 return { sel, range };
             };
 
-            docsSurface.addEventListener('mouseup', () => {
-                saveSelectionRange();
-            });
 
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
@@ -6341,11 +6338,9 @@ class AdminManager {
                         });
                     };
 
-                    docsSurface.addEventListener('mouseup', () => {
-                        saveSelectionRange();
-                        if (shouldUseDocsLikeEditor) updateActiveStates();
+                    docsSurface.addEventListener('keyup', () => {
+                        if (typeof updateActiveStates === 'function') updateActiveStates();
                     });
-                    docsSurface.addEventListener('keyup', updateActiveStates);
 
                     desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
                         const tool = btn.getAttribute('data-tool');
@@ -6463,6 +6458,16 @@ class AdminManager {
                         });
                     });
                 }
+
+                // Global listeners for the editor surface
+                docsSurface.addEventListener('mouseup', () => {
+                    saveSelectionRange();
+                    if (typeof updateActiveStates === 'function') updateActiveStates();
+                });
+
+                docsSurface.addEventListener('keyup', () => {
+                    if (typeof updateActiveStates === 'function') updateActiveStates();
+                });
             }
 
             if (collectionId === 'podcast_transcripts') {
