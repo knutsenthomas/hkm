@@ -1179,6 +1179,35 @@ class ContentManager {
         container.classList.toggle('wix-reference-post', isWixReferencePost);
         container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
 
+        // Mobile cleanup and Gallery wrapping
+        const processContentStructure = (root) => {
+            if (!root) return;
+
+                i++;
+            }
+
+            // 2. Mobile Spacing Cleanup
+            if (!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches)) return;
+
+            const isSpacerLike = (el) => {
+                if (!el || el.nodeType !== 1) return false;
+                const tag = (el.tagName || '').toLowerCase();
+                const cls = ((el.className || '') + '').toLowerCase();
+                const text = (el.textContent || '').replace(/\u00a0/g, '').trim();
+                const hasMedia = !!el.querySelector('img,video,iframe,svg,blockquote');
+                const isEmptyBlock = !text && !hasMedia;
+                return tag === 'br' || tag === 'hr' || cls.includes('spacer') || (isEmptyBlock && (tag === 'p' || tag === 'div'));
+            };
+
+            let removed = 0;
+            while (root.firstElementChild && isSpacerLike(root.firstElementChild) && removed < 8) {
+                root.firstElementChild.remove();
+                removed += 1;
+            }
+        };
+
+        processContentStructure(container);
+
         // Mobile cleanup: remove leading spacer/empty blocks that can create a large gap above first paragraph.
         const normalizeTopSpacingForMobile = (root) => {
             if (!root || !(window.matchMedia && window.matchMedia('(max-width: 768px)').matches)) return;
@@ -3707,15 +3736,6 @@ class ContentManager {
         const root = doc.body.firstElementChild;
         if (!root) return html;
 
-        const imageUrl = this.getContentItemImage(item);
-        const hasInlineImage = !!root.querySelector('img, figure');
-        if (imageUrl && !hasInlineImage) {
-            const figure = doc.createElement('figure');
-            figure.className = 'wix-inline-image';
-            figure.innerHTML = `<img src="${this.escapeHtml(imageUrl)}" alt="${this.escapeHtml(item.title || '')}" loading="lazy">`;
-            root.insertBefore(figure, root.firstChild);
-        }
-
         const children = () => Array.from(root.children);
         const replaceRunWithList = (startIndex, count, tag, htmlItems) => {
             const current = children();
@@ -4193,9 +4213,11 @@ class ContentManager {
 
     renderRichImageFigure(src, alt = '', caption = '', className = '') {
         if (!src) return '';
-        const classAttr = className ? ` class="${this.escapeHtml(className)}"` : '';
+        const normalizedSrc = this.normalizePublicImageUrl(src);
+        const finalClasses = ['block-image', className].filter(Boolean).join(' ');
+        const classAttr = ` class="${this.escapeHtml(finalClasses)}"`;
         const captionHtml = caption ? `<figcaption>${this.escapeHtml(caption)}</figcaption>` : '';
-        return `<figure${classAttr}><img src="${this.escapeHtml(src)}" alt="${this.escapeHtml(alt)}" loading="lazy">${captionHtml}</figure>`;
+        return `<figure${classAttr}><img src="${this.escapeHtml(normalizedSrc)}" alt="${this.escapeHtml(alt)}" loading="lazy">${captionHtml}</figure>`;
     }
 
     _renderRichNodes(nodes, options = {}) {
@@ -4219,13 +4241,15 @@ class ContentManager {
                     const inner = this._renderRichNodes(children, { inListItem: true });
                     if (!inner.trim()) return '';
                     if (inListItem) return inner;
-                    return `<p${this.getRichTextStyleAttr(node.paragraphData || {})}${this.getRichNodeStyleAttr(node)}>${inner}</p>`;
+                    const styleAttr = this.getRichTextStyleAttr(node.paragraphData || {}) + this.getRichNodeStyleAttr(node);
+                    return `<p class="block-paragraph"${styleAttr}>${inner}</p>`;
                 }
                 case 'HEADING': {
                     const level = Math.min(6, Math.max(1, Number(node.headingData?.renderedLevel || node.headingData?.level || 2)));
                     const inner = this._renderRichNodes(children, { inListItem: true });
                     if (!inner.trim()) return '';
-                    return `<h${level}${this.getRichTextStyleAttr(node.headingData || {})}${this.getRichNodeStyleAttr(node)}>${inner}</h${level}>`;
+                    const styleAttr = this.getRichTextStyleAttr(node.headingData || {}) + this.getRichNodeStyleAttr(node);
+                    return `<h${level} class="block-header"${styleAttr}>${inner}</h${level}>`;
                 }
                 case 'BULLETED_LIST':
                 case 'ORDERED_LIST':
@@ -4238,13 +4262,13 @@ class ContentManager {
                         const cleaned = this.stripOuterParagraph(itemHtml);
                         return cleaned ? `<li>${cleaned}</li>` : '';
                     }).join('');
-                    return items ? `<${tag}${start}>${items}</${tag}>` : '';
+                    return items ? `<${tag}${start} class="block-list">${items}</${tag}>` : '';
                 }
                 case 'LIST_ITEM':
                     return this._renderRichNodes(children, { inListItem: true });
                 case 'IMAGE': {
                     const img = node.imageData?.image || {};
-                    const src = this.getRichMediaUrl(img);
+                    const src = this.normalizePublicImageUrl(this.getRichMediaUrl(img));
                     if (!src) return '';
                     const alt = node.imageData?.altText || '';
                     const captionFromChild = children
@@ -4279,7 +4303,7 @@ class ContentManager {
                     const galleryData = node.galleryData || {};
                     const items = Array.isArray(galleryData.items) ? galleryData.items : [];
                     const rendered = items.map(item => {
-                        const imageUrl = this.getRichMediaUrl(item?.image?.media || {});
+                        const imageUrl = this.normalizePublicImageUrl(this.getRichMediaUrl(item?.image?.media || {}));
                         if (imageUrl) return this.renderRichImageFigure(imageUrl, item.altText || item.title || '', item.title || '', 'wix-gallery-item');
 
                         const videoUrl = this.getRichMediaUrl(item?.video?.media || {});
@@ -4451,10 +4475,7 @@ class ContentManager {
             const leadingImagesHaveNoCaption = leadingImages.every((img) => String(img?.data?.caption || '').trim().length === 0);
             const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => hasMeaningfulText(b));
 
-            const blocksForRender =
-                leadingHasOnlyImagesAndBlankParas && leadingImages.length >= 2 && leadingImagesHaveNoCaption && hasTextAfterLeading
-                    ? rawBlocks.slice(startIndex)
-                    : rawBlocks;
+            const blocksForRender = rawBlocks;
 
             return blocksForRender.map((block) => {
                 try {
@@ -4479,7 +4500,7 @@ class ContentManager {
                             return `<${listTag} class="block-list">${items}</${listTag}>`;
                         }
                         case 'image': {
-                            const imageUrl = data?.file?.url || data?.url || '';
+                            const imageUrl = this.normalizePublicImageUrl(data?.file?.url || data?.url || '');
                             if (!imageUrl) return '';
                             const caption = data.caption ? `<figcaption>${data.caption}</figcaption>` : '';
                             const classes = [

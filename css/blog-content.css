@@ -1,680 +1,226 @@
-/* Rich blog content rendering */
-.blog-post-content,
-#single-post-content {
-  color: var(--text-dark);
-  font-family: inherit;
-  line-height: 1.75;
-  font-size: 1.08rem;
-  word-break: break-word;
-  max-width: 780px;
-  margin-left: auto;
-  margin-right: auto;
+/* 
+   ==========================================================================
+   Blog Content Styles - High Fidelity Editor Parity
+   ========================================================================== 
+*/
+
+:root {
+    --rte-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --rte-title-font: 'Inter', system-ui, -apple-system, sans-serif;
+    --rte-text-color: #2d3748;
+    --rte-header-color: #1a202c;
+    --rte-line-height: 1.75;
+    --rte-paragraph-spacing: 2rem;
+    --rte-max-width: 840px;
 }
 
-.blog-post-content p,
-#single-post-content p {
-  display: block;
-  margin: 0 0 1.35rem 0;
+/* Base Container */
+.blog-post-content {
+    max-width: var(--rte-max-width);
+    margin: 0 auto;
+    font-family: var(--rte-font-family);
+    color: var(--rte-text-color);
+    line-height: var(--rte-line-height);
+    padding: 0 24px;
 }
 
-.blog-post-content h1,
-.blog-post-content h2,
-.blog-post-content h3,
-.blog-post-content h4,
-.blog-post-content h5,
-.blog-post-content h6,
-.blog-post-content .block-header,
-#single-post-content h1,
-#single-post-content h2,
-#single-post-content h3,
-#single-post-content h4,
-#single-post-content h5,
-#single-post-content h6,
-#single-post-content .block-header {
-  margin: 1.4em 0 0.55em;
-  line-height: 1.3;
-  color: var(--text-dark);
-  font-family: inherit;
-  font-weight: 700;
-  letter-spacing: 0;
+/* Unified Block Classes (from EditorJS) */
+
+.block-header {
+    font-family: var(--rte-title-font);
+    color: var(--rte-header-color);
+    font-weight: 800;
+    line-height: 1.25;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    letter-spacing: -0.01em;
 }
 
-.blog-post-content > .block-header:first-child,
-.blog-post-content > h1:first-child,
-.blog-post-content > h2:first-child,
-#single-post-content > .block-header:first-child,
-#single-post-content > h1:first-child,
-#single-post-content > h2:first-child {
-  display: block;
+h1.block-header { font-size: 2.5rem; }
+h2.block-header { font-size: 2rem; }
+h3.block-header { font-size: 1.5rem; }
+h4.block-header { font-size: 1.25rem; }
+
+.block-paragraph {
+    margin-bottom: var(--rte-paragraph-spacing);
+    font-size: 1.125rem;
+    font-weight: 400;
+    color: #334155;
+    word-break: break-word;
 }
 
-.blog-post-content h1,
-#single-post-content h1,
-.blog-post-content h1.block-header,
-#single-post-content h1.block-header {
-  font-size: 2.35rem;
+/* First paragraph treatment */
+.block-paragraph:first-of-type {
+    font-size: 1.25rem;
+    line-height: 1.6;
+    color: #1e293b;
+    font-weight: 500;
 }
 
-.blog-post-content h2,
-#single-post-content h2,
-.blog-post-content h2.block-header,
-#single-post-content h2.block-header {
-  font-size: 1.75rem;
+.block-list {
+    margin-bottom: var(--rte-paragraph-spacing);
+    padding-left: 1.5rem;
+    list-style-position: outside;
 }
 
-.blog-post-content h3,
-#single-post-content h3,
-.blog-post-content h3.block-header,
-#single-post-content h3.block-header {
-  font-size: 1.45rem;
+.block-list li {
+    margin-bottom: 0.85rem;
+    padding-left: 0.5rem;
+    font-size: 1.15rem;
+    line-height: 1.75;
 }
 
-.blog-post-content h4,
-#single-post-content h4,
-.blog-post-content h4.block-header,
-#single-post-content h4.block-header {
-  font-size: 1.2rem;
+ul.block-list { list-style-type: disc; }
+ol.block-list { list-style-type: decimal; }
+
+.block-quote {
+    position: relative;
+    margin: 3rem 0;
+    padding: 2rem 2.5rem;
+    background: #f8fafc;
+    border-left: 4px solid #1B4965;
+    border-radius: 0 12px 12px 0;
 }
 
-.blog-post-content h5,
-#single-post-content h5,
-.blog-post-content h5.block-header,
-#single-post-content h5.block-header {
-  font-size: 1.05rem;
+.block-quote p {
+    font-family: var(--rte-title-font);
+    font-style: italic;
+    font-size: 1.35rem;
+    line-height: 1.6;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
 }
 
-.blog-post-content h6,
-#single-post-content h6,
-.blog-post-content h6.block-header,
-#single-post-content h6.block-header {
-  font-size: 0.95rem;
+.block-quote cite {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-style: normal;
 }
 
-.blog-post-content ul,
-#single-post-content ul {
-  list-style-type: disc;
-  margin: 0 0 1.35rem 0;
-  padding-left: 1.8rem;
+.block-delimiter {
+    text-align: center;
+    font-size: 2.5rem;
+    letter-spacing: 1rem;
+    color: #e2e8f0;
+    margin: 4rem 0;
+    font-weight: 300;
 }
 
-.blog-post-content ol,
-#single-post-content ol {
-  list-style-type: decimal;
-  margin: 0 0 1.35rem 0;
-  padding-left: 1.8rem;
+/* Image & Media Styling */
+.block-image {
+    margin: 3rem 0;
+    border-radius: 12px;
+    overflow: hidden;
 }
 
-.blog-post-content li,
-#single-post-content li {
-  margin: 0.42em 0;
-  padding-left: 0.18rem;
-}
-
-.blog-post-content li > p,
-#single-post-content li > p {
-  margin-bottom: 0.55rem;
-}
-
-.blog-post-content blockquote,
-#single-post-content blockquote {
-  margin: 1.7em 0;
-  padding: 1em 1.25em;
-  border-left: 4px solid #f59e0b;
-  background: #fff7ed;
-  border-radius: 0.4rem;
-  color: #374151;
-}
-
-.blog-post-content hr,
-#single-post-content hr {
-  border: 0;
-  border-top: 1px solid #e5e7eb;
-  margin: 2em 0;
-}
-
-.blog-post-content figure,
-#single-post-content figure {
-  margin: 1.8em 0;
-}
-
-.blog-post-content .wix-gallery,
-#single-post-content .wix-gallery {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.9rem;
-  margin: 1.4em 0;
-}
-
-.blog-post-content .wix-gallery figure,
-#single-post-content .wix-gallery figure {
-  margin: 0;
-}
-
-/* Consecutive image blocks → auto gallery */
-.blog-post-content .block-image-gallery,
-#single-post-content .block-image-gallery {
-  display: grid;
-  gap: 0.75rem;
-  margin: 1.8em 0;
-}
-
-.blog-post-content .block-image-gallery--2col,
-#single-post-content .block-image-gallery--2col {
-  grid-template-columns: 1fr 1fr;
-}
-
-.blog-post-content .block-image-gallery--3col,
-#single-post-content .block-image-gallery--3col {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.blog-post-content .block-image-gallery figure,
-#single-post-content .block-image-gallery figure {
-  margin: 0;
-}
-
-.blog-post-content .block-image-gallery img,
-#single-post-content .block-image-gallery img {
-  width: 100%;
-  height: 220px;
-  object-fit: cover;
-  border-radius: 0.45rem;
-}
-
-@media (max-width: 600px) {
-  .blog-post-content .block-image-gallery--2col,
-  #single-post-content .block-image-gallery--2col,
-  .blog-post-content .block-image-gallery--3col,
-  #single-post-content .block-image-gallery--3col {
-    grid-template-columns: 1fr;
-  }
-
-  .blog-post-content .block-image-gallery img,
-  #single-post-content .block-image-gallery img {
+.block-image img {
+    display: block;
+    width: 100%;
     height: auto;
-  }
+    border-radius: 12px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+    transition: transform 0.5s ease;
 }
 
-.blog-post-content .wix-link-preview,
-#single-post-content .wix-link-preview {
-  margin: 1.4em 0;
-  padding: 0.9rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.6rem;
-  background: #fff;
-  display: grid;
-  grid-template-columns: minmax(120px, 0.32fr) 1fr;
-  gap: 1rem;
-  align-items: center;
+.block-image figcaption {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #64748b;
+    font-style: italic;
+    font-family: var(--rte-font-family);
 }
 
-.blog-post-content .wix-link-preview p,
-#single-post-content .wix-link-preview p {
-  margin-top: 0.55em;
-  margin-bottom: 0;
-  color: #4b5563;
+/* Automatic Gallery Layout (Grid) */
+.block-image-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 3rem 0;
 }
 
-.blog-post-content figcaption,
-#single-post-content figcaption {
-  margin-top: 0.45em;
-  font-size: 0.93rem;
-  color: #6b7280;
+.block-image-gallery .block-image {
+    margin: 0;
 }
 
-.blog-post-content img,
-.blog-post-content video,
-.blog-post-content audio,
-#single-post-content iframe,
-#single-post-content img,
-#single-post-content video,
-#single-post-content audio {
-  display: block;
-  width: 100%;
-  max-width: 100%;
-  height: auto;
-  border-radius: 0.5rem;
-  margin: 0;
+.block-image-gallery[data-items="1"] { grid-template-columns: 1fr; }
+.block-image-gallery[data-items="3"] { grid-template-columns: repeat(3, 1fr); }
+.block-image-gallery[data-items="4"] { grid-template-columns: repeat(2, 1fr); }
+
+.block-image-gallery.gallery-3-col { grid-template-columns: repeat(3, 1fr); }
+.block-image-gallery.gallery-2-col { grid-template-columns: repeat(2, 1fr); }
+
+/* Embeds */
+.block-embed-wrapper {
+    margin: 3rem 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15);
 }
 
-.blog-post-content iframe,
-#single-post-content iframe {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  min-height: 0;
-  border: 0;
-  border-radius: 0.5rem;
+.block-embed {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
 }
 
-.blog-post-content .cms-embed,
-#single-post-content .cms-embed {
-  margin: 1.8em 0;
+.block-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 
-.blog-post-content audio,
-#single-post-content audio {
-  width: 100%;
+/* Links */
+.block-paragraph a, .block-list a {
+    color: #1B4965;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+    transition: color 0.2s;
 }
 
-.blog-post-content pre,
-#single-post-content pre {
-  margin: 1.6em 0;
-  padding: 1rem;
-  overflow-x: auto;
-  border-radius: 0.5rem;
-  background: #111827;
-  color: #f9fafb;
-  line-height: 1.55;
-  font-size: 0.92rem;
+.block-paragraph a:hover, .block-list a:hover {
+    color: #d17d39;
 }
 
-.blog-post-content code,
-#single-post-content code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-}
-
-.blog-post-content .wix-table-wrap,
-#single-post-content .wix-table-wrap {
-  margin: 1.8em 0;
-  overflow-x: auto;
-}
-
-.blog-post-content table,
-#single-post-content table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.98rem;
-}
-
-.blog-post-content td,
-.blog-post-content th,
-#single-post-content td,
-#single-post-content th {
-  border: 1px solid #e5e7eb;
-  padding: 0.75rem;
-  vertical-align: top;
-}
-
-.blog-post-content .wix-button,
-#single-post-content .wix-button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-  padding: 0.75rem 1.2rem;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #f39c12, #e74c3c);
-  color: #fff;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.blog-post-content a,
-#single-post-content a {
-  color: #c05621;
-  font-weight: 600;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 0.18em;
-  overflow-wrap: anywhere;
-}
-
-.blog-post-content a:has(figure),
-#single-post-content a:has(figure),
-.blog-post-content .wix-button,
-#single-post-content .wix-button {
-  text-decoration: none;
-}
-
-.blog-post-content sup,
-.blog-post-content sub,
-#single-post-content sup,
-#single-post-content sub {
-  font-size: 0.75em;
-  line-height: 0;
-}
-
-.blog-post-content .wix-collapsible-item,
-#single-post-content .wix-collapsible-item {
-  margin: 1em 0;
-  padding: 1rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 0.5rem;
-}
-
-.blog-post-content .wix-collapsible-item summary,
-#single-post-content .wix-collapsible-item summary {
-  cursor: pointer;
-  font-weight: 700;
-}
-
-@media (max-width: 720px) {
-  .blog-post-content,
-  #single-post-content {
-    font-size: 1rem;
-    line-height: 1.68;
-  }
-
-  #single-post-content > :first-child,
-  #single-post-content > :first-child > :first-child {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-    min-height: 0 !important;
-  }
-
-  #single-post-content > p:empty,
-  #single-post-content > div:empty,
-  #single-post-content > section:empty {
-    display: none !important;
-  }
-
-  .blog-post-content h1,
-  #single-post-content h1 {
-    font-size: 1.6rem !important;
-  }
-
-  .blog-post-content h2,
-  #single-post-content h2 {
-    font-size: 1.35rem !important;
-  }
-
-  .blog-post-content h3,
-  #single-post-content h3 {
-    font-size: 1.22rem;
-  }
-
-  .blog-post-content .wix-gallery,
-  #single-post-content .wix-gallery {
-    grid-template-columns: 1fr;
-  }
-
-  .blog-post-content .wix-link-preview,
-  #single-post-content .wix-link-preview {
-    grid-template-columns: 1fr;
-  }
-}
-
-.blog-post-content > *:last-child,
-#single-post-content > *:last-child {
-  margin-bottom: 0;
-}
-
-/* Wix Blog viewer HTML fallback.
-   Some imported posts only have Wix's rendered viewer HTML, not Ricos JSON.
-   These values mirror the Wix Blog viewer defaults closely. */
-.blog-post-content.wix-html-content,
-#single-post-content.wix-html-content {
-  max-width: 640px;
-  font-family: Inter, Helvetica, Arial, sans-serif;
-  font-size: 18px;
-  line-height: 27px;
-  color: #151a21;
-}
-
-.blog-post-content.wix-html-content p,
-#single-post-content.wix-html-content p {
-  margin: 0 0 1.5em;
-  font-size: 18px;
-  line-height: 27px;
-  font-weight: 400;
-}
-
-.blog-post-content.wix-html-content h1,
-.blog-post-content.wix-html-content h2,
-.blog-post-content.wix-html-content h3,
-.blog-post-content.wix-html-content h4,
-.blog-post-content.wix-html-content h5,
-.blog-post-content.wix-html-content h6,
-#single-post-content.wix-html-content h1,
-#single-post-content.wix-html-content h2,
-#single-post-content.wix-html-content h3,
-#single-post-content.wix-html-content h4,
-#single-post-content.wix-html-content h5,
-#single-post-content.wix-html-content h6 {
-  margin: 1.45em 0 0.55em;
-  line-height: 1.25;
-  letter-spacing: 0;
-  color: #151a21;
-}
-
-.blog-post-content.wix-html-content h1,
-#single-post-content.wix-html-content h1 {
-  font-size: 32px;
-  line-height: 40px;
-  font-weight: 400;
-}
-
-.blog-post-content.wix-html-content h2,
-#single-post-content.wix-html-content h2 {
-  font-size: 28px;
-  line-height: 35px;
-  font-weight: 700;
-}
-
-.blog-post-content.wix-html-content h3,
-#single-post-content.wix-html-content h3 {
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 700;
-}
-
-.blog-post-content.wix-html-content .WhDDP,
-.blog-post-content.wix-html-content .mHxYK,
-#single-post-content.wix-html-content .WhDDP,
-#single-post-content.wix-html-content .mHxYK {
-  display: block;
-}
-
-.blog-post-content.wix-html-content a,
-#single-post-content.wix-html-content a {
-  color: inherit;
-  font-weight: inherit;
-  text-decoration: underline;
-  text-underline-offset: 0.12em;
-}
-
-.blog-post-content.wix-html-content strong,
-#single-post-content.wix-html-content strong {
-  font-weight: 700;
-}
-
-/* Ensure space between bold lead text and following text in list items */
-.blog-post-content.wix-html-content li strong:first-child,
-#single-post-content.wix-html-content li strong:first-child {
-  margin-right: 0.25em;
-}
-
-.blog-post-content.wix-html-content ul,
-.blog-post-content.wix-html-content ol,
-#single-post-content.wix-html-content ul,
-#single-post-content.wix-html-content ol {
-  margin: 0 0 1.5em;
-  padding-left: 1.6rem;
-  font-size: 18px;
-  line-height: 27px;
-}
-
-.blog-post-content.wix-html-content li,
-#single-post-content.wix-html-content li {
-  margin: 0.45em 0;
-  padding-left: 0.2rem;
-}
-
-.blog-post-content.wix-html-content li p,
-#single-post-content.wix-html-content li p {
-  margin: 0.35em 0 0;
-}
-
-.blog-post-content.wix-html-content .wix-inline-image,
-#single-post-content.wix-html-content .wix-inline-image {
-  margin: 0 0 1.8em;
-}
-
-@media (max-width: 720px) {
-  .blog-post-content.wix-html-content,
-  #single-post-content.wix-html-content {
-    max-width: 100%;
-    font-size: 18px;
-    line-height: 27px;
-  }
-
-  .blog-post-content.wix-html-content h1,
-  #single-post-content.wix-html-content h1 {
-    font-size: 28px;
-    line-height: 36px;
-  }
-
-  .blog-post-content.wix-html-content h2,
-  #single-post-content.wix-html-content h2 {
-    font-size: 28px;
-    line-height: 35px;
-  }
-}
-
-/* Styling for the imported Wix reference post layout */
-#single-post-content.wix-reference-post {
-  max-width: 640px;
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  color: #151a21;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-box {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 0 0 24px;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex: 0 0 32px;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-content {
-  min-width: 0;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-name {
-  display: inline-block;
-  color: #151a21;
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 21px;
-  text-decoration: none;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-name:hover,
-#single-post-content.wix-reference-post .wix-reference-author-name:focus-visible {
-  text-decoration: underline;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-meta {
-  margin-top: 2px;
-  color: #6b7280;
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 21px;
-}
-
-#single-post-content.wix-reference-post p {
-  margin-bottom: 1.45em;
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  font-size: 18px;
-  line-height: 27px;
-  font-weight: 400;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-box + figure,
-#single-post-content.wix-reference-post .wix-reference-author-box + p {
-  margin-top: 0;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-box + figure {
-  margin-bottom: 20px;
-}
-
-#single-post-content.wix-reference-post .wix-reference-author-box + p {
-  margin-bottom: 20px;
-}
-
-#single-post-content.wix-reference-post h2 {
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  font-size: 28px;
-  line-height: 35px;
-  font-weight: 400;
-  margin-top: 1.45em;
-  margin-bottom: 0.55em;
-  color: #151a21;
-}
-
-#single-post-content.wix-reference-post h3,
-#single-post-content.wix-reference-post h4 {
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-}
-
-#single-post-content.wix-reference-post ul,
-#single-post-content.wix-reference-post ol,
-#single-post-content.wix-reference-post li {
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  font-size: 18px;
-  line-height: 27px;
-}
-
-body.wix-reference-post-page #single-post-title {
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  font-size: 40px;
-  line-height: 50px;
-  font-weight: 400;
-}
-
-body.wix-reference-post-page #blog-meta-row {
-  gap: 14px;
-}
-
-body.wix-reference-post-page #blog-meta-row span {
-  font-family: Poppins, Inter, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 22px;
-}
-
-@media (max-width: 720px) {
-  #single-post-content.wix-reference-post .wix-reference-author-box {
-    margin-bottom: 18px;
-  }
-
-  #single-post-content.wix-reference-post .wix-reference-author-avatar {
-    width: 30px;
-    height: 30px;
-    flex-basis: 30px;
-  }
-
-  body.wix-reference-post-page #single-post-title {
-    font-size: 32px;
-    line-height: 40px;
-  }
-
-  body.wix-reference-post-page #blog-hero {
-    padding-top: 126px !important;
-  }
-
-  body.wix-reference-post-page #blog-meta-row {
-    margin-top: 12px !important;
-  }
-
-  #single-post-content.wix-reference-post .wix-reference-author-box + figure,
-  #single-post-content.wix-reference-post .wix-reference-author-box + p {
-    margin-top: 0;
-  }
-
-  #single-post-content.wix-reference-post .wix-reference-author-box + figure {
-    margin-bottom: 14px;
-  }
-
-  #single-post-content.wix-reference-post .wix-reference-author-box + p {
-    margin-bottom: 16px;
-  }
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .blog-post-content {
+        padding: 0 20px;
+    }
+    
+    h1.block-header { font-size: 2rem; }
+    h2.block-header { font-size: 1.75rem; }
+    
+    .block-paragraph {
+        font-size: 1.05rem;
+    }
+    
+    .block-image-gallery {
+        display: block;
+        grid-template-columns: 1fr;
+    }
+    
+    .block-image-gallery .block-image {
+        margin-bottom: 2rem;
+    }
+    
+    .block-image-gallery .block-image:last-child {
+        margin-bottom: 0;
+    }
+    
+    .block-quote {
+        padding: 1.5rem;
+    }
+    
+    .block-quote p {
+        font-size: 1.15rem;
+    }
 }
