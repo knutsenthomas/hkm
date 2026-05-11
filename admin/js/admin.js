@@ -6437,37 +6437,50 @@ class AdminManager {
                 };
 
                 // --- High-Reliability Event Delegation for Toolbar ---
-                desktopTools.style.pointerEvents = 'auto';
+                // Only attach the delegation listener ONCE to the container
+                if (!desktopTools.dataset.toolbarInitialized) {
+                    desktopTools.dataset.toolbarInitialized = 'true';
+                    desktopTools.style.pointerEvents = 'auto';
+                    
+                    desktopTools.addEventListener('click', async (e) => {
+                        const btn = e.target.closest('.desktop-richtools-btn');
+                        if (!btn || btn.disabled || btn.classList.contains('is-disabled')) return;
+
+                        // Always get the latest toolHandlers from the current editor context
+                        // We store the current handlers on the element itself for easy access
+                        const currentHandlers = desktopTools._currentHandlers;
+                        const tool = btn.getAttribute('data-tool');
+                        const handler = currentHandlers ? currentHandlers[tool] : null;
+                        
+                        if (handler) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            
+                            // Visual feedback pulse
+                            btn.style.transform = 'scale(0.95)';
+                            setTimeout(() => btn.style.transform = '', 100);
+
+                            try {
+                                await handler();
+                                if (typeof updateActiveStates === 'function') updateActiveStates();
+                            } catch (err) {
+                                console.error(`Toolbar delegation error [${tool}]:`, err);
+                            }
+                        }
+                    }, true); // Use capture phase to be first
+                }
+
+                // Update the current handlers for this specific editor session
+                desktopTools._currentHandlers = toolHandlers;
+                
                 desktopTools.querySelectorAll('.desktop-richtools-btn').forEach(btn => {
                     btn.style.pointerEvents = 'auto';
-                    btn.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
-                    btn.onclick = null; // Clear old individual listeners
+                    btn.onmousedown = (e) => { 
+                        saveSelectionRange(); 
+                        e.preventDefault(); 
+                        e.stopPropagation(); 
+                    };
                 });
-
-                desktopTools.onclick = async (e) => {
-                    const btn = e.target.closest('.desktop-richtools-btn');
-                    if (!btn || btn.disabled || btn.classList.contains('is-disabled')) return;
-
-                    const tool = btn.getAttribute('data-tool');
-                    const handler = toolHandlers[tool];
-                    
-                    if (handler) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        
-                        // Visual feedback pulse
-                        btn.style.transform = 'scale(0.95)';
-                        setTimeout(() => btn.style.transform = '', 100);
-
-                        try {
-                            console.log(`Executing tool: ${tool}`);
-                            await handler();
-                            updateActiveStates();
-                        } catch (err) {
-                            console.error(`Toolbar delegation error [${tool}]:`, err);
-                        }
-                    }
-                };
 
                     const textColorInput = desktopTools.querySelector('[data-color-input="text"]');
                     if (textColorInput) {
