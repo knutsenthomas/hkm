@@ -6068,38 +6068,115 @@ class AdminManager {
                 }
             });
 
+            // Common editor surface utilities
+            const getDocsSurface = () => document.getElementById(editorHolderId);
+
+            const splitTextToItems = (rawText) => {
+                const text = String(rawText || '')
+                    .replace(/\r\n/g, '\n')
+                    .replace(/[\u2028\u2029]/g, '\n')
+                    .replace(/\u00A0/g, ' ')
+                    .trim();
+                if (!text) return [];
+
+                const clean = (line) => String(line || '')
+                    .replace(/^[-*•]\s+/, '')
+                    .trim();
+
+                const rawLines = text.split(/\n+/).map(clean).filter(Boolean);
+                const items = [];
+
+                for (const line of rawLines) {
+                    const sentences = line.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [line];
+                    for (let s of sentences) {
+                        const cleaned = clean(s);
+                        if (cleaned) items.push(cleaned);
+                    }
+                }
+                return items;
+            };
+
+            const getSelectedBlocks = () => {
+                const holder = getDocsSurface();
+                const sel = window.getSelection();
+                if (!sel || sel.rangeCount === 0 || !holder) return [];
+                const range = sel.getRangeAt(0);
+                
+                const allBlocks = Array.from(holder.querySelectorAll('.ce-block'));
+                const selected = [];
+
+                allBlocks.forEach(block => {
+                    try {
+                        if (range.intersectsNode(block)) {
+                            const content = block.querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
+                            if (content) {
+                                selected.push(content);
+                            } else if (block.innerText.trim()) {
+                                selected.push({ 
+                                    textContent: block.innerText, 
+                                    closest: (selector) => (selector === '.ce-block') ? block : block.querySelector(selector),
+                                    isFallback: true
+                                });
+                            }
+                        }
+                    } catch (e) {}
+                });
+                return selected;
+            };
+
+            const replaceSelectionWithList = async (ordered) => {
+                const currentEditor = this._activeEditorInstance;
+                if (!currentEditor || !currentEditor.blocks) return;
+
+                try {
+                    const selectedBlocks = getSelectedBlocks();
+                    let items = [];
+                    let targetIndex = -1;
+                    let blocksToRemove = 0;
+
+                    if (selectedBlocks.length > 0) {
+                        const combinedText = selectedBlocks.map(b => b.textContent).join('\n');
+                        items = splitTextToItems(combinedText);
+                        blocksToRemove = selectedBlocks.length;
+                        const firstBlockEl = selectedBlocks[0].isFallback ? selectedBlocks[0].closest('.ce-block') : selectedBlocks[0].closest('.ce-block');
+                        targetIndex = Array.from(getDocsSurface().querySelectorAll('.ce-block')).indexOf(firstBlockEl);
+                    }
+
+                    if (targetIndex === -1) {
+                        targetIndex = currentEditor.blocks.getCurrentBlockIndex();
+                        if (targetIndex < 0) return;
+                        const block = currentEditor.blocks.getBlockByIndex(targetIndex);
+                        if (block.name === 'list') {
+                            const data = await block.save();
+                            const listItems = data.data.items || [];
+                            for (let i = 0; i < listItems.length; i++) {
+                                await currentEditor.blocks.insert('paragraph', { text: listItems[i] }, {}, targetIndex + i);
+                            }
+                            await currentEditor.blocks.delete(targetIndex + listItems.length);
+                            return;
+                        }
+                        items = splitTextToItems(block?.holder?.textContent || '');
+                        blocksToRemove = 1;
+                    }
+
+                    if (items.length > 0) {
+                        await currentEditor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items }, {}, targetIndex);
+                        for (let i = 0; i < blocksToRemove; i++) {
+                            await currentEditor.blocks.delete(targetIndex + 1);
+                        }
+                        currentEditor.caret.setToBlock(targetIndex);
+                    }
+                } catch (err) {
+                    console.error("Critical List Error:", err);
+                }
+            };
+
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 if (shouldUseDocsLikeEditor && docsSurface) {
                     let lastDocsSelectionRange = null;
 
-                    const splitTextToItems = (rawText) => {
-                        const text = String(rawText || '')
-                            .replace(/\r\n/g, '\n')
-                            .replace(/[\u2028\u2029]/g, '\n')
-                            .replace(/\u00A0/g, ' ')
-                            .trim();
-                        if (!text) return [];
 
-                        const clean = (line) => String(line || '')
-                            .replace(/^[-*•]\s+/, '')
-                            .trim();
-
-                        // Step 1: Split into lines
-                        const rawLines = text.split(/\n+/).map(clean).filter(Boolean);
-                        const items = [];
-
-                        // Step 2: For each line, split into sentences
-                        for (const line of rawLines) {
-                            const sentences = line.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [line];
-                            for (let s of sentences) {
-                                const cleaned = clean(s);
-                                if (cleaned) items.push(cleaned);
-                            }
-                        }
-
-                        return items;
-                    };
 
                     const focusSurface = () => {
                         if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
@@ -6143,107 +6220,7 @@ class AdminManager {
 
                     const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
 
-                    const getSelectedBlocks = () => {
-                        const sel = window.getSelection();
-                        if (!sel || sel.rangeCount === 0) return [];
-                        const range = sel.getRangeAt(0);
-                        
-                        const allBlocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
-                        const selected = [];
 
-                        allBlocks.forEach(block => {
-                            try {
-                                // use intersectsNode to reliably detect selection across blocks
-                                if (range.intersectsNode(block)) {
-                                    const content = block.querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
-                                    if (content) {
-                                        selected.push(content);
-                                    } else if (block.innerText.trim()) {
-                                        // Fallback if no specific content element is found
-                                        selected.push({ 
-                                            textContent: block.innerText, 
-                                            closest: (selector) => {
-                                                if (selector === '.ce-block') return block;
-                                                return block.querySelector(selector);
-                                            },
-                                            isFallback: true
-                                        });
-                                    }
-                                }
-                            } catch (e) {}
-                        });
-                        return selected;
-                    };
-
-                    const applyStyleToSelectedBlocks = (styler) => {
-                        const blocks = getSelectedBlocks();
-                        if (!blocks.length) return;
-                        blocks.forEach((block) => {
-                            try {
-                                styler(block);
-                            } catch (_) {
-                                // no-op
-                            }
-                        });
-                    };
-
-                    const replaceSelectionWithList = async (ordered) => {
-                        const editor = this._activeEditorInstance;
-                        if (!editor || !editor.blocks) return;
-
-                        try {
-                            const selectedBlocks = getSelectedBlocks();
-                            
-                            let items = [];
-                            let targetIndex = -1;
-                            let blocksToRemove = 0;
-
-                            if (selectedBlocks.length > 0) {
-                                // Join text from all selected blocks
-                                const combinedText = selectedBlocks.map(b => b.textContent).join('\n');
-                                items = splitTextToItems(combinedText);
-                                blocksToRemove = selectedBlocks.length;
-                                
-                                const firstBlockEl = selectedBlocks[0].isFallback ? selectedBlocks[0].closest('.ce-block') : selectedBlocks[0].closest('.ce-block');
-                                const allBlocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
-                                targetIndex = allBlocks.indexOf(firstBlockEl);
-                            }
-
-                            // Fallback: Current cursor position if nothing selected or index not found
-                            if (targetIndex === -1) {
-                                targetIndex = editor.blocks.getCurrentBlockIndex();
-                                if (targetIndex < 0) return;
-                                
-                                const block = editor.blocks.getBlockByIndex(targetIndex);
-                                if (block.name === 'list') {
-                                    const data = await block.save();
-                                    const listItems = data.data.items || [];
-                                    for (let i = 0; i < listItems.length; i++) {
-                                        await editor.blocks.insert('paragraph', { text: listItems[i] }, {}, targetIndex + i);
-                                    }
-                                    await editor.blocks.delete(targetIndex + listItems.length);
-                                    return;
-                                }
-                                
-                                items = splitTextToItems(block?.holder?.textContent || '');
-                                blocksToRemove = 1;
-                            }
-
-                            if (items.length > 0) {
-                                await editor.blocks.insert('list', { 
-                                    style: ordered ? 'ordered' : 'unordered', 
-                                    items: items 
-                                }, {}, targetIndex);
-                                
-                                for (let i = 0; i < blocksToRemove; i++) {
-                                    await editor.blocks.delete(targetIndex + 1);
-                                }
-                                editor.caret.setToBlock(targetIndex);
-                            }
-                        } catch (err) {
-                            console.error("List conversion failed:", err);
-                        }
-                    };
 
                     const insertChecklist = () => {
                         const ctx = selectionInsideSurface();
@@ -6432,263 +6409,35 @@ class AdminManager {
                         });
                     }
                 } else {
-                const holder = document.getElementById(editorHolderId);
-                let cachedActiveBlockIndex = -1;
-                let cachedSelectedText = '';
-                let cachedSelectionAt = 0;
-                const stripHtml = (value) => String(value || '')
-                    .replace(/<[^>]*>/g, ' ')
-                    .replace(/&nbsp;/gi, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim();
+                    // Standard non-docs editor: Link unified logic to toolbar
+                    const toolHandlers = {
+                        paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
+                        header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
+                        list: () => replaceSelectionWithList(false),
+                        orderedList: () => replaceSelectionWithList(true),
+                        image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
+                        quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
+                        delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
+                        youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
+                    };
 
-                const splitTextToItems = (rawText) => {
-                    const text = String(rawText || '')
-                        .replace(/\r\n/g, '\n')
-                        .replace(/[\u2028\u2029]/g, '\n')
-                        .replace(/\u00A0/g, ' ')
-                        .trim();
-                    if (!text) return [];
+                    desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
+                        const tool = btn.getAttribute('data-tool');
+                        const handler = toolHandlers[tool];
+                        if (!handler) return;
 
-                    const clean = (line) => String(line || '')
-                        .replace(/^[-*•]\s+/, '')
-                        .trim();
-
-                    const lines = text
-                        .split(/\n+/)
-                        .map(clean)
-                        .filter(Boolean);
-                    if (lines.length > 1) return lines;
-
-                    // Sentence split that works even when punctuation has no trailing space.
-                    const sentenceMatches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
-                    const sentences = sentenceMatches
-                        .map(clean)
-                        .filter(Boolean);
-                    if (sentences.length > 1) return sentences;
-
-                    const semi = text
-                        .split(/;\s*/)
-                        .map(clean)
-                        .filter(Boolean);
-                    if (semi.length > 1) return semi;
-
-                    return [clean(text)];
-                };
-
-                const toEditorListItems = (items) => (Array.isArray(items) ? items : [])
-                    .map((t) => String(t || '').trim())
-                    .filter(Boolean);
-
-                const getSelectedTextInEditor = () => {
-                    try {
-                        if (!holder) return '';
-                        const selection = window.getSelection ? window.getSelection() : null;
-                        if (!selection || selection.rangeCount === 0 || selection.isCollapsed) return '';
-                        const range = selection.getRangeAt(0);
-                        const commonNode = range.commonAncestorContainer;
-                        const containerNode = commonNode?.nodeType === Node.TEXT_NODE ? commonNode.parentElement : commonNode;
-                        if (!containerNode || !holder.contains(containerNode)) return '';
-                        return String(selection.toString() || '').trim();
-                    } catch (error) {
-                        return '';
-                    }
-                };
-
-                const cacheSelectionSnapshot = () => {
-                    try {
-                        const text = getSelectedTextInEditor();
-                        if (text) {
-                            cachedSelectedText = text;
-                            cachedSelectionAt = Date.now();
-                        }
-                    } catch (error) {
-                        // no-op
-                    }
-                };
-
-                const resolveCurrentBlockIndex = () => {
-                    try {
-                        if (editor?.blocks?.getCurrentBlockIndex) {
-                            const idx = editor.blocks.getCurrentBlockIndex();
-                            if (Number.isInteger(idx) && idx >= 0) return idx;
-                        }
-                    } catch (error) {
-                        // no-op
-                    }
-
-                    try {
-                        if (holder) {
-                            const selection = window.getSelection ? window.getSelection() : null;
-                            const anchor = selection?.anchorNode;
-                            const anchorElement = anchor?.nodeType === Node.TEXT_NODE ? anchor.parentElement : anchor;
-                            const blockEl = anchorElement?.closest ? anchorElement.closest('.ce-block') : null;
-                            if (blockEl) {
-                                const allBlocks = Array.from(holder.querySelectorAll('.ce-block'));
-                                const domIdx = allBlocks.indexOf(blockEl);
-                                if (domIdx >= 0) return domIdx;
-                            }
-                        }
-                    } catch (error) {
-                        // no-op
-                    }
-
-                    if (Number.isInteger(cachedActiveBlockIndex) && cachedActiveBlockIndex >= 0) {
-                        return cachedActiveBlockIndex;
-                    }
-                    return -1;
-                };
-
-                const getActiveBlockSnapshot = async () => {
-                    try {
-                        let idx = resolveCurrentBlockIndex();
-                        if (!Number.isInteger(idx) || idx < 0) return null;
-
-                        const saved = await editor.save();
-                        const blocks = Array.isArray(saved?.blocks) ? saved.blocks : [];
-                        const block = blocks[idx];
-                        if (!block) return null;
-                        return { idx, block };
-                    } catch (error) {
-                        console.warn('Could not read active block snapshot:', error);
-                        return null;
-                    }
-                };
-
-                const replaceActiveBlockWithList = async (style, items) => {
-                    try {
-                        const saved = await editor.save();
-                        const blocks = Array.isArray(saved?.blocks) ? [...saved.blocks] : [];
-                        if (!blocks.length) return false;
-
-                        let idx = resolveCurrentBlockIndex();
-                        if (!Number.isInteger(idx) || idx < 0 || idx >= blocks.length) return false;
-
-                        blocks.splice(idx, 1, {
-                            type: 'list',
-                            data: {
-                                style,
-                                items: toEditorListItems(items)
-                            }
+                        btn.addEventListener('mousedown', (e) => {
+                            e.preventDefault();
                         });
 
-                        await editor.render({
-                            time: saved?.time || Date.now(),
-                            version: saved?.version,
-                            blocks
+                        btn.addEventListener('click', async () => {
+                            try {
+                                await handler();
+                            } catch (err) {
+                                console.error(`Unified tool '${tool}' error:`, err);
+                            }
                         });
-                        cachedActiveBlockIndex = idx;
-                        return true;
-                    } catch (error) {
-                        console.warn('Could not replace active block with list:', error);
-                        return false;
-                    }
-                };
-
-                const collectListItems = async () => {
-                    const selectedText = getSelectedTextInEditor();
-                    if (selectedText) {
-                        cachedSelectedText = selectedText;
-                        cachedSelectionAt = Date.now();
-                        return splitTextToItems(selectedText);
-                    }
-
-                    if (cachedSelectedText && (Date.now() - cachedSelectionAt) < 3000) {
-                        return splitTextToItems(cachedSelectedText);
-                    }
-
-                    const snapshot = await getActiveBlockSnapshot();
-                    if (!snapshot) return [];
-
-                    const type = String(snapshot.block?.type || '').toLowerCase();
-                    const data = snapshot.block?.data || {};
-
-                    if (type === 'list') {
-                        const listItems = Array.isArray(data.items) ? data.items : [];
-                        return listItems
-                            .map((it) => typeof it === 'string' ? it : (it?.content || it?.text || ''))
-                            .map((txt) => stripHtml(txt))
-                            .filter(Boolean);
-                    }
-
-                    if (type === 'paragraph' || type === 'header' || type === 'quote') {
-                        return splitTextToItems(stripHtml(data.text || ''));
-                    }
-
-                    return [];
-                };
-
-                const updateCachedActiveBlock = () => {
-                    try {
-                        if (!editor?.blocks?.getCurrentBlockIndex) return;
-                        const idx = editor.blocks.getCurrentBlockIndex();
-                        if (Number.isInteger(idx) && idx >= 0) cachedActiveBlockIndex = idx;
-                    } catch (error) {
-                        // no-op
-                    }
-                };
-
-                if (holder) {
-                    holder.addEventListener('click', updateCachedActiveBlock);
-                    holder.addEventListener('keyup', updateCachedActiveBlock);
-                    holder.addEventListener('mouseup', updateCachedActiveBlock);
-                    holder.addEventListener('focusin', updateCachedActiveBlock);
-                    holder.addEventListener('mouseup', cacheSelectionSnapshot);
-                    holder.addEventListener('keyup', cacheSelectionSnapshot);
-                }
-
-                const toolHandlers = {
-                    paragraph: () => editor.blocks.insert('paragraph', { text: '' }, undefined, undefined, true),
-                    header: () => editor.blocks.insert('header', { text: '', level: 2 }, undefined, undefined, true),
-                    list: async () => {
-                        const items = await collectListItems();
-                        const safeItems = items.length ? items : [''];
-                        const replaced = await replaceActiveBlockWithList('unordered', safeItems);
-                        if (!replaced) {
-                            editor.blocks.insert('list', { style: 'unordered', items: toEditorListItems(safeItems) }, undefined, undefined, true);
-                        }
-                    },
-                    orderedList: async () => {
-                        const items = await collectListItems();
-                        const safeItems = items.length ? items : [''];
-                        const replaced = await replaceActiveBlockWithList('ordered', safeItems);
-                        if (!replaced) {
-                            editor.blocks.insert('list', { style: 'ordered', items: toEditorListItems(safeItems) }, undefined, undefined, true);
-                        }
-                    },
-                    image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
-                    quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
-                    delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
-                    youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
-                };
-
-                desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
-                    const tool = btn.getAttribute('data-tool');
-                    const handler = toolHandlers[tool];
-                    const needsConfig = ['header', 'list', 'orderedList', 'image', 'quote', 'delimiter', 'youtubeVideo'];
-                    const isAvailable = !!handler && (tool === 'paragraph' || !needsConfig.includes(tool) || !!toolsConfig[tool]);
-
-                    if (!isAvailable) {
-                        btn.disabled = true;
-                        btn.classList.add('is-disabled');
-                        btn.title = 'Verktøyet er ikke tilgjengelig akkurat nå';
-                        return;
-                    }
-
-                    btn.addEventListener('mousedown', (e) => {
-                        // Keep editor focus stable while toolbar actions run.
-                        cacheSelectionSnapshot();
-                        e.preventDefault();
                     });
-
-                    btn.addEventListener('click', async () => {
-                        try {
-                            if (handler) await handler();
-                        } catch (err) {
-                            console.error(`Could not insert block for tool '${tool}':`, err);
-                        }
-                    });
-                });
                 }
             }
 
