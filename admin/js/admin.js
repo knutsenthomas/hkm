@@ -6029,6 +6029,16 @@ class AdminManager {
                 toolsConfig.delimiter = Delimiter;
             }
 
+            if (typeof Undo !== 'undefined') {
+                toolsConfig.undo = {
+                    class: Undo,
+                    config: {
+                        debounceTimer: 10,
+                        maxLength: 50
+                    }
+                };
+            }
+
             // Video tool – custom YoutubeVideoTool (defined above, always available)
             toolsConfig.youtubeVideo = {
                 class: YoutubeVideoTool
