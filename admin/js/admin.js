@@ -6229,11 +6229,13 @@ class AdminManager {
                     sel.removeAllRanges();
                     sel.addRange(this._lastDocsSelectionRange);
                     
-                    // Force focus on the container element to ensure execCommand works
+                    // Target the nearest contenteditable parent for precise focus
                     const container = this._lastDocsSelectionRange.commonAncestorContainer;
                     const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
-                    if (el && typeof el.focus === 'function') {
-                        el.focus();
+                    const focusTarget = el.closest('[contenteditable="true"]');
+                    
+                    if (focusTarget) {
+                        focusTarget.focus();
                     }
                     return true;
                 } catch (e) {
@@ -6380,9 +6382,8 @@ class AdminManager {
                     const tool = btn.getAttribute('data-tool');
                     const handler = toolHandlers[tool];
 
-                    // Use onmousedown to prevent focus loss and save selection
+                    // Use onmousedown to prevent focus loss
                     btn.onmousedown = (e) => {
-                        saveSelectionRange();
                         e.preventDefault();
                         e.stopPropagation();
                     };
@@ -6394,13 +6395,6 @@ class AdminManager {
                         btn.onclick = async (e) => {
                             e.preventDefault();
                             try {
-                                // Force focus back to surface before executing
-                                if (docsSurface) {
-                                    const activeEl = document.activeElement;
-                                    if (!docsSurface.contains(activeEl)) {
-                                        docsSurface.focus();
-                                    }
-                                }
                                 await handler();
                                 updateActiveStates();
                             } catch (err) {
