@@ -234,16 +234,20 @@ class AdminManager {
             const messageEl = document.getElementById('confirm-modal-message');
             const confirmBtn = document.getElementById('confirm-modal-confirm');
             const cancelBtn = document.getElementById('confirm-modal-cancel');
+            const headerEl = modal.querySelector('.modal-header');
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
+            
             if (confirmBtn) {
                 confirmBtn.textContent = confirmText;
-                // Use orange gradient for delete actions if specified
                 if (confirmText === 'Slett') {
-                    confirmBtn.style.background = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
+                    const orangeGradient = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
+                    confirmBtn.style.background = orangeGradient;
+                    if (headerEl) headerEl.style.background = orangeGradient;
                 } else {
                     confirmBtn.style.background = '#1B4965';
+                    if (headerEl) headerEl.style.background = '#1B4965';
                 }
             }
 
