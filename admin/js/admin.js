@@ -6087,7 +6087,9 @@ class AdminManager {
                 const items = [];
 
                 for (const line of rawLines) {
-                    const sentences = line.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [line];
+                    // Split by sentences (look for . ! ? followed by space or end of line)
+                    // This handles "Sentence 1. Sentence 2." -> ["Sentence 1.", "Sentence 2."]
+                    const sentences = line.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g) || [line];
                     for (let s of sentences) {
                         const cleaned = clean(s);
                         if (cleaned) items.push(cleaned);
@@ -6099,25 +6101,50 @@ class AdminManager {
             const getSelectedBlocks = () => {
                 const holder = getDocsSurface();
                 const sel = window.getSelection();
-                if (!sel || sel.rangeCount === 0 || !holder) return [];
-                const range = sel.getRangeAt(0);
+                let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
                 
-                const allBlocks = Array.from(holder.querySelectorAll('.ce-block'));
-                const selected = [];
+                // Fallback to last known range if live selection is lost (e.g. on button click)
+                if ((!range || range.collapsed) && this._lastDocsSelectionRange) {
+                    range = this._lastDocsSelectionRange;
+                }
 
+                if (!range || !holder) return [];
+                
+                const startNode = range.startContainer;
+                const endNode = range.endContainer;
+
+                const getBlockEl = (node) => {
+                    if (!node) return null;
+                    const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                    return el.closest('.ce-block');
+                };
+
+                const startBlock = getBlockEl(startNode);
+                const endBlock = getBlockEl(endNode);
+                const allBlocks = Array.from(holder.querySelectorAll('.ce-block'));
+
+                // Precise contiguous block selection
+                if (startBlock && endBlock && holder.contains(startBlock) && holder.contains(endBlock)) {
+                    let startIndex = allBlocks.indexOf(startBlock);
+                    let endIndex = allBlocks.indexOf(endBlock);
+                    if (startIndex !== -1 && endIndex !== -1) {
+                        if (startIndex > endIndex) [startIndex, endIndex] = [endIndex, startIndex];
+                        const selected = [];
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            const content = allBlocks[i].querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
+                            if (content) selected.push(content);
+                        }
+                        return selected;
+                    }
+                }
+
+                // Fallback to intersection if boundary logic fails
+                const selected = [];
                 allBlocks.forEach(block => {
                     try {
                         if (range.intersectsNode(block)) {
                             const content = block.querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
-                            if (content) {
-                                selected.push(content);
-                            } else if (block.innerText.trim()) {
-                                selected.push({ 
-                                    textContent: block.innerText, 
-                                    closest: (selector) => (selector === '.ce-block') ? block : block.querySelector(selector),
-                                    isFallback: true
-                                });
-                            }
+                            if (content) selected.push(content);
                         }
                     } catch (e) {}
                 });
@@ -6129,6 +6156,13 @@ class AdminManager {
                 if (!currentEditor || !currentEditor.blocks) return;
 
                 try {
+                    // Attempt to restore selection if we have a saved range
+                    const sel = window.getSelection();
+                    if ((!sel || sel.rangeCount === 0 || sel.isCollapsed) && this._lastDocsSelectionRange) {
+                        sel.removeAllRanges();
+                        sel.addRange(this._lastDocsSelectionRange);
+                    }
+
                     const selectedBlocks = getSelectedBlocks();
                     let items = [];
                     let targetIndex = -1;
@@ -6138,7 +6172,7 @@ class AdminManager {
                         const combinedText = selectedBlocks.map(b => b.textContent).join('\n');
                         items = splitTextToItems(combinedText);
                         blocksToRemove = selectedBlocks.length;
-                        const firstBlockEl = selectedBlocks[0].isFallback ? selectedBlocks[0].closest('.ce-block') : selectedBlocks[0].closest('.ce-block');
+                        const firstBlockEl = selectedBlocks[0].closest('.ce-block');
                         targetIndex = Array.from(getDocsSurface().querySelectorAll('.ce-block')).indexOf(firstBlockEl);
                     }
 
@@ -6159,6 +6193,11 @@ class AdminManager {
                         blocksToRemove = 1;
                     }
 
+                    if (items.length === 0) {
+                        items = ['Nytt punkt'];
+                        blocksToRemove = 0; // Don't remove anything if we're just inserting a new list
+                    }
+
                     if (items.length > 0) {
                         await currentEditor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items }, {}, targetIndex);
                         for (let i = 0; i < blocksToRemove; i++) {
@@ -6174,14 +6213,6 @@ class AdminManager {
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 if (shouldUseDocsLikeEditor && docsSurface) {
-                    let lastDocsSelectionRange = null;
-
-
-
-                    const focusSurface = () => {
-                        if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
-                    };
-
                     const saveSelectionRange = () => {
                         const sel = window.getSelection ? window.getSelection() : null;
                         if (!sel || sel.rangeCount === 0) return;
@@ -6189,20 +6220,20 @@ class AdminManager {
                         const node = range.commonAncestorContainer;
                         const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
                         if (!el || !docsSurface.contains(el)) return;
-                        lastDocsSelectionRange = range.cloneRange();
+                        this._lastDocsSelectionRange = range.cloneRange();
                     };
 
                     const restoreSelectionRange = () => {
-                        if (!lastDocsSelectionRange) return false;
+                        if (!this._lastDocsSelectionRange) return false;
                         const sel = window.getSelection ? window.getSelection() : null;
                         if (!sel) return false;
                         sel.removeAllRanges();
-                        sel.addRange(lastDocsSelectionRange);
+                        sel.addRange(this._lastDocsSelectionRange);
                         return true;
                     };
 
                     const exec = (command, value = null) => {
-                        focusSurface();
+                        if (docsSurface && document.activeElement !== docsSurface) docsSurface.focus();
                         restoreSelectionRange();
                         document.execCommand(command, false, value);
                         saveSelectionRange();
@@ -6218,7 +6249,12 @@ class AdminManager {
                         return { sel, range };
                     };
 
-                    const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
+                    docsSurface.addEventListener('mouseup', () => {
+                        saveSelectionRange();
+                    });
+
+                    if (shouldUseDocsLikeEditor) {
+                        const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
 
 
 
@@ -6319,9 +6355,11 @@ class AdminManager {
 
                     docsSurface.addEventListener('mouseup', () => {
                         saveSelectionRange();
-                        updateActiveStates();
+                        if (shouldUseDocsLikeEditor) updateActiveStates();
                     });
-                    docsSurface.addEventListener('keyup', updateActiveStates);
+                    if (shouldUseDocsLikeEditor) {
+                        docsSurface.addEventListener('keyup', updateActiveStates);
+                    }
 
                     desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
                         const tool = btn.getAttribute('data-tool');
@@ -6427,6 +6465,7 @@ class AdminManager {
                         if (!handler) return;
 
                         btn.addEventListener('mousedown', (e) => {
+                            saveSelectionRange();
                             e.preventDefault();
                         });
 

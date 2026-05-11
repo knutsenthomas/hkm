@@ -3310,6 +3310,7 @@ window.addEventListener('load', () => {
                 border-top: 1px solid #E2E8F0 !important;
                 padding: 12px 16px 16px !important;
                 width: 100% !important;
+                overflow: hidden !important;
             }
             
             .hkm-chat-privacy {
@@ -3335,9 +3336,8 @@ window.addEventListener('load', () => {
             }
             
             .hkm-chat-form {
-                display: flex !important;
-                align-items: flex-end !important;
-                gap: 10px !important;
+                display: block !important;
+                position: relative !important;
             }
             .hkm-chat-hidden { display: none !important; }
             .hkm-chat-form[hidden] { display: none !important; }
@@ -3346,7 +3346,9 @@ window.addEventListener('load', () => {
                 position: relative !important;
             }
 	            .hkm-chat-input {
-	                width: 100% !important;
+	                width: calc(100% - 54px) !important;
+                    display: block !important;
+                    float: left !important;
 	                border: 1px solid #E2E8F0 !important;
 	                border-radius: 14px !important;
 	                padding: 12px 16px !important;
@@ -3388,7 +3390,8 @@ window.addEventListener('load', () => {
                 width: 44px !important;
                 height: 44px !important;
                 border-radius: 14px !important;
-                display: flex !important;
+                display: block !important;
+                float: right !important;
                 align-items: center !important;
                 justify-content: center !important;
                 cursor: pointer !important;
