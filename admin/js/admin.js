@@ -1,3 +1,4 @@
+// [DEBUG] File re-parsed to check for hidden syntax/encoding issues
 // ===================================
 // Admin Dashboard - His Kingdom Ministry (Global version)
 // Core Logic & Firebase Integration
@@ -73,77 +74,87 @@ class AdminManager {
         this._restoringEditorState = false;
         this._activeEditorInstance = null;
         this.analyticsRangeDays = this._getSavedAnalyticsRangeDays();
-
         // User Detail View State
         this.currentUserDetailId = null;
         this.userEditMode = false;
+    }
 
-        this.widgetLibrary = {
-            'visitors': { id: 'visitors', label: 'Sidevisninger', icon: 'visibility', color: 'purple', default: true },
-            'status': { id: 'status', label: 'Systemstatus', icon: 'check_circle', color: 'green', default: true },
-            'users': { id: 'users', label: 'Brukere', icon: 'group', color: 'mint', default: true },
-            'blog': { id: 'blog', label: 'Blogginnlegg', icon: 'edit_note', color: 'blue', default: true },
-            'teaching': { id: 'teaching', label: 'Undervisning', icon: 'school', color: 'mint', default: true },
-            'donations': { id: 'donations', label: 'Donasjoner', icon: 'volunteer_activism', color: 'donation', default: true },
-            'youtube': { id: 'youtube', label: 'YouTube Abonnenter', icon: 'video_library', color: 'youtube', default: true },
-            'podcast': { id: 'podcast', label: 'Podcast Episoder', icon: 'podcasts', color: 'podcast', default: false },
-            'campaigns': { id: 'campaigns', label: 'Innsamlinger', icon: 'campaign', color: 'megaphone', default: false },
-            'events': { id: 'events', label: 'Arrangementer', icon: 'event', color: 'blue', default: false },
-            'next-events': { id: 'next-events', label: 'Neste Arrangementer', icon: 'event_upcoming', color: 'purple', default: false, type: 'list' },
-            'analytics-engagement': { id: 'analytics-engagement', label: 'Engasjement', icon: 'speed', color: 'mint', default: true },
-            'analytics-devices': { id: 'analytics-devices', label: 'Enheter', icon: 'devices', color: 'blue', default: true },
-            'analytics-cities': { id: 'analytics-cities', label: 'Topp Byer', icon: 'location_city', color: 'purple', default: false, type: 'list' },
-
-        };
-
+    /**
+     * Executes a task while holding a write lock to prevent race conditions.
+     */
+    async _runWriteLocked(lockKey, callback) {
+        if (this._pendingWriteLocks.has(lockKey)) {
+            console.warn(`[AdminManager] Action already in progress: ${lockKey}`);
+            return;
+        }
+        this._pendingWriteLocks.add(lockKey);
         try {
-            this.init();
-        } catch (e) {
-            console.error("Critical: Failed to initialize AdminManager", e);
-            showErrorUI("Klarte ikke å starte admin-panelet: " + e.message);
+            return await callback();
+        } finally {
+            this._pendingWriteLocks.delete(lockKey);
         }
     }
 
-    init() {
-        console.log("Initializing AdminManager...");
-
-        if (!firebaseService) {
-            throw new Error("Firebase Service er ikke lastet!");
+    /**
+     * Executes an async callback while showing a loading state on the provided button.
+     */
+    async _withButtonLoading(btn, callback) {
+        if (!btn) return await callback();
+        const utils = window.HKMAdminUtils || {};
+        if (typeof utils.withButtonLoading === 'function') {
+            return await utils.withButtonLoading(btn, callback);
         }
+        return await callback();
+    }
 
-        // Initialize global notifications if not already available
-        if (!window.hkm_notifications) {
-            console.log("Global notifications not found, initializing...");
-            // The notifications.js should already be loaded, but as a fallback:
-            const container = document.querySelector('.toast-container');
-            if (container) this.toastContainer = container;
-            else {
-                this.toastContainer = document.createElement('div');
-                this.toastContainer.className = 'toast-container';
-                document.body.appendChild(this.toastContainer);
-            }
-        } else {
-            this.toastContainer = window.hkm_notifications.toastContainer;
-        }
-
-        this.initAuth();
-        this.initDashboard();
-        this.initMessageListener();
-        this.initWidgetConfig();
-
-        // Expose to window for the inline navigation script
-        window.adminManager = this;
-        console.log("AdminManager initialized successfully.");
-        // Safety fallback: never reveal seeded HTML; show a neutral loading state instead.
-        setTimeout(() => {
-            if (!document.body.classList.contains('cloak')) return;
-            if (this._initialOverviewRenderComplete) {
-                this.removeSplashScreen();
+    /**
+     * Shows a premium confirmation modal.
+     */
+    showConfirm(title, message, confirmText = 'Bekreft') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('hkm-confirm-modal');
+            if (!modal) {
+                resolve(confirm(message));
                 return;
             }
-            this.renderOverviewLoadingState();
-            this.removeSplashScreen();
-        }, 6000);
+
+            const titleEl = document.getElementById('confirm-modal-title');
+            const messageEl = document.getElementById('confirm-modal-message');
+            const confirmBtn = document.getElementById('confirm-modal-confirm');
+            const cancelBtn = document.getElementById('confirm-modal-cancel');
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.textContent = message;
+            if (confirmBtn) {
+                confirmBtn.textContent = confirmText;
+                // Use orange gradient for delete actions if specified
+                if (confirmText === 'Slett') {
+                    confirmBtn.style.background = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
+                } else {
+                    confirmBtn.style.background = '#1B4965';
+                }
+            }
+
+            const cleanup = () => {
+                modal.style.display = 'none';
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+            };
+
+            confirmBtn.onclick = (e) => {
+                e.preventDefault();
+                cleanup();
+                resolve(true);
+            };
+
+            cancelBtn.onclick = (e) => {
+                e.preventDefault();
+                cleanup();
+                resolve(false);
+            };
+
+            modal.style.display = 'flex';
+        });
     }
 
     removeSplashScreen() {
@@ -161,117 +172,8 @@ class AdminManager {
             const toast = document.createElement('div');
             toast.className = `toast ${type}`;
             toast.innerHTML = `<div class="toast-content"><p class="toast-message">${message}</p></div>`;
-            this.toastContainer.appendChild(toast);
+            document.body.appendChild(toast);
             setTimeout(() => toast.remove(), duration);
-        }
-    }
-
-    /**
-     * Show a prominent alert (Modal-like toast)
-     */
-    showAlert(message, type = 'warning', duration = 8000) {
-        this.showToast(message, type, duration);
-    }
-
-    /**
-     * Komprimerer bilde før opplasting
-     */
-    async compressImage(file, maxWidth = 1920, quality = 0.8) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    let width = img.width;
-                    let height = img.height;
-                    
-                    if (width > maxWidth) {
-                        height = (maxWidth / width) * height;
-                        width = maxWidth;
-                    }
-                    
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-                    
-                    canvas.toBlob((blob) => {
-                        if (!blob) {
-                            reject(new Error('Klarte ikke å komprimere bildet.'));
-                            return;
-                        }
-                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
-                    }, 'image/jpeg', quality);
-                };
-                img.onerror = () => reject(new Error('Kunne ikke laste bilde for komprimering.'));
-            };
-            reader.onerror = () => reject(new Error('Kunne ikke lese filen.'));
-        });
-    }
-
-    renderOverviewLoadingState() {
-        const section = document.getElementById('overview-section');
-        if (!section) return;
-
-        // Replace seeded/static demo content immediately to avoid showing an outdated dashboard on hard refresh.
-        section.innerHTML = `
-            ${this.renderSectionHeader('dashboard', 'Oversikt', 'Laster analyseoversikt...')}
-            <div class="card">
-                <div class="card-body" style="min-height:180px; display:flex; align-items:center; justify-content:center;">
-                    <div class="loader"></div>
-                </div>
-            </div>
-        `;
-    }
-
-    _withButtonLoading(button, task, options = {}) {
-        if (typeof adminUtils.withButtonLoading === 'function') {
-            return adminUtils.withButtonLoading(button, task, options);
-        }
-        return task();
-    }
-
-    async _runWriteLocked(lockKey, fn) {
-        if (!lockKey || typeof fn !== 'function') {
-            return fn ? fn() : undefined;
-        }
-        if (this._pendingWriteLocks.has(lockKey)) {
-            this.showToast('En lagringsoperasjon pågår allerede. Vent et øyeblikk.', 'warning', 3500);
-            return undefined;
-        }
-        this._pendingWriteLocks.add(lockKey);
-        try {
-            return await fn();
-        } finally {
-            this._pendingWriteLocks.delete(lockKey);
-        }
-    }
-
-    _hashString(value) {
-        const text = String(value || '');
-        let hash = 0;
-        for (let i = 0; i < text.length; i++) {
-            hash = ((hash << 5) - hash) + text.charCodeAt(i);
-            hash |= 0;
-        }
-        return String(hash);
-    }
-
-    _persistOpenEditorState(collectionId, item) {
-        try {
-            if (!collectionId || !item || typeof item !== 'object') return;
-            const payload = {
-                collectionId: String(collectionId),
-                itemId: item.id ? String(item.id) : '',
-                itemTitle: item.title ? String(item.title) : '',
-                savedAt: Date.now()
-            };
-            sessionStorage.setItem(this._editorRestoreStateKey, JSON.stringify(payload));
-        } catch (error) {
-            console.warn('[AdminManager] Could not persist editor state', error);
         }
     }
 
@@ -2619,7 +2521,8 @@ class AdminManager {
 
             listBody.querySelectorAll('.delete-comment-btn').forEach(btn => {
                 btn.onclick = async () => {
-                    if (confirm('Er du sikker på at du vil slette denne kommentaren?')) {
+                    const confirmed = await this.showConfirm('Slett kommentar', 'Er du sikker på at du vil slette denne kommentaren?', 'Slett');
+                    if (confirmed) {
                         const cid = btn.dataset.commentId;
                         const pid = btn.dataset.postId;
                         try {
@@ -4407,7 +4310,7 @@ class AdminManager {
             return;
         }
 
-        const confirmed = window.confirm(`Dette vil generere manglende tekst og oppsummering for ${targets.length} podcast-episoder. Vil du fortsette?`);
+        const confirmed = await this.showConfirm('Generer innhold', `Dette vil generere manglende tekst og oppsummering for ${targets.length} podcast-episoder. Vil du fortsette?`, 'Fortsett');
         if (!confirmed) return;
 
         const originalBtnHtml = triggerBtn ? triggerBtn.innerHTML : '';
@@ -5291,7 +5194,7 @@ class AdminManager {
                                 style="background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
                                 Rediger
                             </button>
-                            <button type="button" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
+                            <button type="button" class="icon-btn delete" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
                                 style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s; display: inline-flex; align-items: center; justify-content: center;" 
                                 onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
@@ -7382,21 +7285,26 @@ class AdminManager {
             return;
         }
 
-        if (!confirm('Er du sikker på at du vil slette dette elementet?')) return;
-
+        const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
+        const itemToDelete = collectionItems[index] || null;
         const btn = document.querySelector(`#${collectionId}-list tbody tr:nth-child(${index + 1}) .icon-btn.delete`);
+
+        if (!itemToDelete) {
+            this.showToast('Kunne ikke finne elementet som skal slettes.', 'error');
+            return;
+        }
+
+        const confirmed = await this.showConfirm(
+            'Bekreft sletting',
+            `Er du sikker på at du vil slette "${itemToDelete.title || 'dette elementet'}"? Dette kan ikke angres.`,
+            'Slett'
+        );
+
+        if (!confirmed) return;
 
         await this._runWriteLocked(`collection-delete:${collectionId}`, async () => {
             await this._withButtonLoading(btn, async () => {
                 try {
-                    // Get the actual item we want to delete from the displayed list
-                    const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
-                    const itemToDelete = collectionItems[index] || null;
-
-                    if (!itemToDelete) {
-                        this.showToast('Kunne ikke finne elementet som skal slettes.', 'error');
-                        return;
-                    }
 
                     if (collectionId === 'podcast_transcripts') {
                         // For podcast transcripts, delete directly from Firestore collection
@@ -8406,7 +8314,8 @@ class AdminManager {
     }
 
     async deleteCause(index) {
-        if (!confirm('Er du sikker på at du vil slette denne innsamlingsaksjon?')) return;
+        const confirmed = await this.showConfirm('Slett aksjon', 'Er du sikker på at du vil slette denne innsamlingsaksjon?', 'Slett');
+        if (!confirmed) return;
 
         try {
             let causesData = await firebaseService.getPageContent('collection_causes');
@@ -9113,7 +9022,8 @@ class AdminManager {
     }
 
     async deleteHeroSlide(index) {
-        if (!confirm('Vil du slette denne sliden?')) return;
+        const confirmed = await this.showConfirm('Slett slide', 'Vil du slette denne sliden?', 'Slett');
+        if (!confirmed) return;
         this.heroSlides.splice(index, 1);
         try {
             await firebaseService.savePageContent('hero_slides', { slides: this.heroSlides });
@@ -9481,7 +9391,9 @@ class AdminManager {
         const editCourseKey = document.getElementById('course-id').value;
         const deleteBtn = document.getElementById('delete-course-btn');
         const status = document.getElementById('course-save-status');
-        if (editCourseKey === '' || !confirm('Er du sikker på at du vil slette dette kurset?')) return;
+        if (editCourseKey === '') return;
+        const confirmed = await this.showConfirm('Slett kurs', 'Er du sikker på at du vil slette dette kurset?', 'Slett');
+        if (!confirmed) return;
 
         await this._runWriteLocked('course-delete', async () => {
             await this._withButtonLoading(deleteBtn, async () => {

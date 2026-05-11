@@ -1274,6 +1274,22 @@
             }
         }
     </style>
+    <!-- Custom Confirmation Modal (Premium Design) -->
+    <div id="hkm-confirm-modal" class="profile-modal" style="display: none; z-index: 11000; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.5); align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div class="profile-modal-content card modern" style="max-width: 400px; padding: 0; overflow: hidden; border-radius: 16px; background: white; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); width: 90%; transform: translateZ(0); backface-visibility: hidden;">
+            <div class="modal-header" style="background: #1B4965; color: white; padding: 20px 24px; display: flex; align-items: center; gap: 12px; border-bottom: none;">
+                <span class="material-symbols-outlined" style="font-size: 24px;">warning</span>
+                <h3 id="confirm-modal-title" style="margin: 0; font-size: 18px; font-weight: 600; color: white;">Bekreft handling</h3>
+            </div>
+            <div class="modal-body" style="padding: 24px; font-size: 15px; line-height: 1.6; color: #334155;">
+                <p id="confirm-modal-message" style="margin: 0;">Er du sikker på at du vil utføre denne handlingen?</p>
+            </div>
+            <div class="modal-footer" style="padding: 16px 24px; background: #f8fafc; display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid #e2e8f0;">
+                <button id="confirm-modal-cancel" class="btn-secondary" style="padding: 10px 20px; border-radius: 10px; font-weight: 500; min-width: 90px; cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; background: white;">Avbryt</button>
+                <button id="confirm-modal-confirm" class="btn-primary" style="padding: 10px 20px; border-radius: 10px; font-weight: 600; min-width: 90px; cursor: pointer; transition: all 0.2s; background: #1B4965; color: white; border: none;">Slett</button>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
