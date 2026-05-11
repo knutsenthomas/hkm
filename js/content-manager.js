@@ -3904,7 +3904,26 @@ class ContentManager {
      */
     renderWixRichContent(richContent) {
         if (!richContent || !Array.isArray(richContent.nodes)) return '';
-        return this._renderRichNodes(richContent.nodes);
+        
+        // Remove leading images/galleries that duplicate the hero image
+        let nodes = [...richContent.nodes];
+        let startIndex = 0;
+        const isImageNode = (node) => {
+            if (!node) return false;
+            const type = (node.type || '').toUpperCase();
+            return type === 'IMAGE' || type === 'GALLERY' || type === 'VIDEO' || type === 'GIF';
+        };
+
+        while (startIndex < nodes.length && isImageNode(nodes[startIndex])) {
+            startIndex++;
+        }
+        
+        // Only strip if there is content after the images
+        if (startIndex > 0 && startIndex < nodes.length) {
+            nodes = nodes.slice(startIndex);
+        }
+
+        return this._renderRichNodes(nodes);
     }
 
     firstString(...values) {
@@ -4472,7 +4491,10 @@ class ContentManager {
             const leadingImagesHaveNoCaption = leadingImages.every((img) => String(img?.data?.caption || '').trim().length === 0);
             const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => hasMeaningfulText(b));
 
-            const blocksForRender = rawBlocks;
+            const blocksForRender =
+                leadingHasOnlyImagesAndBlankParas && leadingImages.length >= 1 && leadingImagesHaveNoCaption && hasTextAfterLeading
+                    ? rawBlocks.slice(startIndex)
+                    : rawBlocks;
 
             return blocksForRender.map((block) => {
                 try {
