@@ -5624,7 +5624,7 @@ class AdminManager {
                                 </div>
                             </div>
                             <div class="editor-paper docs-page-paper">
-                                <input type="text" id="col-item-title-v2" placeholder="Skriv din tittel her..." value="${item.title || ''}">
+                                <textarea id="col-item-title-v2" placeholder="Skriv din tittel her..." rows="1">${item.title || ''}</textarea>
                                 <div id="${editorHolderId}"></div>
                                 <input type="file" id="docs-image-upload-input" style="display:none;" accept="image/*">
                             </div>
@@ -7068,6 +7068,18 @@ class AdminManager {
                 } else {
                     setTimeout(attachEditorSurfaceListeners, 0);
                 }
+            }
+
+            // Title Auto-resize logic
+            const titleArea = modal.querySelector('#col-item-title-v2');
+            if (titleArea) {
+                const adjustTitleHeight = () => {
+                    titleArea.style.height = 'auto';
+                    titleArea.style.height = (titleArea.scrollHeight) + 'px';
+                };
+                titleArea.addEventListener('input', adjustTitleHeight);
+                // Initial adjustment
+                setTimeout(adjustTitleHeight, 10);
             }
 
             if (collectionId === 'podcast_transcripts') {

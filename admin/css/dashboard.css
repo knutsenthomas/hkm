@@ -3221,6 +3221,10 @@ input[type="range"] {
     font-family: 'Inter', sans-serif;
     letter-spacing: -0.02em;
     background: transparent;
+    resize: none;
+    overflow: hidden;
+    display: block;
+    line-height: 1.2;
 }
 
 #col-item-title-v2::placeholder {
