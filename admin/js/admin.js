@@ -103,6 +103,117 @@ class AdminManager {
         }
     }
 
+    init() {
+        console.log("Initializing AdminManager...");
+
+        if (!firebaseService) {
+            throw new Error("Firebase Service er ikke lastet!");
+        }
+
+        // Initialize global notifications if not already available
+        if (!window.hkm_notifications) {
+            console.log("Global notifications not found, initializing...");
+            // The notifications.js should already be loaded, but as a fallback:
+            const container = document.querySelector('.toast-container');
+            if (container) this.toastContainer = container;
+            else {
+                this.toastContainer = document.createElement('div');
+                this.toastContainer.className = 'toast-container';
+                document.body.appendChild(this.toastContainer);
+            }
+        }
+
+        // Listen for authentication changes
+        firebaseService.onAuthChange(async (user) => {
+            if (user) {
+                console.log("User logged in:", user.email);
+                
+                // Clear any pending redirect timers
+                if (this._pendingAuthRedirectTimer) {
+                    clearTimeout(this._pendingAuthRedirectTimer);
+                    this._pendingAuthRedirectTimer = null;
+                }
+
+                // Wait for the full admin check and metadata from Firestore
+                try {
+                    const isAdmin = await firebaseService.checkIsAdmin(user.uid);
+                    if (isAdmin) {
+                        this.initDashboard();
+                    } else {
+                        console.warn("User is not an admin, redirecting...");
+                        window.location.href = '/admin/login.html';
+                    }
+                } catch (error) {
+                    console.error("Error checking admin status:", error);
+                    window.location.href = '/admin/login.html';
+                }
+            } else {
+                console.log("No user logged in, redirecting to login...");
+                // Brief delay to allow Firebase to settle
+                this._pendingAuthRedirectTimer = setTimeout(() => {
+                    window.location.href = '/admin/login.html';
+                }, 1000);
+            }
+        });
+
+        // Fail-safe for initial load UI cloak
+        setTimeout(() => {
+            if (!document.body.classList.contains('cloak')) return;
+            if (this._initialOverviewRenderComplete) {
+                this.removeSplashScreen();
+                return;
+            }
+            this.renderOverviewLoadingState();
+            this.removeSplashScreen();
+        }, 6000);
+    }
+
+    /**
+     * Show a prominent alert (Modal-like toast)
+     */
+    showAlert(message, type = 'warning', duration = 8000) {
+        this.showToast(message, type, duration);
+    }
+
+    /**
+     * Komprimerer bilde før opplasting
+     */
+    async compressImage(file, maxWidth = 1920, quality = 0.8) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = (maxWidth / width) * height;
+                        width = maxWidth;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    canvas.toBlob((blob) => {
+                        if (!blob) {
+                            reject(new Error('Klarte ikke å komprimere bildet.'));
+                            return;
+                        }
+                        resolve(new File([blob], file.name, { type: 'image/jpeg', lastModified: Date.now() }));
+                    }, 'image/jpeg', quality);
+                };
+                img.onerror = () => reject(new Error('Kunne ikke laste bilde for komprimering.'));
+            };
+            reader.onerror = () => reject(new Error('Kunne ikke lese filen.'));
+        });
+    }
+
     /**
      * Executes a task while holding a write lock to prevent race conditions.
      */
