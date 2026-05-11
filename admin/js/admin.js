@@ -6227,19 +6227,9 @@ class AdminManager {
                     .replace(/^[-*•]\s+/, '')
                     .trim();
 
-                const rawLines = text.split(/\n+/).map(clean).filter(Boolean);
-                const items = [];
-
-                for (const line of rawLines) {
-                    // Split by sentences (look for . ! ? followed by space or end of line)
-                    // This handles "Sentence 1. Sentence 2." -> ["Sentence 1.", "Sentence 2."]
-                    const sentences = line.match(/[^.!?]+[.!?]+(?:\s+|$)|[^.!?]+$/g) || [line];
-                    for (let s of sentences) {
-                        const cleaned = clean(s);
-                        if (cleaned) items.push(cleaned);
-                    }
-                }
-                return items;
+                // Split ONLY by newlines for a standard Word-like experience
+                // Sentence-splitting was too aggressive and counter-intuitive.
+                return text.split(/\n+/).map(clean).filter(Boolean);
             };
 
             const getRangeElement = (range) => {
@@ -6398,6 +6388,9 @@ class AdminManager {
                 }
 
                 try {
+                    // Force a selection check to ensure we have the latest range before focus is lost
+                    saveSelectionRange();
+                    
                     if (currentEditor.isReady && typeof currentEditor.isReady.then === 'function') {
                         await currentEditor.isReady;
                     }
@@ -6412,80 +6405,88 @@ class AdminManager {
                     const liveSnapshot = buildSelectionSnapshot(liveRange);
                     const savedSnapshot = buildSelectionSnapshot(this._lastDocsSelectionRange) || lastSelectionSnapshot;
                     const activeSnapshot = liveSnapshot?.text ? liveSnapshot : savedSnapshot;
-                    const selectedText = activeSnapshot?.text || '';
+                    
                     let items = [];
                     let targetIndex = -1;
                     let blocksToRemove = 0;
                     let prefixText = '';
                     let suffixText = '';
 
-                    if (selectedText) {
-                        items = splitTextToItems(selectedText);
-                        targetIndex = activeSnapshot?.startIndex ?? -1;
-                        const endIndex = activeSnapshot?.endIndex ?? targetIndex;
-                        if (targetIndex !== -1 && endIndex !== -1) {
-                            blocksToRemove = (endIndex - targetIndex) + 1;
-                        }
-                        const surrounding = getSelectionSurroundingText(activeSnapshot?.range);
+                    // Phase 1: Identify what to convert
+                    if (activeSnapshot?.text) {
+                        items = splitTextToItems(activeSnapshot.text);
+                        targetIndex = activeSnapshot.startIndex;
+                        const endIndex = activeSnapshot.endIndex;
+                        blocksToRemove = (targetIndex !== -1 && endIndex !== -1) ? (endIndex - targetIndex) + 1 : 1;
+                        
+                        const surrounding = getSelectionSurroundingText(activeSnapshot.range);
                         if (surrounding) {
                             prefixText = surrounding.prefix;
                             suffixText = surrounding.suffix;
                         }
-                    }
-
-                    const selectedBlocks = items.length ? [] : getSelectedBlocks();
-                    if (!items.length && selectedBlocks.length > 0) {
-                        const combinedText = selectedBlocks.map(b => b.textContent).join('\n');
-                        items = splitTextToItems(combinedText);
-                        blocksToRemove = selectedBlocks.length;
-                        const firstBlockEl = selectedBlocks[0].closest('.ce-block');
-                        targetIndex = getBlockIndexFromElement(firstBlockEl);
-                    }
-
-                    if (targetIndex === -1) {
-                        targetIndex = currentEditor.blocks.getCurrentBlockIndex();
-                        if (targetIndex < 0) return;
-                        const block = currentEditor.blocks.getBlockByIndex(targetIndex);
-                        if ((block.name || block.type) === 'list') {
-                            const data = await block.save();
-                            const listData = data?.data || data || {};
-                            const listItems = listData.items || [];
-                            for (let i = 0; i < listItems.length; i++) {
-                                await currentEditor.blocks.insert('paragraph', { text: listItems[i] }, {}, targetIndex + i);
+                    } else {
+                        const selectedBlocks = getSelectedBlocks();
+                        if (selectedBlocks.length > 0) {
+                            const firstBlockEl = selectedBlocks[0].closest('.ce-block');
+                            targetIndex = getBlockIndexFromElement(firstBlockEl);
+                            blocksToRemove = selectedBlocks.length;
+                            
+                            for (const contentEl of selectedBlocks) {
+                                items.push(...splitTextToItems(contentEl.textContent));
                             }
-                            await currentEditor.blocks.delete(targetIndex + listItems.length);
-                            return;
+                        } else {
+                            targetIndex = currentEditor.blocks.getCurrentBlockIndex();
+                            if (targetIndex >= 0) {
+                                const block = currentEditor.blocks.getBlockByIndex(targetIndex);
+                                const saved = await block?.save();
+                                // Toggle OFF if it's already a list
+                                if (saved?.type === 'list' || saved?.name === 'list') {
+                                    const listData = saved.data || saved || {};
+                                    const listItems = listData.items || [];
+                                    for (let i = 0; i < listItems.length; i++) {
+                                        await currentEditor.blocks.insert('paragraph', { text: listItems[i] }, {}, targetIndex + i);
+                                    }
+                                    await currentEditor.blocks.delete(targetIndex + listItems.length);
+                                    return;
+                                }
+                                items = splitTextToItems(block?.holder?.textContent || '');
+                                blocksToRemove = 1;
+                            }
                         }
-                        items = splitTextToItems(block?.holder?.textContent || '');
-                        blocksToRemove = 1;
                     }
 
-                    if (items.length === 0) {
-                        items = ['Nytt punkt'];
-                        blocksToRemove = 0; // Don't remove anything if we're just inserting a new list
-                    }
+                    if (targetIndex === -1) return;
+                    if (items.length === 0) items = [''];
 
-                    if (items.length > 0) {
-                        let insertOffset = 0;
-                        if (prefixText) {
-                            await currentEditor.blocks.insert('paragraph', { text: escapeEditorHtml(prefixText) }, {}, targetIndex + insertOffset);
-                            insertOffset++;
-                        }
-
-                        const listIndex = targetIndex + insertOffset;
-                        await currentEditor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items }, {}, listIndex);
+                    // Phase 2: Atomic-like replacement
+                    let insertOffset = 0;
+                    if (prefixText) {
+                        await currentEditor.blocks.insert('paragraph', { text: escapeEditorHtml(prefixText) }, {}, targetIndex + insertOffset);
                         insertOffset++;
-
-                        if (suffixText) {
-                            await currentEditor.blocks.insert('paragraph', { text: escapeEditorHtml(suffixText) }, {}, targetIndex + insertOffset);
-                            insertOffset++;
-                        }
-
-                        for (let i = 0; i < blocksToRemove; i++) {
-                            await currentEditor.blocks.delete(targetIndex + insertOffset);
-                        }
-                        currentEditor.caret.setToBlock(listIndex);
                     }
+
+                    const listIndex = targetIndex + insertOffset;
+                    await currentEditor.blocks.insert('list', { 
+                        style: ordered ? 'ordered' : 'unordered', 
+                        items 
+                    }, {}, listIndex);
+                    insertOffset++;
+
+                    if (suffixText) {
+                        await currentEditor.blocks.insert('paragraph', { text: escapeEditorHtml(suffixText) }, {}, targetIndex + insertOffset);
+                        insertOffset++;
+                    }
+
+                    // DELETE in reverse order to keep indices stable during the process
+                    for (let i = blocksToRemove - 1; i >= 0; i--) {
+                        await currentEditor.blocks.delete(targetIndex + insertOffset + i);
+                    }
+                    
+                    setTimeout(() => {
+                        currentEditor.caret.setToBlock(listIndex, 'end');
+                        if (typeof updateActiveStates === 'function') updateActiveStates();
+                    }, 50);
+
                 } catch (err) {
                     console.error("Critical List Error:", err);
                     const listTag = ordered ? 'ol' : 'ul';
@@ -6654,7 +6655,7 @@ class AdminManager {
 
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
-                const updateActiveStates = () => {
+                const updateActiveStates = async () => {
                     const states = {
                         bold: document.queryCommandState('bold'),
                         italic: document.queryCommandState('italic'),
@@ -6662,6 +6663,19 @@ class AdminManager {
                         strike: document.queryCommandState('strikeThrough'),
                         link: !!document.getSelection()?.anchorNode?.parentElement?.closest('a')
                     };
+
+                    // Check list state
+                    const activeIndex = currentEditor?.blocks?.getCurrentBlockIndex();
+                    if (typeof activeIndex === 'number' && activeIndex >= 0) {
+                        const block = currentEditor.blocks.getBlockByIndex(activeIndex);
+                        const type = (block?.name || block?.type || '').toLowerCase();
+                        if (type === 'list') {
+                            const data = await block.save();
+                            const style = data?.data?.style || data?.style;
+                            states.list = style !== 'ordered';
+                            states.orderedList = style === 'ordered';
+                        }
+                    }
 
                     desktopTools.querySelectorAll('.desktop-richtools-btn').forEach((btn) => {
                         const tool = btn.getAttribute('data-tool');
