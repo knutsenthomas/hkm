@@ -5506,6 +5506,15 @@ class AdminManager {
                             <div class="docs-workspace-shell">
                             <div class="desktop-richtools docs-toolbar" id="desktop-richtools">
                                 <div class="docs-toolbar-group">
+                                    <button type="button" class="desktop-richtools-btn" data-tool="undo" title="Angre">
+                                        <span class="material-symbols-outlined">undo</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="redo" title="Gjør om">
+                                        <span class="material-symbols-outlined">redo</span>
+                                    </button>
+                                </div>
+                                <div class="docs-toolbar-divider"></div>
+                                <div class="docs-toolbar-group">
                                     <button type="button" class="desktop-richtools-btn" data-tool="paragraph" title="Brødtekst">
                                         <span class="material-symbols-outlined">notes</span>
                                     </button>
@@ -6100,16 +6109,6 @@ class AdminManager {
                 toolsConfig.delimiter = Delimiter;
             }
 
-            if (typeof Undo !== 'undefined') {
-                toolsConfig.undo = {
-                    class: Undo,
-                    config: {
-                        debounceTimer: 10,
-                        maxLength: 50
-                    }
-                };
-            }
-
             // Video tool – custom YoutubeVideoTool (defined above, always available)
             toolsConfig.youtubeVideo = {
                 class: YoutubeVideoTool
@@ -6123,8 +6122,62 @@ class AdminManager {
             console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
 
             const shouldUseDocsLikeEditor = ['blog', 'teaching', 'podcast_transcripts'].includes(collectionId);
-            let docsSurface = document.getElementById(editorHolderId);
             let editor;
+            let editorUndo = null;
+            let toolbarListenersAttached = false;
+            let editorSurfaceListenersAttachedTo = null;
+            let selectionChangeHandler = null;
+            const getEditorHolder = () => modal.querySelector(`#${CSS.escape(editorHolderId)}`);
+            const getEditorRoot = () => {
+                const holder = getEditorHolder();
+                return holder?.querySelector('.codex-editor') || holder || null;
+            };
+            const getEditorRedactor = () => {
+                const holder = getEditorHolder();
+                return holder?.querySelector('.codex-editor__redactor') || holder || null;
+            };
+            const getEditorEditable = () => {
+                const holder = getEditorHolder();
+                return holder?.querySelector('[contenteditable="true"]') || null;
+            };
+            const getEditorContact = () => {
+                const holder = getEditorHolder();
+                const root = getEditorRoot();
+                const redactor = getEditorRedactor();
+                const editable = getEditorEditable();
+                const hasShell = !!(
+                    holder &&
+                    root &&
+                    redactor &&
+                    modal.contains(holder) &&
+                    document.body.contains(modal)
+                );
+                return {
+                    holder,
+                    root,
+                    redactor,
+                    editable,
+                    hasShell,
+                    hasBlocks: !!root?.querySelector('.ce-block'),
+                    connected: hasShell
+                };
+            };
+            const assertEditorContact = (context = 'editor') => {
+                const contact = getEditorContact();
+                if (!contact.connected) {
+                    console.warn(`[AdminManager] Editor contact incomplete (${context})`, {
+                        hasHolder: !!contact.holder,
+                        hasRoot: !!contact.root,
+                        hasRedactor: !!contact.redactor,
+                        hasEditable: !!contact.editable,
+                        hasBlocks: contact.hasBlocks,
+                        modalConnected: document.body.contains(modal),
+                        holderId: editorHolderId,
+                        activeEditorMatches: this._activeEditorInstance === editor
+                    });
+                }
+                return contact;
+            };
 
             // Tving EditorJS-modus for blogg, undervisning og podcast
             editor = new EditorJS({
@@ -6135,12 +6188,31 @@ class AdminManager {
                 logLevel: 'ERROR',
                 onReady: () => {
                     this._activeEditorInstance = editor;
+                    assertEditorContact('onReady');
                     this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
+                    if (typeof Undo !== 'undefined') {
+                        try {
+                            editorUndo = new Undo({
+                                editor,
+                                maxLength: 100,
+                                config: {
+                                    debounceTimer: 150,
+                                    shortcuts: {
+                                        undo: ['CMD+Z'],
+                                        redo: ['CMD+SHIFT+Z', 'CMD+Y']
+                                    }
+                                }
+                            });
+                            editorUndo.initialize(editorData || { blocks: [] });
+                        } catch (error) {
+                            console.warn('Could not initialize editor undo history:', error);
+                        }
+                    }
                 }
             });
 
             // Common editor surface utilities
-            const getDocsSurface = () => document.getElementById(editorHolderId);
+            const getDocsSurface = () => getEditorHolder();
             let lastSelectionSnapshot = null;
 
             const splitTextToItems = (rawText) => {
@@ -6189,14 +6261,14 @@ class AdminManager {
             };
 
             const selectionRangeStillValid = (range) => {
-                const surface = getDocsSurface();
+                const surface = getEditorRoot();
                 const el = getRangeElement(range);
                 return !!(range && surface && el && surface.contains(el));
             };
 
             const buildSelectionSnapshot = (range) => {
                 if (!selectionRangeStillValid(range)) return null;
-                const surface = getDocsSurface();
+                const surface = getEditorRoot();
                 const allBlocks = Array.from(surface?.querySelectorAll('.ce-block') || []);
                 const startBlock = getBlockElementFromNode(range.startContainer);
                 const endBlock = getBlockElementFromNode(range.endContainer);
@@ -6215,6 +6287,46 @@ class AdminManager {
                     startIndex,
                     endIndex
                 };
+            };
+
+            const getBlockEditableContent = (blockEl) => {
+                if (!blockEl) return null;
+                return blockEl.querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block') || blockEl;
+            };
+
+            const normalizeRangeText = (value) => String(value || '').replace(/\s+/g, ' ').trim();
+
+            const getSelectionSurroundingText = (range) => {
+                if (!selectionRangeStillValid(range)) return null;
+
+                const startBlock = getBlockElementFromNode(range.startContainer);
+                const endBlock = getBlockElementFromNode(range.endContainer);
+                if (!startBlock || !endBlock) return null;
+
+                const startContent = getBlockEditableContent(startBlock);
+                const endContent = getBlockEditableContent(endBlock);
+                let prefix = '';
+                let suffix = '';
+
+                try {
+                    if (startContent && startContent.contains(range.startContainer)) {
+                        const beforeRange = document.createRange();
+                        beforeRange.selectNodeContents(startContent);
+                        beforeRange.setEnd(range.startContainer, range.startOffset);
+                        prefix = normalizeRangeText(beforeRange.toString());
+                    }
+
+                    if (endContent && endContent.contains(range.endContainer)) {
+                        const afterRange = document.createRange();
+                        afterRange.selectNodeContents(endContent);
+                        afterRange.setStart(range.endContainer, range.endOffset);
+                        suffix = normalizeRangeText(afterRange.toString());
+                    }
+                } catch (error) {
+                    console.warn('Could not read surrounding selection text:', error);
+                }
+
+                return { prefix, suffix, startBlock, endBlock };
             };
 
             const htmlToPlainText = (html) => {
@@ -6279,7 +6391,11 @@ class AdminManager {
 
             const replaceSelectionWithList = async (ordered) => {
                 const currentEditor = this._activeEditorInstance;
-                if (!currentEditor || !currentEditor.blocks) return;
+                const contact = assertEditorContact('list-command');
+                if (!currentEditor || !currentEditor.blocks || !contact.holder || !contact.root) {
+                    this.showToast('Editorområdet er ikke klart ennå. Klikk i teksten og prøv igjen.', 'warning', 4500);
+                    return;
+                }
 
                 try {
                     if (currentEditor.isReady && typeof currentEditor.isReady.then === 'function') {
@@ -6300,6 +6416,8 @@ class AdminManager {
                     let items = [];
                     let targetIndex = -1;
                     let blocksToRemove = 0;
+                    let prefixText = '';
+                    let suffixText = '';
 
                     if (selectedText) {
                         items = splitTextToItems(selectedText);
@@ -6307,6 +6425,11 @@ class AdminManager {
                         const endIndex = activeSnapshot?.endIndex ?? targetIndex;
                         if (targetIndex !== -1 && endIndex !== -1) {
                             blocksToRemove = (endIndex - targetIndex) + 1;
+                        }
+                        const surrounding = getSelectionSurroundingText(activeSnapshot?.range);
+                        if (surrounding) {
+                            prefixText = surrounding.prefix;
+                            suffixText = surrounding.suffix;
                         }
                     }
 
@@ -6343,11 +6466,25 @@ class AdminManager {
                     }
 
                     if (items.length > 0) {
-                        await currentEditor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items }, {}, targetIndex);
-                        for (let i = 0; i < blocksToRemove; i++) {
-                            await currentEditor.blocks.delete(targetIndex + 1);
+                        let insertOffset = 0;
+                        if (prefixText) {
+                            await currentEditor.blocks.insert('paragraph', { text: escapeEditorHtml(prefixText) }, {}, targetIndex + insertOffset);
+                            insertOffset++;
                         }
-                        currentEditor.caret.setToBlock(targetIndex);
+
+                        const listIndex = targetIndex + insertOffset;
+                        await currentEditor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items }, {}, listIndex);
+                        insertOffset++;
+
+                        if (suffixText) {
+                            await currentEditor.blocks.insert('paragraph', { text: escapeEditorHtml(suffixText) }, {}, targetIndex + insertOffset);
+                            insertOffset++;
+                        }
+
+                        for (let i = 0; i < blocksToRemove; i++) {
+                            await currentEditor.blocks.delete(targetIndex + insertOffset);
+                        }
+                        currentEditor.caret.setToBlock(listIndex);
                     }
                 } catch (err) {
                     console.error("Critical List Error:", err);
@@ -6362,13 +6499,7 @@ class AdminManager {
 
             // --- Scoped Selection Engine (Modal-Aware) ---
             const getActiveSurface = () => {
-                // IMPORTANT: Search strictly WITHIN the current modal to avoid hitting stale editors in the background
-                if (!modal) return null;
-                return modal.querySelector(`#${CSS.escape(editorHolderId)}`) ||
-                       modal.querySelector(`[id^="editorjs-holder-"]`) ||
-                       modal.querySelector(`[id^="editor-holder-"]`) || 
-                       modal.querySelector('.ce-editorjs') || 
-                       modal.querySelector('[contenteditable="true"]');
+                return getEditorRoot();
             };
 
             const selectionInsideSurface = () => {
@@ -6441,7 +6572,7 @@ class AdminManager {
                         console.warn('Exec: selection restore failed:', err);
                     }
                 } else {
-                    const editable = surface?.querySelector?.('[contenteditable="true"]');
+                    const editable = getEditorEditable() || surface?.querySelector?.('[contenteditable="true"]');
                     if (editable) editable.focus({ preventScroll: true });
                 }
                 
@@ -6454,7 +6585,7 @@ class AdminManager {
             };
 
             const getSelectedBlocks = () => {
-                const holder = getActiveSurface();
+                const holder = getEditorRoot();
                 const sel = window.getSelection();
                 let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
                 
@@ -6544,6 +6675,20 @@ class AdminManager {
 
                 // Common handlers for both modes
                 const commonHandlers = {
+                    undo: async () => {
+                        if (editorUndo && typeof editorUndo.undo === 'function' && (!editorUndo.canUndo || editorUndo.canUndo())) {
+                            await editorUndo.undo();
+                            return;
+                        }
+                        exec('undo');
+                    },
+                    redo: async () => {
+                        if (editorUndo && typeof editorUndo.redo === 'function' && (!editorUndo.canRedo || editorUndo.canRedo())) {
+                            await editorUndo.redo();
+                            return;
+                        }
+                        exec('redo');
+                    },
                     bold: () => exec('bold'),
                     italic: () => exec('italic'),
                     underline: () => exec('underline'),
@@ -6647,8 +6792,8 @@ class AdminManager {
 
                 // --- High-Reliability Event Delegation for Toolbar ---
                 // Only attach the delegation listener ONCE to the container
-                if (!desktopTools.dataset.toolbarInitialized) {
-                    desktopTools.dataset.toolbarInitialized = 'true';
+                if (!toolbarListenersAttached) {
+                    toolbarListenersAttached = true;
                     desktopTools.style.pointerEvents = 'auto';
                     
                     desktopTools.addEventListener('click', async (e) => {
@@ -6778,44 +6923,63 @@ class AdminManager {
                     }
 
                 // Global listeners for the editor surface
-                const selectionChangeHandler = () => {
-                    if (!document.body.contains(modal)) {
-                        document.removeEventListener('selectionchange', selectionChangeHandler);
-                        return;
-                    }
-                    saveSelectionRange();
+                const attachEditorSurfaceListeners = () => {
+                    const editorSurface = assertEditorContact('surface-listeners').root;
+                    if (!editorSurface || editorSurfaceListenersAttachedTo === editorSurface) return;
+                    editorSurfaceListenersAttachedTo = editorSurface;
+
+                    editorSurface.addEventListener('mouseup', () => {
+                        saveSelectionRange();
+                        if (typeof updateActiveStates === 'function') updateActiveStates();
+                    });
+
+                    editorSurface.addEventListener('keyup', () => {
+                        saveSelectionRange();
+                        if (typeof updateActiveStates === 'function') updateActiveStates();
+                    });
+
+                    // Wix/External Paste Sanitizer
+                    editorSurface.addEventListener('paste', (e) => {
+                        const html = e.clipboardData.getData('text/html');
+                        if (html && (html.includes('wix-') || html.includes('mso-') || html.includes('style='))) {
+                            e.preventDefault();
+                            const doc = new DOMParser().parseFromString(html, 'text/html');
+                            
+                            // Strip all styles, classes, and meta tags
+                            doc.querySelectorAll('*').forEach(el => {
+                                el.removeAttribute('style');
+                                el.removeAttribute('class');
+                                el.removeAttribute('id');
+                            });
+                            
+                            // Remove non-essential tags but keep structure
+                            const cleanHtml = doc.body.innerHTML;
+                            exec('insertHTML', cleanHtml);
+                            console.log('Sanitized paste from external source (Wix/Word/etc)');
+                        }
+                    });
                 };
-                document.addEventListener('selectionchange', selectionChangeHandler);
 
-                docsSurface.addEventListener('mouseup', () => {
-                    saveSelectionRange();
-                    if (typeof updateActiveStates === 'function') updateActiveStates();
-                });
+                if (!selectionChangeHandler) {
+                    selectionChangeHandler = () => {
+                        if (!document.body.contains(modal)) {
+                            document.removeEventListener('selectionchange', selectionChangeHandler);
+                            return;
+                        }
+                        saveSelectionRange();
+                    };
+                    document.addEventListener('selectionchange', selectionChangeHandler);
+                }
 
-                docsSurface.addEventListener('keyup', () => {
-                    if (typeof updateActiveStates === 'function') updateActiveStates();
-                });
-
-                // Wix/External Paste Sanitizer
-                docsSurface.addEventListener('paste', (e) => {
-                    const html = e.clipboardData.getData('text/html');
-                    if (html && (html.includes('wix-') || html.includes('mso-') || html.includes('style='))) {
-                        e.preventDefault();
-                        const doc = new DOMParser().parseFromString(html, 'text/html');
-                        
-                        // Strip all styles, classes, and meta tags
-                        doc.querySelectorAll('*').forEach(el => {
-                            el.removeAttribute('style');
-                            el.removeAttribute('class');
-                            el.removeAttribute('id');
-                        });
-                        
-                        // Remove non-essential tags but keep structure
-                        const cleanHtml = doc.body.innerHTML;
-                        exec('insertHTML', cleanHtml);
-                        console.log('Sanitized paste from external source (Wix/Word/etc)');
-                    }
-                });
+                if (editor?.isReady && typeof editor.isReady.then === 'function') {
+                    editor.isReady.then(() => {
+                        attachEditorSurfaceListeners();
+                    }).catch((error) => {
+                        console.warn('Could not attach editor surface listeners after ready:', error);
+                    });
+                } else {
+                    setTimeout(attachEditorSurfaceListeners, 0);
+                }
             }
 
             if (collectionId === 'podcast_transcripts') {
@@ -7177,6 +7341,9 @@ class AdminManager {
                 closeBtn.onclick = () => {
                     this._clearOpenEditorState(collectionId);
                     document.removeEventListener('keydown', escHandler);
+                    if (selectionChangeHandler) {
+                        document.removeEventListener('selectionchange', selectionChangeHandler);
+                    }
                     modal.remove();
                 };
             }
@@ -7187,6 +7354,9 @@ class AdminManager {
                     this._clearOpenEditorState(collectionId);
                     modal.remove();
                     document.removeEventListener('keydown', escHandler);
+                    if (selectionChangeHandler) {
+                        document.removeEventListener('selectionchange', selectionChangeHandler);
+                    }
                 }
             };
             document.addEventListener('keydown', escHandler);
