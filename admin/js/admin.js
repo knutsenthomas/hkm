@@ -6144,41 +6144,34 @@ class AdminManager {
                     const textBlockSelector = '[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6, blockquote';
 
                     const getSelectedBlocks = () => {
-                        const ctx = selectionInsideSurface();
-                        if (!ctx || !ctx.sel) return [];
-
-                        const sel = ctx.sel;
-                        const anchor = sel.anchorNode;
-                        const focus = sel.focusNode;
-                        if (!anchor || !focus) return [];
-
-                        const getBlockEl = (node) => {
-                            if (!node) return null;
-                            const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
-                            return el.closest('.ce-block');
-                        };
-
-                        const startBlock = getBlockEl(anchor);
-                        const endBlock = getBlockEl(focus);
-                        if (!startBlock || !endBlock) return [];
-
+                        const sel = window.getSelection();
+                        if (!sel || sel.rangeCount === 0) return [];
+                        const range = sel.getRangeAt(0);
+                        
                         const allBlocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
-                        let startIndex = allBlocks.indexOf(startBlock);
-                        let endIndex = allBlocks.indexOf(endBlock);
-
-                        if (startIndex === -1 || endIndex === -1) return [];
-                        if (startIndex > endIndex) [startIndex, endIndex] = [endIndex, startIndex];
-
                         const selected = [];
-                        for (let i = startIndex; i <= endIndex; i++) {
-                            let content = allBlocks[i].querySelector(textBlockSelector);
-                            if (content) {
-                                selected.push(content);
-                            } else if (allBlocks[i].innerText.trim()) {
-                                // Fallback: use innerText if no specific content element is found
-                                selected.push({ textContent: allBlocks[i].innerText, closest: () => allBlocks[i] });
-                            }
-                        }
+
+                        allBlocks.forEach(block => {
+                            try {
+                                // use intersectsNode to reliably detect selection across blocks
+                                if (range.intersectsNode(block)) {
+                                    const content = block.querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
+                                    if (content) {
+                                        selected.push(content);
+                                    } else if (block.innerText.trim()) {
+                                        // Fallback if no specific content element is found
+                                        selected.push({ 
+                                            textContent: block.innerText, 
+                                            closest: (selector) => {
+                                                if (selector === '.ce-block') return block;
+                                                return block.querySelector(selector);
+                                            },
+                                            isFallback: true
+                                        });
+                                    }
+                                }
+                            } catch (e) {}
+                        });
                         return selected;
                     };
 
@@ -6196,40 +6189,27 @@ class AdminManager {
 
                     const replaceSelectionWithList = async (ordered) => {
                         const editor = this._activeEditorInstance;
-                        if (!editor || !editor.blocks) {
-                            exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
-                            return;
-                        }
+                        if (!editor || !editor.blocks) return;
 
                         try {
-                            const ctx = selectionInsideSurface();
                             const selectedBlocks = getSelectedBlocks();
                             
                             let items = [];
                             let targetIndex = -1;
                             let blocksToRemove = 0;
 
-                            // Aggressively extract text to split into items
-                            let textToSplit = "";
                             if (selectedBlocks.length > 0) {
-                                // Join text from all selected blocks to ensure we find all sentences
-                                textToSplit = selectedBlocks.map(b => b.textContent).join("\n");
+                                // Join text from all selected blocks
+                                const combinedText = selectedBlocks.map(b => b.textContent).join('\n');
+                                items = splitTextToItems(combinedText);
                                 blocksToRemove = selectedBlocks.length;
-                                targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(selectedBlocks[0].closest('.ce-block'));
-                            } else if (ctx && !ctx.sel.isCollapsed) {
-                                textToSplit = ctx.sel.toString();
-                                blocksToRemove = 1;
-                                const blockEl = ctx.sel.anchorNode?.parentElement?.closest('.ce-block');
-                                if (blockEl) {
-                                    targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(blockEl);
-                                }
+                                
+                                const firstBlockEl = selectedBlocks[0].isFallback ? selectedBlocks[0].closest('.ce-block') : selectedBlocks[0].closest('.ce-block');
+                                const allBlocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
+                                targetIndex = allBlocks.indexOf(firstBlockEl);
                             }
 
-                            if (textToSplit.trim()) {
-                                items = splitTextToItems(textToSplit);
-                            }
-
-                            // Fallback: Current cursor position
+                            // Fallback: Current cursor position if nothing selected or index not found
                             if (targetIndex === -1) {
                                 targetIndex = editor.blocks.getCurrentBlockIndex();
                                 if (targetIndex < 0) return;
