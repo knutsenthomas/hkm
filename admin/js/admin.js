@@ -6168,7 +6168,6 @@ class AdminManager {
                     const replaceSelectionWithList = async (ordered) => {
                         const editor = this._activeEditorInstance;
                         if (!editor || !editor.blocks) {
-                            // Fallback for non-EditorJS if needed (though unlikely here)
                             exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
                             return;
                         }
@@ -6176,41 +6175,52 @@ class AdminManager {
                         try {
                             const blocks = getSelectedBlocks();
                             if (!blocks.length) {
-                                // If no blocks selected, just toggle for current block
                                 const index = editor.blocks.getCurrentBlockIndex();
                                 if (index >= 0) {
                                     const block = editor.blocks.getBlockByIndex(index);
-                                    const text = block?.holder?.textContent?.trim() || '';
-                                    await editor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items: [text] }, {}, index);
-                                    await editor.blocks.delete(index + 1);
+                                    if (block.name === 'list') {
+                                        // UNWRAP: Convert list back to paragraphs
+                                        const items = block.save?.data?.items || [];
+                                        for (let i = 0; i < items.length; i++) {
+                                            await editor.blocks.insert('paragraph', { text: items[i] }, {}, index + i);
+                                        }
+                                        await editor.blocks.delete(index + items.length);
+                                    } else {
+                                        const text = block?.holder?.textContent?.trim() || '';
+                                        await editor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items: [text] }, {}, index);
+                                        await editor.blocks.delete(index + 1);
+                                    }
                                 }
                                 return;
                             }
 
-                            // Multiple blocks selected: merge them into a single list
+                            // If selection is already inside a list, unwrap it
+                            const firstBlock = blocks[0].closest('.ce-block');
+                            const blockIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(firstBlock);
+                            const blockData = editor.blocks.getBlockByIndex(blockIndex);
+                            
+                            if (blockData && blockData.name === 'list') {
+                                // Unwrap selected list
+                                const items = blockData.save?.data?.items || [];
+                                for (let i = 0; i < items.length; i++) {
+                                    await editor.blocks.insert('paragraph', { text: items[i] }, {}, blockIndex + i);
+                                }
+                                await editor.blocks.delete(blockIndex + items.length);
+                                return;
+                            }
+
                             const items = blocks.map(b => b.textContent.trim()).filter(t => t);
                             if (items.length === 0) return;
 
-                            // Find the index of the first block
                             const firstBlockIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(blocks[0].closest('.ce-block'));
-                            
-                            // Insert the new list
                             await editor.blocks.insert('list', { style: ordered ? 'ordered' : 'unordered', items: items }, {}, firstBlockIndex);
-                            
-                            // Delete the old blocks (in reverse order to keep indices valid)
-                            // Actually, EditorJS indices might shift, so we should be careful.
-                            // Deleting by index from the end:
                             for (let i = 0; i < blocks.length; i++) {
-                                // After insert, the old blocks are shifted by +1
                                 await editor.blocks.delete(firstBlockIndex + 1);
                             }
-                            
-                            // Focus the new list
                             editor.caret.setToBlock(firstBlockIndex);
 
                         } catch (err) {
                             console.error("Manual list conversion failed:", err);
-                            // Last resort fallback
                             exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
                         }
                     };
