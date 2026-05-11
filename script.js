@@ -2997,11 +2997,13 @@ window.addEventListener('load', () => {
 	                background: #fff !important;
 	                border-radius: 16px !important;
 	                box-shadow: 0 12px 40px rgba(0,0,0,0.15) !important;
-                display: none;
-                flex-direction: column !important;
-                overflow: hidden !important;
-                z-index: 10000 !important;
+                    display: none;
+                    flex-direction: column !important;
+                    overflow: hidden !important;
+                    z-index: 10000 !important;
 	                border: 1px solid #E2E8F0 !important;
+                    transform: translateZ(0) !important;
+                    backface-visibility: hidden !important;
 	            }
 	            @supports (height: 100dvh) {
 	                .hkm-chat-panel {
@@ -3020,7 +3022,7 @@ window.addEventListener('load', () => {
             .hkm-chat-header {
                 margin: 0 !important;
                 flex-shrink: 0 !important;
-                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+                background: #1B4965 !important;
                 color: #fff !important;
                 padding: 16px 20px !important;
                 display: flex !important;
@@ -3353,6 +3355,8 @@ window.addEventListener('load', () => {
 	                outline: none !important;
 	                color: #1E293B !important;
 	                transition: border-color 0.2s, background 0.2s !important;
+                    transform: translateZ(0) !important;
+                    backface-visibility: hidden !important;
 	            }
             .hkm-chat-input:focus {
                 border-color: #FED7AA !important;
