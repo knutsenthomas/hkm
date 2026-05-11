@@ -29,10 +29,13 @@
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
+  background-color: #1B4965 !important;
+  color: white !important;
 }
 
 .page-hero-title,
 .hero-title {
+  color: white !important;
   font-size: var(--fs-h1-desktop, 48px);
   line-height: 1.3;
   overflow-wrap: break-word;

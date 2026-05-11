@@ -22,6 +22,18 @@
     color: var(--rte-text-color);
     line-height: var(--rte-line-height);
     padding: 0 24px;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+/* Global Image Guard */
+.blog-post-content img {
+    max-width: 100% !important;
+    height: auto !important;
+    display: block;
+    margin: 2rem auto;
+    border-radius: 8px;
+    box-sizing: border-box;
 }
 
 /* Unified Block Classes (from EditorJS) */

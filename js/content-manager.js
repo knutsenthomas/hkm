@@ -3609,7 +3609,9 @@ class ContentManager {
             if (this.isRenderableImageUrl(normalized)) return normalized;
         }
 
-        const htmlImage = this.normalizePublicImageUrl(this.getImageFromHtml(articleHtml));
+        // Try to extract from content if not found in metadata
+        const content = articleHtml || candidates[0]?.content || candidates[0]?.contentHtml || candidates[0]?.html || '';
+        const htmlImage = this.normalizePublicImageUrl(this.getImageFromHtml(content));
         if (this.isRenderableImageUrl(htmlImage)) return htmlImage;
 
         return '';
