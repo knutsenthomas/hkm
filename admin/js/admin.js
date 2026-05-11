@@ -6042,7 +6042,7 @@ class AdminManager {
             console.log("Final EditorJS Tools Config Keys:", Object.keys(toolsConfig));
 
             const shouldUseDocsLikeEditor = ['blog', 'teaching', 'podcast_transcripts'].includes(collectionId);
-            let docsSurface = null;
+            let docsSurface = document.getElementById(editorHolderId);
             let editor;
 
             // Tving EditorJS-modus for blogg, undervisning og podcast
