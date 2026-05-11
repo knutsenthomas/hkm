@@ -6245,16 +6245,46 @@ class AdminManager {
             };
 
             const exec = (command, value = null) => {
-                const restored = restoreSelectionRange();
-                if (!restored && docsSurface) {
+                let range = this._lastDocsSelectionRange;
+                const sel = window.getSelection();
+                
+                // Fallback: If no saved range, try to get current selection from window
+                if (!range && sel && sel.rangeCount > 0) {
+                    const currentRange = sel.getRangeAt(0);
+                    const node = currentRange.commonAncestorContainer;
+                    const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                    
+                    if (docsSurface && docsSurface.contains(el)) {
+                        range = currentRange;
+                        this._lastDocsSelectionRange = range.cloneRange();
+                    }
+                }
+
+                if (range) {
+                    try {
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        
+                        // Targeted focus on the block
+                        const container = range.commonAncestorContainer;
+                        const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
+                        const focusTarget = el.closest('[contenteditable="true"]');
+                        if (focusTarget) focusTarget.focus();
+                    } catch (err) {
+                        console.warn('Exec: selection restore failed:', err);
+                    }
+                } else if (docsSurface) {
+                    // Last resort fallback: focus the surface and hope for the best
                     docsSurface.focus();
                 }
                 
-                // Extra safety: ensure document focus is correct
-                document.execCommand(command, false, value);
-                
-                // Immediately save the new selection after command
-                setTimeout(() => saveSelectionRange(), 10);
+                try {
+                    document.execCommand(command, false, value);
+                    // Update saved range after change
+                    setTimeout(() => saveSelectionRange(), 20);
+                } catch (err) {
+                    console.error(`execCommand failed for ${command}:`, err);
+                }
             };
 
             const selectionInsideSurface = () => {
