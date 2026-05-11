@@ -6085,19 +6085,20 @@ class AdminManager {
                             .replace(/^[-*•]\s+/, '')
                             .trim();
 
-                        const lines = text
-                            .split(/\n+/)
-                            .map(clean)
-                            .filter(Boolean);
-                        if (lines.length > 1) return lines;
+                        // Step 1: Split into lines
+                        const rawLines = text.split(/\n+/).map(clean).filter(Boolean);
+                        const items = [];
 
-                        const sentenceMatches = text.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [];
-                        const sentences = sentenceMatches
-                            .map(clean)
-                            .filter(Boolean);
-                        if (sentences.length > 1) return sentences;
+                        // Step 2: For each line, split into sentences
+                        for (const line of rawLines) {
+                            const sentences = line.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [line];
+                            for (let s of sentences) {
+                                const cleaned = clean(s);
+                                if (cleaned) items.push(cleaned);
+                            }
+                        }
 
-                        return [clean(text)];
+                        return items;
                     };
 
                     const focusSurface = () => {
