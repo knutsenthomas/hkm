@@ -5626,6 +5626,7 @@ class AdminManager {
                             <div class="editor-paper docs-page-paper">
                                 <input type="text" id="col-item-title-v2" placeholder="Skriv din tittel her..." value="${item.title || ''}">
                                 <div id="${editorHolderId}"></div>
+                                <input type="file" id="docs-image-upload-input" style="display:none;" accept="image/*">
                             </div>
                             </div>
                         </div>
@@ -6817,14 +6818,51 @@ class AdminManager {
                         const input = desktopTools.querySelector('[data-color-input="highlight"]');
                         if (input) input.click();
                     },
-                    image: () => {
-                        if (window.unsplashManager) {
-                            window.unsplashManager.open((selection) => {
-                                if (selection && selection.url) {
-                                    const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
-                                    exec('insertHTML', imgHtml);
+                    image: async () => {
+                        const choice = await this.showConfirm(
+                            'Legg til bilde',
+                            'Vil du søke etter et bilde på Unsplash, eller laste opp et bilde fra din enhet?',
+                            'Søk på Unsplash'
+                        );
+
+                        if (choice) {
+                            // User clicked "Søk på Unsplash" (Confirm button)
+                            if (window.unsplashManager) {
+                                window.unsplashManager.open((selection) => {
+                                    if (selection && selection.url) {
+                                        const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
+                                        exec('insertHTML', imgHtml);
+                                    }
+                                });
+                            }
+                        } else {
+                            // User clicked "Avbryt" (or we can add a custom "Last opp" button if we had a 3-way modal)
+                            // For nå, siden showConfirm er binær, bruker vi en liten triks:
+                            // Vi viser en NY bekreftelse for opplasting hvis de sa nei til Unsplash.
+                            const wantUpload = await this.showConfirm('Last opp bilde', 'Vil du laste opp et bilde fra din maskin/mobil?', 'Ja, last opp');
+                            if (wantUpload) {
+                                const fileInput = modal.querySelector('#docs-image-upload-input');
+                                if (fileInput) {
+                                    fileInput.onchange = async () => {
+                                        const file = fileInput.files[0];
+                                        if (!file) return;
+
+                                        try {
+                                            this.showToast('Laster opp bilde...', 'info');
+                                            const path = `editor/${collectionId}/${Date.now()}_${file.name}`;
+                                            const url = await firebaseService.uploadImage(file, path);
+                                            const imgHtml = `<img src="${url}" alt="" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
+                                            exec('insertHTML', imgHtml);
+                                            this.showToast('Bilde lastet opp!', 'success');
+                                        } catch (err) {
+                                            console.error('Upload failed:', err);
+                                            this.showToast('Kunne ikke laste opp bilde.', 'error');
+                                        }
+                                        fileInput.value = ''; // Reset
+                                    };
+                                    fileInput.click();
                                 }
-                            });
+                            }
                         }
                     },
                     quote: () => exec('formatBlock', 'blockquote')
