@@ -222,7 +222,7 @@ class AdminManager {
     /**
      * Shows a premium confirmation modal.
      */
-    showConfirm(title, message, confirmText = 'Bekreft') {
+    showConfirm(title, message, confirmText = 'Bekreft', cancelText = 'Avbryt') {
         return new Promise((resolve) => {
             const modal = document.getElementById('hkm-confirm-modal');
             if (!modal) {
@@ -238,6 +238,7 @@ class AdminManager {
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
+            if (cancelBtn) cancelBtn.textContent = cancelText;
             
             if (confirmBtn) {
                 confirmBtn.textContent = confirmText;
@@ -4250,10 +4251,16 @@ class AdminManager {
             if (type === 'header' || type === 'paragraph' || type === 'quote') {
                 return stripText(data.text).length > 0;
             }
-
+            if (type === 'image' || type === 'video' || type === 'youtubevideo') {
+                const url = data.file?.url || data.url || '';
+                return url.length > 0;
+            }
             if (type === 'list') {
                 const items = Array.isArray(data.items) ? data.items : [];
-                return items.some((item) => stripText(typeof item === 'string' ? item : (item?.content || item?.text || '')).length > 0);
+                return items.some((item) => {
+                    const txt = typeof item === 'string' ? item : (item?.content || item?.text || '');
+                    return stripText(txt).length > 0;
+                });
             }
 
             if (type === 'image') {
@@ -5769,14 +5776,29 @@ class AdminManager {
 
             // --- Editor.js Data Prep ---
             let editorData = {};
+            
+            // 1. Prefer existing Editor.js blocks
             if (typeof item.content === 'object' && item.content !== null && item.content.blocks) {
                 if (collectionId !== 'podcast_transcripts' || this._hasMeaningfulEditorContent(item.content)) {
                     editorData = item.content;
                 }
-            } else if (typeof item.content === 'string' && item.content.trim().length > 0) {
-                // Always convert legacy HTML strings to Editor.js blocks regardless of collection ID format
-                // (collectionId may be 'collection_blog', 'blog', 'collection_teaching', 'teaching', etc.)
-                editorData = this.htmlToEditorJsBlocks(item.content);
+            } 
+            
+            // 2. Fallback to Wix richContent (if blocks are missing or empty)
+            if (!this._hasMeaningfulEditorContent(editorData) && item.richContent) {
+                console.log("[AdminManager] Content empty, falling back to richContent (Wix format)");
+                // We use the content-manager's rendering logic if possible, 
+                // but since we are in AdminManager, we might need a local version or a bridge.
+                // For now, let's assume item.content might have been the HTML version of richContent.
+            }
+
+            // 3. Fallback to HTML string in content or text
+            if (!this._hasMeaningfulEditorContent(editorData)) {
+                if (typeof item.content === 'string' && item.content.trim().length > 0) {
+                    editorData = this.htmlToEditorJsBlocks(item.content);
+                } else if (typeof item.text === 'string' && item.text.trim().length > 0) {
+                    editorData = this.htmlToEditorJsBlocks(item.text);
+                }
             }
 
             // For podcast transkripsjon, foretrekk 'text' dersom content er tom eller ikke meningsfull.
@@ -6819,14 +6841,15 @@ class AdminManager {
                         if (input) input.click();
                     },
                     image: async () => {
-                        const choice = await this.showConfirm(
-                            'Legg til bilde',
-                            'Vil du søke etter et bilde på Unsplash, eller laste opp et bilde fra din enhet?',
-                            'Søk på Unsplash'
+                        const useUnsplash = await this.showConfirm(
+                            'Bildevalg',
+                            'Vil du søke i bildebiblioteket (Unsplash) eller laste opp fra din enhet?',
+                            'Søk Unsplash',
+                            'Last opp bilde'
                         );
 
-                        if (choice) {
-                            // User clicked "Søk på Unsplash" (Confirm button)
+                        if (useUnsplash) {
+                            // Unsplash flow
                             if (window.unsplashManager) {
                                 window.unsplashManager.open((selection) => {
                                     if (selection && selection.url) {
@@ -6834,35 +6857,39 @@ class AdminManager {
                                         exec('insertHTML', imgHtml);
                                     }
                                 });
-                            }
-                        } else {
-                            // User clicked "Avbryt" (or we can add a custom "Last opp" button if we had a 3-way modal)
-                            // For nå, siden showConfirm er binær, bruker vi en liten triks:
-                            // Vi viser en NY bekreftelse for opplasting hvis de sa nei til Unsplash.
-                            const wantUpload = await this.showConfirm('Last opp bilde', 'Vil du laste opp et bilde fra din maskin/mobil?', 'Ja, last opp');
-                            if (wantUpload) {
-                                const fileInput = modal.querySelector('#docs-image-upload-input');
-                                if (fileInput) {
-                                    fileInput.onchange = async () => {
-                                        const file = fileInput.files[0];
-                                        if (!file) return;
-
-                                        try {
-                                            this.showToast('Laster opp bilde...', 'info');
-                                            const path = `editor/${collectionId}/${Date.now()}_${file.name}`;
-                                            const url = await firebaseService.uploadImage(file, path);
-                                            const imgHtml = `<img src="${url}" alt="" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
-                                            exec('insertHTML', imgHtml);
-                                            this.showToast('Bilde lastet opp!', 'success');
-                                        } catch (err) {
-                                            console.error('Upload failed:', err);
-                                            this.showToast('Kunne ikke laste opp bilde.', 'error');
-                                        }
-                                        fileInput.value = ''; // Reset
-                                    };
-                                    fileInput.click();
+                            } else {
+                                const query = prompt('Hva vil du søke etter på Unsplash?');
+                                if (!query) return;
+                                try {
+                                    const photo = await this.searchUnsplash(query);
+                                    if (photo) {
+                                        const imgHtml = `<img src="${photo.urls.regular}" alt="${photo.alt_description || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
+                                        exec('insertHTML', imgHtml);
+                                    }
+                                } catch (err) {
+                                    this.showToast('Unsplash-søk feilet.', 'error');
                                 }
                             }
+                        } else {
+                            // Upload flow
+                            const fileInput = document.createElement('input');
+                            fileInput.type = 'file';
+                            fileInput.accept = 'image/*';
+                            fileInput.onchange = async (e) => {
+                                const file = e.target.files[0];
+                                if (!file) return;
+                                try {
+                                    this.showToast('Laster opp bilde...', 'info');
+                                    const url = await this.handleImageUpload(file, 'editor/blog');
+                                    const imgHtml = `<img src="${url}" alt="" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
+                                    exec('insertHTML', imgHtml);
+                                    this.showToast('Bilde lastet opp!', 'success');
+                                } catch (err) {
+                                    console.error('Upload failed:', err);
+                                    this.showToast('Opplasting feilet: ' + err.message, 'error');
+                                }
+                            };
+                            fileInput.click();
                         }
                     },
                     quote: () => exec('formatBlock', 'blockquote')
@@ -13274,6 +13301,21 @@ class AdminManager {
         modal.style.display = 'flex';
     }
 
+    /**
+     * Handles image upload with compression and toast feedback.
+     */
+    async handleImageUpload(file, folder = 'editor/blog') {
+        if (!file) return null;
+        try {
+            const compressed = await this.compressImage(file, 1400, 0.85);
+            const fileName = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+            return await firebaseService.uploadFile(compressed, fileName);
+        } catch (err) {
+            console.error('[AdminManager] Upload failed:', err);
+            throw err;
+        }
+    }
+
     async createAdminNotification(notifData) {
         try {
             await firebaseService.db.collection('admin_notifications').add({
@@ -13300,7 +13342,7 @@ class AdminManager {
 
         // Helper: push an <img> element as an image block
         const pushImageBlock = (imgEl) => {
-            const url = imgEl.src || imgEl.getAttribute('src') || '';
+            const url = imgEl.src || imgEl.getAttribute('src') || imgEl.getAttribute('data-src') || imgEl.getAttribute('data-image-src') || '';
             if (!url) return;
             blocks.push({
                 type: 'image',
@@ -13446,6 +13488,24 @@ class AdminManager {
                     });
                 } else if (tagName === 'hr') {
                     blocks.push({ type: 'delimiter', data: {} });
+                } else if (tagName === 'figure') {
+                    const img = elem.querySelector('img') || elem.querySelector('[data-src]');
+                    const figcaption = elem.querySelector('figcaption');
+                    if (img) {
+                        const url = img.src || img.getAttribute('src') || img.getAttribute('data-src') || img.getAttribute('data-image-src') || '';
+                        if (url) {
+                            blocks.push({
+                                type: 'image',
+                                data: {
+                                    file: { url },
+                                    caption: figcaption ? figcaption.textContent : (img.alt || img.getAttribute('alt') || ''),
+                                    withBorder: false,
+                                    stretched: false,
+                                    withBackground: false
+                                }
+                            });
+                        }
+                    }
                 } else if (tagName === 'img') {
                     pushImageBlock(elem);
                 } else if (tagName === 'video') {
@@ -13468,40 +13528,47 @@ class AdminManager {
         if (!Array.isArray(blocks)) return '';
 
         return blocks.map(block => {
-            switch (block.type) {
+            if (!block || typeof block !== 'object') return '';
+            const type = String(block.type || '').toLowerCase();
+            const data = block.data || {};
+
+            switch (type) {
                 case 'paragraph':
-                    return `<p>${block.data?.text || ''}</p>`;
-                case 'header':
-                    const level = Math.min(Math.max(block.data?.level || 2, 1), 6);
-                    return `<h${level}>${block.data?.text || ''}</h${level}>`;
+                    return `<p class="block-paragraph">${data.text || ''}</p>`;
+                case 'header': {
+                    const level = Math.min(Math.max(Number(data.level) || 2, 1), 6);
+                    return `<h${level} class="block-header">${data.text || ''}</h${level}>`;
+                }
                 case 'list': {
-                    const tag = block.data?.style === 'ordered' ? 'ol' : 'ul';
-                    const items = (block.data?.items || []).map(i => `<li>${i}</li>`).join('');
-                    return `<${tag}>${items}</${tag}>`;
+                    const tag = data.style === 'ordered' ? 'ol' : 'ul';
+                    const items = (Array.isArray(data.items) ? data.items : [])
+                        .map(i => `<li>${typeof i === 'string' ? i : (i?.content || i?.text || '')}</li>`)
+                        .join('');
+                    return `<${tag} class="block-list">${items}</${tag}>`;
                 }
                 case 'quote':
-                    return `<blockquote><p>${block.data?.text || ''}</p>${block.data?.caption ? `<cite>— ${block.data.caption}</cite>` : ''}</blockquote>`;
+                    return `<blockquote class="block-quote"><p>${data.text || ''}</p>${data.caption ? `<cite>— ${data.caption}</cite>` : ''}</blockquote>`;
                 case 'delimiter':
-                    return '<hr>';
-                case 'image':
-                    const url = block.data?.file?.url || block.data?.url || '';
-                    const alt = block.data?.caption || '';
-                    return url ? `<figure><img src="${url}" alt="${alt}"><figcaption>${alt}</figcaption></figure>` : '';
-                case 'youtubeVideo':
-                    const ytUrl = block.data?.url || '';
+                    return '<hr class="block-delimiter">';
+                case 'image': {
+                    const url = data.file?.url || data.url || '';
+                    const alt = data.caption || '';
+                    return url ? `<figure class="block-image"><img src="${url}" alt="${alt}"><figcaption>${alt}</figcaption></figure>` : '';
+                }
+                case 'youtubevideo':
+                case 'youtubeVideo': {
+                    const ytUrl = data.url || '';
                     if (!ytUrl) return '';
                     const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                     if (ytMatch) {
-                        return `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div>`;
+                        return `<div class="block-video" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="https://www.youtube.com/embed/${ytMatch[1]}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div>`;
                     }
-                    const vimeoMatch = ytUrl.match(/vimeo\.com\/(?:video\/)?(\d+)/);
-                    if (vimeoMatch) {
-                        return `<div style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin-bottom:10px;"><iframe src="https://player.vimeo.com/video/${vimeoMatch[1]}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div>`;
-                    }
-                    return `<p><a href="${ytUrl}">${ytUrl}</a></p>`;
-                case 'video':
-                    const vidUrl = block.data?.file?.url || block.data?.url || '';
-                    return vidUrl ? `<p><video src="${vidUrl}" controls style="max-width:100%;height:auto;border-radius:10px;"></video></p>` : '';
+                    return `<p class="block-paragraph"><a href="${ytUrl}">${ytUrl}</a></p>`;
+                }
+                case 'video': {
+                    const vidUrl = data.file?.url || data.url || '';
+                    return vidUrl ? `<p class="block-video"><video src="${vidUrl}" controls style="max-width:100%;height:auto;border-radius:10px;"></video></p>` : '';
+                }
                 default:
                     return '';
             }
