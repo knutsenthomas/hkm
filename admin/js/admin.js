@@ -7418,7 +7418,7 @@ class AdminManager {
                         const compressed = await this.compressImage(file, 1200, 0.8);
                         console.log("[Admin] Compression done. New size:", compressed.size);
                         
-                        const fileName = `${collectionId}/${Date.now()}_${file.name}`;
+                        const fileName = `editor/${collectionId}/${Date.now()}_${file.name}`;
                         console.log("[Admin] Uploading to Firebase:", fileName);
                         
                         const url = await firebaseService.uploadFile(compressed, fileName);
