@@ -3136,6 +3136,7 @@ input[type="range"] {
     scrollbar-width: none;
     -ms-overflow-style: none;
     transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 .desktop-richtools::-webkit-scrollbar {
@@ -3154,6 +3155,9 @@ input[type="range"] {
     color: #475569;
     cursor: pointer;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .desktop-richtools-btn:hover {
@@ -3393,6 +3397,9 @@ div[id^="editorjs-holder-"] {
     border-radius: 8px;
     color: #3c4043;
     transition: all 0.2s ease;
+    box-sizing: border-box;
+    line-height: 1;
+    flex-shrink: 0;
 }
 
 .docs-toolbar-select-wrap:hover {
@@ -3413,9 +3420,13 @@ div[id^="editorjs-holder-"] {
     outline: none;
     cursor: pointer;
     padding: 0 2px;
-    height: 100%;
+    height: 36px;
     display: flex;
     align-items: center;
+    line-height: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    box-sizing: border-box;
 }
 
 /* Click-to-replace overlay on image blocks */
