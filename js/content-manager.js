@@ -3823,35 +3823,15 @@ class ContentManager {
     }
 
     resolveArticleHtml(item, sourceItem) {
-        // Pass 0: Try to render from raw Wix richContent if available (authoritative)
-        let richContent = item?.richContent || sourceItem?.richContent;
-        
-        // Handle stringified JSON (sometimes happens with Firestore REST or certain imports)
-        if (typeof richContent === 'string' && richContent.trim().startsWith('{')) {
-            try {
-                richContent = JSON.parse(richContent);
-            } catch (e) {
-                console.warn('[ContentManager] Failed to parse richContent string:', e);
-            }
-        }
-
-        if (richContent && typeof richContent === 'object' && Array.isArray(richContent.nodes)) {
-            const rendered = this.renderWixRichContent(richContent);
-            if (rendered && rendered.length > 50) {
-                console.log('[ContentManager] Successfully rendered content from Wix richContent nodes.');
-                return rendered;
-            }
-        }
-
         const candidates = [
+            item?.content,
+            sourceItem?.content,
             item?.contentHtml,
             sourceItem?.contentHtml,
             item?.wixContentHtml,
             sourceItem?.wixContentHtml,
             item?.html,
             sourceItem?.html,
-            item?.content,
-            sourceItem?.content,
             item?.body,
             sourceItem?.body,
             item?.contentText,
@@ -3860,33 +3840,39 @@ class ContentManager {
             sourceItem?.excerpt
         ];
 
-        // Pass 1: Look for ACTUAL rich HTML or Editor.js blocks that yielded HTML
+        // Pass 1: Look for ACTUAL rich HTML or Editor.js blocks (PREFERRED)
         for (const candidate of candidates) {
             let parsed = this.parseBlocks(candidate);
-            if (this.isWixViewerHtml(parsed)) {
-                parsed = this.normalizeWixViewerHtml(parsed, item || sourceItem);
-            } else if (this.isMeaningfulHtml(parsed) && /<(p|div|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(parsed)) {
-                // Plain HTML (e.g. from content field) – run structure rebuild for list detection and cover image
-                parsed = this.rebuildWixViewerStructure(parsed, item || sourceItem);
-            }
             if (this.isMeaningfulHtml(parsed)) {
                 // If it contains block-level elements, it's rich content!
                 if (/<(p|div|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(parsed)) {
+                    if (this.isWixViewerHtml(parsed)) {
+                        parsed = this.normalizeWixViewerHtml(parsed, item || sourceItem);
+                    } else {
+                        // Standard EditorJS or plain HTML
+                        parsed = this.rebuildWixViewerStructure(parsed, item || sourceItem);
+                    }
                     return parsed;
                 }
             }
         }
 
-        // Pass 2: Fallback to plain text, and format it nicely
+        // Pass 2: Try to render from raw Wix richContent if available (FALLBACK)
+        let richContent = item?.richContent || sourceItem?.richContent;
+        if (typeof richContent === 'string' && richContent.trim().startsWith('{')) {
+            try { richContent = JSON.parse(richContent); } catch (e) {}
+        }
+        if (richContent && typeof richContent === 'object' && Array.isArray(richContent.nodes)) {
+            const rendered = this.renderWixRichContent(richContent);
+            if (rendered && rendered.length > 50) return rendered;
+        }
+
+        // Pass 3: Fallback to plain text, and format it nicely
         for (const candidate of candidates) {
             let parsed = this.parseBlocks(candidate);
             if (this.isMeaningfulHtml(parsed)) {
                 if (parsed.includes('\n')) {
-                    parsed = parsed
-                        .split(/\n\s*\n/)
-                        .filter(p => p.trim())
-                        .map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`)
-                        .join('');
+                    parsed = parsed.split(/\n\s*\n/).filter(p => p.trim()).map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
                 } else {
                     parsed = `<p>${parsed}</p>`;
                 }
