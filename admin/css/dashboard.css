@@ -2375,17 +2375,16 @@ h3.ce-header {
 }
 
 .ce-paragraph {
-    line-height: 1.8;
-    /* Increased line-height for better readability */
+    line-height: 1.6;
+    /* Balanced line-height */
     font-size: 1.05rem;
-    /* Slightly larger text */
     color: #334155;
-    margin-bottom: 20px !important;
+    margin-bottom: 8px !important;
 }
 
 .ce-block {
-    padding-bottom: 24px !important;
-    /* More space between blocks */
+    padding-bottom: 4px !important;
+    /* Tighter spacing between blocks */
 }
 
 .cdx-block {
@@ -2684,19 +2683,18 @@ input[type="range"] {
 }
 
 .ce-paragraph {
-    line-height: 1.8 !important;
-    /* Matches earlier reinforcement */
+    line-height: 1.6 !important;
 }
 
 .ce-header {
-    padding-bottom: 0.2em !important;
-    padding-top: 0.5em !important;
-    margin-bottom: 0 !important;
+    padding-bottom: 0.1em !important;
+    padding-top: 0.4em !important;
+    margin-bottom: 4px !important;
 }
 
 .ce-block {
     margin-bottom: 0 !important;
-    padding-bottom: 0 !important;
+    padding-bottom: 2px !important;
 }
 
 /* Mobile Responsiveness */
