@@ -1183,9 +1183,6 @@ class ContentManager {
         const processContentStructure = (root) => {
             if (!root) return;
 
-                i++;
-            }
-
             // 2. Mobile Spacing Cleanup
             if (!(window.matchMedia && window.matchMedia('(max-width: 768px)').matches)) return;
 
