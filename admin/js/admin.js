@@ -6210,51 +6210,64 @@ class AdminManager {
                 }
             };
 
-            const saveSelectionRange = () => {
-                const sel = window.getSelection ? window.getSelection() : null;
-                if (!sel || sel.rangeCount === 0) return;
+            // --- High-Fidelity Selection Engine (Real-time) ---
+            const getActiveSurface = () => {
+                const holder = document.getElementById(`editor-holder-${collectionId}`);
+                return holder || null;
+            };
+
+            const selectionInsideSurface = () => {
+                const surface = getActiveSurface();
+                const sel = window.getSelection();
+                if (!sel || sel.rangeCount === 0 || !surface) return null;
                 const range = sel.getRangeAt(0);
                 const node = range.commonAncestorContainer;
                 const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
-                if (!el || !docsSurface.contains(el)) return;
-                this._lastDocsSelectionRange = range.cloneRange();
+                if (!el || !surface.contains(el)) return null;
+                return { sel, range, surface };
+            };
+
+            const saveSelectionRange = () => {
+                const ctx = selectionInsideSurface();
+                if (!ctx) return;
+                this._lastDocsSelectionRange = ctx.range.cloneRange();
             };
 
             const restoreSelectionRange = () => {
-                if (!this._lastDocsSelectionRange) return false;
-                const sel = window.getSelection ? window.getSelection() : null;
-                if (!sel) return false;
+                const ctx = selectionInsideSurface();
+                if (ctx && !this._lastDocsSelectionRange) return true;
                 
-                try {
-                    sel.removeAllRanges();
-                    sel.addRange(this._lastDocsSelectionRange);
-                    
-                    // Target the nearest contenteditable parent for precise focus
-                    const container = this._lastDocsSelectionRange.commonAncestorContainer;
-                    const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
-                    const focusTarget = el.closest('[contenteditable="true"]');
-                    
-                    if (focusTarget) {
-                        focusTarget.focus();
+                const sel = window.getSelection();
+                const range = this._lastDocsSelectionRange;
+                const surface = getActiveSurface();
+                
+                if (range && sel) {
+                    try {
+                        sel.removeAllRanges();
+                        sel.addRange(range);
+                        return true;
+                    } catch (e) {
+                        console.warn('Range restoration failed', e);
                     }
-                    return true;
-                } catch (e) {
-                    console.warn('Selection restoration failed:', e);
-                    return false;
                 }
+                
+                if (surface) {
+                    surface.focus();
+                    return true;
+                }
+                return false;
             };
 
             const exec = (command, value = null) => {
                 let range = this._lastDocsSelectionRange;
                 const sel = window.getSelection();
+                const surface = getActiveSurface();
                 
-                // Fallback: If no saved range, try to get current selection from window
                 if (!range && sel && sel.rangeCount > 0) {
                     const currentRange = sel.getRangeAt(0);
                     const node = currentRange.commonAncestorContainer;
                     const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
-                    
-                    if (docsSurface && docsSurface.contains(el)) {
+                    if (surface && surface.contains(el)) {
                         range = currentRange;
                         this._lastDocsSelectionRange = range.cloneRange();
                     }
@@ -6264,8 +6277,6 @@ class AdminManager {
                     try {
                         sel.removeAllRanges();
                         sel.addRange(range);
-                        
-                        // Targeted focus on the block
                         const container = range.commonAncestorContainer;
                         const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
                         const focusTarget = el.closest('[contenteditable="true"]');
@@ -6273,30 +6284,68 @@ class AdminManager {
                     } catch (err) {
                         console.warn('Exec: selection restore failed:', err);
                     }
-                } else if (docsSurface) {
-                    // Last resort fallback: focus the surface and hope for the best
-                    docsSurface.focus();
+                } else if (surface) {
+                    surface.focus();
                 }
                 
                 try {
                     document.execCommand(command, false, value);
-                    // Update saved range after change
                     setTimeout(() => saveSelectionRange(), 20);
                 } catch (err) {
                     console.error(`execCommand failed for ${command}:`, err);
                 }
-            };
+            const getSelectedBlocks = () => {
+                const holder = getActiveSurface();
+                const sel = window.getSelection();
+                let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
+                
+                // Fallback to last known range if live selection is lost (e.g. on button click)
+                if ((!range || range.collapsed) && this._lastDocsSelectionRange) {
+                    range = this._lastDocsSelectionRange;
+                }
 
-            const selectionInsideSurface = () => {
-                const sel = window.getSelection ? window.getSelection() : null;
-                if (!sel || sel.rangeCount === 0) return null;
-                const range = sel.getRangeAt(0);
-                const node = range.commonAncestorContainer;
-                const el = node?.nodeType === Node.TEXT_NODE ? node.parentElement : node;
-                if (!el || !docsSurface.contains(el)) return null;
-                return { sel, range };
-            };
+                if (!range || !holder) return [];
+                
+                const startNode = range.startContainer;
+                const endNode = range.endContainer;
 
+                const getBlockEl = (node) => {
+                    if (!node) return null;
+                    const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                    return el.closest('.ce-block');
+                };
+
+                const startBlock = getBlockEl(startNode);
+                const endBlock = getBlockEl(endNode);
+                const allBlocks = Array.from(holder.querySelectorAll('.ce-block'));
+
+                // Precise contiguous block selection
+                if (startBlock && endBlock && holder.contains(startBlock) && holder.contains(endBlock)) {
+                    let startIndex = allBlocks.indexOf(startBlock);
+                    let endIndex = allBlocks.indexOf(endBlock);
+                    if (startIndex !== -1 && endIndex !== -1) {
+                        if (startIndex > endIndex) [startIndex, endIndex] = [endIndex, startIndex];
+                        const selected = [];
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            const content = allBlocks[i].querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
+                            if (content) selected.push(content);
+                        }
+                        return selected;
+                    }
+                }
+
+                // Fallback to intersection if boundary logic fails
+                const selected = [];
+                allBlocks.forEach(block => {
+                    try {
+                        if (range.intersectsNode(block)) {
+                            const content = block.querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
+                            if (content) selected.push(content);
+                        }
+                    } catch (e) {}
+                });
+                return selected;
+            };
 
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
