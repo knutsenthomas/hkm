@@ -6144,34 +6144,36 @@ class AdminManager {
 
                     const getSelectedBlocks = () => {
                         const ctx = selectionInsideSurface();
-                        if (!ctx) return [];
+                        if (!ctx || !ctx.sel) return [];
 
-                        const blocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
-                        let startIndex = -1;
-                        let endIndex = -1;
+                        const sel = ctx.sel;
+                        const anchor = sel.anchorNode;
+                        const focus = sel.focusNode;
+                        if (!anchor || !focus) return [];
 
-                        blocks.forEach((block, index) => {
-                            // Check if this block is part of the selection
-                            if (ctx.sel.containsNode(block, true)) {
-                                if (startIndex === -1) startIndex = index;
-                                endIndex = index;
-                            }
-                        });
+                        const getBlockEl = (node) => {
+                            if (!node) return null;
+                            const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                            return el.closest('.ce-block');
+                        };
 
-                        if (startIndex !== -1) {
-                            const selected = [];
-                            for (let i = startIndex; i <= endIndex; i++) {
-                                const content = blocks[i].querySelector(textBlockSelector);
-                                if (content) selected.push(content);
-                            }
-                            return selected;
+                        const startBlock = getBlockEl(anchor);
+                        const endBlock = getBlockEl(focus);
+                        if (!startBlock || !endBlock) return [];
+
+                        const allBlocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
+                        let startIndex = allBlocks.indexOf(startBlock);
+                        let endIndex = allBlocks.indexOf(endBlock);
+
+                        if (startIndex === -1 || endIndex === -1) return [];
+                        if (startIndex > endIndex) [startIndex, endIndex] = [endIndex, startIndex];
+
+                        const selected = [];
+                        for (let i = startIndex; i <= endIndex; i++) {
+                            const content = allBlocks[i].querySelector(textBlockSelector);
+                            if (content) selected.push(content);
                         }
-
-                        // Fallback for single block selection where containsNode might be picky
-                        const anchor = ctx.sel.anchorNode;
-                        const anchorEl = anchor?.nodeType === Node.TEXT_NODE ? anchor.parentElement : anchor;
-                        const block = anchorEl?.closest('.ce-block')?.querySelector(textBlockSelector);
-                        return block ? [block] : [];
+                        return selected;
                     };
 
                     const applyStyleToSelectedBlocks = (styler) => {
@@ -6195,24 +6197,30 @@ class AdminManager {
 
                         try {
                             const ctx = selectionInsideSurface();
+                            const selectedBlocks = getSelectedBlocks();
+                            
                             let items = [];
                             let targetIndex = -1;
                             let blocksToRemove = 0;
 
-                            if (ctx && !ctx.sel.isCollapsed) {
+                            if (selectedBlocks.length > 1) {
+                                // CASE 1: Multiple blocks selected (e.g. dragging across paragraphs)
+                                items = selectedBlocks.map(b => b.textContent.trim()).filter(Boolean);
+                                blocksToRemove = selectedBlocks.length;
+                                targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(selectedBlocks[0].closest('.ce-block'));
+                            } else if (ctx && !ctx.sel.isCollapsed) {
+                                // CASE 2: Text selection within one block (or potentially spanning but detected as one)
                                 const selectedText = ctx.sel.toString().trim();
                                 items = splitTextToItems(selectedText);
+                                blocksToRemove = selectedBlocks.length || 1;
                                 
-                                const selectedBlocks = getSelectedBlocks();
-                                blocksToRemove = selectedBlocks.length;
-                                
-                                if (selectedBlocks.length > 0) {
-                                    const firstBlock = selectedBlocks[0].closest('.ce-block');
-                                    targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(firstBlock);
+                                const blockEl = selectedBlocks[0]?.closest('.ce-block') || ctx.sel.anchorNode?.parentElement?.closest('.ce-block');
+                                if (blockEl) {
+                                    targetIndex = Array.from(docsSurface.querySelectorAll('.ce-block')).indexOf(blockEl);
                                 }
                             }
 
-                            // If we didn't find a target from selection, try the current block
+                            // Fallback: Current cursor position
                             if (targetIndex === -1) {
                                 targetIndex = editor.blocks.getCurrentBlockIndex();
                                 if (targetIndex < 0) return;
@@ -6245,7 +6253,6 @@ class AdminManager {
                             }
                         } catch (err) {
                             console.error("List conversion failed:", err);
-                            exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
                         }
                     };
 
