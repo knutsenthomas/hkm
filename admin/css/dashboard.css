@@ -1793,12 +1793,13 @@ textarea.form-control {
     font-weight: 600;
     cursor: pointer;
     transition: var(--transition);
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     box-shadow: 0 4px 12px rgba(255, 107, 43, 0.25);
     border: 1px solid rgba(255, 255, 255, 0.1);
+    vertical-align: middle;
 }
 
 .btn-primary:hover {
@@ -1813,6 +1814,9 @@ textarea.form-control {
 
 .btn-primary span.material-symbols-outlined {
     font-size: 20px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
 }
 
 .btn-secondary {
@@ -3547,11 +3551,12 @@ div[id^="editorjs-holder-"] {
     padding: 8px 12px;
     border-radius: 8px;
     cursor: pointer;
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
     font-weight: 500;
     transition: all 0.2s;
+    vertical-align: middle;
 }
 
 .btn-ghost:hover {
