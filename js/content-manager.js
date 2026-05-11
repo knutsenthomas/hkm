@@ -3777,7 +3777,6 @@ class ContentManager {
         return match ? match[1].trim() : trimmed;
     }
 
-    renderRichImageFigure(src, alt = '', caption = '', className = '') {
     parseBlocks(content) {
         if (!content) return '';
 
