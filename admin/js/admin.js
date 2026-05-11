@@ -6146,21 +6146,32 @@ class AdminManager {
                         const ctx = selectionInsideSurface();
                         if (!ctx) return [];
 
-                        if (ctx.sel.isCollapsed) {
-                            const anchor = ctx.sel.anchorNode;
-                            const anchorElement = anchor?.nodeType === Node.TEXT_NODE ? anchor.parentElement : anchor;
-                            const block = anchorElement?.closest ? anchorElement.closest(textBlockSelector) : null;
-                            return block ? [block] : [];
-                        }
+                        const blocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
+                        let startIndex = -1;
+                        let endIndex = -1;
 
-                        const blocks = Array.from(docsSurface.querySelectorAll(textBlockSelector));
-                        return blocks.filter((block) => {
-                            try {
-                                return ctx.range.intersectsNode(block);
-                            } catch (_) {
-                                return false;
+                        blocks.forEach((block, index) => {
+                            // Check if this block is part of the selection
+                            if (ctx.sel.containsNode(block, true)) {
+                                if (startIndex === -1) startIndex = index;
+                                endIndex = index;
                             }
                         });
+
+                        if (startIndex !== -1) {
+                            const selected = [];
+                            for (let i = startIndex; i <= endIndex; i++) {
+                                const content = blocks[i].querySelector(textBlockSelector);
+                                if (content) selected.push(content);
+                            }
+                            return selected;
+                        }
+
+                        // Fallback for single block selection where containsNode might be picky
+                        const anchor = ctx.sel.anchorNode;
+                        const anchorEl = anchor?.nodeType === Node.TEXT_NODE ? anchor.parentElement : anchor;
+                        const block = anchorEl?.closest('.ce-block')?.querySelector(textBlockSelector);
+                        return block ? [block] : [];
                     };
 
                     const applyStyleToSelectedBlocks = (styler) => {
@@ -6189,8 +6200,9 @@ class AdminManager {
                             let blocksToRemove = 0;
 
                             if (ctx && !ctx.sel.isCollapsed) {
-                                // Use the smarter split logic for the selected text
-                                items = splitTextToItems(ctx.sel.toString());
+                                const selectedText = ctx.sel.toString().trim();
+                                items = splitTextToItems(selectedText);
+                                
                                 const selectedBlocks = getSelectedBlocks();
                                 blocksToRemove = selectedBlocks.length;
                                 
@@ -6200,14 +6212,13 @@ class AdminManager {
                                 }
                             }
 
-                            // Fallback to current block if no selection or selection logic failed
+                            // If we didn't find a target from selection, try the current block
                             if (targetIndex === -1) {
                                 targetIndex = editor.blocks.getCurrentBlockIndex();
                                 if (targetIndex < 0) return;
                                 
                                 const block = editor.blocks.getBlockByIndex(targetIndex);
                                 if (block.name === 'list') {
-                                    // Toggle off: Convert list to paragraphs
                                     const data = await block.save();
                                     const listItems = data.data.items || [];
                                     for (let i = 0; i < listItems.length; i++) {
@@ -6222,21 +6233,18 @@ class AdminManager {
                             }
 
                             if (items.length > 0) {
-                                // Insert the new list
                                 await editor.blocks.insert('list', { 
                                     style: ordered ? 'ordered' : 'unordered', 
                                     items: items 
                                 }, {}, targetIndex);
                                 
-                                // Remove original blocks (they are now shifted down by 1)
                                 for (let i = 0; i < blocksToRemove; i++) {
                                     await editor.blocks.delete(targetIndex + 1);
                                 }
-                                
                                 editor.caret.setToBlock(targetIndex);
                             }
                         } catch (err) {
-                            console.error("Manual list conversion failed:", err);
+                            console.error("List conversion failed:", err);
                             exec(ordered ? 'insertOrderedList' : 'insertUnorderedList');
                         }
                     };
