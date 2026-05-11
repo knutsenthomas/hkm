@@ -6210,10 +6210,13 @@ class AdminManager {
                 }
             };
 
-            // --- High-Fidelity Selection Engine (Real-time) ---
+            // --- Scoped Selection Engine (Modal-Aware) ---
             const getActiveSurface = () => {
-                const holder = document.getElementById(`editor-holder-${collectionId}`);
-                return holder || null;
+                // IMPORTANT: Search strictly WITHIN the current modal to avoid hitting stale editors in the background
+                if (!modal) return null;
+                return modal.querySelector(`[id^="editor-holder-"]`) || 
+                       modal.querySelector('.ce-editorjs') || 
+                       modal.querySelector('[contenteditable="true"]');
             };
 
             const selectionInsideSurface = () => {
