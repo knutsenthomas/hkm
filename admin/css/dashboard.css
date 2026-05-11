@@ -2331,6 +2331,25 @@ textarea.form-control {
     z-index: 10;
 }
 
+/* Editor.js Clean UI: Fjern prikker og flytt pluss-tegn */
+.ce-toolbar__settings-btn {
+    display: none !important;
+}
+
+.ce-toolbar__plus {
+    left: -6px !important;
+    transition: all 0.2s ease;
+}
+
+.ce-toolbar__plus:hover {
+    background-color: #f1f5f9 !important;
+    color: #1B4965 !important;
+}
+
+.ce-toolbar__actions {
+    padding-right: 0 !important;
+}
+
 .codex-editor__redactor {
     padding-bottom: 50px !important;
     padding-left: 50px !important;
