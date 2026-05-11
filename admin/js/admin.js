@@ -6098,58 +6098,6 @@ class AdminManager {
                 return items;
             };
 
-            const getSelectedBlocks = () => {
-                const holder = getDocsSurface();
-                const sel = window.getSelection();
-                let range = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0) : null;
-                
-                // Fallback to last known range if live selection is lost (e.g. on button click)
-                if ((!range || range.collapsed) && this._lastDocsSelectionRange) {
-                    range = this._lastDocsSelectionRange;
-                }
-
-                if (!range || !holder) return [];
-                
-                const startNode = range.startContainer;
-                const endNode = range.endContainer;
-
-                const getBlockEl = (node) => {
-                    if (!node) return null;
-                    const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
-                    return el.closest('.ce-block');
-                };
-
-                const startBlock = getBlockEl(startNode);
-                const endBlock = getBlockEl(endNode);
-                const allBlocks = Array.from(holder.querySelectorAll('.ce-block'));
-
-                // Precise contiguous block selection
-                if (startBlock && endBlock && holder.contains(startBlock) && holder.contains(endBlock)) {
-                    let startIndex = allBlocks.indexOf(startBlock);
-                    let endIndex = allBlocks.indexOf(endBlock);
-                    if (startIndex !== -1 && endIndex !== -1) {
-                        if (startIndex > endIndex) [startIndex, endIndex] = [endIndex, startIndex];
-                        const selected = [];
-                        for (let i = startIndex; i <= endIndex; i++) {
-                            const content = allBlocks[i].querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
-                            if (content) selected.push(content);
-                        }
-                        return selected;
-                    }
-                }
-
-                // Fallback to intersection if boundary logic fails
-                const selected = [];
-                allBlocks.forEach(block => {
-                    try {
-                        if (range.intersectsNode(block)) {
-                            const content = block.querySelector('[contenteditable="true"], .ce-paragraph, .ce-header, .cdx-block, p, h1, h2, h3, h4, h5, h6');
-                            if (content) selected.push(content);
-                        }
-                    } catch (e) {}
-                });
-                return selected;
-            };
 
             const replaceSelectionWithList = async (ordered) => {
                 const currentEditor = this._activeEditorInstance;
@@ -6297,6 +6245,8 @@ class AdminManager {
                 } catch (err) {
                     console.error(`execCommand failed for ${command}:`, err);
                 }
+            };
+
             const getSelectedBlocks = () => {
                 const holder = getActiveSurface();
                 const sel = window.getSelection();
