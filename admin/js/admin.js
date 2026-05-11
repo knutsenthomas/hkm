@@ -77,6 +77,30 @@ class AdminManager {
         // User Detail View State
         this.currentUserDetailId = null;
         this.userEditMode = false;
+
+        this.widgetLibrary = {
+            'visitors': { id: 'visitors', label: 'Sidevisninger', icon: 'visibility', color: 'purple', default: true },
+            'status': { id: 'status', label: 'Systemstatus', icon: 'check_circle', color: 'green', default: true },
+            'users': { id: 'users', label: 'Brukere', icon: 'group', color: 'mint', default: true },
+            'blog': { id: 'blog', label: 'Blogginnlegg', icon: 'edit_note', color: 'blue', default: true },
+            'teaching': { id: 'teaching', label: 'Undervisning', icon: 'school', color: 'mint', default: true },
+            'donations': { id: 'donations', label: 'Donasjoner', icon: 'volunteer_activism', color: 'donation', default: true },
+            'youtube': { id: 'youtube', label: 'YouTube Abonnenter', icon: 'video_library', color: 'youtube', default: true },
+            'podcast': { id: 'podcast', label: 'Podcast Episoder', icon: 'podcasts', color: 'podcast', default: false },
+            'campaigns': { id: 'campaigns', label: 'Innsamlinger', icon: 'campaign', color: 'megaphone', default: false },
+            'events': { id: 'events', label: 'Arrangementer', icon: 'event', color: 'blue', default: false },
+            'next-events': { id: 'next-events', label: 'Neste Arrangementer', icon: 'event_upcoming', color: 'purple', default: false, type: 'list' },
+            'analytics-engagement': { id: 'analytics-engagement', label: 'Engasjement', icon: 'speed', color: 'mint', default: true },
+            'analytics-devices': { id: 'analytics-devices', label: 'Enheter', icon: 'devices', color: 'blue', default: true },
+            'analytics-cities': { id: 'analytics-cities', label: 'Topp Byer', icon: 'location_city', color: 'purple', default: false, type: 'list' },
+        };
+
+        try {
+            this.init();
+        } catch (e) {
+            console.error("Critical: Failed to initialize AdminManager", e);
+            showErrorUI("Klarte ikke å starte admin-panelet: " + e.message);
+        }
     }
 
     /**
@@ -161,6 +185,46 @@ class AdminManager {
         // Since splash screen is removed, we just remove the cloak to reveal the UI
         document.body.classList.remove('cloak');
         console.log("UI revealed (cloak removed)");
+    }
+
+    renderOverviewLoadingState() {
+        const section = document.getElementById('overview-section');
+        if (!section) return;
+
+        // Replace seeded/static demo content immediately to avoid showing an outdated dashboard on hard refresh.
+        section.innerHTML = `
+            ${this.renderSectionHeader('dashboard', 'Oversikt', 'Laster analyseoversikt...')}
+            <div class="card">
+                <div class="card-body" style="min-height:180px; display:flex; align-items:center; justify-content:center;">
+                    <div class="loader"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    _hashString(value) {
+        const text = String(value || '');
+        let hash = 0;
+        for (let i = 0; i < text.length; i++) {
+            hash = ((hash << 5) - hash) + text.charCodeAt(i);
+            hash |= 0;
+        }
+        return String(hash);
+    }
+
+    _persistOpenEditorState(collectionId, item) {
+        try {
+            if (!collectionId || !item || typeof item !== 'object') return;
+            const payload = {
+                collectionId: String(collectionId),
+                itemId: item.id ? String(item.id) : '',
+                itemTitle: item.title ? String(item.title) : '',
+                savedAt: Date.now()
+            };
+            sessionStorage.setItem(this._editorRestoreStateKey, JSON.stringify(payload));
+        } catch (error) {
+            console.warn('[AdminManager] Could not persist editor state', error);
+        }
     }
 
     showToast(message, type = 'success', duration = 5000) {
