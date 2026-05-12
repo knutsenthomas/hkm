@@ -2193,6 +2193,22 @@ class AdminManager {
     onSectionSwitch(sectionId) {
         console.log(`[AdminManager] 🚀 Switching to section: ${sectionId}`);
         this.currentSection = sectionId;
+        
+        // Update currentMediaPath based on section to ensure media library stays in sync
+        const sectionMap = {
+            'blog': 'editor/blog/',
+            'events': 'editor/events/',
+            'teaching': 'editor/teaching/',
+            'media': 'editor/',
+            'hero': 'hero/',
+            'courses': 'editor/courses/',
+            'automation': 'editor/automation/',
+            'content': 'editor/index/' // Default for static content
+        };
+        
+        if (sectionMap[sectionId]) {
+            this.currentMediaPath = sectionMap[sectionId];
+        }
 
         const section = document.getElementById(`${sectionId}-section`);
         if (!section) {
@@ -5438,7 +5454,10 @@ class AdminManager {
         const fileInput = modal.querySelector('#modal-file-input');
         
         let currentPath = this.currentMediaPath || 'editor/blog/';
-        if (currentPath && !currentPath.endsWith('/')) currentPath += '/';
+        // Normalize path: ensure single trailing slash and no double slashes
+        currentPath = currentPath.replace(/\/+$/, '') + '/';
+        currentPath = currentPath.replace(/\/+/g, '/');
+        
         let currentSort = 'date_desc';
 
         const closeModal = () => {
@@ -5584,7 +5603,11 @@ class AdminManager {
                             console.error('Compression failed:', compErr);
                         }
                     }
-                    const path = `${currentPath}${file.name.replace(/\s+/g, '_')}`;
+                    // Ensure path doesn't have double slashes
+                    let uploadPath = currentPath;
+                    if (!uploadPath.endsWith('/')) uploadPath += '/';
+                    const path = `${uploadPath}${file.name.replace(/\s+/g, '_')}`.replace(/\/+/g, '/');
+                    
                     await firebaseService.uploadFile(fileToUpload, path);
                 }
                 showToast('Opplasting ferdig!', 'success');
@@ -6140,6 +6163,10 @@ class AdminManager {
                 item.classList.add('active');
                 const pageId = item.getAttribute('data-page');
                 document.getElementById('editing-page-title').textContent = item.textContent;
+                
+                // Set media path for this specific page
+                this.currentMediaPath = `editor/${pageId}/`;
+                
                 this.loadPageFields(pageId);
             });
         });
@@ -14359,7 +14386,13 @@ class AdminManager {
         if (!file) return null;
         try {
             const compressed = await this.compressImage(file, 1400, 0.85);
-            const fileName = `${folder}/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+            
+            // Normalize folder path
+            let folderPath = folder || 'editor/blog';
+            if (!folderPath.endsWith('/')) folderPath += '/';
+            folderPath = folderPath.replace(/\/+/g, '/');
+            
+            const fileName = `${folderPath}${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
             return await firebaseService.uploadFile(compressed, fileName);
         } catch (err) {
             console.error('[AdminManager] Upload failed:', err);
