@@ -3154,11 +3154,11 @@ input[type="range"] {
     display: flex !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
-    gap: 4px !important;
-    padding: 8px 16px !important;
+    gap: 2px !important;
+    padding: 6px 12px !important;
     background: #ffffff !important;
     border-bottom: 1px solid #e2e8f0 !important;
-    min-height: 52px !important;
+    min-height: 48px !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
     scrollbar-width: none !important;
@@ -3171,19 +3171,17 @@ input[type="range"] {
 .docs-toolbar-group {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 4px !important;
+    gap: 0px !important;
     flex-shrink: 0 !important;
 }
 
 .desktop-richtools-btn {
-    width: 34px !important;
-    height: 34px !important;
-    display: inline-flex !important;
+    width: 32px !important;
+    height: 32px !important;
+    display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    border: 1px solid transparent !important;
-    border-radius: 6px !important;
-    color: #475569 !important;
+    border: none !important;
     background: transparent !important;
     transition: all 0.2s !important;
 }
@@ -3404,11 +3402,12 @@ div[id^="editorjs-holder-"] {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 0 8px;
-    height: 36px;
-    border: 1px solid transparent;
-    border-radius: 8px;
+    padding: 0 6px;
+    height: 32px;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
     color: #3c4043;
+    background: #fff;
     transition: all 0.2s ease;
     box-sizing: border-box;
     line-height: 1;
@@ -3429,17 +3428,18 @@ div[id^="editorjs-holder-"] {
     background: transparent;
     color: #3c4043;
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 500;
     outline: none;
     cursor: pointer;
-    padding: 0 2px;
-    height: 36px;
+    padding: 0 4px 0 2px;
+    height: 30px;
     display: flex;
     align-items: center;
     line-height: 1;
     appearance: none;
     -webkit-appearance: none;
     box-sizing: border-box;
+    max-width: fit-content;
 }
 
 /* Click-to-replace overlay on image blocks */
