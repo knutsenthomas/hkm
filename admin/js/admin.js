@@ -5656,6 +5656,7 @@ class AdminManager {
                                     <label class="docs-toolbar-select-wrap" title="Skriftstørrelse">
                                         <span class="material-symbols-outlined">format_size</span>
                                         <select class="docs-toolbar-select" data-tool-select="fontSize" aria-label="Skriftstørrelse">
+                                            <option value="12">12</option>
                                             <option value="14">14</option>
                                             <option value="16">16</option>
                                             <option value="18" selected>18</option>
@@ -5663,26 +5664,50 @@ class AdminManager {
                                             <option value="24">24</option>
                                             <option value="28">28</option>
                                             <option value="32">32</option>
+                                            <option value="36">36</option>
+                                            <option value="42">42</option>
+                                            <option value="custom">Egendefinert...</option>
                                         </select>
                                     </label>
                                     <label class="docs-toolbar-select-wrap" title="Linjeavstand">
                                         <span class="material-symbols-outlined">format_line_spacing</span>
                                         <select class="docs-toolbar-select" data-tool-select="lineHeight" aria-label="Linjeavstand">
+                                            <option value="1.0">1.0</option>
+                                            <option value="1.15">1.15</option>
+                                            <option value="1.25">1.25</option>
                                             <option value="1.35">1.35</option>
                                             <option value="1.5">1.5</option>
                                             <option value="1.65">1.65</option>
                                             <option value="1.75" selected>1.75</option>
-                                            <option value="2">2.0</option>
+                                            <option value="2.0">2.0</option>
+                                            <option value="2.5">2.5</option>
+                                            <option value="3.0">3.0</option>
+                                            <option value="custom">Egendefinert...</option>
                                         </select>
                                     </label>
                                     <label class="docs-toolbar-select-wrap" title="Avsnittsavstand">
                                         <span class="material-symbols-outlined">notes</span>
                                         <select class="docs-toolbar-select" data-tool-select="paragraphSpacing" aria-label="Avsnittsavstand">
+                                            <option value="0">0</option>
+                                            <option value="0.4">0.4</option>
                                             <option value="0.6">0.6</option>
                                             <option value="0.9">0.9</option>
                                             <option value="1.2" selected>1.2</option>
                                             <option value="1.6">1.6</option>
-                                            <option value="2">2.0</option>
+                                            <option value="2.0">2.0</option>
+                                            <option value="custom">Egendefinert...</option>
+                                        </select>
+                                    </label>
+                                    <label class="docs-toolbar-select-wrap" title="Bokstavavstand">
+                                        <span class="material-symbols-outlined">format_letter_spacing</span>
+                                        <select class="docs-toolbar-select" data-tool-select="letterSpacing" aria-label="Bokstavavstand">
+                                            <option value="normal" selected>Normal</option>
+                                            <option value="-0.02">Smal (-0.02em)</option>
+                                            <option value="-0.01">Litt smal (-0.01em)</option>
+                                            <option value="0.01">Litt bred (0.01em)</option>
+                                            <option value="0.02">Bred (0.02em)</option>
+                                            <option value="0.05">Veldig bred (0.05em)</option>
+                                            <option value="custom">Egendefinert...</option>
                                         </select>
                                     </label>
                                 </div>
@@ -6848,8 +6873,54 @@ class AdminManager {
 
                             // Sync the select menu
                             const headingSelect = desktopTools.querySelector('[data-tool-select="headingLevel"]');
-                            if (headingSelect) {
-                                headingSelect.value = normalizedBlock;
+                            if (headingSelect) headingSelect.value = normalizedBlock;
+
+                            // Sync Spacing controls
+                            const sel = window.getSelection();
+                            if (sel && sel.rangeCount > 0) {
+                                const container = sel.getRangeAt(0).commonAncestorContainer;
+                                const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
+                                const block = el.closest('[contenteditable="true"] > *') || el;
+                                
+                                if (block) {
+                                    const computed = window.getComputedStyle(block);
+                                    
+                                    const fontSizeSelect = desktopTools.querySelector('[data-tool-select="fontSize"]');
+                                    if (fontSizeSelect) {
+                                        const px = parseFloat(computed.fontSize);
+                                        const val = Math.round(px).toString();
+                                        if (Array.from(fontSizeSelect.options).some(o => o.value === val)) {
+                                            fontSizeSelect.value = val;
+                                        }
+                                    }
+
+                                    const lhSelect = desktopTools.querySelector('[data-tool-select="lineHeight"]');
+                                    if (lhSelect) {
+                                        // Line height is tricky, usually unitless in style or px
+                                        const lh = block.style.lineHeight || 'normal';
+                                        if (Array.from(lhSelect.options).some(o => o.value === lh)) {
+                                            lhSelect.value = lh;
+                                        }
+                                    }
+
+                                    const psSelect = desktopTools.querySelector('[data-tool-select="paragraphSpacing"]');
+                                    if (psSelect) {
+                                        const mb = block.style.marginBottom;
+                                        const val = mb.replace('em', '');
+                                        if (Array.from(psSelect.options).some(o => o.value === val)) {
+                                            psSelect.value = val;
+                                        }
+                                    }
+
+                                    const lsSelect = desktopTools.querySelector('[data-tool-select="letterSpacing"]');
+                                    if (lsSelect) {
+                                        const ls = block.style.letterSpacing || 'normal';
+                                        const val = ls.replace('em', '');
+                                        if (Array.from(lsSelect.options).some(o => o.value === val)) {
+                                            lsSelect.value = val;
+                                        }
+                                    }
+                                }
                             }
                         } catch (e) {}
                     } else {
@@ -7114,8 +7185,13 @@ class AdminManager {
                     const fontSizeSelect = desktopTools.querySelector('[data-tool-select="fontSize"]');
                     if (fontSizeSelect) {
                         fontSizeSelect.addEventListener('change', () => {
-                            const px = String(fontSizeSelect.value || '').trim();
-                            if (!px) return;
+                            let val = String(fontSizeSelect.value || '').trim();
+                            if (val === 'custom') {
+                                val = window.prompt('Skriv inn skriftstørrelse (kun tall, f.eks 19):', '18');
+                                if (!val) return;
+                            }
+                            const px = parseInt(val, 10);
+                            if (isNaN(px)) return;
                             applyStyleToSelectedBlocks((block) => {
                                 block.style.fontSize = `${px}px`;
                             });
@@ -7126,7 +7202,11 @@ class AdminManager {
                     const lineHeightSelect = desktopTools.querySelector('[data-tool-select="lineHeight"]');
                     if (lineHeightSelect) {
                         lineHeightSelect.addEventListener('change', () => {
-                            const val = String(lineHeightSelect.value || '').trim();
+                            let val = String(lineHeightSelect.value || '').trim();
+                            if (val === 'custom') {
+                                val = window.prompt('Skriv inn linjeavstand (f.eks 1.4 eller 1.8):', '1.5');
+                                if (!val) return;
+                            }
                             if (!val) return;
                             applyStyleToSelectedBlocks((block) => {
                                 block.style.lineHeight = val;
@@ -7138,10 +7218,30 @@ class AdminManager {
                     const paragraphSpacingSelect = desktopTools.querySelector('[data-tool-select="paragraphSpacing"]');
                     if (paragraphSpacingSelect) {
                         paragraphSpacingSelect.addEventListener('change', () => {
-                            const val = String(paragraphSpacingSelect.value || '').trim();
+                            let val = String(paragraphSpacingSelect.value || '').trim();
+                            if (val === 'custom') {
+                                val = window.prompt('Skriv inn avsnittsavstand (em, f.eks 1.5):', '1.2');
+                                if (!val) return;
+                            }
                             if (!val) return;
                             applyStyleToSelectedBlocks((block) => {
                                 block.style.marginBottom = `${val}em`;
+                            });
+                            saveSelectionRange();
+                        });
+                    }
+
+                    const letterSpacingSelect = desktopTools.querySelector('[data-tool-select="letterSpacing"]');
+                    if (letterSpacingSelect) {
+                        letterSpacingSelect.addEventListener('change', () => {
+                            let val = String(letterSpacingSelect.value || '').trim();
+                            if (val === 'custom') {
+                                val = window.prompt('Skriv inn bokstavavstand (em, f.eks 0.03):', '0.02');
+                                if (!val) return;
+                            }
+                            if (!val) return;
+                            applyStyleToSelectedBlocks((block) => {
+                                block.style.letterSpacing = val === 'normal' ? 'normal' : `${val}em`;
                             });
                             saveSelectionRange();
                         });
