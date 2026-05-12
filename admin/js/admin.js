@@ -8091,7 +8091,9 @@ class AdminManager {
             const desktopTools = modal.querySelector('#desktop-richtools');
             if (desktopTools) {
                 const updateActiveStates = async () => {
-                    const isDocs = !!modal.querySelector('.docs-rte-surface[contenteditable="true"]');
+                    const holder = modal.querySelector('.docs-rte-surface');
+                    const isDocs = !!holder && holder.getAttribute('contenteditable') === 'true';
+                    
                     const states = {
                         bold: document.queryCommandState('bold'),
                         italic: document.queryCommandState('italic'),
@@ -8105,11 +8107,36 @@ class AdminManager {
                     // Detect Heading levels for visual feedback
                     if (isDocs) {
                         try {
-                            const blockValue = document.queryCommandValue('formatBlock');
-                            // Browsers return different values (e.g., 'h1', 'H1', or sometimes the tag name)
-                            const currentBlock = String(blockValue || '').toLowerCase();
-                            const normalizedBlock = (currentBlock === 'p' || currentBlock === '' || currentBlock === 'div') ? 'p' : currentBlock;
+                            let currentTag = 'p';
+                            const sel = window.getSelection();
+                            if (sel && sel.rangeCount > 0) {
+                                let node = sel.anchorNode;
+                                // Walk up to the surface root to find a block tag
+                                while (node && node !== holder) {
+                                    if (node.nodeType === Node.ELEMENT_NODE) {
+                                        const tag = node.tagName.toLowerCase();
+                                        if (/^h[1-6]$/.test(tag)) {
+                                            currentTag = tag;
+                                            break;
+                                        }
+                                        if (tag === 'blockquote') {
+                                            currentTag = 'blockquote';
+                                            break;
+                                        }
+                                    }
+                                    node = node.parentNode;
+                                }
+                            }
                             
+                            // Fallback to legacy queryCommandValue if DOM check found nothing but the browser knows better
+                            if (currentTag === 'p') {
+                                const blockValue = document.queryCommandValue('formatBlock');
+                                const qTag = String(blockValue || '').toLowerCase();
+                                if (/^h[1-6]$/.test(qTag)) currentTag = qTag;
+                                if (qTag === 'blockquote') currentTag = qTag;
+                            }
+
+                            const normalizedBlock = currentTag;
                             states.paragraph = normalizedBlock === 'p';
                             states.h1 = normalizedBlock === 'h1';
                             states.h2 = normalizedBlock === 'h2';
