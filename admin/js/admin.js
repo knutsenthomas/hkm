@@ -7149,12 +7149,6 @@ class AdminManager {
                     shortcut: 'CMD+SHIFT+L',
                     config: { defaultStyle: 'unordered' }
                 };
-            }
-
-            // Media Library Tool
-            toolsConfig.mediaLibrary = {
-                class: MediaLibraryTool
-            };
             } else {
                 toolsConfig.list = {
                     class: SimpleListTool,
@@ -7162,6 +7156,11 @@ class AdminManager {
                     shortcut: 'CMD+SHIFT+L'
                 };
             }
+
+            // Media Library Tool
+            toolsConfig.mediaLibrary = {
+                class: MediaLibraryTool
+            };
 
             if (typeof ImageTool !== 'undefined') {
                 toolsConfig.image = {
