@@ -173,6 +173,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Sideinnhold', icon: 'description', section: 'content', category: 'nettsted' },
             { label: 'Blogg', icon: 'edit_note', section: 'blog', category: 'nettsted' },
             { label: 'Media', icon: 'image', section: 'media', category: 'nettsted' },
+            { label: 'Podcast', icon: 'podcasts', section: 'podcast', category: 'nettsted' },
             { label: 'Hero Slider', icon: 'view_carousel', section: 'hero', category: 'nettsted' },
             { label: 'Undervisning', icon: 'school', section: 'teaching', category: 'nettsted' },
             { label: 'Kursadministrasjon', icon: 'menu_book', section: 'courses', category: 'nettsted' },
