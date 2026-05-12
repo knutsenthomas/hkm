@@ -2202,8 +2202,6 @@ class AdminManager {
         if (alreadyRendered) {
             if (sectionId === 'overview') {
                 this.renderOverview();
-            } else if (sectionId === 'podcast') {
-                this.loadCollection('podcast_transcripts');
             } else if (['blog', 'events', 'teaching', 'comments'].includes(sectionId)) {
                 if (sectionId === 'comments') {
                     this.loadComments();
@@ -2230,9 +2228,6 @@ class AdminManager {
                     break;
                 case 'events':
                     this.renderCollectionEditor('events', 'Arrangementer');
-                    break;
-                case 'podcast':
-                    this.renderPodcastManager();
                     break;
 
                 case 'media':
@@ -2264,9 +2259,6 @@ class AdminManager {
                     break;
                 case 'settings':
                     this.renderSettingsSection();
-                    break;
-                case 'integrations':
-                    this.renderIntegrationsSection();
                     break;
                 case 'users':
                     this.currentUserDetailId = null;
@@ -4660,12 +4652,12 @@ class AdminManager {
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
                     <div>
                         <h2 class="section-title">Media & Ressurser</h2>
-                        <p class="section-subtitle">Administrer bilder, integrasjoner og sosiale medier</p>
+                        <p class="section-subtitle">Administrer bilder, podcast, integrasjoner og AI</p>
                     </div>
                     <div class="header-actions">
                         <div class="tabs-control" style="background: #f1f5f9; padding: 4px; border-radius: 12px; display: flex; gap: 4px;">
                             <button class="tab-btn active" data-tab="library" style="padding: 8px 16px; border-radius: 8px; border: none; background: white; color: #1B4965; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s;">Bibliotek</button>
-                            <button class="tab-btn" data-tab="integrations" style="padding: 8px 16px; border-radius: 8px; border: none; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.2s;">Integrasjoner</button>
+                            <button class="tab-btn" data-tab="integrations" style="padding: 8px 16px; border-radius: 8px; border: none; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.2s;">Integrasjoner & Podcast</button>
                         </div>
                     </div>
                 </div>
@@ -4712,6 +4704,8 @@ class AdminManager {
             <!-- Integrations Tab Content -->
             <div id="media-integrations-content" class="tab-content" style="display: none;">
                 <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+                    
+                    <!-- Podcast & YouTube Settings Card -->
                     <div class="card modern">
                         <div class="card-header flex-between">
                             <h3 class="card-title">YouTube & Podcast Integrasjoner</h3>
@@ -4745,10 +4739,6 @@ class AdminManager {
                                     <label>Apple Podcasts URL</label>
                                     <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
                                 </div>
-                                <div class="form-group" style="margin-top: 15px;">
-                                    <label>Egne Podcast-kategorier (Hurtigvalg)</label>
-                                    <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
-                                </div>
                             </div>
 
                             <div style="margin-top: 30px;">
@@ -4757,19 +4747,23 @@ class AdminManager {
                         </div>
                     </div>
 
+                    <!-- Podcast Management (Transcripts) Card -->
                     <div class="card modern">
                         <div class="card-header flex-between">
-                            <h3 class="card-title">Podcast-kategorier (Overstyring)</h3>
+                            <h3 class="card-title">Podcast-administrasjon</h3>
                             <div style="display:flex; gap:8px; align-items:center;">
-                                <button class="btn-secondary btn-sm" id="open-podcast-transcripts">Rediger transkripsjoner</button>
+                                <button class="btn-secondary btn-sm" id="open-podcast-transcripts-full">Alle episoder</button>
                                 <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater</button>
                             </div>
                         </div>
                         <div class="card-body">
                             <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                                <label style="font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Faste Kategorier (Synk)</label>
-                                <input type="text" id="podcast-global-categories-sync" class="form-control" readonly style="font-size: 13px; border-radius: 8px; background: #f1f5f9;">
+                                <label style="font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Globale Kategorier (Hurtigvalg)</label>
+                                <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
+                                <p style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">Separer med komma. Disse vises som hurtigvalg når du redigerer enkeltepisoder.</p>
                             </div>
+                            
+                            <p style="font-size: 13px; color: #64748b; margin-bottom: 12px; font-weight: 600;">Siste episoder (Overstyring/Transkripsjon):</p>
                             <div id="podcast-overrides-list" style="max-height: 400px; overflow-y: auto;">
                                 <div class="loader">Henter episoder...</div>
                             </div>
@@ -4778,6 +4772,69 @@ class AdminManager {
                             </div>
                         </div>
                     </div>
+
+                    <!-- Google Calendar API Card -->
+                    <div class="card modern">
+                        <div class="card-header flex-between">
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0ea5e9; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
+                                </div>
+                                <h3 class="card-title">Google Calendar API</h3>
+                            </div>
+                            <div class="status-badge" id="gcal-status" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #fee2e2; color: #991b1b; font-weight: 600;">Frakoblet</div>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Google API Key</label>
+                                <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Calendar ID</label>
+                                <div id="gcal-list" class="gcal-list" style="margin-bottom: 8px;"></div>
+                                <button type="button" class="btn btn-outline" id="add-gcal" style="width: 100%;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">add</span>
+                                    Legg til kalender
+                                </button>
+                            </div>
+                            <div id="google-auth-status" style="margin-top: 20px;">
+                                <!-- Auth status injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI & Translation Card -->
+                    <div class="card modern">
+                        <div class="card-header flex-between">
+                             <div style="display: flex; align-items: center; gap: 12px;">
+                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
+                                </div>
+                                <h3 class="card-title">AI & Oversettelse</h3>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                             <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Leverandør</label>
+                                <select id="translation-provider" class="form-control">
+                                    <option value="mymemory">MyMemory (gratis)</option>
+                                    <option value="gemini">Gemini (Google AI)</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 15px;">
+                                <label>Gemini API Key</label>
+                                <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
+                            </div>
+                            <div class="form-group">
+                                <label>Modell</label>
+                                <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
+                            </div>
+                            <div style="margin-top: 24px;">
+                                <button class="btn-primary" id="save-ai-settings" style="width: 100%;">Lagre AI-innstillinger</button>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         `;
@@ -4812,6 +4869,7 @@ class AdminManager {
                     integrationsContent.style.display = 'block';
                     this.loadMediaSettings();
                     this.loadPodcastOverrides();
+                    this._loadIntegrationsSettings();
                 }
             });
         });
@@ -4822,15 +4880,20 @@ class AdminManager {
         // Setup Upload Listeners
         this._setupMediaLibraryListeners();
 
-        // Integrations Listeners (Delegation or check if el exists)
-        document.addEventListener('click', (e) => {
+        // Combined Event Listeners for Integrations tab
+        section.addEventListener('click', (e) => {
             if (e.target.id === 'save-media-settings') this.saveMediaSettings();
             if (e.target.id === 'save-podcast-overrides') this.savePodcastOverrides();
             if (e.target.id === 'refresh-podcast-list') this.loadPodcastOverrides();
-            if (e.target.id === 'open-podcast-transcripts') this.openPodcastTranscriptEditorById('');
+            if (e.target.id === 'open-podcast-transcripts-full') this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon', 'podcast');
+            if (e.target.id === 'save-ai-settings') this.saveIntegrationsSettings();
+            if (e.target.id === 'add-gcal') this.addGCalInput();
+            if (e.target.id === 'connect-google-btn') this.handleGoogleAuth();
+            if (e.target.id === 'disconnect-google') this.handleGoogleDisconnect();
         });
 
-        const overridesList = document.getElementById('podcast-overrides-list');
+        // Podcast item click delegation
+        const overridesList = section.querySelector('#podcast-overrides-list');
         if (overridesList) {
             overridesList.addEventListener('click', (event) => {
                 const btn = event.target.closest('button[data-open-podcast-id]');
@@ -4842,6 +4905,388 @@ class AdminManager {
 
         section.setAttribute('data-rendered', 'true');
     }
+
+    /**
+     * Load and render the media library grid
+     */
+    async loadMediaLibrary() {
+        const grid = document.getElementById('media-grid');
+        const countEl = document.getElementById('media-count');
+        if (!grid) return;
+
+        try {
+            const files = await firebaseService.listMediaFiles('editor/');
+            
+            if (countEl) countEl.innerText = files.length;
+
+            if (files.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: #f8fafc; border-radius: 16px;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 12px;">folder_open</span>
+                        <p style="color: #64748b;">Ingen filer funnet. Last opp ditt første bilde over!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort files by last modified (newest first)
+            files.sort((a, b) => {
+                const dateA = a.metadata?.updated ? new Date(a.metadata.updated) : new Date(0);
+                const dateB = b.metadata?.updated ? new Date(b.metadata.updated) : new Date(0);
+                return dateB - dateA;
+            });
+
+            grid.innerHTML = files.map(file => `
+                <div class="media-card" style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; transition: all 0.2s ease;">
+                    <div class="media-preview" style="height: 140px; background: #f1f5f9; position: relative; overflow: hidden;">
+                        <img src="${file.url}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+                        <div class="media-actions" style="position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s;">
+                            <button class="btn-delete-file" data-path="${file.fullPath}" title="Slett" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div style="padding: 12px;">
+                        <p style="font-size: 12px; font-weight: 600; color: #1e293b; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${file.name}">${file.name}</p>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
+                            <span style="font-size: 10px; color: #64748b;">${file.metadata?.size ? (file.metadata.size / 1024).toFixed(1) + ' KB' : ''}</span>
+                            <button class="btn-copy-url" data-url="${file.url}" style="font-size: 11px; font-weight: 700; color: #1B4965; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;">Kopier URL</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add hover effect for actions via style injection (cleaner than JS loops)
+            if (!document.getElementById('media-hover-styles')) {
+                const style = document.createElement('style');
+                style.id = 'media-hover-styles';
+                style.innerHTML = `
+                    .media-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #cbd5e1 !important; }
+                    .media-card:hover .media-actions { opacity: 1 !important; }
+                    .btn-copy-url:hover { background: rgba(27, 73, 101, 0.05); }
+                `;
+                document.head.appendChild(style);
+            }
+
+        } catch (error) {
+            console.error('Error loading media library:', error);
+            grid.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: #ef4444; padding: 20px;">Feil ved lasting av bibliotek: ${error.message}</p>`;
+        }
+    }
+
+    /**
+     * Setup event listeners for media library (upload, delete, copy)
+     */
+    _setupMediaLibraryListeners() {
+        const dropzone = document.getElementById('media-dropzone');
+        const fileInput = document.getElementById('media-file-input');
+        const grid = document.getElementById('media-grid');
+
+        if (!dropzone || !fileInput || !grid) return;
+
+        // Click to upload
+        dropzone.onclick = () => fileInput.click();
+
+        // File input change
+        fileInput.onchange = async (e) => {
+            if (e.target.files.length > 0) {
+                await this.handleMediaFileUpload(Array.from(e.target.files));
+                fileInput.value = ''; // Reset
+            }
+        };
+
+        // Drag & Drop
+        dropzone.ondragover = (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#1B4965';
+            dropzone.style.background = '#eff6ff';
+        };
+
+        dropzone.ondragleave = () => {
+            dropzone.style.borderColor = '#cbd5e1';
+            dropzone.style.background = '#f8fafc';
+        };
+
+        dropzone.ondrop = async (e) => {
+            e.preventDefault();
+            dropzone.style.borderColor = '#cbd5e1';
+            dropzone.style.background = '#f8fafc';
+            
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            if (files.length > 0) {
+                await this.handleMediaFileUpload(files);
+            }
+        };
+
+        // Delegate grid actions (Copy URL, Delete)
+        grid.onclick = async (e) => {
+            const copyBtn = e.target.closest('.btn-copy-url');
+            const deleteBtn = e.target.closest('.btn-delete-file');
+
+            if (copyBtn) {
+                const url = copyBtn.getAttribute('data-url');
+                try {
+                    await navigator.clipboard.writeText(url);
+                    const originalText = copyBtn.innerText;
+                    copyBtn.innerText = 'Kopiert!';
+                    copyBtn.style.color = '#10b981';
+                    setTimeout(() => {
+                        copyBtn.innerText = originalText;
+                        copyBtn.style.color = '#1B4965';
+                    }, 2000);
+                } catch (err) {
+                    alert('Kunne ikke kopiere URL');
+                }
+            }
+
+            if (deleteBtn) {
+                const path = deleteBtn.getAttribute('data-path');
+                if (confirm('Er du sikker på at du vil slette dette bildet permanent?')) {
+                    await this.deleteMediaFile(path);
+                }
+            }
+        };
+    }
+
+    /**
+     * Handle file upload with compression
+     */
+    async handleMediaFileUpload(files) {
+        const grid = document.getElementById('media-grid');
+        const dropzone = document.getElementById('media-dropzone');
+        
+        // Show loading state in dropzone
+        const originalContent = dropzone.innerHTML;
+        dropzone.innerHTML = `
+            <div class="loader-sm" style="margin-bottom: 12px;"></div>
+            <h3 style="margin: 0; font-size: 18px; color: #334155;">Laster opp ${files.length} bilde(r)...</h3>
+            <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Vennligst vent mens bildene komprimeres og lagres</p>
+        `;
+        dropzone.style.pointerEvents = 'none';
+
+        try {
+            for (const file of files) {
+                let fileToUpload = file;
+
+                // Compress image if it's an image and browser-image-compression is available
+                if (file.type.startsWith('image/') && typeof imageCompression !== 'undefined') {
+                    try {
+                        const options = {
+                            maxSizeMB: 1.5,
+                            maxWidthOrHeight: 1920,
+                            useWebWorker: true
+                        };
+                        fileToUpload = await imageCompression(file, options);
+                        // Maintain original extension but ensure it's a file object
+                        fileToUpload = new File([fileToUpload], file.name, { type: file.type });
+                    } catch (error) {
+                        console.warn('Compression failed, uploading original:', error);
+                    }
+                }
+
+                const path = `editor/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+                await firebaseService.uploadFile(fileToUpload, path);
+            }
+
+            showToast(`${files.length} bilde(r) ble lastet opp`, 'success');
+            await this.loadMediaLibrary();
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast('Opplasting feilet: ' + error.message, 'error');
+        } finally {
+            dropzone.innerHTML = originalContent;
+            dropzone.style.pointerEvents = 'auto';
+        }
+    }
+
+    /**
+     * Delete a media file
+     */
+    async deleteMediaFile(path) {
+        try {
+            // Check if firebaseService has deleteFile, otherwise use a generic implementation
+            if (typeof firebaseService.deleteFile === 'function') {
+                await firebaseService.deleteFile(path);
+            } else {
+                // Fallback to storage ref delete if service method missing
+                const storageRef = firebaseService.storage.ref(path);
+                await storageRef.delete();
+            }
+            
+            showToast('Bilde slettet', 'success');
+            await this.loadMediaLibrary();
+        } catch (error) {
+            console.error('Delete error:', error);
+            showToast('Kunne ikke slette bilde: ' + error.message, 'error');
+        }
+    }
+
+    async _loadIntegrationsSettings() {
+        try {
+            const settings = await firebaseService.getPageContent('settings_integrations') || {};
+            
+            // AI Settings
+            const translation = settings.translation || {};
+            const provEl = document.getElementById('translation-provider');
+            if (provEl) provEl.value = translation.provider || 'mymemory';
+            
+            const geminiKeyEl = document.getElementById('gemini-api-key');
+            if (geminiKeyEl) geminiKeyEl.value = translation.geminiApiKey || '';
+            
+            const geminiModelEl = document.getElementById('gemini-model');
+            if (geminiModelEl) geminiModelEl.value = translation.geminiModel || 'gemini-1.5-flash';
+
+            // Google Calendar Settings
+            const gcal = settings.googleCalendar || {};
+            const gcalKeyEl = document.getElementById('gcal-api-key');
+            if (gcalKeyEl) gcalKeyEl.value = gcal.apiKey || '';
+
+            const calendars = settings.googleCalendars || [];
+            const gcalList = document.getElementById('gcal-list');
+            if (gcalList) {
+                gcalList.innerHTML = '';
+                calendars.forEach(cal => this.addGCalInput(cal.label, cal.id));
+                if (calendars.length === 0 && gcal.calendarId) {
+                    this.addGCalInput(gcal.label || 'Hovedkalender', gcal.calendarId);
+                }
+            }
+
+            // Update GCal Status Badge
+            const statusBadge = document.getElementById('gcal-status');
+            if (statusBadge) {
+                if (gcal.apiKey && (calendars.length > 0 || gcal.calendarId)) {
+                    statusBadge.textContent = 'Konfigurert';
+                    statusBadge.style.background = '#dcfce7';
+                    statusBadge.style.color = '#166534';
+                } else {
+                    statusBadge.textContent = 'Frakoblet';
+                    statusBadge.style.background = '#fee2e2';
+                    statusBadge.style.color = '#991b1b';
+                }
+            }
+
+            // Google Auth Status
+            this._updateGoogleAuthUI();
+
+        } catch (error) {
+            console.error('Error loading integrations settings:', error);
+        }
+    }
+
+    _updateGoogleAuthUI() {
+        const authContainer = document.getElementById('google-auth-status');
+        if (!authContainer) return;
+
+        authContainer.innerHTML = this.googleAccessToken ? `
+            <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
+                <span class="material-symbols-outlined" style="color: #16a34a;">check_circle</span>
+                <div style="flex: 1;">
+                    <p style="font-size: 13px; font-weight: 600; color: #166534; margin: 0;">Tilkoblet Google</p>
+                    <p style="font-size: 11px; color: #15803d; margin: 0;">Skrivetilgang er aktivert</p>
+                </div>
+                <button id="disconnect-google" class="btn btn-outline" style="color: #dc2626; border-color: #fca5a5; font-size: 12px; padding: 4px 8px;">Koble fra</button>
+            </div>
+        ` : `
+            <button class="btn btn-outline" id="connect-google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="Google">
+                Koble til Google for skrivetilgang
+            </button>
+        `;
+    }
+
+    async saveIntegrationsSettings() {
+        const btn = document.getElementById('save-ai-settings');
+        if (btn) {
+            btn.textContent = 'Lagrer...';
+            btn.disabled = true;
+        }
+
+        try {
+            const currentSettings = await firebaseService.getPageContent('settings_integrations') || {};
+            
+            const gcalApiKey = document.getElementById('gcal-api-key')?.value.trim() || '';
+            const translationProvider = document.getElementById('translation-provider')?.value || 'mymemory';
+            const geminiApiKey = document.getElementById('gemini-api-key')?.value.trim() || '';
+            const geminiModel = document.getElementById('gemini-model')?.value.trim() || 'gemini-1.5-flash';
+
+            const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
+            const calendars = rows.map(row => ({
+                label: row.querySelector('.gcal-label')?.value.trim() || '',
+                id: row.querySelector('.gcal-id')?.value.trim() || ''
+            })).filter(item => item.id);
+
+            const newSettings = {
+                ...currentSettings,
+                googleCalendar: {
+                    ...currentSettings.googleCalendar,
+                    apiKey: gcalApiKey,
+                    calendarId: calendars[0]?.id || currentSettings.googleCalendar?.calendarId || '',
+                    label: calendars[0]?.label || currentSettings.googleCalendar?.label || 'Hovedkalender'
+                },
+                googleCalendars: calendars,
+                translation: {
+                    provider: translationProvider,
+                    geminiApiKey,
+                    geminiModel,
+                    lastUpdated: new Date().toISOString()
+                }
+            };
+
+            await firebaseService.savePageContent('settings_integrations', newSettings);
+            this._translationSettingsCache = null;
+            this._translationSettingsCacheLoadedAt = 0;
+            
+            this.showToast('Integrasjonsinnstillinger lagret!', 'success');
+            this._loadIntegrationsSettings();
+        } catch (error) {
+            console.error('Error saving integrations:', error);
+            this.showToast('Kunne ikke lagre innstillinger.', 'error');
+        } finally {
+            if (btn) {
+                btn.textContent = 'Lagre AI-innstillinger';
+                btn.disabled = false;
+            }
+        }
+    }
+
+    addGCalInput(label = '', id = '') {
+        const container = document.getElementById('gcal-list');
+        if (!container) return;
+
+        const row = document.createElement('div');
+        row.className = 'gcal-row';
+        row.style = 'display: flex; gap: 8px; margin-bottom: 8px;';
+        row.innerHTML = `
+            <input type="text" class="form-control gcal-label" placeholder="Navn (f.eks. HKM)" value="${label}" style="flex: 1;">
+            <input type="text" class="form-control gcal-id" placeholder="Calendar ID" value="${id}" style="flex: 2;">
+            <button type="button" class="btn btn-icon remove-gcal" style="color: #ef4444; background: transparent; border: none; cursor: pointer;">
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+        `;
+
+        row.querySelector('.remove-gcal').onclick = () => row.remove();
+        container.appendChild(row);
+    }
+
+    async handleGoogleAuth() {
+        try {
+            const result = await firebaseService.connectToGoogle();
+            this.googleAccessToken = result.accessToken;
+            this.showToast('Tilkoblet Google! Du har nå skrivetilgang.', 'success');
+            this._updateGoogleAuthUI();
+        } catch (error) {
+            console.error('Google connection failed:', error);
+            this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
+        }
+    }
+
+    handleGoogleDisconnect() {
+        this.googleAccessToken = null;
+        this.showToast('Koblet fra Google. Skrivetilgang deaktivert.');
+        this._updateGoogleAuthUI();
+    }
+
+
 
 
     async openPodcastTranscriptEditorById(episodeId) {
@@ -10155,9 +10600,7 @@ class AdminManager {
         this.renderCollectionEditor('teaching', 'Undervisning');
     }
 
-    async renderPodcastManager() {
-        this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon', 'podcast');
-    }
+
 
     async renderCoursesManager() {
         const section = document.getElementById('courses-section');
@@ -10856,278 +11299,6 @@ class AdminManager {
         };
     }
 
-    async renderIntegrationsSection() {
-        const section = document.getElementById('integrations-section');
-        if (!section) return;
-
-        section.innerHTML = `
-            ${this.renderSectionHeader('integration_instructions', 'Integrasjoner', 'Koble nettsiden din til eksterne tjenester som Google Calendar.', '')}
-
-            <div class="design-ui-shell">
-            <div class="design-ui-workspace">
-                <div class="design-ui-top-grid">
-                    <div class="design-ui-main-column">
-                        <!-- Google Calendar Integration -->
-                        <div class="design-ui-panel">
-                            <div class="design-ui-panel-header">
-                                <div class="design-ui-panel-header-icon" style="background: #e0f2fe; color: #0ea5e9;">
-                                    <span class="material-symbols-outlined">calendar_month</span>
-                                </div>
-                                <div>
-                                    <h3 class="design-ui-panel-title">Google Calendar API</h3>
-                                    <p class="design-ui-panel-subtitle">Hent arrangementer automatisk fra din Google-kalender til nettsiden.</p>
-                                </div>
-                                <div class="status-badge" id="gcal-status" style="font-size: 12px; padding: 4px 10px; border-radius: 12px; background: #fee2e2; color: #991b1b; font-weight: 500;">Frakoblet</div>
-                            </div>
-                            <div class="design-ui-panel-body">
-                                <div class="form-group">
-                                    <label>Google API Key</label>
-                                    <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
-                                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Sørg for at 'Google Calendar API' er aktivert i Cloud Console.</p>
-                                </div>
-
-                                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                                    <h4 style="margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                                        <span class="material-symbols-outlined" style="font-size: 18px; color: #7c3aed;">translate</span>
-                                        AI-oversettelse for blogg
-                                    </h4>
-                                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Velg oversetter for EN/ES-blogginnhold. Gemini anbefales hvis du har API-nøkkel.</p>
-
-                                    <div class="form-group" style="margin-bottom: 10px;">
-                                        <label for="translation-provider">Oversettelsesleverandør</label>
-                                        <select id="translation-provider" class="form-control">
-                                            <option value="mymemory">MyMemory (gratis, begrenset)</option>
-                                            <option value="gemini">Gemini (Google AI API)</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group" style="margin-bottom: 10px;">
-                                        <label for="gemini-api-key">Gemini API Key</label>
-                                        <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
-                                    </div>
-
-                                    <div class="form-group" style="margin-bottom: 0;">
-                                        <label for="gemini-model">Gemini modell</label>
-                                        <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
-                                        <p style="font-size: 11px; color: var(--text-muted); margin-top: 4px;">Tips: Sett API key-restriksjoner i Google Cloud for tryggere bruk.</p>
-                                    </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Calendar ID</label>
-                                    <div id="gcal-list" class="gcal-list" style="margin-bottom: 8px;"></div>
-                                    <button type="button" class="btn btn-outline" id="add-gcal" style="width: 100%;">
-                                        <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">add</span>
-                                        Legg til kalender
-                                    </button>
-                                    <p style="font-size: 11px; color: var(--text-muted); margin-top: 8px;">Legg inn flere kalendere for filtrering. Calendar ID finner du under "Integrer kalender".</p>
-                                </div>
-
-                                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                                    <h4 style="margin-bottom: 8px; font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                                        <span class="material-symbols-outlined" style="font-size: 18px; color: #f59e0b;">sync</span>
-                                        Synkronisering (To-veis)
-                                    </h4>
-                                    <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 12px;">Aktiver to-veis synkronisering for å sende endringer fra dashbordet tilbake til Google Calendar.</p>
-
-                                    <div id="google-auth-status" style="margin-bottom: 15px;">
-                                        ${this.googleAccessToken ? `
-                                            <div style="display: flex; align-items: center; gap: 10px; padding: 12px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0;">
-                                                <span class="material-symbols-outlined" style="color: #16a34a;">check_circle</span>
-                                                <div style="flex: 1;">
-                                                    <p style="font-size: 13px; font-weight: 600; color: #166534; margin: 0;">Tilkoblet Google</p>
-                                                    <p style="font-size: 11px; color: #15803d; margin: 0;">Skrivetilgang er aktivert</p>
-                                                </div>
-                                                <button id="disconnect-google" class="btn btn-outline" style="color: #dc2626; border-color: #fca5a5; font-size: 12px; padding: 4px 8px;">Koble fra</button>
-                                            </div>
-                                        ` : `
-                                            <button class="btn btn-outline" id="connect-google-btn" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                                <img src="https://www.google.com/favicon.ico" width="16" height="16" alt="Google">
-                                                Koble til Google for skrivetilgang
-                                            </button>
-                                        `}
-                                    </div>
-                                </div>
-
-                                <div style="margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                                    <h4 style="margin-bottom: 12px; font-size: 14px;">Visningsinnstillinger</h4>
-                                    <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                                        <input type="checkbox" id="gcal-show-month" style="width: 18px; height: 18px; accent-color: var(--primary-color);">
-                                            <label for="gcal-show-month" style="margin-bottom: 0; cursor: pointer;">Vis Månedskalender</label>
-                                    </div>
-                                    <div class="form-group" style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
-                                        <input type="checkbox" id="gcal-show-agenda" style="width: 18px; height: 18px; accent-color: var(--primary-color);">
-                                            <label for="gcal-show-agenda" style="margin-bottom: 0; cursor: pointer;">Vis Agendaoversikt (Kommende arrangementer)</label>
-                                    </div>
-                                </div>
-
-                                <div style="margin-top: 10px;">
-                                    <button class="btn btn-primary" id="save-gcal-settings" style="width: 100%;">
-                                        <span class="material-symbols-outlined">save</span>
-                                        Lagre Kalender-innstillinger
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Guidance Panel -->
-                    <aside class="design-ui-side-column">
-                        <div class="design-ui-panel">
-                            <div class="design-ui-panel-header design-ui-panel-header--compact">
-                                <div class="design-ui-panel-header-icon" style="background: #f1f5f9; color: #475569;">
-                                    <span class="material-symbols-outlined">info</span>
-                                </div>
-                                <div style="flex: 1;">
-                                    <h3 class="design-ui-panel-title">Slik setter du opp Google Calendar</h3>
-                                </div>
-                            </div>
-                            <div class="design-ui-panel-body">
-                                <ol style="font-size: 13px; padding-left: 16px; line-height: 1.6; color: var(--text-main); margin: 0; display: flex; flex-direction: column; gap: 12px;">
-                                    <li>Gå til <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--primary-color); text-decoration: none; font-weight: 500;">Google Cloud Console</a>.</li>
-                                    <li>Opprett et prosjekt og aktiver <b>Google Calendar API</b>.</li>
-                                    <li>Gå til "Credentials" og opprett en <b>API Key</b> (begrens den gjerne til ditt domene).</li>
-                                    <li>I Google Calendar: Gå til innstillinger for kalenderen du vil dele.</li>
-                                    <li>Under "Access permissions", huk av for <b>Make available to public</b>.</li>
-                                    <li>Finn <b>Calendar ID</b> under "Integrate calendar" og lim den inn.</li>
-                                </ol>
-                            </div>
-                        </div>
-                    </aside>
-                </div>
-            </div>
-        </div>
-        `;
-
-        // Bind Google Auth listeners
-        const connectBtn = document.getElementById('connect-google-btn');
-        if (connectBtn) {
-            connectBtn.onclick = async () => {
-                try {
-                    const result = await firebaseService.connectToGoogle();
-                    this.googleAccessToken = result.accessToken;
-                    this.showToast('Tilkoblet Google! Du har nå skrivetilgang.', 'success');
-                    this.renderIntegrationsSection(); // Refresh UI to show connected state
-                } catch (error) {
-                    console.error('Google connection failed:', error);
-                    this.showToast('Kunne ikke koble til Google: ' + (error.message || 'Ukjent feil'), 'error');
-                }
-            };
-        }
-
-        const disconnectBtn = document.getElementById('disconnect-google');
-        if (disconnectBtn) {
-            disconnectBtn.onclick = () => {
-                this.googleAccessToken = null;
-                this.showToast('Koblet fra Google. Skrivetilgang deaktivert.');
-                this.renderIntegrationsSection();
-            };
-        }
-
-        // Load existing settings
-        const settings = await firebaseService.getPageContent('settings_integrations') || {};
-        const gcal = settings.googleCalendar || {};
-        const translation = (settings.translation && typeof settings.translation === 'object')
-            ? settings.translation
-            : {};
-        const fallbackGeminiKey = String(translation.geminiApiKey || gcal.apiKey || '').trim();
-
-        document.getElementById('gcal-api-key').value = gcal.apiKey || '';
-        document.getElementById('gcal-show-month').checked = settings.showMonthView !== false; // Default true
-        document.getElementById('gcal-show-agenda').checked = settings.showAgendaView !== false; // Default true
-        document.getElementById('translation-provider').value = translation.provider === 'gemini' ? 'gemini' : 'mymemory';
-        document.getElementById('gemini-api-key').value = fallbackGeminiKey;
-        document.getElementById('gemini-model').value = translation.geminiModel || 'gemini-1.5-flash';
-
-        const listEl = document.getElementById('gcal-list');
-        const addBtn = document.getElementById('add-gcal');
-        const savedCalendars = Array.isArray(settings.googleCalendars)
-            ? settings.googleCalendars
-            : (gcal.calendarId ? [{ id: gcal.calendarId, label: gcal.label || '' }] : []);
-
-        const renderCalendarRow = (value = {}) => {
-            const row = document.createElement('div');
-            row.className = 'gcal-row';
-            row.style.display = 'grid';
-            row.style.gridTemplateColumns = '1fr 2fr auto';
-            row.style.gap = '8px';
-            row.style.marginBottom = '8px';
-
-            row.innerHTML = `
-                <input type="text" class="form-control gcal-label" placeholder="Navn (f.eks. Moter)" value="${this.escapeHtml(value.label || '')}">
-                <input type="text" class="form-control gcal-id" placeholder="Calendar ID" value="${this.escapeHtml(value.id || '')}">
-                <button type="button" class="btn btn-outline gcal-remove">Fjern</button>
-            `;
-
-            row.querySelector('.gcal-remove').addEventListener('click', () => {
-                row.remove();
-            });
-
-            listEl.appendChild(row);
-        };
-
-        if (savedCalendars.length > 0) {
-            savedCalendars.forEach(renderCalendarRow);
-        } else {
-            renderCalendarRow();
-        }
-
-        if (addBtn) {
-            addBtn.addEventListener('click', () => renderCalendarRow());
-        }
-
-        if (gcal.apiKey && (savedCalendars.length > 0 || gcal.calendarId)) {
-            const statusBadge = document.getElementById('gcal-status');
-            statusBadge.textContent = 'Konfigurert';
-            statusBadge.style.background = '#dcfce7';
-            statusBadge.style.color = '#166534';
-        }
-
-        document.getElementById('save-gcal-settings').onclick = async (e) => {
-            const btn = e.target;
-            const apiKey = document.getElementById('gcal-api-key').value.trim();
-            const translationProvider = document.getElementById('translation-provider').value;
-            const geminiApiKeyInput = document.getElementById('gemini-api-key').value.trim();
-            const geminiApiKey = geminiApiKeyInput || translation.geminiApiKey || apiKey || '';
-            const geminiModel = document.getElementById('gemini-model').value.trim() || 'gemini-1.5-flash';
-            const rows = Array.from(document.querySelectorAll('#gcal-list .gcal-row'));
-            const calendars = rows.map(row => {
-                const label = row.querySelector('.gcal-label')?.value.trim();
-                const id = row.querySelector('.gcal-id')?.value.trim();
-                return { label, id };
-            }).filter(item => item.id);
-
-            btn.textContent = 'Lagrer...';
-            btn.disabled = true;
-
-            try {
-                const newSettings = {
-                    ...settings,
-                    showMonthView: document.getElementById('gcal-show-month').checked,
-                    showAgendaView: document.getElementById('gcal-show-agenda').checked,
-                    googleCalendar: {
-                        apiKey,
-                        calendarId: calendars[0]?.id || '',
-                        label: calendars[0]?.label || '',
-                        lastUpdated: new Date().toISOString()
-                    },
-                    googleCalendars: calendars,
-                    translation: {
-                        provider: translationProvider === 'gemini' ? 'gemini' : 'mymemory',
-                        geminiApiKey,
-                        geminiModel,
-                        lastUpdated: new Date().toISOString()
-                    }
-                };
-
-                await firebaseService.savePageContent('settings_integrations', newSettings);
-                this._translationSettingsCache = null;
-                this._translationSettingsCacheLoadedAt = 0;
-
-                btn.textContent = 'Lagret!';
-                const statusBadge = document.getElementById('gcal-status');
-                if (apiKey && calendars.length > 0) {
-                    statusBadge.textContent = 'Konfigurert';
                     statusBadge.style.background = '#dcfce7';
                     statusBadge.style.color = '#166534';
                 }
