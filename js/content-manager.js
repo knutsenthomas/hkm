@@ -1165,7 +1165,8 @@ class ContentManager {
 
         if (container) {
             try {
-                container.innerHTML = articleHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+                const finalHtml = this.cleanLegacyHtml(articleHtml);
+                container.innerHTML = finalHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
             } catch (err) {
                 console.error('[ContentManager] Render error:', err);
             }
@@ -3999,10 +4000,35 @@ class ContentManager {
     }
 
     /**
-     * Helper to get nested object values
-     * @param {object} obj 
-     * @param {string} path - e.g. "hero.title"
+     * Cleans legacy HTML content from Wix/Wordpress artifacts
+     * @param {string} html 
      */
+    cleanLegacyHtml(html) {
+        if (!html || typeof html !== 'string') return html;
+        
+        let cleaned = html;
+        
+        // Remove style attributes from basic text tags to allow CSS overrides
+        cleaned = cleaned.replace(/<(p|span|h1|h2|h3|h4|h5|h6|li)\b[^>]*\bstyle=["'][^"']*["']/gi, (match) => {
+            // Keep text-alignment if present
+            const alignMatch = match.match(/text-align\s*:\s*([^;"]+)/i);
+            const tagMatch = match.match(/^<[a-z0-9]+/i);
+            if (alignMatch && tagMatch) {
+                return `${tagMatch[0]} style="text-align: ${alignMatch[1]}"`;
+            }
+            return tagMatch[0];
+        });
+
+        // Remove Wix-specific classes and IDs
+        cleaned = cleaned.replace(/\bclass=["']([^"']*\b)?wix-[^"']*["']/gi, '');
+        cleaned = cleaned.replace(/\bid=["']comp-[^"']*["']/gi, '');
+
+        // Remove known Wix "junk" tags but keep images
+        cleaned = cleaned.replace(/<(object|embed|iframe)\b[^>]*\bsrc=["'][^"']*wix\.com[^"']*["'][^>]*>.*?<\/\1>/gi, '');
+
+        return cleaned;
+    }
+
     getValueByPath(obj, path) {
         return path.split('.').reduce((prev, curr) => {
             return prev ? prev[curr] : undefined;
