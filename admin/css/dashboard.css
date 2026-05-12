@@ -3401,17 +3401,18 @@ div[id^="editorjs-holder-"] {
 .docs-toolbar-select-wrap {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    padding: 0 6px;
-    height: 32px;
+    gap: 2px;
+    padding: 0 4px;
+    height: 30px;
     border: 1px solid #e2e8f0;
-    border-radius: 6px;
+    border-radius: 4px;
     color: #3c4043;
     background: #fff;
     transition: all 0.2s ease;
     box-sizing: border-box;
     line-height: 1;
     flex-shrink: 0;
+    width: auto !important;
 }
 
 .docs-toolbar-select-wrap:hover {
@@ -3431,16 +3432,24 @@ div[id^="editorjs-holder-"] {
     font-weight: 500;
     outline: none;
     cursor: pointer;
-    padding: 0 4px 0 2px;
-    height: 30px;
-    display: flex;
+    padding: 0 2px;
+    height: 100%;
+    display: inline-flex;
     align-items: center;
     line-height: 1;
     appearance: none;
     -webkit-appearance: none;
     box-sizing: border-box;
-    max-width: fit-content;
+    width: auto !important;
+    min-width: 0 !important;
 }
+
+/* Specific narrow widths for numeric controls */
+[data-tool-select="fontSize"] { width: 22px !important; text-align: center; }
+[data-tool-select="lineHeight"] { width: 32px !important; text-align: center; }
+[data-tool-select="paragraphSpacing"] { width: 32px !important; text-align: center; }
+[data-tool-select="letterSpacing"] { width: 48px !important; }
+[data-tool-select="headingLevel"] { width: 75px !important; }
 
 /* Click-to-replace overlay on image blocks */
 .image-tool__image {
