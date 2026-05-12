@@ -3636,37 +3636,6 @@ class ContentManager {
         return '';
     }
 
-    getTranslation(key) {
-        if (window.i18n && typeof window.i18n.t === 'function') {
-            return window.i18n.t(key);
-        }
-        const dict = {
-            'reading_time': 'min lesing',
-            'views': 'visninger'
-        };
-        return dict[key] || key;
-    }
-
-    stripHtml(html) {
-        if (!html) return '';
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        return doc.body.textContent || '';
-    }
-
-    formatDate(date) {
-        if (!date) return '';
-        try {
-            const d = (typeof date.toDate === 'function') ? date.toDate() : new Date(date);
-            return d.toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', year: 'numeric' });
-        } catch (e) {
-            return '';
-        }
-    }
-
-    escapeHtml(str) {
-        if (typeof str !== 'string') return '';
-        return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
-    }
 
     getRichMediaUrl(media) {
         if (!media) return '';
@@ -3994,15 +3963,6 @@ class ContentManager {
         return gEvent;
     }
 
-    formatDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
-        } catch (e) {
-            return dateStr;
-        }
-    }
 
     isSameDay(d1, d2) {
         if (!d1 || !d2) return false;
