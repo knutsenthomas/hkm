@@ -145,6 +145,50 @@ class AdminManager {
         }, 6000);
     }
 
+    async performWixDatabaseCleanup() {
+        if (!confirm('Dette vil permanent fjerne Wix-spesifikk formatering og "junk" fra alle innlegg i databasen. Er du sikker?')) return;
+        
+        try {
+            console.log('[Cleanup] Starter Wix-opprydding...');
+            const collections = ['collection_blog', 'collection_teaching'];
+            let totalCleaned = 0;
+
+            for (const colName of collections) {
+                const snapshot = await window.firebaseService.db.collection(colName).get();
+                for (const doc of snapshot.docs) {
+                    const data = doc.data();
+                    let hasChanges = false;
+                    
+                    if (data.articleHtml) {
+                        const cleaned = window.contentManager.cleanLegacyHtml(data.articleHtml);
+                        if (cleaned !== data.articleHtml) {
+                            data.articleHtml = cleaned;
+                            hasChanges = true;
+                        }
+                    }
+                    
+                    if (data.content && typeof data.content === 'string') {
+                        const cleaned = window.contentManager.cleanLegacyHtml(data.content);
+                        if (cleaned !== data.content) {
+                            data.content = cleaned;
+                            hasChanges = true;
+                        }
+                    }
+
+                    if (hasChanges) {
+                        await doc.ref.update(data);
+                        totalCleaned++;
+                    }
+                }
+            }
+            alert(`Suksess! Ryddet opp i ${totalCleaned} dokumenter. Alle Wix-rester er nå fjernet.`);
+            window.location.reload();
+        } catch (err) {
+            console.error('[Cleanup] Feil under opprydding:', err);
+            alert('En feil oppstod under oppryddingen. Se konsollen for detaljer.');
+        }
+    }
+
     /**
      * Show a prominent alert (Modal-like toast)
      */
@@ -10867,6 +10911,20 @@ class AdminManager {
                                                     </div>
                                                     <button class="btn btn-outline" style="width: 100%; border-color: #fca5a5; color: #ef4444;" onclick="localStorage.clear(); window.location.reload();">
                                                         Tøm Cache
+                                                    </button>
+                                                </div>
+
+                                                <!-- Wix Cleanup Tool -->
+                                                <div class="tool-card" style="border: 1px solid var(--border-color); border-radius: 12px; padding: 16px;">
+                                                    <div class="tool-icon-circle warning" style="background: #fff7ed; color: #f97316; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 12px;">
+                                                        <span class="material-symbols-outlined">auto_fix_high</span>
+                                                    </div>
+                                                    <div class="tool-info" style="margin-bottom: 16px;">
+                                                        <h4 style="font-weight: 600; font-size: 15px; margin-bottom: 4px;">Wix-vasker (Database)</h4>
+                                                        <p style="font-size: 13px; color: var(--text-muted);">Fjerner permanent Wix-rester fra alle innlegg.</p>
+                                                    </div>
+                                                    <button class="btn btn-primary" style="width: 100%;" onclick="window.adminManager.performWixDatabaseCleanup()">
+                                                        Kjør Wix-vask
                                                     </button>
                                                 </div>
                                             </div>
