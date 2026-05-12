@@ -4721,7 +4721,7 @@ class AdminManager {
                 <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
                     <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
-                    <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">/</strong></p>
+                    <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">Mediebibliotek</strong></p>
                     <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
                 </div>
 
@@ -4938,6 +4938,61 @@ class AdminManager {
         section.setAttribute('data-rendered', 'true');
     }
 
+    _getLegacyMediaPrefixForPath(path = '') {
+        const normalized = String(path || '').replace(/^\/+/, '').replace(/\/+$/, '');
+        const parts = normalized.split('/').filter(Boolean);
+        if (parts.length !== 2 || parts[0] !== 'editor') return '';
+        return parts[1];
+    }
+
+    _getMediaPathDisplayName(path = '') {
+        const normalized = String(path || '').replace(/^\/+/, '').replace(/\/+$/, '');
+        const parts = normalized.split('/').filter(Boolean).filter((part) => part !== 'editor');
+        if (!parts.length) return 'Mediebibliotek';
+
+        const labels = {
+            blog: 'Blogg',
+            teaching: 'Undervisning',
+            podcast_transcripts: 'Podkast',
+            events: 'Arrangementer',
+            courses: 'Kurs'
+        };
+
+        return parts
+            .map((part) => labels[part] || part.replace(/[-_]+/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase()))
+            .join(' / ');
+    }
+
+    async _getLegacyMediaFilesForPath(path = '') {
+        const legacyPrefix = this._getLegacyMediaPrefixForPath(path);
+        if (!legacyPrefix || !firebaseService?.listMediaFiles) return [];
+
+        try {
+            const rootMedia = await firebaseService.listMediaFiles('editor/', false);
+            return (rootMedia.files || []).filter((file) => {
+                const fullPath = String(file?.fullPath || '');
+                const fileName = String(file?.name || '');
+                return fullPath.startsWith(`editor/${legacyPrefix}`)
+                    && !fullPath.startsWith(`editor/${legacyPrefix}/`)
+                    && fileName !== `${legacyPrefix}.keep`
+                    && !fileName.endsWith('.keep');
+            });
+        } catch (error) {
+            console.warn('[AdminManager] Could not load legacy media files:', error);
+            return [];
+        }
+    }
+
+    _mergeMediaFiles(files = [], legacyFiles = []) {
+        const seen = new Set();
+        return [...files, ...legacyFiles].filter((file) => {
+            const key = file?.fullPath || file?.url || file?.name;
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
+    }
+
     /**
      * Load and render the media library grid with folder support
      */
@@ -4954,8 +5009,7 @@ class AdminManager {
 
         // Update upload path display
         if (uploadPathEl) {
-            const displayPath = this.currentMediaPath.replace('editor/', '/') || '/';
-            uploadPathEl.innerText = displayPath;
+            uploadPathEl.innerText = this._getMediaPathDisplayName(this.currentMediaPath);
         }
 
         // Update breadcrumbs
@@ -4980,7 +5034,8 @@ class AdminManager {
         }
 
         try {
-            const { files, folders } = await firebaseService.listMediaFiles(this.currentMediaPath, false);
+            const { files: rawFiles, folders } = await firebaseService.listMediaFiles(this.currentMediaPath, false);
+            const files = this._mergeMediaFiles(rawFiles, await this._getLegacyMediaFilesForPath(this.currentMediaPath));
             
             if (countEl) countEl.innerText = files.length;
             if (folderCountEl) folderCountEl.innerText = folders.length;
@@ -5302,7 +5357,8 @@ class AdminManager {
         const uploadBtn = modal.querySelector('#modal-upload-btn');
         const fileInput = modal.querySelector('#modal-file-input');
         
-        let currentPath = this.currentMediaPath || 'editor/blog';
+        let currentPath = this.currentMediaPath || 'editor/blog/';
+        if (currentPath && !currentPath.endsWith('/')) currentPath += '/';
         let currentSort = 'date_desc';
 
         const closeModal = () => {
@@ -5347,7 +5403,7 @@ class AdminManager {
 
             try {
                 const result = await firebaseService.listMediaFiles(currentPath);
-                let files = result.files;
+                let files = this._mergeMediaFiles(result.files, await this._getLegacyMediaFilesForPath(currentPath));
                 const folders = result.folders;
 
                 // Sort files
@@ -5448,7 +5504,7 @@ class AdminManager {
                             console.error('Compression failed:', compErr);
                         }
                     }
-                    const path = `${currentPath}${file.name}`;
+                    const path = `${currentPath}${file.name.replace(/\s+/g, '_')}`;
                     await firebaseService.uploadFile(fileToUpload, path);
                 }
                 showToast('Opplasting ferdig!', 'success');
@@ -6426,7 +6482,7 @@ class AdminManager {
             const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
             const item = collectionItems[index] ? { ...collectionItems[index] } : {};
             this._persistOpenEditorState(collectionId, item);
-            this.currentMediaPath = `editor/${collectionId}`;
+            this.currentMediaPath = `editor/${collectionId}/`;
 
             let safeDate = new Date().toISOString().split('T')[0];
             if (item.date && typeof item.date === 'string') {
