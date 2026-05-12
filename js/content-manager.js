@@ -1234,12 +1234,12 @@ class ContentManager {
         const relatedContainer = document.getElementById('single-post-related');
         if (relatedContainer) {
             let relatedItems = [];
-            let heading = 'Relaterte innlegg';
-            let ctaLabel = 'Les mer';
+            let heading = this.getTranslation('related_posts');
+            let ctaLabel = this.getTranslation('read_more');
 
             if (isTeaching) {
-                heading = 'Relatert undervisning';
-                ctaLabel = 'Les undervisning';
+                heading = this.getTranslation('related_teaching');
+                ctaLabel = this.getTranslation('read_teaching');
                 const seriesIds = Array.isArray(sourceItem?.seriesItems) ? sourceItem.seriesItems : [];
                 if (seriesIds.length > 0) {
                     relatedItems = teachingItems.filter(i =>
@@ -3225,7 +3225,10 @@ class ContentManager {
                 'no_description': 'Ingen beskrivelse tilgjengelig.',
                 'read_more': 'Les mer',
                 'reading_time': 'min lesing',
-                'views': 'visninger'
+                'views': 'visninger',
+                'related_posts': 'Relaterte innlegg',
+                'related_teaching': 'Relatert undervisning',
+                'read_teaching': 'Les undervisning'
             },
             'en': {
                 'loading': 'Loading...',
@@ -3236,7 +3239,10 @@ class ContentManager {
                 'no_description': 'No description available.',
                 'read_more': 'Read more',
                 'reading_time': 'min read',
-                'views': 'views'
+                'views': 'views',
+                'related_posts': 'Related posts',
+                'related_teaching': 'Related teaching',
+                'read_teaching': 'Read teaching'
             },
             'es': {
                 'loading': 'Cargando...',
@@ -3247,7 +3253,11 @@ class ContentManager {
                 'no_description': 'No hay descripción disponible.',
                 'read_more': 'Leer más',
                 'reading_time': 'min lectura',
-                'views': 'vistas'
+                'views': 'vistas',
+                'related_posts': 'Entradas relacionadas',
+                'related_teaching': 'Enseñanza relacionada',
+                'read_teaching': 'Leer enseñanza'
+            }
             }
         };
         return (strings[lang] && strings[lang][key]) || strings['no'][key] || key;
