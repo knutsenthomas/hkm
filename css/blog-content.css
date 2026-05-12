@@ -247,8 +247,8 @@ ol.block-list { list-style-type: decimal; }
         font-size: 1rem; /* Fix: Ensure base size is 16px on mobile for all elements */
     }
     
-    h1.block-header { font-size: 1.85rem; }
-    h2.block-header { font-size: 1.5rem; }
+    h1.block-header { font-size: 1.7rem; }
+    h2.block-header { font-size: 1.35rem; }
     
     .block-paragraph {
         /* Inherits from .blog-post-content (1rem/16px) */
