@@ -2815,13 +2815,16 @@ class AdminManager {
                 const hasSummary = !!transcriptData.summary;
                 const title = ep.title || 'Uten tittel';
                 const dateStr = ep.date || '';
-                const imageUrl = ep.image || 'https://via.placeholder.com/150';
+                const imageUrl = ep.imageUrl || '';
 
                 return `
                     <tr data-episode-id="${id}" style="transition: background 0.2s;">
                         <td style="padding-left: 24px;">
-                            <div style="width: 54px; height: 54px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0;">
-                                <img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/150'">
+                            <div style="width: 54px; height: 54px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                                ${imageUrl 
+                                    ? `<img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\\'material-symbols-outlined\\' style=\\'font-size:24px;color:#94a3b8\\'>mic</span>'">`
+                                    : `<span class="material-symbols-outlined" style="font-size: 24px; color: #94a3b8;">mic</span>`
+                                }
                             </div>
                         </td>
                         <td style="max-width: 400px;">
