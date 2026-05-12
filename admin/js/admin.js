@@ -154,7 +154,7 @@ class AdminManager {
             let totalCleaned = 0;
 
             for (const colName of collections) {
-                const snapshot = await window.firebaseService.db.collection(colName).get();
+                const snapshot = await window.firebaseService.db.collection('content').doc(colName).collection('items').get();
                 for (const doc of snapshot.docs) {
                     const data = doc.data();
                     let hasChanges = false;
