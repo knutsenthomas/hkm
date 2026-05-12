@@ -59,42 +59,50 @@ service firebase.storage {
 
     match /profiles/{userId}/{allPaths=**} {
       allow read: if isOwnProfile(userId) || isPrivilegedUser();
-      allow write: if isImageUpload() && (isOwnProfile(userId) || isPrivilegedUser());
+      allow create, update: if isImageUpload() && (isOwnProfile(userId) || isPrivilegedUser());
+      allow delete: if isOwnProfile(userId) || isPrivilegedUser();
     }
 
     match /editor/{allPaths=**} {
       allow read: if true;
-      allow write: if isImageUpload() && isPrivilegedUser();
+      allow create, update: if isImageUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
     }
 
     match /editor/visitor-chat/{allPaths=**} {
       allow read: if true;
-      allow write: if isVisitorChatMediaUpload() && isPrivilegedUser();
+      allow create, update: if isVisitorChatMediaUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
     }
 
     match /editor/inbox-email/{allPaths=**} {
       allow read: if true;
-      allow write: if isInboxEmailAttachmentUpload() && isPrivilegedUser();
+      allow create, update: if isInboxEmailAttachmentUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
     }
 
     match /covers/{allPaths=**} {
       allow read: if true;
-      allow write: if isImageUpload() && isPrivilegedUser();
+      allow create, update: if isImageUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
     }
 
     match /hero/{allPaths=**} {
       allow read: if true;
-      allow write: if isImageUpload() && isPrivilegedUser();
+      allow create, update: if isImageUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
     }
 
     match /seo/{allPaths=**} {
       allow read: if true;
-      allow write: if isImageUpload() && isPrivilegedUser();
+      allow create, update: if isImageUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
     }
 
     match /newsletter/images/{allPaths=**} {
       allow read: if true;
-      allow write: if isImageUpload() && isPrivilegedUser();
+      allow create, update: if isImageUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
     }
 
     match /{allPaths=**} {
