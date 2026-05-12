@@ -2834,13 +2834,13 @@ class AdminManager {
                             <div style="font-size: 13px; font-weight: 500; color: #64748b;">${dateStr}</div>
                         </td>
                         <td>
-                            <div style="display: flex; gap: 8px;">
-                                <span class="status-badge ${hasTranscript ? 'status-active' : 'status-pending'}" style="font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border: 1px solid ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
-                                    Tekst
+                            <div style="display: flex; gap: 8px; align-items: center;">
+                                <span style="font-size: 12px; padding: 6px 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; line-height: 1; background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border: 1px solid ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1;">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
+                                    TEKST
                                 </span>
-                                <span class="status-badge ${hasSummary ? 'status-active' : 'status-pending'}" style="font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border: 1px solid ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
-                                    <span class="material-symbols-outlined" style="font-size: 14px;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
+                                <span style="font-size: 12px; padding: 6px 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; line-height: 1; background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border: 1px solid ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
                                     AI
                                 </span>
                             </div>
@@ -2851,7 +2851,7 @@ class AdminManager {
                                     <span class="material-symbols-outlined">edit_note</span>
                                 </button>
                                 <button class="btn-icon-round" onclick="window.adminManager.openPodcastSettingsModal('${id}')" title="Kategorier og overstyringer">
-                                    <span class="material-symbols-outlined">settings_input_component</span>
+                                    <span class="material-symbols-outlined">tune</span>
                                 </button>
                             </div>
                         </td>
