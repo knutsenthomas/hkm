@@ -6692,11 +6692,14 @@ class AdminManager {
                                       
                                       <!-- Actions Area -->
                                       <div style="padding: 16px; display: flex; flex-direction: column; gap: 12px;">
-                                          <div style="display: flex; gap: 8px;">
-                                              <button type="button" id="sidebar-img-upload-btn" class="btn-ghost" style="flex: 1; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #475569;">
+                                          <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                              <button type="button" id="sidebar-img-upload-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #475569;">
                                                   <span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp
                                               </button>
-                                              <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="flex: 1; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #1B4965;">
+                                              <button type="button" id="sidebar-img-library-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #1B4965;">
+                                                  <span class="material-symbols-outlined" style="font-size: 20px;">photo_library</span> Bibliotek
+                                              </button>
+                                              <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #1B4965;">
                                                   <span class="material-symbols-outlined" style="font-size: 20px;">image_search</span> Unsplash
                                               </button>
                                           </div>
@@ -8013,6 +8016,19 @@ class AdminManager {
                     list: () => replaceSelectionWithList(false),
                     orderedList: () => replaceSelectionWithList(true),
                     image: () => editor.blocks.insert('image', {}, undefined, undefined, true),
+                    'media-library': () => {
+                        this.openMediaLibraryModal((selection) => {
+                            if (selection && selection.url) {
+                                editor.blocks.insert('image', {
+                                    file: { url: selection.url },
+                                    caption: selection.name || '',
+                                    withBorder: false,
+                                    withBackground: false,
+                                    stretched: false
+                                }, undefined, undefined, true);
+                            }
+                        });
+                    },
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
                     delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
                     youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
@@ -8521,6 +8537,7 @@ class AdminManager {
             const preview = document.getElementById('sidebar-img-preview');
             const imgFile = document.getElementById('col-item-img-file');
             const uploadBtn = document.getElementById('sidebar-img-upload-btn');
+            const libraryBtn = document.getElementById('sidebar-img-library-btn');
             const unsplashBtn = document.getElementById('unsplash-trigger-btn');
 
             if (imgTrigger && imgFile) {
@@ -8546,6 +8563,18 @@ class AdminManager {
                 // Upload Actions
                 if (uploadBtn) uploadBtn.onclick = (e) => { e.stopPropagation(); imgFile.click(); };
                 imgTrigger.onclick = (e) => { if (e.target.closest('#sidebar-img-trigger')) imgFile.click(); };
+
+                if (libraryBtn) {
+                    libraryBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        this.openMediaLibraryModal((selection) => {
+                            if (selection && selection.url && imgInput) {
+                                imgInput.value = selection.url;
+                                imgInput.dispatchEvent(new Event('input'));
+                            }
+                        });
+                    };
+                }
 
                 imgFile.onchange = async (e) => {
                     const file = e.target.files[0];
