@@ -21,10 +21,10 @@
     font-family: var(--rte-font-family);
     color: var(--rte-text-color);
     line-height: var(--rte-line-height);
-    padding: 0 24px;
+    padding: 0; /* Removed internal padding to avoid doubling with .container */
     box-sizing: border-box;
     overflow-x: hidden;
-    font-size: 1.25rem !important; /* Force base size */
+    font-size: 1rem; /* Standard 16px base size */
 }
 
 /* Global Image & Element Guard */
@@ -98,7 +98,7 @@ h4.block-header { font-size: 1.25rem; }
 
 .block-paragraph {
     margin-bottom: var(--rte-paragraph-spacing);
-    font-size: 1.25rem;
+    font-size: 1rem;
     font-weight: 400;
     color: var(--rte-text-color);
     word-break: break-word;
@@ -107,7 +107,7 @@ h4.block-header { font-size: 1.25rem; }
 
 /* First paragraph treatment */
 .block-paragraph:first-of-type {
-    font-size: 1.25rem;
+    font-size: 1.1rem;
     line-height: 1.6;
     color: #1e293b;
     font-weight: 500;
@@ -122,7 +122,7 @@ h4.block-header { font-size: 1.25rem; }
 .block-list li {
     margin-bottom: 1rem;
     padding-left: 0.5rem;
-    font-size: 1.25rem;
+    font-size: 1rem;
     line-height: var(--rte-line-height);
 }
 
@@ -249,14 +249,14 @@ ol.block-list { list-style-type: decimal; }
 /* Responsive Adjustments */
 @media (max-width: 768px) {
     .blog-post-content {
-        padding: 0 20px;
+        padding: 0;
     }
     
     h1.block-header { font-size: 2rem; }
     h2.block-header { font-size: 1.75rem; }
     
     .block-paragraph {
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
     
     .block-image-gallery {
