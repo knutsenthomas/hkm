@@ -168,12 +168,22 @@ service cloud.firestore {
     match /content/{docId} {
       allow read: if true;
       allow write: if isAdmin();
+      
+      match /{allPaths=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
     }
 
     // Public site content storage (e.g. courses)
     match /siteContent/{docId} {
       allow read: if true;
       allow write: if isAdmin();
+      
+      match /{allPaths=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
     }
 
     // Legacy/public teaching collection used by Min Side
