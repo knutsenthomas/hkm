@@ -8916,23 +8916,28 @@ class AdminManager {
 
             const upsertItemInList = (list, nextItem) => {
                 let existingIdx = -1;
+                
+                // 1. Try matching by ID first (most reliable)
                 if (nextItem.id) {
-                    existingIdx = list.findIndex(fi => fi.id === nextItem.id);
+                    existingIdx = list.findIndex(fi => fi && fi.id === nextItem.id);
                 }
 
-                if (existingIdx === -1 && collectionId === 'events') {
-                    existingIdx = list.findIndex(fi =>
-                        (nextItem.gcalId && fi.gcalId === nextItem.gcalId) ||
-                        (fi.title === nextItem.title && fi.date?.split('T')[0] === nextItem.date?.split('T')[0])
+                // 2. Fallback: match by title and date (for all collections)
+                if (existingIdx === -1 && nextItem.title) {
+                    existingIdx = list.findIndex(fi => 
+                        fi && 
+                        fi.title === nextItem.title && 
+                        (String(fi.date || '').split('T')[0] === String(nextItem.date || '').split('T')[0])
                     );
                 }
 
-                if (existingIdx === -1 && nextItem.isFirestore && typeof index === 'number' && index >= 0 && !nextItem.isSynced) {
+                // 3. Last resort: use the original index if it's a known Firestore item
+                if (existingIdx === -1 && nextItem.isFirestore && typeof index === 'number' && index >= 0) {
                     existingIdx = index;
                 }
 
-                if (existingIdx >= 0) {
-                    list[existingIdx] = nextItem;
+                if (existingIdx >= 0 && existingIdx < list.length) {
+                    list[existingIdx] = { ...list[existingIdx], ...nextItem };
                 } else {
                     list.unshift(nextItem);
                 }
@@ -9301,6 +9306,11 @@ class AdminManager {
                                     }
                                     await firebase.firestore().collection('podcast_transcripts').doc(safeItem.id).set(podcastPayload, { merge: true });
                                 } else {
+                                    // FORCE CACHE INVALIDATION before fetching the list for saving.
+                                    // This prevents the "Lost Update" problem where we fetch a stale 
+                                    // cached list and overwrite the document with it.
+                                    firebaseService.invalidatePageContentCache(`collection_${collectionId}`);
+                                    
                                     const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                                     const list = this._getCollectionItems(currentData);
 
@@ -9325,6 +9335,11 @@ class AdminManager {
 
                                 // Stay in the editor after saving — just show confirmation
                                 this.showToast('✅ Lagret!', 'success');
+                                
+                                // Clear restore state on successful save so a subsequent page refresh
+                                // doesn't try to "restore" potentially stale content from session storage.
+                                this._clearOpenEditorState(collectionId);
+
                                 // Refresh the background list silently without closing the editor
                                 this.loadCollection(collectionId);
                             } catch (err) {
