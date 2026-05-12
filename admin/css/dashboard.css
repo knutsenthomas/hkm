@@ -2342,7 +2342,7 @@ textarea.form-control {
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    opacity: 0.3;
+    opacity: 0.6; /* Increased for better visibility */
     transition: all 0.2s ease;
     margin-left: 4px;
 }
@@ -2356,7 +2356,7 @@ textarea.form-control {
 .ce-toolbar__plus {
     left: -10px !important;
     transition: all 0.2s ease;
-    opacity: 0.6;
+    opacity: 0.8; /* Increased for better visibility */
 }
 
 .ce-toolbar__plus:hover {

@@ -5888,10 +5888,15 @@ class AdminManager {
                 }
             }
 
-            // For podcast transkripsjon, foretrekk 'text' dersom content er tom eller ikke meningsfull.
-            if (collectionId === 'podcast_transcripts' && typeof item.text === 'string' && item.text.trim().length > 0) {
-                if (!this._hasMeaningfulEditorContent(editorData)) {
-                    editorData = this.htmlToEditorJsBlocks(item.text);
+            // --- Wix Artifact Cleanup (Pre-Editor Initialization) ---
+            // Ensure the editor opens with sanitized content even before the first save
+            if (editorData && typeof editorData === 'object' && Array.isArray(editorData.blocks)) {
+                if (window.contentManager && typeof window.contentManager.cleanEditorBlocks === 'function') {
+                    editorData = window.contentManager.cleanEditorBlocks(editorData);
+                }
+            } else if (typeof editorData === 'string' && editorData.trim().length > 0) {
+                if (window.contentManager && typeof window.contentManager.cleanLegacyHtml === 'function') {
+                    editorData = window.contentManager.cleanLegacyHtml(editorData);
                 }
             }
 
@@ -7602,6 +7607,18 @@ class AdminManager {
                     nextContent = previousContent;
                 }
 
+                // --- Wix Artifact Cleanup ---
+                // Apply the aggressive cleanup logic before saving to Firestore
+                if (nextContent && typeof nextContent === 'object' && Array.isArray(nextContent.blocks)) {
+                    if (window.contentManager && typeof window.contentManager.cleanEditorBlocks === 'function') {
+                        nextContent = window.contentManager.cleanEditorBlocks(nextContent);
+                    }
+                } else if (typeof nextContent === 'string' && nextContent.trim().length > 0) {
+                    if (window.contentManager && typeof window.contentManager.cleanLegacyHtml === 'function') {
+                        nextContent = window.contentManager.cleanLegacyHtml(nextContent);
+                    }
+                }
+
                 item.content = nextContent;
                 item.date = document.getElementById('col-item-date')?.value || '';
 
@@ -8046,12 +8063,9 @@ class AdminManager {
                                     const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                                     const list = this._getCollectionItems(currentData);
 
-                                    // Translation is only done via the explicit "Oversett"-button, not on every save
-
-                                    if (collectionId === 'blog') {
-                                        safeItem.dashboardEdited = true;
-                                        safeItem.dashboardEditedAt = new Date().toISOString();
-                                    }
+                                    // Mark as edited in dashboard so the public site prioritizes this version
+                                    safeItem.dashboardEdited = true;
+                                    safeItem.dashboardEditedAt = new Date().toISOString();
 
                                     upsertItemInList(list, safeItem);
 

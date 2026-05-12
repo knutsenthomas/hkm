@@ -79,10 +79,7 @@
         h2.ce-header { font-size: 2rem !important; }
         h3.ce-header { font-size: 1.5rem !important; }
         
-        /* NUCLEAR FIX V2: Force Images and Blocks to stay centered */
-        .codex-editor *, 
-        .editor-main-canvas *,
-        .ce-block, 
+        /* NUCLEAR FIX V2: Force Images and Blocks to stay centered without breaking EditorJS UI */
         .ce-block__content,
         .ce-image__img,
         .ce-block img,
@@ -91,28 +88,31 @@
         .editor-main-canvas figure {
             max-width: 100% !important;
             box-sizing: border-box !important;
-            transform: none !important;
-            left: auto !important;
-            right: auto !important;
-            position: static !important;
             margin-left: auto !important;
             margin-right: auto !important;
+            display: block !important;
         }
         
-        /* Specific centering for the editor canvas */
-        .ce-block__content, .editor-main-canvas {
-            max-width: 840px !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            float: none !important;
-            position: relative !important; /* Container needs relative for EditorJS UI */
-        }
-
-        /* Image specific resets */
-        .ce-block img, .editor-main-canvas img {
+        /* Ensure images don't overflow their containers */
+        .ce-image__img, .ce-block img {
             height: auto !important;
-            display: block !important;
             margin: 1.5rem auto !important;
+        }
+        
+        /* Restore EditorJS UI components that need specific positioning */
+        .ce-toolbar, .ce-settings, .ce-inline-toolbar, .ce-conversion-toolbar, .ce-toolbox {
+            position: absolute !important;
+            transform: none; /* Allow EditorJS to handle its own transforms */
+            z-index: 1000;
+        }
+        
+        /* Fix for the "Plus" and "Settings" buttons which were hidden or misaligned */
+        .ce-toolbar__actions {
+            position: absolute !important;
+            right: 100% !important;
+            margin-right: 10px !important;
+            display: flex !important;
+            align-items: center !important;
         }
         
         .cdx-list {

@@ -318,6 +318,18 @@ class ContentManager {
         if (!existingItem) return nextItem;
         if (!nextItem) return existingItem;
 
+        // --- Priority Rule 1: Dashboard-edited content always wins over legacy/sync content ---
+        if (nextItem.dashboardEdited && !existingItem.dashboardEdited) return nextItem;
+        if (existingItem.dashboardEdited && !nextItem.dashboardEdited) return existingItem;
+
+        // --- Priority Rule 2: Most recent dashboard edit wins ---
+        if (nextItem.dashboardEdited && existingItem.dashboardEdited) {
+            const nextTime = new Date(nextItem.dashboardEditedAt || 0).getTime();
+            const existingTime = new Date(existingItem.dashboardEditedAt || 0).getTime();
+            return nextTime >= existingTime ? nextItem : existingItem;
+        }
+
+        // --- Fallback: Score-based logic for legacy items ---
         const existingContent = typeof existingItem.content === 'string' ? existingItem.content.trim() : '';
         const nextContent = typeof nextItem.content === 'string' ? nextItem.content.trim() : '';
         const existingExcerpt = typeof existingItem.excerpt === 'string' ? existingItem.excerpt.trim() : '';
@@ -4026,25 +4038,47 @@ class ContentManager {
                 const textContent = el.textContent.trim();
                 
                 // If it contains many images and very little actual content, it's a gallery residue
-                if (imgs.length >= 3 && textContent.length < 100) {
-                    console.log('[Cleanup] Removing legacy image gallery artifact');
-                    el.remove();
+                if (imgs.length >= 2 && textContent.length < 50) {
+                    const hasWixImg = Array.from(imgs).some(img => (img.src || '').includes('wixstatic.com') || (img.src || '').includes('wixmp.com'));
+                    if (hasWixImg || imgs.length >= 3) {
+                        console.log('[Cleanup] Removing legacy image gallery artifact (HTML)');
+                        el.remove();
+                    }
                 }
             });
 
-            // Remove sequences of siblings that are just images (another gallery format)
-            const allImgs = Array.from(body.querySelectorAll('img'));
-            for (let i = 0; i < allImgs.length; i++) {
-                let cluster = [allImgs[i]];
-                let next = allImgs[i].nextElementSibling;
-                while (next && (next.tagName === 'IMG' || (next.tagName === 'DIV' && next.querySelectorAll('img').length === 1 && next.textContent.trim() === ''))) {
-                    cluster.push(next);
-                    next = next.nextElementSibling;
+            // Remove sequences of siblings that are just images or empty paragraphs (another gallery format)
+            const children = Array.from(body.children);
+            for (let i = 0; i < children.length; i++) {
+                let cluster = [];
+                let j = i;
+                
+                while (j < children.length) {
+                    const child = children[j];
+                    const isImg = child.tagName === 'IMG';
+                    const isImgWrapper = (child.tagName === 'DIV' || child.tagName === 'P' || child.tagName === 'FIGURE') && 
+                                        child.querySelectorAll('img').length > 0 && 
+                                        child.textContent.trim().length < 20;
+                    const isEmptyPara = (child.tagName === 'P' || child.tagName === 'DIV') && 
+                                       child.textContent.trim().length === 0 && 
+                                       child.querySelectorAll('img').length === 0;
+
+                    if (isImg || isImgWrapper) {
+                        cluster.push(child);
+                    } else if (isEmptyPara && cluster.length > 0) {
+                        // Keep track of empty paras inside/between images to remove them too
+                        cluster.push(child);
+                    } else {
+                        break;
+                    }
+                    j++;
                 }
-                if (cluster.length >= 3) {
-                    console.log('[Cleanup] Removing image sequence/gallery');
+                
+                const imgCount = cluster.filter(c => c.tagName === 'IMG' || c.querySelectorAll('img').length > 0).length;
+                if (imgCount >= 2) {
+                    console.log(`[Cleanup] Removing HTML image sequence of size ${imgCount}`);
                     cluster.forEach(item => item.remove());
-                    i += cluster.length - 1;
+                    i = j - 1;
                 }
             }
 
@@ -4081,26 +4115,53 @@ class ContentManager {
         let i = 0;
         
         while (i < blocks.length) {
-            // Check for image clusters (sequences of 3+ image blocks)
+            const block = blocks[i];
+            
+            // 1. Detect Wix image clusters (including empty paragraphs between them)
             let cluster = [];
             let j = i;
-            while (j < blocks.length && (blocks[j].type === 'image' || blocks[j].type === 'imageGallery')) {
-                cluster.push(blocks[j]);
+            let imagesInCluster = 0;
+            
+            while (j < blocks.length) {
+                const b = blocks[j];
+                const isImage = b.type === 'image' || b.type === 'imageGallery';
+                const isEmpty = (b.type === 'paragraph' && (!b.data.text || b.data.text.trim() === ''));
+                
+                if (isImage) {
+                    cluster.push(j);
+                    imagesInCluster++;
+                } else if (isEmpty && imagesInCluster > 0) {
+                    cluster.push(j);
+                } else {
+                    break;
+                }
                 j++;
             }
             
-            // If we found a cluster of 3 or more images, it's likely a legacy Wix gallery artifact
-            if (cluster.length >= 3) {
-                console.log(`[Cleanup] Pruning image cluster of size ${cluster.length}`);
-                // Optional: Keep the first image of the cluster if you want one "hero" image
-                // For now, let's keep 0 as requested ("BARE ta vekk alt fra wix")
-                // Actually, let's keep the first one just in case it was a single image that got clustered
-                // But the user said "remove all Wix elements", so if it's a gallery, it's likely junk.
-                // Decision: Remove all images in the cluster.
+            // If cluster has 2+ Wix images OR 3+ any images, it's likely a Wix artifact
+            let shouldPrune = false;
+            if (imagesInCluster >= 3) shouldPrune = true;
+            if (imagesInCluster >= 2) {
+                // Check for wix domains in the URLs
+                const hasWixDomain = cluster.some(idx => {
+                    const b = blocks[idx];
+                    if (b.type !== 'image') return false;
+                    const url = b.data?.file?.url || b.data?.url || '';
+                    return url.includes('wixstatic.com') || url.includes('wixmp.com');
+                });
+                if (hasWixDomain) shouldPrune = true;
+            }
+            
+            if (shouldPrune) {
+                console.log(`[Cleanup] Pruning EditorJS cluster: ${imagesInCluster} images across ${cluster.length} blocks`);
                 i = j; // Skip the entire cluster
                 continue;
             }
             
+            // 2. Individual Wix image removal (optional, but let's keep it safe for now)
+            // If it's a single Wix image that is NOT the only image in the post, 
+            // we could remove it, but let's stick to clusters for now to avoid false positives.
+
             newBlocks.push(blocks[i]);
             i++;
         }
