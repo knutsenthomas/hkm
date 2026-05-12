@@ -192,11 +192,20 @@ class AdminManager {
                             }
                         }
                         
-                        if (data.content && typeof data.content === 'string') {
-                            const cleaned = window.contentManager.cleanLegacyHtml(data.content);
-                            if (cleaned !== data.content) {
-                                data.content = cleaned;
-                                hasChanges = true;
+                        if (data.content) {
+                            if (typeof data.content === 'string') {
+                                const cleaned = window.contentManager.cleanLegacyHtml(data.content);
+                                if (cleaned !== data.content) {
+                                    data.content = cleaned;
+                                    hasChanges = true;
+                                }
+                            } else if (typeof data.content === 'object') {
+                                const cleaned = window.contentManager.cleanEditorBlocks(data.content);
+                                // Simple JSON comparison for change detection
+                                if (JSON.stringify(cleaned) !== JSON.stringify(data.content)) {
+                                    data.content = cleaned;
+                                    hasChanges = true;
+                                }
                             }
                         }
 

@@ -4069,6 +4069,48 @@ class ContentManager {
         return cleaned;
     }
 
+    /**
+     * Cleans EditorJS blocks from legacy Wix artifacts (e.g. image clusters)
+     * @param {object} content EditorJS data object
+     */
+    cleanEditorBlocks(content) {
+        if (!content || !Array.isArray(content.blocks)) return content;
+        
+        const blocks = content.blocks;
+        const newBlocks = [];
+        let i = 0;
+        
+        while (i < blocks.length) {
+            // Check for image clusters (sequences of 3+ image blocks)
+            let cluster = [];
+            let j = i;
+            while (j < blocks.length && (blocks[j].type === 'image' || blocks[j].type === 'imageGallery')) {
+                cluster.push(blocks[j]);
+                j++;
+            }
+            
+            // If we found a cluster of 3 or more images, it's likely a legacy Wix gallery artifact
+            if (cluster.length >= 3) {
+                console.log(`[Cleanup] Pruning image cluster of size ${cluster.length}`);
+                // Optional: Keep the first image of the cluster if you want one "hero" image
+                // For now, let's keep 0 as requested ("BARE ta vekk alt fra wix")
+                // Actually, let's keep the first one just in case it was a single image that got clustered
+                // But the user said "remove all Wix elements", so if it's a gallery, it's likely junk.
+                // Decision: Remove all images in the cluster.
+                i = j; // Skip the entire cluster
+                continue;
+            }
+            
+            newBlocks.push(blocks[i]);
+            i++;
+        }
+        
+        return {
+            ...content,
+            blocks: newBlocks
+        };
+    }
+
     getValueByPath(obj, path) {
         return path.split('.').reduce((prev, curr) => {
             return prev ? prev[curr] : undefined;
