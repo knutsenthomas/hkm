@@ -2237,6 +2237,9 @@ class AdminManager {
                 this.loadMediaLibrary();
             } else if (sectionId === 'podcast') {
                 this.loadPodcastEpisodes();
+            } else if (sectionId === 'integrations') {
+                this.loadMediaSettings();
+                this._loadIntegrationsSettings();
             }
         }
 
@@ -2254,7 +2257,10 @@ class AdminManager {
                     break;
 
                 case 'media':
-                    this.renderMediaManager();
+                    this.renderMediaLibrarySection();
+                    break;
+                case 'integrations':
+                    this.renderIntegrationsSection();
                     break;
                 case 'causes':
                     this.renderCausesManager();
@@ -2756,6 +2762,58 @@ class AdminManager {
                 </div>
             `, '')}
 
+            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-bottom: 24px;">
+                <div class="card modern">
+                    <div class="card-header flex-between">
+                        <h3 class="card-title">Podcast-innstillinger</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label>RSS Feed URL</label>
+                                <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://feeds.simplecast.com/xxxxxx">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Spotify Podcast URL</label>
+                                <input type="text" id="podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Apple Podcasts URL</label>
+                                <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>Globale kategorier (hurtigvalg)</label>
+                                <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
+                                <input type="hidden" id="podcast-global-categories-sync">
+                                <p style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">Separer med komma. Disse vises som hurtigvalg når du redigerer enkeltepisoder.</p>
+                            </div>
+                            <div style="margin-top: 24px;">
+                                <button class="btn-primary" id="save-podcast-settings" style="width: 100%;">Lagre podcast-innstillinger</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card modern">
+                    <div class="card-header flex-between">
+                        <h3 class="card-title">Kategorier og tekst</h3>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <button class="btn-secondary btn-sm" id="open-podcast-transcripts-full">Alle episoder</button>
+                            <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px; font-weight: 600;">Siste episoder (overstyring/transkripsjon):</p>
+                        <div id="podcast-overrides-list" style="max-height: 420px; overflow-y: auto;">
+                            <div class="loader">Henter episoder...</div>
+                        </div>
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                            <button class="btn-primary" id="save-podcast-overrides" style="width: 100%;">Lagre overstyringer</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="podcast-management-grid" style="display: grid; grid-template-columns: 1fr; gap: 24px;">
                 <!-- Main Episode List -->
                 <div class="card kinetic-card" style="padding: 0; overflow: hidden; border-radius: 20px; background: white; border: 1px solid #f1f5f9; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
@@ -2785,6 +2843,21 @@ class AdminManager {
         `;
 
         this.loadPodcastEpisodes();
+        this.loadMediaSettings();
+        this.loadPodcastOverrides();
+
+        section.addEventListener('click', (event) => {
+            if (event.target.id === 'save-podcast-settings') this.saveMediaSettings('save-podcast-settings');
+            if (event.target.id === 'save-podcast-overrides') this.savePodcastOverrides();
+            if (event.target.id === 'refresh-podcast-list') this.loadPodcastOverrides();
+            if (event.target.id === 'open-podcast-transcripts-full') this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon', 'podcast');
+
+            const editBtn = event.target.closest('button[data-open-podcast-id]');
+            if (editBtn) {
+                event.preventDefault();
+                this.openPodcastTranscriptEditorById(editBtn.getAttribute('data-open-podcast-id') || '');
+            }
+        });
     }
 
     async loadPodcastEpisodes() {
@@ -2814,7 +2887,7 @@ class AdminManager {
                 const hasTranscript = !!(transcriptData.text || transcriptData.content);
                 const hasSummary = !!transcriptData.summary;
                 const title = ep.title || 'Uten tittel';
-                const dateStr = ep.date || '';
+                const dateStr = this._formatPodcastDateForDisplay(ep.date);
                 const imageUrl = ep.imageUrl || '';
 
                 return `
@@ -2838,12 +2911,12 @@ class AdminManager {
                         </td>
                         <td>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <span style="font-size: 12px; padding: 0 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; min-height: 32px; max-height: 32px; box-sizing: border-box; line-height: 1; white-space: nowrap; background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border: 1px solid ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
-                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1; vertical-align: middle;">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
+                                <span class="podcast-status-badge" style="background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border-color: ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined podcast-status-icon">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
                                     TEKST
                                 </span>
-                                <span style="font-size: 12px; padding: 0 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; min-height: 32px; max-height: 32px; box-sizing: border-box; line-height: 1; white-space: nowrap; background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border: 1px solid ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
-                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1; vertical-align: middle;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
+                                <span class="podcast-status-badge" style="background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border-color: ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined podcast-status-icon">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
                                     AI
                                 </span>
                             </div>
@@ -4488,6 +4561,25 @@ class AdminManager {
         return parsed.toISOString().split('T')[0];
     }
 
+    _formatPodcastDateForDisplay(value) {
+        const raw = typeof value === 'string' ? value.trim() : '';
+        if (!raw) return '';
+
+        const parsed = /^\d{4}-\d{2}-\d{2}$/.test(raw)
+            ? new Date(`${raw}T12:00:00`)
+            : new Date(raw);
+
+        if (Number.isNaN(parsed.getTime())) {
+            return raw;
+        }
+
+        return parsed.toLocaleDateString('nb-NO', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    }
+
     async fetchPodcastEpisodesForAdmin() {
         try {
             const response = await fetch('https://getpodcast-42bhgdjkcq-uc.a.run.app');
@@ -5049,6 +5141,193 @@ class AdminManager {
             console.error('Error fetching Analytics data:', error);
             return null;
         }
+    }
+
+    async renderMediaLibrarySection() {
+        const section = document.getElementById('media-section');
+        if (!section) return;
+
+        section.innerHTML = `
+            <div class="section-header" style="margin-bottom: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%; gap: 16px; flex-wrap: wrap;">
+                    <div>
+                        <h2 class="section-title">Mediebibliotek</h2>
+                        <p class="section-subtitle">Administrer, sorter og last opp filer til nettstedet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
+                <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(27, 73, 101, 0.1); color: #1B4965; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">image</span>
+                    </div>
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">Totalt antall filer</p>
+                        <h4 id="media-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">0</h4>
+                    </div>
+                </div>
+                <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">folder</span>
+                    </div>
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">Mapper</p>
+                        <h4 id="media-folder-count" style="font-size: 18px; font-weight: 700; margin: 0; color: #1e293b;">-</h4>
+                    </div>
+                </div>
+            </div>
+
+            <div class="media-controls-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; gap: 16px; flex-wrap: wrap;">
+                <div class="media-breadcrumbs" id="media-breadcrumbs" style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #64748b;">
+                </div>
+
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;">
+                        Område:
+                        <select id="media-location-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px;">
+                            ${this._getMediaLocationOptionsHtml()}
+                        </select>
+                    </label>
+                    <button id="btn-new-folder" class="btn-secondary" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
+                        Ny mappe
+                    </button>
+                    <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 13px; color: #64748b;">Sorter:</span>
+                        <select id="media-sort-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none;">
+                            <option value="date-desc">Nyeste først</option>
+                            <option value="date-asc">Eldste først</option>
+                            <option value="name-asc">Navn (A-Å)</option>
+                            <option value="name-desc">Navn (Å-A)</option>
+                            <option value="size-desc">Størst først</option>
+                            <option value="size-asc">Minst først</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
+                <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
+                <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">Mediebibliotek</strong></p>
+                <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
+            </div>
+
+            <div id="media-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px;">
+                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
+                    <div class="loader" style="margin: 0 auto;"></div>
+                    <p style="margin-top: 16px; color: #64748b;">Henter mediebibliotek...</p>
+                </div>
+            </div>
+        `;
+
+        section.setAttribute('data-rendered', 'true');
+        this.loadMediaLibrary();
+        this._setupMediaLibraryListeners();
+    }
+
+    renderIntegrationsSection() {
+        const section = document.getElementById('integrations-section');
+        if (!section) return;
+
+        section.innerHTML = `
+            ${this.renderSectionHeader('hub', 'Integrasjoner', 'Administrer YouTube, Google Calendar, AI og oversettelse.', '')}
+
+            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+                <div class="card modern">
+                    <div class="card-header flex-between">
+                        <h3 class="card-title">YouTube</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-section">
+                            <div class="form-group">
+                                <label>YouTube Channel ID</label>
+                                <input type="text" id="yt-channel-id" class="form-control" placeholder="f.eks. UCxxxxxxxxxxxx">
+                            </div>
+                            <div class="form-group" style="margin-top: 15px;">
+                                <label>YouTube Kategorier (Playlister)</label>
+                                <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)"></textarea>
+                            </div>
+                            <div style="margin-top: 24px;">
+                                <button class="btn-primary" id="save-youtube-settings" style="width: 100%;">Lagre YouTube-innstillinger</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card modern">
+                    <div class="card-header flex-between">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0ea5e9; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
+                            </div>
+                            <h3 class="card-title">Google Calendar API</h3>
+                        </div>
+                        <div class="status-badge" id="gcal-status" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #fee2e2; color: #991b1b; font-weight: 600;">Frakoblet</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Google API Key</label>
+                            <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
+                        </div>
+                        <div class="form-group" style="margin-top: 15px;">
+                            <label>Calendar ID</label>
+                            <div id="gcal-list" class="gcal-list" style="margin-bottom: 8px;"></div>
+                            <button type="button" class="btn btn-outline" id="add-gcal" style="width: 100%;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">add</span>
+                                Legg til kalender
+                            </button>
+                        </div>
+                        <div id="google-auth-status" style="margin-top: 20px;"></div>
+                    </div>
+                </div>
+
+                <div class="card modern">
+                    <div class="card-header flex-between">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
+                            </div>
+                            <h3 class="card-title">AI & Oversettelse</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Leverandør</label>
+                            <select id="translation-provider" class="form-control">
+                                <option value="mymemory">MyMemory (gratis)</option>
+                                <option value="gemini">Gemini (Google AI)</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin-bottom: 15px;">
+                            <label>Gemini API Key</label>
+                            <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
+                        </div>
+                        <div class="form-group">
+                            <label>Modell</label>
+                            <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <button class="btn-primary" id="save-ai-settings" style="width: 100%;">Lagre integrasjoner</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        section.setAttribute('data-rendered', 'true');
+        this.loadMediaSettings();
+        this._loadIntegrationsSettings();
+
+        section.addEventListener('click', (event) => {
+            if (event.target.id === 'save-youtube-settings') this.saveMediaSettings('save-youtube-settings');
+            if (event.target.id === 'save-ai-settings') this.saveIntegrationsSettings();
+            if (event.target.id === 'add-gcal') this.addGCalInput();
+            if (event.target.id === 'connect-google-btn') this.handleGoogleAuth();
+            if (event.target.id === 'disconnect-google') this.handleGoogleDisconnect();
+        });
     }
 
     async renderMediaManager() {
@@ -6159,6 +6438,7 @@ class AdminManager {
 
     async saveIntegrationsSettings() {
         const btn = document.getElementById('save-ai-settings');
+        const originalText = btn?.textContent || 'Lagre integrasjoner';
         if (btn) {
             btn.textContent = 'Lagrer...';
             btn.disabled = true;
@@ -6206,7 +6486,7 @@ class AdminManager {
             this.showToast('Kunne ikke lagre innstillinger.', 'error');
         } finally {
             if (btn) {
-                btn.textContent = 'Lagre AI-innstillinger';
+                btn.textContent = originalText;
                 btn.disabled = false;
             }
         }
@@ -6281,14 +6561,21 @@ class AdminManager {
         try {
             const settings = await firebaseService.getPageContent('settings_media');
             if (settings) {
-                if (settings.youtubeChannelId) document.getElementById('yt-channel-id').value = settings.youtubeChannelId;
-                if (settings.youtubePlaylists) document.getElementById('yt-playlists').value = settings.youtubePlaylists;
-                if (settings.podcastRssUrl) document.getElementById('podcast-rss-url').value = settings.podcastRssUrl;
-                if (settings.spotifyUrl) document.getElementById('podcast-spotify-url').value = settings.spotifyUrl;
-                if (settings.appleUrl) document.getElementById('podcast-apple-url').value = settings.appleUrl;
+                const ytChannel = document.getElementById('yt-channel-id');
+                const ytPlaylists = document.getElementById('yt-playlists');
+                const podcastRss = document.getElementById('podcast-rss-url');
+                const spotify = document.getElementById('podcast-spotify-url');
+                const apple = document.getElementById('podcast-apple-url');
+                const podcastCategories = document.getElementById('podcast-custom-categories');
+
+                if (settings.youtubeChannelId && ytChannel) ytChannel.value = settings.youtubeChannelId;
+                if (settings.youtubePlaylists && ytPlaylists) ytPlaylists.value = settings.youtubePlaylists;
+                if (settings.podcastRssUrl && podcastRss) podcastRss.value = settings.podcastRssUrl;
+                if (settings.spotifyUrl && spotify) spotify.value = settings.spotifyUrl;
+                if (settings.appleUrl && apple) apple.value = settings.appleUrl;
                 if (settings.podcastCustomCategories) {
                     const val = settings.podcastCustomCategories;
-                    document.getElementById('podcast-custom-categories').value = val;
+                    if (podcastCategories) podcastCategories.value = val;
                     const syncInput = document.getElementById('podcast-global-categories-sync');
                     if (syncInput) syncInput.value = val;
                 }
@@ -6298,36 +6585,46 @@ class AdminManager {
         }
     }
 
-    async saveMediaSettings() {
-        const btn = document.getElementById('save-media-settings');
-        const ytChannelId = document.getElementById('yt-channel-id').value.trim();
-        const youtubePlaylists = document.getElementById('yt-playlists').value.trim();
-        const podcastRssUrl = document.getElementById('podcast-rss-url').value.trim();
-        const spotifyUrl = document.getElementById('podcast-spotify-url').value.trim();
-        const appleUrl = document.getElementById('podcast-apple-url').value.trim();
-        const podcastCustomCategories = document.getElementById('podcast-custom-categories').value.trim();
+    async saveMediaSettings(buttonId = 'save-media-settings') {
+        const btn = document.getElementById(buttonId) || document.getElementById('save-media-settings');
+        const ytChannelInput = document.getElementById('yt-channel-id');
+        const ytPlaylistsInput = document.getElementById('yt-playlists');
+        const podcastRssInput = document.getElementById('podcast-rss-url');
+        const spotifyInput = document.getElementById('podcast-spotify-url');
+        const appleInput = document.getElementById('podcast-apple-url');
+        const podcastCategoriesInput = document.getElementById('podcast-custom-categories');
 
-        btn.textContent = 'Lagrer...';
-        btn.disabled = true;
+        const originalText = btn?.textContent || 'Lagre';
+        if (btn) {
+            btn.textContent = 'Lagrer...';
+            btn.disabled = true;
+        }
 
         try {
-            await firebaseService.savePageContent('settings_media', {
-                youtubeChannelId: ytChannelId,
-                youtubePlaylists: youtubePlaylists,
-                podcastRssUrl: podcastRssUrl,
-                spotifyUrl: spotifyUrl,
-                appleUrl: appleUrl,
-                podcastCustomCategories: podcastCustomCategories,
+            const currentSettings = await firebaseService.getPageContent('settings_media') || {};
+            const nextSettings = {
+                ...currentSettings,
                 updatedAt: new Date().toISOString()
-            });
-            this.showToast('✅ Media-innstillinger er lagret!', 'success', 5000);
-            this.loadPodcastOverrides();
+            };
+
+            if (ytChannelInput) nextSettings.youtubeChannelId = ytChannelInput.value.trim();
+            if (ytPlaylistsInput) nextSettings.youtubePlaylists = ytPlaylistsInput.value.trim();
+            if (podcastRssInput) nextSettings.podcastRssUrl = podcastRssInput.value.trim();
+            if (spotifyInput) nextSettings.spotifyUrl = spotifyInput.value.trim();
+            if (appleInput) nextSettings.appleUrl = appleInput.value.trim();
+            if (podcastCategoriesInput) nextSettings.podcastCustomCategories = podcastCategoriesInput.value.trim();
+
+            await firebaseService.savePageContent('settings_media', nextSettings);
+            this.showToast('✅ Innstillingene er lagret!', 'success', 5000);
+            if (document.getElementById('podcast-overrides-list')) this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save media settings error:", err);
             this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
         } finally {
-            btn.textContent = 'Lagre media-innstillinger';
-            btn.disabled = false;
+            if (btn) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
         }
     }
 
