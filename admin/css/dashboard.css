@@ -3578,33 +3578,35 @@ div[id^="editorjs-holder-"] {
     position: absolute;
     top: 12px;
     right: 12px;
-    width: 32px;
-    height: 32px;
-    background: rgba(239, 68, 68, 0.95);
+    width: 36px;
+    height: 36px;
+    background: rgba(239, 68, 68, 0.85);
     color: white;
-    border-radius: 8px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    opacity: 0;
-    transition: all 0.2s ease;
+    opacity: 0.4; /* Slightly visible by default to show it's there */
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     z-index: 10;
     border: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .image-tool__image:hover .btn-remove-block-image {
     opacity: 1;
+    transform: scale(1.05);
 }
 
 .btn-remove-block-image:hover {
     background: #ef4444;
-    transform: scale(1.1);
+    transform: scale(1.15) !important;
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
 }
 
 .btn-remove-block-image span {
-    font-size: 18px;
+    font-size: 20px;
 }
 
 

@@ -4260,18 +4260,35 @@ class AdminManager {
         const container = document.getElementById(containerId);
         if (!container) return;
 
-        // Inject delete button on hover if not present
-        container.addEventListener('mouseover', (e) => {
-            const imageWrapper = e.target.closest('.image-tool__image');
-            if (!imageWrapper || imageWrapper.querySelector('.btn-remove-block-image')) return;
-            
+        const injectDeleteButton = (wrapper) => {
+            if (!wrapper || wrapper.querySelector('.btn-remove-block-image')) return;
             const btn = document.createElement('button');
             btn.className = 'btn-remove-block-image';
             btn.type = 'button';
             btn.innerHTML = '<span class="material-symbols-outlined">delete</span>';
             btn.title = 'Fjern bilde';
-            imageWrapper.appendChild(btn);
+            wrapper.appendChild(btn);
+        };
+
+        // Scan existing images
+        container.querySelectorAll('.image-tool__image').forEach(injectDeleteButton);
+
+        // Observe for new images
+        const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) {
+                        if (node.classList.contains('image-tool__image')) {
+                            injectDeleteButton(node);
+                        } else {
+                            node.querySelectorAll('.image-tool__image').forEach(injectDeleteButton);
+                        }
+                    }
+                });
+            });
         });
+
+        observer.observe(container, { childList: true, subtree: true });
 
         // Delegate click handler on the editor container
         container.addEventListener('click', async (e) => {
