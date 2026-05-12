@@ -5244,6 +5244,230 @@ class AdminManager {
         }
     }
 
+    /**
+     * Opens a modal to select an image from the media library
+     */
+    async openMediaLibraryModal(callback) {
+        const modal = document.createElement('div');
+        modal.className = 'admin-modal';
+        modal.style.zIndex = '10000';
+        modal.innerHTML = `
+            <div class="admin-modal-content" style="max-width: 1000px; height: 85vh; display: flex; flex-direction: column;">
+                <div class="admin-modal-header" style="flex-shrink: 0;">
+                    <div class="header-left">
+                        <span class="material-symbols-outlined">photo_library</span>
+                        <h2>Velg fra mediebibliotek</h2>
+                    </div>
+                    <button class="close-modal-btn">&times;</button>
+                </div>
+                <div class="admin-modal-body" style="flex: 1; overflow: hidden; display: flex; flex-direction: column; padding: 0;">
+                    <div id="modal-media-controls" style="padding: 16px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; flex-wrap: wrap; gap: 12px;">
+                        <div id="modal-media-breadcrumbs" style="display: flex; gap: 8px; align-items: center; font-size: 14px; color: #64748b; flex: 1; min-width: 200px;">
+                            <!-- Breadcrumbs will be rendered here -->
+                        </div>
+                        <div class="media-actions" style="display: flex; gap: 8px; align-items: center;">
+                            <select id="modal-media-sort" class="admin-input" style="width: auto; padding: 4px 8px; font-size: 13px; height: 36px;">
+                                <option value="date_desc">Nyeste først</option>
+                                <option value="date_asc">Eldste først</option>
+                                <option value="name_asc">Navn A-Å</option>
+                                <option value="size_desc">Størst først</option>
+                            </select>
+                            <button id="modal-new-folder" class="btn-ghost" style="height: 36px; padding: 0 12px; font-size: 13px; border: 1px solid #e2e8f0;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
+                            </button>
+                            <button id="modal-upload-btn" class="btn-primary" style="height: 36px; padding: 0 12px; font-size: 13px;">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">upload</span> Last opp
+                            </button>
+                            <input type="file" id="modal-file-input" style="display:none;" accept="image/*" multiple>
+                        </div>
+                    </div>
+                    <div id="modal-media-grid" class="media-grid" style="flex: 1; overflow-y: auto; padding: 20px;">
+                        <div class="admin-loading">
+                            <div class="spinner"></div>
+                            <p>Henter filer...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('is-active'));
+
+        const closeBtn = modal.querySelector('.close-modal-btn');
+        const grid = modal.querySelector('#modal-media-grid');
+        const breadcrumbsContainer = modal.querySelector('#modal-media-breadcrumbs');
+        const sortSelect = modal.querySelector('#modal-media-sort');
+        const newFolderBtn = modal.querySelector('#modal-new-folder');
+        const uploadBtn = modal.querySelector('#modal-upload-btn');
+        const fileInput = modal.querySelector('#modal-file-input');
+        
+        let currentPath = this.currentMediaPath || 'editor/blog';
+        let currentSort = 'date_desc';
+
+        const closeModal = () => {
+            modal.classList.remove('is-active');
+            setTimeout(() => modal.remove(), 300);
+        };
+
+        closeBtn.onclick = closeModal;
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+        const loadModalMedia = async () => {
+            grid.innerHTML = '<div class="admin-loading"><div class="spinner"></div><p>Henter filer...</p></div>';
+            
+            // Render Breadcrumbs
+            breadcrumbsContainer.innerHTML = '';
+            const parts = currentPath.split('/').filter(Boolean);
+            let pathAcc = '';
+            
+            const rootItem = document.createElement('span');
+            rootItem.className = 'breadcrumb-item';
+            rootItem.style.cursor = 'pointer';
+            rootItem.style.color = '#1B4965';
+            rootItem.innerHTML = 'Hjem';
+            rootItem.onclick = () => { currentPath = 'editor/'; loadModalMedia(); };
+            breadcrumbsContainer.appendChild(rootItem);
+
+            parts.forEach((part, i) => {
+                if (part === 'editor') return; // Hide "editor" internal folder from display if desired, or keep it
+                
+                breadcrumbsContainer.appendChild(document.createTextNode(' / '));
+                pathAcc += part + '/';
+                const item = document.createElement('span');
+                item.className = 'breadcrumb-item';
+                item.style.cursor = 'pointer';
+                item.style.fontWeight = (i === parts.length - 1) ? '600' : 'normal';
+                item.style.color = (i === parts.length - 1) ? '#64748b' : '#1B4965';
+                item.innerText = part;
+                const currentAcc = (parts[0] === 'editor' ? '' : 'editor/') + pathAcc;
+                item.onclick = () => { currentPath = currentAcc; loadModalMedia(); };
+                breadcrumbsContainer.appendChild(item);
+            });
+
+            try {
+                const result = await firebaseService.listMediaFiles(currentPath);
+                let files = result.files;
+                const folders = result.folders;
+
+                // Sort files
+                files.sort((a, b) => {
+                    if (currentSort === 'date_desc') return b.timeCreated - a.timeCreated;
+                    if (currentSort === 'date_asc') return a.timeCreated - b.timeCreated;
+                    if (currentSort === 'name_asc') return a.name.localeCompare(b.name);
+                    if (currentSort === 'size_desc') return b.size - a.size;
+                    return 0;
+                });
+
+                grid.innerHTML = '';
+
+                if (folders.length === 0 && files.length === 0) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">Mappen er tom.</div>';
+                    return;
+                }
+
+                // Render Folders
+                folders.forEach(folder => {
+                    const item = document.createElement('div');
+                    item.className = 'media-item folder-item';
+                    item.style.cursor = 'pointer';
+                    item.innerHTML = `
+                        <div class="media-preview folder-preview" style="background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; height: 120px;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8;">folder</span>
+                        </div>
+                        <div class="media-info" style="padding: 8px; text-align: center;">
+                            <div class="media-name" style="font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${folder.name}</div>
+                        </div>
+                    `;
+                    item.onclick = () => {
+                        currentPath = folder.fullPath + (folder.fullPath.endsWith('/') ? '' : '/');
+                        loadModalMedia();
+                    };
+                    grid.appendChild(item);
+                });
+
+                // Render Files
+                files.forEach(file => {
+                    if (file.name === '.keep') return;
+
+                    const item = document.createElement('div');
+                    item.className = 'media-item';
+                    item.style.cursor = 'pointer';
+                    item.innerHTML = `
+                        <div class="media-preview" style="height: 120px; border-radius: 8px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0;">
+                            <img src="${file.url}" alt="${file.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <div class="media-info" style="padding: 8px;">
+                            <div class="media-name" style="font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</div>
+                            <div class="media-meta" style="font-size: 11px; color: #94a3b8;">${(file.size / 1024).toFixed(0)} KB</div>
+                        </div>
+                    `;
+                    item.onclick = () => {
+                        callback(file);
+                        closeModal();
+                    };
+                    grid.appendChild(item);
+                });
+
+            } catch (err) {
+                console.error('Modal media load error:', err);
+                grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">Kunne ikke hente media.</div>';
+            }
+        };
+
+        newFolderBtn.onclick = async () => {
+            const folderName = prompt('Navn på ny mappe:');
+            if (folderName && folderName.trim()) {
+                const path = `${currentPath}${folderName.trim()}/.keep`;
+                try {
+                    const dummyFile = new Blob([''], { type: 'text/plain' });
+                    await firebaseService.uploadFile(dummyFile, path);
+                    showToast('Mappe opprettet', 'success');
+                    loadModalMedia();
+                } catch (err) {
+                    showToast('Kunne ikke opprette mappe', 'error');
+                }
+            }
+        };
+
+        uploadBtn.onclick = () => fileInput.click();
+
+        fileInput.onchange = async (e) => {
+            const files = Array.from(e.target.files);
+            if (files.length === 0) return;
+
+            try {
+                grid.innerHTML = '<div class="admin-loading"><div class="spinner"></div><p>Laster opp bilder...</p></div>';
+                for (const file of files) {
+                    let fileToUpload = file;
+                    if (file.type.startsWith('image/') && typeof imageCompression !== 'undefined') {
+                        try {
+                            const options = { maxSizeMB: 1, maxWidthOrHeight: 1920, useWebWorker: true };
+                            fileToUpload = await imageCompression(file, options);
+                        } catch (compErr) {
+                            console.error('Compression failed:', compErr);
+                        }
+                    }
+                    const path = `${currentPath}${file.name}`;
+                    await firebaseService.uploadFile(fileToUpload, path);
+                }
+                showToast('Opplasting ferdig!', 'success');
+                loadModalMedia();
+            } catch (err) {
+                console.error('Upload error:', err);
+                showToast('Opplasting feilet', 'error');
+                loadModalMedia();
+            }
+        };
+
+        sortSelect.onchange = (e) => {
+            currentSort = e.target.value;
+            loadModalMedia();
+        };
+
+        loadModalMedia();
+    }
+
     async _loadIntegrationsSettings() {
         try {
             const settings = await firebaseService.getPageContent('settings_integrations') || {};
@@ -6202,6 +6426,7 @@ class AdminManager {
             const collectionItems = this._collectionItemsCache[collectionId] || this.currentItems || [];
             const item = collectionItems[index] ? { ...collectionItems[index] } : {};
             this._persistOpenEditorState(collectionId, item);
+            this.currentMediaPath = `editor/${collectionId}`;
 
             let safeDate = new Date().toISOString().split('T')[0];
             if (item.date && typeof item.date === 'string') {
@@ -6393,8 +6618,11 @@ class AdminManager {
                                 </div>
                                 <div class="docs-toolbar-divider"></div>
                                 <div class="docs-toolbar-group">
-                                    <button type="button" class="desktop-richtools-btn" data-tool="image" title="Bilde">
-                                        <span class="material-symbols-outlined">image</span>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="image" title="Bilde (Last opp)">
+                                        <span class="material-symbols-outlined">upload</span>
+                                    </button>
+                                    <button type="button" class="desktop-richtools-btn" data-tool="media-library" title="Bilde fra bibliotek">
+                                        <span class="material-symbols-outlined">photo_library</span>
                                     </button>
                                     <button type="button" class="desktop-richtools-btn" data-tool="video" title="Video">
                                         <span class="material-symbols-outlined">smart_display</span>
@@ -6804,6 +7032,59 @@ class AdminManager {
                 }
             }
 
+            class MediaLibraryTool {
+                static get toolbox() {
+                    return {
+                        title: 'Bibliotek',
+                        icon: '<span class="material-symbols-outlined">photo_library</span>'
+                    };
+                }
+
+                constructor({ api }) {
+                    this.api = api;
+                }
+
+                render() {
+                    const btn = document.createElement('div');
+                    btn.style.cssText = 'padding: 24px; border: 2px dashed #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; color: #1B4965; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s ease;';
+                    btn.innerHTML = `
+                        <span class="material-symbols-outlined" style="font-size: 32px;">photo_library</span>
+                        <span>Klikk for å hente bilde fra mediebibliotek</span>
+                    `;
+                    
+                    btn.onmouseover = () => {
+                        btn.style.background = '#eff6ff';
+                        btn.style.borderColor = '#1B4965';
+                    };
+                    btn.onmouseout = () => {
+                        btn.style.background = 'transparent';
+                        btn.style.borderColor = '#e2e8f0';
+                    };
+
+                    btn.onclick = () => {
+                        window.adminManager.openMediaLibraryModal((selection) => {
+                            if (selection && selection.url) {
+                                const index = this.api.blocks.getCurrentBlockIndex();
+                                this.api.blocks.insert('image', {
+                                    file: { url: selection.url },
+                                    caption: selection.name || '',
+                                    withBorder: false,
+                                    withBackground: false,
+                                    stretched: false
+                                });
+                                this.api.blocks.delete(index);
+                            }
+                        });
+                    };
+
+                    return btn;
+                }
+
+                save() {
+                    return {};
+                }
+            }
+
             class SimpleListTool {
                 static get toolbox() {
                     return {
@@ -6868,6 +7149,12 @@ class AdminManager {
                     shortcut: 'CMD+SHIFT+L',
                     config: { defaultStyle: 'unordered' }
                 };
+            }
+
+            // Media Library Tool
+            toolsConfig.mediaLibrary = {
+                class: MediaLibraryTool
+            };
             } else {
                 toolsConfig.list = {
                     class: SimpleListTool,
@@ -7692,57 +7979,32 @@ class AdminManager {
                         const input = desktopTools.querySelector('[data-color-input="highlight"]');
                         if (input) input.click();
                     },
-                    image: async () => {
-                        const useUnsplash = await this.showConfirm(
-                            'Bildevalg',
-                            'Vil du søke i bildebiblioteket (Unsplash) eller laste opp fra din enhet?',
-                            'Søk Unsplash',
-                            'Last opp bilde'
-                        );
-
-                        if (useUnsplash) {
-                            // Unsplash flow
-                            if (window.unsplashManager) {
-                                window.unsplashManager.open((selection) => {
-                                    if (selection && selection.url) {
-                                        const imgHtml = `<img src="${selection.url}" alt="${selection.caption || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
-                                        exec('insertHTML', imgHtml);
-                                    }
-                                });
-                            } else {
-                                const query = prompt('Hva vil du søke etter på Unsplash?');
-                                if (!query) return;
-                                try {
-                                    const photo = await this.searchUnsplash(query);
-                                    if (photo) {
-                                        const imgHtml = `<img src="${photo.urls.regular}" alt="${photo.alt_description || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
-                                        exec('insertHTML', imgHtml);
-                                    }
-                                } catch (err) {
-                                    this.showToast('Unsplash-søk feilet.', 'error');
-                                }
+                    image: () => {
+                        const fileInput = document.createElement('input');
+                        fileInput.type = 'file';
+                        fileInput.accept = 'image/*';
+                        fileInput.onchange = async (e) => {
+                            const file = e.target.files[0];
+                            if (!file) return;
+                            try {
+                                this.showToast('Laster opp bilde...', 'info');
+                                const url = await this.handleImageUpload(file, this.currentMediaPath || 'editor/blog');
+                                const imgHtml = `<img src="${url}" alt="" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
+                                exec('insertHTML', imgHtml);
+                                this.showToast('Bilde lastet opp!', 'success');
+                            } catch (err) {
+                                this.showToast('Opplasting feilet.', 'error');
                             }
-                        } else {
-                            // Upload flow
-                            const fileInput = document.createElement('input');
-                            fileInput.type = 'file';
-                            fileInput.accept = 'image/*';
-                            fileInput.onchange = async (e) => {
-                                const file = e.target.files[0];
-                                if (!file) return;
-                                try {
-                                    this.showToast('Laster opp bilde...', 'info');
-                                    const url = await this.handleImageUpload(file, 'editor/blog');
-                                    const imgHtml = `<img src="${url}" alt="" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
-                                    exec('insertHTML', imgHtml);
-                                    this.showToast('Bilde lastet opp!', 'success');
-                                } catch (err) {
-                                    console.error('Upload failed:', err);
-                                    this.showToast('Opplasting feilet: ' + err.message, 'error');
-                                }
-                            };
-                            fileInput.click();
-                        }
+                        };
+                        fileInput.click();
+                    },
+                    'media-library': () => {
+                        this.openMediaLibraryModal((selection) => {
+                            if (selection && selection.url) {
+                                const imgHtml = `<img src="${selection.url}" alt="${selection.name || ''}" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;">`;
+                                exec('insertHTML', imgHtml);
+                            }
+                        });
                     },
                     quote: () => exec('formatBlock', 'blockquote')
                 } : {
