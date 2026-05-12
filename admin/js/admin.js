@@ -2200,6 +2200,7 @@ class AdminManager {
             'events': 'editor/events/',
             'teaching': 'editor/teaching/',
             'media': 'editor/',
+            'podcast': 'editor/podcast/',
             'hero': 'hero/',
             'courses': 'editor/courses/',
             'automation': 'editor/automation/',
@@ -2234,6 +2235,8 @@ class AdminManager {
                 this.loadUsersList();
             } else if (sectionId === 'media') {
                 this.loadMediaLibrary();
+            } else if (sectionId === 'podcast') {
+                this.loadPodcastEpisodes();
             }
         }
 
@@ -2290,6 +2293,9 @@ class AdminManager {
                     break;
                 case 'comments':
                     this.renderCommentsSection();
+                    break;
+                case 'podcast':
+                    this.renderPodcastSection();
                     break;
                 case 'kommunikasjon':
                     this.renderKommunikasjonSection();
@@ -2729,6 +2735,321 @@ class AdminManager {
         `;
 
         this.loadComments();
+    }
+
+    async renderPodcastSection() {
+        const section = document.getElementById('podcast-section');
+        if (!section) return;
+
+        section.setAttribute('data-rendered', 'true');
+
+        section.innerHTML = `
+            ${this.renderSectionHeader('mic_external_on', 'Podcast Administrasjon', 'Administrer episoder, AI-transkripsjoner og overstyringer.', `
+                <div style="display:flex; gap:12px;">
+                    <button class="btn btn-secondary" onclick="window.adminManager.loadPodcastEpisodes()">
+                        <span class="material-symbols-outlined">refresh</span>
+                        Synkroniser
+                    </button>
+                    <button class="btn btn-primary" id="save-podcast-overrides-btn" style="display:none;">
+                        Lagre endringer
+                    </button>
+                </div>
+            `, '')}
+
+            <div class="podcast-management-grid" style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+                <!-- Main Episode List -->
+                <div class="card kinetic-card" style="padding: 0; overflow: hidden; border-radius: 20px; background: white; border: 1px solid #f1f5f9; box-shadow: 0 4px 20px rgba(0,0,0,0.04);">
+                    <div class="table-container full-bleed">
+                        <table class="crm-table podcast-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px; padding-left: 24px;">Bilde</th>
+                                    <th>Episode</th>
+                                    <th>Dato</th>
+                                    <th>AI-Status</th>
+                                    <th class="col-actions" style="text-align:right; padding-right:24px;">Handlinger</th>
+                                </tr>
+                            </thead>
+                            <tbody id="podcast-episodes-list">
+                                <tr>
+                                    <td colspan="5" style="text-align:center; padding: 60px 0;">
+                                        <div class="loader" style="margin:0 auto;"></div>
+                                        <p style="margin-top: 16px; color: #64748b; font-weight: 500;">Henter episoder fra RSS-feed...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        this.loadPodcastEpisodes();
+    }
+
+    async loadPodcastEpisodes() {
+        const listBody = document.getElementById('podcast-episodes-list');
+        if (!listBody) return;
+
+        try {
+            // 1. Fetch episodes from feed
+            const episodes = await this.fetchPodcastEpisodesForAdmin();
+            
+            // 2. Fetch existing transcripts metadata from Firestore
+            const transcriptsSnap = await firebase.firestore().collection('podcast_transcripts').get();
+            const transcriptMap = {};
+            transcriptsSnap.forEach(doc => {
+                transcriptMap[doc.id] = doc.data();
+            });
+
+            // 3. Render list
+            if (episodes.length === 0) {
+                listBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: #64748b;">Ingen episoder funnet i feeden.</td></tr>`;
+                return;
+            }
+
+            listBody.innerHTML = episodes.map((ep, idx) => {
+                const id = ep.id;
+                const transcriptData = transcriptMap[id] || {};
+                const hasTranscript = !!(transcriptData.text || transcriptData.content);
+                const hasSummary = !!transcriptData.summary;
+                const title = ep.title || 'Uten tittel';
+                const dateStr = ep.date || '';
+                const imageUrl = ep.image || 'https://via.placeholder.com/150';
+
+                return `
+                    <tr data-episode-id="${id}" style="transition: background 0.2s;">
+                        <td style="padding-left: 24px;">
+                            <div style="width: 54px; height: 54px; border-radius: 12px; overflow: hidden; background: #f1f5f9; border: 1px solid #e2e8f0;">
+                                <img src="${imageUrl}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://via.placeholder.com/150'">
+                            </div>
+                        </td>
+                        <td style="max-width: 400px;">
+                            <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px;">${this.escapeHtml(title)}</div>
+                            <div style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">
+                                ${this.escapeHtml(ep.description || '').substring(0, 100)}...
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size: 13px; font-weight: 500; color: #64748b;">${dateStr}</div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <span class="status-badge ${hasTranscript ? 'status-active' : 'status-pending'}" style="font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border: 1px solid ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
+                                    Tekst
+                                </span>
+                                <span class="status-badge ${hasSummary ? 'status-active' : 'status-pending'}" style="font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 700; display: flex; align-items: center; gap: 4px; background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border: 1px solid ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
+                                    AI
+                                </span>
+                            </div>
+                        </td>
+                        <td style="text-align:right; padding-right:24px;">
+                            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                                <button class="btn-icon-round" onclick="window.adminManager.openPodcastTranscriptEditorById('${id}')" title="Rediger tekst og AI">
+                                    <span class="material-symbols-outlined">edit_note</span>
+                                </button>
+                                <button class="btn-icon-round" onclick="window.adminManager.openPodcastSettingsModal('${id}')" title="Kategorier og overstyringer">
+                                    <span class="material-symbols-outlined">settings_input_component</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            // Update stats
+            const totalCount = episodes.length;
+            const transcribedCount = Object.values(transcriptMap).filter(t => t.text || t.content).length;
+            
+            const totalEl = document.getElementById('podcast-total-count');
+            const transcribedEl = document.getElementById('podcast-transcribed-count');
+            if (totalEl) totalEl.textContent = totalCount;
+            if (transcribedEl) transcribedEl.textContent = transcribedCount;
+
+        } catch (error) {
+            console.error('Error loading podcast episodes:', error);
+            listBody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 40px; color: #ef4444;">Kunne ikke laste episoder: ${error.message}</td></tr>`;
+        }
+    }
+
+    async openPodcastSettingsModal(episodeId) {
+        try {
+            // 1. Fetch current overrides and media settings
+            const overridesData = await firebaseService.getPageContent('settings_podcast_overrides') || {};
+            const overrides = overridesData.overrides || {};
+            
+            const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
+            const customCatStr = mediaSettings.podcastCustomCategories || '';
+            const customCatArr = customCatStr.split(',').map(s => s.trim()).filter(Boolean);
+
+            // 2. Find episode details from cache
+            const episodes = this._collectionItemsCache['podcast_episodes_raw'] || await this.fetchPodcastEpisodesForAdmin();
+            this._collectionItemsCache['podcast_episodes_raw'] = episodes;
+            
+            const ep = episodes.find(e => e.id === episodeId);
+            if (!ep) {
+                this.showToast('Fant ikke episode-detaljer.', 'error');
+                return;
+            }
+
+            const currentCats = this.parsePodcastOverrideCategories(overrides[episodeId]);
+            const normalizedCurrentCats = currentCats.map(c => c.toLowerCase());
+
+            const podcastCategories = [
+                { value: 'tro', label: 'Tro' },
+                { value: 'bibel', label: 'Bibel' },
+                { value: 'bønn', label: 'Bønn' },
+                { value: 'undervisning', label: 'Undervisning' }
+            ];
+
+            customCatArr.forEach(cat => {
+                const val = cat.toLowerCase();
+                if (!podcastCategories.find(p => p.value === val)) {
+                    podcastCategories.push({ value: val, label: cat });
+                }
+            });
+
+            // 3. Create Modal
+            const modal = document.createElement('div');
+            modal.className = 'admin-modal active';
+            modal.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(4px);';
+            
+            modal.innerHTML = `
+                <div class="modal-content" style="background:white; border-radius:24px; width:100%; max-width:600px; box-shadow:0 20px 50px rgba(0,0,0,0.2); overflow:hidden; animation: modalSlideUp 0.3s ease;">
+                    <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 style="margin:0; font-size:18px; font-weight:800; color:#1e293b;">Episodeinnstillinger</h3>
+                            <p style="margin:4px 0 0; font-size:13px; color:#64748b; font-weight:500;">${this.escapeHtml(ep.title)}</p>
+                        </div>
+                        <button class="close-modal-btn" style="background:none; border:none; cursor:pointer; color:#94a3b8; padding:8px; border-radius:50%; transition:all 0.2s;">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" style="padding:32px; max-height:70vh; overflow-y:auto;">
+                        <div style="margin-bottom:24px;">
+                            <label style="display:block; font-size:13px; font-weight:700; color:#1e293b; margin-bottom:12px; text-transform:uppercase; letter-spacing:0.04em;">Kategorier</label>
+                            <div class="podcast-category-chip-group" style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom:16px;">
+                                ${podcastCategories.map(cat => {
+                                    const isSelected = normalizedCurrentCats.includes(cat.value.toLowerCase());
+                                    return `
+                                        <button type="button" class="podcast-modal-chip" data-value="${cat.value}" data-selected="${isSelected}"
+                                            style="padding:10px 18px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; border:1px solid ${isSelected ? '#1B4965' : '#e2e8f0'}; background:${isSelected ? '#1B4965' : 'white'}; color:${isSelected ? 'white' : '#64748b'};">
+                                            ${cat.label}
+                                        </button>
+                                    `;
+                                }).join('')}
+                            </div>
+                            
+                            <div style="display:flex; flex-direction:column; gap:8px;">
+                                <label style="font-size:12px; font-weight:600; color:#64748b;">Legg til egne kategorier (kommaseparert)</label>
+                                <input type="text" id="modal-custom-cats" class="admin-input" placeholder="f.eks. lederskap, familie" 
+                                    value="${currentCats.filter(c => !podcastCategories.find(pc => pc.value === c.toLowerCase())).join(', ')}"
+                                    style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #e2e8f0; font-size:14px;">
+                            </div>
+                        </div>
+
+                        <div style="background:#f8fafc; border-radius:16px; padding:20px; border:1px solid #e2e8f0;">
+                            <h4 style="margin:0 0 8px; font-size:14px; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined" style="font-size:18px; color:#1B4965;">info</span>
+                                Info
+                            </h4>
+                            <p style="margin:0; font-size:13px; color:#64748b; line-height:1.6;">
+                                Kategorier brukes for å filtrere episoder på nettsiden. Hvis ingen velges, vil systemet prøve å autokategorisere basert på innholdet.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
+                        <button class="btn btn-secondary cancel-btn" style="padding:12px 24px; font-weight:700;">Avbryt</button>
+                        <button class="btn btn-primary save-btn" style="padding:12px 24px; font-weight:700; background:#1B4965;">Lagre innstillinger</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+
+            // Handle chip clicks
+            const chips = modal.querySelectorAll('.podcast-modal-chip');
+            chips.forEach(chip => {
+                chip.onclick = () => {
+                    const isSelected = chip.getAttribute('data-selected') === 'true';
+                    const newVal = !isSelected;
+                    chip.setAttribute('data-selected', newVal);
+                    chip.style.background = newVal ? '#1B4965' : 'white';
+                    chip.style.color = newVal ? 'white' : '#64748b';
+                    chip.style.borderColor = newVal ? '#1B4965' : '#e2e8f0';
+                };
+            });
+
+            const close = () => {
+                modal.style.opacity = '0';
+                modal.querySelector('.modal-content').style.transform = 'translateY(20px)';
+                setTimeout(() => modal.remove(), 300);
+            };
+
+            modal.querySelector('.close-modal-btn').onclick = close;
+            modal.querySelector('.cancel-btn').onclick = close;
+            modal.onclick = (e) => { if (e.target === modal) close(); };
+
+            modal.querySelector('.save-btn').onclick = async () => {
+                const saveBtn = modal.querySelector('.save-btn');
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Lagrer...';
+
+                try {
+                    const selected = Array.from(modal.querySelectorAll('.podcast-modal-chip[data-selected="true"]'))
+                        .map(c => c.getAttribute('data-value'));
+                    
+                    const customStr = document.getElementById('modal-custom-cats').value;
+                    const customArr = this.parsePodcastOverrideCategories(customStr);
+                    
+                    const merged = Array.from(new Set([...selected, ...customArr]));
+
+                    // Save to Firebase
+                    const currentOverridesSnap = await firebaseService.getPageContent('settings_podcast_overrides') || { overrides: {} };
+                    const updatedOverrides = { ...currentOverridesSnap.overrides };
+                    
+                    if (merged.length === 0) {
+                        delete updatedOverrides[episodeId];
+                    } else if (merged.length === 1) {
+                        updatedOverrides[episodeId] = merged[0];
+                    } else {
+                        updatedOverrides[episodeId] = merged;
+                    }
+
+                    await firebaseService.savePageContent('settings_podcast_overrides', {
+                        overrides: updatedOverrides,
+                        updatedAt: new Date().toISOString()
+                    });
+
+                    // Also check if we need to add to global custom categories
+                    const newGlobalCats = new Set(customCatArr);
+                    customArr.forEach(c => newGlobalCats.add(c));
+                    
+                    if (newGlobalCats.size > customCatArr.length) {
+                        await firebaseService.savePageContent('settings_media', {
+                            ...mediaSettings,
+                            podcastCustomCategories: Array.from(newGlobalCats).join(', '),
+                            updatedAt: new Date().toISOString()
+                        });
+                    }
+
+                    this.showToast('✅ Innstillinger lagret!', 'success');
+                    close();
+                } catch (err) {
+                    console.error('Save podcast settings error:', err);
+                    this.showToast('Kunne ikke lagre innstillinger.', 'error');
+                } finally {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Lagre innstillinger';
+                }
+            };
+
+        } catch (error) {
+            console.error('Open podcast settings error:', error);
+            this.showToast('Kunne ikke åpne innstillinger.', 'error');
+        }
     }
 
     async loadComments() {
@@ -4201,6 +4522,11 @@ class AdminManager {
                     source: 'feed'
                 };
             }).filter((ep) => ep.id);
+            
+            // Cache results for settings modal
+            this._collectionItemsCache['podcast_episodes_raw'] = items;
+            
+            return items;
         } catch (error) {
             console.error('Error fetching podcast episodes for admin:', error);
             return [];
