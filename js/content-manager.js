@@ -4007,10 +4007,54 @@ class ContentManager {
         if (!html || typeof html !== 'string') return html;
         
         let cleaned = html;
-        
-        // Remove style attributes from basic text tags to allow CSS overrides
+
+        // 1. Initial cleanup: Remove Wix-specific IDs and known junk tags
+        cleaned = cleaned.replace(/\bid=["']comp-[^"']*["']/gi, '');
+        cleaned = cleaned.replace(/<(object|embed|iframe)\b[^>]*\bsrc=["'][^"']*wix\.com[^"']*["'][^>]*>.*?<\/\1>/gi, '');
+
+        // 2. DOM-based structural cleanup (Image Clusters/Galleries)
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(cleaned, 'text/html');
+            const body = doc.body;
+
+            // Remove containers that act as image clusters (Galleries)
+            // If a container has 3+ images and minimal text, it's a legacy gallery artifact
+            const containers = body.querySelectorAll('div, figure, section, span');
+            containers.forEach(el => {
+                const imgs = el.querySelectorAll('img');
+                const textContent = el.textContent.trim();
+                
+                // If it contains many images and very little actual content, it's a gallery residue
+                if (imgs.length >= 3 && textContent.length < 100) {
+                    console.log('[Cleanup] Removing legacy image gallery artifact');
+                    el.remove();
+                }
+            });
+
+            // Remove sequences of siblings that are just images (another gallery format)
+            const allImgs = Array.from(body.querySelectorAll('img'));
+            for (let i = 0; i < allImgs.length; i++) {
+                let cluster = [allImgs[i]];
+                let next = allImgs[i].nextElementSibling;
+                while (next && (next.tagName === 'IMG' || (next.tagName === 'DIV' && next.querySelectorAll('img').length === 1 && next.textContent.trim() === ''))) {
+                    cluster.push(next);
+                    next = next.nextElementSibling;
+                }
+                if (cluster.length >= 3) {
+                    console.log('[Cleanup] Removing image sequence/gallery');
+                    cluster.forEach(item => item.remove());
+                    i += cluster.length - 1;
+                }
+            }
+
+            cleaned = body.innerHTML;
+        } catch (e) {
+            console.warn('[Cleanup] DOM parsing failed:', e);
+        }
+
+        // 3. Text style cleanup (Existing logic)
         cleaned = cleaned.replace(/<(p|span|h1|h2|h3|h4|h5|h6|li)\b[^>]*\bstyle=["'][^"']*["']/gi, (match) => {
-            // Keep text-alignment if present
             const alignMatch = match.match(/text-align\s*:\s*([^;"]+)/i);
             const tagMatch = match.match(/^<[a-z0-9]+/i);
             if (alignMatch && tagMatch) {
@@ -4019,12 +4063,8 @@ class ContentManager {
             return tagMatch[0];
         });
 
-        // Remove Wix-specific classes and IDs
+        // 4. Final Wix class removal
         cleaned = cleaned.replace(/\bclass=["']([^"']*\b)?wix-[^"']*["']/gi, '');
-        cleaned = cleaned.replace(/\bid=["']comp-[^"']*["']/gi, '');
-
-        // Remove known Wix "junk" tags but keep images
-        cleaned = cleaned.replace(/<(object|embed|iframe)\b[^>]*\bsrc=["'][^"']*wix\.com[^"']*["'][^>]*>.*?<\/\1>/gi, '');
 
         return cleaned;
     }
