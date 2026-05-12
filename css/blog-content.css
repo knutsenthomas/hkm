@@ -91,10 +91,10 @@
     letter-spacing: -0.01em;
 }
 
-h1.block-header { font-size: 2.5rem; }
-h2.block-header { font-size: 2rem; }
-h3.block-header { font-size: 1.5rem; }
-h4.block-header { font-size: 1.25rem; }
+h1.block-header { font-size: 2.25rem; } /* 36px */
+h2.block-header { font-size: 1.75rem; } /* 28px */
+h3.block-header { font-size: 1.4rem; }  /* 22px */
+h4.block-header { font-size: 1.25rem; } /* 20px */
 
 .block-paragraph {
     margin-bottom: var(--rte-paragraph-spacing);
@@ -105,12 +105,12 @@ h4.block-header { font-size: 1.25rem; }
     letter-spacing: -0.011em;
 }
 
-/* First paragraph treatment */
+/* First paragraph treatment - Matching user request for consistent size */
 .block-paragraph:first-of-type {
-    font-size: 1.25rem; /* Slightly larger lead paragraph on desktop */
-    line-height: 1.5; /* Slightly tighter */
+    font-size: 1.125rem; /* Match 18px base */
+    line-height: 1.6;
     color: #1e293b;
-    font-weight: 500;
+    font-weight: 600; /* Keep it semi-bold as a lead-in */
 }
 
 .block-list {
@@ -252,15 +252,16 @@ ol.block-list { list-style-type: decimal; }
         padding: 0;
     }
     
-    h1.block-header { font-size: 2rem; }
-    h2.block-header { font-size: 1.75rem; }
+    h1.block-header { font-size: 1.85rem; }
+    h2.block-header { font-size: 1.5rem; }
     
     .block-paragraph {
-        font-size: 1rem; /* Back to 16px on mobile */
+        font-size: 1rem; /* Exactly 16px on mobile */
     }
     
     .block-paragraph:first-of-type {
-        font-size: 1.1rem; /* Slightly larger lead on mobile too */
+        font-size: 1rem; /* Exactly 16px on mobile */
+        font-weight: 600;
     }
     
     .block-list li {
