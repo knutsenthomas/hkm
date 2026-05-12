@@ -8151,7 +8151,6 @@ class AdminManager {
                             if (headingSelect) headingSelect.value = normalizedBlock;
 
                             // Sync Spacing controls
-                            const sel = window.getSelection();
                             if (sel && sel.rangeCount > 0) {
                                 const container = sel.getRangeAt(0).commonAncestorContainer;
                                 const el = container.nodeType === Node.TEXT_NODE ? container.parentElement : container;
