@@ -79,31 +79,40 @@
         h2.ce-header { font-size: 2rem !important; }
         h3.ce-header { font-size: 1.5rem !important; }
         
-        /* Force Images and Blocks in Editor to stay in frame */
+        /* NUCLEAR FIX V2: Force Images and Blocks to stay centered */
         .codex-editor *, 
+        .editor-main-canvas *,
         .ce-block, 
         .ce-block__content,
         .ce-image__img,
         .ce-block img,
-        .ce-block figure {
+        .ce-block figure,
+        .editor-main-canvas img,
+        .editor-main-canvas figure {
             max-width: 100% !important;
             box-sizing: border-box !important;
             transform: none !important;
+            left: auto !important;
+            right: auto !important;
+            position: static !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
         }
         
-        /* Centering Fix for Editor Content */
-        .ce-block__content {
+        /* Specific centering for the editor canvas */
+        .ce-block__content, .editor-main-canvas {
             max-width: 840px !important;
             margin-left: auto !important;
             margin-right: auto !important;
             float: none !important;
+            position: relative !important; /* Container needs relative for EditorJS UI */
         }
 
-        /* Image specific styling in editor */
-        .ce-block img {
+        /* Image specific resets */
+        .ce-block img, .editor-main-canvas img {
             height: auto !important;
             display: block !important;
-            margin: 1rem auto !important;
+            margin: 1.5rem auto !important;
         }
         
         .cdx-list {
