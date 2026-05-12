@@ -39,10 +39,7 @@
 
 /* Reset Wix/Legacy Divs that might shrink text */
 .blog-post-content div, 
-.blog-post-content p, 
-.blog-post-content span {
-    font-size: inherit; /* Removed !important to allow editor overrides */
-    line-height: inherit;
+.blog-post-content p {
     margin-bottom: var(--rte-paragraph-spacing);
 }
 
@@ -98,7 +95,6 @@ h4.block-header { font-size: 1.25rem; } /* 20px */
 
 .block-paragraph {
     margin-bottom: var(--rte-paragraph-spacing);
-    font-size: 1.125rem;
     font-weight: 400;
     color: var(--rte-text-color);
     word-break: break-word;
@@ -107,7 +103,6 @@ h4.block-header { font-size: 1.25rem; } /* 20px */
 
 /* First paragraph treatment - Matching user request for consistent weight */
 .block-paragraph:first-of-type {
-    font-size: 1.125rem; /* Match 18px base */
     line-height: 1.6;
     color: #1e293b;
     font-weight: 400; /* Normal weight as requested */
@@ -122,7 +117,6 @@ h4.block-header { font-size: 1.25rem; } /* 20px */
 .block-list li {
     margin-bottom: 1rem;
     padding-left: 0.5rem;
-    font-size: 1.125rem;
     line-height: var(--rte-line-height);
 }
 
@@ -257,16 +251,15 @@ ol.block-list { list-style-type: decimal; }
     h2.block-header { font-size: 1.5rem; }
     
     .block-paragraph {
-        font-size: 1rem; /* Exactly 16px on mobile */
+        /* Inherits from .blog-post-content (1rem/16px) */
     }
     
     .block-paragraph:first-of-type {
-        font-size: 1rem; /* Exactly 16px on mobile */
         font-weight: 400;
     }
     
     .block-list li {
-        font-size: 1rem;
+        /* Inherits from .blog-post-content (1rem/16px) */
     }
     
     .block-image-gallery {
