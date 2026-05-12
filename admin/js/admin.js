@@ -4696,7 +4696,13 @@ class AdminManager {
                         <!-- Dynamically filled -->
                     </div>
                     
-                    <div style="display: flex; gap: 12px; align-items: center;">
+                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;">
+                            Område:
+                            <select id="media-location-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px;">
+                                ${this._getMediaLocationOptionsHtml()}
+                            </select>
+                        </label>
                         <button id="btn-new-folder" class="btn-secondary" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
                             <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
                             Ny mappe
@@ -4945,6 +4951,61 @@ class AdminManager {
         return parts[1];
     }
 
+    _getMediaLocations() {
+        return [
+            { label: 'Mediebibliotek', path: 'editor/' },
+            { label: 'Blogg', path: 'editor/blog/' },
+            { label: 'Undervisning', path: 'editor/teaching/' },
+            { label: 'Arrangementer', path: 'editor/events/' },
+            { label: 'Podkast', path: 'editor/podcast_transcripts/' },
+            { label: 'Kurs', path: 'editor/courses/' },
+            { label: 'Forside / hero', path: 'hero/' },
+            { label: 'SEO / deling', path: 'seo/' },
+            { label: 'Nyhetsbrev', path: 'newsletter/images/' }
+        ];
+    }
+
+    _getMediaLocationOptionsHtml() {
+        const options = this._getMediaLocations()
+            .map((location) => `<option value="${this.escapeHtml(location.path)}">${this.escapeHtml(location.label)}</option>`)
+            .join('');
+        return `${options}<option value="__custom__">Ny mappe...</option>`;
+    }
+
+    _normalizeMediaPath(path = '') {
+        const normalized = String(path || 'editor/')
+            .replace(/^\/+/, '')
+            .replace(/\/{2,}/g, '/')
+            .replace(/\s+/g, '_');
+        return normalized.endsWith('/') ? normalized : `${normalized}/`;
+    }
+
+    _getMediaLocationValueForPath(path = '') {
+        const normalized = this._normalizeMediaPath(path);
+        return this._getMediaLocations().some((location) => location.path === normalized)
+            ? normalized
+            : '__custom__';
+    }
+
+    _promptForMediaPath() {
+        const raw = prompt('Navn på mappe/område:', '');
+        if (!raw || !raw.trim()) return null;
+
+        const clean = raw
+            .trim()
+            .replace(/^\/+|\/+$/g, '')
+            .replace(/^editor\/?/i, '')
+            .replace(/\s+/g, '_')
+            .replace(/[^a-zA-Z0-9_/-]/g, '');
+
+        if (!clean) {
+            alert('Ugyldig mappenavn');
+            return null;
+        }
+
+        return this._normalizeMediaPath(`editor/${clean}`);
+    }
+
     _getMediaPathDisplayName(path = '') {
         const normalized = String(path || '').replace(/^\/+/, '').replace(/\/+$/, '');
         const parts = normalized.split('/').filter(Boolean).filter((part) => part !== 'editor');
@@ -5003,9 +5064,11 @@ class AdminManager {
         const breadcrumbsEl = document.getElementById('media-breadcrumbs');
         const uploadPathEl = document.getElementById('current-upload-path');
         const sortSelect = document.getElementById('media-sort-select');
+        const locationSelect = document.getElementById('media-location-select');
 
         if (!grid) return;
         if (sortSelect) this.mediaSortOrder = sortSelect.value;
+        if (locationSelect) locationSelect.value = this._getMediaLocationValueForPath(this.currentMediaPath);
 
         // Update upload path display
         if (uploadPathEl) {
@@ -5129,6 +5192,7 @@ class AdminManager {
         const fileInput = document.getElementById('media-file-input');
         const grid = document.getElementById('media-grid');
         const sortSelect = document.getElementById('media-sort-select');
+        const locationSelect = document.getElementById('media-location-select');
         const btnNewFolder = document.getElementById('btn-new-folder');
 
         if (!dropzone || !fileInput || !grid) return;
@@ -5136,6 +5200,22 @@ class AdminManager {
         // Sorting
         if (sortSelect) {
             sortSelect.onchange = () => this.loadMediaLibrary();
+        }
+
+        if (locationSelect) {
+            locationSelect.onchange = () => {
+                const nextPath = locationSelect.value === '__custom__'
+                    ? this._promptForMediaPath()
+                    : locationSelect.value;
+
+                if (!nextPath) {
+                    locationSelect.value = this._getMediaLocationValueForPath(this.currentMediaPath);
+                    return;
+                }
+
+                this.currentMediaPath = this._normalizeMediaPath(nextPath);
+                this.loadMediaLibrary();
+            };
         }
 
         // Create Folder
