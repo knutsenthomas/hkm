@@ -814,8 +814,11 @@ class FirebaseService {
     /**
      * Storage Methods
      */
+    /**
+     * Storage Methods
+     */
     async uploadImage(file, path, onProgress = null, options = {}) {
-        return this.uploadFile(file, path, ['image/'], 10, onProgress, options);
+        return this.uploadFile(file, path, ['image/'], 20, onProgress, options); // Increased maxSizeMB since we compress
     }
 
     async uploadFile(file, path, allowedTypes = ['image/'], maxSizeMB = 10, onProgress = null, options = {}) {
@@ -826,14 +829,36 @@ class FirebaseService {
             throw new Error("Du er ikke logget inn. Logg inn på nytt før du laster opp filer.");
         }
 
+        const isImage = file.type && file.type.startsWith('image/');
+        let finalFile = file;
+
+        // --- AUTOMATIC IMAGE COMPRESSION ---
+        if (isImage && typeof imageCompression === 'function') {
+            try {
+                console.log(`[FirebaseService] Compressing image: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+                const compressionOptions = {
+                    maxSizeMB: 1.5,
+                    maxWidthOrHeight: 1920,
+                    useWebWorker: true,
+                    initialQuality: 0.85
+                };
+                finalFile = await imageCompression(file, compressionOptions);
+                console.log(`[FirebaseService] Compression complete: ${(finalFile.size / 1024 / 1024).toFixed(2)} MB`);
+            } catch (compressionError) {
+                console.error("[FirebaseService] Compression failed, uploading original:", compressionError);
+                // Fallback to original file
+                finalFile = file;
+            }
+        }
+
         const maxSizeBytes = (options.maxSizeBytes || maxSizeMB * 1024 * 1024);
         const timeoutMs = options.timeoutMs || 120000;
         
-        if (file.size > maxSizeBytes) {
+        if (finalFile.size > maxSizeBytes) {
             throw new Error(`Filen er for stor. Maks størrelse er ${maxSizeMB} MB.`);
         }
         
-        const isAllowedType = allowedTypes.some(type => file.type && file.type.startsWith(type));
+        const isAllowedType = allowedTypes.some(type => finalFile.type && finalFile.type.startsWith(type));
         if (!isAllowedType) {
             throw new Error("Ugyldig filtype.");
         }
@@ -841,7 +866,7 @@ class FirebaseService {
         try {
             await this.auth.currentUser.getIdToken(true);
             const storageRef = this.storage.ref(path);
-            const uploadTask = storageRef.put(file);
+            const uploadTask = storageRef.put(finalFile);
 
             const snapshot = await new Promise((resolve, reject) => {
                 const timeoutId = window.setTimeout(() => {
@@ -870,10 +895,69 @@ class FirebaseService {
             return await snapshot.ref.getDownloadURL();
         } catch (error) {
             console.error("[FirebaseService] Upload error:", error);
-
             throw error;
         }
     }
+
+    /**
+     * List files in a storage directory (recursive-ish)
+     */
+    async listMediaFiles(path = 'editor/') {
+        if (!this.isInitialized || !this.storage) return [];
+        
+        try {
+            const listRef = this.storage.ref(path);
+            const res = await listRef.listAll();
+            
+            let allItems = [...res.items];
+            
+            // Check subdirectories (one level deep)
+            if (res.prefixes.length > 0) {
+                const subPromises = res.prefixes.map(p => p.listAll());
+                const subResults = await Promise.all(subPromises);
+                subResults.forEach(sr => {
+                    allItems = [...allItems, ...sr.items];
+                });
+            }
+            
+            const filePromises = allItems.map(async (itemRef) => {
+                try {
+                    const url = await itemRef.getDownloadURL();
+                    const metadata = await itemRef.getMetadata();
+                    return {
+                        name: itemRef.name,
+                        fullPath: itemRef.fullPath,
+                        url: url,
+                        size: metadata.size,
+                        contentType: metadata.contentType,
+                        timeCreated: metadata.timeCreated
+                    };
+                } catch (e) {
+                    return null; // Skip failed items
+                }
+            });
+            
+            const files = (await Promise.all(filePromises)).filter(Boolean);
+            // Sort by time created (newest first)
+            return files.sort((a, b) => new Date(b.timeCreated) - new Date(a.timeCreated));
+        } catch (error) {
+            console.error("[FirebaseService] List files error:", error);
+            return [];
+        }
+    }
+
+
+    async deleteFile(path) {
+        if (!this.isInitialized || !this.storage) return;
+        try {
+            const fileRef = this.storage.ref(path);
+            await fileRef.delete();
+        } catch (error) {
+            console.error("[FirebaseService] Delete file error:", error);
+            throw error;
+        }
+    }
+
 
     async requestNotificationPermission() {
         if (!this.isInitialized || typeof firebase.messaging !== 'function' || !firebase.messaging.isSupported()) {

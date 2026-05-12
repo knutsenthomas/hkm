@@ -4648,96 +4648,185 @@ class AdminManager {
         }
     }
 
-
     async renderMediaManager() {
         const section = document.getElementById('media-section');
         if (!section) return;
 
+        // Use tabs to separate Media Library and Integrations
         section.innerHTML = `
-            ${this.renderSectionHeader('perm_media', 'Media-integrasjoner', 'Koble til YouTube og Podcast-strømmer.')}
-            
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
-                <div class="card">
-                    <div class="card-header"><h3 class="card-title">YouTube & RSS</h3></div>
-                    <div class="card-body">
-                        <div class="form-section">
-                            <h4>YouTube Innstillinger</h4>
-                            <div class="form-group">
-                                <label>YouTube Channel ID</label>
-                                <input type="text" id="yt-channel-id" class="form-control" placeholder="f.eks. UCxxxxxxxxxxxx">
-                            </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>YouTube Kategorier (Playlister)</label>
-                                <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)"></textarea>
-                            </div>
+            <div class="section-header" style="margin-bottom: 32px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
+                    <div>
+                        <h2 class="section-title">Media & Ressurser</h2>
+                        <p class="section-subtitle">Administrer bilder, integrasjoner og sosiale medier</p>
+                    </div>
+                    <div class="header-actions">
+                        <div class="tabs-control" style="background: #f1f5f9; padding: 4px; border-radius: 12px; display: flex; gap: 4px;">
+                            <button class="tab-btn active" data-tab="library" style="padding: 8px 16px; border-radius: 8px; border: none; background: white; color: #1B4965; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s;">Bibliotek</button>
+                            <button class="tab-btn" data-tab="integrations" style="padding: 8px 16px; border-radius: 8px; border: none; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.2s;">Integrasjoner</button>
                         </div>
-                        
-                        <div class="divider"></div>
+                    </div>
+                </div>
+            </div>
 
-                        <div class="form-section">
-                            <h4>Podcast Innstillinger</h4>
-                            <div class="form-group">
-                                <label>RSS Feed URL</label>
-                                <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://feeds.simplecast.com/xxxxxx">
-                            </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>Spotify Podcast URL</label>
-                                <input type="text" id="podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
-                            </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>Apple Podcasts URL</label>
-                                <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
-                            </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>Egne Podcast-kategorier (Hurtigvalg)</label>
-                                <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
-                                <p style="font-size: 11px; color: #64748b; margin-top: 4px;">Separer med komma. Disse legges til som valgbare knapper under.</p>
-                            </div>
+            <!-- Media Library Tab Content -->
+            <div id="media-library-content" class="tab-content active">
+                <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
+                    <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(27, 73, 101, 0.1); color: #1B4965; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined">image</span>
                         </div>
-
-                        <div style="margin-top: 30px;">
-                            <button class="btn-primary" id="save-media-settings">Lagre media-innstillinger</button>
+                        <div>
+                            <p style="font-size: 13px; color: #64748b; margin: 0;">Totalt antall filer</p>
+                            <h4 id="media-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">0</h4>
+                        </div>
+                    </div>
+                    <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
+                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined">compress</span>
+                        </div>
+                        <div>
+                            <p style="font-size: 13px; color: #64748b; margin: 0;">Auto-komprimering</p>
+                            <h4 style="font-size: 18px; font-weight: 700; margin: 0; color: #1e293b;">Aktiv</h4>
                         </div>
                     </div>
                 </div>
 
-                <div class="card">
-                    <div class="card-header flex-between">
-                        <h3 class="card-title">Podcast-kategorier (Manuell overstyring)</h3>
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <button class="btn-secondary btn-sm" id="open-podcast-transcripts">Rediger transkripsjoner</button>
-                            <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater liste</button>
+                <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
+                    <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
+                    <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder komprimeres automatisk for optimal kvalitet og hastighet</p>
+                    <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
+                </div>
+
+                <div id="media-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px;">
+                    <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
+                        <div class="loader" style="margin: 0 auto;"></div>
+                        <p style="margin-top: 16px; color: #64748b;">Henter mediebibliotek...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integrations Tab Content -->
+            <div id="media-integrations-content" class="tab-content" style="display: none;">
+                <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+                    <div class="card modern">
+                        <div class="card-header flex-between">
+                            <h3 class="card-title">YouTube & Podcast Integrasjoner</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-section">
+                                <h4>YouTube Innstillinger</h4>
+                                <div class="form-group">
+                                    <label>YouTube Channel ID</label>
+                                    <input type="text" id="yt-channel-id" class="form-control" placeholder="f.eks. UCxxxxxxxxxxxx">
+                                </div>
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <label>YouTube Kategorier (Playlister)</label>
+                                    <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+
+                            <div class="form-section">
+                                <h4>Podcast Innstillinger</h4>
+                                <div class="form-group">
+                                    <label>RSS Feed URL</label>
+                                    <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://feeds.simplecast.com/xxxxxx">
+                                </div>
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <label>Spotify Podcast URL</label>
+                                    <input type="text" id="podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
+                                </div>
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <label>Apple Podcasts URL</label>
+                                    <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
+                                </div>
+                                <div class="form-group" style="margin-top: 15px;">
+                                    <label>Egne Podcast-kategorier (Hurtigvalg)</label>
+                                    <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
+                                </div>
+                            </div>
+
+                            <div style="margin-top: 30px;">
+                                <button class="btn-primary" id="save-media-settings" style="width: 100%;">Lagre media-innstillinger</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="card-body" style="max-height: 600px; overflow-y: auto;">
-                        <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                            <label style="font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Faste Kategorier (Hurtigvalg)</label>
-                            <input type="text" id="podcast-global-categories-sync" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie" style="font-size: 13px; border-radius: 8px; border: 1px solid #cbd5e1;">
-                            <p style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">Kategorier her vises som knapper på alle episoder. Nye kategorier du skriver inn på enkeltepisoder blir også lagret her automatisk når du lagrer.</p>
-                        </div>
 
-                        <p style="font-size: 13px; color: #64748b; margin-bottom: 15px; font-weight: 500;">Overstyr kategorier for hver episode:</p>
-                        <div id="podcast-overrides-list">
-                            <div class="loader">Henter episoder...</div>
+                    <div class="card modern">
+                        <div class="card-header flex-between">
+                            <h3 class="card-title">Podcast-kategorier (Overstyring)</h3>
+                            <div style="display:flex; gap:8px; align-items:center;">
+                                <button class="btn-secondary btn-sm" id="open-podcast-transcripts">Rediger transkripsjoner</button>
+                                <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater</button>
+                            </div>
                         </div>
-                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                            <button class="btn-primary" id="save-podcast-overrides" style="width: 100%;">Lagre overstyringer</button>
+                        <div class="card-body">
+                            <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                                <label style="font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Faste Kategorier (Synk)</label>
+                                <input type="text" id="podcast-global-categories-sync" class="form-control" readonly style="font-size: 13px; border-radius: 8px; background: #f1f5f9;">
+                            </div>
+                            <div id="podcast-overrides-list" style="max-height: 400px; overflow-y: auto;">
+                                <div class="loader">Henter episoder...</div>
+                            </div>
+                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
+                                <button class="btn-primary" id="save-podcast-overrides" style="width: 100%;">Lagre overstyringer</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         `;
-        section.setAttribute('data-rendered', 'true');
 
-        // Initial Load
-        this.loadMediaSettings();
-        this.loadPodcastOverrides();
+        // Tab Switching Logic
+        const tabBtns = section.querySelectorAll('.tab-btn');
+        const libraryContent = section.querySelector('#media-library-content');
+        const integrationsContent = section.querySelector('#media-integrations-content');
 
-        // Listeners
-        document.getElementById('save-media-settings').addEventListener('click', () => this.saveMediaSettings());
-        document.getElementById('save-podcast-overrides').addEventListener('click', () => this.savePodcastOverrides());
-        document.getElementById('refresh-podcast-list').addEventListener('click', () => this.loadPodcastOverrides());
-        document.getElementById('open-podcast-transcripts').addEventListener('click', () => this.openPodcastTranscriptEditorById(''));
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const target = btn.getAttribute('data-tab');
+                
+                tabBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'transparent';
+                    b.style.color = '#64748b';
+                    b.style.boxShadow = 'none';
+                });
+
+                btn.classList.add('active');
+                btn.style.background = 'white';
+                btn.style.color = '#1B4965';
+                btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
+
+                if (target === 'library') {
+                    libraryContent.style.display = 'block';
+                    integrationsContent.style.display = 'none';
+                    this.loadMediaLibrary();
+                } else {
+                    libraryContent.style.display = 'none';
+                    integrationsContent.style.display = 'block';
+                    this.loadMediaSettings();
+                    this.loadPodcastOverrides();
+                }
+            });
+        });
+
+        // Initialize Media Library
+        this.loadMediaLibrary();
+        
+        // Setup Upload Listeners
+        this._setupMediaLibraryListeners();
+
+        // Integrations Listeners (Delegation or check if el exists)
+        document.addEventListener('click', (e) => {
+            if (e.target.id === 'save-media-settings') this.saveMediaSettings();
+            if (e.target.id === 'save-podcast-overrides') this.savePodcastOverrides();
+            if (e.target.id === 'refresh-podcast-list') this.loadPodcastOverrides();
+            if (e.target.id === 'open-podcast-transcripts') this.openPodcastTranscriptEditorById('');
+        });
 
         const overridesList = document.getElementById('podcast-overrides-list');
         if (overridesList) {
@@ -4748,7 +4837,10 @@ class AdminManager {
                 this.openPodcastTranscriptEditorById(btn.getAttribute('data-open-podcast-id') || '');
             });
         }
+
+        section.setAttribute('data-rendered', 'true');
     }
+
 
     async openPodcastTranscriptEditorById(episodeId) {
         const targetId = (episodeId || '').trim();
