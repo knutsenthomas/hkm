@@ -105,12 +105,12 @@ h4.block-header { font-size: 1.25rem; } /* 20px */
     letter-spacing: -0.011em;
 }
 
-/* First paragraph treatment - Matching user request for consistent size */
+/* First paragraph treatment - Matching user request for consistent weight */
 .block-paragraph:first-of-type {
     font-size: 1.125rem; /* Match 18px base */
     line-height: 1.6;
     color: #1e293b;
-    font-weight: 600; /* Keep it semi-bold as a lead-in */
+    font-weight: 400; /* Normal weight as requested */
 }
 
 .block-list {
@@ -261,7 +261,7 @@ ol.block-list { list-style-type: decimal; }
     
     .block-paragraph:first-of-type {
         font-size: 1rem; /* Exactly 16px on mobile */
-        font-weight: 600;
+        font-weight: 400;
     }
     
     .block-list li {
