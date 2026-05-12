@@ -62,81 +62,35 @@
             margin: 0 auto !important;
         }
         .ce-paragraph {
-            font-size: 1.25rem !important;
+            font-size: 1.125rem !important; /* Matches 18px base */
             line-height: 1.85 !important;
             color: #1a202c !important;
-            margin-bottom: 2.5rem !important;
+            margin-bottom: 1rem !important; /* Reduced from 2.5rem to match frontend 16px */
             letter-spacing: -0.011em !important;
         }
-        .ce-header {
-            font-weight: 800 !important;
-            line-height: 1.25 !important;
-            margin-top: 2.5rem !important;
-            margin-bottom: 1.25rem !important;
-            letter-spacing: -0.01em !important;
-        }
-        h1.ce-header { font-size: 2.5rem !important; }
-        h2.ce-header { font-size: 2rem !important; }
-        h3.ce-header { font-size: 1.5rem !important; }
         
-        /* NUCLEAR FIX V2: Force Images and Blocks to stay centered without breaking EditorJS UI */
-        .ce-block__content,
-        .ce-image__img,
-        .ce-block img,
-        .ce-block figure,
-        .editor-main-canvas img,
-        .editor-main-canvas figure {
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            display: block !important;
-        }
-        
-        /* Ensure images don't overflow their containers */
-        .ce-image__img, .ce-block img {
-            height: auto !important;
-            margin: 1.5rem auto !important;
-        }
-        
-        /* Restore EditorJS UI components - Allow EditorJS to handle its own positioning primarily */
-        .ce-toolbar, .ce-settings, .ce-inline-toolbar, .ce-conversion-toolbar, .ce-toolbox {
-            z-index: 1000;
-        }
-        
-        /* Ensure the block conversion menu is visible and correctly layered */
-        .ce-conversion-toolbar {
-            background: #fff !important;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
-            border: 1px solid #e2e8f0 !important;
-            border-radius: 12px !important;
-        }
-        
-        /* Fix for the "Plus" and "Settings" buttons - Make them visible on hover and keep them to the left */
-        .ce-toolbar__actions {
-            display: flex !important;
-            align-items: center !important;
-            transition: opacity 0.2s ease;
-        }
-        
-        /* Heading Styles H1-H6 */
+        /* Unified Header Styles for parity */
         .ce-header {
             font-family: 'Merriweather', serif !important;
             color: #1B4965 !important;
-            margin-bottom: 1rem !important;
+            font-weight: 800 !important;
+            line-height: 1.25 !important;
+            margin-top: 1rem !important;
+            margin-bottom: 0.5rem !important;
+            letter-spacing: -0.01em !important;
         }
-        h1.ce-header { font-size: 2.75rem !important; font-weight: 800 !important; }
-        h2.ce-header { font-size: 2.25rem !important; font-weight: 700 !important; }
-        h3.ce-header { font-size: 1.75rem !important; font-weight: 600 !important; }
-        h4.ce-header { font-size: 1.5rem !important; font-weight: 600 !important; }
-        h5.ce-header { font-size: 1.25rem !important; font-weight: 600 !important; }
-        h6.ce-header { font-size: 1.1rem !important; font-weight: 600 !important; }
+        h1.ce-header { font-size: 2.25rem !important; }
+        h2.ce-header { font-size: 1.75rem !important; }
+        h3.ce-header { font-size: 1.35rem !important; }
+        h4.ce-header { font-size: 1.15rem !important; }
+        h5.ce-header { font-size: 1.1rem !important; }
+        h6.ce-header { font-size: 1rem !important; }
         
         .cdx-list {
             padding-left: 24px !important;
-            margin: 8px 0 2.5rem 0 !important;
+            margin: 8px 0 1rem 0 !important;
             list-style-position: outside !important;
-            font-size: 1.25rem !important;
+            font-size: 1.125rem !important;
         }
         .cdx-list__item {
             padding: 4px 0 !important;
