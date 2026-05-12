@@ -6865,6 +6865,9 @@ class AdminManager {
                                               <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #1B4965;">
                                                   <span class="material-symbols-outlined" style="font-size: 20px;">image_search</span> Unsplash
                                               </button>
+                                              <button type="button" id="sidebar-img-remove-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #fee2e2; background: #fef2f2; font-size: 13px; font-weight: 600; color: #b91c1c; display: ${item.imageUrl ? 'flex' : 'none'};">
+                                                  <span class="material-symbols-outlined" style="font-size: 20px;">delete</span> Fjern
+                                              </button>
                                           </div>
                                           
                                           <div style="position: relative;">
@@ -8702,6 +8705,7 @@ class AdminManager {
             const uploadBtn = document.getElementById('sidebar-img-upload-btn');
             const libraryBtn = document.getElementById('sidebar-img-library-btn');
             const unsplashBtn = document.getElementById('unsplash-trigger-btn');
+            const removeBtn = document.getElementById('sidebar-img-remove-btn');
 
             if (imgTrigger && imgFile) {
                 // Drag & Drop Listeners
@@ -8748,6 +8752,9 @@ class AdminManager {
                 if (imgInput) {
                     imgInput.addEventListener('input', (e) => {
                         const url = e.target.value;
+                        if (removeBtn) {
+                            removeBtn.style.display = (url && url.length > 10) ? 'flex' : 'none';
+                        }
                         if (preview) {
                             if (url && url.length > 10) {
                                 preview.innerHTML = `<img src="${url}" style="width:100%; height:100%; object-fit:cover;">`;
@@ -8760,6 +8767,17 @@ class AdminManager {
                             }
                         }
                     });
+                }
+
+                // --- Remove Button Listener ---
+                if (removeBtn) {
+                    removeBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        if (imgInput) {
+                            imgInput.value = '';
+                            imgInput.dispatchEvent(new Event('input'));
+                        }
+                    };
                 }
 
                 // --- Unsplash Listener ---
