@@ -79,24 +79,31 @@
         h2.ce-header { font-size: 2rem !important; }
         h3.ce-header { font-size: 1.5rem !important; }
         
-        /* Force Images in Editor to stay in frame */
-        .ce-block__content img, 
-        .ce-block__content figure,
-        .ce-block__content .wix-image-container,
-        .ce-image__img {
+        /* Force Images and Blocks in Editor to stay in frame */
+        .codex-editor *, 
+        .ce-block, 
+        .ce-block__content,
+        .ce-image__img,
+        .ce-block img,
+        .ce-block figure {
             max-width: 100% !important;
-            height: auto !important;
-            margin: 1.5rem auto !important;
-            display: block !important;
-            position: static !important;
-            transform: none !important;
             box-sizing: border-box !important;
+            transform: none !important;
         }
         
-        /* Ensure all block children adhere to max-width */
-        .ce-block__content > * {
-            max-width: 100% !important;
-            box-sizing: border-box !important;
+        /* Centering Fix for Editor Content */
+        .ce-block__content {
+            max-width: 840px !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            float: none !important;
+        }
+
+        /* Image specific styling in editor */
+        .ce-block img {
+            height: auto !important;
+            display: block !important;
+            margin: 1rem auto !important;
         }
         
         .cdx-list {
