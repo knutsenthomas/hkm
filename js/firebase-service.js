@@ -900,27 +900,34 @@ class FirebaseService {
     }
 
     /**
-     * List files in a storage directory (recursive-ish)
+     * List files and folders in a storage directory
+     * @param {string} path - The path to list
+     * @param {boolean} recursive - Whether to include items from subfolders
      */
-    async listMediaFiles(path = 'editor/') {
-        if (!this.isInitialized || !this.storage) return [];
+    async listMediaFiles(path = 'editor/', recursive = false) {
+        if (!this.isInitialized || !this.storage) return { files: [], folders: [] };
         
         try {
             const listRef = this.storage.ref(path);
             const res = await listRef.listAll();
             
-            let allItems = [...res.items];
-            
-            // Check subdirectories (one level deep)
-            if (res.prefixes.length > 0) {
-                const subPromises = res.prefixes.map(p => p.listAll());
+            let filesList = [...res.items];
+            const foldersList = res.prefixes.map(p => ({
+                name: p.name,
+                fullPath: p.fullPath,
+                type: 'folder'
+            }));
+
+            // Handle recursion if requested
+            if (recursive && res.prefixes.length > 0) {
+                const subPromises = res.prefixes.map(p => this.listMediaFiles(p.fullPath, true));
                 const subResults = await Promise.all(subPromises);
                 subResults.forEach(sr => {
-                    allItems = [...allItems, ...sr.items];
+                    filesList = [...filesList, ...sr.files];
                 });
             }
             
-            const filePromises = allItems.map(async (itemRef) => {
+            const filePromises = filesList.map(async (itemRef) => {
                 try {
                     const url = await itemRef.getDownloadURL();
                     const metadata = await itemRef.getMetadata();
@@ -930,19 +937,24 @@ class FirebaseService {
                         url: url,
                         size: metadata.size,
                         contentType: metadata.contentType,
-                        timeCreated: metadata.timeCreated
+                        updated: metadata.updated,
+                        timeCreated: metadata.timeCreated,
+                        type: 'file'
                     };
                 } catch (e) {
-                    return null; // Skip failed items
+                    return null;
                 }
             });
             
             const files = (await Promise.all(filePromises)).filter(Boolean);
-            // Sort by time created (newest first)
-            return files.sort((a, b) => new Date(b.timeCreated) - new Date(a.timeCreated));
+            
+            return { 
+                files: files.sort((a, b) => new Date(b.updated || b.timeCreated) - new Date(a.updated || a.timeCreated)),
+                folders: foldersList.sort((a, b) => a.name.localeCompare(b.name))
+            };
         } catch (error) {
             console.error("[FirebaseService] List files error:", error);
-            return [];
+            return { files: [], folders: [] };
         }
     }
 

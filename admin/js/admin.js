@@ -77,6 +77,10 @@ class AdminManager {
         // User Detail View State
         this.currentUserDetailId = null;
         this.userEditMode = false;
+        
+        // Media Library State
+        this.currentMediaPath = 'editor/';
+        this.mediaSortOrder = 'date-desc';
 
         this.widgetLibrary = {
             'visitors': { id: 'visitors', label: 'Sidevisninger', icon: 'visibility', color: 'purple', default: true },
@@ -4677,11 +4681,39 @@ class AdminManager {
                     </div>
                     <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
                         <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined">compress</span>
+                            <span class="material-symbols-outlined">folder</span>
                         </div>
                         <div>
-                            <p style="font-size: 13px; color: #64748b; margin: 0;">Auto-komprimering</p>
-                            <h4 style="font-size: 18px; font-weight: 700; margin: 0; color: #1e293b;">Aktiv</h4>
+                            <p style="font-size: 13px; color: #64748b; margin: 0;">Mapper</p>
+                            <h4 id="media-folder-count" style="font-size: 18px; font-weight: 700; margin: 0; color: #1e293b;">-</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation and Controls Bar -->
+                <div class="media-controls-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
+                    <div class="media-breadcrumbs" id="media-breadcrumbs" style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #64748b;">
+                        <!-- Dynamically filled -->
+                    </div>
+                    
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <button id="btn-new-folder" class="btn-secondary" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
+                            Ny mappe
+                        </button>
+                        
+                        <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
+                        
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span style="font-size: 13px; color: #64748b;">Sorter:</span>
+                            <select id="media-sort-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none;">
+                                <option value="date-desc">Nyeste først</option>
+                                <option value="date-asc">Eldste først</option>
+                                <option value="name-asc">Navn (A-Å)</option>
+                                <option value="name-desc">Navn (Å-A)</option>
+                                <option value="size-desc">Størst først</option>
+                                <option value="size-asc">Minst først</option>
+                            </select>
                         </div>
                     </div>
                 </div>
@@ -4689,7 +4721,7 @@ class AdminManager {
                 <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
                     <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
-                    <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder komprimeres automatisk for optimal kvalitet og hastighet</p>
+                    <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">/</strong></p>
                     <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
                 </div>
 
@@ -4907,36 +4939,85 @@ class AdminManager {
     }
 
     /**
-     * Load and render the media library grid
+     * Load and render the media library grid with folder support
      */
     async loadMediaLibrary() {
         const grid = document.getElementById('media-grid');
         const countEl = document.getElementById('media-count');
+        const folderCountEl = document.getElementById('media-folder-count');
+        const breadcrumbsEl = document.getElementById('media-breadcrumbs');
+        const uploadPathEl = document.getElementById('current-upload-path');
+        const sortSelect = document.getElementById('media-sort-select');
+
         if (!grid) return;
+        if (sortSelect) this.mediaSortOrder = sortSelect.value;
+
+        // Update upload path display
+        if (uploadPathEl) {
+            const displayPath = this.currentMediaPath.replace('editor/', '/') || '/';
+            uploadPathEl.innerText = displayPath;
+        }
+
+        // Update breadcrumbs
+        if (breadcrumbsEl) {
+            const parts = this.currentMediaPath.replace('editor/', '').split('/').filter(Boolean);
+            let html = `<span class="breadcrumb-item" data-path="editor/" style="cursor: pointer; color: #1B4965; hover: underline;">Hjem</span>`;
+            
+            let accumulatedPath = 'editor/';
+            parts.forEach((part, index) => {
+                accumulatedPath += part + '/';
+                html += ` <span style="color: #cbd5e1;">/</span> <span class="breadcrumb-item" data-path="${accumulatedPath}" style="cursor: pointer; color: ${index === parts.length - 1 ? '#64748b' : '#1B4965'};">${part}</span>`;
+            });
+            breadcrumbsEl.innerHTML = html;
+
+            // Add breadcrumb listeners
+            breadcrumbsEl.querySelectorAll('.breadcrumb-item').forEach(item => {
+                item.onclick = (e) => {
+                    this.currentMediaPath = e.target.getAttribute('data-path');
+                    this.loadMediaLibrary();
+                };
+            });
+        }
 
         try {
-            const files = await firebaseService.listMediaFiles('editor/');
+            const { files, folders } = await firebaseService.listMediaFiles(this.currentMediaPath, false);
             
             if (countEl) countEl.innerText = files.length;
+            if (folderCountEl) folderCountEl.innerText = folders.length;
 
-            if (files.length === 0) {
+            if (files.length === 0 && folders.length === 0) {
                 grid.innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: #f8fafc; border-radius: 16px;">
                         <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 12px;">folder_open</span>
-                        <p style="color: #64748b;">Ingen filer funnet. Last opp ditt første bilde over!</p>
+                        <p style="color: #64748b;">Denne mappen er tom.</p>
                     </div>
                 `;
                 return;
             }
 
-            // Sort files by last modified (newest first)
-            files.sort((a, b) => {
-                const dateA = a.metadata?.updated ? new Date(a.metadata.updated) : new Date(0);
-                const dateB = b.metadata?.updated ? new Date(b.metadata.updated) : new Date(0);
-                return dateB - dateA;
+            const sortedFiles = [...files]
+                .filter(f => !f.name.endsWith('.keep'))
+                .sort((a, b) => {
+                switch (this.mediaSortOrder) {
+                    case 'date-asc': return new Date(a.updated || a.timeCreated) - new Date(b.updated || b.timeCreated);
+                    case 'name-asc': return a.name.localeCompare(b.name);
+                    case 'name-desc': return b.name.localeCompare(a.name);
+                    case 'size-desc': return (b.size || 0) - (a.size || 0);
+                    case 'size-asc': return (a.size || 0) - (b.size || 0);
+                    default: return new Date(b.updated || b.timeCreated) - new Date(a.updated || a.timeCreated);
+                }
             });
 
-            grid.innerHTML = files.map(file => `
+            const folderHtml = folders.map(folder => `
+                <div class="media-card media-folder" data-path="${folder.fullPath}/" style="background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s ease;">
+                    <div style="height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #1B4965;">folder</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #1B4965;">${folder.name}</span>
+                    </div>
+                </div>
+            `).join('');
+
+            const fileHtml = sortedFiles.map(file => `
                 <div class="media-card" style="background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; transition: all 0.2s ease;">
                     <div class="media-preview" style="height: 140px; background: #f1f5f9; position: relative; overflow: hidden;">
                         <img src="${file.url}" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
@@ -4949,14 +5030,24 @@ class AdminManager {
                     <div style="padding: 12px;">
                         <p style="font-size: 12px; font-weight: 600; color: #1e293b; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${file.name}">${file.name}</p>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
-                            <span style="font-size: 10px; color: #64748b;">${file.metadata?.size ? (file.metadata.size / 1024).toFixed(1) + ' KB' : ''}</span>
+                            <span style="font-size: 10px; color: #64748b;">${file.size ? (file.size / 1024).toFixed(1) + ' KB' : ''}</span>
                             <button class="btn-copy-url" data-url="${file.url}" style="font-size: 11px; font-weight: 700; color: #1B4965; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;">Kopier URL</button>
                         </div>
                     </div>
                 </div>
             `).join('');
 
-            // Add hover effect for actions via style injection (cleaner than JS loops)
+            grid.innerHTML = folderHtml + fileHtml;
+
+            // Add folder click listeners
+            grid.querySelectorAll('.media-folder').forEach(folder => {
+                folder.onclick = () => {
+                    this.currentMediaPath = folder.getAttribute('data-path');
+                    this.loadMediaLibrary();
+                };
+            });
+
+            // Add hover effect for actions
             if (!document.getElementById('media-hover-styles')) {
                 const style = document.createElement('style');
                 style.id = 'media-hover-styles';
@@ -4964,6 +5055,7 @@ class AdminManager {
                     .media-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #cbd5e1 !important; }
                     .media-card:hover .media-actions { opacity: 1 !important; }
                     .btn-copy-url:hover { background: rgba(27, 73, 101, 0.05); }
+                    .media-folder:hover { background: #eff6ff !important; border-color: #1B4965 !important; }
                 `;
                 document.head.appendChild(style);
             }
@@ -4975,14 +5067,45 @@ class AdminManager {
     }
 
     /**
-     * Setup event listeners for media library (upload, delete, copy)
+     * Setup event listeners for media library (upload, delete, copy, sort, folders)
      */
     _setupMediaLibraryListeners() {
         const dropzone = document.getElementById('media-dropzone');
         const fileInput = document.getElementById('media-file-input');
         const grid = document.getElementById('media-grid');
+        const sortSelect = document.getElementById('media-sort-select');
+        const btnNewFolder = document.getElementById('btn-new-folder');
 
         if (!dropzone || !fileInput || !grid) return;
+
+        // Sorting
+        if (sortSelect) {
+            sortSelect.onchange = () => this.loadMediaLibrary();
+        }
+
+        // Create Folder
+        if (btnNewFolder) {
+            btnNewFolder.onclick = async () => {
+                const folderName = prompt('Navn på ny mappe:');
+                if (folderName && folderName.trim()) {
+                    const cleanName = folderName.trim().replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '');
+                    if (!cleanName) return alert('Ugyldig mappenavn');
+                    
+                    // Firebase Storage doesn't have empty folders. 
+                    // We create a dummy .keep file to "create" the path.
+                    const dummyFile = new Blob([''], { type: 'text/plain' });
+                    const path = `${this.currentMediaPath}${cleanName}/.keep`;
+                    
+                    try {
+                        await firebaseService.uploadFile(dummyFile, path);
+                        showToast('Mappe opprettet', 'success');
+                        await this.loadMediaLibrary();
+                    } catch (err) {
+                        showToast('Kunne ikke opprette mappe', 'error');
+                    }
+                }
+            };
+        }
 
         // Click to upload
         dropzone.onclick = () => fileInput.click();
@@ -5084,7 +5207,7 @@ class AdminManager {
                     }
                 }
 
-                const path = `editor/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+                const path = `${this.currentMediaPath}${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
                 await firebaseService.uploadFile(fileToUpload, path);
             }
 
