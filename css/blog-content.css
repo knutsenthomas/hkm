@@ -41,8 +41,8 @@
 .blog-post-content div, 
 .blog-post-content p, 
 .blog-post-content span {
-    font-size: inherit !important;
-    line-height: inherit !important;
+    font-size: inherit; /* Removed !important to allow editor overrides */
+    line-height: inherit;
     margin-bottom: var(--rte-paragraph-spacing);
 }
 
