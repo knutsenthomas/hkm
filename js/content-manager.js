@@ -3258,7 +3258,6 @@ class ContentManager {
                 'related_teaching': 'Enseñanza relacionada',
                 'read_teaching': 'Leer enseñanza'
             }
-            }
         };
         return (strings[lang] && strings[lang][key]) || strings['no'][key] || key;
     }
