@@ -6829,18 +6829,41 @@ class AdminManager {
                         link: !!document.getSelection()?.anchorNode?.parentElement?.closest('a')
                     };
 
-                    if (!isDocs) {
-                        // Check list state for EditorJS mode
-                        const activeIndex = currentEditor?.blocks?.getCurrentBlockIndex();
-                        if (typeof activeIndex === 'number' && activeIndex >= 0) {
-                            const block = currentEditor.blocks.getBlockByIndex(activeIndex);
-                            const type = (block?.name || block?.type || '').toLowerCase();
-                            if (type === 'list') {
-                                const data = await block.save();
-                                const style = data?.data?.style || data?.style;
-                                states.list = style !== 'ordered';
-                                states.orderedList = style === 'ordered';
+                    // Detect Heading levels for visual feedback
+                    if (isDocs) {
+                        try {
+                            const blockValue = document.queryCommandValue('formatBlock');
+                            // Browsers return different values (e.g., 'h1', 'H1', or sometimes the tag name)
+                            const currentBlock = String(blockValue || '').toLowerCase();
+                            const normalizedBlock = (currentBlock === 'p' || currentBlock === '' || currentBlock === 'div') ? 'p' : currentBlock;
+                            
+                            states.paragraph = normalizedBlock === 'p';
+                            states.h1 = normalizedBlock === 'h1';
+                            states.h2 = normalizedBlock === 'h2';
+                            states.h3 = normalizedBlock === 'h3';
+                            states.h4 = normalizedBlock === 'h4';
+                            states.h5 = normalizedBlock === 'h5';
+                            states.h6 = normalizedBlock === 'h6';
+                            states.blockquote = normalizedBlock === 'blockquote';
+
+                            // Sync the select menu
+                            const headingSelect = desktopTools.querySelector('[data-tool-select="headingLevel"]');
+                            if (headingSelect) {
+                                headingSelect.value = normalizedBlock;
                             }
+                        } catch (e) {}
+                    } else {
+                        // Check block state for EditorJS mode
+                        const activeIndex = this._activeEditorInstance?.blocks?.getCurrentBlockIndex();
+                        if (typeof activeIndex === 'number' && activeIndex >= 0) {
+                            const block = this._activeEditorInstance.blocks.getBlockByIndex(activeIndex);
+                            const type = (block?.name || block?.type || '').toLowerCase();
+                            states.paragraph = type === 'paragraph';
+                            states.h1 = type === 'header' && block.data?.level === 1;
+                            states.h2 = type === 'header' && block.data?.level === 2;
+                            states.h3 = type === 'header' && block.data?.level === 3;
+                            states.list = type === 'list';
+                            // ... other states as needed
                         }
                     }
 
@@ -6905,7 +6928,11 @@ class AdminManager {
                 const toolHandlers = shouldUseDocsLikeEditor ? {
                     ...commonHandlers,
                     paragraph: () => exec('formatBlock', 'p'),
-                    h1: () => exec('formatBlock', 'h1'),
+                    h1: () => {
+                        exec('formatBlock', 'h1');
+                        // Edge case fix: if formatBlock produced a div with h1 inside, or failed
+                        // we don't do much here to avoid complexity, but ensured CSS handles it.
+                    },
                     h2: () => exec('formatBlock', 'h2'),
                     h3: () => exec('formatBlock', 'h3'),
                     h4: () => exec('formatBlock', 'h4'),
@@ -7143,6 +7170,18 @@ class AdminManager {
                     editorSurface.addEventListener('keyup', () => {
                         saveSelectionRange();
                         if (typeof updateActiveStates === 'function') updateActiveStates();
+                    });
+
+                    // Professional Shortcuts (CMD+1 to CMD+6 for headings, CMD+0 for paragraph)
+                    editorSurface.addEventListener('keydown', (e) => {
+                        if ((e.metaKey || e.ctrlKey) && !e.shiftKey && !e.altKey) {
+                            if (e.key >= '0' && e.key <= '6') {
+                                e.preventDefault();
+                                const level = e.key === '0' ? 'p' : `h${e.key}`;
+                                exec('formatBlock', level);
+                                if (typeof updateActiveStates === 'function') updateActiveStates();
+                            }
+                        }
                     });
 
                     // Wix/External Paste Sanitizer

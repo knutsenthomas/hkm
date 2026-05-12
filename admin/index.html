@@ -99,21 +99,38 @@
             margin: 1.5rem auto !important;
         }
         
-        /* Restore EditorJS UI components that need specific positioning */
+        /* Restore EditorJS UI components - Allow EditorJS to handle its own positioning primarily */
         .ce-toolbar, .ce-settings, .ce-inline-toolbar, .ce-conversion-toolbar, .ce-toolbox {
-            position: absolute !important;
-            transform: none; /* Allow EditorJS to handle its own transforms */
             z-index: 1000;
         }
         
-        /* Fix for the "Plus" and "Settings" buttons which were hidden or misaligned */
+        /* Ensure the block conversion menu is visible and correctly layered */
+        .ce-conversion-toolbar {
+            background: #fff !important;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 12px !important;
+        }
+        
+        /* Fix for the "Plus" and "Settings" buttons - Make them visible on hover and keep them to the left */
         .ce-toolbar__actions {
-            position: absolute !important;
-            right: 100% !important;
-            margin-right: 10px !important;
             display: flex !important;
             align-items: center !important;
+            transition: opacity 0.2s ease;
         }
+        
+        /* Heading Styles H1-H6 */
+        .ce-header {
+            font-family: 'Merriweather', serif !important;
+            color: #1B4965 !important;
+            margin-bottom: 1rem !important;
+        }
+        h1.ce-header { font-size: 2.75rem !important; font-weight: 800 !important; }
+        h2.ce-header { font-size: 2.25rem !important; font-weight: 700 !important; }
+        h3.ce-header { font-size: 1.75rem !important; font-weight: 600 !important; }
+        h4.ce-header { font-size: 1.5rem !important; font-weight: 600 !important; }
+        h5.ce-header { font-size: 1.25rem !important; font-weight: 600 !important; }
+        h6.ce-header { font-size: 1.1rem !important; font-weight: 600 !important; }
         
         .cdx-list {
             padding-left: 24px !important;
