@@ -250,6 +250,7 @@ ol.block-list { list-style-type: decimal; }
 @media (max-width: 768px) {
     .blog-post-content {
         padding: 0;
+        font-size: 1rem; /* Fix: Ensure base size is 16px on mobile for all elements */
     }
     
     h1.block-header { font-size: 1.85rem; }
