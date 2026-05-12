@@ -3547,6 +3547,8 @@ div[id^="editorjs-holder-"] {
 .image-tool__image {
     position: relative;
     cursor: pointer;
+    overflow: hidden;
+    border-radius: 8px;
 }
 
 .image-tool__image::after {
@@ -3556,19 +3558,53 @@ div[id^="editorjs-holder-"] {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(15, 23, 42, 0.55);
+    background: rgba(15, 23, 42, 0.4);
     color: #fff;
     font-size: 13px;
     font-weight: 700;
     letter-spacing: 0.03em;
-    border-radius: 6px;
     opacity: 0;
     transition: opacity 0.18s;
     pointer-events: none;
+    z-index: 1;
 }
 
 .image-tool__image:hover::after {
     opacity: 1;
+}
+
+/* Internal Delete Button for Editor Images */
+.btn-remove-block-image {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    background: rgba(239, 68, 68, 0.95);
+    color: white;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    z-index: 10;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.image-tool__image:hover .btn-remove-block-image {
+    opacity: 1;
+}
+
+.btn-remove-block-image:hover {
+    background: #ef4444;
+    transform: scale(1.1);
+}
+
+.btn-remove-block-image span {
+    font-size: 18px;
 }
 
 

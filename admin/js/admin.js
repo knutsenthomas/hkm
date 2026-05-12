@@ -4260,8 +4260,45 @@ class AdminManager {
         const container = document.getElementById(containerId);
         if (!container) return;
 
+        // Inject delete button on hover if not present
+        container.addEventListener('mouseover', (e) => {
+            const imageWrapper = e.target.closest('.image-tool__image');
+            if (!imageWrapper || imageWrapper.querySelector('.btn-remove-block-image')) return;
+            
+            const btn = document.createElement('button');
+            btn.className = 'btn-remove-block-image';
+            btn.type = 'button';
+            btn.innerHTML = '<span class="material-symbols-outlined">delete</span>';
+            btn.title = 'Fjern bilde';
+            imageWrapper.appendChild(btn);
+        });
+
         // Delegate click handler on the editor container
         container.addEventListener('click', async (e) => {
+            // Handle Delete Button Click
+            const deleteBtn = e.target.closest('.btn-remove-block-image');
+            if (deleteBtn) {
+                e.stopPropagation();
+                const imageWrapper = deleteBtn.closest('.image-tool__image');
+                const ceBlock = imageWrapper.closest('.ce-block');
+                const blockId = ceBlock?.dataset?.id;
+                
+                if (blockId && editor?.blocks) {
+                    if (confirm('Vil du fjerne dette bildet fra innholdet?')) {
+                        try {
+                            const index = editor.blocks.getIndex(blockId);
+                            editor.blocks.delete(index);
+                            this.showToast('Bilde fjernet', 'success');
+                        } catch (err) {
+                            console.error('Could not delete image block:', err);
+                            // Fallback for older EditorJS versions
+                            ceBlock.remove();
+                        }
+                    }
+                }
+                return;
+            }
+
             const imageWrapper = e.target.closest('.image-tool__image');
             if (!imageWrapper) return;
 
