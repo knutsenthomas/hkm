@@ -49,37 +49,51 @@
             }
         }
 
-        /* EditorJS Spacing Fix - Force Tight Layout */
+        /* EditorJS Spacing Fix - High Fidelity Blog Parity */
+        .codex-editor__redactor {
+            padding-bottom: 150px !important;
+            font-family: 'Inter', system-ui, sans-serif !important;
+        }
         .ce-block {
-            margin: 0 !important;
-            padding-top: 2px !important;
-            padding-bottom: 2px !important;
-        }
-        .ce-paragraph {
-            padding: 0 !important;
-            margin: 0 !important;
-            line-height: 1.5 !important;
-        }
-        .ce-header {
-            margin: 12px 0 6px 0 !important;
-            padding: 0 !important;
+            margin-bottom: 0 !important;
         }
         .ce-block__content {
+            max-width: 840px !important;
             margin: 0 auto !important;
         }
+        .ce-paragraph {
+            font-size: 1.25rem !important;
+            line-height: 1.85 !important;
+            color: #1a202c !important;
+            margin-bottom: 2.5rem !important;
+            letter-spacing: -0.011em !important;
+        }
+        .ce-header {
+            font-weight: 800 !important;
+            line-height: 1.25 !important;
+            margin-top: 2.5rem !important;
+            margin-bottom: 1.25rem !important;
+            letter-spacing: -0.01em !important;
+        }
+        h1.ce-header { font-size: 2.5rem !important; }
+        h2.ce-header { font-size: 2rem !important; }
+        h3.ce-header { font-size: 1.5rem !important; }
+        
+        /* Force Images in Editor to stay in frame */
+        .ce-image__img, .cdx-block, .ce-block * {
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
+        
         .cdx-list {
             padding-left: 24px !important;
-            margin: 8px 0 !important;
+            margin: 8px 0 2.5rem 0 !important;
             list-style-position: outside !important;
+            font-size: 1.25rem !important;
         }
         .cdx-list__item {
-            padding: 1px 0 !important;
-            margin: 0 !important;
-            line-height: 1.4 !important;
-            display: list-item !important;
-        }
-        .codex-editor__redactor {
-            padding-bottom: 100px !important;
+            padding: 4px 0 !important;
+            line-height: 1.6 !important;
         }
     </style>
     

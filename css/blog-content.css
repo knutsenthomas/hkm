@@ -30,6 +30,10 @@
 .blog-post-content * {
     max-width: 100% !important;
     box-sizing: border-box !important;
+    position: static !important;
+    transform: none !important;
+    left: 0 !important;
+    right: 0 !important;
 }
 
 .blog-post-content img, 
