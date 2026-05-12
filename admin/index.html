@@ -50,47 +50,56 @@
         }
 
         /* EditorJS Spacing Fix - High Fidelity Blog Parity */
-        .codex-editor__redactor {
+        .codex-editor__redactor, .editor-paper .codex-editor__redactor {
             padding-bottom: 150px !important;
             font-family: 'Inter', system-ui, sans-serif !important;
         }
-        .ce-block {
-            margin-bottom: 1rem !important; /* Default paragraph spacing 16px */
+        
+        /* Force kill all top margins on all blocks/elements to avoid double spacing */
+        .ce-block, .ce-paragraph, .ce-header, .cdx-block, .editor-paper * {
+            margin-top: 0 !important;
         }
-        /* Tighten space specifically for headers */
-        .ce-block:has(.ce-header) {
-            margin-top: 1rem !important;
-            margin-bottom: 0.5rem !important; /* Heading bottom margin 8px */
+
+        /* Base block spacing (Paragraph spacing) */
+        .ce-block, .editor-paper .ce-block {
+            margin-bottom: 1rem !important; /* 16px default */
         }
-        .ce-block__content {
+        
+        /* Tighten space for blocks containing headers */
+        .ce-block:has(.ce-header), .editor-paper .ce-block:has(.ce-header) {
+            margin-bottom: 0.5rem !important; /* 8px after heading */
+        }
+        
+        /* Ensure content width */
+        .ce-block__content, .editor-paper .ce-block__content {
             max-width: 840px !important;
             margin: 0 auto !important;
         }
-        .ce-paragraph {
+
+        /* Element Resets */
+        .ce-paragraph, .editor-paper .ce-paragraph {
             font-size: 1.125rem !important;
             line-height: 1.85 !important;
             color: #1a202c !important;
-            margin: 0 !important; /* Controlled by .ce-block */
+            margin: 0 !important;
             padding: 0 !important;
             letter-spacing: -0.011em !important;
         }
         
-        /* Unified Header Styles for parity */
-        .ce-header {
+        .ce-header, .editor-paper .ce-header {
             font-family: 'Merriweather', serif !important;
             color: #1B4965 !important;
             font-weight: 800 !important;
             line-height: 1.25 !important;
-            margin: 0 !important; /* Controlled by .ce-block container */
+            margin: 0 !important;
             padding: 0 !important;
             letter-spacing: -0.01em !important;
         }
+
         h1.ce-header { font-size: 2.25rem !important; }
         h2.ce-header { font-size: 1.75rem !important; }
         h3.ce-header { font-size: 1.35rem !important; }
         h4.ce-header { font-size: 1.15rem !important; }
-        h5.ce-header { font-size: 1.1rem !important; }
-        h6.ce-header { font-size: 1rem !important; }
         
         .cdx-list {
             padding-left: 24px !important;
