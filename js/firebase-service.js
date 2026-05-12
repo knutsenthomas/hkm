@@ -970,6 +970,25 @@ class FirebaseService {
         }
     }
 
+    async deleteFolder(path) {
+        if (!this.isInitialized || !this.storage) return;
+        try {
+            const listRef = this.storage.ref(path);
+            const result = await listRef.listAll();
+            
+            // Delete all files in this folder
+            const deletePromises = result.items.map(item => item.delete());
+            
+            // Recursively delete subfolders
+            const subfolderPromises = result.prefixes.map(prefix => this.deleteFolder(prefix.fullPath));
+            
+            await Promise.all([...deletePromises, ...subfolderPromises]);
+        } catch (error) {
+            console.error("[FirebaseService] Delete folder error:", error);
+            throw error;
+        }
+    }
+
 
     async requestNotificationPermission() {
         if (!this.isInitialized || typeof firebase.messaging !== 'function' || !firebase.messaging.isSupported()) {

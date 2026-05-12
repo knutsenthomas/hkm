@@ -5143,10 +5143,15 @@ class AdminManager {
             });
 
             const folderHtml = folders.map(folder => `
-                <div class="media-card media-folder" data-path="${folder.fullPath}/" style="background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s ease;">
+                <div class="media-card media-folder" data-path="${folder.fullPath}/" style="background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s ease; position: relative;">
                     <div style="height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
                         <span class="material-symbols-outlined" style="font-size: 48px; color: #1B4965;">folder</span>
                         <span style="font-size: 14px; font-weight: 600; color: #1B4965;">${folder.name}</span>
+                    </div>
+                    <div class="media-actions" style="position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s;">
+                        <button class="btn-delete-folder" data-path="${folder.fullPath}" title="Slett mappe" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                            <span class="material-symbols-outlined" style="font-size: 18px;">delete</span>
+                        </button>
                     </div>
                 </div>
             `).join('');
@@ -5296,6 +5301,7 @@ class AdminManager {
         grid.onclick = async (e) => {
             const copyBtn = e.target.closest('.btn-copy-url');
             const deleteBtn = e.target.closest('.btn-delete-file');
+            const deleteFolderBtn = e.target.closest('.btn-delete-folder');
 
             if (copyBtn) {
                 const url = copyBtn.getAttribute('data-url');
@@ -5317,6 +5323,13 @@ class AdminManager {
                 const path = deleteBtn.getAttribute('data-path');
                 if (confirm('Er du sikker på at du vil slette dette bildet permanent?')) {
                     await this.deleteMediaFile(path);
+                }
+            }
+
+            if (deleteFolderBtn) {
+                const path = deleteFolderBtn.getAttribute('data-path');
+                if (confirm('Er du sikker på at du vil slette denne mappen og ALT innholdet i den? Dette kan ikke angres.')) {
+                    await this.deleteMediaFolder(path);
                 }
             }
         };
@@ -5377,21 +5390,25 @@ class AdminManager {
      * Delete a media file
      */
     async deleteMediaFile(path) {
+        if (!confirm('Er du sikker på at du vil slette dette bildet permanent?')) return;
         try {
-            // Check if firebaseService has deleteFile, otherwise use a generic implementation
-            if (typeof firebaseService.deleteFile === 'function') {
-                await firebaseService.deleteFile(path);
-            } else {
-                // Fallback to storage ref delete if service method missing
-                const storageRef = firebaseService.storage.ref(path);
-                await storageRef.delete();
-            }
-            
+            await firebaseService.deleteFile(path);
             showToast('Bilde slettet', 'success');
             await this.loadMediaLibrary();
         } catch (error) {
-            console.error('Delete error:', error);
+            console.error('Delete media error:', error);
             showToast('Kunne ikke slette bilde: ' + error.message, 'error');
+        }
+    }
+
+    async deleteMediaFolder(path) {
+        try {
+            await firebaseService.deleteFolder(path);
+            showToast('Mappe slettet', 'success');
+            await this.loadMediaLibrary();
+        } catch (error) {
+            console.error('Delete folder error:', error);
+            showToast('Kunne ikke slette mappe: ' + error.message, 'error');
         }
     }
 
@@ -5453,7 +5470,8 @@ class AdminManager {
         const uploadBtn = modal.querySelector('#modal-upload-btn');
         const fileInput = modal.querySelector('#modal-file-input');
         
-        let currentPath = this.currentMediaPath || 'editor/blog/';
+        // Always start at root 'editor/' as per user request
+        let currentPath = 'editor/';
         // Normalize path: ensure single trailing slash and no double slashes
         currentPath = currentPath.replace(/\/+$/, '') + '/';
         currentPath = currentPath.replace(/\/+/g, '/');
@@ -5526,6 +5544,7 @@ class AdminManager {
                     const item = document.createElement('div');
                     item.className = 'media-item folder-item';
                     item.style.cursor = 'pointer';
+                    item.style.position = 'relative';
                     item.innerHTML = `
                         <div class="media-preview folder-preview" style="background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; height: 120px;">
                             <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8;">folder</span>
@@ -5533,8 +5552,32 @@ class AdminManager {
                         <div class="media-info" style="padding: 8px; text-align: center;">
                             <div class="media-name" style="font-size: 13px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${folder.name}</div>
                         </div>
+                        <button class="btn-delete-folder" data-path="${folder.fullPath}" title="Slett mappe" style="position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 6px; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                        </button>
                     `;
-                    item.onclick = () => {
+                    
+                    const deleteBtn = item.querySelector('.btn-delete-folder');
+                    item.onmouseenter = () => { if (deleteBtn) deleteBtn.style.opacity = '1'; };
+                    item.onmouseleave = () => { if (deleteBtn) deleteBtn.style.opacity = '0'; };
+                    
+                    if (deleteBtn) {
+                        deleteBtn.onclick = async (e) => {
+                            e.stopPropagation();
+                            if (confirm('Er du sikker på at du vil slette denne mappen og ALT innholdet i den?')) {
+                                try {
+                                    await firebaseService.deleteFolder(folder.fullPath);
+                                    showToast('Mappe slettet', 'success');
+                                    loadModalMedia();
+                                } catch (err) {
+                                    showToast('Kunne ikke slette mappe', 'error');
+                                }
+                            }
+                        };
+                    }
+
+                    item.onclick = (e) => {
+                        if (e.target.closest('.btn-delete-folder')) return;
                         currentPath = folder.fullPath + (folder.fullPath.endsWith('/') ? '' : '/');
                         loadModalMedia();
                     };
@@ -5548,6 +5591,7 @@ class AdminManager {
                     const item = document.createElement('div');
                     item.className = 'media-item';
                     item.style.cursor = 'pointer';
+                    item.style.position = 'relative';
                     item.innerHTML = `
                         <div class="media-preview" style="height: 120px; border-radius: 8px; overflow: hidden; background: #f8fafc; border: 1px solid #e2e8f0;">
                             <img src="${file.url}" alt="${file.name}" loading="lazy" style="width: 100%; height: 100%; object-fit: cover;">
@@ -5556,8 +5600,32 @@ class AdminManager {
                             <div class="media-name" style="font-size: 12px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${file.name}</div>
                             <div class="media-meta" style="font-size: 11px; color: #94a3b8;">${(file.size / 1024).toFixed(0)} KB</div>
                         </div>
+                        <button class="btn-delete-file" data-path="${file.fullPath}" title="Slett bilde" style="position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; border-radius: 6px; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                        </button>
                     `;
-                    item.onclick = () => {
+
+                    const deleteBtn = item.querySelector('.btn-delete-file');
+                    item.onmouseenter = () => { if (deleteBtn) deleteBtn.style.opacity = '1'; };
+                    item.onmouseleave = () => { if (deleteBtn) deleteBtn.style.opacity = '0'; };
+
+                    if (deleteBtn) {
+                        deleteBtn.onclick = async (e) => {
+                            e.stopPropagation();
+                            if (confirm('Er du sikker på at du vil slette dette bildet permanent?')) {
+                                try {
+                                    await firebaseService.deleteFile(file.fullPath);
+                                    showToast('Bilde slettet', 'success');
+                                    loadModalMedia();
+                                } catch (err) {
+                                    showToast('Kunne ikke slette bilde', 'error');
+                                }
+                            }
+                        };
+                    }
+
+                    item.onclick = (e) => {
+                        if (e.target.closest('.btn-delete-file')) return;
                         callback(file);
                         closeModal();
                     };

@@ -57,16 +57,23 @@ service firebase.storage {
         && request.resource.contentType != null;
     }
 
+    // --- Specific Paths ---
+
     match /profiles/{userId}/{allPaths=**} {
       allow read: if isOwnProfile(userId) || isPrivilegedUser();
       allow create, update: if isImageUpload() && (isOwnProfile(userId) || isPrivilegedUser());
       allow delete: if isOwnProfile(userId) || isPrivilegedUser();
     }
 
+    // General media library for the admin panel
+    match /mediebibliotek/{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isPrivilegedUser();
+    }
+
     match /editor/{allPaths=**} {
       allow read: if true;
-      allow create, update: if isImageUpload() && isPrivilegedUser();
-      allow delete: if isPrivilegedUser();
+      allow create, update, delete: if isPrivilegedUser();
     }
 
     match /editor/visitor-chat/{allPaths=**} {
@@ -83,26 +90,22 @@ service firebase.storage {
 
     match /covers/{allPaths=**} {
       allow read: if true;
-      allow create, update: if isImageUpload() && isPrivilegedUser();
-      allow delete: if isPrivilegedUser();
+      allow create, update, delete: if isPrivilegedUser();
     }
 
     match /hero/{allPaths=**} {
       allow read: if true;
-      allow create, update: if isImageUpload() && isPrivilegedUser();
-      allow delete: if isPrivilegedUser();
+      allow create, update, delete: if isPrivilegedUser();
     }
 
     match /seo/{allPaths=**} {
       allow read: if true;
-      allow create, update: if isImageUpload() && isPrivilegedUser();
-      allow delete: if isPrivilegedUser();
+      allow create, update, delete: if isPrivilegedUser();
     }
 
     match /newsletter/images/{allPaths=**} {
       allow read: if true;
-      allow create, update: if isImageUpload() && isPrivilegedUser();
-      allow delete: if isPrivilegedUser();
+      allow create, update, delete: if isPrivilegedUser();
     }
 
     match /{allPaths=**} {
