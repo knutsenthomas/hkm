@@ -80,7 +80,21 @@
         h3.ce-header { font-size: 1.5rem !important; }
         
         /* Force Images in Editor to stay in frame */
-        .ce-image__img, .cdx-block, .ce-block * {
+        .ce-block__content img, 
+        .ce-block__content figure,
+        .ce-block__content .wix-image-container,
+        .ce-image__img {
+            max-width: 100% !important;
+            height: auto !important;
+            margin: 1.5rem auto !important;
+            display: block !important;
+            position: static !important;
+            transform: none !important;
+            box-sizing: border-box !important;
+        }
+        
+        /* Ensure all block children adhere to max-width */
+        .ce-block__content > * {
             max-width: 100% !important;
             box-sizing: border-box !important;
         }
