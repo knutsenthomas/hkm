@@ -2827,7 +2827,7 @@ class AdminManager {
                         <td style="max-width: 400px;">
                             <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px;">${this.escapeHtml(title)}</div>
                             <div style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">
-                                ${this.escapeHtml(ep.description || '').substring(0, 100)}...
+                                ${(() => { const tmp = document.createElement('div'); tmp.innerHTML = ep.description || ''; return this.escapeHtml(tmp.textContent.substring(0, 100)); })()}...
                             </div>
                         </td>
                         <td>
