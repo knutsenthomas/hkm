@@ -11297,26 +11297,9 @@ class AdminManager {
                 btn.disabled = false;
             }
         };
+
     }
 
-                    statusBadge.style.background = '#dcfce7';
-                    statusBadge.style.color = '#166534';
-                }
-                setTimeout(() => { btn.textContent = 'Lagre Kalender-innstillinger'; btn.disabled = false; }, 2000);
-            } catch (err) {
-                console.error("Save Error:", err);
-                btn.textContent = 'Feil ved lagring';
-                btn.style.setProperty('background', '#ef4444', 'important');
-                setTimeout(() => {
-                    btn.textContent = 'Lagre Kalender-innstillinger';
-                    btn.disabled = false;
-                    btn.style.setProperty('background', '', '');
-                }, 2000);
-            }
-        };
-
-        section.setAttribute('data-rendered', 'true');
-    }
 
     /**
      * Settings, Placeholders and Helpers
