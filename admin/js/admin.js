@@ -5234,7 +5234,6 @@ class AdminManager {
 
         section.innerHTML = `
             ${this.renderSectionHeader('hub', 'Integrasjoner', 'Administrer YouTube, Google Calendar, AI og oversettelse.', '')}
-
             <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
                 <div class="card modern">
                     <div class="card-header flex-between">
@@ -5256,7 +5255,6 @@ class AdminManager {
                         </div>
                     </div>
                 </div>
-
                 <div class="card modern">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
@@ -5283,7 +5281,6 @@ class AdminManager {
                         <div id="google-auth-status" style="margin-top: 20px;"></div>
                     </div>
                 </div>
-
                 <div class="card modern">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
@@ -5334,269 +5331,74 @@ class AdminManager {
         const section = document.getElementById('media-section');
         if (!section) return;
 
-        // Use tabs to separate Media Library and Integrations
+        // Kun Media Library (filhåndtering)
         section.innerHTML = `
             <div class="section-header" style="margin-bottom: 32px;">
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; width: 100%;">
+                <h2 class="section-title">Media & Ressurser</h2>
+                <p class="section-subtitle">Administrer bilder og filer</p>
+            </div>
+            <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
+                <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(27, 73, 101, 0.1); color: #1B4965; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">image</span>
+                    </div>
                     <div>
-                        <h2 class="section-title">Media & Ressurser</h2>
-                        <p class="section-subtitle">Administrer bilder, podcast, integrasjoner og AI</p>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">Totalt antall filer</p>
+                        <h4 id="media-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">0</h4>
                     </div>
-                    <div class="header-actions">
-                        <div class="tabs-control" style="background: #f1f5f9; padding: 4px; border-radius: 12px; display: flex; gap: 4px;">
-                            <button class="tab-btn active" data-tab="library" style="padding: 8px 16px; border-radius: 8px; border: none; background: white; color: #1B4965; font-weight: 600; cursor: pointer; box-shadow: 0 1px 3px rgba(0,0,0,0.1); transition: all 0.2s;">Bibliotek</button>
-                            <button class="tab-btn" data-tab="integrations" style="padding: 8px 16px; border-radius: 8px; border: none; background: transparent; color: #64748b; font-weight: 600; cursor: pointer; transition: all 0.2s;">Integrasjoner & Podcast</button>
-                        </div>
+                </div>
+                <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined">folder</span>
+                    </div>
+                    <div>
+                        <p style="font-size: 13px; color: #64748b; margin: 0;">Mapper</p>
+                        <h4 id="media-folder-count" style="font-size: 18px; font-weight: 700; margin: 0; color: #1e293b;">-</h4>
                     </div>
                 </div>
             </div>
-
-            <!-- Media Library Tab Content -->
-            <div id="media-library-content" class="tab-content active">
-                <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
-                    <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(27, 73, 101, 0.1); color: #1B4965; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined">image</span>
-                        </div>
-                        <div>
-                            <p style="font-size: 13px; color: #64748b; margin: 0;">Totalt antall filer</p>
-                            <h4 id="media-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">0</h4>
-                        </div>
-                    </div>
-                    <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
-                        <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center;">
-                            <span class="material-symbols-outlined">folder</span>
-                        </div>
-                        <div>
-                            <p style="font-size: 13px; color: #64748b; margin: 0;">Mapper</p>
-                            <h4 id="media-folder-count" style="font-size: 18px; font-weight: 700; margin: 0; color: #1e293b;">-</h4>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Navigation and Controls Bar -->
-                <div class="media-controls-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
-                    <div class="media-breadcrumbs" id="media-breadcrumbs" style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #64748b;">
-                        <!-- Dynamically filled -->
-                    </div>
-                    
-                    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;">
-                            Område:
-                            <select id="media-location-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px;">
-                                ${this._getMediaLocationOptionsHtml()}
-                            </select>
-                        </label>
-                        <button id="btn-new-folder" class="btn-secondary" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                            <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
-                            Ny mappe
-                        </button>
-                        
-                        <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
-                        
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span style="font-size: 13px; color: #64748b;">Sorter:</span>
-                            <select id="media-sort-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none;">
-                                <option value="date-desc">Nyeste først</option>
-                                <option value="date-asc">Eldste først</option>
-                                <option value="name-asc">Navn (A-Å)</option>
-                                <option value="name-desc">Navn (Å-A)</option>
-                                <option value="size-desc">Størst først</option>
-                                <option value="size-asc">Minst først</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
-                    <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
-                    <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
-                    <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">Mediebibliotek</strong></p>
-                    <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
-                </div>
-
-                <div id="media-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px;">
-                    <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
-                        <div class="loader" style="margin: 0 auto;"></div>
-                        <p style="margin-top: 16px; color: #64748b;">Henter mediebibliotek...</p>
+            <div class="media-controls-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
+                <div class="media-breadcrumbs" id="media-breadcrumbs" style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #64748b;"></div>
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;">
+                        Område:
+                        <select id="media-location-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px;">
+                            ${this._getMediaLocationOptionsHtml()}
+                        </select>
+                    </label>
+                    <button id="btn-new-folder" class="btn-secondary" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
+                        Ny mappe
+                    </button>
+                    <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <span style="font-size: 13px; color: #64748b;">Sorter:</span>
+                        <select id="media-sort-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none;">
+                            <option value="date-desc">Nyeste først</option>
+                            <option value="date-asc">Eldste først</option>
+                            <option value="name-asc">Navn (A-Å)</option>
+                            <option value="name-desc">Navn (Å-A)</option>
+                            <option value="size-desc">Størst først</option>
+                            <option value="size-asc">Minst først</option>
+                        </select>
                     </div>
                 </div>
             </div>
-
-            <!-- Integrations Tab Content -->
-            <div id="media-integrations-content" class="tab-content" style="display: none;">
-                <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
-                    
-                    <!-- Podcast & YouTube Settings Card -->
-                    <div class="card modern">
-                        <div class="card-header flex-between">
-                            <h3 class="card-title">YouTube & Podcast Integrasjoner</h3>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-section">
-                                <h4>YouTube Innstillinger</h4>
-                                <div class="form-group">
-                                    <label>YouTube Channel ID</label>
-                                    <input type="text" id="yt-channel-id" class="form-control" placeholder="f.eks. UCxxxxxxxxxxxx">
-                                </div>
-                                <div class="form-group" style="margin-top: 15px;">
-                                    <label>YouTube Kategorier (Playlister)</label>
-                                    <textarea id="yt-playlists" class="form-control" style="height: 100px;" placeholder="Navn: PlaylistID (én per linje)"></textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="divider"></div>
-
-                            <div class="form-section">
-                                <h4>Podcast Innstillinger</h4>
-                                <div class="form-group">
-                                    <label>RSS Feed URL</label>
-                                    <input type="text" id="podcast-rss-url" class="form-control" placeholder="https://feeds.simplecast.com/xxxxxx">
-                                </div>
-                                <div class="form-group" style="margin-top: 15px;">
-                                    <label>Spotify Podcast URL</label>
-                                    <input type="text" id="podcast-spotify-url" class="form-control" placeholder="https://open.spotify.com/show/...">
-                                </div>
-                                <div class="form-group" style="margin-top: 15px;">
-                                    <label>Apple Podcasts URL</label>
-                                    <input type="text" id="podcast-apple-url" class="form-control" placeholder="https://podcasts.apple.com/...">
-                                </div>
-                            </div>
-
-                            <div style="margin-top: 30px;">
-                                <button class="btn-primary" id="save-media-settings" style="width: 100%;">Lagre media-innstillinger</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Podcast Management (Transcripts) Card -->
-                    <div class="card modern">
-                        <div class="card-header flex-between">
-                            <h3 class="card-title">Podcast-administrasjon</h3>
-                            <div style="display:flex; gap:8px; align-items:center;">
-                                <button class="btn-secondary btn-sm" id="open-podcast-transcripts-full">Alle episoder</button>
-                                <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater</button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div style="background: #f8fafc; padding: 15px; border-radius: 12px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                                <label style="font-size: 11px; font-weight: 800; color: #1e293b; text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Globale Kategorier (Hurtigvalg)</label>
-                                <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie">
-                                <p style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">Separer med komma. Disse vises som hurtigvalg når du redigerer enkeltepisoder.</p>
-                            </div>
-                            
-                            <p style="font-size: 13px; color: #64748b; margin-bottom: 12px; font-weight: 600;">Siste episoder (Overstyring/Transkripsjon):</p>
-                            <div id="podcast-overrides-list" style="max-height: 400px; overflow-y: auto;">
-                                <div class="loader">Henter episoder...</div>
-                            </div>
-                            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                                <button class="btn-primary" id="save-podcast-overrides" style="width: 100%;">Lagre overstyringer</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Google Calendar API Card -->
-                    <div class="card modern">
-                        <div class="card-header flex-between">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #e0f2fe; color: #0ea5e9; display: flex; align-items: center; justify-content: center;">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span>
-                                </div>
-                                <h3 class="card-title">Google Calendar API</h3>
-                            </div>
-                            <div class="status-badge" id="gcal-status" style="font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #fee2e2; color: #991b1b; font-weight: 600;">Frakoblet</div>
-                        </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label>Google API Key</label>
-                                <input type="password" id="gcal-api-key" class="form-control" placeholder="Din Google Cloud API Key">
-                            </div>
-                            <div class="form-group" style="margin-top: 15px;">
-                                <label>Calendar ID</label>
-                                <div id="gcal-list" class="gcal-list" style="margin-bottom: 8px;"></div>
-                                <button type="button" class="btn btn-outline" id="add-gcal" style="width: 100%;">
-                                    <span class="material-symbols-outlined" style="font-size: 18px; margin-right: 4px;">add</span>
-                                    Legg til kalender
-                                </button>
-                            </div>
-                            <div id="google-auth-status" style="margin-top: 20px;">
-                                <!-- Auth status injected by JS -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- AI & Translation Card -->
-                    <div class="card modern">
-                        <div class="card-header flex-between">
-                             <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center;">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
-                                </div>
-                                <h3 class="card-title">AI & Oversettelse</h3>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                             <div class="form-group" style="margin-bottom: 15px;">
-                                <label>Leverandør</label>
-                                <select id="translation-provider" class="form-control">
-                                    <option value="mymemory">MyMemory (gratis)</option>
-                                    <option value="gemini">Gemini (Google AI)</option>
-                                </select>
-                            </div>
-                            <div class="form-group" style="margin-bottom: 15px;">
-                                <label>Gemini API Key</label>
-                                <input type="password" id="gemini-api-key" class="form-control" placeholder="AIza...">
-                            </div>
-                            <div class="form-group">
-                                <label>Modell</label>
-                                <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
-                            </div>
-                            <div style="margin-top: 24px;">
-                                <button class="btn-primary" id="save-ai-settings" style="width: 100%;">Lagre AI-innstillinger</button>
-                            </div>
-                        </div>
-                    </div>
-
+            <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
+                <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
+                <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">Mediebibliotek</strong></p>
+                <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
+            </div>
+            <div id="media-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px;">
+                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
+                    <div class="loader" style="margin: 0 auto;"></div>
+                    <p style="margin-top: 16px; color: #64748b;">Henter mediebibliotek...</p>
                 </div>
             </div>
         `;
 
-        // Tab Switching Logic
-        const tabBtns = section.querySelectorAll('.tab-btn');
-        const libraryContent = section.querySelector('#media-library-content');
-        const integrationsContent = section.querySelector('#media-integrations-content');
-
-        tabBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                const target = btn.getAttribute('data-tab');
-                
-                tabBtns.forEach(b => {
-                    b.classList.remove('active');
-                    b.style.background = 'transparent';
-                    b.style.color = '#64748b';
-                    b.style.boxShadow = 'none';
-                });
-
-                btn.classList.add('active');
-                btn.style.background = 'white';
-                btn.style.color = '#1B4965';
-                btn.style.boxShadow = '0 1px 3px rgba(0,0,0,0.1)';
-
-                if (target === 'library') {
-                    libraryContent.style.display = 'block';
-                    integrationsContent.style.display = 'none';
-                    this.loadMediaLibrary();
-                } else {
-                    libraryContent.style.display = 'none';
-                    integrationsContent.style.display = 'block';
-                    this.loadMediaSettings();
-                    this.loadPodcastOverrides();
-                    this._loadIntegrationsSettings();
-                }
-            });
-        });
-
-        // Initialize Media Library
+        // Kun Media Library
         this.loadMediaLibrary();
         
         // Setup Upload Listeners
