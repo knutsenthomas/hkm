@@ -7607,6 +7607,9 @@ class AdminManager {
 
                     // Expose for toolbar handlers
                     this._activeEditorInstance = editor;
+
+                    // Initialize image behaviors for single surface
+                    this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
                 }
             } else {
                 // Standard Block-based EditorJS
