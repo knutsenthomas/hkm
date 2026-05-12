@@ -3428,6 +3428,19 @@ class ContentManager {
         return text;
     }
 
+    formatDate(date) {
+        if (!date) return '';
+        try {
+            // Handle Firebase Timestamp objects or standard Date strings/objects
+            const d = (date && typeof date.toDate === 'function') ? date.toDate() : new Date(date);
+            if (isNaN(d.getTime())) return String(date);
+            return d.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch (e) {
+            console.warn('[ContentManager] formatDate error:', e);
+            return String(date || '');
+        }
+    }
+
     /**
      * Generate a clean excerpt from blog content, excluding the title
      * @param {string|object} content - Blog content (HTML string or Editor.js JSON)
