@@ -55,17 +55,23 @@
             font-family: 'Inter', system-ui, sans-serif !important;
         }
         .ce-block {
-            margin-bottom: 0 !important;
+            margin-bottom: 1rem !important; /* Default paragraph spacing 16px */
+        }
+        /* Tighten space specifically for headers */
+        .ce-block:has(.ce-header) {
+            margin-top: 1rem !important;
+            margin-bottom: 0.5rem !important; /* Heading bottom margin 8px */
         }
         .ce-block__content {
             max-width: 840px !important;
             margin: 0 auto !important;
         }
         .ce-paragraph {
-            font-size: 1.125rem !important; /* Matches 18px base */
+            font-size: 1.125rem !important;
             line-height: 1.85 !important;
             color: #1a202c !important;
-            margin-bottom: 1rem !important; /* Reduced from 2.5rem to match frontend 16px */
+            margin: 0 !important; /* Controlled by .ce-block */
+            padding: 0 !important;
             letter-spacing: -0.011em !important;
         }
         
@@ -75,8 +81,8 @@
             color: #1B4965 !important;
             font-weight: 800 !important;
             line-height: 1.25 !important;
-            margin-top: 1rem !important;
-            margin-bottom: 0.5rem !important;
+            margin: 0 !important; /* Controlled by .ce-block container */
+            padding: 0 !important;
             letter-spacing: -0.01em !important;
         }
         h1.ce-header { font-size: 2.25rem !important; }
@@ -88,7 +94,7 @@
         
         .cdx-list {
             padding-left: 24px !important;
-            margin: 8px 0 1rem 0 !important;
+            margin: 0 !important;
             list-style-position: outside !important;
             font-size: 1.125rem !important;
         }
