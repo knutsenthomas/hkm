@@ -147,7 +147,21 @@
   .media-description,
   .podcast-description,
   .feature-text {
-    font-size: 15px !important; /* Slightly smaller than 16px since 16px felt big */
+    font-size: 15px !important;
     line-height: 1.5 !important;
+  }
+
+  /* Blog post content text size */
+  .blog-post-content p, 
+  .blog-post-content li,
+  .blog-post-content {
+    font-size: 16px !important;
+    line-height: 1.6 !important;
+  }
+
+  /* Reduce side padding on mobile */
+  .container {
+    padding-left: 15px !important;
+    padding-right: 15px !important;
   }
 }
