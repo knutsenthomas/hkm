@@ -3544,14 +3544,16 @@ div[id^="editorjs-holder-"] {
 [data-tool-select="headingLevel"] { width: 75px !important; }
 
 /* Click-to-replace overlay on image blocks */
-.image-tool__image {
+.image-tool__image, .block-image {
     position: relative;
     cursor: pointer;
     overflow: hidden;
     border-radius: 8px;
+    display: block;
+    width: 100%;
 }
 
-.image-tool__image::after {
+.image-tool__image::after, .block-image::after {
     content: '🔄  Klikk for å erstatte';
     position: absolute;
     inset: 0;
@@ -3569,7 +3571,7 @@ div[id^="editorjs-holder-"] {
     z-index: 1;
 }
 
-.image-tool__image:hover::after {
+.image-tool__image:hover::after, .block-image:hover::after {
     opacity: 1;
 }
 
@@ -3594,7 +3596,8 @@ div[id^="editorjs-holder-"] {
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-.image-tool__image:hover .btn-remove-block-image {
+.image-tool__image:hover .btn-remove-block-image, 
+.block-image:hover .btn-remove-block-image {
     opacity: 1;
     transform: scale(1.05);
 }

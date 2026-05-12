@@ -4271,17 +4271,17 @@ class AdminManager {
         };
 
         // Scan existing images
-        container.querySelectorAll('.image-tool__image').forEach(injectDeleteButton);
+        container.querySelectorAll('.image-tool__image, .block-image').forEach(injectDeleteButton);
 
         // Observe for new images
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 mutation.addedNodes.forEach((node) => {
                     if (node.nodeType === 1) {
-                        if (node.classList.contains('image-tool__image')) {
+                        if (node.classList.contains('image-tool__image') || node.classList.contains('block-image')) {
                             injectDeleteButton(node);
                         } else {
-                            node.querySelectorAll('.image-tool__image').forEach(injectDeleteButton);
+                            node.querySelectorAll('.image-tool__image, .block-image').forEach(injectDeleteButton);
                         }
                     }
                 });
@@ -4296,27 +4296,32 @@ class AdminManager {
             const deleteBtn = e.target.closest('.btn-remove-block-image');
             if (deleteBtn) {
                 e.stopPropagation();
-                const imageWrapper = deleteBtn.closest('.image-tool__image');
+                if (!confirm('Vil du fjerne dette bildet fra innholdet?')) return;
+
+                const imageWrapper = deleteBtn.closest('.image-tool__image, .block-image');
+                
+                // Case 1: Standard EditorJS Block
                 const ceBlock = imageWrapper.closest('.ce-block');
                 const blockId = ceBlock?.dataset?.id;
                 
-                if (blockId && editor?.blocks) {
-                    if (confirm('Vil du fjerne dette bildet fra innholdet?')) {
-                        try {
-                            const index = editor.blocks.getIndex(blockId);
-                            editor.blocks.delete(index);
-                            this.showToast('Bilde fjernet', 'success');
-                        } catch (err) {
-                            console.error('Could not delete image block:', err);
-                            // Fallback for older EditorJS versions
-                            ceBlock.remove();
-                        }
+                if (blockId && editor?.blocks && typeof editor.blocks.delete === 'function') {
+                    try {
+                        const index = editor.blocks.getIndex(blockId);
+                        editor.blocks.delete(index);
+                        this.showToast('Bilde fjernet', 'success');
+                        return;
+                    } catch (err) {
+                        console.warn('Could not delete via editor.blocks API:', err);
                     }
                 }
+
+                // Case 2: Docs-like Editor or Fallback
+                imageWrapper.remove();
+                this.showToast('Bilde fjernet', 'success');
                 return;
             }
 
-            const imageWrapper = e.target.closest('.image-tool__image');
+            const imageWrapper = e.target.closest('.image-tool__image, .block-image');
             if (!imageWrapper) return;
 
             // Don't interfere if the click is on a native file input already
