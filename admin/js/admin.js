@@ -2214,6 +2214,8 @@ class AdminManager {
                 this._loadCoursesList();
             } else if (sectionId === 'users' && !this.currentUserDetailId) {
                 this.loadUsersList();
+            } else if (sectionId === 'media') {
+                this.loadMediaLibrary();
             }
         }
 
