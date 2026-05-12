@@ -151,14 +151,6 @@
     line-height: 1.5 !important;
   }
 
-  /* Blog post content text size */
-  .blog-post-content p, 
-  .blog-post-content li,
-  .blog-post-content {
-    font-size: 16px !important;
-    line-height: 1.6 !important;
-  }
-
   /* Reduce side padding on mobile */
   .container {
     padding-left: 15px !important;
