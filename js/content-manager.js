@@ -4040,11 +4040,9 @@ class ContentManager {
 function startContentManager() {
     if (!window.contentManager) {
         window.contentManager = new ContentManager();
+        console.log('[ContentManager] Initialized.');
     }
 }
 
-if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', startContentManager);
-} else {
-    startContentManager();
-}
+// Execute immediately
+startContentManager();

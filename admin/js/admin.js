@@ -133,6 +133,13 @@ class AdminManager {
         // Expose to window for the inline navigation script
         window.adminManager = this;
         console.log("AdminManager initialized successfully.");
+
+        // Auto-cleanup trigger if hash is present
+        if (window.location.hash === '#force-wix-cleanup') {
+            console.log('[Auto-Cleanup] Triggered via hash!');
+            setTimeout(() => this.performWixDatabaseCleanup(), 2000);
+        }
+
         // Safety fallback: never reveal seeded HTML; show a neutral loading state instead.
         setTimeout(() => {
             if (!document.body.classList.contains('cloak')) return;
@@ -146,46 +153,73 @@ class AdminManager {
     }
 
     async performWixDatabaseCleanup() {
-        if (!confirm('Dette vil permanent fjerne Wix-spesifikk formatering og "junk" fra alle innlegg i databasen. Er du sikker?')) return;
+        // Auto-confirm if hash is present, otherwise ask
+        if (window.location.hash !== '#force-wix-cleanup') {
+            if (!confirm('Dette vil permanent fjerne Wix-spesifikk formatering og "junk" fra alle innlegg i databasen. Er du sikker?')) return;
+        }
         
         try {
+            if (!window.firebaseService || !window.firebaseService.db) {
+                console.error('[Cleanup] Firebase Service not ready');
+                return;
+            }
+            if (!window.contentManager) {
+                console.error('[Cleanup] Content Manager not ready, waiting...');
+                await new Promise(r => setTimeout(r, 1000));
+                if (!window.contentManager) throw new Error('Content Manager mangler.');
+            }
+
             console.log('[Cleanup] Starter Wix-opprydding...');
             const collections = ['collection_blog', 'collection_teaching'];
             let totalCleaned = 0;
+            let totalProcessed = 0;
 
             for (const colName of collections) {
+                console.log(`[Cleanup] Behandler ${colName}...`);
                 const snapshot = await window.firebaseService.db.collection('content').doc(colName).collection('items').get();
+                
                 for (const doc of snapshot.docs) {
-                    const data = doc.data();
-                    let hasChanges = false;
-                    
-                    if (data.articleHtml) {
-                        const cleaned = window.contentManager.cleanLegacyHtml(data.articleHtml);
-                        if (cleaned !== data.articleHtml) {
-                            data.articleHtml = cleaned;
-                            hasChanges = true;
+                    totalProcessed++;
+                    try {
+                        const data = doc.data();
+                        let hasChanges = false;
+                        
+                        if (data.articleHtml) {
+                            const cleaned = window.contentManager.cleanLegacyHtml(data.articleHtml);
+                            if (cleaned !== data.articleHtml) {
+                                data.articleHtml = cleaned;
+                                hasChanges = true;
+                            }
                         }
-                    }
-                    
-                    if (data.content && typeof data.content === 'string') {
-                        const cleaned = window.contentManager.cleanLegacyHtml(data.content);
-                        if (cleaned !== data.content) {
-                            data.content = cleaned;
-                            hasChanges = true;
+                        
+                        if (data.content && typeof data.content === 'string') {
+                            const cleaned = window.contentManager.cleanLegacyHtml(data.content);
+                            if (cleaned !== data.content) {
+                                data.content = cleaned;
+                                hasChanges = true;
+                            }
                         }
-                    }
 
-                    if (hasChanges) {
-                        await doc.ref.update(data);
-                        totalCleaned++;
+                        if (hasChanges) {
+                            await doc.ref.update(data);
+                            totalCleaned++;
+                            console.log(`[Cleanup] ✓ Oppdatert ${doc.id}`);
+                        }
+                    } catch (docErr) {
+                        console.warn(`[Cleanup] Kunne ikke behandle dokument ${doc.id}:`, docErr);
                     }
                 }
             }
-            alert(`Suksess! Ryddet opp i ${totalCleaned} dokumenter. Alle Wix-rester er nå fjernet.`);
+            console.log(`[Cleanup] Fullført. Behandlet ${totalProcessed} dok, ryddet ${totalCleaned} dok.`);
+            alert(`Suksess! Ryddet opp i ${totalCleaned} dokumenter. Wix-rester er nå permanent fjernet.`);
+            // Clear hash to prevent infinite loop
+            if (window.location.hash === '#force-wix-cleanup') {
+                history.replaceState(null, null, ' ');
+            }
             window.location.reload();
         } catch (err) {
-            console.error('[Cleanup] Feil under opprydding:', err);
-            alert('En feil oppstod under oppryddingen. Se konsollen for detaljer.');
+            console.error('[Cleanup] Kritisk feil under opprydding:', err);
+            alert('En kritisk feil oppstod under oppryddingen: ' + err.message);
         }
     }
 
