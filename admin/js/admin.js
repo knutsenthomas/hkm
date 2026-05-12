@@ -2838,12 +2838,12 @@ class AdminManager {
                         </td>
                         <td>
                             <div style="display: flex; gap: 8px; align-items: center;">
-                                <span style="font-size: 12px; padding: 6px 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; line-height: 1; background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border: 1px solid ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
-                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1;">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
+                                <span style="font-size: 12px; padding: 0 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; min-height: 32px; max-height: 32px; box-sizing: border-box; line-height: 1; white-space: nowrap; background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border: 1px solid ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1; vertical-align: middle;">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
                                     TEKST
                                 </span>
-                                <span style="font-size: 12px; padding: 6px 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; line-height: 1; background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border: 1px solid ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
-                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
+                                <span style="font-size: 12px; padding: 0 12px; border-radius: 20px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; height: 32px; min-height: 32px; max-height: 32px; box-sizing: border-box; line-height: 1; white-space: nowrap; background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border: 1px solid ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
+                                    <span class="material-symbols-outlined" style="font-size: 16px; line-height: 1; vertical-align: middle;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
                                     AI
                                 </span>
                             </div>
