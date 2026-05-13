@@ -3052,10 +3052,8 @@ class AdminManager {
             const aiBtn = modal.querySelector('#ai-suggest-seo');
             if (aiBtn) {
                 aiBtn.onclick = async function() {
-                    const title = modal.querySelector('#col-item-title')?.value || '';
-                    const desc = modal.querySelector('#col-item-desc')?.value || '';
-                    const transcript = modal.querySelector('#col-item-transcript')?.value || '';
-                    const context = [title, desc, transcript].filter(Boolean).join('\n');
+                    // Bruk episode-data direkte
+                    const context = [ep.title, ep.description, ep.transcript].filter(Boolean).join('\n');
                     aiBtn.disabled = true;
                     aiBtn.innerHTML = 'Henter forslag...';
                     try {
