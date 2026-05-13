@@ -3052,20 +3052,23 @@ class AdminManager {
             const aiBtn = modal.querySelector('#ai-suggest-seo');
             if (aiBtn) {
                 aiBtn.onclick = async function() {
-                    // Bruk episode-data direkte
-                    const context = [ep.title, ep.description, ep.transcript].filter(Boolean).join('\n');
                     aiBtn.disabled = true;
                     aiBtn.innerHTML = 'Henter forslag...';
                     try {
                         const response = await fetch('/gemini/seo-suggest', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ text: context })
+                            body: JSON.stringify({
+                                title: ep.title,
+                                description: ep.description,
+                                categories: currentCats,
+                                transcript: ep.transcript || ''
+                            })
                         });
                         const data = await response.json();
-                        if (data.tags) modal.querySelector('#tag-input').value = data.tags.join(', ');
-                        if (data.title) modal.querySelector('#col-item-seo-title').value = data.title;
-                        if (data.description) modal.querySelector('#col-item-seo-desc').value = data.description;
+                        if (data.tags) modal.querySelector('#tag-input').value = data.tags;
+                        if (data.metaTitle) modal.querySelector('#col-item-seo-title').value = data.metaTitle;
+                        if (data.metaDescription) modal.querySelector('#col-item-seo-desc').value = data.metaDescription;
                     } catch (e) {
                         alert('Kunne ikke hente AI-forslag.');
                     } finally {
