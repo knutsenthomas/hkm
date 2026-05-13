@@ -2929,6 +2929,9 @@ class AdminManager {
                                 <button class="btn-icon-round" onclick="window.adminManager.openPodcastSettingsModal('${id}')" title="Kategorier og overstyringer">
                                     <span class="material-symbols-outlined">tune</span>
                                 </button>
+                                   <a class="btn-icon-round" href="/admin/podcast-rediger.html?id=${id}" title="Rediger tekst og kategorier på egen side">
+                                       <span class="material-symbols-outlined">open_in_new</span>
+                                   </a>
                             </div>
                         </td>
                     </tr>

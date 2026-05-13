@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>Rediger Podcast-episode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/interactions.css">
+    <link rel="stylesheet" href="/css/features-enhanced.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+    <link rel="stylesheet" href="/css/search-v2.css">
+    <link rel="stylesheet" href="/css/stripe-checkout.css">
+    <link rel="stylesheet" href="/css/subpage-hero.css">
+    <link rel="stylesheet" href="/css/blog-content.css">
+    <script src="/js/firebase-service.js" type="module"></script>
+    <script src="/admin/js/podcast-rediger.js" type="module"></script>
+</head>
+<body>
+    <div class="container" style="max-width: 700px; margin: 40px auto;">
+        <h1>Rediger podcast-episode</h1>
+        <div id="episode-info"></div>
+        <form id="edit-podcast-form">
+            <div class="form-group">
+                <label for="episode-title">Tittel</label>
+                <input type="text" id="episode-title" name="title" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label for="episode-description">Beskrivelse</label>
+                <textarea id="episode-description" name="description" class="form-control" rows="4"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="episode-categories">Kategorier (kommaseparert)</label>
+                <input type="text" id="episode-categories" name="categories" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Lagre endringer</button>
+            <a href="/admin/index.html#podcast" class="btn">Tilbake</a>
+        </form>
+        <div id="save-status"></div>
+    </div>
+</body>
+</html>
