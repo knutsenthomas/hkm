@@ -3026,6 +3026,35 @@ class AdminManager {
 
             document.body.appendChild(modal);
 
+            // Koble AI-knapp for SEO/tagger etter at modal er i DOM
+            const aiBtn = modal.querySelector('#ai-suggest-seo');
+            if (aiBtn) {
+                aiBtn.onclick = async function() {
+                    const title = modal.querySelector('#col-item-title')?.value || '';
+                    const desc = modal.querySelector('#col-item-desc')?.value || '';
+                    const transcript = modal.querySelector('#col-item-transcript')?.value || '';
+                    const context = [title, desc, transcript].filter(Boolean).join('\n');
+                    aiBtn.disabled = true;
+                    aiBtn.innerHTML = 'Henter forslag...';
+                    try {
+                        const response = await fetch('/gemini/seo-suggest', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: context })
+                        });
+                        const data = await response.json();
+                        if (data.tags) modal.querySelector('#tag-input').value = data.tags.join(', ');
+                        if (data.title) modal.querySelector('#col-item-seo-title').value = data.title;
+                        if (data.description) modal.querySelector('#col-item-seo-desc').value = data.description;
+                    } catch (e) {
+                        alert('Kunne ikke hente AI-forslag.');
+                    } finally {
+                        aiBtn.disabled = false;
+                        aiBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span> Foreslå tagger og SEO med AI';
+                    }
+                };
+            }
+
             // Handle chip clicks
             const chips = modal.querySelectorAll('.podcast-modal-chip');
             chips.forEach(chip => {
@@ -7378,14 +7407,14 @@ class AdminManager {
 
                              <h4 class="sidebar-section-title">TAGGER</h4>
                              <div class="sidebar-group">
-                                 <div class="tags-input-container">
-                                     <div id="active-tags" class="active-tags-list"></div>
-                                     <input type="text" id="tag-input" class="sidebar-control" placeholder="Legg til tag + Enter">
-                                 </div>
-                                <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-top:10px;align-self:flex-end;">
+                                <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:10px;align-self:flex-start;">
                                     <span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span>
                                     Foreslå tagger og SEO med AI
                                 </button>
+                                <div class="tags-input-container">
+                                    <div id="active-tags" class="active-tags-list"></div>
+                                    <input type="text" id="tag-input" class="sidebar-control" placeholder="Legg til tag + Enter">
+                                </div>
                              </div>
 
                              <h4 class="sidebar-section-title">SEO & SYNLIGHET</h4>
@@ -7397,32 +7426,6 @@ class AdminManager {
                                  <label>Meta-beskrivelse</label>
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
-                            <script>
-                            document.getElementById('ai-suggest-seo').onclick = async function() {
-                                const title = document.getElementById('col-item-title')?.value || '';
-                                const desc = document.getElementById('col-item-desc')?.value || '';
-                                const transcript = document.getElementById('col-item-transcript')?.value || '';
-                                const context = [title, desc, transcript].filter(Boolean).join('\n');
-                                this.disabled = true;
-                                this.textContent = 'Henter forslag...';
-                                try {
-                                    const response = await fetch('/gemini/seo-suggest', {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ text: context })
-                                    });
-                                    const data = await response.json();
-                                    if (data.tags) document.getElementById('tag-input').value = data.tags.join(', ');
-                                    if (data.title) document.getElementById('col-item-seo-title').value = data.title;
-                                    if (data.description) document.getElementById('col-item-seo-desc').value = data.description;
-                                } catch (e) {
-                                    alert('Kunne ikke hente AI-forslag.');
-                                } finally {
-                                    this.disabled = false;
-                                    this.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span> Foreslå tagger og SEO med AI';
-                                }
-                            };
-                            </script>
                              ${collectionId === 'blog' ? `
                              <h4 class="sidebar-section-title">RELATERTE INNLEGG</h4>
                              <div class="sidebar-group">
