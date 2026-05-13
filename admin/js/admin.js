@@ -2843,11 +2843,11 @@ class AdminManager {
         `;
 
         this.loadPodcastEpisodes();
-        this.loadMediaSettings();
+        this.loadPodcastSettings();
         this.loadPodcastOverrides();
 
         section.addEventListener('click', (event) => {
-            if (event.target.id === 'save-podcast-settings') this.saveMediaSettings('save-podcast-settings');
+            if (event.target.id === 'save-podcast-settings') this.savePodcastSettings('save-podcast-settings');
             if (event.target.id === 'save-podcast-overrides') this.savePodcastOverrides();
             if (event.target.id === 'refresh-podcast-list') this.loadPodcastOverrides();
             if (event.target.id === 'open-podcast-transcripts-full') this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon', 'podcast');
@@ -2952,12 +2952,12 @@ class AdminManager {
 
     async openPodcastSettingsModal(episodeId) {
         try {
-            // 1. Fetch current overrides and media settings
+            // 1. Fetch current overrides and podcast settings
             const overridesData = await firebaseService.getPageContent('settings_podcast_overrides') || {};
             const overrides = overridesData.overrides || {};
             
-            const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
-            const customCatStr = mediaSettings.podcastCustomCategories || '';
+            const podcastSettings = await this.getPodcastSettings();
+            const customCatStr = podcastSettings.podcastCustomCategories || '';
             const customCatArr = customCatStr.split(',').map(s => s.trim()).filter(Boolean);
 
             // 2. Find episode details from cache
@@ -3104,8 +3104,8 @@ class AdminManager {
                     customArr.forEach(c => newGlobalCats.add(c));
                     
                     if (newGlobalCats.size > customCatArr.length) {
-                        await firebaseService.savePageContent('settings_media', {
-                            ...mediaSettings,
+                        await firebaseService.savePageContent('settings_podcast', {
+                            ...podcastSettings,
                             podcastCustomCategories: Array.from(newGlobalCats).join(', '),
                             updatedAt: new Date().toISOString()
                         });
@@ -5327,108 +5327,7 @@ class AdminManager {
         });
     }
 
-    async renderMediaManager() {
-        const section = document.getElementById('media-section');
-        if (!section) return;
 
-        // Kun Media Library (filhåndtering)
-        section.innerHTML = `
-            <div class="section-header" style="margin-bottom: 32px;">
-                <h2 class="section-title">Media & Ressurser</h2>
-                <p class="section-subtitle">Administrer bilder og filer</p>
-            </div>
-            <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
-                <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(27, 73, 101, 0.1); color: #1B4965; display: flex; align-items: center; justify-content: center;">
-                        <span class="material-symbols-outlined">image</span>
-                    </div>
-                    <div>
-                        <p style="font-size: 13px; color: #64748b; margin: 0;">Totalt antall filer</p>
-                        <h4 id="media-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">0</h4>
-                    </div>
-                </div>
-                <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(16, 185, 129, 0.1); color: #10b981; display: flex; align-items: center; justify-content: center;">
-                        <span class="material-symbols-outlined">folder</span>
-                    </div>
-                    <div>
-                        <p style="font-size: 13px; color: #64748b; margin: 0;">Mapper</p>
-                        <h4 id="media-folder-count" style="font-size: 18px; font-weight: 700; margin: 0; color: #1e293b;">-</h4>
-                    </div>
-                </div>
-            </div>
-            <div class="media-controls-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; padding: 16px; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
-                <div class="media-breadcrumbs" id="media-breadcrumbs" style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #64748b;"></div>
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;">
-                        Område:
-                        <select id="media-location-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px;">
-                            ${this._getMediaLocationOptionsHtml()}
-                        </select>
-                    </label>
-                    <button id="btn-new-folder" class="btn-secondary" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
-                        Ny mappe
-                    </button>
-                    <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <span style="font-size: 13px; color: #64748b;">Sorter:</span>
-                        <select id="media-sort-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none;">
-                            <option value="date-desc">Nyeste først</option>
-                            <option value="date-asc">Eldste først</option>
-                            <option value="name-asc">Navn (A-Å)</option>
-                            <option value="name-desc">Navn (Å-A)</option>
-                            <option value="size-desc">Størst først</option>
-                            <option value="size-asc">Minst først</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
-                <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
-                <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
-                <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">Mediebibliotek</strong></p>
-                <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
-            </div>
-            <div id="media-grid" class="media-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px;">
-                <div class="loader-container" style="grid-column: 1/-1; text-align: center; padding: 60px 0;">
-                    <div class="loader" style="margin: 0 auto;"></div>
-                    <p style="margin-top: 16px; color: #64748b;">Henter mediebibliotek...</p>
-                </div>
-            </div>
-        `;
-
-        // Kun Media Library
-        this.loadMediaLibrary();
-        
-        // Setup Upload Listeners
-        this._setupMediaLibraryListeners();
-
-        // Combined Event Listeners for Integrations tab
-        section.addEventListener('click', (e) => {
-            if (e.target.id === 'save-media-settings') this.saveMediaSettings();
-            if (e.target.id === 'save-podcast-overrides') this.savePodcastOverrides();
-            if (e.target.id === 'refresh-podcast-list') this.loadPodcastOverrides();
-            if (e.target.id === 'open-podcast-transcripts-full') this.renderCollectionEditor('podcast_transcripts', 'Podcast Transkripsjon', 'podcast');
-            if (e.target.id === 'save-ai-settings') this.saveIntegrationsSettings();
-            if (e.target.id === 'add-gcal') this.addGCalInput();
-            if (e.target.id === 'connect-google-btn') this.handleGoogleAuth();
-            if (e.target.id === 'disconnect-google') this.handleGoogleDisconnect();
-        });
-
-        // Podcast item click delegation
-        const overridesList = section.querySelector('#podcast-overrides-list');
-        if (overridesList) {
-            overridesList.addEventListener('click', (event) => {
-                const btn = event.target.closest('button[data-open-podcast-id]');
-                if (!btn) return;
-                event.preventDefault();
-                this.openPodcastTranscriptEditorById(btn.getAttribute('data-open-podcast-id') || '');
-            });
-        }
-
-        section.setAttribute('data-rendered', 'true');
-    }
 
     _getLegacyMediaPrefixForPath(path = '') {
         const normalized = String(path || '').replace(/^\/+/, '').replace(/\/+$/, '');
@@ -5443,7 +5342,7 @@ class AdminManager {
             { label: 'Blogg', path: 'editor/blog/' },
             { label: 'Undervisning', path: 'editor/teaching/' },
             { label: 'Arrangementer', path: 'editor/events/' },
-            { label: 'Podkast', path: 'editor/podcast_transcripts/' },
+
             { label: 'Kurs', path: 'editor/courses/' },
             { label: 'Forside / hero', path: 'hero/' },
             { label: 'SEO / deling', path: 'seo/' },
@@ -6359,28 +6258,98 @@ class AdminManager {
         }
     }
 
+    async getPodcastSettings() {
+        try {
+            const [podcastSettings, legacyMediaSettings] = await Promise.all([
+                firebaseService.getPageContent('settings_podcast').catch(() => ({})),
+                firebaseService.getPageContent('settings_media').catch(() => ({}))
+            ]);
+
+            const legacyPodcastFields = {};
+            ['podcastRssUrl', 'spotifyUrl', 'appleUrl', 'podcastCustomCategories'].forEach((key) => {
+                if (legacyMediaSettings && legacyMediaSettings[key] !== undefined) {
+                    legacyPodcastFields[key] = legacyMediaSettings[key];
+                }
+            });
+
+            return {
+                ...legacyPodcastFields,
+                ...(podcastSettings || {})
+            };
+        } catch (error) {
+            console.error('Load podcast settings error:', error);
+            return {};
+        }
+    }
+
+    async loadPodcastSettings() {
+        try {
+            const settings = await this.getPodcastSettings();
+            const podcastRss = document.getElementById('podcast-rss-url');
+            const spotify = document.getElementById('podcast-spotify-url');
+            const apple = document.getElementById('podcast-apple-url');
+            const podcastCategories = document.getElementById('podcast-custom-categories');
+
+            if (podcastRss) podcastRss.value = settings.podcastRssUrl || '';
+            if (spotify) spotify.value = settings.spotifyUrl || '';
+            if (apple) apple.value = settings.appleUrl || '';
+            if (podcastCategories) podcastCategories.value = settings.podcastCustomCategories || '';
+
+            const syncInput = document.getElementById('podcast-global-categories-sync');
+            if (syncInput) syncInput.value = settings.podcastCustomCategories || '';
+        } catch (e) {
+            console.error("Load podcast settings error:", e);
+        }
+    }
+
+    async savePodcastSettings(buttonId = 'save-podcast-settings') {
+        const btn = document.getElementById(buttonId) || document.getElementById('save-podcast-settings');
+        const podcastRssInput = document.getElementById('podcast-rss-url');
+        const spotifyInput = document.getElementById('podcast-spotify-url');
+        const appleInput = document.getElementById('podcast-apple-url');
+        const podcastCategoriesInput = document.getElementById('podcast-custom-categories');
+
+        const originalText = btn?.textContent || 'Lagre';
+        if (btn) {
+            btn.textContent = 'Lagrer...';
+            btn.disabled = true;
+        }
+
+        try {
+            const currentSettings = await this.getPodcastSettings();
+            const nextSettings = {
+                ...currentSettings,
+                updatedAt: new Date().toISOString()
+            };
+
+            if (podcastRssInput) nextSettings.podcastRssUrl = podcastRssInput.value.trim();
+            if (spotifyInput) nextSettings.spotifyUrl = spotifyInput.value.trim();
+            if (appleInput) nextSettings.appleUrl = appleInput.value.trim();
+            if (podcastCategoriesInput) nextSettings.podcastCustomCategories = podcastCategoriesInput.value.trim();
+
+            await firebaseService.savePageContent('settings_podcast', nextSettings);
+            this.showToast('✅ Podcast-innstillingene er lagret!', 'success', 5000);
+            if (document.getElementById('podcast-overrides-list')) this.loadPodcastOverrides();
+        } catch (err) {
+            console.error("Save podcast settings error:", err);
+            this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
+        } finally {
+            if (btn) {
+                btn.textContent = originalText;
+                btn.disabled = false;
+            }
+        }
+    }
+
     async loadMediaSettings() {
         try {
             const settings = await firebaseService.getPageContent('settings_media');
             if (settings) {
                 const ytChannel = document.getElementById('yt-channel-id');
                 const ytPlaylists = document.getElementById('yt-playlists');
-                const podcastRss = document.getElementById('podcast-rss-url');
-                const spotify = document.getElementById('podcast-spotify-url');
-                const apple = document.getElementById('podcast-apple-url');
-                const podcastCategories = document.getElementById('podcast-custom-categories');
 
                 if (settings.youtubeChannelId && ytChannel) ytChannel.value = settings.youtubeChannelId;
                 if (settings.youtubePlaylists && ytPlaylists) ytPlaylists.value = settings.youtubePlaylists;
-                if (settings.podcastRssUrl && podcastRss) podcastRss.value = settings.podcastRssUrl;
-                if (settings.spotifyUrl && spotify) spotify.value = settings.spotifyUrl;
-                if (settings.appleUrl && apple) apple.value = settings.appleUrl;
-                if (settings.podcastCustomCategories) {
-                    const val = settings.podcastCustomCategories;
-                    if (podcastCategories) podcastCategories.value = val;
-                    const syncInput = document.getElementById('podcast-global-categories-sync');
-                    if (syncInput) syncInput.value = val;
-                }
             }
         } catch (e) {
             console.error("Load media settings error:", e);
@@ -6391,10 +6360,6 @@ class AdminManager {
         const btn = document.getElementById(buttonId) || document.getElementById('save-media-settings');
         const ytChannelInput = document.getElementById('yt-channel-id');
         const ytPlaylistsInput = document.getElementById('yt-playlists');
-        const podcastRssInput = document.getElementById('podcast-rss-url');
-        const spotifyInput = document.getElementById('podcast-spotify-url');
-        const appleInput = document.getElementById('podcast-apple-url');
-        const podcastCategoriesInput = document.getElementById('podcast-custom-categories');
 
         const originalText = btn?.textContent || 'Lagre';
         if (btn) {
@@ -6411,14 +6376,9 @@ class AdminManager {
 
             if (ytChannelInput) nextSettings.youtubeChannelId = ytChannelInput.value.trim();
             if (ytPlaylistsInput) nextSettings.youtubePlaylists = ytPlaylistsInput.value.trim();
-            if (podcastRssInput) nextSettings.podcastRssUrl = podcastRssInput.value.trim();
-            if (spotifyInput) nextSettings.spotifyUrl = spotifyInput.value.trim();
-            if (appleInput) nextSettings.appleUrl = appleInput.value.trim();
-            if (podcastCategoriesInput) nextSettings.podcastCustomCategories = podcastCategoriesInput.value.trim();
 
             await firebaseService.savePageContent('settings_media', nextSettings);
             this.showToast('✅ Innstillingene er lagret!', 'success', 5000);
-            if (document.getElementById('podcast-overrides-list')) this.loadPodcastOverrides();
         } catch (err) {
             console.error("Save media settings error:", err);
             this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
@@ -6457,8 +6417,8 @@ class AdminManager {
             const overridesData = await firebaseService.getPageContent('settings_podcast_overrides') || {};
             const overrides = overridesData.overrides || {};
 
-            const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
-            const customCatStr = mediaSettings.podcastCustomCategories || '';
+            const podcastSettings = await this.getPodcastSettings();
+            const customCatStr = podcastSettings.podcastCustomCategories || '';
             const customCatArr = customCatStr.split(',').map(s => s.trim()).filter(Boolean);
 
             // 2. Fetch episodes from the same source used by Podcast redigering
@@ -6620,19 +6580,19 @@ class AdminManager {
         btn.disabled = true;
 
         try {
-            // 1. Fetch latest media settings to avoid overwriting other changes (like Spotify URL)
-            const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
+            // 1. Fetch latest podcast settings to avoid overwriting other changes (like Spotify URL)
+            const podcastSettings = await this.getPodcastSettings();
             
             // Also merge in categories that might already be in the database
-            const dbGlobalStr = mediaSettings.podcastCustomCategories || '';
+            const dbGlobalStr = podcastSettings.podcastCustomCategories || '';
             dbGlobalStr.split(',').forEach(addToGlobal);
 
             // Final string of all global categories
             const updatedGlobalStr = Array.from(globalCatsMap.values()).join(', ');
 
             // 2. Save updated global categories
-            await firebaseService.savePageContent('settings_media', {
-                ...mediaSettings,
+            await firebaseService.savePageContent('settings_podcast', {
+                ...podcastSettings,
                 podcastCustomCategories: updatedGlobalStr,
                 updatedAt: new Date().toISOString()
             });

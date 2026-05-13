@@ -108,7 +108,32 @@ async function loadMediaSettings() {
     if (!svc || !svc.isInitialized) {
         return null;
     }
-    return await svc.getPageContent('settings_media');
+
+    const [mediaSettings, podcastSettings] = await Promise.all([
+        svc.getPageContent('settings_media').catch(() => ({})),
+        svc.getPageContent('settings_podcast').catch(() => ({}))
+    ]);
+
+    return {
+        ...(mediaSettings || {}),
+        ...(podcastSettings || {})
+    };
+}
+
+function updatePlatformLinks(settings = {}) {
+    const linksContainer = document.getElementById('podcast-links-container');
+    if (!linksContainer) return;
+
+    const spotifyLink = linksContainer.querySelector('.platform-spotify');
+    const appleLink = linksContainer.querySelector('.platform-apple');
+
+    if (settings.spotifyUrl && spotifyLink) {
+        spotifyLink.href = settings.spotifyUrl;
+    }
+
+    if (settings.appleUrl && appleLink) {
+        appleLink.href = settings.appleUrl;
+    }
 }
 
 /**
