@@ -7405,17 +7405,17 @@ class AdminManager {
                                   <input type="file" id="col-item-img-file" style="display: none;" accept="image/*">
                               </div>
 
-                             <h4 class="sidebar-section-title">TAGGER</h4>
-                             <div class="sidebar-group">
-                                <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:10px;align-self:flex-start;">
-                                    <span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span>
-                                    Foreslå tagger og SEO med AI
-                                </button>
+                            <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:14px;align-self:flex-start;display:block;width:100%;">
+                                <span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span>
+                                Foreslå tagger og SEO med AI
+                            </button>
+                            <h4 class="sidebar-section-title">TAGGER</h4>
+                            <div class="sidebar-group">
                                 <div class="tags-input-container">
                                     <div id="active-tags" class="active-tags-list"></div>
                                     <input type="text" id="tag-input" class="sidebar-control" placeholder="Legg til tag + Enter">
                                 </div>
-                             </div>
+                            </div>
 
                              <h4 class="sidebar-section-title">SEO & SYNLIGHET</h4>
                              <div class="sidebar-group">
