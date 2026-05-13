@@ -2881,6 +2881,7 @@ class AdminManager {
                 return;
             }
 
+
             listBody.innerHTML = episodes.map((ep, idx) => {
                 const id = ep.id;
                 const transcriptData = transcriptMap[id] || {};
@@ -2921,13 +2922,7 @@ class AdminManager {
                                 </span>
                             </div>
                         </td>
-                        <td style="text-align:right; padding-right:24px;">
-                            <div style="display:flex; gap:8px; justify-content:flex-end;">
-                                <button class="btn-icon-round" onclick="window.adminManager.openPodcastSettingsModal('${id}')" title="Rediger kategorier">
-                                    <span class="material-symbols-outlined">tune</span>
-                                </button>
-                            </div>
-                        </td>
+                        <td style="text-align:right; padding-right:24px;"></td>
                     </tr>
                 `;
             }).join('');
