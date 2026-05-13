@@ -2762,7 +2762,7 @@ class AdminManager {
                 </div>
             `, '')}
 
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-bottom: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-bottom: 24px;">
                 <div class="card modern">
                     <div class="card-header flex-between">
                         <h3 class="card-title">Podcast-innstillinger</h3>
@@ -5234,7 +5234,7 @@ class AdminManager {
 
         section.innerHTML = `
             ${this.renderSectionHeader('hub', 'Integrasjoner', 'Administrer YouTube, Google Calendar, AI og oversettelse.', '')}
-            <div class="grid-2-cols" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
                 <div class="card modern">
                     <div class="card-header flex-between">
                         <h3 class="card-title">YouTube</h3>
