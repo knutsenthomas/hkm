@@ -12631,7 +12631,7 @@ class AdminManager {
                             title: 'Ressurser',
                             store: 'Butikk',
                             events: 'Arrangementer',
-                            media: 'Media & Podcast',
+                            media: 'Media',
                             blog: 'Nyheter & Blogg',
                             courses: 'Kurs',
                             myPage: 'Min Side'

@@ -1081,17 +1081,10 @@ body.admin-body .welcome-subtitle {
   border-left: 1px solid #edf2f7;
 }
 
-#media-section #podcast-overrides-list {
+#podcast-section #podcast-overrides-list {
   display: flex;
   flex-direction: column;
   gap: 8px;
-}
-
-#media-section .podcast-override-item {
-  padding: 12px !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 10px;
-  background: #f8fafc;
 }
 
 #media-section .override-select {
