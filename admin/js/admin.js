@@ -2794,23 +2794,11 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card modern">
-                    <div class="card-header flex-between">
-                        <h3 class="card-title">Kategorier og tekst</h3>
-                        <div style="display:flex; gap:8px; align-items:center;">
-                            <button class="btn-secondary btn-sm" id="open-podcast-transcripts-full">Alle episoder</button>
-                            <button class="btn-secondary btn-sm" id="refresh-podcast-list">Oppdater</button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <p style="font-size: 13px; color: #64748b; margin-bottom: 12px; font-weight: 600;">Siste episoder (overstyring/transkripsjon):</p>
-                        <div id="podcast-overrides-list" style="max-height: 420px; overflow-y: auto;">
-                            <div class="loader">Henter episoder...</div>
-                        </div>
-                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee;">
-                            <button class="btn-primary" id="save-podcast-overrides" style="width: 100%;">Lagre overstyringer</button>
-                        </div>
-                    </div>
+                <div style="margin-bottom: 24px;">
+                    <label for="podcast-custom-categories" style="font-weight:600; font-size:14px;">Globale kategorier for alle episoder</label>
+                    <input type="text" id="podcast-custom-categories" class="form-control" placeholder="f.eks. Lederskap, Helbredelse, Familie" style="max-width:340px; display:inline-block; margin-right:12px;">
+                    <button class="btn-primary" id="save-podcast-settings">Lagre</button>
+                    <p style="font-size: 11px; color: #64748b; margin-top: 6px; line-height: 1.4;">Separer med komma. Disse gjelder for alle episoder.</p>
                 </div>
             </div>
 
