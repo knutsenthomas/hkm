@@ -2,7 +2,7 @@
 // Flyttet fra admin.js: Podcast administrasjon for bruk på podcast.html
 // Vises kun for innloggede administratorer
 
-import { firebaseService } from './js/firebase-service.js';
+import { firebaseService } from './firebase-service.js';
 
 window.podcastAdmin = {
     // ... Her limes inn all relevant podcast admin-funksjonalitet fra admin.js ...
