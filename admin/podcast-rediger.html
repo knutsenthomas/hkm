@@ -15,26 +15,28 @@
     <script src="/admin/js/podcast-rediger.js" type="module"></script>
 </head>
 <body>
-    <div class="container" style="max-width: 700px; margin: 40px auto;">
-        <h1>Rediger podcast-episode</h1>
-        <div id="episode-info"></div>
-        <form id="edit-podcast-form">
+    <div class="container" style="max-width: 700px; margin: 40px auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(0,0,0,0.07); padding: 36px 32px 32px 32px;">
+        <h1 style="text-align:center; margin-bottom: 24px; font-size: 2rem; font-weight: 800; color: #1e293b;">Rediger podcast-episode</h1>
+        <div id="episode-info" style="margin-bottom: 18px; color: #64748b; font-size: 15px;"></div>
+        <form id="edit-podcast-form" style="display: flex; flex-direction: column; gap: 22px;">
             <div class="form-group">
-                <label for="episode-title">Tittel</label>
-                <input type="text" id="episode-title" name="title" class="form-control" required>
+                <label for="episode-title" style="font-weight: 600; color: #1e293b;">Tittel</label>
+                <input type="text" id="episode-title" name="title" class="form-control" required style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0; font-size:16px;">
             </div>
             <div class="form-group">
-                <label for="episode-description">Beskrivelse</label>
-                <textarea id="episode-description" name="description" class="form-control" rows="4"></textarea>
+                <label for="episode-description" style="font-weight: 600; color: #1e293b;">Beskrivelse</label>
+                <textarea id="episode-description" name="description" class="form-control" rows="5" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0; font-size:16px;"></textarea>
             </div>
             <div class="form-group">
-                <label for="episode-categories">Kategorier (kommaseparert)</label>
-                <input type="text" id="episode-categories" name="categories" class="form-control">
+                <label for="episode-categories" style="font-weight: 600; color: #1e293b;">Kategorier <span style="font-weight:400; color:#64748b;">(kommaseparert)</span></label>
+                <input type="text" id="episode-categories" name="categories" class="form-control" style="width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e2e8f0; font-size:16px;">
             </div>
-            <button type="submit" class="btn btn-primary">Lagre endringer</button>
-            <a href="/admin/index.html#podcast" class="btn">Tilbake</a>
+            <div style="display:flex; gap:12px; align-items:center; margin-top: 10px;">
+                <button type="submit" class="btn btn-primary" style="background:#1e40af; color:#fff; border:none; border-radius:8px; padding:10px 22px; font-size:16px; font-weight:700; cursor:pointer;">Lagre endringer</button>
+                <a href="/admin/index.html#podcast" class="btn" style="color:#1e40af; text-decoration:underline; font-size:15px;">Tilbake</a>
+            </div>
         </form>
-        <div id="save-status"></div>
+        <div id="save-status" style="margin-top:18px; font-size:15px;"></div>
     </div>
 </body>
 </html>
