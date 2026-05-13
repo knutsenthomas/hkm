@@ -2922,7 +2922,13 @@ class AdminManager {
                                 </span>
                             </div>
                         </td>
-                        <td style="text-align:right; padding-right:24px;"></td>
+                        <td style="text-align:right; padding-right:24px;">
+                            <div style="display:flex; gap:8px; justify-content:flex-end;">
+                                <button class="btn-icon-round" onclick="window.adminManager.openPodcastTranscriptEditorById('${id}')" title="Rediger tekst">
+                                    <span class="material-symbols-outlined">edit</span>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 `;
             }).join('');
