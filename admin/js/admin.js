@@ -2999,7 +2999,29 @@ class AdminManager {
                                 }).join('')}
                             </div>
                             
-                            <div style="display:flex; flex-direction:column; gap:8px;">
+                            <!-- AI-knapp for tagger/SEO/meta -->
+                            <button id="ai-suggest-seo" type="button" style="margin:16px 0 8px 0; display:flex; align-items:center; gap:8px; background:#f1f5f9; color:#1B4965; border:none; border-radius:8px; padding:10px 18px; font-weight:700; font-size:14px; cursor:pointer;">
+                                <span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span>
+                                Foreslå tagger og SEO med AI
+                            </button>
+
+                            <!-- Tagger input -->
+                            <div style="margin: 18px 0 0 0;">
+                                <label for="tag-input" style="font-size:12px; font-weight:700; color:#64748b; letter-spacing:0.04em;">Tagger</label>
+                                <input id="tag-input" type="text" class="admin-input" placeholder="Legg til tag + Enter" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #e2e8f0; font-size:14px; margin-top:6px;">
+                            </div>
+
+                            <!-- SEO & Synlighet -->
+                            <div style="margin: 18px 0 0 0;">
+                                <label for="col-item-seo-title" style="font-size:12px; font-weight:700; color:#64748b; letter-spacing:0.04em;">Meta-tittel (SEO)</label>
+                                <input id="col-item-seo-title" type="text" class="admin-input" placeholder="Meta-tittel for søkemotorer" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #e2e8f0; font-size:14px; margin-top:6px;">
+                            </div>
+                            <div style="margin: 18px 0 0 0;">
+                                <label for="col-item-seo-desc" style="font-size:12px; font-weight:700; color:#64748b; letter-spacing:0.04em;">Meta-beskrivelse</label>
+                                <textarea id="col-item-seo-desc" class="admin-input" placeholder="Meta-beskrivelse for søkemotorer" style="width:100%; padding:12px; border-radius:12px; border:1.5px solid #e2e8f0; font-size:14px; margin-top:6px; min-height:60px;"></textarea>
+                            </div>
+
+                            <div style="display:flex; flex-direction:column; gap:8px; margin-top:18px;">
                                 <label style="font-size:12px; font-weight:600; color:#64748b;">Legg til egne kategorier (kommaseparert)</label>
                                 <input type="text" id="modal-custom-cats" class="admin-input" placeholder="f.eks. lederskap, familie" 
                                     value="${currentCats.filter(c => !podcastCategories.find(pc => pc.value === c.toLowerCase())).join(', ')}"
