@@ -3051,11 +3051,12 @@ class AdminManager {
             // Koble AI-knapp for SEO/tagger etter at modal er i DOM
             const aiBtn = modal.querySelector('#ai-suggest-seo');
             if (aiBtn) {
-                aiBtn.onclick = async function() {
+                aiBtn.onclick = async () => {
                     aiBtn.disabled = true;
                     aiBtn.innerHTML = 'Henter forslag...';
                     try {
-                        const response = await fetch('/gemini/seo-suggest', {
+                        // Use the correct endpoint for Firebase Functions
+                        const response = await fetch('/seoSuggest', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -3066,7 +3067,21 @@ class AdminManager {
                             })
                         });
                         const data = await response.json();
-                        if (data.tags) modal.querySelector('#tag-input').value = data.tags;
+                        // Update tag UI properly
+                        if (data.tags) {
+                            // Split tags and update the tag UI
+                            const tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
+                            const tagInput = modal.querySelector('#tag-input');
+                            if (tagInput) tagInput.value = '';
+                            // Try to update the tag badge UI if present
+                            if (typeof renderTags === 'function') {
+                                currentTags = tags;
+                                renderTags();
+                            } else {
+                                // fallback: set input value as comma-separated
+                                if (tagInput) tagInput.value = tags.join(', ');
+                            }
+                        }
                         if (data.metaTitle) modal.querySelector('#col-item-seo-title').value = data.metaTitle;
                         if (data.metaDescription) modal.querySelector('#col-item-seo-desc').value = data.metaDescription;
                     } catch (e) {
