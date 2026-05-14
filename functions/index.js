@@ -171,13 +171,30 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
 
     if (task === 'generate_blog_draft') {
       const draftPrompt = `
-        Du er en inspirerende skribent for His Kingdom Ministry.
+        Du er en inspirerende og dyktig skribent for His Kingdom Ministry.
         Tema: ${prompt}
-        Lag et strukturert utkast til et ${options?.type || 'blogginnlegg'}.
-        Bruk et varmt, bibelsk forankret og engasjerende språk.
-        Svar KUN med gyldig JSON på dette formatet (EditorJS-blokker):
-        { "blocks": [ { "type": "header", "data": { "text": "Overskrift", "level": 2 } }, { "type": "paragraph", "data": { "text": "..." } } ] }
-        Ikke bruk markdown-blokker som f.eks. kodelister med json, svar kun med rå tekst.
+        
+        Lag et omfattende og strukturert utkast til et ${options?.type || 'blogginnlegg'}. 
+        
+        KRAV TIL INNHOLD:
+        1. LENGDE: Skriv utfyllende, sikt på minst 500-700 ord.
+        2. STRUKTUR: Bruk en fengende hovedoverskrift (H1), en engasjerende introduksjon, 3-4 hovedavsnitt med egne underoverskrifter (H2), og en inspirerende avslutning.
+        3. SPRÅK: Bruk et varmt, bibelsk forankret og moderne norsk språk. Inkluder gjerne 1-2 relevante bibelvers som passer til temaet.
+        4. FORMATERING: IKKE bruk bold (fet skrift) på hele avsnitt. Bruk kun bold for å fremheve enkelte ord eller korte setninger.
+        
+        Svar KUN med gyldig JSON i EditorJS-format. Hvert avsnitt SKAL være en egen 'paragraph'-blokk. Overskrifter SKAL være 'header'-blokker.
+        
+        FORMAT:
+        { 
+          "blocks": [ 
+            { "type": "header", "data": { "text": "Hovedoverskrift", "level": 1 } },
+            { "type": "paragraph", "data": { "text": "Introduksjonstekst her..." } },
+            { "type": "header", "data": { "text": "Underoverskrift 1", "level": 2 } },
+            { "type": "paragraph", "data": { "text": "Første hoveddel..." } },
+            ...
+          ] 
+        }
+        Svar kun med rå tekst uten markdown-formatering.
       `.trim();
 
       try {
