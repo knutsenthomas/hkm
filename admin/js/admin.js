@@ -1776,24 +1776,29 @@ class AdminManager {
             if (adminName) adminName.textContent = safeName;
             if (!adminAvatar) return;
 
-            if (photoURL) {
+            // Clear any previous state
+            adminAvatar.textContent = '';
+            adminAvatar.innerHTML = '';
+
+            if (photoURL && photoURL.trim().length > 5) {
                 // Show actual photo
-                adminAvatar.innerHTML = `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;" onerror="this.parentElement.innerHTML='${(safeName[0] || 'A').toUpperCase()}'">`;
-                adminAvatar.textContent = ''; // Clear initials if we have a photo
+                const img = document.createElement('img');
+                img.src = photoURL;
+                img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
+                
+                // Fallback if image fails to load
+                img.onerror = () => {
+                    adminAvatar.innerHTML = '';
+                    const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
+                    adminAvatar.textContent = (initials || 'A').substring(0, 2);
+                };
+                
+                adminAvatar.appendChild(img);
             } else {
                 // Fallback: Use initials
-                const initials = safeName.split(' ').map(n => (n || '').trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
+                const initials = safeName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
                 adminAvatar.textContent = (initials || 'A').substring(0, 2);
             }
-            
-            adminAvatar.style.fontSize = '15px';
-            adminAvatar.style.fontWeight = '800';
-            adminAvatar.style.letterSpacing = '0';
-            adminAvatar.style.borderRadius = '12px';
-            adminAvatar.style.overflow = 'hidden';
-            adminAvatar.style.display = 'flex';
-            adminAvatar.style.alignItems = 'center';
-            adminAvatar.style.justifyContent = 'center';
         };
 
         const cacheHeaderIdentity = (name, photoURL) => {
@@ -1919,11 +1924,24 @@ class AdminManager {
         document.getElementById('modal-admin-email').textContent = user.email || '';
 
         const modalAvatar = document.getElementById('modal-admin-avatar');
-        if (profile.photoURL) {
-            modalAvatar.innerHTML = `<img src="${profile.photoURL}" alt="Profile" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">`;
-        } else {
-            const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
-            modalAvatar.textContent = initials.substring(0, 2);
+        if (modalAvatar) {
+            modalAvatar.innerHTML = '';
+            modalAvatar.textContent = '';
+            if (profile.photoURL && profile.photoURL.trim().length > 5) {
+                const img = document.createElement('img');
+                img.src = profile.photoURL;
+                img.alt = "Profile";
+                img.style.cssText = "width: 100%; height: 100%; border-radius: inherit; object-fit: cover;";
+                img.onerror = () => {
+                    modalAvatar.innerHTML = '';
+                    const initials = displayName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
+                    modalAvatar.textContent = (initials || 'B').substring(0, 2);
+                };
+                modalAvatar.appendChild(img);
+            } else {
+                const initials = displayName.split(' ').map(n => n.trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
+                modalAvatar.textContent = (initials || 'B').substring(0, 2);
+            }
         }
 
         document.getElementById('admin-modal-display-name').value = displayName;
@@ -9796,7 +9814,21 @@ class AdminManager {
                 }
 
                 if (existingIdx >= 0 && existingIdx < list.length) {
-                    list[existingIdx] = { ...list[existingIdx], ...nextItem };
+                    const existing = list[existingIdx];
+                    list[existingIdx] = { ...existing, ...nextItem };
+
+                    // HKM Safety: If the update (nextItem) is missing translations but the existing 
+                    // item has them, we MUST preserve them. This prevents regressions if the 
+                    // editor was opened with a stale/partial version of the item.
+                    if (existing.translations && (!nextItem.translations || Object.keys(nextItem.translations).length === 0)) {
+                        list[existingIdx].translations = existing.translations;
+                        if (existing.translationSourceHash && !nextItem.translationSourceHash) {
+                            list[existingIdx].translationSourceHash = existing.translationSourceHash;
+                        }
+                        if (existing.sourceLanguage && !nextItem.sourceLanguage) {
+                            list[existingIdx].sourceLanguage = existing.sourceLanguage;
+                        }
+                    }
                 } else {
                     list.unshift(nextItem);
                 }

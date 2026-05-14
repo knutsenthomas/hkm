@@ -244,6 +244,18 @@
             item.content = rawItem.content;
         }
 
+        // HKM Fix: Explicitly preserve translations and translation metadata if present in rawItem
+        // This ensures they are not lost even if sanitizeForFirestore or other logic skips them.
+        if (rawItem && rawItem.translations && typeof rawItem.translations === 'object' && !item.translations) {
+            item.translations = rawItem.translations;
+        }
+        if (rawItem && rawItem.translationSourceHash && !item.translationSourceHash) {
+            item.translationSourceHash = rawItem.translationSourceHash;
+        }
+        if (rawItem && rawItem.sourceLanguage && !item.sourceLanguage) {
+            item.sourceLanguage = rawItem.sourceLanguage;
+        }
+
         if (rawItem && typeof rawItem.isFirestore === 'boolean') item.isFirestore = rawItem.isFirestore;
         if (rawItem && typeof rawItem.isSynced === 'boolean') item.isSynced = rawItem.isSynced;
 
