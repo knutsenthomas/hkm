@@ -4271,7 +4271,7 @@ exports.scheduledPodcastTranscription = onSchedule({
  * Endpoint to fetch and proxy the podcast RSS feed as JSON
  */
 exports.getPodcast = onRequest({ cors: true }, async (req, res) => {
-  const rssUrl = "https://podcasters.spotify.com/pod/show/hiskingdomministry/podcast/rss";
+  const rssUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
 
   try {
     const response = await fetch(rssUrl);
