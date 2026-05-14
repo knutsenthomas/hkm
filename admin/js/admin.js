@@ -9476,10 +9476,31 @@ class AdminManager {
 
                         const data = response.data;
                         if (data && data.blocks) {
-                            // Vi legger til de nye blokkene i editoren
-                            const currentData = await editor.save();
+                            // Vi legger til de nye blokkene i editoren på en robust måte
+                            const activeEditor = editor || this._activeEditorInstance;
+                            if (!activeEditor) throw new Error('Fant ingen aktiv editor.');
+
+                            // Vent til editoren er klar
+                            if (activeEditor.isReady) await activeEditor.isReady;
+
+                            const currentData = await activeEditor.save();
                             const mergedBlocks = [...(currentData.blocks || []), ...data.blocks];
-                            await editor.render({ blocks: mergedBlocks });
+
+                            // Prøv ulike render-metoder for maksimal kompatibilitet
+                            if (typeof activeEditor.render === 'function') {
+                                await activeEditor.render({ blocks: mergedBlocks });
+                            } else if (activeEditor.blocks && typeof activeEditor.blocks.render === 'function') {
+                                await activeEditor.blocks.render({ blocks: mergedBlocks });
+                            } else {
+                                console.warn('Render function not found, trying fallback update');
+                                // Fallback: Hvis render feiler, prøv å tømme og sette inn blokker
+                                if (activeEditor.blocks && typeof activeEditor.blocks.clear === 'function') {
+                                    await activeEditor.blocks.clear();
+                                    for (const block of mergedBlocks) {
+                                        await activeEditor.blocks.insert(block.type, block.data);
+                                    }
+                                }
+                            }
                             this.showToast('AI-utkast er generert!', 'success');
                         }
                     } catch (err) {
