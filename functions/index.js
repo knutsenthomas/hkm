@@ -173,28 +173,30 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         Du er en inspirerende og dyktig Senior Skribent for His Kingdom Ministry.
         TEMA (Bruk dette kun som inspirasjon): ${prompt}
         
-        OPPGAVE: Lag et profesjonelt, vakkert og bibelsk forankret blogginnlegg i EditorJS-format. 
-        VIKTIG: Start DIREKTE med selve innholdet. ALDRI gjenta tittelen i den første blokka.
+        OPPGAVE: Lag et OMFATTENDE, profesjonelt og bibelsk forankret blogginnlegg i EditorJS-format. 
+        Målet er å gi leseren dyp innsikt og praktisk inspirasjon.
         
-        STRUKTUR-REGLER:
-        - Første blokk SKAL være en vanlig 'paragraph'.
-        - Bruk 'header' (level 3) for nye underpoenger.
-        - Bruk 'list' (style: unordered) for viktige punkter.
-        - Bruk 'quote' for bibelvers.
-        - Bruk 'delimiter' for visuelle pauser.
+        KVALITETSKRAV TIL INNHOLD:
+        - LENGDE: Skriv MYE mer tekst. Hvert avsnitt (paragraph) skal være fyldig og reflekterende (minst 4-6 setninger).
+        - DYBDE: Gå i dybden på teologiske sannheter. Ikke bare skrap på overflaten.
+        - STRUKTUR: Bruk 4-5 hovedseksjoner med hver sin 'header' (level 3).
+        - BIBELVERS: Inkluder minst 2-3 relevante bibelvers i 'quote'-blokker og utdyp hva de betyr for oss i dag.
+        - LISTER: Bruk 'list' for praktiske steg eller prinsipper.
         
-        KVALITETSKRAV:
-        - Skriv varmt, moderne og engasjerende norsk.
-        - Skap LUFT ved å bruke mange korte 'paragraph'-blokker (maks 3-4 setninger per blokk).
-        - IKKE bruk bold på hele avsnitt.
+        TEKNISKE REGLER:
+        - Start DIREKTE med selve innholdet. ALDRI gjenta tittelen i den første blokka.
+        - Skap LUFT ved å dele opp i mange blokker, men sørg for at innholdet i hver blokk er av høy kvalitet.
+        - Bruk et varmt, moderne og myndig norsk språk.
         
         JSON FORMAT (Svar KUN med dette):
         { 
           "blocks": [ 
-            { "type": "paragraph", "data": { "text": "Start rett på saken her..." } },
-            { "type": "header", "data": { "text": "Et underpoeng", "level": 3 } },
-            { "type": "list", "data": { "style": "unordered", "items": ["Punkt 1", "Punkt 2"] } },
+            { "type": "paragraph", "data": { "text": "Fyldig og engasjerende introduksjon som drar leseren inn..." } },
+            { "type": "header", "data": { "text": "En dypere titt på temaet", "level": 3 } },
+            { "type": "paragraph", "data": { "text": "Lang og reflekterende tekst som forklarer poenget i dybden..." } },
             { "type": "quote", "data": { "text": "Bibelvers", "caption": "Referanse" } },
+            { "type": "paragraph", "data": { "text": "Utdypning av verset og praktisk anvendelse..." } },
+            { "type": "list", "data": { "style": "unordered", "items": ["Dyptgående prinsipp 1", "Dyptgående prinsipp 2"] } },
             { "type": "delimiter", "data": {} }
           ] 
         }
