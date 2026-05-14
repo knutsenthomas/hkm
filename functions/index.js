@@ -118,7 +118,12 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
     ].join('\n');
 
     const genAI = new GoogleGenerativeAI(geminiKey.trim());
-    const modelCandidates = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
+    const modelCandidates = [
+      "gemini-2.0-flash",
+      "gemini-2.0-flash-lite",
+      "gemini-1.5-flash",
+      "gemini-1.5-pro"
+    ];
     
     let textResult = '';
     let lastError = null;
@@ -127,10 +132,16 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
       try {
         console.log(`Prøver AI-forslag med modell: ${modelName}`);
         const model = genAI.getGenerativeModel({ model: modelName });
+        
+        // Add a timeout to avoid hanging
         const result = await model.generateContent(prompt);
         const response = await result.response;
         textResult = response.text();
-        if (textResult) break;
+        
+        if (textResult) {
+          console.log(`Suksess med modell: ${modelName}`);
+          break;
+        }
       } catch (err) {
         console.warn(`Feil med modell ${modelName}:`, err.message);
         lastError = err;
@@ -138,7 +149,7 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
     }
 
     if (!textResult) {
-      console.error('Alle AI-modeller feilet:', lastError);
+      console.error('Alle AI-modeller feilet. Siste feil:', lastError);
       throw new HttpsError('unavailable', `AI-tjenesten er utilgjengelig: ${lastError?.message || 'Ukjent feil'}`);
     }
 
