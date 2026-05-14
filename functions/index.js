@@ -120,8 +120,8 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
     const geminiKeyClean = geminiKey.trim();
     const genAI = new GoogleGenerativeAI(geminiKeyClean);
     
-    // Prøver flere modeller for å unngå Quota Exceeded på én spesifikk modell
-    const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
+    // Prøver flere 2.0-modeller for å unngå Quota Exceeded (vi vet at 2.0 fungerer for denne kontoen)
+    const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
     let textResult = "";
     let lastError = null;
 
@@ -138,7 +138,7 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
           break;
         }
       } catch (err) {
-        console.warn(`Modell ${modelName} feilet (sannsynligvis kvote):`, err.message);
+        console.warn(`Modell ${modelName} feilet:`, err.message);
         lastError = err;
       }
     }
