@@ -9475,33 +9475,32 @@ class AdminManager {
                         });
 
                         const data = response.data;
-                        if (data && data.blocks) {
-                            // Vi legger til de nye blokkene i editoren på en robust måte
+                        if (data && data.blocks && Array.isArray(data.blocks)) {
                             const activeEditor = editor || this._activeEditorInstance;
                             if (!activeEditor) throw new Error('Fant ingen aktiv editor.');
 
                             // Vent til editoren er klar
                             if (activeEditor.isReady) await activeEditor.isReady;
 
-                            const currentData = await activeEditor.save();
-                            const mergedBlocks = [...(currentData.blocks || []), ...data.blocks];
-
-                            // Prøv ulike render-metoder for maksimal kompatibilitet
-                            if (typeof activeEditor.render === 'function') {
-                                await activeEditor.render({ blocks: mergedBlocks });
-                            } else if (activeEditor.blocks && typeof activeEditor.blocks.render === 'function') {
-                                await activeEditor.blocks.render({ blocks: mergedBlocks });
-                            } else {
-                                console.warn('Render function not found, trying fallback update');
-                                // Fallback: Hvis render feiler, prøv å tømme og sette inn blokker
-                                if (activeEditor.blocks && typeof activeEditor.blocks.clear === 'function') {
-                                    await activeEditor.blocks.clear();
-                                    for (const block of mergedBlocks) {
+                            // Vi går gjennom hver blokk fra AI og legger den inn manuelt
+                            // Dette er mye tryggere enn .render() som kan tømme editoren hvis noe er feil
+                            let addedCount = 0;
+                            for (const block of data.blocks) {
+                                try {
+                                    if (activeEditor.blocks && typeof activeEditor.blocks.insert === 'function') {
                                         await activeEditor.blocks.insert(block.type, block.data);
+                                        addedCount++;
                                     }
+                                } catch (blockErr) {
+                                    console.warn('Kunne ikke sette inn AI-blokk:', block, blockErr);
                                 }
                             }
-                            this.showToast('AI-utkast er generert!', 'success');
+
+                            if (addedCount > 0) {
+                                this.showToast(`Suksess! La til ${addedCount} avsnitt fra AI.`, 'success');
+                            } else {
+                                this.showToast('AI genererte innhold, men kunne ikke sette det inn i editoren.', 'warning');
+                            }
                         }
                     } catch (err) {
                         console.error('AI Write failed:', err);
