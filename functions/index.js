@@ -165,37 +165,42 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         throw new HttpsError('internal', 'AI returnerte ingen tekst.');
       } catch (err) {
         console.error("Newsletter structure generation failed:", err);
-        throw new HttpsError('internal', 'Kunne ikke generere nyhetsbrev-struktur.');
       }
     }
 
     if (task === 'generate_blog_draft') {
       const draftPrompt = `
         Du er en inspirerende og dyktig Senior Skribent for His Kingdom Ministry.
-        Tema: ${prompt}
+        TEMA (Bruk dette kun som inspirasjon, ikke kopier stilen): ${prompt}
         
-        Lag et profesjonelt, vakkert og bibelsk forankret blogginnlegg i EditorJS-format. 
-        Målet er å skape et innlegg som ser ut nøyaktig som de beste refleksjonene i Gemini, med dybde og variasjon.
+        OPPGAVE: Lag et profesjonelt, vakkert og bibelsk forankret blogginnlegg i EditorJS-format. 
+        VIKTIG: Start DIREKTE med introduksjonen som et vanlig avsnitt (paragraph). IKKE lag en ny overskrift på toppen.
         
-        KRAV TIL STRUKTUR OG BLOKKER:
-        1. INTRODUKSJON: Start med en engasjerende introduksjon (paragraph).
-        2. SPØRSMÅL: Still et tankevekkende spørsmål for å engasjere leseren.
-        3. UNDERPOINTS: Bruk 'header' (level 3) for seksjoner som "Hva er trofasthet?" eller "Tre søyler å hvile i".
-        4. LISTER: Bruk 'list' blokken (style: unordered) for å presentere punkter eller sannheter.
-        5. BIBELVERS: Bruk 'quote' blokken for bibelvers. Legg selve verset i 'text' og referansen i 'caption'.
-        6. SKILLELINJER: Bruk 'delimiter' blokken for å skape visuelle pauser mellom hoveddeler.
-        7. DAGENS TANKE: Avslutt alltid med en "Dagens tanke" eller "Invitasjon til hvile".
+        KRAV TIL STRUKTUR (FØLG SLAVISK):
+        1. START: Første blokk SKAL være 'paragraph'. Begynn rett på den engasjerende teksten.
+        2. AVSSNITT: Del opp i 3-4 fyldige deler med 'paragraph'-blokker.
+        3. UNDER-OVERSKRIFTER: Bruk 'header' level 3 for å markere nye poenger inne i teksten.
+        4. LISTE: En 'list' blokk (style: unordered) med 3-5 korte punkter.
+        5. BIBELVERS: En 'quote' blokk med et relevant vers.
+        6. SKILLELINJE: En 'delimiter' blokk for luft.
+        7. DAGENS TANKE: Avslutt med en oppmuntrende "Dagens tanke" (paragraph).
         
-        TEKNISK FORMAT (JSON):
-        Bruk disse blokk-typene korrekt:
-        - { "type": "header", "data": { "text": "...", "level": 2 } }
-        - { "type": "paragraph", "data": { "text": "..." } }
-        - { "type": "list", "data": { "style": "unordered", "items": ["Punkt 1", "Punkt 2"] } }
-        - { "type": "quote", "data": { "text": "Bibelvers tekst", "caption": "Referanse", "alignment": "left" } }
-        - { "type": "delimiter", "data": {} }
+        TEKNISKE REGLER:
+        - MAKS 3 setninger per 'paragraph'-blokk. Skap LUFT!
+        - Bruk MINST 10 blokker totalt.
+        - IKKE bruk bold på hele avsnitt.
         
-        VIKTIG: Skriv langt og utfyllende. Bruk et varmt og moderne norsk språk. IKKE bruk bold på hele avsnitt.
-        Svar kun med rå JSON-tekst uten markdown-formatering eller forklaringer.
+        JSON FORMAT:
+        { 
+          "blocks": [ 
+            { "type": "paragraph", "data": { "text": "Første vanlige avsnitt..." } },
+            { "type": "header", "data": { "text": "...", "level": 3 } },
+            { "type": "list", "data": { "style": "unordered", "items": ["...", "..."] } },
+            { "type": "quote", "data": { "text": "...", "caption": "...", "alignment": "left" } },
+            { "type": "delimiter", "data": {} }
+          ] 
+        }
+        Svar kun med rå JSON uten markdown-blokker eller forklaringer.
       `.trim();
 
       try {
