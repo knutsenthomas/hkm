@@ -143,10 +143,10 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] },
     // 2. Fallback til OpenAI (ChatGPT) hvis Gemini feilet
     if (!textResult && openaiKey) {
       try {
-        console.log("Prøver OpenAI (ChatGPT) fallback...");
+        console.log("Prøver OpenAI (ChatGPT) fallback med gpt-4o-mini...");
         const openai = new OpenAI({ apiKey: openaiKey });
         const completion = await openai.chat.completions.create({
-          model: "gpt-4o",
+          model: "gpt-4o-mini",
           messages: [{ role: "user", content: prompt }],
           response_format: { type: "json_object" }
         });
