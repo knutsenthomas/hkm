@@ -124,20 +124,30 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
       try {
         const geminiKey = getGeminiApiKey();
         let textResult = "";
+        // Try Gemini first
         if (geminiKey) {
-          const genAI = new GoogleGenerativeAI(geminiKey.trim());
-          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-          const result = await model.generateContent(structurePrompt);
-          textResult = (await result.response).text();
+          try {
+            const genAI = new GoogleGenerativeAI(geminiKey.trim());
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const result = await model.generateContent(structurePrompt);
+            textResult = (await result.response).text();
+          } catch (geminiErr) {
+            console.error("Gemini failed for newsletter, trying OpenAI fallback:", geminiErr);
+          }
         }
         
+        // Fallback to OpenAI if Gemini failed or returned empty
         if (!textResult && openaiApiKeyParam.value()) {
-          const openai = new OpenAI({ apiKey: openaiApiKeyParam.value() });
-          const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [{ role: "user", content: structurePrompt }]
-          });
-          textResult = completion.choices[0].message.content;
+          try {
+            const openai = new OpenAI({ apiKey: openaiApiKeyParam.value() });
+            const completion = await openai.chat.completions.create({
+              model: "gpt-4o-mini",
+              messages: [{ role: "user", content: structurePrompt }]
+            });
+            textResult = completion.choices[0].message.content;
+          } catch (openaiErr) {
+            console.error("OpenAI also failed for newsletter:", openaiErr);
+          }
         }
         
         if (textResult) {
@@ -173,20 +183,31 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
       try {
         const geminiKey = getGeminiApiKey();
         let textResult = "";
+        
+        // Try Gemini first
         if (geminiKey) {
-          const genAI = new GoogleGenerativeAI(geminiKey.trim());
-          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-          const result = await model.generateContent(draftPrompt);
-          textResult = (await result.response).text();
+          try {
+            const genAI = new GoogleGenerativeAI(geminiKey.trim());
+            const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+            const result = await model.generateContent(draftPrompt);
+            textResult = (await result.response).text();
+          } catch (geminiErr) {
+            console.error("Gemini failed for blog draft, trying OpenAI fallback:", geminiErr);
+          }
         }
 
+        // Fallback to OpenAI if Gemini failed or returned empty
         if (!textResult && openaiApiKeyParam.value()) {
-          const openai = new OpenAI({ apiKey: openaiApiKeyParam.value() });
-          const completion = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [{ role: "user", content: draftPrompt }]
-          });
-          textResult = completion.choices[0].message.content;
+          try {
+            const openai = new OpenAI({ apiKey: openaiApiKeyParam.value() });
+            const completion = await openai.chat.completions.create({
+              model: "gpt-4o-mini",
+              messages: [{ role: "user", content: draftPrompt }]
+            });
+            textResult = completion.choices[0].message.content;
+          } catch (openaiErr) {
+            console.error("OpenAI also failed for blog draft:", openaiErr);
+          }
         }
 
         if (textResult) {
