@@ -1,882 +1,199 @@
-const { onRequest, onCall } = require("firebase-functions/v2/https");
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
-const { onSchedule } = require("firebase-functions/v2/scheduler");
-const { defineSecret } = require("firebase-functions/params");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const { defineSecret } = require('firebase-functions/params');
+const geminiApiKeyParam = defineSecret('GEMINI_API_KEY');
+const gaPropertyIdParam = defineSecret('GA_PROPERTY_ID');
+const gaServiceAccountEmailParam = defineSecret('GA_SERVICE_ACCOUNT_EMAIL');
+const gaServiceAccountPrivateKeyParam = defineSecret('GA_SERVICE_ACCOUNT_PRIVATE_KEY');
+const emailUserParam = defineSecret('EMAIL_USER');
+const emailPassParam = defineSecret('EMAIL_PASS');
+const vippsClientIdParam = defineSecret('VIPPS_CLIENT_ID');
+const vippsClientSecretParam = defineSecret('VIPPS_CLIENT_SECRET');
+const vippsSubscriptionKeyParam = defineSecret('VIPPS_SUBSCRIPTION_KEY');
+const vippsMsnParam = defineSecret('VIPPS_MSN');
+const googleChatWebhookUrlParam = defineSecret('GOOGLE_CHAT_WEBHOOK_URL');
+const googleChatBridgeTokenParam = defineSecret('GOOGLE_CHAT_BRIDGE_TOKEN');
+const stripeSecretKeyParam = defineSecret('STRIPE_SECRET_KEY');
 
-const fetch = require("node-fetch");
-const { parseStringPromise } = require("xml2js");
-const admin = require("firebase-admin");
-const { FieldValue, Timestamp } = require("firebase-admin/firestore");
-const nodemailer = require("nodemailer");
-const fs = require("fs");
-const os = require("os");
-const path = require("path");
-const crypto = require("crypto");
-const { pipeline } = require("stream");
-const { promisify } = require("util");
-require("dotenv").config({ path: path.join(__dirname, ".env"), quiet: true });
-require("dotenv").config({ path: path.join(__dirname, ".env.local"), override: true, quiet: true });
-const { GoogleAIFileManager } = require("@google/generative-ai/server");
+const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
+const { onDocumentCreated } = require('firebase-functions/v2/firestore');
+const { onSchedule } = require('firebase-functions/v2/scheduler');
+const admin = require('firebase-admin');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleAIFileManager } = require('@google/generative-ai/server');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+const { parseStringPromise } = require('xml2js');
 
-admin.initializeApp();
+if (admin.apps.length === 0) {
+  admin.initializeApp();
+}
+
 const db = admin.firestore();
-const streamPipeline = promisify(pipeline);
-const PODCAST_RSS_URL = "https://anchor.fm/s/f7a13dec/podcast/rss";
-const PODCAST_TRANSCRIPT_RETRY_MS = 6 * 60 * 60 * 1000;
-const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 2;
+const { FieldValue, Timestamp } = admin.firestore;
+const cors = require("cors")({ origin: true });
+
+// Constants for podcast transcription
+const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 3;
+const PODCAST_TRANSCRIPT_RETRY_MS = 1000 * 60 * 60 * 24; // 24 hours
 const PODCAST_AUTO_TRANSCRIPTION_ENABLED = true;
 
-// Stripe is initialized inside the function to avoid build-time errors
-const stripeInit = require("stripe");
-const stripeSecretKeyParam = defineSecret("STRIPE_SECRET_KEY");
-const vippsClientIdParam = defineSecret("VIPPS_CLIENT_ID");
-const vippsClientSecretParam = defineSecret("VIPPS_CLIENT_SECRET");
-const vippsSubscriptionKeyParam = defineSecret("VIPPS_SUBSCRIPTION_KEY");
-const vippsMsnParam = defineSecret("VIPPS_MSN");
-const googleChatWebhookUrlParam = defineSecret("GOOGLE_CHAT_WEBHOOK_URL");
-const googleChatBridgeTokenParam = defineSecret("GOOGLE_CHAT_BRIDGE_TOKEN");
-const geminiApiKeyParam = defineSecret("GEMINI_API_KEY");
-const emailUserParam = defineSecret("EMAIL_USER");
-const emailPassParam = defineSecret("EMAIL_PASS");
-const gaPropertyIdParam = defineSecret("GA4_PROPERTY_ID");
-const gaServiceAccountEmailParam = defineSecret("GA_SERVICE_ACCOUNT_EMAIL");
-const gaServiceAccountPrivateKeyParam = defineSecret("GA_SERVICE_ACCOUNT_PRIVATE_KEY");
-
-function getSecretOrEnv(secretParam, envKeys = []) {
-  const candidates = [];
-
-  try {
-    candidates.push(secretParam.value());
-  } catch (error) {
-    // Secret may be unavailable in local/emulator contexts.
-  }
-
-  envKeys.forEach((key) => {
-    if (typeof key === "string" && key) {
-      candidates.push(process.env[key]);
-    }
-  });
-
-  return candidates.find((value) => typeof value === "string" && value.trim()) || "";
-}
-
-function decodeCommonHtmlEntities(value) {
-  if (typeof value !== "string" || !value) return "";
-  return decodeHtmlEntities(
-    value
-      .replace(/&nbsp;/gi, " ")
-      .replace(/&#39;/gi, "'")
-      .replace(/&apos;/gi, "'")
-  );
-}
-
-
-function readCssBackgroundImageUrl(styleValue) {
-  if (typeof styleValue !== "string" || !styleValue) return "";
-  const match = styleValue.match(/background-image\s*:\s*url\((['"]?)(.*?)\1\)/i);
-  return match && match[2] ? decodeHtmlAttribute(match[2].trim()) : "";
-}
-
-// --- Google Analytics Data API Helpers ---
-const GA_SCOPE = "https://www.googleapis.com/auth/analytics.readonly";
-const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
-const GA_DATA_BASE = "https://analyticsdata.googleapis.com/v1beta";
-
-const base64UrlEncode = (input) => {
-  const buffer = Buffer.isBuffer(input) ? input : Buffer.from(input);
-  return buffer
-    .toString("base64")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
-};
-
-const signJwt = ({ clientEmail, privateKey }) => {
-  const now = Math.floor(Date.now() / 1000);
-  const header = { alg: "RS256", typ: "JWT" };
-  const payload = {
-    iss: clientEmail,
-    scope: GA_SCOPE,
-    aud: GOOGLE_TOKEN_URL,
-    iat: now,
-    exp: now + 3600,
-  };
-
-  const encodedHeader = base64UrlEncode(JSON.stringify(header));
-  const encodedPayload = base64UrlEncode(JSON.stringify(payload));
-  const unsignedToken = `${encodedHeader}.${encodedPayload}`;
-
-  const signer = crypto.createSign("RSA-SHA256");
-  signer.update(unsignedToken);
-  signer.end();
-
-  const signature = signer.sign(privateKey);
-  return `${unsignedToken}.${base64UrlEncode(signature)}`;
-};
-
-const getGaAccessToken = async ({ clientEmail, privateKey }) => {
-  const assertion = signJwt({ clientEmail, privateKey });
-  const body = new URLSearchParams({
-    grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-    assertion,
-  });
-
-  const response = await fetch(GOOGLE_TOKEN_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body,
-  });
-
-  const json = await response.json();
-  if (!response.ok || !json?.access_token) {
-    throw new Error(json?.error_description || json?.error || "Failed to get Google access token");
-  }
-
-  return json.access_token;
-};
-
-const googleGaPost = async ({ path, accessToken, body }) => {
-  const response = await fetch(`${GA_DATA_BASE}${path}`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-
-  const json = await response.json();
-  if (!response.ok) {
-    const msg = json?.error?.message || "Google Analytics Data API request failed";
-    throw new Error(msg);
-  }
-  return json;
-};
-
-const gaMetricValue = (report, rowIndex = 0, metricIndex = 0) => {
-  const raw = report?.rows?.[rowIndex]?.metricValues?.[metricIndex]?.value;
-  const num = Number(raw);
-  return Number.isFinite(num) ? num : 0;
-};
-
-const mapGaDimensionMetricRows = (report) => (
-  (report?.rows || []).map((row) => ({
-    dimension: row?.dimensionValues?.[0]?.value || "Unknown",
-    metric: Number(row?.metricValues?.[0]?.value || 0),
-  }))
-);
-
-
-
-function decodeHtmlAttribute(value) {
-  if (typeof value !== "string" || !value) return "";
-  return value
-    .replace(/&quot;/gi, '"')
-    .replace(/&#34;/g, '"')
-    .replace(/&amp;/gi, "&")
-    .replace(/&lt;/gi, "<")
-    .replace(/&gt;/gi, ">");
-}
-
-function readHtmlAttr(attrs, name) {
-  if (typeof attrs !== "string" || !attrs || !name) return "";
-  const pattern = new RegExp(`${name}\\s*=\\s*(["'])([\\s\\S]*?)\\1`, "i");
-  const match = attrs.match(pattern);
-  return match && match[2] ? decodeHtmlAttribute(match[2]) : "";
-}
-
-
-
-function contentHasEquivalentImage(content, imageUrl) {
-  if (typeof content !== "string" || !content || typeof imageUrl !== "string" || !imageUrl) return false;
-  const targetIdentity = extractMediaIdentity(imageUrl);
-  if (!targetIdentity) return false;
-
-  const imgRegex = /<img\b[^>]*src=("|')([^"']+)\1/gi;
-  let match;
-  while ((match = imgRegex.exec(content)) !== null) {
-    const existingUrl = match[2] || "";
-    if (extractMediaIdentity(existingUrl) === targetIdentity) return true;
-  }
-  return false;
-}
-
-function dedupeFigureImagesInHtml(content) {
-  if (typeof content !== "string" || !content) return content || "";
-  const seen = new Set();
-
-  return content.replace(/<figure\b[\s\S]*?<\/figure>/gi, (figureHtml) => {
-    const imgMatch = figureHtml.match(/<img\b[^>]*src=("|')([^"']+)\1/i);
-    if (!imgMatch || !imgMatch[2]) return figureHtml;
-
-    const identity = extractMediaIdentity(imgMatch[2]);
-    if (!identity) return figureHtml;
-    if (seen.has(identity)) return "";
-
-    seen.add(identity);
-    return figureHtml;
-  });
-}
-
-
-
-function getStripeSecretKey() {
-  return getSecretOrEnv(
-      stripeSecretKeyParam,
-      [
-        "STRIPE_SECRET_KEY",
-        "STRIPE_KEY",
-        "STRIPE_API_KEY",
-      ],
-  );
-}
-
-function getGoogleChatWebhookUrl() {
-  return getSecretOrEnv(
-      googleChatWebhookUrlParam,
-      [
-        "GOOGLE_CHAT_WEBHOOK_URL",
-      ],
-  );
-}
-
-function getGoogleChatBridgeToken() {
-  return getSecretOrEnv(
-      googleChatBridgeTokenParam,
-      [
-        "GOOGLE_CHAT_BRIDGE_TOKEN",
-      ],
-  );
-}
-
+/**
+ * Helper to get Gemini API key
+ */
 function getGeminiApiKey() {
-  return getSecretOrEnv(
-      geminiApiKeyParam,
-      [
-        "GEMINI_API_KEY",
-      ],
-  );
-}
-
-
-function pickFirstString(...values) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim()) return value.trim();
-  }
-  return "";
-}
-
-function pickFirstNumber(...values) {
-  for (const value of values) {
-    if (typeof value === "number" && Number.isFinite(value)) return value;
-    if (typeof value === "string" && value.trim()) {
-      const parsed = Number(value.replace(",", "."));
-      if (Number.isFinite(parsed)) return parsed;
-    }
-  }
-  return null;
-}
-
-function extractMediaIdentity(url) {
-  if (typeof url !== "string") return null;
-  const match = url.match(/\/media\/([^\/#\?]+)/);
-  if (match && match[1]) return match[1].split("~")[0].split(".")[0];
-  return url;
-}
-
-
-const VISITOR_CHAT_RETENTION_DAYS = 7;
-
-async function deleteQuerySnapshotDocs(querySnapshot) {
-  if (!querySnapshot || querySnapshot.empty) return 0;
-
-  let deletedCount = 0;
-  let batch = db.batch();
-  let ops = 0;
-  const commits = [];
-
-  querySnapshot.docs.forEach((doc) => {
-    batch.delete(doc.ref);
-    ops += 1;
-    deletedCount += 1;
-
-    if (ops === 450) {
-      commits.push(batch.commit());
-      batch = db.batch();
-      ops = 0;
-    }
-  });
-
-  if (ops > 0) {
-    commits.push(batch.commit());
-  }
-
-  await Promise.all(commits);
-
-  return deletedCount;
-}
-
-async function deleteVisitorChatById(chatId) {
-  if (!chatId) return { messagesDeleted: 0, mappingsDeleted: 0 };
-
-  let messagesDeleted = 0;
-  let lastDoc = null;
-
-  do {
-    let query = db.collection("visitorChats")
-        .doc(chatId)
-        .collection("messages")
-        .orderBy(admin.firestore.FieldPath.documentId())
-        .limit(400);
-
-    if (lastDoc) {
-      query = query.startAfter(lastDoc);
-    }
-
-    const snapshot = await query.get();
-    if (snapshot.empty) break;
-
-    messagesDeleted += await deleteQuerySnapshotDocs(snapshot);
-    lastDoc = snapshot.docs[snapshot.docs.length - 1];
-  } while (lastDoc);
-
-  const threadMappingsSnap = await db.collection("googleChatThreadMappings")
-      .where("chatId", "==", chatId)
-      .get();
-  const mappingsDeleted = await deleteQuerySnapshotDocs(threadMappingsSnap);
-
-  await db.collection("visitorChats").doc(chatId).delete();
-
-  return {
-    messagesDeleted,
-    mappingsDeleted,
-  };
-}
-
-
-
-
-
-
-function clampText(value, maxLen = 800) {
-  if (typeof value !== "string") return "";
-  const normalized = value.replace(/\s+/g, " ").trim();
-  if (!normalized) return "";
-  return normalized.length > maxLen ? `${normalized.slice(0, maxLen - 1)}…` : normalized;
-}
-
-function cleanGoogleChatCommandText(rawText) {
-  if (typeof rawText !== "string") return "";
-  return rawText
-      .replace(/<users\/[^>]+>/g, " ")
-      .replace(/<[^>]+>/g, " ")
-      .replace(/\s+/g, " ")
-      .trim();
-}
-
-function parseGoogleChatEventPayload(req) {
-  if (req && req.body && typeof req.body === "object" && Object.keys(req.body).length > 0) {
-    return req.body;
-  }
-
-  let rawText = "";
-  if (req && typeof req.rawBody === "string") {
-    rawText = req.rawBody;
-  } else if (req && Buffer.isBuffer(req.rawBody)) {
-    rawText = req.rawBody.toString("utf8");
-  } else if (req && typeof req.body === "string") {
-    rawText = req.body;
-  }
-  rawText = (rawText || "").trim();
-  if (!rawText) return {};
-
-  try {
-    const parsed = JSON.parse(rawText);
-    if (parsed && typeof parsed === "object") return parsed;
-  } catch (error) {
-    // Fallback below handles payload=<json>.
-  }
-
-  try {
-    const form = new URLSearchParams(rawText);
-    const embedded = (form.get("payload") || "").trim();
-    if (embedded) {
-      const parsed = JSON.parse(embedded);
-      if (parsed && typeof parsed === "object") return parsed;
-    }
-  } catch (error) {
-    // Ignore and return empty payload.
-  }
-
-  return {};
-}
-
-function pickFirstNonEmptyString(values = []) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim()) {
-      return value.trim();
-    }
-  }
-  return "";
-}
-
-function extractGoogleChatEventFields(payload) {
-  const chat = payload && typeof payload.chat === "object" ? payload.chat : {};
-  const msgPayload = chat && typeof chat.messagePayload === "object" ? chat.messagePayload : {};
-  const msgInPayload = msgPayload && typeof msgPayload.message === "object" ? msgPayload.message : {};
-  const topMessage = payload && typeof payload.message === "object" ? payload.message : {};
-  const chatMessage = chat && typeof chat.message === "object" ? chat.message : {};
-  const appCommandPayload = chat && typeof chat.appCommandPayload === "object" ? chat.appCommandPayload : {};
-  const appCommandMessage = appCommandPayload && typeof appCommandPayload.message === "object" ?
-    appCommandPayload.message :
-    {};
-  const appCommandSpace = appCommandPayload && typeof appCommandPayload.space === "object" ?
-    appCommandPayload.space :
-    {};
-  const appCommandThread = appCommandPayload && typeof appCommandPayload.thread === "object" ?
-    appCommandPayload.thread :
-    {};
-  const appCommandMetadata = appCommandPayload && typeof appCommandPayload.appCommandMetadata === "object" ?
-    appCommandPayload.appCommandMetadata :
-    {};
-
-  const rawText = pickFirstNonEmptyString([
-    topMessage.argumentText,
-    topMessage.text,
-    payload && payload.text,
-    chatMessage.argumentText,
-    chatMessage.text,
-    msgInPayload.argumentText,
-    msgInPayload.text,
-    msgPayload.argumentText,
-    msgPayload.text,
-    appCommandMessage.argumentText,
-    appCommandMessage.text,
-  ]);
-
-  const eventType = pickFirstNonEmptyString([
-    payload && payload.type,
-    payload && payload.eventType,
-    chat && chat.type,
-    chat && chat.eventType,
-    msgPayload && msgPayload.type,
-  ]);
-
-  const userType = pickFirstNonEmptyString([
-    payload && payload.user && payload.user.type,
-    chat && chat.user && chat.user.type,
-    msgInPayload && msgInPayload.sender && msgInPayload.sender.type,
-  ]);
-
-  const userDisplayName = pickFirstNonEmptyString([
-    payload && payload.user && payload.user.displayName,
-    chat && chat.user && chat.user.displayName,
-    msgInPayload && msgInPayload.sender && msgInPayload.sender.displayName,
-  ]);
-
-  const spaceName = pickFirstNonEmptyString([
-    payload && payload.space && payload.space.name,
-    payload && payload.message && payload.message.space && payload.message.space.name,
-    chat && chat.space && chat.space.name,
-    chatMessage && chatMessage.space && chatMessage.space.name,
-    msgInPayload && msgInPayload.space && msgInPayload.space.name,
-    appCommandMessage && appCommandMessage.space && appCommandMessage.space.name,
-    appCommandSpace && appCommandSpace.name,
-  ]);
-
-  const threadName = pickFirstNonEmptyString([
-    payload && payload.message && payload.message.thread && payload.message.thread.name,
-    chatMessage && chatMessage.thread && chatMessage.thread.name,
-    msgInPayload && msgInPayload.thread && msgInPayload.thread.name,
-    appCommandMessage && appCommandMessage.thread && appCommandMessage.thread.name,
-    appCommandThread && appCommandThread.name,
-  ]);
-
-  const threadKey = pickFirstNonEmptyString([
-    payload && payload.message && payload.message.thread && payload.message.thread.threadKey,
-    chatMessage && chatMessage.thread && chatMessage.thread.threadKey,
-    msgInPayload && msgInPayload.thread && msgInPayload.thread.threadKey,
-    appCommandPayload && appCommandPayload.thread && appCommandPayload.thread.threadKey,
-    appCommandMessage && appCommandMessage.thread && appCommandMessage.thread.threadKey,
-    appCommandThread && appCommandThread.threadKey,
-  ]);
-
-  const appCommandId = pickFirstNonEmptyString([
-    appCommandMetadata && appCommandMetadata.appCommandId,
-  ]);
-
-  const appCommandType = pickFirstNonEmptyString([
-    appCommandMetadata && appCommandMetadata.appCommandType,
-  ]);
-
-  const normalizedPayload = {
-    type: eventType,
-    user: { type: userType, displayName: userDisplayName },
-    space: { name: spaceName },
-    message: {
-      argumentText: rawText,
-      text: rawText,
-      thread: {
-        name: threadName,
-        threadKey,
-      },
-    },
-  };
-
-  return {
-    eventType,
-    userType,
-    userDisplayName,
-    rawText,
-    rawTextPreview: clampText(rawText, 200),
-    spaceName,
-    threadName,
-    threadKey,
-    appCommandId,
-    appCommandType,
-    normalizedPayload,
-    payloadKeys: payload && typeof payload === "object" ? Object.keys(payload).slice(0, 12) : [],
-    chatKeys: chat && typeof chat === "object" ? Object.keys(chat).slice(0, 12) : [],
-    msgPayloadKeys: msgPayload && typeof msgPayload === "object" ? Object.keys(msgPayload).slice(0, 12) : [],
-    appCommandKeys: appCommandPayload && typeof appCommandPayload === "object" ?
-      Object.keys(appCommandPayload).slice(0, 12) :
-      [],
-  };
-}
-
-function makeGoogleChatResponse(message, isWorkspaceAddon = false) {
-  if (!isWorkspaceAddon) return message;
-  return {
-    hostAppDataAction: {
-      chatDataAction: {
-        createMessageAction: {
-          message,
-        },
-      },
-    },
-  };
-}
-
-function parseGoogleChatReplyCommand(rawText) {
-  const text = cleanGoogleChatCommandText(rawText);
-  if (!text) return null;
-
-  const match = text.match(/^\/?(reply|svar)\s+([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/i);
-  if (!match) return null;
-
-  return {
-    chatId: match[2],
-    replyText: clampText(match[3], 4000),
-  };
-}
-
-function parseGoogleChatReplyArgs(rawText) {
-  const text = cleanGoogleChatCommandText(rawText);
-  if (!text) return null;
-
-  const match = text.match(/^([A-Za-z0-9_-]{6,})\s+([\s\S]+)$/);
-  if (!match) return null;
-
-  return {
-    chatId: match[1],
-    replyText: clampText(match[2], 4000),
-  };
-}
-
-function stripGoogleChatReplyPrefix(rawText, knownChatId = "") {
-  const text = cleanGoogleChatCommandText(rawText);
-  if (!text) return "";
-
-  let stripped = text.replace(/^\/?(reply|svar)\s+/i, "").trim();
-  if (knownChatId) {
-    const escapedChatId = knownChatId.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    stripped = stripped.replace(new RegExp(`^${escapedChatId}\\s+`), "").trim();
-  }
-  return clampText(stripped, 4000);
-}
-
-function makeGoogleChatMappingId(spaceName, threadName) {
-  return crypto
-      .createHash("sha256")
-      .update(`${spaceName}|${threadName}`)
-      .digest("hex");
-}
-
-function extractGoogleChatSpaceNameFromWebhookUrl(webhookUrl) {
-  if (typeof webhookUrl !== "string" || !webhookUrl.trim()) return "";
-  try {
-    const parsed = new URL(webhookUrl.trim());
-    const match = parsed.pathname.match(/\/v1\/spaces\/([^/]+)\/messages$/);
-    if (match && match[1]) return `spaces/${match[1]}`;
-  } catch (error) {
-    return "";
-  }
-  return "";
-}
-
-async function saveGoogleChatThreadMapping({ spaceName, threadName, chatId }) {
-  if (!spaceName || !threadName || !chatId) return;
-
-  const mappingId = makeGoogleChatMappingId(spaceName, threadName);
-  await db.collection("googleChatThreadMappings").doc(mappingId).set({
-    spaceName,
-    threadName,
-    chatId,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  }, { merge: true });
-}
-
-async function saveGoogleChatSpaceFallback({ spaceName, chatId }) {
-  if (!spaceName || !chatId) return;
-
-  const mappingId = crypto
-      .createHash("sha256")
-      .update(spaceName)
-      .digest("hex");
-
-  await db.collection("googleChatSpaceFallback").doc(mappingId).set({
-    spaceName,
-    chatId,
-    updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-  }, { merge: true });
-}
-
-async function inferChatIdFromGooglePayload(payload) {
-  const payloadMessage = payload && payload.message ? payload.message : {};
-  const threadKey = (
-    (payloadMessage.thread && payloadMessage.thread.threadKey) ||
-    ""
-  ).trim();
-  const spaceName = (
-    (payload && payload.space && payload.space.name) ||
-    (payloadMessage.space && payloadMessage.space.name) ||
-    ""
-  ).trim();
-  const threadName = (
-    (payloadMessage.thread && payloadMessage.thread.name) ||
-    ""
-  ).trim();
-
-  // Fast path: if Google Chat returns our original threadKey (visitor_<chatId>),
-  // we can resolve without extra lookups.
-  const keyMatch = threadKey.match(/^visitor_([A-Za-z0-9_-]{6,})$/);
-  if (keyMatch && keyMatch[1]) {
-    return keyMatch[1];
-  }
-
-  if (spaceName && threadName) {
-    const mappingId = makeGoogleChatMappingId(spaceName, threadName);
-    const mappingSnap = await db.collection("googleChatThreadMappings").doc(mappingId).get();
-    if (mappingSnap.exists) {
-      const data = mappingSnap.data() || {};
-      if (data.chatId) return String(data.chatId);
-    }
-  }
-
-  if (spaceName) {
-    const fallbackId = crypto
-        .createHash("sha256")
-        .update(spaceName)
-        .digest("hex");
-    const fallbackSnap = await db.collection("googleChatSpaceFallback").doc(fallbackId).get();
-    if (fallbackSnap.exists) {
-      const data = fallbackSnap.data() || {};
-      if (data.chatId) return String(data.chatId);
-    }
-  }
-
-  return "";
-}
-
-// Cache the selected Gemini model name for the lifetime of the function instance.
-// Avoids a listModels roundtrip (~300ms) on every warm invocation.
-let _cachedGeminiModel = "";
-
-async function resolveGeminiModel(cleanKey) {
-  if (_cachedGeminiModel) return _cachedGeminiModel;
-
-  const apiBase = "https://generativelanguage.googleapis.com/v1beta";
-  const modelsResponse = await fetch(`${apiBase}/models?key=${cleanKey}`, {
-    method: "GET",
-    headers: { "Accept": "application/json" },
-  });
-
-  const modelsPayload = await modelsResponse.json().catch(() => ({}));
-  if (!modelsResponse.ok) {
-    console.error("Gemini listModels-feil:", JSON.stringify(modelsPayload));
-    return "";
-  }
-
-  const modelNames = Array.isArray(modelsPayload.models) ?
-    modelsPayload.models
-        .filter((m) =>
-          m &&
-          typeof m.name === "string" &&
-          Array.isArray(m.supportedGenerationMethods) &&
-          m.supportedGenerationMethods.includes("generateContent"))
-        .map((m) => m.name) :
-    [];
-
-  _cachedGeminiModel = chooseGeminiModel(modelNames);
-  console.log("[Gemini] Selected model:", _cachedGeminiModel);
-  return _cachedGeminiModel;
-}
-
-function getOrderedGeminiChatModels(modelNames = []) {
-  // Prefer text-capable Flash models. Exclude image/vision/live variants that may
-  // have separate quotas or non-chat behavior.
-  const isTextChatModel = (name) => {
-    const n = String(name || "").toLowerCase();
-    if (!n.includes("gemini")) return false;
-    if (n.includes("embedding") || n.includes("aqa")) return false;
-    if (n.includes("image") || n.includes("vision") || n.includes("live") || n.includes("tts")) return false;
-    return true;
-  };
-
-  const chatModels = modelNames.filter((n) => isTextChatModel(n));
-  const flashModels = chatModels.filter((n) => n.includes("flash"));
-  const proModels = chatModels.filter((n) => !n.includes("flash"));
-
-  function scoreModel(name) {
-    // Extract version numbers from model name, e.g. "models/gemini-2.5-flash-preview-04-17"
-    const versionMatch = name.match(/gemini-(\d+)\.(\d+)/);
-    const major = versionMatch ? Number(versionMatch[1]) : 0;
-    const minor = versionMatch ? Number(versionMatch[2]) : 0;
-    // Preview models rank slightly below stable releases of same version.
-    const isPreview = name.includes("preview") ? 0 : 1;
-    // Lite/exp models rank lower.
-    const isLite = (name.includes("lite") || name.includes("exp")) ? 0 : 1;
-    return major * 10000 + minor * 100 + isPreview * 10 + isLite;
-  }
-
-  const sortedFlash = flashModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
-  const sortedPro = proModels.slice().sort((a, b) => scoreModel(b) - scoreModel(a));
-
-  const prioritized = [...sortedFlash, ...sortedPro];
-  const seen = new Set(prioritized);
-  for (const modelName of chatModels) {
-    if (!seen.has(modelName)) {
-      prioritized.push(modelName);
-      seen.add(modelName);
-    }
-  }
-
-  return prioritized;
-}
-
-function chooseGeminiModel(modelNames = []) {
-  const orderedCandidates = getOrderedGeminiChatModels(modelNames);
-  return orderedCandidates[0] || modelNames[0] || "";
+  return geminiApiKeyParam.value();
 }
 
 /**
- * Konverterer Ekstern' interne bildeformat (ekstern:image://v1/...) til en offentlig URL.
+ * Helper to get secret or environment variable
  */
+function getSecretOrEnv(param, envKeys = []) {
+  try {
+    return param.value();
+  } catch (e) {
+    for (const key of envKeys) {
+      if (process.env[key]) return process.env[key];
+    }
+    return "";
+  }
+}
 
+/**
+ * Helper to fetch podcast episodes from RSS feed
+ */
+async function fetchPodcastEpisodesFromRss(limit = 10) {
+  const rssUrl = "https://anchor.fm/s/f7a13dec/podcast/rss";
+  try {
+    const resp = await fetch(rssUrl);
+    if (!resp.ok) throw new Error(`RSS fetch failed: ${resp.statusText}`);
+    const xml = await resp.text();
+    const data = await parseStringPromise(xml);
+    const channel = data.rss.channel[0];
+    const items = (channel.item || []).slice(0, limit).map(it => {
+      const audioUrl = it.enclosure ? it.enclosure[0].$.url : "";
+      const title = it.title ? it.title[0] : "";
+      const guid = it.guid ? (typeof it.guid[0] === 'object' ? it.guid[0]._ : it.guid[0]) : "";
+      const episodeId = guid.split('/').pop() || guid;
+      
+      return {
+        episodeId,
+        title,
+        audioUrl,
+        pubDate: it.pubDate ? it.pubDate[0] : ""
+      };
+    });
+    return items;
+  } catch (error) {
+    console.error("Error fetching podcast RSS:", error);
+    return [];
+  }
+}
 
-exports.getPodcast = onRequest({ cors: true, invoker: "public" }, async (req, res) => {
-  const rssUrl = PODCAST_RSS_URL;
+/**
+ * AI endpoint: Suggest SEO tags, meta title, and meta description for podcast episodes using Gemini.
+ */
+exports.seoSuggest = onRequest({ cors: true, secrets: [geminiApiKeyParam] }, async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).send('');
+    return;
+  }
+  
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
+  }
 
   try {
-    const response = await fetch(rssUrl);
-    const text = await response.text();
-    const data = await parseStringPromise(text);
-    res.json(data);
+    const geminiKey = getGeminiApiKey();
+    if (!geminiKey) {
+      return res.status(500).json({ error: 'Gemini API key not configured.' });
+    }
+
+    const { title, description, categories, transcript } = req.body || {};
+    if (!title || !description) {
+      return res.status(400).json({ error: 'Missing required fields: title, description.' });
+    }
+
+    const prompt = [
+      `Du er en SEO-ekspert for en kristen podcast.`,
+      `Lag forslag til:`,
+      `- 5-10 relevante tagger (kommaseparert, små bokstaver, ingen #)`,
+      `- En god meta-tittel (maks 60 tegn)`,
+      `- En god meta-beskrivelse (maks 155 tegn, oppsummerende, inviterende, inkluderer relevante søkeord)`,
+      `\n      Episodetittel: ${title}\n      Beskrivelse: ${description}\n      Kategorier: ${(categories || []).join(', ')}\n      ${transcript ? `Transkripsjon (utdrag): ${transcript.substring(0, 1000)}` : ''}\n      `,
+      `Svar i JSON-format slik: { "tags": "tag1, tag2, ...", "metaTitle": "...", "metaDescription": "..." }`
+    ].join('\n');
+
+    const apiBase = 'https://generativelanguage.googleapis.com/v1beta';
+    const model = 'models/gemini-1.5-flash';
+    const url = `${apiBase}/${model}:generateContent?key=${geminiKey.trim()}`;
+    
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: prompt }] }]
+      })
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return res.status(500).json({ error: data?.error?.message || 'Gemini API error.' });
+    }
+
+    let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    let json = null;
+    try {
+      const match = text.match(/\{[\s\S]*\}/);
+      json = match ? JSON.parse(match[0]) : null;
+    } catch (e) {
+      json = null;
+    }
+
+    if (!json || !json.tags || !json.metaTitle || !json.metaDescription) {
+      return res.status(500).json({ error: 'Ugyldig svar fra Gemini. Kunne ikke tolke SEO-data.' });
+    }
+
+    return res.status(200).json(json);
   } catch (error) {
-    console.error("Error fetching podcast:", error);
-    res.status(500).send("Error fetching podcast");
+    console.error("SEO Suggest Error:", error);
+    return res.status(500).json({ error: error.message });
   }
 });
 
-function firstArrayValue(value) {
-  return Array.isArray(value) ? value[0] : value;
-}
-
-function asPodcastText(value) {
-  const raw = firstArrayValue(value);
-  if (raw && typeof raw === "object") {
-    if (typeof raw._ === "string") return raw._.trim();
-    return "";
-  }
-  return typeof raw === "string" ? raw.trim() : "";
-}
-
-function normalizePodcastEpisode(item = {}) {
-  const rawGuid = firstArrayValue(item.guid);
-  const guid = rawGuid && typeof rawGuid === "object"
-    ? asPodcastText(rawGuid._)
-    : asPodcastText(rawGuid);
-  const enclosure = firstArrayValue(item.enclosure);
-  const audioUrl = enclosure && enclosure.$ && typeof enclosure.$.url === "string"
-    ? enclosure.$.url.trim()
-    : "";
-  const title = asPodcastText(item.title);
-  const link = asPodcastText(item.link);
-  const pubDate = asPodcastText(item.pubDate);
-  const episodeId = guid || link || title;
-
-  return {
-    episodeId,
-    title,
-    link,
-    audioUrl,
-    pubDate,
-  };
-}
-
-async function fetchPodcastEpisodesFromRss(limit = 5) {
-  const response = await fetch(PODCAST_RSS_URL);
-  if (!response.ok) {
-    throw new Error(`Podcast RSS utilgjengelig: ${response.status} ${response.statusText}`);
-  }
-
-  const xml = await response.text();
-  const parsed = await parseStringPromise(xml);
-  const channel = parsed?.rss?.channel?.[0] || {};
-  const items = Array.isArray(channel.item) ? channel.item : [];
-
-  return items
-    .map(normalizePodcastEpisode)
-    .filter((episode) => episode.episodeId && episode.audioUrl)
-    .slice(0, limit);
-}
-
-async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle = "", initiatedBy = "manual" }) {
-  if (!audioUrl || !episodeId) {
-    throw new Error("Mangler audioUrl eller episodeId");
-  }
-
+/**
+ * Helper function to transcribe a podcast episode using Gemini
+ */
+async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, initiatedBy }) {
   const geminiKey = getGeminiApiKey();
-  if (!geminiKey) {
-    throw new Error("Gemini API-nøkkel mangler på serveren.");
-  }
-
   const transcriptRef = db.collection("podcast_transcripts").doc(episodeId);
-  const tmpFilePath = path.join(os.tmpdir(), `podcast_${episodeId}_${Date.now()}.mp3`);
-  const transcriptSource = initiatedBy === "scheduled" ? "gemini-auto" : "gemini-manual";
-  let uploadedFileName = "";
-
+  const transcriptSource = initiatedBy === 'scheduled' ? 'gemini_auto' : 'gemini_manual';
+  
+  // Set initial status
   await transcriptRef.set({
     episodeId,
     title: episodeTitle || null,
     audioUrl,
-    status: "processing",
     source: transcriptSource,
+    status: "processing",
     updatedAt: FieldValue.serverTimestamp(),
-    lastAttemptAt: FieldValue.serverTimestamp(),
-    attemptCount: FieldValue.increment(1),
   }, { merge: true });
 
+  const tmpDir = os.tmpdir();
+  const tmpFilePath = path.join(tmpDir, `podcast_${episodeId}.mp3`);
+  let uploadedFileName = null;
+
   try {
-    console.log(`Laster ned podcast ${episodeId} fra ${audioUrl}...`);
-    const response = await fetch(audioUrl);
-    if (!response.ok) throw new Error(`Klarte ikke laste ned: ${response.statusText}`);
-    await streamPipeline(response.body, fs.createWriteStream(tmpFilePath));
-    console.log(`Nedlasting fullført: ${tmpFilePath}`);
+    // 1. Last ned lydfilen
+    console.log(`Laster ned lydfil fra ${audioUrl}...`);
+    const resp = await fetch(audioUrl);
+    if (!resp.ok) throw new Error(`Kunne ikke laste ned lydfil: ${resp.statusText}`);
+    const buffer = await resp.arrayBuffer();
+    fs.writeFileSync(tmpFilePath, Buffer.from(buffer));
 
     const fileManager = new GoogleAIFileManager(geminiKey);
-    console.log(`Laster opp til Gemini...`);
     const uploadResult = await fileManager.uploadFile(tmpFilePath, {
       mimeType: "audio/mpeg",
       displayName: `Podcast ${episodeId}`,
@@ -1165,7 +482,7 @@ exports.getAnalyticsOverview = onRequest({
  * Henter produkter fra Ekstern Stores via Ekstern SDK og returnerer et frontend-vennlig JSON-format.
  * Frontend (`js/ekstern-store.js`) leser `items` direkte.
  */
-const cors = require("cors")({ origin: true });
+
 const DEFAULT_FACEBOOK_PAGE_ID = "hiskingdomministry777";
 const DEFAULT_FACEBOOK_PAGE_URL = "https://www.facebook.com/hiskingdomministry777?locale=nb_NO";
 
