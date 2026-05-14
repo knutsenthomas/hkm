@@ -3764,7 +3764,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       try {
         const pText = await podcastRes.text();
         const pData = await parseStringPromise(pText);
-        const channel = pData.rss.channel[0];
+        const channel = Array.isArray(pData?.rss?.channel) ? pData.rss.channel[0] : pData?.rss?.channel;
         const pItems = (channel.item || []).slice(0, 5).map(it => ({
           title: it.title ? it.title[0] : "Ukjent episode",
           link: it.link ? it.link[0] : "https://anchor.fm/s/f7a13dec/podcast/rss",

@@ -4603,7 +4603,8 @@ class AdminManager {
             const response = await fetch('https://getpodcast-42bhgdjkcq-uc.a.run.app');
             const data = await response.json();
             // The Cloud Function uses xml2js, so items are in data.rss.channel[0].item
-            const items = data?.rss?.channel?.[0]?.item;
+            const channel = Array.isArray(data?.rss?.channel) ? data.rss.channel[0] : data?.rss?.channel;
+            const items = channel?.item;
             if (items && Array.isArray(items)) {
                 return items.length;
             }
@@ -4660,7 +4661,8 @@ class AdminManager {
         try {
             const response = await fetch('https://getpodcast-42bhgdjkcq-uc.a.run.app');
             const data = await response.json();
-            const rawItems = data?.rss?.channel?.[0]?.item;
+            const channel = Array.isArray(data?.rss?.channel) ? data.rss.channel[0] : data?.rss?.channel;
+            const rawItems = channel?.item;
             const items = Array.isArray(rawItems) ? rawItems : [];
 
             return items.map((episode) => {
