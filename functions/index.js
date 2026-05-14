@@ -1,5 +1,6 @@
 const { defineSecret } = require('firebase-functions/params');
 const geminiApiKeyParam = defineSecret('GEMINI_API_KEY');
+const openaiApiKeyParam = defineSecret('OPENAI_API_KEY');
 const gaPropertyIdParam = defineSecret('GA_PROPERTY_ID');
 const gaServiceAccountEmailParam = defineSecret('GA_SERVICE_ACCOUNT_EMAIL');
 const gaServiceAccountPrivateKeyParam = defineSecret('GA_SERVICE_ACCOUNT_PRIVATE_KEY');
@@ -23,6 +24,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { parseStringPromise } = require('xml2js');
+const OpenAI = require('openai');
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -95,13 +97,11 @@ async function fetchPodcastEpisodesFromRss(limit = 10) {
 /**
  * AI endpoint: Suggest SEO tags, meta title, and meta description for podcast episodes using Gemini.
  */
-exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) => {
+exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, async (request) => {
   try {
     const geminiKey = getGeminiApiKey();
-    if (!geminiKey) {
-      throw new HttpsError('internal', 'Gemini API key not configured.');
-    }
-
+    const openaiKey = openaiApiKeyParam.value();
+    
     const { title, description, categories, transcript } = request.data || {};
     if (!title || !description) {
       throw new HttpsError('invalid-argument', 'Missing required fields: title, description.');
@@ -117,34 +117,49 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
       `Svar KUN i JSON-format slik: { "tags": "tag1, tag2, ...", "metaTitle": "...", "metaDescription": "..." }`
     ].join('\n');
 
-    const geminiKeyClean = geminiKey.trim();
-    const genAI = new GoogleGenerativeAI(geminiKeyClean);
-    
-    // Prøver flere 2.0-modeller for å unngå Quota Exceeded (vi vet at 2.0 fungerer for denne kontoen)
-    const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
     let textResult = "";
     let lastError = null;
 
-    for (const modelName of modelsToTry) {
-      try {
-        console.log(`Forsøker AI-generering med ${modelName}...`);
-        const model = genAI.getGenerativeModel({ model: modelName });
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        textResult = response.text();
-        
-        if (textResult) {
-          console.log(`Suksess med modell: ${modelName}`);
-          break;
+    // 1. Prøv Google Gemini (2.0 Flash og Lite)
+    if (geminiKey) {
+      const genAI = new GoogleGenerativeAI(geminiKey.trim());
+      const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+      
+      for (const modelName of modelsToTry) {
+        try {
+          console.log(`Prøver Gemini-modell: ${modelName}`);
+          const model = genAI.getGenerativeModel({ model: modelName });
+          const result = await model.generateContent(prompt);
+          const response = await result.response;
+          textResult = response.text();
+          if (textResult) break;
+        } catch (err) {
+          console.warn(`Gemini ${modelName} feilet:`, err.message);
+          lastError = err;
         }
+      }
+    }
+
+    // 2. Fallback til OpenAI (ChatGPT) hvis Gemini feilet
+    if (!textResult && openaiKey) {
+      try {
+        console.log("Prøver OpenAI (ChatGPT) fallback...");
+        const openai = new OpenAI({ apiKey: openaiKey });
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o",
+          messages: [{ role: "user", content: prompt }],
+          response_format: { type: "json_object" }
+        });
+        textResult = completion.choices[0].message.content;
+        console.log("Suksess med OpenAI!");
       } catch (err) {
-        console.warn(`Modell ${modelName} feilet:`, err.message);
+        console.error("OpenAI feilet også:", err.message);
         lastError = err;
       }
     }
 
     if (!textResult) {
-      throw new HttpsError('unavailable', `AI-tjenesten er overbelastet: ${lastError?.message || 'Prøv igjen om et minutt.'}`);
+      throw new HttpsError('unavailable', `Alle AI-tjenester feilet: ${lastError?.message || 'Prøv igjen om et minutt.'}`);
     }
 
     const jsonMatch = textResult.match(/\{[\s\S]*\}/);
