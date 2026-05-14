@@ -8066,9 +8066,26 @@ class AdminManager {
                         },
                         blocks: {
                             insert: (type, data) => {
-                                // Fallback for programmatic inserts
-                                const html = type === 'header' ? `<h${data.level || 2}>${data.text || ''}</h${data.level || 2}>` : `<p>${data.text || ''}</p>`;
-                                document.execCommand('insertHTML', false, html);
+                                // Fallback for programmatic inserts in Single Surface mode
+                                let html = '';
+                                if (type === 'header') {
+                                    html = `<h${data.level || 2}>${data.text || ''}</h${data.level || 2}>`;
+                                } else if (type === 'list') {
+                                    const items = (data.items || []).map(i => `<li>${i}</li>`).join('');
+                                    html = data.style === 'ordered' ? `<ol>${items}</ol>` : `<ul>${items}</ul>`;
+                                } else if (type === 'quote') {
+                                    html = `<blockquote><p>${data.text || ''}</p><cite>${data.caption || ''}</cite></blockquote>`;
+                                } else if (type === 'delimiter') {
+                                    html = `<hr>`;
+                                } else {
+                                    // Default to paragraph
+                                    html = `<p>${data.text || ''}</p>`;
+                                }
+                                
+                                // Robust insertion to prevent style leakage
+                                holder.focus();
+                                // Add a dummy paragraph to reset formatting context if needed
+                                document.execCommand('insertHTML', false, html + '<p><br></p>');
                             }
                         }
                     };
@@ -9482,12 +9499,36 @@ class AdminManager {
                             // Vent til editoren er klar
                             if (activeEditor.isReady) await activeEditor.isReady;
 
-                            // Vi går gjennom hver blokk fra AI og legger den inn manuelt
-                            // Dette er mye tryggere enn .render() som kan tømme editoren hvis noe er feil
+                            // Rens ut tittelen fra første blokk hvis den gjentas
+                            if (data.blocks.length > 0 && data.blocks[0].type === 'paragraph') {
+                                const firstText = data.blocks[0].data.text || '';
+                                if (firstText.toLowerCase().startsWith(title.toLowerCase())) {
+                                    data.blocks[0].data.text = firstText.substring(title.length).replace(/^[:\s,.-]+/, '').trim();
+                                }
+                            }
+
+                            // Hvis vi er i Docs-modus, sørg for at vi starter i et nytt avsnitt
+                            if (shouldUseDocsLikeEditor) {
+                                const holder = getEditorHolder();
+                                if (holder) {
+                                    holder.focus();
+                                    // Gå til bunnen
+                                    const selection = window.getSelection();
+                                    const range = document.createRange();
+                                    range.selectNodeContents(holder);
+                                    range.collapse(false);
+                                    selection.removeAllRanges();
+                                    selection.addRange(range);
+                                }
+                            }
+
                             let addedCount = 0;
                             for (const block of data.blocks) {
                                 try {
                                     if (activeEditor.blocks && typeof activeEditor.blocks.insert === 'function') {
+                                        // Hopp over tomme blokker
+                                        if (block.type === 'paragraph' && !block.data.text?.trim()) continue;
+                                        
                                         await activeEditor.blocks.insert(block.type, block.data);
                                         addedCount++;
                                     }

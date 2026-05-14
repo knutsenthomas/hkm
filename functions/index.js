@@ -171,36 +171,34 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
     if (task === 'generate_blog_draft') {
       const draftPrompt = `
         Du er en inspirerende og dyktig Senior Skribent for His Kingdom Ministry.
-        TEMA (Bruk dette kun som inspirasjon, ikke kopier stilen): ${prompt}
+        TEMA (Bruk dette kun som inspirasjon): ${prompt}
         
         OPPGAVE: Lag et profesjonelt, vakkert og bibelsk forankret blogginnlegg i EditorJS-format. 
-        VIKTIG: Start DIREKTE med introduksjonen som et vanlig avsnitt (paragraph). IKKE lag en ny overskrift på toppen.
+        VIKTIG: Start DIREKTE med selve innholdet. ALDRI gjenta tittelen i den første blokka.
         
-        KRAV TIL STRUKTUR (FØLG SLAVISK):
-        1. START: Første blokk SKAL være 'paragraph'. Begynn rett på den engasjerende teksten.
-        2. AVSSNITT: Del opp i 3-4 fyldige deler med 'paragraph'-blokker.
-        3. UNDER-OVERSKRIFTER: Bruk 'header' level 3 for å markere nye poenger inne i teksten.
-        4. LISTE: En 'list' blokk (style: unordered) med 3-5 korte punkter.
-        5. BIBELVERS: En 'quote' blokk med et relevant vers.
-        6. SKILLELINJE: En 'delimiter' blokk for luft.
-        7. DAGENS TANKE: Avslutt med en oppmuntrende "Dagens tanke" (paragraph).
+        STRUKTUR-REGLER:
+        - Første blokk SKAL være en vanlig 'paragraph'.
+        - Bruk 'header' (level 3) for nye underpoenger.
+        - Bruk 'list' (style: unordered) for viktige punkter.
+        - Bruk 'quote' for bibelvers.
+        - Bruk 'delimiter' for visuelle pauser.
         
-        TEKNISKE REGLER:
-        - MAKS 3 setninger per 'paragraph'-blokk. Skap LUFT!
-        - Bruk MINST 10 blokker totalt.
+        KVALITETSKRAV:
+        - Skriv varmt, moderne og engasjerende norsk.
+        - Skap LUFT ved å bruke mange korte 'paragraph'-blokker (maks 3-4 setninger per blokk).
         - IKKE bruk bold på hele avsnitt.
         
-        JSON FORMAT:
+        JSON FORMAT (Svar KUN med dette):
         { 
           "blocks": [ 
-            { "type": "paragraph", "data": { "text": "Første vanlige avsnitt..." } },
-            { "type": "header", "data": { "text": "...", "level": 3 } },
-            { "type": "list", "data": { "style": "unordered", "items": ["...", "..."] } },
-            { "type": "quote", "data": { "text": "...", "caption": "...", "alignment": "left" } },
+            { "type": "paragraph", "data": { "text": "Start rett på saken her..." } },
+            { "type": "header", "data": { "text": "Et underpoeng", "level": 3 } },
+            { "type": "list", "data": { "style": "unordered", "items": ["Punkt 1", "Punkt 2"] } },
+            { "type": "quote", "data": { "text": "Bibelvers", "caption": "Referanse" } },
             { "type": "delimiter", "data": {} }
           ] 
         }
-        Svar kun med rå JSON uten markdown-blokker eller forklaringer.
+        Svar kun med rå JSON.
       `.trim();
 
       try {
