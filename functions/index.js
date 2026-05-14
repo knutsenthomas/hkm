@@ -141,10 +141,18 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         }
         
         if (textResult) {
-          // Clean up potential markdown code blocks
+          const jsonMatch = textResult.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            try {
+              return JSON.parse(jsonMatch[0]);
+            } catch (e) {
+              console.error("Newsletter JSON parse error:", e, textResult);
+            }
+          }
           textResult = textResult.replace(/```json|```/g, "").trim();
           return JSON.parse(textResult);
         }
+        throw new HttpsError('internal', 'AI returnerte ingen tekst.');
       } catch (err) {
         console.error("Newsletter structure generation failed:", err);
         throw new HttpsError('internal', 'Kunne ikke generere nyhetsbrev-struktur.');
@@ -182,12 +190,23 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         }
 
         if (textResult) {
+          // Robust JSON extraction
+          const jsonMatch = textResult.match(/\{[\s\S]*\}/);
+          if (jsonMatch) {
+            try {
+              return JSON.parse(jsonMatch[0]);
+            } catch (e) {
+              console.error("JSON parse error from AI result:", e, textResult);
+            }
+          }
+          // Fallback if no JSON found or parse failed
           textResult = textResult.replace(/```json|```/g, "").trim();
           return JSON.parse(textResult);
         }
+        throw new HttpsError('internal', 'AI returnerte ingen tekst.');
       } catch (err) {
         console.error("Blog draft generation failed:", err);
-        throw new HttpsError('internal', 'Kunne ikke generere utkast.');
+        throw new HttpsError('internal', err.message || 'Kunne ikke generere utkast.');
       }
     }
 
