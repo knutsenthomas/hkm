@@ -5452,6 +5452,33 @@ class AdminManager {
                 <div class="card modern">
                     <div class="card-header flex-between">
                         <div style="display: flex; align-items: center; gap: 12px;">
+                            <div style="width: 32px; height: 32px; border-radius: 8px; background: #fef2f2; color: #ef4444; display: flex; align-items: center; justify-content: center;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">monitoring</span>
+                            </div>
+                            <h3 class="card-title">Google Analytics 4</h3>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label>GA4 Property ID</label>
+                            <input type="text" id="ga-property-id" class="form-control" placeholder="f.eks. 123456789">
+                        </div>
+                        <div class="form-group" style="margin-bottom: 12px;">
+                            <label>Service Account Email</label>
+                            <input type="text" id="ga-service-email" class="form-control" placeholder="analytics-bot@project.iam.gserviceaccount.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Service Account Private Key</label>
+                            <textarea id="ga-private-key" class="form-control" style="height: 80px; font-family: monospace; font-size: 11px;" placeholder="-----BEGIN PRIVATE KEY-----\n..."></textarea>
+                        </div>
+                        <div style="margin-top: 24px;">
+                            <button class="btn-primary" id="save-ga-settings" style="width: 100%; background: #ef4444;">Lagre Analytics-nøkler</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card modern">
+                    <div class="card-header flex-between">
+                        <div style="display: flex; align-items: center; gap: 12px;">
                             <div style="width: 32px; height: 32px; border-radius: 8px; background: #f5f3ff; color: #7c3aed; display: flex; align-items: center; justify-content: center;">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">translate</span>
                             </div>
@@ -5475,7 +5502,7 @@ class AdminManager {
                             <input type="text" id="gemini-model" class="form-control" placeholder="gemini-1.5-flash">
                         </div>
                         <div style="margin-top: 24px;">
-                            <button class="btn-primary" id="save-ai-settings" style="width: 100%;">Lagre integrasjoner</button>
+                            <button class="btn-primary" id="save-ai-settings" style="width: 100%;">Lagre AI-integrasjoner</button>
                         </div>
                     </div>
                 </div>
@@ -5488,7 +5515,7 @@ class AdminManager {
 
         section.addEventListener('click', (event) => {
             if (event.target.id === 'save-youtube-settings') this.saveMediaSettings('save-youtube-settings');
-            if (event.target.id === 'save-ai-settings') this.saveIntegrationsSettings();
+            if (event.target.id === 'save-ai-settings' || event.target.id === 'save-ga-settings') this.saveIntegrationsSettings();
             if (event.target.id === 'add-gcal') this.addGCalInput();
             if (event.target.id === 'connect-google-btn') this.handleGoogleAuth();
             if (event.target.id === 'disconnect-google') this.handleGoogleDisconnect();
@@ -6257,10 +6284,18 @@ class AdminManager {
             if (gcalList) {
                 gcalList.innerHTML = '';
                 calendars.forEach(cal => this.addGCalInput(cal.label, cal.id));
-                if (calendars.length === 0 && gcal.calendarId) {
-                    this.addGCalInput(gcal.label || 'Hovedkalender', gcal.calendarId);
-                }
             }
+
+            // Google Analytics Settings
+            const ga = settings.googleAnalytics || {};
+            const gaPropEl = document.getElementById('ga-property-id');
+            if (gaPropEl) gaPropEl.value = ga.propertyId || '';
+            
+            const gaEmailEl = document.getElementById('ga-service-email');
+            if (gaEmailEl) gaEmailEl.value = ga.serviceEmail || '';
+            
+            const gaKeyEl = document.getElementById('ga-private-key');
+            if (gaKeyEl) gaKeyEl.value = ga.privateKey || '';
 
             // Update GCal Status Badge
             const statusBadge = document.getElementById('gcal-status');
@@ -6340,6 +6375,14 @@ class AdminManager {
                     provider: translationProvider,
                     geminiApiKey,
                     geminiModel,
+                },
+                googleAnalytics: {
+                    propertyId: document.getElementById('ga-property-id')?.value.trim() || '',
+                    serviceEmail: document.getElementById('ga-service-email')?.value.trim() || '',
+                    privateKey: document.getElementById('ga-private-key')?.value.trim() || ''
+                },
+                updatedAt: new Date().toISOString()
+            };
                     lastUpdated: new Date().toISOString()
                 }
             };

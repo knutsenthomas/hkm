@@ -552,10 +552,23 @@ exports.getAnalyticsOverview = onRequest({
 }, async (req, res) => {
   return cors(req, res, async () => {
     try {
-      const propertyId = gaPropertyIdParam.value();
-      const clientEmail = gaServiceAccountEmailParam.value();
-      const privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
-      const privateKey = privateKeyRaw.replace(/\\n/g, "\n").trim();
+      let propertyId = gaPropertyIdParam.value();
+      let clientEmail = gaServiceAccountEmailParam.value();
+      let privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
+
+      // Fallback to Firestore if secrets are missing
+      if (!propertyId || !clientEmail || !privateKeyRaw) {
+        console.log("[Analytics] Secrets missing, checking Firestore fallback...");
+        const settingsDoc = await admin.firestore().collection('pages_content').doc('settings_integrations').get();
+        if (settingsDoc.exists) {
+            const ga = settingsDoc.data().googleAnalytics || {};
+            if (!propertyId) propertyId = ga.propertyId;
+            if (!clientEmail) clientEmail = ga.serviceEmail;
+            if (!privateKeyRaw) privateKeyRaw = ga.privateKey;
+        }
+      }
+
+      const privateKey = (privateKeyRaw || "").replace(/\\n/g, "\n").trim();
 
       if (!propertyId || !clientEmail || !privateKey) {
         return res.status(503).json({
