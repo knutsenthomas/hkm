@@ -243,7 +243,13 @@ class NewsletterBuilder {
         document.querySelectorAll('.element-card').forEach(btn => {
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
-                this.addBlock(type);
+                if (type === 'ai_text') {
+                    this.showAiTextPrompt();
+                } else if (type === 'ai_image') {
+                    this.showAiImagePrompt();
+                } else {
+                    this.addBlock(type);
+                }
                 if (this.isMobileViewport()) {
                     this.closeToolsUi();
                 }
@@ -364,10 +370,95 @@ class NewsletterBuilder {
             case 'spacer':
                 content = { height: 32 };
                 break;
+            case 'ai_generated':
+                content = { text: 'AI-generert innhold...' };
+                break;
         }
 
-        this.blocks.push({ id, type, content });
+        this.blocks.push({ id, type: (type === 'ai_text' ? 'text' : type), content });
         this.renderCanvas();
+    }
+
+    async buildWithAi() {
+        const prompt = window.prompt("Beskriv hva nyhetsbrevet skal handle om, så bygger jeg strukturen for deg: (f.eks: 'En invitasjon til bønnemøte på tirsdag')");
+        if (!prompt) return;
+
+        showToast("AI bygger nyhetsbrevet ditt...", "info");
+        try {
+            const callable = firebase.functions().httpsCallable('aiProcess');
+            const result = await callable({
+                task: 'generate_newsletter_structure',
+                prompt: prompt
+            });
+
+            if (result.data && result.data.blocks) {
+                // Vi tømmer ikke nødvendigvis alt, men legger til de nye blokkene
+                for (const aiBlock of result.data.blocks) {
+                    const id = Date.now() + Math.random().toString(36).substr(2, 9);
+                    this.blocks.push({
+                        id,
+                        type: aiBlock.type,
+                        content: aiBlock.content
+                    });
+                }
+                this.renderCanvas();
+                showToast(`AI har bygget ${result.data.blocks.length} blokker!`, "success");
+            }
+        } catch (err) {
+            console.error("AI Builder failed:", err);
+            showToast("Kunne ikke bygge med AI: " + err.message, "error");
+        }
+    }
+
+    async showAiTextPrompt() {
+        const prompt = window.prompt("Hva vil du at jeg skal skrive? (f.eks: 'Et velkomstbrev til nye medlemmer')");
+        if (!prompt) return;
+
+        showToast("AI tenker...", "info");
+        try {
+            const callable = firebase.functions().httpsCallable('aiProcess');
+            const result = await callable({
+                task: 'generate_text',
+                prompt: `Du er en dyktig tekstforfatter for His Kingdom Ministry. ${prompt}. Svar med selve teksten, ingen kommentarer rundt.`,
+                options: { model: "gpt-4o-mini" }
+            });
+
+            if (result.data && result.data.text) {
+                this.addBlock('text');
+                const lastBlock = this.blocks[this.blocks.length - 1];
+                lastBlock.content.text = result.data.text;
+                this.renderCanvas();
+                showToast("Tekst generert!", "success");
+            }
+        } catch (err) {
+            console.error("AI Text failed:", err);
+            showToast("Kunne ikke generere tekst: " + err.message, "error");
+        }
+    }
+
+    async showAiImagePrompt() {
+        const prompt = window.prompt("Beskriv bildet du vil lage: (f.eks: 'En soloppgang over en rolig innsjø, fotorealistisk')");
+        if (!prompt) return;
+
+        showToast("Genererer bilde (dette kan ta 10-15 sek)...", "info", 10000);
+        try {
+            const callable = firebase.functions().httpsCallable('aiProcess');
+            const result = await callable({
+                task: 'generate_image',
+                prompt: prompt
+            });
+
+            if (result.data && result.data.imageUrl) {
+                this.addBlock('image');
+                const lastBlock = this.blocks[this.blocks.length - 1];
+                lastBlock.content.url = result.data.imageUrl;
+                this.renderCanvas();
+                showToast("Bilde generert!", "success");
+            }
+        } catch (err) {
+            console.error("AI Image failed:", err);
+            showToast("Kunne ikke generere bilde: " + err.message, "error");
+        }
     }
 
 

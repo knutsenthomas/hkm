@@ -97,6 +97,115 @@ async function fetchPodcastEpisodesFromRss(limit = 10) {
 /**
  * AI endpoint: Suggest SEO tags, meta title, and meta description for podcast episodes using Gemini.
  */
+/**
+ * Universal AI Engine: Handles text generation, newsletters, and DALL-E 3 image generation.
+ */
+exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, async (request) => {
+  try {
+    const { task, prompt, options } = request.data || {};
+    const geminiKey = getGeminiApiKey();
+    const openaiKey = openaiApiKeyParam.value();
+
+    if (!prompt) throw new HttpsError('invalid-argument', 'Missing prompt.');
+
+    // --- CASE 1: Bildegenerering (DALL-E 3) ---
+    if (task === 'generate_newsletter_structure') {
+      const structurePrompt = `
+        Du er en ekspert på nyhetsbrev for His Kingdom Ministry.
+        Brukeren ønsker: ${prompt}
+        Lag en struktur for nyhetsbrevet bestående av 3-5 blokker.
+        Tilgjengelige blokktyper: 'title', 'text', 'image', 'button', 'spacer'.
+        For 'image', bruk denne placeholder-URLen: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=800&q=80'.
+        Svar KUN med gyldig JSON på dette formatet:
+        { "blocks": [ { "type": "title", "content": { "text": "..." } }, { "type": "text", "content": { "text": "..." } } ] }
+        Ikke bruk markdown-blokker som f.eks. kodelister med json, svar kun med rå tekst.
+      `.trim();
+      
+      try {
+        const geminiKey = getGeminiApiKey();
+        let textResult = "";
+        if (geminiKey) {
+          const genAI = new GoogleGenerativeAI(geminiKey.trim());
+          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+          const result = await model.generateContent(structurePrompt);
+          textResult = (await result.response).text();
+        }
+        
+        if (!textResult && openaiApiKeyParam.value()) {
+          const openai = new OpenAI({ apiKey: openaiApiKeyParam.value() });
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: structurePrompt }]
+          });
+          textResult = completion.choices[0].message.content;
+        }
+        
+        if (textResult) {
+          // Clean up potential markdown code blocks
+          textResult = textResult.replace(/```json|```/g, "").trim();
+          return JSON.parse(textResult);
+        }
+      } catch (err) {
+        console.error("Newsletter structure generation failed:", err);
+        throw new HttpsError('internal', 'Kunne ikke generere nyhetsbrev-struktur.');
+      }
+    }
+
+    if (task === 'generate_image') {
+      if (!openaiKey) throw new HttpsError('unavailable', 'OpenAI-nøkkel mangler for bildegenerering.');
+      
+      console.log("Genererer bilde med DALL-E 3...");
+      const openai = new OpenAI({ apiKey: openaiKey });
+      const response = await openai.images.generate({
+        model: "dall-e-3",
+        prompt: prompt,
+        n: 1,
+        size: "1024x1024",
+        quality: "hd"
+      });
+
+      return { imageUrl: response.data[0].url };
+    }
+
+    // --- CASE 2: Tekstgenerering (Nyhetsbrev, Blogg, Chat) ---
+    let textResult = "";
+    let lastError = null;
+
+    // Prøv Gemini først (billigst/raskest)
+    if (geminiKey) {
+      const genAI = new GoogleGenerativeAI(geminiKey.trim());
+      const models = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+      for (const m of models) {
+        try {
+          const model = genAI.getGenerativeModel({ model: m });
+          const result = await model.generateContent(prompt);
+          textResult = (await result.response).text();
+          if (textResult) break;
+        } catch (err) { lastError = err; }
+      }
+    }
+
+    // Fallback til OpenAI (ChatGPT)
+    if (!textResult && openaiKey) {
+      try {
+        const openai = new OpenAI({ apiKey: openaiKey });
+        const completion = await openai.chat.completions.create({
+          model: options?.model || "gpt-4o-mini",
+          messages: [{ role: "user", content: prompt }]
+        });
+        textResult = completion.choices[0].message.content;
+      } catch (err) { lastError = err; }
+    }
+
+    if (!textResult) throw new HttpsError('unavailable', `AI feilet: ${lastError?.message}`);
+    return { text: textResult };
+
+  } catch (error) {
+    console.error('AI Process failed:', error);
+    throw new HttpsError('internal', error.message);
+  }
+});
+
 exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, async (request) => {
   try {
     const geminiKey = getGeminiApiKey();
@@ -3837,128 +3946,84 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       7. Hvis en bruker spør om bloggen eller undervisning, bruk informasjonen over for å gi dem et godt svar. Ikke si at du ikke har tilgang hvis informasjonen står i listen.
       6. For kundeservice-spørsmål du ikke kan svare på, be kunden vente på svar fra teamet.
       7. Aldri nevn tekniske detaljer om systemet.
-      8. ISRAEL-PRODUKTER: Fortell gjerne besøkende at vi har flotte, autentiske produkter fra Israel i butikken vår. Vi er stolte av å støtte Israel og tilby disse varene. Du kan henvise dem til: https://www.hiskingdomministry.no/category/israel for å se utvalget.
-    `.trim();
+      8. ISRAEL-PRODUKTER: Fortell gjerne besøkende at vi har flotte, autentiske produkter fra Israel i butikken vår. Vi er stolte av å støtte Israel og tilby disse varene. Du kan henvise dem til: https://www.hiskingdomministry.no/category/israel for å se utvalget.`;
 
     const userMessage = msgData.text || "";
     if (!userMessage) return;
 
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{
-          parts: [{ text: `${systemPrompt}\n\nBesøkende: ${userMessage}` }]
-        }]
-      })
+    const finalSystemPrompt = `${systemPrompt}\n\nBesøkende: ${userMessage}`;
+
+    // --- AI Generation Logic with Robust Fallback ---
+    let aiText = "";
+    let lastError = null;
+
+    // 1. Prøv Gemini (Primary & Fallback models)
+    try {
+      const genAI = new GoogleGenerativeAI(cleanKey);
+      const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+      
+      for (const modelName of modelsToTry) {
+        try {
+          console.log(`[ChatAI] Prøver Gemini: ${modelName}`);
+          const model = genAI.getGenerativeModel({ model: modelName });
+          const result = await model.generateContent(finalSystemPrompt);
+          aiText = (await result.response).text();
+          if (aiText) {
+            console.log(`[ChatAI] Suksess med Gemini (${modelName})`);
+            break;
+          }
+        } catch (err) {
+          console.warn(`[ChatAI] Gemini ${modelName} feilet:`, err.message);
+          lastError = err;
+        }
+      }
+    } catch (err) {
+      console.error("[ChatAI] Gemini SDK init feilet:", err);
+    }
+
+    // 2. Ultimate Fallback: OpenAI (ChatGPT)
+    const openaiKey = openaiApiKeyParam.value();
+    if (!aiText && openaiKey) {
+      try {
+        console.log("[ChatAI] Prøver OpenAI fallback...");
+        const openai = new OpenAI({ apiKey: openaiKey });
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "Du er en hjelpsom assistent for His Kingdom Ministry. Bruk informasjonen gitt i prompten for å svare." },
+            { role: "user", content: finalSystemPrompt }
+          ]
+        });
+        aiText = completion.choices[0].message.content;
+        console.log("[ChatAI] Suksess med OpenAI!");
+      } catch (err) {
+        console.error("[ChatAI] OpenAI feilet også:", err.message);
+        lastError = err;
+      }
+    }
+
+    if (!aiText) {
+      aiText = "AI-assistenten er midlertidig opptatt. Prøv igjen om et lite øyeblikk, eller bruk e-post-fanen så følger vi deg opp.";
+      console.error("[ChatAI] Alle AI-modeller feilet.");
+    }
+
+    // 4. Lagre AI-svaret i Firestore
+    const chatRef = db.collection("visitorChats").doc(chatId);
+    await chatRef.collection("messages").add({
+      sender: "agent",
+      source: "ai_gemini", // Behold for frontend-kompatibilitet
+      fromName: "HKM Assistent",
+      text: aiText.trim(),
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    const data = await response.json();
-    if (!response.ok) {
-      console.error("Gemini REST API feil:", JSON.stringify(data));
+    await chatRef.set({
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      lastAgentMessageAt: admin.firestore.FieldValue.serverTimestamp(),
+      lastTargetMode: "ai",
+    }, { merge: true });
 
-      // On overload/quota errors, clear cache and retry once with stable fallback model.
-      const isRetryableGeminiError =
-        response.status === 503 ||
-        response.status === 429 ||
-        data?.error?.status === "UNAVAILABLE" ||
-        data?.error?.status === "RESOURCE_EXHAUSTED";
-
-      if (isRetryableGeminiError) {
-        _cachedGeminiModel = ""; // Force re-selection on next request
-
-        const fallbackCandidates = [
-          "models/gemini-2.0-flash",
-          "models/gemini-2.0-flash-lite",
-        ];
-
-        // Enrich with currently available, text-capable models.
-        try {
-          const modelsResp = await fetch(`${apiBase}/models?key=${cleanKey}`);
-          const modelsPayload = await modelsResp.json();
-          if (modelsResp.ok) {
-            const availableNames = (modelsPayload.models || [])
-              .filter((m) =>
-                m &&
-                typeof m.name === "string" &&
-                Array.isArray(m.supportedGenerationMethods) &&
-                m.supportedGenerationMethods.includes("generateContent"))
-              .map((m) => m.name);
-
-            const dynamicCandidates = getOrderedGeminiChatModels(availableNames)
-              .filter((name) => name !== selectedModel);
-
-            for (const candidate of dynamicCandidates) {
-              if (!fallbackCandidates.includes(candidate)) fallbackCandidates.push(candidate);
-            }
-          }
-        } catch (listErr) {
-          console.warn("Kunne ikke hente fallback-modeller fra listModels:", listErr);
-        }
-
-        for (const fallbackModel of fallbackCandidates) {
-          try {
-            const fallbackUrl = `${apiBase}/${fallbackModel}:generateContent?key=${cleanKey}`;
-            const fallbackResp = await fetch(fallbackUrl, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                contents: [{ parts: [{ text: `${systemPrompt}\n\nBesøkende: ${userMessage}` }] }]
-              })
-            });
-            const fallbackData = await fallbackResp.json();
-            if (fallbackResp.ok) {
-              const fallbackText = fallbackData.candidates?.[0]?.content?.parts?.[0]?.text;
-              if (fallbackText) {
-                const chatRef = db.collection("visitorChats").doc(chatId);
-                await chatRef.collection("messages").add({
-                  sender: "agent",
-                  source: "ai_gemini",
-                  fromName: "HKM Assistent",
-                  text: fallbackText.trim(),
-                  createdAt: admin.firestore.FieldValue.serverTimestamp(),
-                });
-                await chatRef.set({ updatedAt: admin.firestore.FieldValue.serverTimestamp() }, { merge: true });
-                return;
-              }
-            }
-            console.error(`Fallback Gemini feil (${fallbackModel}):`, JSON.stringify(fallbackData));
-          } catch (fallbackErr) {
-            console.error(`Fallback Gemini unntak (${fallbackModel}):`, fallbackErr);
-          }
-        }
-
-        // Both primary and fallback failed — write user-visible error so user isn't left hanging.
-        await db.collection("visitorChats").doc(chatId).collection("messages").add({
-          sender: "agent",
-          source: "ai_gemini",
-          fromName: "HKM Assistent",
-          text: "AI-assistenten er midlertidig opptatt. Prøv igjen om et lite øyeblikk, eller bruk e-post-fanen så følger vi deg opp.",
-          createdAt: admin.firestore.FieldValue.serverTimestamp(),
-        }).catch(() => {});
-      }
-      return;
-    }
-
-    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (aiText) {
-      // 4. Lagre AI-svaret i Firestore
-      const chatRef = db.collection("visitorChats").doc(chatId);
-      await chatRef.collection("messages").add({
-        sender: "agent",
-        source: "ai_gemini",
-        fromName: "HKM Assistent",
-        text: aiText.trim(),
-        createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      });
-
-      // Oppdater sist aktiv tid
-      await chatRef.set({
-        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-      }, { merge: true });
-    }
-
+    console.log(`[ChatAI] AI-svar lagret for chatId=${chatId}`);
   } catch (error) {
     console.error("Feil i chatbot-AI logikk (SDK):", error);
   }
