@@ -315,8 +315,8 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] },
     const openaiKey = openaiApiKeyParam.value();
     
     const { title, description, categories, transcript, type } = request.data || {};
-    if (!title || !description) {
-      throw new HttpsError('invalid-argument', 'Missing required fields: title, description.');
+    if (!title) {
+      throw new HttpsError('invalid-argument', 'Vennligst skriv en tittel først.');
     }
 
     const typeLabel = type === 'blog' ? 'blogginnlegg' : (type === 'teaching' ? 'undervisning' : 'podcast');
