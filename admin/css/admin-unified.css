@@ -128,6 +128,19 @@ body.builder-active .toolbar-action-btn {
 }
 /* --- End Emergency Fixes --- */
 
+/* RBAC Visibility Rules */
+body.hide-critical-deletes .icon-btn.delete,
+body.hide-critical-deletes .btn-delete-file,
+body.hide-critical-deletes .btn-delete-folder,
+body.hide-critical-deletes .delete-user-btn,
+body.hide-critical-deletes .delete-cause-btn,
+body.hide-critical-deletes .delete-comment-btn,
+body.hide-critical-deletes #admin-detail-delete-btn,
+body.hide-critical-deletes #delete-course-btn,
+body.hide-critical-deletes .hkm-modal-btn-delete {
+  display: none !important;
+}
+
 :root {
   --admin-surface: #ffffff;
   --admin-surface-muted: #f4f7fa;

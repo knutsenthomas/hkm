@@ -1576,9 +1576,9 @@ class AdminManager {
 
                 const hasAdminAccess = typeof adminUtils.isElevatedAdminRole === 'function'
                     ? adminUtils.isElevatedAdminRole(role)
-                    : ['admin', 'superadmin'].includes(String(role || '').toLowerCase());
+                    : ['editor', 'admin', 'superadmin'].includes(String(role || '').toLowerCase());
 
-                // Strict RBAC: only admin/superadmin may access admin directory
+                // Strict RBAC: only allowed roles may access admin directory
                 if (!hasAdminAccess) {
                     console.warn("Access denied: User lacks admin role.");
                     if (typeof adminUtils.redirectToMinSideWithAccessDenied === 'function') {
@@ -1659,24 +1659,48 @@ class AdminManager {
         console.log(`Applying restrictions for role: ${role}`);
         const ROLES = window.HKM_ROLES;
 
-        // Editor Restrictions: Can only manage content
-        if (role === ROLES.EDITOR) {
-            // Hide admin-only sections from editors
-            const adminOnlySections = ['settings', 'hero', 'design', 'seo', 'users'];
-            document.querySelectorAll('.nav-item').forEach(item => {
-                const section = item.querySelector('a')?.getAttribute('data-section');
-                if (adminOnlySections.includes(section)) {
+        // 1. Sidebar Menu Filtering
+        document.querySelectorAll('.nav-item').forEach(item => {
+            const section = item.querySelector('a')?.getAttribute('data-section');
+            const link = item.querySelector('a')?.getAttribute('href');
+            
+            // Editor Restrictions: Only Blog, Overview, and Media
+            if (role === ROLES.EDITOR) {
+                const allowedSections = ['overview', 'blog', 'media'];
+                const allowedLinks = []; // Strictly content only
+                
+                const isAllowed = allowedSections.includes(section) || 
+                                 allowedLinks.some(l => link && link.includes(l)) ||
+                                 item.getAttribute('data-nav-category') === 'all';
+                
+                if (!isAllowed) {
                     item.style.display = 'none';
                 }
-            });
+            }
+            
+            // Hide specific high-level management for non-superadmins
+            if (role !== ROLES.SUPERADMIN) {
+                const superAdminOnlySections = ['settings', 'automation', 'integrations'];
+                if (superAdminOnlySections.includes(section)) {
+                    item.style.display = 'none';
+                }
+            }
+        });
 
-            // Note: More granular button restrictions can be added in specific render methods
+        // 2. Hide specific admin categories if they end up empty
+        if (role === ROLES.EDITOR) {
+            document.querySelectorAll('.nav-category-header').forEach(header => {
+                const cat = header.getAttribute('data-target-category');
+                if (cat === 'administrasjon' || cat === 'nettsted') {
+                    // We keep 'nettsted' because Blog is there, but could hide others
+                }
+            });
         }
 
-        // Non-Superadmin Restrictions: No Core Deletions
+        // 3. Deletion Restrictions: Disable delete buttons for non-superadmins in certain contexts
         if (role !== ROLES.SUPERADMIN) {
-            // This is a placeholder for where we'd hide specific "Superadmin only" buttons
-            // For now, we'll implement this as logic in specific delete handlers if needed
+            // We'll add classes to the body to help with CSS-based hiding of delete buttons
+            document.body.classList.add('hide-critical-deletes');
         }
     }
 
@@ -1733,6 +1757,10 @@ class AdminManager {
                     await user.updateProfile(authUpdates);
                 }
             }
+
+            // Store for blog author attribution
+            this._lastKnownDisplayName = userData.displayName;
+            this._lastKnownPhotoURL = userData.photoURL;
         } catch (e) {
             console.warn('Kunne ikke synkronisere brukerprofil i admin:', e);
         }
@@ -1748,13 +1776,24 @@ class AdminManager {
             if (adminName) adminName.textContent = safeName;
             if (!adminAvatar) return;
 
-            // HKM Fix: Always use initials instead of photoURL
-            const initials = safeName.split(' ').map(n => (n || '').trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
-            adminAvatar.textContent = (initials || 'A').substring(0, 2);
+            if (photoURL) {
+                // Show actual photo
+                adminAvatar.innerHTML = `<img src="${photoURL}" style="width:100%; height:100%; object-fit:cover; border-radius:inherit;" onerror="this.parentElement.innerHTML='${(safeName[0] || 'A').toUpperCase()}'">`;
+                adminAvatar.textContent = ''; // Clear initials if we have a photo
+            } else {
+                // Fallback: Use initials
+                const initials = safeName.split(' ').map(n => (n || '').trim()).filter(Boolean).map(n => n[0]).join('').toUpperCase();
+                adminAvatar.textContent = (initials || 'A').substring(0, 2);
+            }
+            
             adminAvatar.style.fontSize = '15px';
             adminAvatar.style.fontWeight = '800';
             adminAvatar.style.letterSpacing = '0';
             adminAvatar.style.borderRadius = '12px';
+            adminAvatar.style.overflow = 'hidden';
+            adminAvatar.style.display = 'flex';
+            adminAvatar.style.alignItems = 'center';
+            adminAvatar.style.justifyContent = 'center';
         };
 
         const cacheHeaderIdentity = (name, photoURL) => {
@@ -1811,6 +1850,10 @@ class AdminManager {
 
         renderHeaderIdentity(displayName, photoURL);
         cacheHeaderIdentity(displayName, photoURL);
+        
+        // Store for blog author attribution
+        this._lastKnownDisplayName = displayName;
+        this._lastKnownPhotoURL = photoURL;
 
         // Profile trigger in dashboard header -> Open full profile section
         const profileTrigger = document.getElementById('admin-profile-trigger');
@@ -10133,6 +10176,24 @@ class AdminManager {
                                     // Mark as edited in dashboard so the public site prioritizes this version
                                     safeItem.dashboardEdited = true;
                                     safeItem.dashboardEditedAt = new Date().toISOString();
+
+                                    // HKM Fix: Dynamically attach author info from logged in profile
+                                    if (collectionId === 'blog' || collectionId === 'teaching') {
+                                        const currentUser = firebase.auth().currentUser;
+                                        if (currentUser) {
+                                            // Prioritize Firestore profile if we have it, otherwise Auth profile
+                                            const displayName = this._lastKnownDisplayName || currentUser.displayName || currentUser.email;
+                                            const photoURL = this._lastKnownPhotoURL || currentUser.photoURL;
+                                            
+                                            // Only set if not manually overridden in the form
+                                            if (!safeItem.author || safeItem.author === 'Ukjent forfatter' || safeItem.author === 'Navn') {
+                                                safeItem.author = displayName;
+                                            }
+                                            if (!safeItem.authorPhoto || safeItem.authorPhoto.includes('author-placeholder')) {
+                                                if (photoURL) safeItem.authorPhoto = photoURL;
+                                            }
+                                        }
+                                    }
 
                                     upsertItemInList(list, safeItem);
 
