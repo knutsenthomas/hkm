@@ -3055,7 +3055,6 @@ class AdminManager {
                     aiBtn.disabled = true;
                     aiBtn.innerHTML = 'Henter forslag...';
                     try {
-                        // Use the correct endpoint for Firebase Functions
                         const response = await fetch('/seoSuggest', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -3066,7 +3065,30 @@ class AdminManager {
                                 transcript: ep.transcript || ''
                             })
                         });
-                        const data = await response.json();
+                        let data = {};
+                        let errorText = '';
+                        if (!response.ok) {
+                            // Try to get error details from backend
+                            try {
+                                data = await response.json();
+                                errorText = data.error || data.message || '';
+                            } catch (err) {
+                                errorText = await response.text();
+                            }
+                            let msg = 'Kunne ikke hente AI-forslag.';
+                            if (response.status === 429) {
+                                msg = 'AI-tjenesten er midlertidig overbelastet (rate limit). Prøv igjen om litt.';
+                            }
+                            if (errorText) msg += '\n' + errorText;
+                            if (typeof window.adminManager?.showToast === 'function') {
+                                window.adminManager.showToast(msg, 'error', 7000);
+                            } else {
+                                alert(msg);
+                            }
+                            return;
+                        } else {
+                            data = await response.json();
+                        }
                         // Update tag UI properly
                         if (data.tags) {
                             // Split tags and update the tag UI
@@ -3085,7 +3107,13 @@ class AdminManager {
                         if (data.metaTitle) modal.querySelector('#col-item-seo-title').value = data.metaTitle;
                         if (data.metaDescription) modal.querySelector('#col-item-seo-desc').value = data.metaDescription;
                     } catch (e) {
-                        alert('Kunne ikke hente AI-forslag.');
+                        let msg = 'Kunne ikke hente AI-forslag.';
+                        if (e && e.message) msg += '\n' + e.message;
+                        if (typeof window.adminManager?.showToast === 'function') {
+                            window.adminManager.showToast(msg, 'error', 7000);
+                        } else {
+                            alert(msg);
+                        }
                     } finally {
                         aiBtn.disabled = false;
                         aiBtn.innerHTML = '<span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span> Foreslå tagger og SEO med AI';
