@@ -119,7 +119,7 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
 
     const geminiKeyClean = geminiKey.trim();
     const genAI = new GoogleGenerativeAI(geminiKeyClean);
-    const modelName = "gemini-1.5-flash"; // Bruker den mest stabile standardmodellen
+    const modelName = "gemini-2.0-flash"; // Bruker samme modell som transkripsjonen (som vi vet fungerer)
     
     try {
       console.log(`Forsøker AI-generering med ${modelName}...`);
