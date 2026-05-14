@@ -171,28 +171,31 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
 
     if (task === 'generate_blog_draft') {
       const draftPrompt = `
-        Du er en inspirerende og dyktig skribent for His Kingdom Ministry.
+        Du er en inspirerende og dyktig Senior Skribent for His Kingdom Ministry.
         Tema: ${prompt}
         
-        Lag et omfattende og strukturert utkast til et ${options?.type || 'blogginnlegg'}. 
+        Lag et profesjonelt, vakkert og bibelsk forankret blogginnlegg i EditorJS-format. 
+        Målet er å skape et innlegg som ser ut nøyaktig som de beste refleksjonene i Gemini, med dybde og variasjon.
         
-        VIKTIGE REGLER FOR STRUKTUR (FØLG NØYE):
-        1. BRUK FLERE BLOKKER: Hvert avsnitt SKAL være en egen 'paragraph'-blokk. Aldri legg mer enn ett avsnitt i samme blokk.
-        2. OVERSKRIFTER: Bruk 'header' med level 2 for hoveddeler, og level 3 for underpunkter. IKKE bruk level 1 inne i selve teksten.
-        3. FORMATERING: Bruk ren tekst i 'paragraph'-blokker. IKKE bruk bold på hele avsnitt.
-        4. LENGDE: Skriv minst 5-8 fyldige avsnitt.
+        KRAV TIL STRUKTUR OG BLOKKER:
+        1. INTRODUKSJON: Start med en engasjerende introduksjon (paragraph).
+        2. SPØRSMÅL: Still et tankevekkende spørsmål for å engasjere leseren.
+        3. UNDERPOINTS: Bruk 'header' (level 3) for seksjoner som "Hva er trofasthet?" eller "Tre søyler å hvile i".
+        4. LISTER: Bruk 'list' blokken (style: unordered) for å presentere punkter eller sannheter.
+        5. BIBELVERS: Bruk 'quote' blokken for bibelvers. Legg selve verset i 'text' og referansen i 'caption'.
+        6. SKILLELINJER: Bruk 'delimiter' blokken for å skape visuelle pauser mellom hoveddeler.
+        7. DAGENS TANKE: Avslutt alltid med en "Dagens tanke" eller "Invitasjon til hvile".
         
-        Svar KUN med gyldig JSON på dette formatet:
-        { 
-          "blocks": [ 
-            { "type": "header", "data": { "text": "En inspirerende tittel", "level": 2 } },
-            { "type": "paragraph", "data": { "text": "Første avsnitt med introduksjon..." } },
-            { "type": "paragraph", "data": { "text": "Andre avsnitt som utdyper temaet..." } },
-            { "type": "header", "data": { "text": "Et viktig poeng", "level": 3 } },
-            { "type": "paragraph", "data": { "text": "Tekst om dette poenget..." } }
-          ] 
-        }
-        Svar kun med rå tekst uten markdown-formatering eller forklaringer.
+        TEKNISK FORMAT (JSON):
+        Bruk disse blokk-typene korrekt:
+        - { "type": "header", "data": { "text": "...", "level": 2 } }
+        - { "type": "paragraph", "data": { "text": "..." } }
+        - { "type": "list", "data": { "style": "unordered", "items": ["Punkt 1", "Punkt 2"] } }
+        - { "type": "quote", "data": { "text": "Bibelvers tekst", "caption": "Referanse", "alignment": "left" } }
+        - { "type": "delimiter", "data": {} }
+        
+        VIKTIG: Skriv langt og utfyllende. Bruk et varmt og moderne norsk språk. IKKE bruk bold på hele avsnitt.
+        Svar kun med rå JSON-tekst uten markdown-formatering eller forklaringer.
       `.trim();
 
       try {
