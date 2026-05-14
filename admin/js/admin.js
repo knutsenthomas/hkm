@@ -9425,6 +9425,8 @@ class AdminManager {
                 // Shared Upload Handler
                 const handleImageUpload = async (file) => {
                     if (!file) return;
+                    const preview = document.getElementById('sidebar-img-preview');
+                    const imgInput = document.getElementById('col-item-img');
                     const originalContent = preview.innerHTML;
                     preview.innerHTML = '<div style="display:flex; flex-direction:column; align-items:center; gap:10px;"><div class="loader-sm"></div><span style="font-size:11px; color:#64748b;">Laster opp...</span></div>';
                     
@@ -9441,6 +9443,68 @@ class AdminManager {
                     }
                 };
             }
+
+            // --- AI Suggest Listener (SEO/Tags) ---
+            const aiSuggestBtn = modal.querySelector('#ai-suggest-seo');
+            if (aiSuggestBtn) {
+                aiSuggestBtn.onclick = async () => {
+                    aiSuggestBtn.disabled = true;
+                    const originalHtml = aiSuggestBtn.innerHTML;
+                    aiSuggestBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Henter forslag...';
+
+                    try {
+                        const title = document.getElementById('col-item-title-v2')?.value || item.title || '';
+                        let transcriptText = '';
+                        try {
+                            const saved = await editor.save();
+                            transcriptText = (saved.blocks || [])
+                                .map(b => b.data?.text || '')
+                                .join(' ')
+                                .replace(/<[^>]*>/g, '')
+                                .substring(0, 2000);
+                        } catch (e) {
+                            transcriptText = typeof item.content === 'string' ? item.content.substring(0, 2000) : '';
+                        }
+
+                        const response = await fetch('/seoSuggest', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                title,
+                                description: document.getElementById('col-item-seo-desc')?.value || item.description || '',
+                                transcript: transcriptText
+                            })
+                        });
+
+                        if (!response.ok) throw new Error('AI-tjenesten svarte ikke korrekt.');
+                        const data = await response.json();
+
+                        if (data.tags) {
+                            const newTags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
+                            newTags.forEach(tag => {
+                                if (!currentTags.includes(tag)) currentTags.push(tag);
+                            });
+                            renderTags();
+                        }
+                        if (data.metaTitle) {
+                            const titleInp = document.getElementById('col-item-seo-title');
+                            if (titleInp) titleInp.value = data.metaTitle;
+                        }
+                        if (data.metaDescription) {
+                            const descInp = document.getElementById('col-item-seo-desc');
+                            if (descInp) descInp.value = data.metaDescription;
+                        }
+                        this.showToast('AI-forslag lagt til!', 'success');
+                    } catch (err) {
+                        console.error('AI Suggest failed:', err);
+                        this.showToast('Kunne ikke hente AI-forslag: ' + (err.message || 'Ukjent feil'), 'error');
+                    } finally {
+                        aiSuggestBtn.disabled = false;
+                        aiSuggestBtn.innerHTML = originalHtml;
+                    }
+                };
+            }
+
             const closeBtn = modal.querySelector('#close-col-modal');
             if (closeBtn) {
                 closeBtn.onclick = () => {
