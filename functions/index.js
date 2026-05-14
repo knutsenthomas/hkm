@@ -4237,8 +4237,7 @@ exports.scheduledPodcastTranscription = onSchedule({
     const nextRetryAtMs = transcriptData?.nextRetryAt && typeof transcriptData.nextRetryAt.toMillis === "function"
       ? transcriptData.nextRetryAt.toMillis()
       : 0;
-
-    if (transcriptData?.text) {
+  if (transcriptData?.text) {
       continue;
     }
 
@@ -4265,5 +4264,77 @@ exports.scheduledPodcastTranscription = onSchedule({
         break;
       }
     }
+  }
+});
+
+/**
+ * Endpoint to fetch and proxy the podcast RSS feed as JSON
+ */
+exports.getPodcast = onRequest({ cors: true }, async (req, res) => {
+  const rssUrl = "https://podcasters.spotify.com/pod/show/hiskingdomministry/podcast/rss";
+
+  try {
+    const response = await fetch(rssUrl);
+    const xmlData = await response.text();
+
+    // Translate XML to JSON
+    const jsonData = await parseStringPromise(xmlData, { explicitArray: false });
+
+    res.status(200).send(jsonData);
+  } catch (error) {
+    console.error("Podcast Fetch Error:", error);
+    res.status(500).send({ error: "Kunne ikke hente eller oversette feeden" });
+  }
+});
+
+/**
+ * Endpoint to sync Google Calendar events
+ */
+exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
+  console.log("⏰ Starter planlagt synkronisering...");
+
+  try {
+    const settingsSnap = await db.collection("content").doc("settings_integrations").get();
+    if (!settingsSnap.exists) {
+      console.log("❌ Ingen integrasjonsinnstillinger funnet.");
+      return;
+    }
+
+    const gcal = settingsSnap.data().googleCalendar;
+    if (!gcal || !gcal.apiKey || !gcal.calendarId) {
+      console.log("❌ Google Calendar er ikke konfigurert.");
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(gcal.calendarId)}/events?key=${gcal.apiKey}&timeMin=${now}&orderBy=startTime&singleEvents=true&maxResults=20`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+
+    if (data.error) {
+      throw new Error(`GCal API Error: ${data.error.message}`);
+    }
+
+    const events = (data.items || []).map(item => ({
+      id: item.id,
+      title: item.summary || 'Uten navn',
+      description: item.description || '',
+      location: item.location || '',
+      start: item.start.dateTime || item.start.date,
+      end: item.end.dateTime || item.end.date,
+      link: item.htmlLink,
+      source: 'google_calendar',
+      syncedAt: admin.firestore.FieldValue.serverTimestamp()
+    }));
+
+    await db.collection("content").doc("collection_events").set({
+      items: events,
+      lastSync: admin.firestore.FieldValue.serverTimestamp()
+    });
+
+    console.log(`✅ Synkronisering fullført. ${events.length} arrangementer lagret.`);
+  } catch (error) {
+    console.error("❌ Feil under synkronisering:", error);
   }
 });
