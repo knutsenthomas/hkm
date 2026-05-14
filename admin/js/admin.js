@@ -4176,16 +4176,40 @@ class AdminManager {
             ];
 
         // Generate a simple SVG sparkline if daily traffic is available
-        let sparklineHtml = `
-            <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.6;">
-                <span class="material-symbols-outlined" style="font-size: 48px; color: #d97706; margin-bottom: 16px;">monitoring</span>
-                <div style="text-align: center;">
-                    <h4 style="color: #1e293b; margin-bottom: 8px;">Venter på data</h4>
-                    <p style="font-size: 13px; color: #94a3b8;">Henter dine siste besøkstall...</p>
+        let sparklineHtml = '';
+        
+        if (!this.gaData) {
+            // Loading or Empty state
+            sparklineHtml = `
+                <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.8; text-align: center; padding: 20px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 16px;">monitoring</span>
+                    <div>
+                        <h4 style="color: #1e293b; margin-bottom: 8px;">Ingen data tilgjengelig</h4>
+                        <p style="font-size: 13px; color: #64748b; max-width: 240px; margin: 0 auto 20px;">
+                            ${this._analyticsFetchFailed 
+                                ? 'Kunne ikke hente data fra Google Analytics. Sjekk integrasjonene dine.' 
+                                : 'Henter dine siste besøkstall eller venter på konfigurasjon...'}
+                        </p>
+                        ${this._analyticsFetchFailed ? `
+                            <button onclick="window.adminManager.onSectionSwitch('settings')" style="background: #1B4965; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                                Åpne Integrasjoner
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
-            </div>
-        `;
-
+            `;
+        } else {
+            sparklineHtml = `
+                <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.6;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: #d97706; margin-bottom: 16px;">monitoring</span>
+                    <div style="text-align: center;">
+                        <h4 style="color: #1e293b; margin-bottom: 8px;">Venter på trafikk</h4>
+                        <p style="font-size: 13px; color: #94a3b8;">Det er ikke registrert nok trafikk i denne perioden.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
         if (ga.dailyTraffic && Array.isArray(ga.dailyTraffic) && ga.dailyTraffic.length > 1) {
             const trafficData = ga.dailyTraffic.map(d => parseInt(d.users) || 0);
             const maxUsers = Math.max(...trafficData, 1);
@@ -5268,16 +5292,21 @@ class AdminManager {
             const safeDays = [7, 14, 30, 60, 90, 180, 365].includes(Number(days)) ? Number(days) : 30;
             // Call the Firebase Function
             const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${safeDays}`);
+            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
+            
             const result = await response.json();
             if (result.status === 'success') {
+                this._analyticsFetchFailed = false;
                 return result.data;
             } else if (result.status === 'unconfigured') {
                 console.warn('Analytics is not configured on the backend.');
+                this._analyticsFetchFailed = true;
                 return null;
             }
             throw new Error(result.error || 'Failed to fetch analytics');
         } catch (error) {
             console.error('Error fetching Analytics data:', error);
+            this._analyticsFetchFailed = true;
             return null;
         }
     }
