@@ -159,7 +159,7 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         Bruk et varmt, bibelsk forankret og engasjerende språk.
         Svar KUN med gyldig JSON på dette formatet (EditorJS-blokker):
         { "blocks": [ { "type": "header", "data": { "text": "Overskrift", "level": 2 } }, { "type": "paragraph", "data": { "text": "..." } } ] }
-        Ikke bruk markdown-blokker (```json), svar kun med rå tekst.
+        Ikke bruk markdown-blokker som f.eks. kodelister med json, svar kun med rå tekst.
       `.trim();
 
       try {
