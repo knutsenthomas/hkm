@@ -102,18 +102,19 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] },
     const geminiKey = getGeminiApiKey();
     const openaiKey = openaiApiKeyParam.value();
     
-    const { title, description, categories, transcript } = request.data || {};
+    const { title, description, categories, transcript, type } = request.data || {};
     if (!title || !description) {
       throw new HttpsError('invalid-argument', 'Missing required fields: title, description.');
     }
 
+    const typeLabel = type === 'blog' ? 'blogginnlegg' : (type === 'teaching' ? 'undervisning' : 'podcast');
     const prompt = [
-      `Du er en SEO-ekspert for en kristen podcast.`,
+      `Du er en SEO-ekspert for et kristent ${typeLabel}.`,
       `Lag forslag til:`,
       `- 5-10 relevante tagger (kommaseparert, små bokstaver, ingen #)`,
       `- En god meta-tittel (maks 60 tegn)`,
       `- En god meta-beskrivelse (maks 155 tegn, oppsummerende, inviterende, inkluderer relevante søkeord)`,
-      `\n      Episodetittel: ${title}\n      Beskrivelse: ${description}\n      Kategorier: ${(categories || []).join(', ')}\n      ${transcript ? `Transkripsjon (utdrag): ${transcript.substring(0, 1000)}` : ''}\n      `,
+      `\n      Tittel: ${title}\n      Beskrivelse: ${description}\n      Kategorier: ${(categories || []).join(', ')}\n      ${transcript ? `Innhold/Transkripsjon (utdrag): ${transcript.substring(0, 1000)}` : ''}\n      `,
       `Svar KUN i JSON-format slik: { "tags": "tag1, tag2, ...", "metaTitle": "...", "metaDescription": "..." }`
     ].join('\n');
 

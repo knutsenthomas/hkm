@@ -9469,6 +9469,7 @@ class AdminManager {
                         const callable = firebase.functions().httpsCallable('seoSuggest');
                         const response = await callable({
                             title,
+                            type: collectionId, // Forteller AI-en om det er blog, teaching eller podcast
                             description: document.getElementById('col-item-seo-desc')?.value || item.description || '',
                             transcript: transcriptText
                         });
