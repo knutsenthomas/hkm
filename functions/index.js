@@ -117,8 +117,8 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
       `Svar i JSON-format slik: { "tags": "tag1, tag2, ...", "metaTitle": "...", "metaDescription": "..." }`
     ].join('\n');
 
-    const apiBase = 'https://generativelanguage.googleapis.com/v1';
-    const model = 'models/gemini-1.5-flash';
+    const apiBase = 'https://generativelanguage.googleapis.com/v1beta';
+    const model = 'models/gemini-1.5-flash-latest';
     const url = `${apiBase}/${model}:generateContent?key=${geminiKey.trim()}`;
     
     const response = await fetch(url, {
