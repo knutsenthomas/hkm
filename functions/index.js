@@ -117,50 +117,33 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
       `Svar KUN i JSON-format slik: { "tags": "tag1, tag2, ...", "metaTitle": "...", "metaDescription": "..." }`
     ].join('\n');
 
-    const genAI = new GoogleGenerativeAI(geminiKey.trim());
-    const modelCandidates = [
-      "gemini-2.0-flash",
-      "gemini-2.0-flash-lite",
-      "gemini-1.5-flash",
-      "gemini-1.5-pro"
-    ];
+    const geminiKeyClean = geminiKey.trim();
+    const genAI = new GoogleGenerativeAI(geminiKeyClean);
+    const modelName = "gemini-1.5-flash"; // Bruker den mest stabile standardmodellen
     
-    let textResult = '';
-    let lastError = null;
+    try {
+      console.log(`Forsøker AI-generering med ${modelName}...`);
+      const model = genAI.getGenerativeModel({ model: modelName });
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const textResult = response.text();
 
-    for (const modelName of modelCandidates) {
-      try {
-        console.log(`Prøver AI-forslag med modell: ${modelName}`);
-        const model = genAI.getGenerativeModel({ model: modelName });
-        
-        // Add a timeout to avoid hanging
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        textResult = response.text();
-        
-        if (textResult) {
-          console.log(`Suksess med modell: ${modelName}`);
-          break;
-        }
-      } catch (err) {
-        console.warn(`Feil med modell ${modelName}:`, err.message);
-        lastError = err;
+      if (!textResult) {
+        throw new Error("AI returnerte en tom respons.");
       }
-    }
 
-    if (!textResult) {
-      console.error('Alle AI-modeller feilet. Siste feil:', lastError);
-      throw new HttpsError('unavailable', `AI-tjenesten er utilgjengelig: ${lastError?.message || 'Ukjent feil'}`);
-    }
+      const jsonMatch = textResult.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        console.error('Ugyldig AI-respons (ikke JSON):', textResult);
+        throw new HttpsError('internal', 'AI returnerte ikke gyldig JSON-format.');
+      }
 
-    const jsonMatch = textResult.match(/\{[\s\S]*\}/);
-    if (!jsonMatch) {
-      console.error('Ugyldig AI-respons (ikke JSON):', textResult);
-      throw new HttpsError('internal', 'AI returnerte ikke gyldig JSON-format.');
+      const resultData = JSON.parse(jsonMatch[0]);
+      return resultData;
+    } catch (err) {
+      console.error(`Feil ved AI-kall (${modelName}):`, err.message);
+      throw new HttpsError('unavailable', `AI-tjenesten feilet: ${err.message}`);
     }
-
-    const resultData = JSON.parse(jsonMatch[0]);
-    return resultData;
 
   } catch (error) {
     console.error('AI Suggest failed:', error);
