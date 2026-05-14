@@ -151,6 +151,46 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
       }
     }
 
+    if (task === 'generate_blog_draft') {
+      const draftPrompt = `
+        Du er en inspirerende skribent for His Kingdom Ministry.
+        Tema: ${prompt}
+        Lag et strukturert utkast til et ${options?.type || 'blogginnlegg'}.
+        Bruk et varmt, bibelsk forankret og engasjerende språk.
+        Svar KUN med gyldig JSON på dette formatet (EditorJS-blokker):
+        { "blocks": [ { "type": "header", "data": { "text": "Overskrift", "level": 2 } }, { "type": "paragraph", "data": { "text": "..." } } ] }
+        Ikke bruk markdown-blokker (```json), svar kun med rå tekst.
+      `.trim();
+
+      try {
+        const geminiKey = getGeminiApiKey();
+        let textResult = "";
+        if (geminiKey) {
+          const genAI = new GoogleGenerativeAI(geminiKey.trim());
+          const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+          const result = await model.generateContent(draftPrompt);
+          textResult = (await result.response).text();
+        }
+
+        if (!textResult && openaiApiKeyParam.value()) {
+          const openai = new OpenAI({ apiKey: openaiApiKeyParam.value() });
+          const completion = await openai.chat.completions.create({
+            model: "gpt-4o-mini",
+            messages: [{ role: "user", content: draftPrompt }]
+          });
+          textResult = completion.choices[0].message.content;
+        }
+
+        if (textResult) {
+          textResult = textResult.replace(/```json|```/g, "").trim();
+          return JSON.parse(textResult);
+        }
+      } catch (err) {
+        console.error("Blog draft generation failed:", err);
+        throw new HttpsError('internal', 'Kunne ikke generere utkast.');
+      }
+    }
+
     if (task === 'generate_image') {
       if (!openaiKey) throw new HttpsError('unavailable', 'OpenAI-nøkkel mangler for bildegenerering.');
       

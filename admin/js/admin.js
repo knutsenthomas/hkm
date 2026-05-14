@@ -7473,6 +7473,11 @@ class AdminManager {
                                   <input type="file" id="col-item-img-file" style="display: none;" accept="image/*">
                               </div>
 
+                            <button type="button" class="btn-primary" id="ai-write-content" style="margin-bottom:8px;align-self:flex-start;display:block;width:100%;background:linear-gradient(135deg, #7c3aed, #4f46e5);border:none;box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
+                                <span class="material-symbols-outlined" style="vertical-align:middle;">edit_note</span>
+                                Skriv innhold med AI
+                            </button>
+
                             <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:14px;align-self:flex-start;display:block;width:100%;">
                                 <span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span>
                                 Foreslå tagger og SEO med AI
@@ -9440,6 +9445,49 @@ class AdminManager {
                     } catch (error) {
                         preview.innerHTML = originalContent;
                         this.showToast('Kunne ikke laste opp bilde: ' + (error.message || 'Ukjent feil'), 'error');
+                    }
+                };
+            }
+
+            // --- AI Write Content Listener ---
+            const aiWriteBtn = modal.querySelector('#ai-write-content');
+            if (aiWriteBtn) {
+                aiWriteBtn.onclick = async () => {
+                    const title = document.getElementById('col-item-title-v2')?.value || document.getElementById('col-item-title-sidebar')?.value || item.title || '';
+                    if (!title) {
+                        this.showToast('Vennligst skriv en tittel først!', 'info');
+                        return;
+                    }
+
+                    const confirmMsg = "Vil du at jeg skal generere et utkast basert på tittelen din? Dette vil legge til innhold nederst i editoren.";
+                    if (!confirm(confirmMsg)) return;
+
+                    aiWriteBtn.disabled = true;
+                    const originalHtml = aiWriteBtn.innerHTML;
+                    aiWriteBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Skriver utkast...';
+
+                    try {
+                        const callable = firebase.functions().httpsCallable('aiProcess');
+                        const response = await callable({
+                            task: 'generate_blog_draft',
+                            prompt: title,
+                            options: { type: isTeachingCollection ? 'undervisning' : 'blogginnlegg' }
+                        });
+
+                        const data = response.data;
+                        if (data && data.blocks) {
+                            // Vi legger til de nye blokkene i editoren
+                            const currentData = await editor.save();
+                            const mergedBlocks = [...(currentData.blocks || []), ...data.blocks];
+                            await editor.render({ blocks: mergedBlocks });
+                            this.showToast('AI-utkast er generert!', 'success');
+                        }
+                    } catch (err) {
+                        console.error('AI Write failed:', err);
+                        this.showToast('Kunne ikke skrive utkast: ' + err.message, 'error');
+                    } finally {
+                        aiWriteBtn.disabled = false;
+                        aiWriteBtn.innerHTML = originalHtml;
                     }
                 };
             }
