@@ -114,39 +114,42 @@ exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) =>
       `- En god meta-tittel (maks 60 tegn)`,
       `- En god meta-beskrivelse (maks 155 tegn, oppsummerende, inviterende, inkluderer relevante søkeord)`,
       `\n      Episodetittel: ${title}\n      Beskrivelse: ${description}\n      Kategorier: ${(categories || []).join(', ')}\n      ${transcript ? `Transkripsjon (utdrag): ${transcript.substring(0, 1000)}` : ''}\n      `,
-      `Svar i JSON-format slik: { "tags": "tag1, tag2, ...", "metaTitle": "...", "metaDescription": "..." }`
+      `Svar KUN i JSON-format slik: { "tags": "tag1, tag2, ...", "metaTitle": "...", "metaDescription": "..." }`
     ].join('\n');
 
-    const apiBase = 'https://generativelanguage.googleapis.com/v1beta';
-    const model = 'models/gemini-1.5-flash-latest';
-    const url = `${apiBase}/${model}:generateContent?key=${geminiKey.trim()}`;
+    const genAI = new GoogleGenerativeAI(geminiKey.trim());
+    const modelCandidates = ["gemini-1.5-flash", "gemini-1.5-flash-latest", "gemini-1.5-pro"];
     
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      })
-    });
+    let textResult = '';
+    let lastError = null;
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Gemini API error response:', errorText);
-      throw new HttpsError('unavailable', 'Gemini API call failed.');
+    for (const modelName of modelCandidates) {
+      try {
+        console.log(`Prøver AI-forslag med modell: ${modelName}`);
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        textResult = response.text();
+        if (textResult) break;
+      } catch (err) {
+        console.warn(`Feil med modell ${modelName}:`, err.message);
+        lastError = err;
+      }
     }
 
-    const data = await response.json();
-    let textResult = '';
-    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
-      textResult = data.candidates[0].content.parts[0].text;
+    if (!textResult) {
+      console.error('Alle AI-modeller feilet:', lastError);
+      throw new HttpsError('unavailable', `AI-tjenesten er utilgjengelig: ${lastError?.message || 'Ukjent feil'}`);
     }
 
     const jsonMatch = textResult.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      throw new HttpsError('internal', 'Invalid AI response format.');
+      console.error('Ugyldig AI-respons (ikke JSON):', textResult);
+      throw new HttpsError('internal', 'AI returnerte ikke gyldig JSON-format.');
     }
 
-    return JSON.parse(jsonMatch[0]);
+    const resultData = JSON.parse(jsonMatch[0]);
+    return resultData;
 
   } catch (error) {
     console.error('AI Suggest failed:', error);
