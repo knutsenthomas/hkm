@@ -176,25 +176,23 @@ exports.aiProcess = onCall({ secrets: [geminiApiKeyParam, openaiApiKeyParam] }, 
         
         Lag et omfattende og strukturert utkast til et ${options?.type || 'blogginnlegg'}. 
         
-        KRAV TIL INNHOLD:
-        1. LENGDE: Skriv utfyllende, sikt på minst 500-700 ord.
-        2. STRUKTUR: Bruk en fengende hovedoverskrift (H1), en engasjerende introduksjon, 3-4 hovedavsnitt med egne underoverskrifter (H2), og en inspirerende avslutning.
-        3. SPRÅK: Bruk et varmt, bibelsk forankret og moderne norsk språk. Inkluder gjerne 1-2 relevante bibelvers som passer til temaet.
-        4. FORMATERING: IKKE bruk bold (fet skrift) på hele avsnitt. Bruk kun bold for å fremheve enkelte ord eller korte setninger.
+        VIKTIGE REGLER FOR STRUKTUR (FØLG NØYE):
+        1. BRUK FLERE BLOKKER: Hvert avsnitt SKAL være en egen 'paragraph'-blokk. Aldri legg mer enn ett avsnitt i samme blokk.
+        2. OVERSKRIFTER: Bruk 'header' med level 2 for hoveddeler, og level 3 for underpunkter. IKKE bruk level 1 inne i selve teksten.
+        3. FORMATERING: Bruk ren tekst i 'paragraph'-blokker. IKKE bruk bold på hele avsnitt.
+        4. LENGDE: Skriv minst 5-8 fyldige avsnitt.
         
-        Svar KUN med gyldig JSON i EditorJS-format. Hvert avsnitt SKAL være en egen 'paragraph'-blokk. Overskrifter SKAL være 'header'-blokker.
-        
-        FORMAT:
+        Svar KUN med gyldig JSON på dette formatet:
         { 
           "blocks": [ 
-            { "type": "header", "data": { "text": "Hovedoverskrift", "level": 1 } },
-            { "type": "paragraph", "data": { "text": "Introduksjonstekst her..." } },
-            { "type": "header", "data": { "text": "Underoverskrift 1", "level": 2 } },
-            { "type": "paragraph", "data": { "text": "Første hoveddel..." } },
-            ...
+            { "type": "header", "data": { "text": "En inspirerende tittel", "level": 2 } },
+            { "type": "paragraph", "data": { "text": "Første avsnitt med introduksjon..." } },
+            { "type": "paragraph", "data": { "text": "Andre avsnitt som utdyper temaet..." } },
+            { "type": "header", "data": { "text": "Et viktig poeng", "level": 3 } },
+            { "type": "paragraph", "data": { "text": "Tekst om dette poenget..." } }
           ] 
         }
-        Svar kun med rå tekst uten markdown-formatering.
+        Svar kun med rå tekst uten markdown-formatering eller forklaringer.
       `.trim();
 
       try {
