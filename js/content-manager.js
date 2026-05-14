@@ -1086,10 +1086,42 @@ class ContentManager {
         // Populate author avatar in hero
         const avatarEl = document.getElementById('single-post-author-avatar');
         if (avatarEl) {
-            const avatarUrl = 'https://images-wixmp-7ef3383b5fd80a9f5a5cc686.wixmp.com/3a1544f7-8319-4a6c-9833-6a4723d7bdbe/1733008750689/v1/fill/w_320,h_320/file.jpg';
-            avatarEl.src = avatarUrl;
-            avatarEl.alt = `Forfatterens bilde: ${item.author || sourceItem?.author || ''}`;
-            avatarEl.style.display = 'inline-block';
+            // HKM Fix: Use actual author photo or a professional icon fallback
+            const avatarUrl = item.authorPhoto || sourceItem?.authorPhoto;
+            
+            if (avatarUrl && avatarUrl !== 'img/author-placeholder.png') {
+                avatarEl.src = avatarUrl;
+                avatarEl.alt = `Forfatterens bilde: ${item.author || sourceItem?.author || ''}`;
+                avatarEl.style.display = 'inline-block';
+                // Ensure it's showing as an image
+                if (avatarEl.tagName === 'DIV') {
+                    // This case shouldn't normally happen but good for robustness
+                    const img = document.createElement('img');
+                    img.id = 'single-post-author-avatar';
+                    img.className = avatarEl.className;
+                    img.style.cssText = avatarEl.style.cssText;
+                    avatarEl.replaceWith(img);
+                }
+            } else {
+                // Fallback: Show a nice FontAwesome icon instead of a broken/wrong image
+                const iconContainer = document.createElement('div');
+                iconContainer.id = 'single-post-author-avatar';
+                // Copy styles from the original img for layout consistency
+                iconContainer.style.width = '40px';
+                iconContainer.style.height = '40px';
+                iconContainer.style.borderRadius = '50%';
+                iconContainer.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                iconContainer.style.display = 'inline-flex';
+                iconContainer.style.alignItems = 'center';
+                iconContainer.style.justifyContent = 'center';
+                iconContainer.style.border = '2px solid rgba(255,255,255,0.7)';
+                iconContainer.style.flexShrink = '0';
+                iconContainer.style.color = 'white';
+                iconContainer.style.fontSize = '18px';
+                
+                iconContainer.innerHTML = '<i class="fas fa-user"></i>';
+                avatarEl.replaceWith(iconContainer);
+            }
         }
 
         if (dateEl) {
