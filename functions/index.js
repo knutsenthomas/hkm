@@ -92,28 +92,19 @@ async function fetchPodcastEpisodesFromRss(limit = 10) {
 /**
  * AI endpoint: Suggest SEO tags, meta title, and meta description for podcast episodes using Gemini.
  */
-exports.seoSuggest = onRequest({ cors: true, secrets: [geminiApiKeyParam] }, async (req, res) => {
-  if (req.method === 'OPTIONS') {
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Access-Control-Allow-Methods', 'POST');
-    res.set('Access-Control-Allow-Headers', 'Content-Type');
-    res.status(204).send('');
-    return;
-  }
-  
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed. Use POST.' });
-  }
-
+/**
+ * AI endpoint: Suggest SEO tags, meta title, and meta description for podcast episodes using Gemini.
+ */
+exports.seoSuggest = onCall({ secrets: [geminiApiKeyParam] }, async (request) => {
   try {
     const geminiKey = getGeminiApiKey();
     if (!geminiKey) {
-      return res.status(500).json({ error: 'Gemini API key not configured.' });
+      throw new HttpsError('internal', 'Gemini API key not configured.');
     }
 
-    const { title, description, categories, transcript } = req.body || {};
+    const { title, description, categories, transcript } = request.data || {};
     if (!title || !description) {
-      return res.status(400).json({ error: 'Missing required fields: title, description.' });
+      throw new HttpsError('invalid-argument', 'Missing required fields: title, description.');
     }
 
     const prompt = [
@@ -138,28 +129,29 @@ exports.seoSuggest = onRequest({ cors: true, secrets: [geminiApiKeyParam] }, asy
       })
     });
 
-    const data = await response.json();
     if (!response.ok) {
-      return res.status(500).json({ error: data?.error?.message || 'Gemini API error.' });
+      const errorText = await response.text();
+      console.error('Gemini API error response:', errorText);
+      throw new HttpsError('unavailable', 'Gemini API call failed.');
     }
 
-    let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || '';
-    let json = null;
-    try {
-      const match = text.match(/\{[\s\S]*\}/);
-      json = match ? JSON.parse(match[0]) : null;
-    } catch (e) {
-      json = null;
+    const data = await response.json();
+    let textResult = '';
+    if (data.candidates && data.candidates[0] && data.candidates[0].content) {
+      textResult = data.candidates[0].content.parts[0].text;
     }
 
-    if (!json || !json.tags || !json.metaTitle || !json.metaDescription) {
-      return res.status(500).json({ error: 'Ugyldig svar fra Gemini. Kunne ikke tolke SEO-data.' });
+    const jsonMatch = textResult.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) {
+      throw new HttpsError('internal', 'Invalid AI response format.');
     }
 
-    return res.status(200).json(json);
+    return JSON.parse(jsonMatch[0]);
+
   } catch (error) {
-    console.error("SEO Suggest Error:", error);
-    return res.status(500).json({ error: error.message });
+    console.error('AI Suggest failed:', error);
+    if (error instanceof HttpsError) throw error;
+    throw new HttpsError('internal', error.message || 'Unknown AI error.');
   }
 });
 

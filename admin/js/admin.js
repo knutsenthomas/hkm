@@ -9466,18 +9466,14 @@ class AdminManager {
                             transcriptText = typeof item.content === 'string' ? item.content.substring(0, 2000) : '';
                         }
 
-                        const response = await fetch('/seoSuggest', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                title,
-                                description: document.getElementById('col-item-seo-desc')?.value || item.description || '',
-                                transcript: transcriptText
-                            })
+                        const callable = firebase.functions().httpsCallable('seoSuggest');
+                        const response = await callable({
+                            title,
+                            description: document.getElementById('col-item-seo-desc')?.value || item.description || '',
+                            transcript: transcriptText
                         });
 
-                        if (!response.ok) throw new Error('AI-tjenesten svarte ikke korrekt.');
-                        const data = await response.json();
+                        const data = response.data;
 
                         if (data.tags) {
                             const newTags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
@@ -9497,7 +9493,8 @@ class AdminManager {
                         this.showToast('AI-forslag lagt til!', 'success');
                     } catch (err) {
                         console.error('AI Suggest failed:', err);
-                        this.showToast('Kunne ikke hente AI-forslag: ' + (err.message || 'Ukjent feil'), 'error');
+                        const reason = this._getCallableErrorMessage ? this._getCallableErrorMessage(err) : (err.message || 'Ukjent feil');
+                        this.showToast('Kunne ikke hente AI-forslag: ' + reason, 'error');
                     } finally {
                         aiSuggestBtn.disabled = false;
                         aiSuggestBtn.innerHTML = originalHtml;
