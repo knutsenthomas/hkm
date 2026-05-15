@@ -4834,9 +4834,9 @@ class AdminManager {
                 merged.push({
                     ...episode,
                     ...existingTranscript,
-                    // Distinct fields for short description and AI summary
-                    description: existingTranscript.description || '',
-                    summary: existingTranscript.summary || '',
+                    // Preserve RSS description as fallback; allow summary to bridge from legacy description field
+                    description: existingTranscript.description || episode.description || '',
+                    summary: existingTranscript.summary || existingTranscript.description || '',
                     id: existingTranscript.id,
                     isFirestore: true
                 });
