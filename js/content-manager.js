@@ -2873,7 +2873,10 @@ class ContentManager {
         setColorVar('--bg-light', data.backgroundColor || data.bgLightColor || data.bgLight);
         setColorVar('--bg-white', data.surfaceColor || data.bgWhiteColor || data.bgWhite);
         setColorVar('--text-dark', data.textColor || data.textDarkColor || data.textDark);
-        setColorVar('--text-light', data.textLightColor || data.accentColor || data.textMutedColor || data.textLight);
+        setColorVar('--text-light', data.textLightColor || data.accentColor || data.textMutedColor);
+        setColorVar('--header-bg', data.headerBg);
+        setColorVar('--footer-bg', data.footerBg);
+        setColorVar('--footer-text', data.footerText);
         setColorVar('--accent-color', data.accentColor || data.textLightColor);
     }
 

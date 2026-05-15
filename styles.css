@@ -3868,11 +3868,11 @@ th {
 /* CSS Variables */
 
 :root {
-  --primary-orange: #D17D39;
+  --primary-color: #1B4965;
+  --secondary-color: #FF6B2B;
+  --primary-orange: var(--primary-color);
   --primary-green: #21543D;
   --accent-green: #00b050;
-  /* Vibrant green for buttons */
-  /* Dark green from Ingen Utelatt */
   --primary-red: #B54D2B;
   --accent-blue: #3498DB;
   --accent-yellow: #F39C12;
@@ -3880,6 +3880,9 @@ th {
   --text-light: #7F8C8D;
   --bg-light: #F8F9FA;
   --bg-white: #FFFFFF;
+  --header-bg: #FFFFFF;
+  --footer-bg: #2C3E50;
+  --footer-text: #FFFFFF;
   --border-color: #E0E0E0;
   --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -4234,9 +4237,9 @@ a.button {
 .button-primary,
 a.btn-primary,
 a.button-primary {
-  background: #c8682a !important;
+  background: var(--primary-color) !important;
   color: #fff !important;
-  border-color: #c8682a !important;
+  border-color: var(--primary-color) !important;
   padding: 12px 28px !important;
   border-radius: 50px !important;
   font-weight: bold !important;
@@ -4252,8 +4255,8 @@ a.button-primary {
 a.btn-secondary,
 a.button-secondary {
   background: #fff !important;
-  color: #c8682a !important;
-  border-color: #c8682a !important;
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
   padding: 12px 28px !important;
   border-radius: 50px !important;
   font-weight: bold !important;
@@ -4926,10 +4929,9 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-sear
 }
 
 .header.scrolled {
-  background: rgba(255, 255, 255, 0.98);
+  background: var(--header-bg);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  -webkit-backdrop-filter: blur(10px);
-          backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
 }
 
 /* Standardize header content */
@@ -6520,8 +6522,8 @@ body.hero-animate .slide-buttons {
 /* Footer */
 
 .footer {
-  background: #2C3E50;
-  color: white;
+  background: var(--footer-bg);
+  color: var(--footer-text);
   padding: 60px 0 20px;
 }
 

@@ -10528,7 +10528,10 @@ class AdminManager {
             backgroundColor: '#F8F9FA',
             surfaceColor: '#FFFFFF',
             textColor: '#2C3E50',
-            textLightColor: '#7F8C8D'
+            textLightColor: '#7F8C8D',
+            headerBg: '#FFFFFF',
+            footerBg: '#2C3E50',
+            footerText: '#FFFFFF'
         };
 
         section.innerHTML = `
@@ -10616,7 +10619,35 @@ class AdminManager {
                                             </div>
                                         </div>
                                     </div>
-                                    <p class="design-ui-muted design-ui-inline-help">Tips: Velg en varm oransje tone for å bevare HKM-uttrykket på knapper og CTA-er.</p>
+
+                                    <div class="design-ui-divider" style="margin: 24px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
+
+                                    <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main);">Seksjonsspesifikke farger</h4>
+                                    <div class="design-ui-form-grid design-ui-color-edit-grid">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Header Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="header-bg-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="header-bg-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Footer Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="footer-bg-picker" class="premium-color-picker-input" value="#2C3E50">
+                                                <input type="text" id="footer-bg-hex" class="premium-color-hex" value="#2C3E50" placeholder="#2C3E50">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Footer Tekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="footer-text-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="footer-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <p class="design-ui-muted design-ui-inline-help" style="margin-top: 20px;">Tips: Bruk mørke farger på footeren for et eksklusivt uttrykk.</p>
                                 </div>
                             </div>
                         </div>
@@ -10877,7 +10908,10 @@ class AdminManager {
             { key: 'backgroundColor', pickerId: 'background-color-picker', hexId: 'background-color-hex', tilePrefix: 'palette-bg', fallback: DEFAULT_THEME.backgroundColor },
             { key: 'surfaceColor', pickerId: 'surface-color-picker', hexId: 'surface-color-hex', tilePrefix: 'palette-surface', fallback: DEFAULT_THEME.surfaceColor },
             { key: 'textColor', pickerId: 'text-color-picker', hexId: 'text-color-hex', tilePrefix: 'palette-text', fallback: DEFAULT_THEME.textColor },
-            { key: 'textLightColor', pickerId: 'text-light-color-picker', hexId: 'text-light-color-hex', tilePrefix: 'palette-accent', fallback: DEFAULT_THEME.textLightColor }
+            { key: 'textLightColor', pickerId: 'text-light-color-picker', hexId: 'text-light-color-hex', tilePrefix: 'palette-accent', fallback: DEFAULT_THEME.textLightColor },
+            { key: 'headerBg', pickerId: 'header-bg-picker', hexId: 'header-bg-hex', tilePrefix: 'palette-header', fallback: DEFAULT_THEME.headerBg },
+            { key: 'footerBg', pickerId: 'footer-bg-picker', hexId: 'footer-bg-hex', tilePrefix: 'palette-footer', fallback: DEFAULT_THEME.footerBg },
+            { key: 'footerText', pickerId: 'footer-text-picker', hexId: 'footer-text-hex', tilePrefix: 'palette-footer-text', fallback: DEFAULT_THEME.footerText }
         ];
 
         const normalizeThemeColors = (raw = {}) => {
@@ -10888,8 +10922,10 @@ class AdminManager {
                 backgroundColor: normalizeHex(raw.backgroundColor || raw.bgLightColor || raw.bgLight) || DEFAULT_THEME.backgroundColor,
                 surfaceColor: normalizeHex(raw.surfaceColor || raw.bgWhiteColor || raw.bgWhite) || DEFAULT_THEME.surfaceColor,
                 textColor: normalizeHex(raw.textColor || raw.textDarkColor || raw.textDark) || DEFAULT_THEME.textColor,
-                // Backwards compatibility: older admin builds may have stored "accentColor" instead.
-                textLightColor: normalizeHex(raw.textLightColor || raw.accentColor || raw.textMutedColor || raw.textLight) || DEFAULT_THEME.textLightColor
+                textLightColor: normalizeHex(raw.textLightColor || raw.accentColor || raw.textMutedColor || raw.textLight) || DEFAULT_THEME.textLightColor,
+                headerBg: normalizeHex(raw.headerBg) || DEFAULT_THEME.headerBg,
+                footerBg: normalizeHex(raw.footerBg) || DEFAULT_THEME.footerBg,
+                footerText: normalizeHex(raw.footerText) || DEFAULT_THEME.footerText
             };
         };
 
@@ -11078,7 +11114,7 @@ class AdminManager {
                     document.getElementById('font-size-h1-desktop').value = data.fontSizeH1Desktop;
                     document.getElementById('font-size-h1-desktop-val').textContent = `${data.fontSizeH1Desktop}px`;
                 }
-                applyPaletteToInputs(normalizeThemeColors(data));
+                applyPaletteToInputs(data);
             }
         } catch (e) {
             console.error("Load design error:", e);
@@ -11102,6 +11138,9 @@ class AdminManager {
                 surfaceColor: palette.surfaceColor,
                 textColor: palette.textColor,
                 textLightColor: palette.textLightColor,
+                headerBg: palette.headerBg,
+                footerBg: palette.footerBg,
+                footerText: palette.footerText,
                 // Alias for backwards compatibility with older preview logic.
                 accentColor: palette.textLightColor,
                 updatedAt: new Date().toISOString()
