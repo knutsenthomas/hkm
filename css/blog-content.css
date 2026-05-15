@@ -28,7 +28,7 @@
 }
 
 /* Global Image & Element Guard */
-.blog-post-content * {
+.blog-post-content *:not(.block-embed):not(.block-embed iframe) {
     max-width: 100% !important;
     box-sizing: border-box !important;
     position: static !important;
