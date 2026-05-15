@@ -7672,12 +7672,15 @@ class AdminManager {
                                  <label>Meta-beskrivelse</label>
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
-                             ${collectionId === 'podcast_transcripts' ? `
                              <h4 class="sidebar-section-title">PODCAST OPPSUMMERING (AI)</h4>
                              <div class="sidebar-group">
                                  <label>AI-generert oppsummering</label>
                                  <textarea id="col-item-summary" class="sidebar-control" style="height: 200px; font-size: 13px; line-height: 1.5;" placeholder="Lim inn AI-oppsummering her...">${podcastSummary}</textarea>
-                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Dette vises i listen og som introduksjon på podcast-siden.</p>
+                                 <button type="button" class="btn" id="generate-podcast-ai-summary" style="margin-top: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; border-radius: 12px; font-weight: 600; min-height: 42px; background: linear-gradient(135deg, #d17d39, #bd4f2a); color: white; border: none; box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);">
+                                     <span class="material-symbols-outlined" style="font-size: 20px;">auto_awesome</span>
+                                     Generer med AI
+                                 </button>
+                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 12px;">Dette vises i listen og som introduksjon på podcast-siden.</p>
                              </div>
                              ` : ''}
                              ${collectionId === 'blog' ? `
