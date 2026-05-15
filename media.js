@@ -670,13 +670,10 @@ function getEpisodeSummaryHtml(episodeData, storedData) {
         storedData = getStoredPodcastData(episodeData.id);
     }
 
-    if (storedData && Object.prototype.hasOwnProperty.call(storedData, 'description')) {
-        const adminSummary = String(storedData.description || '').trim();
-        if (!adminSummary) {
-            return '<p>Ingen oppsummering tilgjengelig.</p>';
-        }
-
-        return `<p style="line-height:1.75;">${adminSummary}</p>`;
+    // Prioriter 'summary' fra Firestore hvis den finnes
+    const firestoreSummary = (storedData?.summary || storedData?.description || '').trim();
+    if (firestoreSummary) {
+        return `<p style="line-height:1.75;">${firestoreSummary}</p>`;
     }
 
     if (!episodeData) {
@@ -698,9 +695,7 @@ function getStoredPodcastData(episodeId) {
 
 function getEpisodeCardDescription(episode) {
     const stored = getStoredPodcastData(episode?.id);
-    const storedSummary = stored && typeof stored.description === 'string'
-        ? stored.description.trim()
-        : '';
+    const storedSummary = (stored?.summary || stored?.description || '').trim();
     const source = storedSummary || String(episode?.description || '').trim();
 
     if (!source) return '';

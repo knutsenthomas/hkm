@@ -2637,15 +2637,9 @@ window.addEventListener('load', () => {
 
         const setOpen = (open, autoFocus = false) => {
             root.classList.toggle('open', open);
-            panel.setAttribute('aria-hidden', open ? 'false' : 'true');
+            panel.setAttribute('aria-hidden', !open);
             if (open) {
-                if (autoFocus) {
-                    if (activeMode === 'email') {
-                        emailNameInput.focus();
-                    } else {
-                        input.focus();
-                    }
-                }
+                if (autoFocus && input) input.focus();
                 bodyEl.scrollTop = bodyEl.scrollHeight;
             }
         };
@@ -3012,6 +3006,9 @@ window.addEventListener('load', () => {
 	            }
             #hkm-visitor-chat-widget.open .hkm-chat-panel {
                 display: flex !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+                transform: translateY(0) scale(1) !important;
                 animation: hkmSlideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
             @keyframes hkmSlideUp {
@@ -3022,7 +3019,15 @@ window.addEventListener('load', () => {
             .hkm-chat-header {
                 margin: 0 !important;
                 flex-shrink: 0 !important;
-                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+                background: #1B4965 !important;
+                padding: 18px 24px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+                color: #fff !important;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+                border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+            }
                 color: #fff !important;
                 padding: 16px 20px !important;
                 display: flex !important;
@@ -3336,7 +3341,12 @@ window.addEventListener('load', () => {
             }
             
             .hkm-chat-form {
-                display: block !important;
+                display: flex !important;
+                align-items: center !important;
+                gap: 8px !important;
+                padding: 12px 16px !important;
+                background: #fff !important;
+                border-top: 1px solid #f1f5f9 !important;
                 position: relative !important;
             }
             .hkm-chat-hidden { display: none !important; }
@@ -3346,17 +3356,14 @@ window.addEventListener('load', () => {
                 position: relative !important;
             }
 	            .hkm-chat-input {
-	                width: calc(100% - 54px) !important;
-                    display: block !important;
-                    float: left !important;
-	                border: 1px solid #E2E8F0 !important;
-	                border-radius: 14px !important;
+	                flex: 1 !important;
+	                border: none !important;
+	                background: transparent !important;
 	                padding: 12px 16px !important;
-	                font-size: 14px !important;
-	                background: #F8FAFC !important;
+	                font-size: 15px !important;
+	                color: #1e293b !important;
 	                outline: none !important;
-	                color: #1E293B !important;
-	                transition: border-color 0.2s, background 0.2s !important;
+                    display: block !important;
                     transform: translateZ(0) !important;
                     backface-visibility: hidden !important;
 	            }
@@ -3444,27 +3451,7 @@ window.addEventListener('load', () => {
                     border-color: #d17d39 !important;
                     background: #fff !important;
                 }
-            .hkm-chat-panel {
-                position: fixed !important;
-                bottom: 100px !important;
-                right: 30px !important;
-                width: 420px !important;
-                height: calc(100% - 140px) !important;
-                max-height: 780px !important;
-                background: white !important;
-                border-radius: 28px !important;
-                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 40px rgba(0,0,0,0.05) !important;
-                display: flex !important;
-                flex-direction: column !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                transform: translateY(30px) scale(0.95) translateZ(0) !important;
-                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
-                z-index: 999999 !important;
-                overflow: hidden !important;
-                border: 1px solid rgba(255,255,255,0.8) !important;
-                backface-visibility: hidden !important;
-            }
+            /* Panel Visibility state logic is handled in the primary #hkm-visitor-chat-widget.open .hkm-chat-panel block */
             .hkm-chat-email-submit {
                 margin-top: 10px !important;
                 background: #d17d39 !important;
@@ -3516,18 +3503,6 @@ window.addEventListener('load', () => {
                 margin: 8px 0 !important;
                 font-size: 12px !important;
                 color: #64748B !important;
-            }
-            .hkm-chat-body {
-                flex: 1 !important;
-                padding: 24px !important;
-                overflow-y: auto !important;
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 20px !important;
-                background: #f8fafc !important;
-                scroll-behavior: smooth !important;
-                position: relative !important;
-                transform: translateZ(0) !important;
             }
             .hkm-chat-privacy-label {
                 display: flex !important;
@@ -3595,7 +3570,14 @@ window.addEventListener('load', () => {
         document.head.appendChild(style);
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
+    function initVisitorChat() {
+        if (mounted) return;
         waitForFirebaseService();
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initVisitorChat);
+    } else {
+        initVisitorChat();
+    }
 })();

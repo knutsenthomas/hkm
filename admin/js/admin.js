@@ -2934,8 +2934,13 @@ class AdminManager {
                 const id = ep.id;
                 const transcriptData = transcriptMap[id] || {};
                 const hasTranscript = !!(transcriptData.text || transcriptData.content);
-                const hasSummary = !!transcriptData.summary;
-                const translationStats = this._getBlogTranslationStatus(transcriptData);
+                const summary = (transcriptData.summary || transcriptData.description || '').trim();
+                const hasSummary = !!summary;
+                const translationStats = this._getBlogTranslationStatus({
+                    ...transcriptData,
+                    title: ep.title || 'Uten tittel',
+                    text: summary || transcriptData.text || ep.description || ''
+                });
                 const title = ep.title || 'Uten tittel';
                 const dateStr = this._formatPodcastDateForDisplay(ep.date);
                 const imageUrl = ep.imageUrl || '';
@@ -2952,13 +2957,13 @@ class AdminManager {
                         </td>
                         <td style="max-width: 400px;">
                             <div style="font-weight: 700; color: #1e293b; font-size: 15px; margin-bottom: 4px;">${this.escapeHtml(title)}</div>
-                            <div style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical;">
+                            <div style="font-size: 13px; color: #64748b; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">
                                 ${(() => { 
-                                    const raw = (transcriptData && transcriptData.summary) ? transcriptData.summary : (ep.description || '');
+                                    const raw = summary || ep.description || '';
                                     const tmp = document.createElement('div'); 
                                     tmp.innerHTML = raw; 
-                                    const cleanText = tmp.textContent || tmp.innerText || '';
-                                    return this.escapeHtml(cleanText.substring(0, 140)); 
+                                    const cleanText = (tmp.textContent || tmp.innerText || '').trim();
+                                    return this.escapeHtml(cleanText.substring(0, 160)); 
                                 })()}...
                             </div>
                         </td>
@@ -2966,7 +2971,7 @@ class AdminManager {
                             <div style="font-size: 13px; font-weight: 500; color: #64748b;">${dateStr}</div>
                         </td>
                         <td>
-                            <div style="display: flex; gap: 8px; align-items: center;">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
                                 <span class="podcast-status-badge" style="background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border-color: ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
                                     <span class="material-symbols-outlined podcast-status-icon">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
                                     TEKST
@@ -4829,6 +4834,9 @@ class AdminManager {
                 merged.push({
                     ...episode,
                     ...existingTranscript,
+                    // Force using Firestore summary/description to avoid bleed-through from RSS description
+                    description: existingTranscript.summary || existingTranscript.description || '',
+                    summary: existingTranscript.summary || existingTranscript.description || '',
                     id: existingTranscript.id,
                     isFirestore: true
                 });
@@ -7210,9 +7218,22 @@ class AdminManager {
                 : (() => {
                     if (collectionId === 'blog' || collectionId === 'teaching') {
                         const translationStats = this._getBlogTranslationStatus(item);
+                        const hasTranscript = !!(item.text || item.content);
+                        const hasSummary = !!(item.summary || item.description);
                         const publishedPill = item.published === false
                             ? '<span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">UTKAST</span>'
                             : '<span style="background:#ecfdf5;color:#047857;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">PUBLISERT</span>';
+                        
+                        let extraBadges = '';
+                        if (collectionId === 'teaching') {
+                            if (hasTranscript) {
+                                extraBadges += `<span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">TEKST</span>`;
+                            }
+                            if (hasSummary) {
+                                extraBadges += `<span style="background:#eff6ff;color:#1e40af;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">AI</span>`;
+                            }
+                        }
+
                         let translationPill = '';
                         if (translationStats.level === 'ok') {
                             translationPill = `<span style="background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
@@ -7221,7 +7242,7 @@ class AdminManager {
                         } else {
                             translationPill = '<span style="background:#f1f5f9;color:#94a3b8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">IKKE OVERSATT</span>';
                         }
-                        return `<div style="display:flex;gap:6px;flex-wrap:wrap;">${publishedPill}${translationPill}</div>`;
+                        return `<div style="display:flex;gap:6px;flex-wrap:wrap;">${publishedPill}${extraBadges}${translationPill}</div>`;
                     }
                     return item.isSynced
                         ? '<span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.05em;">SYNKRONISERT</span>'
@@ -7347,7 +7368,7 @@ class AdminManager {
             const isTeachingCollection = collectionId === 'teaching';
             const selectedTeachingType = (item.teachingType || item.category || 'Bibelstudie').toLowerCase();
             const seriesSelection = Array.isArray(item.seriesItems) ? item.seriesItems : [];
-            const rawDescription = item.description || item.summary || '';
+            const rawDescription = item.summary || item.description || '';
             // Strip HTML tags from description for clean display in textarea
             const podcastSummary = rawDescription.replace(/<[^>]*>/g, '').trim();
             const teachingCandidates = (collectionItems || [])
@@ -7651,6 +7672,14 @@ class AdminManager {
                                  <label>Meta-beskrivelse</label>
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
+                             ${collectionId === 'podcast_transcripts' ? `
+                             <h4 class="sidebar-section-title">PODCAST OPPSUMMERING (AI)</h4>
+                             <div class="sidebar-group">
+                                 <label>AI-generert oppsummering</label>
+                                 <textarea id="col-item-summary" class="sidebar-control" style="height: 200px; font-size: 13px; line-height: 1.5;" placeholder="Lim inn AI-oppsummering her...">${podcastSummary}</textarea>
+                                 <p style="font-size: 11px; color: #94a3b8; margin-top: 6px;">Dette vises i listen og som introduksjon på podcast-siden.</p>
+                             </div>
+                             ` : ''}
                              ${collectionId === 'blog' ? `
                              <h4 class="sidebar-section-title">RELATERTE INNLEGG</h4>
                              <div class="sidebar-group">
@@ -9862,7 +9891,9 @@ class AdminManager {
                 }
 
                 if (collectionId === 'podcast_transcripts') {
-                    item.description = document.getElementById('col-item-summary')?.value?.trim() || '';
+                    const podcastSummaryVal = document.getElementById('col-item-summary')?.value?.trim() || '';
+                    item.description = podcastSummaryVal;
+                    item.summary = podcastSummaryVal;
                     const htmlFromBlocks = this.editorJsBlocksToHtml((nextContent?.blocks) || []);
                     item.text = htmlFromBlocks || (typeof item.text === 'string' ? item.text : '');
                 }
