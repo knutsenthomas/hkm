@@ -1087,40 +1087,69 @@ class ContentManager {
         const avatarEl = document.getElementById('single-post-author-avatar');
         if (avatarEl) {
             // HKM Fix: Use actual author photo or a professional icon fallback
-            const avatarUrl = item.authorPhoto || sourceItem?.authorPhoto;
+            let avatarUrl = item.authorPhoto || sourceItem?.authorPhoto;
+            const authorName = item.author || sourceItem?.author || '';
             
-            if (avatarUrl && avatarUrl !== 'img/author-placeholder.png') {
-                avatarEl.src = avatarUrl;
-                avatarEl.alt = `Forfatterens bilde: ${item.author || sourceItem?.author || ''}`;
-                avatarEl.style.display = 'inline-block';
-                // Ensure it's showing as an image
-                if (avatarEl.tagName === 'DIV') {
-                    // This case shouldn't normally happen but good for robustness
-                    const img = document.createElement('img');
-                    img.id = 'single-post-author-avatar';
-                    img.className = avatarEl.className;
-                    img.style.cssText = avatarEl.style.cssText;
-                    avatarEl.replaceWith(img);
-                }
-            } else {
-                // Fallback: Show a nice FontAwesome icon instead of a broken/wrong image
-                const iconContainer = document.createElement('div');
-                iconContainer.id = 'single-post-author-avatar';
-                // Copy styles from the original img for layout consistency
-                iconContainer.style.width = '40px';
-                iconContainer.style.height = '40px';
-                iconContainer.style.borderRadius = '50%';
-                iconContainer.style.backgroundColor = 'rgba(255,255,255,0.2)';
-                iconContainer.style.display = 'inline-flex';
-                iconContainer.style.alignItems = 'center';
-                iconContainer.style.justifyContent = 'center';
-                iconContainer.style.border = '2px solid rgba(255,255,255,0.7)';
-                iconContainer.style.flexShrink = '0';
-                iconContainer.style.color = 'white';
-                iconContainer.style.fontSize = '18px';
+            const renderAvatar = (url) => {
+                const el = document.getElementById('single-post-author-avatar');
+                if (!el) return;
                 
-                iconContainer.innerHTML = '<i class="fas fa-user"></i>';
-                avatarEl.replaceWith(iconContainer);
+                if (url && url !== 'img/author-placeholder.png') {
+                    if (el.tagName === 'DIV') {
+                        const img = document.createElement('img');
+                        img.id = 'single-post-author-avatar';
+                        img.className = el.className;
+                        img.style.cssText = el.style.cssText;
+                        img.src = url;
+                        img.alt = `Forfatterens bilde: ${authorName}`;
+                        el.replaceWith(img);
+                    } else {
+                        el.src = url;
+                        el.alt = `Forfatterens bilde: ${authorName}`;
+                        el.style.display = 'inline-block';
+                    }
+                } else if (el.tagName === 'IMG') {
+                    // Fallback: Show a nice FontAwesome icon instead of a broken/wrong image
+                    const iconContainer = document.createElement('div');
+                    iconContainer.id = 'single-post-author-avatar';
+                    // Copy styles from the original img for layout consistency
+                    iconContainer.style.width = '40px';
+                    iconContainer.style.height = '40px';
+                    iconContainer.style.borderRadius = '50%';
+                    iconContainer.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                    iconContainer.style.display = 'inline-flex';
+                    iconContainer.style.alignItems = 'center';
+                    iconContainer.style.justifyContent = 'center';
+                    iconContainer.style.border = '2px solid rgba(255,255,255,0.7)';
+                    iconContainer.style.flexShrink = '0';
+                    iconContainer.style.color = 'white';
+                    iconContainer.style.fontSize = '18px';
+                    
+                    iconContainer.innerHTML = '<i class="fas fa-user"></i>';
+                    el.replaceWith(iconContainer);
+                }
+            };
+
+            // First render whatever we have locally
+            renderAvatar(avatarUrl);
+
+            // Then asynchronously ask the Users database for the freshest picture!
+            if (authorName && window.firebaseService && window.firebaseService.db) {
+                window.firebaseService.db.collection('users')
+                    .where('displayName', '==', authorName)
+                    .limit(1)
+                    .get()
+                    .then(snap => {
+                        if (!snap.empty) {
+                            const latestPhoto = snap.docs[0].data().photoURL;
+                            if (latestPhoto && latestPhoto !== avatarUrl) {
+                                renderAvatar(latestPhoto);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('[ContentManager] Kunne ikke hente ferskt brukerbilde:', err);
+                    });
             }
         }
 
