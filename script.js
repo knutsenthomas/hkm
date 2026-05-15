@@ -3020,7 +3020,7 @@ window.addEventListener('load', () => {
                 margin: 0 !important;
                 flex-shrink: 0 !important;
                 background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
-                padding: 18px 24px !important;
+                padding: 16px 24px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
@@ -3095,7 +3095,7 @@ window.addEventListener('load', () => {
                 display: grid !important;
                 grid-template-columns: repeat(3, 1fr) !important;
                 gap: 8px !important;
-                padding: 10px 16px !important;
+                padding: 8px 16px !important;
                 border-bottom: 1px solid #F1F5F9 !important;
                 background: #fff !important;
             }
@@ -3391,19 +3391,20 @@ window.addEventListener('load', () => {
                 white-space: nowrap !important;
             }
             .hkm-chat-send {
+                display: flex !important;
+                align-items: center !important;
+                justify-content: center !important;
                 background: #d17d39 !important;
                 color: #fff !important;
                 border: none !important;
-                width: 44px !important;
-                height: 44px !important;
-                border-radius: 14px !important;
-                display: block !important;
-                float: right !important;
-                align-items: center !important;
-                justify-content: center !important;
+                width: 40px !important;
+                height: 40px !important;
+                border-radius: 50% !important;
                 cursor: pointer !important;
                 flex-shrink: 0 !important;
-                transition: transform 0.2s, background 0.2s !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                transition: all 0.3s ease !important;
             }
             .hkm-chat-send:hover:not(:disabled) {
                 background: #bd4f2a !important;
