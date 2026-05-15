@@ -4093,10 +4093,11 @@ ul {
 
 .page-hero {
   position: relative !important;
-  padding-top: 140px !important;
-  padding-bottom: 140px !important;
-  min-height: 450px !important;
+  padding-top: 200px !important; /* 100px header + 100px visible padding */
+  padding-bottom: 100px !important;
+  min-height: 400px !important;
   display: flex !important;
+  flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
   text-align: center !important;
@@ -7492,7 +7493,10 @@ body {
 
 @media (max-width: 768px) {
   .page-hero {
-    padding: 130px 20px 130px;
+    padding-top: 140px !important; /* 70px header + 70px visible padding */
+    padding-bottom: 70px !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
   }
 
   .page-hero-title {
@@ -9489,8 +9493,8 @@ a[href*="#deduccion-fiscal"],
   }
 
   .page-hero {
-    padding-top: 130px !important;
-    padding-bottom: 130px !important;
+    padding-top: 140px !important;
+    padding-bottom: 70px !important;
   }
 
   /* Logo & Header adjustments */
