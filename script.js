@@ -3028,18 +3028,11 @@ window.addEventListener('load', () => {
                 box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
                 border-bottom: 1px solid rgba(255,255,255,0.1) !important;
             }
-                color: #fff !important;
-                padding: 16px 20px !important;
-                display: flex !important;
-                justify-content: space-between !important;
-                align-items: center !important;
-                min-height: 70px !important;
-                width: 100% !important;
-            }
             .hkm-chat-header-info {
                 display: flex !important;
                 align-items: center !important;
-                gap: 12px !important;
+                gap: 16px !important;
+                flex: 1 !important;
             }
             .hkm-chat-header-avatar {
                 width: 36px !important;
@@ -3067,15 +3060,22 @@ window.addEventListener('load', () => {
                 display: flex !important;
                 align-items: center !important;
                 gap: 6px !important;
-                font-size: 12px !important;
-                opacity: 0.9 !important;
                 margin-top: 2px !important;
             }
             .status-dot {
                 width: 8px !important;
                 height: 8px !important;
-                background: #4ADE80 !important;
+                background: #10B981 !important;
                 border-radius: 50% !important;
+                display: inline-block !important;
+            }
+            .hkm-chat-online-status::after {
+                content: 'Online' !important;
+                font-size: 11px !important;
+                font-weight: 500 !important;
+                color: rgba(255,255,255,0.8) !important;
+                text-transform: uppercase !important;
+                letter-spacing: 0.05em !important;
             }
             .hkm-chat-close {
                 background: none !important;
