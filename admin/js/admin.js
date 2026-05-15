@@ -6384,9 +6384,6 @@ class AdminManager {
                 },
                 updatedAt: new Date().toISOString()
             };
-                    lastUpdated: new Date().toISOString()
-                }
-            };
 
             await firebaseService.savePageContent('settings_integrations', newSettings);
             this._translationSettingsCache = null;
