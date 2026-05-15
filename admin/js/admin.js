@@ -4185,9 +4185,9 @@ class AdminManager {
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 16px;">monitoring</span>
                     <div>
                         <h4 style="color: #1e293b; margin-bottom: 8px;">Ingen data tilgjengelig</h4>
-                        <p style="font-size: 13px; color: #64748b; max-width: 240px; margin: 0 auto 20px;">
+                        <p style="font-size: 13px; color: #64748b; max-width: 320px; margin: 0 auto 20px;">
                             ${this._analyticsFetchFailed 
-                                ? 'Kunne ikke hente data fra Google Analytics. Sjekk integrasjonene dine.' 
+                                ? (this._analyticsErrorMessage || 'Kunne ikke hente data fra Google Analytics. Sjekk integrasjonene dine.') 
                                 : 'Henter dine siste besøkstall eller venter på konfigurasjon...'}
                         </p>
                         ${this._analyticsFetchFailed ? `
@@ -5293,21 +5293,27 @@ class AdminManager {
             const safeDays = [7, 14, 30, 60, 90, 180, 365].includes(Number(days)) ? Number(days) : 30;
             // Call the Firebase Function
             const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${safeDays}`);
-            if (!response.ok) throw new Error(`HTTP error ${response.status}`);
             
-            const result = await response.json();
-            if (result.status === 'success') {
+            const result = await response.json().catch(() => ({ error: `HTTP error ${response.status}` }));
+            
+            if (response.ok && result.status === 'success') {
                 this._analyticsFetchFailed = false;
+                this._analyticsUnconfigured = false;
                 return result.data;
             } else if (result.status === 'unconfigured') {
-                console.warn('Analytics is not configured on the backend.');
+                console.warn('Analytics is not configured:', result.message);
                 this._analyticsFetchFailed = true;
+                this._analyticsUnconfigured = true;
+                this._analyticsErrorMessage = result.message;
                 return null;
             }
-            throw new Error(result.error || 'Failed to fetch analytics');
+            
+            this._analyticsErrorMessage = result.error || result.message || 'Kunne ikke hente data';
+            throw new Error(this._analyticsErrorMessage);
         } catch (error) {
             console.error('Error fetching Analytics data:', error);
             this._analyticsFetchFailed = true;
+            this._analyticsErrorMessage = error.message;
             return null;
         }
     }
