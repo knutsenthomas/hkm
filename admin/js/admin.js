@@ -2965,12 +2965,12 @@ class AdminManager {
                                     <span class="material-symbols-outlined podcast-status-icon">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
                                     TEKST
                                 </span>
-                                <span class="podcast-status-badge" style="background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border-color: ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
-                                    <span class="material-symbols-outlined podcast-status-icon">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
+                                <span class="podcast-status-badge" style="background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border: 1px solid ${hasSummary ? '#bfdbfe' : '#e2e8f0'}; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined podcast-status-icon" style="font-size: 14px;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
                                     AI
                                 </span>
-                                <span class="podcast-status-badge" style="background: ${translationStats.level === 'ok' ? '#eff6ff' : (translationStats.level === 'partial' ? '#fffbeb' : '#f1f5f9')}; color: ${translationStats.level === 'ok' ? '#1e40af' : (translationStats.level === 'partial' ? '#92400e' : '#64748b')}; border-color: ${translationStats.level === 'ok' ? '#bfdbfe' : (translationStats.level === 'partial' ? '#fde68a' : '#e2e8f0')};">
-                                    <span class="material-symbols-outlined podcast-status-icon">${translationStats.level === 'ok' ? 'translate' : 'language_poker'}</span>
+                                <span class="podcast-status-badge" style="background: ${translationStats.level === 'ok' ? '#eff6ff' : (translationStats.level === 'partial' ? '#fffbeb' : '#f8fafc')}; color: ${translationStats.level === 'ok' ? '#1e40af' : (translationStats.level === 'partial' ? '#92400e' : '#94a3b8')}; border: 1px solid ${translationStats.level === 'ok' ? '#bfdbfe' : (translationStats.level === 'partial' ? '#fde68a' : '#e2e8f0')}; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined podcast-status-icon" style="font-size: 14px;">${translationStats.level === 'ok' ? 'translate' : 'language'}</span>
                                     ${translationStats.level === 'ok' ? 'OVERSATT' : (translationStats.level === 'partial' ? 'DELVIS' : 'IKKE OVERSATT')}
                                 </span>
                             </div>
