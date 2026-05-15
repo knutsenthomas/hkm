@@ -4092,21 +4092,21 @@ ul {
 /* Page Hero - Default Styles */
 
 .page-hero {
-  position: relative;
-  padding-top: 140px;
-  padding-bottom: 140px;
-  min-height: 450px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+  position: relative !important;
+  padding-top: 140px !important;
+  padding-bottom: 140px !important;
+  min-height: 450px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  text-align: center !important;
   background-color: var(--primary-green);
   /* Fallback dark background */
   background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058df31?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
-  background-size: cover;
-  background-position: center;
-  color: white;
-  margin-top: 0;
+  background-size: cover !important;
+  background-position: center !important;
+  color: white !important;
+  margin-top: 0 !important;
 }
 
 /* Ensure text is white in hero */
@@ -7078,7 +7078,7 @@ body {
 
 .page-hero {
   background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-red) 100%);
-  padding: 120px 0 80px;
+  padding: 140px 0;
   text-align: center;
   color: white;
   position: relative;
@@ -9490,7 +9490,7 @@ a[href*="#deduccion-fiscal"],
 
   .page-hero {
     padding-top: 130px !important;
-    padding-bottom: 50px !important;
+    padding-bottom: 130px !important;
   }
 
   /* Logo & Header adjustments */
