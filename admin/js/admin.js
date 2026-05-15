@@ -10533,7 +10533,12 @@ class AdminManager {
             footerBg: '#2C3E50',
             footerText: '#FFFFFF',
             newsletterBg: '#1B4965',
-            newsletterText: '#FFFFFF'
+            newsletterText: '#FFFFFF',
+            btnPrimaryBg: '#1B4965',
+            btnPrimaryText: '#FFFFFF',
+            btnSecondaryBg: '#FFFFFF',
+            btnSecondaryText: '#1B4965',
+            btnSecondaryBorder: '#1B4965'
         };
 
         section.innerHTML = `
@@ -10659,6 +10664,40 @@ class AdminManager {
                                             <div class="premium-color-wrapper">
                                                 <input type="color" id="newsletter-text-picker" class="premium-color-picker-input" value="#FFFFFF">
                                                 <input type="text" id="newsletter-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="design-ui-divider" style="margin: 24px 0; border-top: 1px solid var(--border-color); opacity: 0.5;"></div>
+
+                                    <h4 class="design-ui-panel-subtitle" style="margin-bottom: 16px; font-weight: 700; color: var(--text-main);">Knapper</h4>
+                                    <div class="design-ui-form-grid design-ui-color-edit-grid">
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Primærknapp Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-primary-bg-picker" class="premium-color-picker-input" value="#1B4965">
+                                                <input type="text" id="btn-primary-bg-hex" class="premium-color-hex" value="#1B4965" placeholder="#1B4965">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Primærknapp Tekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-primary-text-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="btn-primary-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Sekundærknapp Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-secondary-bg-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="btn-secondary-bg-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Sekundærknapp Tekst/Ramme</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="btn-secondary-text-picker" class="premium-color-picker-input" value="#1B4965">
+                                                <input type="text" id="btn-secondary-text-hex" class="premium-color-hex" value="#1B4965" placeholder="#1B4965">
                                             </div>
                                         </div>
                                     </div>
@@ -10929,7 +10968,11 @@ class AdminManager {
             { key: 'footerBg', pickerId: 'footer-bg-picker', hexId: 'footer-bg-hex', tilePrefix: 'palette-footer', fallback: DEFAULT_THEME.footerBg },
             { key: 'footerText', pickerId: 'footer-text-picker', hexId: 'footer-text-hex', tilePrefix: 'palette-footer-text', fallback: DEFAULT_THEME.footerText },
             { key: 'newsletterBg', pickerId: 'newsletter-bg-picker', hexId: 'newsletter-bg-hex', tilePrefix: 'palette-newsletter', fallback: DEFAULT_THEME.newsletterBg },
-            { key: 'newsletterText', pickerId: 'newsletter-text-picker', hexId: 'newsletter-text-hex', tilePrefix: 'palette-newsletter-text', fallback: DEFAULT_THEME.newsletterText }
+            { key: 'newsletterText', pickerId: 'newsletter-text-picker', hexId: 'newsletter-text-hex', tilePrefix: 'palette-newsletter-text', fallback: DEFAULT_THEME.newsletterText },
+            { key: 'btnPrimaryBg', pickerId: 'btn-primary-bg-picker', hexId: 'btn-primary-bg-hex', tilePrefix: 'palette-btn-p-bg', fallback: DEFAULT_THEME.btnPrimaryBg },
+            { key: 'btnPrimaryText', pickerId: 'btn-primary-text-picker', hexId: 'btn-primary-text-hex', tilePrefix: 'palette-btn-p-text', fallback: DEFAULT_THEME.btnPrimaryText },
+            { key: 'btnSecondaryBg', pickerId: 'btn-secondary-bg-picker', hexId: 'btn-secondary-bg-hex', tilePrefix: 'palette-btn-s-bg', fallback: DEFAULT_THEME.btnSecondaryBg },
+            { key: 'btnSecondaryText', pickerId: 'btn-secondary-text-picker', hexId: 'btn-secondary-text-hex', tilePrefix: 'palette-btn-s-text', fallback: DEFAULT_THEME.btnSecondaryText }
         ];
 
         const normalizeThemeColors = (raw = {}) => {
@@ -10945,7 +10988,11 @@ class AdminManager {
                 footerBg: normalizeHex(raw.footerBg) || DEFAULT_THEME.footerBg,
                 footerText: normalizeHex(raw.footerText) || DEFAULT_THEME.footerText,
                 newsletterBg: normalizeHex(raw.newsletterBg) || DEFAULT_THEME.newsletterBg,
-                newsletterText: normalizeHex(raw.newsletterText) || DEFAULT_THEME.newsletterText
+                newsletterText: normalizeHex(raw.newsletterText) || DEFAULT_THEME.newsletterText,
+                btnPrimaryBg: normalizeHex(raw.btnPrimaryBg) || DEFAULT_THEME.btnPrimaryBg,
+                btnPrimaryText: normalizeHex(raw.btnPrimaryText) || DEFAULT_THEME.btnPrimaryText,
+                btnSecondaryBg: normalizeHex(raw.btnSecondaryBg) || DEFAULT_THEME.btnSecondaryBg,
+                btnSecondaryText: normalizeHex(raw.btnSecondaryText) || DEFAULT_THEME.btnSecondaryText
             };
         };
 

@@ -3885,6 +3885,10 @@ th {
   --footer-text: #FFFFFF;
   --newsletter-bg: #1B4965;
   --newsletter-text: #FFFFFF;
+  --btn-primary-bg: #1B4965;
+  --btn-primary-text: #FFFFFF;
+  --btn-secondary-bg: #FFFFFF;
+  --btn-secondary-text: #1B4965;
   --border-color: #E0E0E0;
   --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -4234,14 +4238,13 @@ a.button {
 }
 
 /* Primary Button: Brand Orange */
-
 .btn-primary,
 .button-primary,
 a.btn-primary,
 a.button-primary {
-  background: var(--primary-color) !important;
-  color: #fff !important;
-  border-color: var(--primary-color) !important;
+  background: var(--btn-primary-bg) !important;
+  color: var(--btn-primary-text) !important;
+  border-color: var(--btn-primary-bg) !important;
   padding: 12px 28px !important;
   border-radius: 50px !important;
   font-weight: bold !important;
@@ -4251,14 +4254,13 @@ a.button-primary {
 }
 
 /* Secondary Button: White with Orange Border */
-
 .btn-secondary,
 .button-secondary,
 a.btn-secondary,
 a.button-secondary {
-  background: #fff !important;
-  color: var(--primary-color) !important;
-  border-color: var(--primary-color) !important;
+  background: var(--btn-secondary-bg) !important;
+  color: var(--btn-secondary-text) !important;
+  border-color: var(--btn-secondary-text) !important;
   padding: 12px 28px !important;
   border-radius: 50px !important;
   font-weight: bold !important;
