@@ -10531,7 +10531,9 @@ class AdminManager {
             textLightColor: '#7F8C8D',
             headerBg: '#FFFFFF',
             footerBg: '#2C3E50',
-            footerText: '#FFFFFF'
+            footerText: '#FFFFFF',
+            newsletterBg: '#1B4965',
+            newsletterText: '#FFFFFF'
         };
 
         section.innerHTML = `
@@ -10643,6 +10645,20 @@ class AdminManager {
                                             <div class="premium-color-wrapper">
                                                 <input type="color" id="footer-text-picker" class="premium-color-picker-input" value="#FFFFFF">
                                                 <input type="text" id="footer-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Nyhetsbrev Bakgrunn</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="newsletter-bg-picker" class="premium-color-picker-input" value="#1B4965">
+                                                <input type="text" id="newsletter-bg-hex" class="premium-color-hex" value="#1B4965" placeholder="#1B4965">
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:0;">
+                                            <label>Nyhetsbrev Tekst</label>
+                                            <div class="premium-color-wrapper">
+                                                <input type="color" id="newsletter-text-picker" class="premium-color-picker-input" value="#FFFFFF">
+                                                <input type="text" id="newsletter-text-hex" class="premium-color-hex" value="#FFFFFF" placeholder="#FFFFFF">
                                             </div>
                                         </div>
                                     </div>
@@ -10911,7 +10927,9 @@ class AdminManager {
             { key: 'textLightColor', pickerId: 'text-light-color-picker', hexId: 'text-light-color-hex', tilePrefix: 'palette-accent', fallback: DEFAULT_THEME.textLightColor },
             { key: 'headerBg', pickerId: 'header-bg-picker', hexId: 'header-bg-hex', tilePrefix: 'palette-header', fallback: DEFAULT_THEME.headerBg },
             { key: 'footerBg', pickerId: 'footer-bg-picker', hexId: 'footer-bg-hex', tilePrefix: 'palette-footer', fallback: DEFAULT_THEME.footerBg },
-            { key: 'footerText', pickerId: 'footer-text-picker', hexId: 'footer-text-hex', tilePrefix: 'palette-footer-text', fallback: DEFAULT_THEME.footerText }
+            { key: 'footerText', pickerId: 'footer-text-picker', hexId: 'footer-text-hex', tilePrefix: 'palette-footer-text', fallback: DEFAULT_THEME.footerText },
+            { key: 'newsletterBg', pickerId: 'newsletter-bg-picker', hexId: 'newsletter-bg-hex', tilePrefix: 'palette-newsletter', fallback: DEFAULT_THEME.newsletterBg },
+            { key: 'newsletterText', pickerId: 'newsletter-text-picker', hexId: 'newsletter-text-hex', tilePrefix: 'palette-newsletter-text', fallback: DEFAULT_THEME.newsletterText }
         ];
 
         const normalizeThemeColors = (raw = {}) => {
@@ -10925,7 +10943,9 @@ class AdminManager {
                 textLightColor: normalizeHex(raw.textLightColor || raw.accentColor || raw.textMutedColor || raw.textLight) || DEFAULT_THEME.textLightColor,
                 headerBg: normalizeHex(raw.headerBg) || DEFAULT_THEME.headerBg,
                 footerBg: normalizeHex(raw.footerBg) || DEFAULT_THEME.footerBg,
-                footerText: normalizeHex(raw.footerText) || DEFAULT_THEME.footerText
+                footerText: normalizeHex(raw.footerText) || DEFAULT_THEME.footerText,
+                newsletterBg: normalizeHex(raw.newsletterBg) || DEFAULT_THEME.newsletterBg,
+                newsletterText: normalizeHex(raw.newsletterText) || DEFAULT_THEME.newsletterText
             };
         };
 

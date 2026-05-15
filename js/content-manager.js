@@ -2877,6 +2877,8 @@ class ContentManager {
         setColorVar('--header-bg', data.headerBg);
         setColorVar('--footer-bg', data.footerBg);
         setColorVar('--footer-text', data.footerText);
+        setColorVar('--newsletter-bg', data.newsletterBg);
+        setColorVar('--newsletter-text', data.newsletterText);
         setColorVar('--accent-color', data.accentColor || data.textLightColor);
     }
 

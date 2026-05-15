@@ -191,6 +191,8 @@ th {
     --header-bg: #FFFFFF;
     --footer-bg: #2C3E50;
     --footer-text: #FFFFFF;
+    --newsletter-bg: #1B4965;
+    --newsletter-text: #FFFFFF;
     --border-color: #E0E0E0;
     --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
     --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -2740,8 +2742,8 @@ body.hero-animate .slide-buttons {
 
 /* Newsletter */
 .newsletter {
-    background: linear-gradient(135deg, var(--primary-orange), var(--primary-red));
-    color: white;
+    background: var(--newsletter-bg);
+    color: var(--newsletter-text);
     text-align: center;
 }
 
