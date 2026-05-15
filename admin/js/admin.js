@@ -2304,8 +2304,8 @@ class AdminManager {
             }
         }
 
-        if (section.getAttribute('data-rendered') !== 'true') {
-            console.log(`[AdminManager] Initializing first-time render for: ${sectionId}`);
+        if (section.getAttribute('data-rendered') !== 'true' || sectionId === 'integrations') {
+            console.log(`[AdminManager] Initializing render for: ${sectionId}`);
             switch (sectionId) {
                 case 'content':
                     this.renderContentEditor();
@@ -4191,7 +4191,8 @@ class AdminManager {
                                 : 'Henter dine siste besøkstall eller venter på konfigurasjon...'}
                         </p>
                         ${this._analyticsFetchFailed ? `
-                            <button onclick="window.adminManager.onSectionSwitch('settings')" style="background: #1B4965; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                            <button onclick="window.adminManager.onSectionSwitch('integrations')" style="background: #1B4965; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                                <span class="material-symbols-outlined" style="font-size: 18px;">settings_input_component</span>
                                 Åpne Integrasjoner
                             </button>
                         ` : ''}
