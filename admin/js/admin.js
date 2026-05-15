@@ -7193,7 +7193,7 @@ class AdminManager {
                     </div>
                 `
                 : (() => {
-                    if (collectionId === 'blog') {
+                    if (collectionId === 'blog' || collectionId === 'teaching') {
                         const translationStats = this._getBlogTranslationStatus(item);
                         const publishedPill = item.published === false
                             ? '<span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">UTKAST</span>'
@@ -7221,7 +7221,7 @@ class AdminManager {
                     : (!podcastAudit.hasTranscript
                         ? 'Mangler transkripsjonstekst'
                         : 'Mangler oppsummering'))
-                : (category || 'Blogg');
+                : (category || (collectionId === 'teaching' ? 'Undervisning' : (collectionId === 'blog' ? 'Blogg' : 'Innhold')));
 
             return `
                 <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.2s;">
