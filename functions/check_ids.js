@@ -11,13 +11,14 @@ async function checkIds() {
   const snap = await db.collection('podcast_transcripts').get();
   let translatedCount = 0;
   snap.forEach(doc => {
-    if (doc.data().translations) {
+    const data = doc.data();
+    if (data.translations || data.summary) {
       translatedCount++;
-      console.log(`Document ${doc.id} HAS translations!`);
+      console.log(`Document ${doc.id} HAS data (Summary: ${!!data.summary}, Translations: ${!!data.translations})`);
     }
   });
   console.log(`Total documents: ${snap.size}`);
-  console.log(`Documents with translations: ${translatedCount}`);
+  console.log(`Documents with summaries/translations: ${translatedCount}`);
 }
 
 checkIds();

@@ -101,11 +101,9 @@
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="/en/../index" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇳🇴 Norsk</a>
-                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 font-bold">🇺🇸
-                            English</a>
-                        <a href="/en/../es/index" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇪🇸
-                            Español</a>
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="no">🇳🇴 Norsk</a>
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="en">🇺🇸 English</a>
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn" data-lang="es">🇪🇸 Español</a>
                     </div>
                 </div>
 
@@ -143,16 +141,11 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="/en/../index" class="text-sm font-bold text-primary-orange"
-                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange" data-lang="no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
-                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <a href="/en/" class="text-sm font-bold text-primary-orange" data-lang="en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/en/../es/index"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
-                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                            <a href="/es/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange" data-lang="es">ES</a>
                         </div>
                     </div>
                 </div>
@@ -196,7 +189,7 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.resources.title">Resources</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/en/../butikk" data-content-doc="settings_global"
+                            <li><a href="/butikk" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.store">Store</a></li>
                             <li><a href="/en/events" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.events">Events</a></li>
@@ -206,7 +199,7 @@
                                     data-content-key="menu.sections.resources.blog">News & Blog</a></li>
                             <li><a href="/en/teaching" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.courses">Courses</a></li>
-                            <li><a href="/en/../minside/index" data-content-doc="settings_global"
+                            <li><a href="/minside/index" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.myPage">My Page</a></li>
                         </ul>
                     </div>

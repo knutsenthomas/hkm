@@ -85,67 +85,26 @@ class ContentManager {
     }
 
     getLocalizedLink(noFile) {
-        let lang = document.documentElement.lang || 'no';
-        if (lang.includes('-')) lang = lang.split('-')[0]; // Handle es-ES -> es
-
-        if (lang === 'no') return noFile;
-        if (window.i18n && typeof window.i18n.mapFileName === 'function') {
-            return window.i18n.mapFileName(noFile, lang);
-        }
-        // Fallback logic if i18n not yet loaded
-        const mappings = {
-            'en': {
-                'index': 'index',
-                'om-oss': 'about',
-                'arrangementer': 'events',
-                'kontakt': 'contact',
-                'donasjoner': 'donations',
-                'for-menigheter': 'for-churches',
-                'for-bedrifter': 'for-businesses',
-                'bnn': 'bnn',
-                'arrangement-detaljer': 'event-details',
-                'blogg': 'blog',
-                'blogg-post': 'blog-post',
-                'kalender': 'calendar',
-                'undervisningsserier': 'teaching',
-                'undervisning': 'teaching',
-                'bibelstudier': 'teaching',
-                'seminarer': 'teaching',
-                'kurs': 'teaching',
-                'reisevirksomhet': 'events',
-                'bli-fast-giver': 'regular-donors',
-                'personvern': 'privacy',
-                'tilgjengelighet': 'accessibility'
-            },
-            'es': {
-                'index': 'index',
-                'om-oss': 'sobre-nosotros',
-                'arrangementer': 'eventos',
-                'kontakt': 'contacto',
-                'donasjoner': 'donaciones',
-                'for-menigheter': 'para-iglesias',
-                'for-bedrifter': 'para-empresas',
-                'bnn': 'bnn',
-                'arrangement-detaljer': 'detalles-evento',
-                'blogg': 'blog',
-                'blogg-post': 'blog-post',
-                'kalender': 'calendario',
-                'undervisningsserier': 'ensenanza',
-                'undervisning': 'ensenanza',
-                'bibelstudier': 'ensenanza',
-                'seminarer': 'ensenanza',
-                'kurs': 'ensenanza',
-                'reisevirksomhet': 'eventos',
-                'bli-fast-giver': 'donantes-regulares',
-                'personvern': 'privacidad',
-                'tilgjengelighet': 'accesibilidad'
-            }
-        };
-
-        // Standardize input by removing .html if present
+        const lang = this.getCurrentLanguage();
         const cleanNoFile = noFile.replace(/\.html$/, '');
-        return (mappings[lang] && mappings[lang][cleanNoFile]) || cleanNoFile;
+
+        if (lang === 'no') return '/' + (cleanNoFile === 'index' ? '' : cleanNoFile);
+
+        let mapped = cleanNoFile;
+        if (window.i18n && typeof window.i18n.mapFileName === 'function') {
+            mapped = window.i18n.mapFileName(cleanNoFile, lang);
+        } else {
+            const mappings = {
+                'en': { 'blogg': 'blog', 'blogg-post': 'blog-post', 'om-oss': 'about', 'arrangementer': 'events' },
+                'es': { 'blogg': 'blog', 'blogg-post': 'blog-post', 'om-oss': 'sobre-nosotros', 'arrangementer': 'eventos' }
+            };
+            mapped = (mappings[lang] && mappings[lang][cleanNoFile]) || cleanNoFile;
+        }
+
+        const safeMapped = mapped === 'index' ? '' : mapped;
+        return `/${lang}/${safeMapped}`;
     }
+
 
     getCurrentLanguage() {
         let lang = document.documentElement.lang || 'no';
@@ -1069,7 +1028,9 @@ class ContentManager {
         const postId = sourceItem ? (sourceItem.__stableId || this.getContentItemStableId(sourceItem)) : null;
 
         if (!item) {
-            container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
+            const lang = this.getCurrentLanguage();
+            const msg = lang === 'en' ? 'The content could not be found.' : (lang === 'es' ? 'No se pudo encontrar el contenido.' : 'Innholdet ble ikke funnet.');
+            container.innerHTML = `<p>${msg}</p>`;
             revealPostContainer();
             return;
         }

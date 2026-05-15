@@ -504,8 +504,23 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
     const transcriptHtml = result.response.text();
     console.log(`Transkripsjon generert (${transcriptHtml.length} tegn).`);
 
+    // --- AUTOMATISK OPPSUMMERING ---
+    let autoSummary = null;
+    try {
+      console.log(`Genererer automatisk oppsummering for episode ${episodeId}...`);
+      // Vi bruker den eksisterende hjelpefunksjonen
+      autoSummary = await generatePodcastSummaryWithGemini({
+        episodeTitle: episodeTitle || '',
+        transcriptText: transcriptHtml
+      });
+      console.log(`Automatisk oppsummering generert.`);
+    } catch (summaryError) {
+      console.error(`Automatisk oppsummering feilet (men transkripsjonen fortsetter):`, summaryError);
+    }
+
     await transcriptRef.set({
       text: transcriptHtml,
+      summary: autoSummary || FieldValue.delete(), // Lagre hvis vi fikk en, slett ikke hvis vi ikke fikk
       episodeId,
       title: episodeTitle || null,
       audioUrl,
@@ -517,7 +532,7 @@ async function transcribePodcastEpisode({ audioUrl, episodeId, episodeTitle, ini
       nextRetryAt: FieldValue.delete(),
     }, { merge: true });
 
-    console.log(`Transkripsjon lagret vellykket i Firestore.`);
+    console.log(`Transkripsjon og oppsummering lagret vellykket i Firestore.`);
     return { success: true, message: "Transkribering fullført" };
   } catch (error) {
     const retryAt = Timestamp.fromMillis(Date.now() + PODCAST_TRANSCRIPT_RETRY_MS);
