@@ -3868,9 +3868,9 @@ th {
 /* CSS Variables */
 
 :root {
-  --primary-color: #1B4965;
-  --secondary-color: #FF6B2B;
-  --primary-orange: var(--primary-color);
+  --primary-color: #c8682a;
+  --secondary-color: #1B4965;
+  --primary-orange: #D17D39;
   --primary-green: #21543D;
   --accent-green: #00b050;
   --primary-red: #B54D2B;
@@ -3881,14 +3881,14 @@ th {
   --bg-light: #F8F9FA;
   --bg-white: #FFFFFF;
   --header-bg: #FFFFFF;
-  --footer-bg: #2C3E50;
+  --footer-bg: #1B4965;
   --footer-text: #FFFFFF;
-  --newsletter-bg: #1B4965;
+  --newsletter-bg: linear-gradient(135deg, #D17D39, #B54D2B);
   --newsletter-text: #FFFFFF;
-  --btn-primary-bg: #1B4965;
+  --btn-primary-bg: #c8682a;
   --btn-primary-text: #FFFFFF;
   --btn-secondary-bg: #FFFFFF;
-  --btn-secondary-text: #1B4965;
+  --btn-secondary-text: #c8682a;
   --border-color: #E0E0E0;
   --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);

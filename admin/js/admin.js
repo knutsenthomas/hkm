@@ -10523,22 +10523,22 @@ class AdminManager {
             mainFont: 'Inter',
             fontSizeH1Desktop: 48,
             fontSizeBase: 16,
-            primaryColor: '#F97316',
-            secondaryColor: '#FF6B2B',
+            primaryColor: '#c8682a',
+            secondaryColor: '#1B4965',
             backgroundColor: '#F8F9FA',
             surfaceColor: '#FFFFFF',
             textColor: '#2C3E50',
             textLightColor: '#7F8C8D',
             headerBg: '#FFFFFF',
-            footerBg: '#2C3E50',
+            footerBg: '#1B4965',
             footerText: '#FFFFFF',
-            newsletterBg: '#1B4965',
+            newsletterBg: 'linear-gradient(135deg, #D17D39, #B54D2B)',
             newsletterText: '#FFFFFF',
-            btnPrimaryBg: '#1B4965',
+            btnPrimaryBg: '#c8682a',
             btnPrimaryText: '#FFFFFF',
             btnSecondaryBg: '#FFFFFF',
-            btnSecondaryText: '#1B4965',
-            btnSecondaryBorder: '#1B4965'
+            btnSecondaryText: '#c8682a',
+            btnSecondaryBorder: '#c8682a'
         };
 
         section.innerHTML = `
