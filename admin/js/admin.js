@@ -7646,13 +7646,13 @@ class AdminManager {
                                   <input type="file" id="col-item-img-file" style="display: none;" accept="image/*">
                               </div>
 
-                            <button type="button" class="btn-primary" id="ai-write-content" style="margin-bottom:8px;align-self:flex-start;display:block;width:100%;background:linear-gradient(135deg, #7c3aed, #4f46e5);border:none;box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);">
-                                <span class="material-symbols-outlined" style="vertical-align:middle;">edit_note</span>
+                            <button type="button" class="btn-primary" id="ai-write-content" style="margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:12px; width:100%; background:linear-gradient(135deg, #d17d39, #bd4f2a); border:none; box-shadow: 0 4px 15px rgba(209, 125, 57, 0.25); min-height: 48px; border-radius: 12px; font-weight: 700; transition: all 0.3s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">edit_note</span>
                                 Skriv innhold med AI
                             </button>
 
-                            <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:14px;align-self:flex-start;display:block;width:100%;">
-                                <span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span>
+                            <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:12px; width:100%; min-height: 48px; border-radius: 12px; font-weight: 600; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; transition: all 0.3s ease;">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">auto_awesome</span>
                                 Foreslå tagger og SEO med AI
                             </button>
                             <h4 class="sidebar-section-title">TAGGER</h4>
