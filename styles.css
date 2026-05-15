@@ -4093,9 +4093,9 @@ ul {
 
 .page-hero {
   position: relative;
-  padding-top: 180px;
-  padding-bottom: 100px;
-  min-height: 500px;
+  padding-top: 140px;
+  padding-bottom: 140px;
+  min-height: 450px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7492,7 +7492,7 @@ body {
 
 @media (max-width: 768px) {
   .page-hero {
-    padding: 140px 0 80px;
+    padding: 130px 20px 130px;
   }
 
   .page-hero-title {
