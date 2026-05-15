@@ -6,30 +6,36 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blog Post | His Kingdom Ministry</title>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="../styles.css?v=2026.04.22.09.36">
+    <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../css/cookie-consent.css">
-    <link rel="stylesheet" href="../css/blog-content.css?v=2026.05.10.3">
-
-    <!-- Firebase SDK (Compat) -->
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-
-    <!-- Core Modules (Moved to head for early loading) -->
-    <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
-    <script type="module" src="../js/content-manager.js?v=2026.05.10.6"></script>
-    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <link rel="stylesheet" href="../css/subpage-hero.css?v=2026.05.01.5">
+    <link rel="stylesheet" href="../css/interactions.css">
+    <link rel="stylesheet" href="../css/blog-content.css?v=2.5">
+    <!-- Tailwind config (guarded if Play CDN is absent) -->
+    <script>
+        if (window.tailwind) {
+            window.tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'primary-orange': '#f39c12',
+                            'primary-red': '#e74c3c',
+                            'text-dark': '#333333',
+                        }
+                    }
+                }
+            };
+        }
+    </script>
     <!-- Loader Safety Net -->
     <script>
         (function() {
@@ -44,21 +50,41 @@
             }, 4000);
         })();
     </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <style>
+        @media (max-width: 768px) {
+            #blog-hero {
+                padding-top: 170px !important;
+                padding-bottom: 90px !important;
+            }
+            #blog-hero .container {
+                width: 100% !important;
+                text-align: center !important;
+            }
+            #single-post-title {
+                font-size: clamp(1.4rem, 5.5vw, 2rem) !important;
+                line-height: 1.15 !important;
+                font-weight: 900 !important;
+            }
+            .subpage-hero + .section,
+            .subpage-hero + .blog-post-section,
+            .blog-post-section {
+                padding-top: 16px !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="cms-loading">
-
-
-        <!-- Header -->
-        <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
+    <!-- Header -->
+    <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
             <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo"
-                        class="w-full h-full object-cover">
+                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
             </a>
@@ -82,13 +108,13 @@
                 </div>
                 <a href="/en/donations"
                     class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Gi gave <i class="fas fa-heart text-sm"></i>
+                    Donate <i class="fas fa-heart heart text-sm" style="vertical-align: middle;"></i>
                 </a>
 
                 <!-- Unified Toggle Button -->
                 <button
                     class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny">
+                    id="menu-toggle" aria-label="Toggle menu">
                     <i class="fas fa-bars text-lg open-icon"></i>
                     <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
@@ -96,7 +122,7 @@
         </div>
     </header>
 
-        <!-- Full-screen Mega Menu Overlay -->
+    <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
         id="mega-menu" aria-hidden="true">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
@@ -104,7 +130,7 @@
             <div class="flex flex-col gap-6">
                 <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                    <input type="text" placeholder="Search..." data-content-doc="settings_global"
                         data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
@@ -114,11 +140,16 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange" data-lang="no">NO</a>
+                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/en/" class="text-sm font-bold text-primary-orange" data-lang="en">EN</a>
+                            <a href="/en/"
+                                class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="/es/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange" data-lang="es">ES</a>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
@@ -133,14 +164,14 @@
                             data-content-key="menu.sections.engage.title">Get Involved</h3>
                         <ul class="mega-nav-list">
                             <li><a href="/en/donations" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.supportWork">Support the Work</a></li>
-                            <li><a href="/en/regular-donors" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.regularDonor">Become a Monthly Donor</a></li>
+                                    data-content-key="menu.sections.engage.supportWork">Support the work</a></li>
+                            <li><a href="/en/become-donor" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Become a regular donor</a></li>
                             <li><a href="/en/for-churches" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.churches">For Churches</a></li>
+                                    data-content-key="menu.sections.engage.churches">For churches</a></li>
                             <li><a href="/en/for-businesses" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.engage.businesses">For Businesses</a></li>
-                            <li><a href="/en/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For businesses</a></li>
+                            <li><a href="/en/prayer" data-content-doc="settings_global"
                                     data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
@@ -150,10 +181,10 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.about.title">Get to Know Us</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/en/about" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.about">About Us</a></li>
+                            <li><a href="/en/about-us" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">About us</a></li>
                             <li><a href="/en/contact" data-content-doc="settings_global"
-                                    data-content-key="menu.sections.about.contact">Contact Us</a></li>
+                                    data-content-key="menu.sections.about.contact">Contact us</a></li>
                         </ul>
                     </div>
 
@@ -162,7 +193,7 @@
                         <h3 class="menu-section-title" data-content-doc="settings_global"
                             data-content-key="menu.sections.resources.title">Resources</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/en/../butikk" data-content-doc="settings_global"
+                            <li><a href="/en/store" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.store">Store</a></li>
                             <li><a href="/en/events" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.events">Events</a></li>
@@ -170,9 +201,9 @@
                                     data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
                             <li><a href="/en/blog" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.blog">News & Blog</a></li>
-                            <li><a href="/en/teaching" data-content-doc="settings_global"
+                            <li><a href="/en/courses" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.courses">Courses</a></li>
-                            <li><a href="/en/../minside/index" data-content-doc="settings_global"
+                            <li><a href="/my-page/index.html" data-content-doc="settings_global"
                                     data-content-key="menu.sections.resources.myPage">My Page</a></li>
                         </ul>
                     </div>
@@ -181,17 +212,18 @@
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
                     <a href="/en/donations" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
-                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support Now</span><i
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support now</span><i
                             class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="/butikk" data-content-doc="settings_global"
+                        <a href="/en/store" data-content-doc="settings_global"
                             data-content-key="menu.footer.store">Store</a>
                         <a href="/en/donations" data-content-doc="settings_global"
                             data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
-                        <a href="/en/about" data-content-doc="settings_global"
-                            data-content-key="menu.footer.about">About Us</a>
+                        <a href="/en/about-us" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">About us</a>
                         <a href="/en/privacy" data-content-doc="settings_global"
-                            data-content-key="menu.footer.privacy">Privacy</a>
+                            data-content-key="menu.footer.privacy">Privacy Policy</a>
+                        <a href="/en/terms" data-content-doc="settings_global" data-content-key="menu.footer.terms">Terms & Conditions</a>
                     </div>
                 </div>
             </div>
@@ -201,6 +233,7 @@
     <section class="page-hero subpage-hero relative" id="blog-hero"
         style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); margin-top: 0; transition: opacity 0.4s ease;">
         <div class="container" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <!-- Title hidden until JS populates it -->
             <h1 class="page-hero-title" id="single-post-title" style="opacity:0; transition: opacity 0.4s ease; margin:0;">Blog Post</h1>
             <div class="blog-meta" id="blog-meta-row"
                 style="display:flex; flex-direction:column; gap:8px; justify-content:center; align-items:center; color:white; margin-top:20px; opacity:0; transition:opacity 0.4s ease; width:100%;">
@@ -218,165 +251,231 @@
                 </div>
                 <span id="single-post-category" style="display:none;"><i class="fas fa-tag"></i> </span>
             </div>
-            </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Blog Post Content -->
-        <section class="section" style="padding: 40px 20px 80px 20px;">
-            <div class="container" style="max-width: 1020px;">
-                <article class="blog-post-content" id="single-post-content">
-                    <p>Loading post...</p>
-                </article>
-
-                <!-- Tags Section (Populated by JS) -->
-                <div id="single-post-author-box" style="display: none;">
-                    <!-- Content injected by JS -->
+    <!-- Blog Post Content -->
+    <section class="section blog-post-section">
+        <div class="container" style="max-width: 840px;">
+            <!-- Skeleton loader shown while content is loading -->
+            <div id="post-skeleton" style="animation: skeletonPulse 1.5s ease-in-out infinite;">
+                <div style="height: 36px; background: #e2e8f0; border-radius: 8px; margin-bottom: 20px; width: 70%;">
                 </div>
-
-                <div class="blog-share" style="border-top: 1px solid #eee; padding-top: 30px; margin-top: 50px;">
-                    <h4>Share this post</h4>
-                    <div style="display: flex; gap: 15px; margin-top: 15px;">
-                        <a href="javascript:void(0)" class="social-link" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href), 'facebook-share-dialog', 'width=800,height=600'); return false;"
-                            style="background: #3b5998; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a href="javascript:void(0)" class="social-link" onclick="window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent(document.title), 'twitter-share-dialog', 'width=800,height=600'); return false;"
-                            style="background: #000000; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 512 512" fill="white"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></a>
-                        <a href="javascript:void(0)" class="social-link" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title), 'linkedin-share-dialog', 'width=800,height=600'); return false;"
-                            style="background: #0077b5; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
-                                class="fab fa-linkedin-in"></i></a>
-                        <a href="https://instagram.com" target="_blank" class="social-link"
-                            style="background: #E1306C; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
-                                class="fab fa-instagram"></i></a>
-                        <a href="javascript:void(0)" class="social-link" onclick="window.print(); return false;"
-                            style="background: #6c757d; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Skriv ut"><i
-                                class="fas fa-print"></i></a>
-                        <a href="javascript:void(0)" class="social-link" onclick="if(navigator.share) { navigator.share({title: document.title, url: window.location.href}).catch(console.error); } else { alert('Deling er ikke støttet på denne enheten.'); } return false;"
-                            style="background: #f39c12; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Del med app"><i
-                                class="fas fa-share-nodes"></i></a>
-            </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 100%;">
                 </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 95%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 88%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 24px; width: 60%;">
+                </div>
+                <div style="height: 28px; background: #e2e8f0; border-radius: 8px; margin-bottom: 16px; width: 50%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 100%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 92%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 80%;">
+                </div>
+            </div>
+            <style>
+                @keyframes skeletonPulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                }
+            </style>
+            <article class="blog-post-content" id="single-post-content" style="display:none;">
+            </article>
 
-                
-            <!-- Related Posts Container -->
-            <div id="single-post-related" style="margin-top: 60px; display: none;">
+            <!-- Tags Section (Populated by JS) -->
+            <div id="single-post-author-box" style="display: none;">
                 <!-- Content injected by JS -->
             </div>
 
+            <div class="blog-share" style="border-top: 1px solid #eee; padding-top: 30px; margin-top: 50px;">
+                <h4>Share this post</h4>
+                <div style="display: flex; gap: 15px; margin-top: 15px;">
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href), 'facebook-share-dialog', 'width=800,height=600'); return false;"
+                        style="background: #3b5998; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
+                            class="fab fa-facebook-f"></i></a>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent(document.title), 'twitter-share-dialog', 'width=800,height=600'); return false;"
+                        style="background: #000000; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><svg
+                            xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 512 512"
+                            fill="white">
+                            <path
+                                d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+                        </svg></a>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title), 'linkedin-share-dialog', 'width=800,height=600'); return false;"
+                        style="background: #0077b5; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
+                            class="fab fa-linkedin-in"></i></a>
+                    <a href="https://instagram.com" target="_blank" class="social-link"
+                        style="background: #E1306C; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="javascript:void(0)" class="social-link" onclick="window.print(); return false;"
+                        style="background: #6c757d; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
+                        title="Print"><i class="fas fa-print"></i></a>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="if(navigator.share) { navigator.share({title: document.title, url: window.location.href}).catch(console.error); } else { alert('Sharing is not supported on this device.'); } return false;"
+                        style="background: #f39c12; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
+                        title="Share with app"><i class="fas fa-share-nodes"></i></a>
+                </div>
+            </div>
+
+
+            <!-- Interactions (Likes & Comments) -->
+            <div id="blog-interactions"></div>
+        </div>
+
+        <!-- Related Posts Container (Wider) -->
+        <div class="container" style="max-width: 1200px; margin-top: 64px;">
+            <div id="single-post-related" style="display: none;">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+
+        <div class="container" style="max-width: 840px;">
             <div class="blog-navigation"
-
-                    style="display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #eee;">
-                    <a href="/en/blog" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to blog</a>
-                </div>
+                style="display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #eee;">
+                <a href="/en/blog" id="back-btn" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Back to
+                    blog</a>
             </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Footer -->
-        <footer class="footer" id="kontakt">
-            <div class="container">
-                <div class="footer-layout-v2">
-                    <!-- Left Section: Brand + Links -->
-                    <div class="footer-left">
-                        <!-- Brand / Intro -->
-                        <div class="footer-brand">
-                            <a href="/en/" class="logo">
-                                <div class="logo-icon">
-                                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
-                                </div>
-                                <span class="logo-text">His Kingdom Ministry</span>
-                            </a>
-                            <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to
-                                spiritual growth through teaching, podcasts, and travel.</p>
-                        </div>
-
-                        <!-- Links Grid -->
-                        <div class="footer-nav-grid">
-                            <div class="nav-col">
-                                <h4>About Us</h4>
-                                <ul>
-                                    <li><a href="/en">Home</a></li>
-                                    <li><a href="/en/about">Who we are</a></li>
-                                    <li><a href="/en/about">Our Vision</a></li>
-                                    <li><a href="/en/contact">Contact Us</a></li>
-                                </ul>
+    <!-- Footer -->
+    <footer class="footer" id="kontakt">
+        <div class="container">
+            <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
+                <div class="footer-left">
+                    <!-- Brand / Intro -->
+                    <div class="footer-brand">
+                        <a href="/en/" class="logo">
+                            <div class="logo-icon">
+                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                             </div>
-
-                            <div class="nav-col">
-                                <h4>Resources</h4>
-                                <ul>
-                                    <li><a href="/en/media">Teaching</a></li>
-                                    <li><a href="/en/events">Online Courses</a></li>
-                                    <li><a href="/en/blog">Books & Blog</a></li>
-                                    <li><a href="/en/../minside/index" target="_blank">My Page</a></li>
-                                </ul>
-                            </div>
-
-                            <div class="nav-col">
-                                <h4>Media</h4>
-                                <ul>
-                                    <li><a href="/en/media">Podcast</a></li>
-                                    <li><a href="/en/media">Videos</a></li>
-                                    <li><a href="https://www.youtube.com/@HisKingdomMinistry"
-                                            target="_blank">YouTube</a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <div class="nav-col">
-                                <h4>Get Involved</h4>
-                                <ul>
-                                    <li><a href="/en/events">Calendar</a></li>
-                                    <li><a href="/en/donations">Give a Donation</a></li>
-                                    <li><a href="/en/privacy">Privacy Policy</a></li>
-                                    <li><a href="/en/accessibility">Accessibility</a></li>
-                                </ul>
-                            </div>
-                        </div>
+                            <span class="logo-text">His Kingdom Ministry</span>
+                        </a>
+                        <p class="brand-description">His Kingdom Ministry is a non-profit organization dedicated to spiritual growth through teaching, podcasting, and travel ministry.</p>
                     </div>
 
-                    <!-- Right Section: Cards -->
-                    <div class="footer-right">
-                        <!-- Follow Us Card -->
-                        <div class="footer-card">
-                            <h3>Follow Us</h3>
-                            <div class="footer-social-icons">
-                                <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
-                                        class="fab fa-facebook-f"></i></a>
-                                <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
-                                        class="fab fa-instagram"></i></a>
-                                <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
-                                        class="fab fa-youtube"></i></a>
-                            </div>
+                    <!-- Links Grid -->
+                    <div class="footer-nav-grid">
+                        <div class="nav-col">
+                            <h4>About Us</h4>
+                            <ul>
+                                <li><a href="/en/">Home</a></li>
+                                <li><a href="/en/about-us">About Us</a></li>
+                                <li><a href="/en/about-us">Our Vision</a></li>
+                                <li><a href="/en/contact">Contact Us</a></li>
+                            </ul>
                         </div>
 
-                        <!-- Contact Us Card -->
-                        <div class="footer-card contact-card">
-                            <h3>Contact Us</h3>
-                            <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+                        <div class="nav-col">
+                            <h4>Resources</h4>
+                            <ul>
+                                <li><a href="/en/media">Teaching</a></li>
+                                <li><a href="/en/events">Events</a></li>
+                                <li><a href="/en/blog">News & Blog</a></li>
+                                <li><a href="/my-page/index.html" target="_blank">My Page</a></li>
+                            </ul>
+                        </div>
 
-                            <div class="contact-details">
-                                <div class="detail-item">
-                                    <strong>Email:</strong>
-                                    <p>post@hiskingdomministry.no</p>
-                                </div>
-                                <div class="detail-item">
-                                    <strong>Phone:</strong>
-                                    <p>+47 930 94 615</p>
-                                </div>
-                            </div>
+                        <div class="nav-col">
+                            <h4>Media</h4>
+                            <ul>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Involvement</h4>
+                            <ul>
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Give a gift</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/terms">Terms & Conditions</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
 
-                <div class="footer-bottom">
-                    <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. All rights reserved.</p>
-                    <a href="/en/../admin/login" class="admin-link">Admin</a>
+                <!-- Right Section: Cards -->
+                <div class="footer-right">
+                    <!-- Follow Us Card -->
+                    <div class="footer-card">
+                        <h3>Follow Us</h3>
+                        <div class="footer-social-icons">
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
+                        </div>
+                    </div>
+
+                    <!-- Contact Us Card -->
+                    <div class="footer-card contact-card">
+                        <h3>Contact Us</h3>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+
+                        <div class="contact-details">
+                            <div class="detail-item">
+                                <strong>Email:</strong>
+                                <p>post@hiskingdomministry.no</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Phone:</strong>
+                                <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Account No.:</strong>
+                                <p>3000.66.08759</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </footer>
 
-    <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
-    <script type="module" src="../js/cookie-consent.js"></script>
+            <div class="footer-bottom">
+                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. All rights reserved.</p>
+                <a href="/admin/login.html" class="admin-link">Admin</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+    <!-- Firebase Config & Service -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+
+    <script type="module" src="../js/user-roles.js"></script>
+
+    <!-- App Scripts -->
     <script type="module" src="../js/i18n.js"></script>
+    <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.11.6"></script>
+    <script type="module" src="../js/cookie-consent.js"></script>
     <script>
         // Force mobile spacing overrides via inline styles (beats all CSS cascade)
         function applyMobileHeroFix() {
@@ -399,15 +498,5 @@
         window.addEventListener('resize', applyMobileHeroFix);
     </script>
 </body>
-
-        <!-- Init Language -->
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                if (window.i18n) {
-                    window.i18n.init();
-                }
-            });
-        </script>
-    </body>
 
 </html>
