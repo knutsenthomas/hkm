@@ -7672,6 +7672,7 @@ class AdminManager {
                                  <label>Meta-beskrivelse</label>
                                  <textarea id="col-item-seo-desc" class="sidebar-control" style="height: 100px;" placeholder="Kort oppsummering...">${item.seoDescription || ''}</textarea>
                              </div>
+                             ${collectionId === 'podcast_transcripts' ? `
                              <h4 class="sidebar-section-title">PODCAST OPPSUMMERING (AI)</h4>
                              <div class="sidebar-group">
                                  <label>AI-generert oppsummering</label>
