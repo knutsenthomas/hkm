@@ -3465,7 +3465,12 @@ class ContentManager {
             // Handle Firebase Timestamp objects or standard Date strings/objects
             const d = (date && typeof date.toDate === 'function') ? date.toDate() : new Date(date);
             if (isNaN(d.getTime())) return String(date);
-            return d.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            const lang = document.documentElement.lang || 'no';
+            const locales = { 'no': 'nb-NO', 'en': 'en-US', 'es': 'es-ES' };
+            const locale = locales[lang] || 'nb-NO';
+            
+            return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
         } catch (e) {
             console.warn('[ContentManager] formatDate error:', e);
             return String(date || '');
