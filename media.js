@@ -898,7 +898,7 @@ function enhanceTranscriptRichFormatting(html) {
             heading.style.margin = '24px 0 12px';
             heading.style.fontSize = '1.2rem';
             heading.style.fontWeight = '800';
-            heading.style.color = '#1b4965'; // Mandal Regnskapskontor Mørkeblå
+            heading.style.color = '#0F172A'; // Slate 900 instead of blue
             heading.style.letterSpacing = '0.01em';
             heading.style.borderLeft = '4px solid #d17d39';
             heading.style.paddingLeft = '12px';
@@ -924,7 +924,7 @@ function enhanceTranscriptRichFormatting(html) {
             inlineHeading.style.margin = '24px 0 12px';
             inlineHeading.style.fontSize = '1.2rem';
             inlineHeading.style.fontWeight = '800';
-            inlineHeading.style.color = '#1b4965';
+            inlineHeading.style.color = '#0F172A';
             inlineHeading.style.letterSpacing = '0.01em';
             inlineHeading.style.borderLeft = '4px solid #d17d39';
             inlineHeading.style.paddingLeft = '12px';
@@ -1276,7 +1276,7 @@ function applyFullscreenPlayerLayout(bar) {
             .ts-link {
                 background: #f1f5f9;
                 border: 1px solid #e2e8f0;
-                color: #1b4965;
+                color: #0F172A;
                 padding: 2px 8px;
                 border-radius: 6px;
                 font-size: 0.9em;
@@ -1289,9 +1289,9 @@ function applyFullscreenPlayerLayout(bar) {
                 vertical-align: middle;
             }
             .ts-link:hover {
-                background: #1b4965;
+                background: #d17d39;
                 color: #fff;
-                border-color: #1b4965;
+                border-color: #bd4f2a;
                 transform: translateY(-1px);
             }
             .fs-transcript-search-wrap {
@@ -1319,8 +1319,8 @@ function applyFullscreenPlayerLayout(bar) {
                 background: #fff;
             }
             #fs-transcript-search:focus {
-                border-color: #1b4965;
-                box-shadow: 0 0 0 4px rgba(27, 73, 101, 0.1);
+                border-color: #d17d39;
+                box-shadow: 0 0 0 4px rgba(209, 125, 57, 0.1);
             }
             .search-highlight {
                 background: #fef08a;

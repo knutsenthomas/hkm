@@ -2067,7 +2067,7 @@ body.hero-animate .slide-buttons {
     margin-bottom: 24px;
     font-size: 48px;
     font-weight: 800;
-    color: #1B4965;
+    color: #0F172A;
     line-height: 1.1;
 }
 
@@ -2114,7 +2114,7 @@ body.hero-animate .slide-buttons {
 .about-feature-text h4 {
     font-size: 18px;
     font-weight: 700;
-    color: #1B4965;
+    color: #0F172A;
     margin-bottom: 8px;
 }
 
@@ -2771,7 +2771,7 @@ body.hero-animate .slide-buttons {
 
 /* Footer */
 .footer {
-    background: #1A202C;
+    background: #1B4965;
     color: white;
     padding: 60px 0 20px;
 }

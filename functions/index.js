@@ -4371,9 +4371,8 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
 
   const genAI = new GoogleGenerativeAI(geminiKey);
   const modelCandidates = [
-    'gemini-2.5-flash',
+    'gemini-1.5-flash',
     'gemini-2.0-flash',
-    'gemini-2.0-flash-lite',
   ];
 
   let result = null;

@@ -4834,9 +4834,9 @@ class AdminManager {
                 merged.push({
                     ...episode,
                     ...existingTranscript,
-                    // Force using Firestore summary/description to avoid bleed-through from RSS description
-                    description: existingTranscript.summary || existingTranscript.description || '',
-                    summary: existingTranscript.summary || existingTranscript.description || '',
+                    // Distinct fields for short description and AI summary
+                    description: existingTranscript.description || '',
+                    summary: existingTranscript.summary || '',
                     id: existingTranscript.id,
                     isFirestore: true
                 });
@@ -5223,13 +5223,13 @@ class AdminManager {
         }
 
         await firebase.firestore().collection('podcast_transcripts').doc(episodeId).set({
-            description: summary,
+            summary: summary,
             updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         }, { merge: true });
 
         return {
             ...item,
-            description: summary
+            summary: summary
         };
     }
 
