@@ -498,6 +498,7 @@ class AdminManager {
             post.category || '',
             post.seoTitle || '',
             post.seoDescription || '',
+            post.text || '',
             (Array.isArray(post.tags) ? post.tags : []).join(',')
         ].join('|');
         return this._hashString(payload);
@@ -1106,6 +1107,9 @@ class AdminManager {
         if (typeof post.content !== 'undefined') {
             translation.content = await this._translateBlogContent(post.content, targetLang, 'no');
         }
+        if (typeof post.text === 'string') {
+            translation.text = await this._translateRichText(post.text, targetLang, 'no');
+        }
         return translation;
     }
 
@@ -1252,7 +1256,7 @@ class AdminManager {
                 return;
             }
 
-            const isFresh = tr._sourceHash === sourceHash && !!tr.title && !!tr.content;
+            const isFresh = tr._sourceHash === sourceHash && !!tr.title && (!!tr.content || !!tr.text);
             if (isFresh) {
                 upToDate += 1;
             } else {
@@ -2931,6 +2935,7 @@ class AdminManager {
                 const transcriptData = transcriptMap[id] || {};
                 const hasTranscript = !!(transcriptData.text || transcriptData.content);
                 const hasSummary = !!transcriptData.summary;
+                const translationStats = this._getBlogTranslationStatus(transcriptData);
                 const title = ep.title || 'Uten tittel';
                 const dateStr = this._formatPodcastDateForDisplay(ep.date);
                 const imageUrl = ep.imageUrl || '';
@@ -2963,6 +2968,10 @@ class AdminManager {
                                 <span class="podcast-status-badge" style="background: ${hasSummary ? '#eff6ff' : '#f1f5f9'}; color: ${hasSummary ? '#1e40af' : '#64748b'}; border-color: ${hasSummary ? '#bfdbfe' : '#e2e8f0'};">
                                     <span class="material-symbols-outlined podcast-status-icon">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
                                     AI
+                                </span>
+                                <span class="podcast-status-badge" style="background: ${translationStats.level === 'ok' ? '#eff6ff' : (translationStats.level === 'partial' ? '#fffbeb' : '#f1f5f9')}; color: ${translationStats.level === 'ok' ? '#1e40af' : (translationStats.level === 'partial' ? '#92400e' : '#64748b')}; border-color: ${translationStats.level === 'ok' ? '#bfdbfe' : (translationStats.level === 'partial' ? '#fde68a' : '#e2e8f0')};">
+                                    <span class="material-symbols-outlined podcast-status-icon">${translationStats.level === 'ok' ? 'translate' : 'language_poker'}</span>
+                                    ${translationStats.level === 'ok' ? 'OVERSATT' : (translationStats.level === 'partial' ? 'DELVIS' : 'IKKE OVERSATT')}
                                 </span>
                             </div>
                         </td>
@@ -7360,10 +7369,10 @@ class AdminManager {
                              </span>
                         </div>
                         <div class="editor-header-right">
-                                      ${(collectionId === 'blog' || collectionId === 'teaching') ? `
+                                      ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `
                                       <span id="blog-translation-status" title="Status for oversettelser" style="display:none;"></span>
                                       ` : ''}
-                                      ${(collectionId === 'blog' || collectionId === 'teaching') ? `
+                                      ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `
                                       <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk" style="display:flex; align-items:center; gap:6px;">
                                           <span class="material-symbols-outlined">g_translate</span> Oversett til tilgjengelige språk
                                       </button>
@@ -9911,7 +9920,7 @@ class AdminManager {
             };
 
             const translateBtn = modal.querySelector('#translate-col-item');
-            if (translateBtn && (collectionId === 'blog' || collectionId === 'teaching')) {
+            if (translateBtn && (collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts')) {
                 translateBtn.onclick = async () => {
                     await this._withButtonLoading(translateBtn, async () => {
                         let slowNoticeTimer = null;
