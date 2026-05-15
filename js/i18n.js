@@ -94,27 +94,6 @@ const i18nManager = {
         } else {
             startObserve();
         }
-                    scheduleSync();
-                    return;
-                }
-            }
-        });
-
-        const startObserve = () => {
-            if (!document.body) return;
-            observer.observe(document.body, {
-                subtree: true,
-                childList: true,
-                characterData: true
-            });
-            scheduleSync();
-        };
-
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', startObserve, { once: true });
-        } else {
-            startObserve();
-        }
 
         window.addEventListener('pageshow', () => this.syncCurrentLanguageBadge());
         window.addEventListener('focus', () => this.syncCurrentLanguageBadge());
