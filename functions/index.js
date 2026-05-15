@@ -25,6 +25,7 @@ const path = require('path');
 const os = require('os');
 const { parseStringPromise } = require('xml2js');
 const OpenAI = require('openai');
+const crypto = require('crypto');
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
@@ -568,12 +569,15 @@ exports.getAnalyticsOverview = onRequest({
         }
       }
 
-      const privateKey = (privateKeyRaw || "").replace(/\\n/g, "\n").trim();
+      const privateKey = (privateKeyRaw || "")
+        .replace(/\\n/g, "\n")
+        .replace(/\n\n/g, "\n")
+        .trim();
 
       if (!propertyId || !clientEmail || !privateKey) {
         return res.status(503).json({
           status: "unconfigured",
-          message: "Google Analytics backend is not configured."
+          message: `Konfigurasjon mangler: ${!propertyId ? 'Property ID ' : ''}${!clientEmail ? 'Email ' : ''}${!privateKey ? 'Key' : ''}`
         });
       }
 
@@ -716,6 +720,56 @@ exports.getAnalyticsOverview = onRequest({
     }
   });
 });
+
+/**
+ * Hjelpefunksjoner for Google Analytics (GA4) API
+ */
+async function getGaAccessToken({ clientEmail, privateKey }) {
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const now = Math.floor(Date.now() / 1000);
+  const payload = {
+    iss: clientEmail,
+    sub: clientEmail,
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600,
+    scope: 'https://www.googleapis.com/auth/analytics.readonly',
+  };
+
+  const encodedHeader = Buffer.from(JSON.stringify(header)).toString('base64url');
+  const encodedPayload = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signatureInput = `${encodedHeader}.${encodedPayload}`;
+  const signer = crypto.createSign('RSA-SHA256');
+  signer.update(signatureInput);
+  const signature = signer.sign(privateKey, 'base64url');
+  const jwt = `${signatureInput}.${signature}`;
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: `grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=${jwt}`,
+  });
+
+  const data = await response.json();
+  if (data.error) throw new Error(`GA Auth Error: ${data.error_description || data.error}`);
+  return data.access_token;
+}
+
+async function googleGaPost({ path, accessToken, body }) {
+  const response = await fetch(`https://analyticsdata.googleapis.com/v1beta${path}`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+  return response.json();
+}
+
+function gaMetricValue(report, rowIndex, metricIndex) {
+  return report?.rows?.[rowIndex]?.metricValues?.[metricIndex]?.value || "0";
+}
 
 
 
