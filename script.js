@@ -3019,7 +3019,7 @@ window.addEventListener('load', () => {
             .hkm-chat-header {
                 margin: 0 !important;
                 flex-shrink: 0 !important;
-                background: #1B4965 !important;
+                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
                 padding: 18px 24px !important;
                 display: flex !important;
                 align-items: center !important;
@@ -3117,8 +3117,8 @@ window.addEventListener('load', () => {
             .hkm-chat-mode-btn.active {
                 background: #FFF7ED !important;
                 border-color: #FED7AA !important;
-                color: #C2410C !important;
-                box-shadow: 0 2px 4px rgba(194, 65, 12, 0.05) !important;
+                color: #EA580C !important;
+                box-shadow: 0 2px 4px rgba(234, 88, 12, 0.1) !important;
             }
             .hkm-chat-mode-icon svg {
                 width: 20px !important;
