@@ -10311,6 +10311,11 @@ class AdminManager {
                                 if (collectionId === 'podcast_transcripts') {
                                     // For podcast transcripts, save directly to Firestore collection
                                     const podcastPayload = { ...safeItem };
+                                    
+                                    // CRITICAL FIX: Never overwrite translations from the manual save form.
+                                    // This prevents the stale UI state from deleting background AI translations.
+                                    delete podcastPayload.translations;
+                                    
                                     const summaryValue = document.getElementById('col-item-summary')?.value?.trim() || '';
                                     if (summaryValue) {
                                         podcastPayload.description = summaryValue;
