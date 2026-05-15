@@ -5643,6 +5643,10 @@ a[href*="#deduccion-fiscal"],
         max-width: 100%;
         width: 100%;
     }
+    
+    .blog-content {
+        padding: 20px 20px 16px 20px; /* Reduced bottom padding to remove empty space */
+    }
 }
 
 /* iPad specific styles for mega menu */
