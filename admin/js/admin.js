@@ -9863,10 +9863,8 @@ class AdminManager {
                 item.content = nextContent;
                 item.date = document.getElementById('col-item-date')?.value || '';
 
-                if (collectionId !== 'podcast_transcripts') {
-                    item.imageUrl = document.getElementById('col-item-img')?.value || '';
-                    item.author = document.getElementById('col-item-author')?.value || '';
-                }
+                item.imageUrl = document.getElementById('col-item-img')?.value || '';
+                item.author = document.getElementById('col-item-author')?.value || '';
 
                 if (isTeachingCollection) {
                     const typeValue = document.getElementById('col-item-type')?.value || 'Bibelstudier';
@@ -9876,15 +9874,13 @@ class AdminManager {
                     item.seriesItems = typeValue === 'Undervisningsserier' && seriesSelect
                         ? Array.from(seriesSelect.selectedOptions).map(opt => opt.value)
                         : [];
-                } else if (collectionId !== 'podcast_transcripts') {
+                } else {
                     item.category = document.getElementById('col-item-cat')?.value || '';
                 }
 
-                if (collectionId !== 'podcast_transcripts') {
-                    item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
-                    item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
-                    item.tags = currentTags;
-                }
+                item.seoTitle = document.getElementById('col-item-seo-title')?.value || '';
+                item.seoDescription = document.getElementById('col-item-seo-desc')?.value || '';
+                item.tags = currentTags;
 
                 if (collectionId === 'blog') {
                     const relatedSelect = document.getElementById('col-item-related');
