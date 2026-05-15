@@ -7360,10 +7360,10 @@ class AdminManager {
                              </span>
                         </div>
                         <div class="editor-header-right">
-                                      ${collectionId === 'blog' ? `
+                                      ${(collectionId === 'blog' || collectionId === 'teaching') ? `
                                       <span id="blog-translation-status" title="Status for oversettelser" style="display:none;"></span>
                                       ` : ''}
-                                      ${collectionId === 'blog' ? `
+                                      ${(collectionId === 'blog' || collectionId === 'teaching') ? `
                                       <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk" style="display:flex; align-items:center; gap:6px;">
                                           <span class="material-symbols-outlined">g_translate</span> Oversett til tilgjengelige språk
                                       </button>
@@ -9911,7 +9911,7 @@ class AdminManager {
             };
 
             const translateBtn = modal.querySelector('#translate-col-item');
-            if (translateBtn && collectionId === 'blog') {
+            if (translateBtn && (collectionId === 'blog' || collectionId === 'teaching')) {
                 translateBtn.onclick = async () => {
                     await this._withButtonLoading(translateBtn, async () => {
                         let slowNoticeTimer = null;
@@ -9961,11 +9961,11 @@ class AdminManager {
                                 throw new Error('Ingen språk ble oversatt. Oversettelsestjenesten svarte uten gyldig oversettelse. Prøv igjen, eller bytt provider i Integrasjoner.');
                             }
 
-                            const currentData = await firebaseService.getPageContent('collection_blog');
+                            const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
                             const list = this._getCollectionItems(currentData);
                             upsertItemInList(list, translatedItem);
 
-                            await firebaseService.savePageContent('collection_blog', { items: list });
+                            await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
                             Object.assign(item, translatedItem);
                             this._renderBlogTranslationStatusBadge(item);
                             if (successfulLanguages.length === targetLanguages.length) {
