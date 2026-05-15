@@ -1266,12 +1266,15 @@ class AdminManager {
 
         const total = targetLanguages.length;
         let level = 'none';
+        
         if (upToDate === total && total > 0) {
             level = 'ok';
         } else if (upToDate > 0) {
             level = 'partial';
-        } else if (failed > 0 || stale > 0 || missing > 0) {
-            level = 'missing';
+        } else if (stale > 0 && missing === 0) {
+            level = 'stale';
+        } else if (missing > 0 || stale > 0) {
+            level = 'none';
         }
 
         return { total, upToDate, failed, stale, missing, level };
@@ -2980,9 +2983,9 @@ class AdminManager {
                                     <span class="material-symbols-outlined podcast-status-icon" style="font-size: 14px;">${hasSummary ? 'auto_awesome' : 'hourglass_empty'}</span>
                                     AI
                                 </span>
-                                <span class="podcast-status-badge" style="background: ${translationStats.level === 'ok' ? '#eff6ff' : (translationStats.level === 'partial' ? '#fffbeb' : '#f8fafc')}; color: ${translationStats.level === 'ok' ? '#1e40af' : (translationStats.level === 'partial' ? '#92400e' : '#94a3b8')}; border: 1px solid ${translationStats.level === 'ok' ? '#bfdbfe' : (translationStats.level === 'partial' ? '#fde68a' : '#e2e8f0')}; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
-                                    <span class="material-symbols-outlined podcast-status-icon" style="font-size: 14px;">${translationStats.level === 'ok' ? 'translate' : 'language'}</span>
-                                    ${translationStats.level === 'ok' ? 'OVERSATT' : (translationStats.level === 'partial' ? 'DELVIS' : 'IKKE OVERSATT')}
+                                <span class="podcast-status-badge" style="background: ${translationStats.level === 'ok' ? '#eff6ff' : (translationStats.level === 'stale' ? '#fff7ed' : (translationStats.level === 'partial' ? '#fffbeb' : '#f8fafc'))}; color: ${translationStats.level === 'ok' ? '#1e40af' : (translationStats.level === 'stale' ? '#c2410c' : (translationStats.level === 'partial' ? '#92400e' : '#94a3b8'))}; border: 1px solid ${translationStats.level === 'ok' ? '#bfdbfe' : (translationStats.level === 'stale' ? '#fdba74' : (translationStats.level === 'partial' ? '#fde68a' : '#e2e8f0'))}; white-space: nowrap; display: inline-flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined podcast-status-icon" style="font-size: 14px;">${translationStats.level === 'ok' ? 'translate' : (translationStats.level === 'stale' ? 'sync_problem' : 'language')}</span>
+                                    ${translationStats.level === 'ok' ? 'OVERSATT' : (translationStats.level === 'stale' ? 'UTDATERT' : (translationStats.level === 'partial' ? 'DELVIS' : 'IKKE OVERSATT'))}
                                 </span>
                             </div>
                         </td>
@@ -7239,6 +7242,8 @@ class AdminManager {
                             translationPill = `<span style="background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
                         } else if (translationStats.level === 'partial') {
                             translationPill = `<span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">DELVIS OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
+                        } else if (translationStats.level === 'stale') {
+                            translationPill = `<span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">UTDATERT (${translationStats.upToDate}/${translationStats.total})</span>`;
                         } else {
                             translationPill = '<span style="background:#f1f5f9;color:#94a3b8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">IKKE OVERSATT</span>';
                         }
