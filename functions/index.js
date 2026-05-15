@@ -4350,51 +4350,71 @@ async function generatePodcastSummaryWithGemini({ episodeTitle = '', transcriptT
     throw new Error('Transkripsjonen er for kort til å lage en god oppsummering.');
   }
 
-  const prompt = [
-    {
-      text: [
-        'Du er en norsk redaktør for kristent innhold.',
-        'Lag en kort, varm og tydelig oppsummering av podcast-episoden under.',
-        'Krav:',
-        '- Skriv på norsk bokmål.',
-        '- 2-3 setninger, maks 320 tegn.',
-        '- Ingen punktliste, ingen emojis, ingen markdown.',
-        '- Ikke finn opp detaljer som ikke finnes i teksten.',
-        '- Avslutt med en naturlig setning, ikke call-to-action.',
-        '',
-        `Tittel: ${String(episodeTitle || '').trim() || 'Uten tittel'}`,
-        'Transkripsjon:',
-        cleanTranscript,
-      ].join('\n')
-    }
-  ];
+  const promptString = [
+    'Du er en norsk redaktør for kristent innhold.',
+    'Lag en kort, varm og tydelig oppsummering av podcast-episoden under.',
+    'Krav:',
+    '- Skriv på norsk bokmål.',
+    '- 2-3 setninger, maks 320 tegn.',
+    '- Ingen punktliste, ingen emojis, ingen markdown.',
+    '- Ikke finn opp detaljer som ikke finnes i teksten.',
+    '- Avslutt med en naturlig setning, ikke call-to-action.',
+    '',
+    `Tittel: ${String(episodeTitle || '').trim() || 'Uten tittel'}`,
+    'Transkripsjon:',
+    cleanTranscript,
+  ].join('\n');
 
-  const genAI = new GoogleGenerativeAI(geminiKey);
-  const modelCandidates = [
-    'gemini-1.5-flash',
-    'gemini-2.0-flash',
-  ];
-
-  let result = null;
+  let resultText = null;
   let lastModelError = null;
 
-  for (const modelName of modelCandidates) {
-    const model = genAI.getGenerativeModel({ model: modelName });
+  try {
+    const genAI = new GoogleGenerativeAI(geminiKey);
+    const modelCandidates = ['gemini-2.0-flash', 'gemini-1.5-flash'];
+    for (const modelName of modelCandidates) {
+      const model = genAI.getGenerativeModel({ model: modelName });
+      try {
+        const result = await model.generateContent(promptString);
+        resultText = result.response.text();
+        if (resultText) break;
+      } catch (error) {
+        lastModelError = error;
+        console.error(`Oppsummering feilet med Gemini ${modelName}:`, error);
+        if (isGeminiRateLimitError(error)) break;
+      }
+    }
+  } catch (err) {
+    console.error("Gemini SDK init feilet:", err);
+  }
+
+  // Fallback to OpenAI
+  if (!resultText) {
     try {
-      result = await model.generateContent(prompt);
-      if (result) break;
-    } catch (error) {
-      lastModelError = error;
-      console.error(`Oppsummering feilet med ${modelName}:`, error);
-      if (!isGeminiRateLimitError(error)) break;
+      const openaiKey = openaiApiKeyParam.value();
+      if (openaiKey) {
+        console.log("Prøver OpenAI (ChatGPT) fallback for podcast-oppsummering...");
+        const openai = new OpenAI({ apiKey: openaiKey });
+        const completion = await openai.chat.completions.create({
+          model: "gpt-4o-mini",
+          messages: [
+            { role: "system", content: "Du er en norsk redaktør for kristent innhold." },
+            { role: "user", content: promptString }
+          ]
+        });
+        resultText = completion.choices[0].message.content;
+        console.log("Suksess med OpenAI for podcast-oppsummering!");
+      }
+    } catch (err) {
+      console.error("OpenAI fallback feilet for podcast-oppsummering:", err);
+      lastModelError = err;
     }
   }
 
-  if (!result) {
-    throw lastModelError || new Error('Ingen Gemini-modell kunne lage oppsummering.');
+  if (!resultText) {
+    throw lastModelError || new Error('Ingen AI-modell kunne lage oppsummering.');
   }
 
-  const summary = normalizePodcastSummaryText(result.response.text());
+  const summary = normalizePodcastSummaryText(resultText);
   if (!summary) {
     throw new Error('AI returnerte tom oppsummering.');
   }
@@ -4436,7 +4456,7 @@ exports.transcribePodcast = onCall({
 
 exports.generatePodcastSummary = onCall({
   cors: true,
-  secrets: [geminiApiKeyParam],
+  secrets: [geminiApiKeyParam, openaiApiKeyParam],
   timeoutSeconds: 120,
   memory: '512MiB'
 }, async (request) => {
