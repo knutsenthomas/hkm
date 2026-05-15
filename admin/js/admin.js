@@ -2971,7 +2971,7 @@ class AdminManager {
                             <div style="font-size: 13px; font-weight: 500; color: #64748b;">${dateStr}</div>
                         </td>
                         <td>
-                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                            <div style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;">
                                 <span class="podcast-status-badge" style="background: ${hasTranscript ? '#dcfce7' : '#f1f5f9'}; color: ${hasTranscript ? '#166534' : '#64748b'}; border-color: ${hasTranscript ? '#bbf7d0' : '#e2e8f0'};">
                                     <span class="material-symbols-outlined podcast-status-icon">${hasTranscript ? 'check_circle' : 'hourglass_empty'}</span>
                                     TEKST
@@ -7210,7 +7210,7 @@ class AdminManager {
             const podcastAudit = isPodcastTranscriptCollection ? this.getPodcastTranscriptAudit(item) : null;
             const statusPill = isPodcastTranscriptCollection
                 ? `
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <div style="display:flex; gap:8px; flex-wrap:nowrap;">
                         <span style="background:${podcastAudit.hasTranscript ? '#ecfdf5' : '#fef2f2'}; color:${podcastAudit.hasTranscript ? '#047857' : '#b91c1c'}; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:0.03em;">${podcastAudit.hasTranscript ? 'TEKST OK' : 'MANGLER TEKST'}</span>
                         <span style="background:${podcastAudit.hasSummary ? '#eff6ff' : '#fff7ed'}; color:${podcastAudit.hasSummary ? '#1d4ed8' : '#c2410c'}; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:0.03em;">${podcastAudit.hasSummary ? 'OPPSUMMERING OK' : 'MANGLER OPPSUMMERING'}</span>
                     </div>
@@ -7242,7 +7242,7 @@ class AdminManager {
                         } else {
                             translationPill = '<span style="background:#f1f5f9;color:#94a3b8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">IKKE OVERSATT</span>';
                         }
-                        return `<div style="display:flex;gap:6px;flex-wrap:wrap;">${publishedPill}${extraBadges}${translationPill}</div>`;
+                        return `<div style="display:flex;gap:6px;flex-wrap:nowrap;">${publishedPill}${extraBadges}${translationPill}</div>`;
                     }
                     return item.isSynced
                         ? '<span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.05em;">SYNKRONISERT</span>'
