@@ -4,49 +4,88 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>His Kingdom Ministry | Una Comunidad para el Crecimiento</title>
+    <title>His Kingdom Ministry | Crecimiento Espiritual y Comunidad</title>
     <meta name="description"
-        content="His Kingdom Ministry - Una organización sin fines de lucro dedicada al crecimiento espiritual a través de la enseñanza, el podcast y los viajes misioneros.">
+        content="Únete a His Kingdom Ministry. Experimenta el crecimiento espiritual a través de enseñanzas bíblicas, podcasts inspiradores y viajes misioneros internacionales.">
+    <meta name="keywords" content="His Kingdom Ministry, ministerio cristiano, crecimiento espiritual, enseñanza bíblica, podcast cristiano, misiones, Noruega">
+    <link rel="canonical" href="https://www.hiskingdomministry.no/es/">
+    
+    <!-- Internationalization -->
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/es/">
+    <meta property="og:title" content="His Kingdom Ministry | Una Comunidad para el Crecimiento">
+    <meta property="og:description" content="Descubra el crecimiento espiritual a través de la enseñanza, el podcast y los viajes misioneros. Únase a His Kingdom Ministry hoy.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/es/">
+    <meta property="twitter:title" content="His Kingdom Ministry | Una Comunidad para el Crecimiento">
+    <meta property="twitter:description" content="Descubra el crecimiento espiritual a través de la enseñanza, el podcast y los viajes misioneros.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "NGO",
+      "name": "His Kingdom Ministry",
+      "url": "https://www.hiskingdomministry.no/es/",
+      "logo": "https://www.hiskingdomministry.no/img/logo-hkm.png",
+      "description": "Una organización sin fines de lucro dedicada al crecimiento espiritual a través de la enseñanza, el podcast y los viajes misioneros.",
+      "sameAs": [
+        "https://www.facebook.com/hiskingdomministry777",
+        "https://www.instagram.com/hiskingdomministry"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "general info",
+        "email": "kontakt@hiskingdomministry.no"
+      }
+    }
+    </script>
 
     <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Material Symbols Outlined -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
 
-    <link rel="stylesheet" href="../styles.css?v=11">
+    <link rel="stylesheet" href="../styles.css?v=2026.04.22.09.36">
+    <link rel="stylesheet" href="../css/notifications.css">
     <link rel="stylesheet" href="../css/cookie-consent.css">
-
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
-                    }
-                }
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="../css/features-enhanced.css">
+    
+    <!-- Firebase Config & Service -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
 
     <!-- Error Logger -->
     <script type="module" src="../js/error-logger.js"></script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+
 </head>
 
-<body class="cms-loading">
+<body class="page-index header-dark-start cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl text-white">His Kingdom Ministry</span>
             </a>
@@ -61,15 +100,15 @@
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="../index.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇳🇴 Norsk</a>
-                        <a href="../en/index.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇺🇸
+                        <a href="/es/../index" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇳🇴 Norsk</a>
+                        <a href="/es/../en/index" class="block px-4 py-2 text-gray-800 hover:bg-gray-50">🇺🇸
                             English</a>
-                        <a href="index.html" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 font-bold">🇪🇸
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 font-bold">🇪🇸
                             Español</a>
                     </div>
                 </div>
 
-                <a href="donaciones.html"
+                <a href="/es/donaciones"
                     class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
                     Donar <i class="fas fa-heart text-sm"></i>
                 </a>
@@ -87,13 +126,14 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="¿Qué estás buscando?"
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
@@ -102,13 +142,16 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../index.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="/es/../index" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../en/index.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <a href="/es/../en/index"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="index.html" class="text-sm font-bold text-primary-orange">ES</a>
+                            <a href="/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
@@ -117,49 +160,71 @@
             <div class="mega-menu-body">
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1: Participa -->
+                    <!-- Column 1: Involúcrate -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Participa</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Involúcrate</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="donaciones.html">Apoya nuestro trabajo</a></li>
-                            <li><a href="donantes-regulares.html">Hazte donante regular</a></li>
-                            <li><a href="para-iglesias.html">Para iglesias</a></li>
-                            <li><a href="para-empresas.html">Para empresas</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li><a href="/es/donaciones" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Apoya la obra</a></li>
+                            <li><a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a></li>
+                            <li><a href="/es/para-iglesias" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">Para iglesias</a></li>
+                            <li><a href="/es/para-empresas" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">Para empresas</a></li>
+                            <li><a href="/es/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Conócenos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Conócenos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Conócenos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="sobre-nosotros.html">Sobre la fundación</a></li>
-                            <li><a href="sobre-nosotros.html#historia">Nuestra historia</a></li>
-                            <li><a href="contacto.html">Dónde trabajamos</a></li>
-                            <li><a href="contacto.html">Contáctanos</a></li>
+                            <li><a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Sobre nosotros</a></li>
+                            <li><a href="/es/contacto" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contáctanos</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 3: Recursos & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Recursos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Recursos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="eventos.html">Eventos</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blog.html">Noticias & Blog</a></li>
-                            <li><a href="../minside/index.html">Mi Página</a></li>
+                            <li><a href="/es/../butikk" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Tienda</a></li>
+                            <li><a href="/es/eventos" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Eventos</a></li>
+                            <li><a href="/es/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="/es/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Noticias y Blog</a></li>
+                            <li><a href="/es/ensenanza" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Cursos</a></li>
+                            <li><a href="/es/../minside/index" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Mi página</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donaciones.html" class="btn btn-primary btn-large btn-block">Apoya ahora <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donaciones.html#deduccion-fiscal">Deducción Fiscal</a>
-                        <a href="sobre-nosotros.html">Sobre nosotros</a>
-                        <a href="privacidad.html">Política de Privacidad</a>
+                        <a href="/es/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción fiscal</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacidad</a>
                     </div>
                 </div>
             </div>
@@ -183,7 +248,7 @@
                             Jesús
                             juntos.</p>
                         <div class="slide-buttons">
-                            <a href="sobre-nosotros.html" class="btn btn-primary">Descubre más</a>
+                            <a href="/es/sobre-nosotros" class="btn btn-primary">Descubre más</a>
                         </div>
                     </div>
                 </div>
@@ -202,7 +267,7 @@
                             la
                             fuerza de una comunidad viva que se edifica mutuamente en fe y amor.</p>
                         <div class="slide-buttons">
-                            <a href="sobre-nosotros.html" class="btn btn-primary">Descubre más</a>
+                            <a href="/es/sobre-nosotros" class="btn btn-primary">Descubre más</a>
                         </div>
                     </div>
                 </div>
@@ -220,7 +285,7 @@
                             personas
                             con el evangelio a través de la enseñanza, los viajes y el cuidado.</p>
                         <div class="slide-buttons">
-                            <a href="donaciones.html" class="btn btn-primary">Apoya ahora</a>
+                            <a href="/es/donaciones" class="btn btn-primary">Apoya ahora</a>
                         </div>
                     </div>
                 </div>
@@ -235,37 +300,44 @@
     <!-- Feature Boxes -->
     <section class="features">
         <div class="container">
+            <div class="section-header features-section-header">
+                <span class="section-label" data-content-key="features.header.label">Siguiente paso</span>
+                <h2 class="section-title" data-content-key="features.header.title">Involúcrate</h2>
+                <p class="section-description" data-content-key="features.header.description">Hay varias maneras naturales de sumarte al trabajo. Elige la que mejor encaje contigo ahora mismo.</p>
+            </div>
+
             <div class="features-grid">
-                <div class="feature-box">
-                    <div class="feature-icon blue">
-                        <i class="fas fa-book-open"></i>
+                <div class="feature-box teaching">
+                    <div class="feature-media">
+                        <span class="material-symbols-outlined">school</span>
                     </div>
-                    <h3 class="feature-title" data-content-key="features.teaching.title">Enseñanza</h3>
-                    <p class="feature-text" data-content-key="features.teaching.text">Escuelas bíblicas, seminarios y
-                        enseñanza profunda de la palabra de Dios para el crecimiento espiritual.</p>
-                    <a href="media.html" class="feature-link">Leer más <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.teaching.title">Enseñanza</h3>
+                        <p class="feature-text" data-content-key="features.teaching.text">Escuelas bíblicas, seminarios y enseñanza profunda de la palabra de Dios para el crecimiento espiritual.</p>
+                        <a href="/es/media" class="feature-link"><span data-content-key="features.teaching.btnText">Leer más</span> <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
 
-                <div class="feature-box">
-                    <div class="feature-icon yellow">
-                        <i class="fas fa-podcast"></i>
+                <div class="feature-box podcast">
+                    <div class="feature-media">
+                        <span class="material-symbols-outlined">mic</span>
                     </div>
-                    <h3 class="feature-title" data-content-key="features.podcast.title">Podcast</h3>
-                    <p class="feature-text" data-content-key="features.podcast.text">Escucha nuestras conversaciones
-                        sobre
-                        la fe, la vida y el crecimiento espiritual en cualquier lugar.</p>
-                    <a href="podcast.html" class="feature-link">Escucha ahora <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.podcast.title">Podcast</h3>
+                        <p class="feature-text" data-content-key="features.podcast.text">Escucha nuestras conversaciones sobre la fe, la vida y el crecimiento espiritual en cualquier lugar.</p>
+                        <a href="/es/podcast" class="feature-link"><span data-content-key="features.podcast.btnText">Escucha ahora</span> <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
 
-                <div class="feature-box">
-                    <div class="feature-icon red">
-                        <i class="fas fa-globe-americas"></i>
+                <div class="feature-box travel">
+                    <div class="feature-media">
+                        <span class="material-symbols-outlined">public</span>
                     </div>
-                    <h3 class="feature-title" data-content-key="features.travel.title">Misiones</h3>
-                    <p class="feature-text" data-content-key="features.travel.text">Predicación y conferencias por todo
-                        el
-                        mundo para difundir el evangelio.</p>
-                    <a href="misiones.html" class="feature-link">Descubre más <i class="fas fa-arrow-right"></i></a>
+                    <div class="feature-content">
+                        <h3 class="feature-title" data-content-key="features.travel.title">Misiones</h3>
+                        <p class="feature-text" data-content-key="features.travel.text">Predicación y conferencias por todo el mundo para difundir el evangelio.</p>
+                        <a href="/es/eventos" class="feature-link"><span data-content-key="features.travel.btnText">Descubre más</span> <i class="fas fa-arrow-right"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -321,7 +393,7 @@
                         </div>
                     </div>
 
-                    <a href="sobre-nosotros.html" class="btn btn-primary">Descubre más</a>
+                    <a href="/es/sobre-nosotros" class="btn btn-primary">Descubre más</a>
                 </div>
             </div>
         </div>
@@ -330,7 +402,14 @@
     <!-- Fun Facts / Statistics -->
     <section class="funfacts">
         <div class="container">
-            <div class="funfacts-grid">
+            <div class="section-header impact-section-header">
+                <span class="section-label" data-content-key="impact.label">Impacto</span>
+                <h2 class="section-title" data-content-key="impact.title">Impacto en números</h2>
+                <p class="section-description" data-content-key="impact.description">Algunas cifras clave que muestran hasta dónde está llegando el trabajo.</p>
+            </div>
+
+            <div class="impact-panel">
+                <div class="funfacts-grid">
                 <div class="funfact">
                     <div class="funfact-icon red">
                         <i class="fab fa-youtube"></i>
@@ -370,6 +449,7 @@
                         <span class="funfact-label">Países Visitados</span>
                     </div>
                 </div>
+                </div>
             </div>
         </div>
     </section>
@@ -389,7 +469,7 @@
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="donaciones.html" class="btn btn-outline">Ver todas las campañas</a>
+                <a href="/es/donaciones" class="btn btn-outline">Ver todas las campañas</a>
             </div>
         </div>
     </section>
@@ -408,7 +488,7 @@
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="eventos.html" class="btn btn-outline">Ver todos los eventos</a>
+                <a href="/es/eventos" class="btn btn-outline">Ver todos los eventos</a>
             </div>
         </div>
     </section>
@@ -427,7 +507,7 @@
             </div>
 
             <div class="section-footer" style="text-align: center; margin-top: 50px;">
-                <a href="blog.html" class="btn btn-outline">Ver todas las noticias</a>
+                <a href="/es/blog" class="btn btn-outline">Ver todas las noticias</a>
             </div>
         </div>
     </section>
@@ -507,9 +587,9 @@
                 <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
                     <div class="footer-brand">
-                        <a href="index.html" class="logo">
+                        <a href="/es/" class="logo">
                             <div class="logo-icon">
-                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
@@ -522,28 +602,28 @@
                         <div class="nav-col">
                             <h4>Sobre nosotros</h4>
                             <ul>
-                                <li><a href="index.html#inicio">Inicio</a></li>
-                                <li><a href="sobre-nosotros.html">¿Quiénes somos?</a></li>
-                                <li><a href="sobre-nosotros.html#vision">Nuestra visión</a></li>
-                                <li><a href="contacto.html">Contáctanos</a></li>
+                                <li><a href="/es">Inicio</a></li>
+                                <li><a href="/es/sobre-nosotros">¿Quiénes somos?</a></li>
+                                <li><a href="/es/sobre-nosotros">Nuestra visión</a></li>
+                                <li><a href="/es/contacto">Contáctanos</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Recursos</h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Enseñanza</a></li>
-                                <li><a href="eventos.html">Cursos en línea</a></li>
-                                <li><a href="blog.html">Libros & Blog</a></li>
-                                <li><a href="../minside/index.html">Mi Página</a></li>
+                                <li><a href="/es/media">Enseñanza</a></li>
+                                <li><a href="/es/eventos">Cursos en línea</a></li>
+                                <li><a href="/es/blog">Libros & Blog</a></li>
+                                <li><a href="/es/../minside/index">Mi Página</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="/es/media">Podcast</a></li>
+                                <li><a href="/es/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>
                             </ul>
@@ -552,10 +632,10 @@
                         <div class="nav-col">
                             <h4>Participación</h4>
                             <ul>
-                                <li><a href="eventos.html">Calendario</a></li>
-                                <li><a href="donaciones.html">Haz un donativo</a></li>
-                                <li><a href="privacidad.html">Privacidad</a></li>
-                                <li><a href="accesibilidad.html">Accesibilidad</a></li>
+                                <li><a href="/es/eventos">Calendario</a></li>
+                                <li><a href="/es/donaciones">Haz un donativo</a></li>
+                                <li><a href="/es/privacidad">Privacidad</a></li>
+                                <li><a href="/es/accesibilidad">Accesibilidad</a></li>
                             </ul>
                         </div>
                     </div>
@@ -577,7 +657,7 @@
 
                     <div class="footer-card contact-card">
                         <h3>Contáctanos</h3>
-                        <a href="contacto.html" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
+                        <a href="/es/contacto" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
@@ -603,7 +683,7 @@
 
             <div class="footer-bottom">
                 <p>&copy; 2026 His Kingdom Ministry. Todos los derechos reservados.</p>
-                <a href="../admin/login.html" class="admin-link">Admin</a>
+                <a href="/es/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -614,15 +694,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
-    <!-- Firebase Config & Service -->
-    <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
-    <script type="module" src="../js/user-roles.js"></script>
 
     <!-- App Scripts -->
+    <script type="module" src="../js/user-roles.js"></script>
     <script type="module" src="../js/i18n.js"></script>
-    <script type="module" src="../script.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
 </body>
 

@@ -1,0 +1,115 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDocPath() {
+      return /databases/(default)/documents/users/$(request.auth.uid);
+    }
+
+    function hasUserDoc() {
+      return isSignedIn() && firestore.exists(userDocPath());
+    }
+
+    function currentUserRole() {
+      return hasUserDoc()
+        ? firestore.get(userDocPath()).data.role
+        : null;
+    }
+
+    function isPrivilegedUser() {
+      return isSignedIn()
+        && (
+          currentUserRole() == 'editor'
+          || currentUserRole() == 'admin'
+          || currentUserRole() == 'superadmin'
+          || (request.auth.token.email is string && request.auth.token.email == 'thomas@hiskingdomministry.no')
+        );
+    }
+
+    function isOwnProfile(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isImageUpload() {
+      return request.resource != null
+        && request.resource.size < 20 * 1024 * 1024
+        && request.resource.contentType != null
+        && request.resource.contentType.matches('image/.*');
+    }
+
+    function isVisitorChatMediaUpload() {
+      return request.resource != null
+        && request.resource.size < 50 * 1024 * 1024
+        && request.resource.contentType != null
+        && (
+          request.resource.contentType.matches('image/.*')
+          || request.resource.contentType.matches('video/.*')
+        );
+    }
+
+    function isInboxEmailAttachmentUpload() {
+      return request.resource != null
+        && request.resource.size < 25 * 1024 * 1024
+        && request.resource.contentType != null;
+    }
+
+    // --- Specific Paths ---
+
+    match /profiles/{userId}/{allPaths=**} {
+      allow read: if isOwnProfile(userId) || isPrivilegedUser();
+      allow create, update: if isImageUpload() && (isOwnProfile(userId) || isPrivilegedUser());
+      allow delete: if isOwnProfile(userId) || isPrivilegedUser();
+    }
+
+    // General media library for the admin panel
+    match /mediebibliotek/{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isPrivilegedUser();
+    }
+
+    match /editor/{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isPrivilegedUser();
+    }
+
+    match /editor/visitor-chat/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isVisitorChatMediaUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
+    }
+
+    match /editor/inbox-email/{allPaths=**} {
+      allow read: if true;
+      allow create, update: if isInboxEmailAttachmentUpload() && isPrivilegedUser();
+      allow delete: if isPrivilegedUser();
+    }
+
+    match /covers/{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isPrivilegedUser();
+    }
+
+    match /hero/{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isPrivilegedUser();
+    }
+
+    match /seo/{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isPrivilegedUser();
+    }
+
+    match /newsletter/images/{allPaths=**} {
+      allow read: if true;
+      allow create, update, delete: if isPrivilegedUser();
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

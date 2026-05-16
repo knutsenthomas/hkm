@@ -7,3 +7,20 @@ node_modules/
 dist/
 .firebase/
 firebase-debug.log
+
+# Build logs and temporary files
+.agents/
+.env.local
+.vercel/
+build_after_fix.txt
+build_error.log
+build_error.txt
+build_error_2.txt
+build_esm_check.txt
+firepit-log.txt
+material-symbols-outlined>group<
+*.py
+test-reply*.txt
+build_*.txt
+
+dist/

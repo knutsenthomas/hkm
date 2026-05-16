@@ -77,6 +77,16 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 28px; /* Ensure fixed size */
+    overflow: hidden; /* Prevent text from stacking if font fails */
+    text-indent: -999px; /* Hide text if font fails (standard icon font practice) */
+}
+
+/* Show icon text only if font is loaded (handled by font-face logic, otherwise manual fallback) */
+.toast-icon::before {
+    content: ''; /* We'll use the span's text as the icon name */
+    text-indent: 0;
+    display: inline-block;
 }
 
 .toast.success .toast-icon {
@@ -122,6 +132,12 @@
     border-radius: 50%;
     transition: all 0.2s;
     flex-shrink: 0;
+    overflow: hidden;
+    text-indent: -999px; /* Hide "close" text if font fails */
+}
+
+.toast-close span {
+    text-indent: 0;
 }
 
 .toast-close:hover {

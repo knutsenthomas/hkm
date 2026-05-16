@@ -21,6 +21,15 @@ function getHtmlEntries(dir, entries = {}) {
 }
 
 export default defineConfig({
+    server: {
+        proxy: {
+            '/api/facebook-feed': {
+                target: 'http://127.0.0.1:5001/his-kingdom-ministry/us-central1/facebookFeed',
+                changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/facebook-feed/, '')
+            }
+        }
+    },
     build: {
         rollupOptions: {
             input: getHtmlEntries(__dirname)

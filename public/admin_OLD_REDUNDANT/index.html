@@ -20,10 +20,25 @@
 
     <!-- Dashboard CSS -->
     <!-- Dashboard CSS -->
-    <link rel="stylesheet" href="css/dashboard.css?v=admin_users_v5">
+    <link rel="stylesheet" href="css/dashboard.css">
 
     <!-- Error Logger -->
     <script type="module" src="../js/error-logger.js"></script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
 <body class="admin-body">
@@ -44,7 +59,7 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <div class="logo">
-                <img src="img/logo_circular.png" alt="HKM Logo" style="width: 40px; height: 40px; border-radius: 50%;">
+                <img src="img/logo-hkm.png" alt="HKM Logo" style="width: 40px; height: 40px; border-radius: 50%;">
                 <h1 class="logo-text">HKM Studio</h1>
             </div>
         </div>
@@ -52,91 +67,91 @@
         <nav class="sidebar-nav">
             <ul class="nav-list">
                 <li class="nav-item">
-                    <a href="#" class="nav-link active" data-section="overview">
+                    <a href="javascript:void(0)" class="nav-link active" data-section="overview">
                         <span class="material-symbols-outlined">home</span>
                         <span>Oversikt</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="content">
+                    <a href="javascript:void(0)" class="nav-link" data-section="content">
                         <span class="material-symbols-outlined">article</span>
                         <span>Sideinnhold</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="blog">
+                    <a href="javascript:void(0)" class="nav-link" data-section="blog">
                         <span class="material-symbols-outlined">edit_note</span>
                         <span>Blogg</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="events">
+                    <a href="javascript:void(0)" class="nav-link" data-section="events">
                         <span class="material-symbols-outlined">calendar_today</span>
                         <span>Arrangementer</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="messages">
+                    <a href="javascript:void(0)" class="nav-link" data-section="messages">
                         <span class="material-symbols-outlined">mail</span>
                         <span>Meldinger</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="media">
+                    <a href="javascript:void(0)" class="nav-link" data-section="media">
                         <span class="material-symbols-outlined">video_library</span>
                         <span>Media</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="causes">
+                    <a href="javascript:void(0)" class="nav-link" data-section="causes">
                         <span class="material-symbols-outlined">volunteer_activism</span>
                         <span>Gaver</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="hero">
+                    <a href="javascript:void(0)" class="nav-link" data-section="hero">
                         <span class="material-symbols-outlined">view_carousel</span>
                         <span>Hero Slider</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="teaching">
+                    <a href="javascript:void(0)" class="nav-link" data-section="teaching">
                         <span class="material-symbols-outlined">school</span>
                         <span>Undervisning</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="design">
+                    <a href="javascript:void(0)" class="nav-link" data-section="design">
                         <span class="material-symbols-outlined">palette</span>
                         <span>Design & Logo</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="settings">
+                    <a href="javascript:void(0)" class="nav-link" data-section="settings">
                         <span class="material-symbols-outlined">settings</span>
                         <span>Innstillinger</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="seo">
+                    <a href="javascript:void(0)" class="nav-link" data-section="seo">
                         <span class="material-symbols-outlined">search_check</span>
                         <span>SEO & Meta</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="integrations">
+                    <a href="javascript:void(0)" class="nav-link" data-section="integrations">
                         <span class="material-symbols-outlined">api</span>
                         <span>Integrasjoner</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="users">
+                    <a href="javascript:void(0)" class="nav-link" data-section="users">
                         <span class="material-symbols-outlined">group</span>
                         <span>Brukere</span>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="#" class="nav-link" data-section="profile">
+                    <a href="javascript:void(0)" class="nav-link" data-section="profile">
                         <span class="material-symbols-outlined">person</span>
                         <span>Profil</span>
                     </a>
@@ -145,11 +160,11 @@
         </nav>
 
         <div class="sidebar-footer">
-            <a href="../minside/index.html" class="nav-link">
+            <a href="/public/admin_OLD_REDUNDANT/../minside/index" class="nav-link">
                 <span class="material-symbols-outlined">account_circle</span>
                 <span>Min Side</span>
             </a>
-            <a href="../index.html" class="nav-link" target="_blank" rel="noopener noreferrer">
+            <a href="/public/admin_OLD_REDUNDANT/../index" class="nav-link" target="_blank" rel="noopener noreferrer">
                 <span class="material-symbols-outlined">visibility</span>
                 <span>Se nettside</span>
             </a>
@@ -476,7 +491,7 @@
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>
     <script type="module" src="../js/user-roles.js"></script>
-    <script type="module" src="../js/firebase-service.js?v=editorjs5"></script>
+    <script type="module" src="../js/firebase-service.js"></script>
 
     <!-- Editor.js & Plugins (Versioned) -->
     <script src="https://cdn.jsdelivr.net/npm/@editorjs/editorjs@2.29.0"></script>
@@ -491,7 +506,7 @@
 
     <!-- Admin Logic -->
     <!-- Admin Logic -->
-    <script type="module" src="js/admin.js?v=admin_users_v5"></script>
+    <script type="module" src="js/admin.js"></script>
     <script>
         // Initialize Admin Manager after scripts load
         window.addEventListener('load', () => {

@@ -1,20 +1,22 @@
 {
-    "name": "HKM Admin",
-    "short_name": "HKM Admin",
-    "start_url": "/admin/index.html",
+    "name": "His Kingdom Ministry",
+    "short_name": "HKM",
+    "start_url": "/",
     "display": "standalone",
-    "background_color": "#ffffff",
-    "theme_color": "#1e293b",
+    "background_color": "#cc6f2c",
+    "theme_color": "#cc6f2c",
     "icons": [
         {
-            "src": "/admin/img/logo_circular.png",
+            "src": "/icons/icon-192.png",
             "sizes": "192x192",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         },
         {
-            "src": "/admin/img/logo_circular.png",
+            "src": "/icons/icon-512.png",
             "sizes": "512x512",
-            "type": "image/png"
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }

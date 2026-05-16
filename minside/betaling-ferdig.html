@@ -85,7 +85,6 @@
     </style>
     <script src="https://js.stripe.com/v3/"></script>
 <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -99,9 +98,24 @@
             }
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
-<body>
+<body class="cms-loading">
 
     <div class="status-card" id="status-card">
         <div class="icon-circle processing" id="status-icon">
@@ -109,7 +123,7 @@
         </div>
         <h1 id="status-title">Sjekker betaling...</h1>
         <p id="status-message">Vennligst vent mens vi bekrefter betalingen din med banken.</p>
-        <a href="index.html" class="btn hidden" id="action-btn">Tilbake til Min Side</a>
+        <a href="/minside/index.html" class="btn hidden" id="action-btn">Tilbake til Min Side</a>
     </div>
 
     <!-- Firebase SDK (for logging if needed) -->

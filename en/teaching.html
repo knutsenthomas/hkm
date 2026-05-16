@@ -4,7 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teaching Series | His Kingdom Ministry</title>
+    <title>Christian Teaching Series | Biblical Wisdom | His Kingdom Ministry</title>
+    <meta name="description"
+        content="Explore our in-depth Christian teaching series. Learn about biblical wisdom, faith, and spiritual growth through our curated digital resources and studies.">
+    <meta name="keywords" content="teaching series, bible study, christian education, spiritual growth, faith, His Kingdom Ministry, biblical wisdom, discipleship">
+    <link rel="canonical" href="https://www.hiskingdomministry.no/en/teaching">
+    
+    <!-- Internationalization -->
+    <link rel="alternate" hreflang="no" href="https://www.hiskingdomministry.no/undervisning">
+    <link rel="alternate" hreflang="en" href="https://www.hiskingdomministry.no/en/teaching">
+    <link rel="alternate" hreflang="es" href="https://www.hiskingdomministry.no/es/ensenanza">
+    <link rel="alternate" hreflang="x-default" href="https://www.hiskingdomministry.no/undervisning">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.hiskingdomministry.no/en/teaching">
+    <meta property="og:title" content="Christian Teaching Series | His Kingdom Ministry">
+    <meta property="og:description" content="In-depth teaching on central Christian themes. Start your learning journey today.">
+    <meta property="og:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://www.hiskingdomministry.no/en/teaching">
+    <meta property="twitter:title" content="Christian Teaching Series | His Kingdom Ministry">
+    <meta property="twitter:description" content="Explore biblical teaching series from His Kingdom Ministry.">
+    <meta property="twitter:image" content="https://www.hiskingdomministry.no/img/logo-hkm.png">
 
     <!-- Google Fonts: Inter for the whole site -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +43,6 @@
     <link rel="stylesheet" href="../css/cookie-consent.css">
 
     <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -33,18 +56,33 @@
             }
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
-<body>
+<body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo"
                         class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
@@ -55,19 +93,19 @@
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                        <i class="fas fa-globe text-lg"></i> <span>EN</span>
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="no">🇳🇴 Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="en">🇺🇸 English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="es">🇪🇸 Español</a>
                     </div>
                 </div>
-                <a href="donasjoner.html"
+                <a href="/en/donations"
                     class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
                     Gi gave <i class="fas fa-heart text-sm"></i>
                 </a>
@@ -85,96 +123,121 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search..."
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
                 <!-- Mobile Language Selector (Pill Style) -->
                 <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-100">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../undervisningsserier.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="/en/../index" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="teaching.html" class="text-sm font-bold text-primary-orange">EN</a>
+                            <a href="/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../es/ensenanza.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                            <a href="/en/../es/index"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="mega-menu-body">
-
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
                     <!-- Column 1: Get Involved -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Get Involved</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Get Involved</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="donations.html">Support the Work</a></li>
-                            <li><a href="donations.html#faste-givere">Become a Monthly Donor</a></li>
-                            <li><a href="for-churches.html">For Churches</a></li>
-                            <li><a href="for-businesses.html">For Businesses</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li><a href="/en/donations" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Support the Work</a></li>
+                            <li><a href="/en/regular-donors" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Become a Monthly Donor</a></li>
+                            <li><a href="/en/for-churches" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For Churches</a></li>
+                            <li><a href="/en/for-businesses" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For Businesses</a></li>
+                            <li><a href="/en/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Get to Know Us -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Get to Know Us</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Get to Know Us</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="about.html">About the Foundation</a></li>
-                            <li><a href="about.html#historie">Our History</a></li>
-                            <li><a href="contact.html">Where We Work</a></li>
-                            <li><a href="contact.html">Contact Us</a></li>
+                            <li><a href="/en/about" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">About Us</a></li>
+                            <li><a href="/en/contact" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contact Us</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 3: Resources & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Resources</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Resources</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="events.html">Events</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blog.html">News & Blog</a></li>
-                            <li><a href="../minside/index.html">My Account</a></li>
+                            <li><a href="/en/../butikk" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Store</a></li>
+                            <li><a href="/en/events" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Events</a></li>
+                            <li><a href="/en/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="/en/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">News & Blog</a></li>
+                            <li><a href="/en/teaching" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Courses</a></li>
+                            <li><a href="/en/../minside/index" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">My Page</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donations.html" class="btn btn-primary btn-large btn-block">Support Now <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/en/donations" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support Now</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donations.html#skattefradrag">Tax Deduction</a>
-                        <a href="about.html">About Us</a>
-                        <a href="privacy.html">Privacy</a>
+                        <a href="/en/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Store</a>
+                        <a href="/en/donations" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
+                        <a href="/en/about" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">About Us</a>
+                        <a href="/en/privacy" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacy</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- Page Hero -->
-    <section class="page-hero" data-content-key="hero.backgroundImage" style="padding-top: 160px;">
+    <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
+        style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1501503060445-7096f33b40ad?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
         <div class="container">
-            <h1 class="page-hero-title">Teaching Series</h1>
-            <p class="page-hero-subtitle">Thematic teaching series on important Christian topics</p>
-            <div style="margin-top: 20px;">
-                <a href="media.html#teaching-section" class="btn btn-outline btn-sm">
-                    <i class="fas fa-arrow-left"></i> Back to Teaching
-                </a>
+            <h1 class="page-title">Teaching Series</h1>
+            <div class="breadcrumbs">
+                <a href="/">Home</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="/en/media">Resources</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>Teaching</span>
             </div>
         </div>
     </section>
@@ -184,7 +247,7 @@
         <div class="container">
             <div class="section-header">
                 <span class="section-label">Available Series</span>
-                <h2 class="section-title">15 Teaching Series</h2>
+                <h2 class="section-title">Loading...</h2>
                 <p class="section-description">In-depth teaching on central Christian themes</p>
             </div>
 
@@ -205,8 +268,8 @@
                 <h2>Start Your Learning Journey</h2>
                 <p>All our teaching series are free and available. Grow in your faith with us!</p>
                 <div class="cta-buttons">
-                    <a href="media.html" class="btn btn-primary">View all resources</a>
-                    <a href="contact.html" class="btn btn-outline">Contact us</a>
+                    <a href="/en/media" class="btn btn-primary">View all resources</a>
+                    <a href="/en/contact" class="btn btn-outline">Contact us</a>
                 </div>
             </div>
         </div>
@@ -220,9 +283,9 @@
                 <div class="footer-left">
                     <!-- Brand / Intro -->
                     <div class="footer-brand">
-                        <a href="index.html" class="logo">
+                        <a href="/en/" class="logo">
                             <div class="logo-icon">
-                                <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
@@ -235,28 +298,28 @@
                         <div class="nav-col">
                             <h4>About Us</h4>
                             <ul>
-                                <li><a href="index.html#hjem">Home</a></li>
-                                <li><a href="about.html">Who We Are</a></li>
-                                <li><a href="about.html#visjon">Our Vision</a></li>
-                                <li><a href="contact.html">Contact Us</a></li>
+                                <li><a href="/en">Home</a></li>
+                                <li><a href="/en/about">Who We Are</a></li>
+                                <li><a href="/en/about">Our Vision</a></li>
+                                <li><a href="/en/contact">Contact Us</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Resources</h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Teaching</a></li>
-                                <li><a href="events.html">Online Courses</a></li>
-                                <li><a href="blog.html">Books & Blog</a></li>
-                                <li><a href="../minside/index.html">My Account</a></li>
+                                <li><a href="/en/media">Teaching</a></li>
+                                <li><a href="/en/events">Online Courses</a></li>
+                                <li><a href="/en/blog">Books & Blog</a></li>
+                                <li><a href="/en/../minside/index">My Account</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="/en/media">Podcast</a></li>
+                                <li><a href="/en/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>
                             </ul>
@@ -265,11 +328,11 @@
                         <div class="nav-col">
                             <h4>Get Involved</h4>
                             <ul>
-                                <li><a href="events.html">Calendar</a></li>
-                                <li><a href="donations.html">Make a Donation</a></li>
-                                <li><a href="privacy.html">Privacy Policy</a></li>
-                                <li><a href="accessibility.html">Accessibility</a></li>
-                                <li><a href="#"
+                                <li><a href="/en/events">Calendar</a></li>
+                                <li><a href="/en/donations">Make a Donation</a></li>
+                                <li><a href="/en/privacy">Privacy Policy</a></li>
+                                <li><a href="/en/accessibility">Accessibility</a></li>
+                                <li><a href="javascript:void(0)"
                                         onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
                                 </li>
                             </ul>
@@ -295,7 +358,7 @@
                     <!-- Contact Us Card -->
                     <div class="footer-card contact-card">
                         <h3>Contact Us</h3>
-                        <a href="contact.html" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+                        <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
@@ -321,7 +384,7 @@
 
             <div class="footer-bottom">
                 <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. All rights reserved.</p>
-                <a href="../admin/login.html" class="admin-link">Admin</a>
+                <a href="/en/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -334,13 +397,13 @@
 
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
     <script type="module" src="../js/teaching-loader.js"></script>
 
     <!-- Scripts -->
     <script type="module" src="../js/i18n.js"></script>
-    <script type="module" src="../script.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
 
     <script>

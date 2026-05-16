@@ -409,9 +409,11 @@ class ContentManager {
             readingTimeEl.style.display = 'inline-block';
         }
 
-        // --- View Counter ---
+        // --- View Counter (Wix + local) ---
         const postId = item.id || item.title;
-        let viewCount = 1;
+        const wixViewsRaw = Number(item.views ?? 0);
+        const wixViews = Number.isFinite(wixViewsRaw) ? Math.max(0, Math.floor(wixViewsRaw)) : 0;
+        let localViewsAfterIncrement = 1;
 
         if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
             try {
@@ -422,7 +424,8 @@ class ContentManager {
                 // Read current stats (if exists) before incrementing, allows immediate update while updating remote.
                 const docSnap = await docRef.get();
                 if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
-                    viewCount = docSnap.data().views + 1;
+                    const existingLocalViews = Number(docSnap.data().views);
+                    localViewsAfterIncrement = Number.isFinite(existingLocalViews) ? Math.max(0, Math.floor(existingLocalViews)) + 1 : 1;
                 }
 
                 // Increment view asynchronously
@@ -435,6 +438,8 @@ class ContentManager {
                 console.warn('[ContentManager] Feil ved henting av visninger:', err);
             }
         }
+
+        const viewCount = wixViews + localViewsAfterIncrement;
 
         let viewsEl = document.getElementById('single-post-views');
         if (!viewsEl && document.querySelector('.blog-meta')) {
@@ -514,7 +519,13 @@ class ContentManager {
             let finalEvents = [];
 
             // 2. Prefer direct GCal fetch when configured
-            const integrations = await firebaseService.getPageContent('settings_integrations');
+            const service = window.firebaseService;
+            if (!service || !service.isInitialized || typeof service.getPageContent !== 'function') {
+                console.warn('[ContentManager] Firebase service unavailable while loading events. Using local fallback events.');
+                return monthHolidays;
+            }
+
+            const integrations = await service.getPageContent('settings_integrations') || {};
             const gcal = integrations?.googleCalendar || {};
             const apiKey = gcal.apiKey || '';
             const calendarList = Array.isArray(integrations?.googleCalendars)
@@ -540,7 +551,7 @@ class ContentManager {
             }
 
             // 3. Fetch Firestore events (always, to allow overrides or manual events)
-            const eventData = await firebaseService.getPageContent('collection_events');
+            const eventData = await service.getPageContent('collection_events');
             const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
             const taggedFirebase = firebaseItems.map(event => ({
                 ...event,
@@ -2138,25 +2149,141 @@ class ContentManager {
 
         // Handle Editor.js JSON
         if (typeof content === 'object' && content.blocks) {
-            return content.blocks.map(block => {
+            const isIgnorableParagraph = (block) => {
+                if (!block || block.type !== 'paragraph') return false;
+                const html = String(block?.data?.text || '')
+                    .replace(/&nbsp;/gi, ' ')
+                    .replace(/<br\s*\/?>/gi, ' ')
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                return html.length === 0;
+            };
+
+            const hasMeaningfulText = (block) => {
+                if (!block) return false;
+                const type = String(block.type || '').toLowerCase();
+                const data = block.data || {};
+
+                if (type === 'header' || type === 'paragraph' || type === 'quote') {
+                    const text = String(data.text || '')
+                        .replace(/<[^>]*>/g, ' ')
+                        .replace(/&nbsp;/gi, ' ')
+                        .replace(/\s+/g, ' ')
+                        .trim();
+                    return text.length > 0;
+                }
+
+                if (type === 'list') {
+                    const items = Array.isArray(data.items) ? data.items : [];
+                    return items.some((item) => {
+                        const txt = typeof item === 'string' ? item : (item?.content || item?.text || '');
+                        return String(txt).replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().length > 0;
+                    });
+                }
+
+                return false;
+            };
+
+            const rawBlocks = Array.isArray(content.blocks) ? content.blocks : [];
+
+            // Guard against legacy imports where multiple uncaptioned images were accidentally
+            // prepended before the real text body. Keep intentional single lead images intact.
+            let startIndex = 0;
+            while (startIndex < rawBlocks.length && (rawBlocks[startIndex]?.type === 'image' || isIgnorableParagraph(rawBlocks[startIndex]))) {
+                startIndex += 1;
+            }
+
+            const leadingSlice = rawBlocks.slice(0, startIndex);
+            const leadingImages = leadingSlice.filter((b) => b?.type === 'image');
+            const leadingHasOnlyImagesAndBlankParas = leadingSlice.every((b) => b?.type === 'image' || isIgnorableParagraph(b));
+            const leadingImagesHaveNoCaption = leadingImages.every((img) => String(img?.data?.caption || '').trim().length === 0);
+            const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => hasMeaningfulText(b));
+
+            const blocksForRender =
+                leadingHasOnlyImagesAndBlankParas && leadingImages.length >= 2 && leadingImagesHaveNoCaption && hasTextAfterLeading
+                    ? rawBlocks.slice(startIndex)
+                    : rawBlocks;
+
+            // Group consecutive image blocks so they can be rendered as a gallery
+            const groups = [];
+            let currentImageGroup = null;
+            for (const block of blocksForRender) {
+                if (block.type === 'image') {
+                    if (!currentImageGroup) {
+                        currentImageGroup = { type: 'imageGroup', blocks: [] };
+                        groups.push(currentImageGroup);
+                    }
+                    currentImageGroup.blocks.push(block);
+                } else if (currentImageGroup && isIgnorableParagraph(block)) {
+                    // Keep image grouping intact even if editor inserted blank spacer paragraphs.
+                    continue;
+                } else {
+                    currentImageGroup = null;
+                    groups.push(block);
+                }
+            }
+
+            const renderImageBlock = (block, inGallery = false) => {
+                const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
+                const classes = [
+                    'block-image',
+                    block.data.withBorder ? 'with-border' : '',
+                    block.data.withBackground ? 'with-background' : '',
+                    (!inGallery && block.data.stretched) ? 'stretched' : ''
+                ].filter(Boolean).join(' ');
+                return `<figure class="${classes}"><img src="${block.data.file.url}" alt="${block.data.caption || ''}">${caption}</figure>`;
+            };
+
+            return groups.map(group => {
+                if (group.type === 'imageGroup') {
+                    if (group.blocks.length === 1) {
+                        return renderImageBlock(group.blocks[0]);
+                    }
+                    // Multiple consecutive images → gallery grid
+                    const cols = Math.min(group.blocks.length, 3);
+                    return `<div class="block-image-gallery block-image-gallery--${cols}col">${group.blocks.map(b => renderImageBlock(b, true)).join('')}</div>`;
+                }
+
+                const block = group;
                 switch (block.type) {
                     case 'header':
                         return `<h${block.data.level} class="block-header">${block.data.text}</h${block.data.level}>`;
                     case 'paragraph':
+                        if (isIgnorableParagraph(block)) return '';
                         return `<p class="block-paragraph">${block.data.text}</p>`;
-                    case 'list':
+                    case 'list': {
+                        const extractListItemText = (item) => {
+                            if (typeof item === 'string') return item;
+                            if (item && typeof item === 'object') {
+                                return item.content || item.text || '';
+                            }
+                            return '';
+                        };
+
+                        const renderNestedItems = (items) => {
+                            const safeItems = Array.isArray(items) ? items : [];
+                            return safeItems.map((item) => {
+                                if (typeof item === 'string') {
+                                    return `<li>${item}</li>`;
+                                }
+
+                                if (item && typeof item === 'object') {
+                                    const text = extractListItemText(item);
+                                    const children = Array.isArray(item.items) && item.items.length > 0
+                                        ? `<ul>${renderNestedItems(item.items)}</ul>`
+                                        : '';
+                                    return `<li>${text}${children}</li>`;
+                                }
+
+                                return '';
+                            }).join('');
+                        };
+
                         const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
-                        const items = block.data.items.map(item => `<li>${item}</li>`).join('');
+                        const items = renderNestedItems(block.data.items);
                         return `<${listTag} class="block-list">${items}</${listTag}>`;
-                    case 'image':
-                        const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
-                        const classes = [
-                            'block-image',
-                            block.data.withBorder ? 'with-border' : '',
-                            block.data.withBackground ? 'with-background' : '',
-                            block.data.stretched ? 'stretched' : ''
-                        ].join(' ');
-                        return `<figure class="${classes}"><img src="${block.data.file.url}" alt="${block.data.caption || ''}">${caption}</figure>`;
+                    }
                     case 'quote':
                         return `<blockquote class="block-quote"><p>${block.data.text}</p><cite>${block.data.caption}</cite></blockquote>`;
                     case 'delimiter':

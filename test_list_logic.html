@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>List Logic Test Bench</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        #editor { border: 1px solid #ccc; padding: 10px; min-height: 100px; margin-bottom: 10px; }
+        .ce-block { border: 1px border: 1px solid transparent; margin: 5px 0; }
+        .ce-block--selected { background: rgba(0,0,0,0.05); }
+        .cdx-block { outline: none; }
+    </style>
+</head>
+<body>
+    <h3>Test Logic Bench</h3>
+    <div id="editor">
+        <div class="ce-block" id="block1">
+            <div class="cdx-block" contenteditable="true">Å leve et liv i tjeneste for hans rike er mer enn bare en idé. Det er en livsstil. En daglig beslutning.</div>
+        </div>
+        <div class="ce-block" id="block2">
+            <div class="cdx-block" contenteditable="true">Dette er et annet avsnitt. Med flere setninger.</div>
+        </div>
+    </div>
+    <button id="convert-btn">Convert to List</button>
+    <div id="output" style="margin-top: 20px; white-space: pre-wrap; background: #f0f0f0; padding: 10px;"></div>
+
+    <script>
+        const docsSurface = document.getElementById('editor');
+        const textBlockSelector = '.cdx-block';
+
+        const splitTextToItems = (rawText) => {
+            const text = String(rawText || '')
+                .replace(/\r\n/g, '\n')
+                .replace(/[\u2028\u2029]/g, '\n')
+                .replace(/\u00A0/g, ' ')
+                .trim();
+            if (!text) return [];
+
+            const clean = (line) => String(line || '')
+                .replace(/^[-*•]\s+/, '')
+                .trim();
+
+            const rawLines = text.split(/\n+/).map(clean).filter(Boolean);
+            const items = [];
+            for (const line of rawLines) {
+                const sentences = line.match(/[^.!?]+[.!?]+|[^.!?]+$/g) || [line];
+                for (let s of sentences) {
+                    const cleaned = clean(s);
+                    if (cleaned) items.push(cleaned);
+                }
+            }
+            return items;
+        };
+
+        const getSelectedBlocks = () => {
+            const sel = window.getSelection();
+            if (!sel || sel.rangeCount === 0) return [];
+            const anchor = sel.anchorNode;
+            const focus = sel.focusNode;
+            if (!anchor || !focus) return [];
+
+            const getBlockEl = (node) => {
+                if (!node) return null;
+                const el = node.nodeType === Node.TEXT_NODE ? node.parentElement : node;
+                return el.closest('.ce-block');
+            };
+
+            const startBlock = getBlockEl(anchor);
+            const endBlock = getBlockEl(focus);
+            if (!startBlock || !endBlock) return [];
+
+            const allBlocks = Array.from(docsSurface.querySelectorAll('.ce-block'));
+            let startIndex = allBlocks.indexOf(startBlock);
+            let endIndex = allBlocks.indexOf(endBlock);
+
+            if (startIndex === -1 || endIndex === -1) return [];
+            if (startIndex > endIndex) [startIndex, endIndex] = [endIndex, startIndex];
+
+            const selected = [];
+            for (let i = startIndex; i <= endIndex; i++) {
+                const content = allBlocks[i].querySelector(textBlockSelector);
+                if (content) selected.push(content);
+            }
+            return selected;
+        };
+
+        document.getElementById('convert-btn').addEventListener('click', () => {
+            const sel = window.getSelection();
+            const selectedBlocks = getSelectedBlocks();
+            let textToSplit = "";
+            
+            if (selectedBlocks.length > 0) {
+                textToSplit = selectedBlocks.map(b => b.textContent).join("\n");
+            } else if (sel && !sel.isCollapsed) {
+                textToSplit = sel.toString();
+            }
+
+            const items = splitTextToItems(textToSplit);
+            document.getElementById('output').textContent = "Input Text:\n" + textToSplit + "\n\nResult Items:\n" + JSON.stringify(items, null, 2);
+        });
+    </script>
+</body>
+</html>

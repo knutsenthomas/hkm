@@ -8,8 +8,8 @@ get_header();
 <main>
     <!-- Page Hero -->
     <section class="page-hero"
-        style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');">
-        <div class="container">
+        style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); height: 540px; min-height: 540px; max-height: 540px;">
+        <div class="container" style="height: 100%; display: flex; align-items: center; justify-content: center;">
             <div class="page-hero-content">
                 <h1 class="page-title">
                     <?php the_title(); ?>

@@ -6,7 +6,7 @@
 get_header(); ?>
 
 <!-- Page Hero -->
-<section class="page-hero" style="padding-top: 160px;">
+<section class="page-hero">
     <div class="container">
         <h1 class="page-hero-title">
             <?php the_title(); ?>

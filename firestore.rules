@@ -1,0 +1,393 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function hasKey(data, key) {
+      return data.keys().hasAny([key]);
+    }
+
+    function isNumberValue(v) {
+      return v is int || v is float;
+    }
+
+    function currentUserRole() {
+      return signedIn() &&
+          exists(/databases/$(database)/documents/users/$(request.auth.uid))
+        ? get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role
+        : '';
+    }
+
+    function isBootstrapAdminEmail() {
+      return signedIn() &&
+        request.auth.token.email is string &&
+        request.auth.token.email == 'thomas@hiskingdomministry.no';
+    }
+
+    function isAdmin() {
+      let role = currentUserRole();
+      return signedIn() &&
+        (isBootstrapAdminEmail() || role == 'admin' || role == 'superadmin');
+    }
+
+    function isSelf(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    function selfEmailAligned() {
+      return !hasKey(request.resource.data, 'email') ||
+        (request.auth.token.email is string &&
+         request.resource.data.email == request.auth.token.email);
+    }
+
+    function selfRoleSafeOnCreate() {
+      return !hasKey(request.resource.data, 'role') ||
+        request.resource.data.role == 'medlem';
+    }
+
+    function selfRoleUnchanged() {
+      let beforeHasRole = hasKey(resource.data, 'role');
+      let afterHasRole = hasKey(request.resource.data, 'role');
+      return beforeHasRole == afterHasRole &&
+        (!beforeHasRole || request.resource.data.role == resource.data.role);
+    }
+
+    function selfUidFieldAligned(uid) {
+      return !hasKey(request.resource.data, 'uid') ||
+        request.resource.data.uid == uid;
+    }
+
+    function validPublicNewsletterSubscription() {
+      let d = request.resource.data;
+      return d is map &&
+        hasKey(d, 'email') &&
+        d.email is string &&
+        d.email.size() > 3 &&
+        d.email.size() <= 254 &&
+        (!hasKey(d, 'source') || d.source is string);
+    }
+
+    function validPublicContactMessage() {
+      let d = request.resource.data;
+      return d is map &&
+        hasKey(d, 'email') &&
+        hasKey(d, 'message') &&
+        hasKey(d, 'name') &&
+        d.email is string &&
+        d.email.size() > 3 &&
+        d.email.size() <= 254 &&
+        d.name is string &&
+        d.name.size() > 0 &&
+        d.name.size() <= 200 &&
+        d.message is string &&
+        d.message.size() > 0 &&
+        d.message.size() <= 10000 &&
+        (!hasKey(d, 'subject') || (d.subject is string && d.subject.size() <= 300)) &&
+        (!hasKey(d, 'phone') || (d.phone is string && d.phone.size() <= 40)) &&
+        (!hasKey(d, 'source') || (d.source is string && d.source.size() <= 80)) &&
+        (!hasKey(d, 'pagePath') || (d.pagePath is string && d.pagePath.size() <= 300));
+    }
+
+    function isVisitorChatOwner(chatId) {
+      return signedIn() &&
+        exists(/databases/$(database)/documents/visitorChats/$(chatId)) &&
+        get(/databases/$(database)/documents/visitorChats/$(chatId)).data.visitorUid == request.auth.uid;
+    }
+
+    function validVisitorChatCreate(chatId) {
+      let d = request.resource.data;
+      return signedIn() &&
+        d is map &&
+        request.resource.id == chatId &&
+        hasKey(d, 'visitorUid') &&
+        d.visitorUid == request.auth.uid &&
+        hasKey(d, 'status') &&
+        d.status == 'open' &&
+        (!hasKey(d, 'visitorName') || (d.visitorName is string && d.visitorName.size() <= 120)) &&
+        (!hasKey(d, 'visitorEmail') || (d.visitorEmail is string && d.visitorEmail.size() <= 254)) &&
+        (!hasKey(d, 'visitorPhone') || (d.visitorPhone is string && d.visitorPhone.size() <= 40)) &&
+        (!hasKey(d, 'sourcePage') || (d.sourcePage is string && d.sourcePage.size() <= 300));
+    }
+
+    function validVisitorMessageCreate() {
+      let d = request.resource.data;
+      return signedIn() &&
+        d is map &&
+        hasKey(d, 'sender') &&
+        d.sender == 'visitor' &&
+        hasKey(d, 'text') &&
+        d.text is string &&
+        d.text.size() > 0 &&
+        d.text.size() <= 4000 &&
+        (!hasKey(d, 'source') || (d.source is string && d.source.size() <= 40)) &&
+        (!hasKey(d, 'pagePath') || (d.pagePath is string && d.pagePath.size() <= 300)) &&
+        (!hasKey(d, 'targetMode') || (
+          d.targetMode is string &&
+          d.targetMode in ['ai', 'google_chat', 'email']
+        ));
+    }
+
+    function validDonationCreate(donationId) {
+      let d = request.resource.data;
+      return d is map &&
+        hasKey(d, 'paymentIntentId') &&
+        d.paymentIntentId is string &&
+        d.paymentIntentId == donationId &&
+        hasKey(d, 'amount') &&
+        isNumberValue(d.amount) &&
+        (!hasKey(d, 'currency') || d.currency is string) &&
+        (!hasKey(d, 'status') || d.status is string) &&
+        (!hasKey(d, 'email') || d.email == null || d.email is string) &&
+        (!hasKey(d, 'uid') || d.uid == null || d.uid is string) &&
+        (!hasKey(d, 'userId') || d.userId == null || d.userId is string);
+    }
+
+    function validSelfAdminNotificationCreate() {
+      let d = request.resource.data;
+      return signedIn() &&
+        d is map &&
+        hasKey(d, 'type') &&
+        d.type == 'NEW_USER_REGISTRATION' &&
+        hasKey(d, 'userId') &&
+        d.userId == request.auth.uid &&
+        hasKey(d, 'read') &&
+        d.read == false &&
+        (!hasKey(d, 'userEmail') || d.userEmail == null ||
+          (request.auth.token.email is string && d.userEmail == request.auth.token.email));
+    }
+
+    function canReadOwnDonation() {
+      return signedIn() &&
+        ((hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid) ||
+         (hasKey(resource.data, 'uid') && resource.data.uid == request.auth.uid));
+    }
+
+    // Public CMS content (website pages + collections)
+    match /content/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      
+      match /{allPaths=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    // Public site content storage (e.g. courses)
+    match /siteContent/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+      
+      match /{allPaths=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+      }
+    }
+
+    // Legacy/public teaching collection used by Min Side
+    match /teaching/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // User profiles / roles
+    match /users/{userId} {
+      allow read: if isSelf(userId) || isAdmin();
+
+      allow create: if isAdmin() ||
+        (isSelf(userId) &&
+         selfEmailAligned() &&
+         selfRoleSafeOnCreate() &&
+         selfUidFieldAligned(userId));
+
+      allow update: if isAdmin() ||
+        (isSelf(userId) &&
+         selfEmailAligned() &&
+         selfRoleUnchanged() &&
+         selfUidFieldAligned(userId));
+
+      allow delete: if isAdmin() || isSelf(userId);
+    }
+
+    // Contact form messages (public submit, admin process)
+    match /contactMessages/{messageId} {
+      allow create: if validPublicContactMessage();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Visitor chat: authenticated anonymously on the client and synced with Google Chat via Cloud Functions.
+    match /visitorChats/{chatId} {
+      allow create: if validVisitorChatCreate(chatId);
+      allow read: if isAdmin() || isVisitorChatOwner(chatId);
+      allow update: if isAdmin() || (
+        isVisitorChatOwner(chatId) &&
+        request.resource.data.visitorUid == resource.data.visitorUid &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly([
+          'updatedAt',
+          'lastVisitorMessageAt',
+          'lastPagePath',
+          'visitorName',
+          'visitorEmail',
+          'visitorPhone',
+          'lastTargetMode',
+          'requestHuman',
+          'privacyConsent',
+          'privacyConsentAt'
+        ]) &&
+        (!hasKey(request.resource.data, 'visitorName') ||
+          (request.resource.data.visitorName is string && request.resource.data.visitorName.size() <= 120)) &&
+        (!hasKey(request.resource.data, 'visitorEmail') ||
+          (request.resource.data.visitorEmail is string && request.resource.data.visitorEmail.size() <= 254)) &&
+        (!hasKey(request.resource.data, 'visitorPhone') ||
+          (request.resource.data.visitorPhone is string && request.resource.data.visitorPhone.size() <= 40)) &&
+        (!hasKey(request.resource.data, 'lastPagePath') ||
+          (request.resource.data.lastPagePath is string && request.resource.data.lastPagePath.size() <= 300)) &&
+        (!hasKey(request.resource.data, 'lastTargetMode') || (
+          request.resource.data.lastTargetMode is string &&
+          request.resource.data.lastTargetMode in ['ai', 'google_chat', 'email']
+        )) &&
+        (!hasKey(request.resource.data, 'requestHuman') ||
+          request.resource.data.requestHuman is bool) &&
+        (!hasKey(request.resource.data, 'privacyConsent') ||
+          request.resource.data.privacyConsent is bool)
+      );
+      allow delete: if isAdmin();
+
+      match /messages/{messageId} {
+        allow read: if isAdmin() || isVisitorChatOwner(chatId);
+        allow create: if isAdmin() || (isVisitorChatOwner(chatId) && validVisitorMessageCreate());
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // Newsletter signup from website footer/forms
+    match /newsletter_subscriptions/{subId} {
+      allow create: if validPublicNewsletterSubscription();
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Cookie consent logs (anonymous allowed)
+    match /consent_logs/{logId} {
+      allow create: if request.resource.data is map;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Donations recorded client-side after successful Stripe confirmation.
+    // Note: this is create-only for public clients; consider moving fully to webhook-only writes.
+    match /donations/{donationId} {
+      allow create: if validDonationCreate(donationId);
+      allow read: if isAdmin() || canReadOwnDonation();
+      allow update, delete: if isAdmin();
+    }
+
+    // In-app notifications targeted to users
+    match /user_notifications/{notificationId} {
+      allow create, delete: if isAdmin();
+      allow read: if isAdmin() ||
+        (signedIn() && hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid);
+
+      allow update: if isAdmin() || (
+        signedIn() &&
+        hasKey(resource.data, 'userId') &&
+        resource.data.userId == request.auth.uid &&
+        hasKey(request.resource.data, 'userId') &&
+        request.resource.data.userId == resource.data.userId &&
+        request.resource.data.diff(resource.data).changedKeys().hasOnly(['read']) &&
+        hasKey(request.resource.data, 'read') &&
+        request.resource.data.read is bool
+      );
+    }
+
+    // Notes written by the user for themselves
+    match /personal_notes/{noteId} {
+      allow create: if signedIn() &&
+        hasKey(request.resource.data, 'userId') &&
+        request.resource.data.userId == request.auth.uid;
+
+      allow read, delete: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid);
+
+      allow update: if isAdmin() ||
+        (signedIn() &&
+         hasKey(resource.data, 'userId') &&
+         resource.data.userId == request.auth.uid &&
+         hasKey(request.resource.data, 'userId') &&
+         request.resource.data.userId == request.auth.uid);
+    }
+
+    // Shared/user notes (typically admin-authored, user-readable)
+    match /user_notes/{noteId} {
+      allow read: if isAdmin() ||
+        (signedIn() && hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // Admin activity and internal notifications
+    match /admin_notifications/{notifId} {
+      allow read, update, delete: if isAdmin();
+      allow create: if isAdmin() || validSelfAdminNotificationCreate();
+    }
+
+    // Admin-only communication / CRM / templates / logs
+    match /email_templates/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /email_logs/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /push_log/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /segments/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /newsletter_templates/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /newsletter_campaigns/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /system_logs/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Interactions (Likes & Comments)
+    match /interactions/{postId} {
+      allow read: if true;
+      allow create, update: if true; 
+      
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if true;
+        allow update, delete: if isAdmin();
+      }
+    }
+
+    // Public blog statistics (Views)
+    match /blog_stats/{postId} {
+      allow read: if true;
+      allow create, update: if true;
+    }
+
+    // Podcast transcripts are public content on the website.
+    match /podcast_transcripts/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

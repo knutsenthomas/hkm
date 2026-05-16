@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Seed Website Content | HKM CMS</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 40px;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            color: #333;
+        }
+
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+        }
+
+        h1 {
+            color: #1B4965;
+        }
+
+        button {
+            background: #1B4965;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:disabled {
+            background: #ccc;
+        }
+
+        #log {
+            font-family: monospace;
+            background: #eee;
+            padding: 10px;
+            border-radius: 4px;
+            height: 300px;
+            overflow-y: auto;
+            font-size: 13px;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+    </style>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+</head>
+
+<body class="cms-loading">
+    <h1>Fullstendig innholdsmigrering</h1>
+    <p>Dette verktøyet vil laste opp innholdet for de nylig lagt til sidene, samt globale innstillinger og plassholdere
+        for samlinger til Firestore.</p>
+
+    <div class="card">
+        <h3>Dette vil bli opprettet/oppdatert:</h3>
+        <ul>
+            <li><strong>Sider:</strong> For Menigheter, For Bedrifter, Business Network</li>
+            <li><strong>Globalt:</strong> settings_global (Footer-tekster)</li>
+            <li><strong>Samlinger:</strong> collection_blog, collection_testimonials (Initialiseres)</li>
+        </ul>
+        <button id="runBtn">🚀 Start migrering</button>
+    </div>
+
+    <div id="log">Venter på start...</div>
+
+    <!-- Firebase SDK (Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+    <!-- Config & Services -->
+    <script type="module" src="js/firebase-config.js"></script>
+    <script type="module" src="js/firebase-service.js"></script>
+
+    <script type="module">
+        const firebaseService = window.firebaseService;
+
+        const logEl = document.getElementById('log');
+        const runBtn = document.getElementById('runBtn');
+
+        function log(msg, type = '') {
+            const div = document.createElement('div');
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            if (type) div.className = type;
+            logEl.appendChild(div);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        const data = {
+            'for-menigheter': {
+                hero: {
+                    title: 'For Menigheter',
+                    subtitle: 'Vi ønsker å stå sammen med lokale menigheter for å utruste troende og spre evangeliet.',
+                    bg: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+                },
+                intro: {
+                    label: 'Samarbeid',
+                    title: 'Et felles oppdrag',
+                    text: 'His Kingdom Ministry brenner for å se den lokale kirken blomstre. Vi tilbyr ressurser, seminarer og undervisning som kan komplementere deres eksisterende arbeid og inspirere til dypere etterfølgelse av Jesus.',
+                    image: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                },
+                features: {
+                    f1: 'Seminarer om bønn og disippelskap',
+                    f2: 'Ressurser for smågrupper',
+                    f3: 'Besøk av våre undervisere',
+                    f4: 'Felles bønneinitiativ'
+                },
+                cta: {
+                    title: 'Vil dere høre mer?',
+                    text: 'Vi sender gjerne mer informasjon om hvordan vi kan støtte deres menighet.',
+                    btnText: 'Kontakt oss i dag'
+                }
+            },
+            'for-bedrifter': {
+                hero: {
+                    title: 'For Bedrifter',
+                    subtitle: 'Bli en samarbeidspartner og vær med på å finansiere viktig arbeid som forandrer liv.',
+                    bg: 'https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+                },
+                intro: {
+                    label: 'Samarbeidspartner',
+                    title: 'Bedrifter med et hjerte for misjon',
+                    text: 'Vi inviterer bedrifter til å stå sammen med oss i vårt oppdrag. Gjennom bedriftsgaver bidrar dere direkte til åndelig vekst og hjelp til mennesker som trenger det.',
+                    image: 'https://images.unsplash.com/photo-1556761175-b413da4baf72?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+                },
+                features: {
+                    f1: { title: 'Målbare resultater', text: 'Vi sender regelmessige oppdateringer på hvordan deres støtte blir brukt.' },
+                    f2: { title: 'Verdibasert samarbeid', text: 'Vi deler verdier som integritet, omsorg og nestekjærlighet.' }
+                },
+                cta: {
+                    title: 'Ønsker dere et bedriftssamarbeid?',
+                    text: 'Vi tar gjerne en uforpliktende prat om hvordan din bedrift kan bidra.',
+                    btnText: 'Kontakt oss i dag'
+                }
+            },
+            'bnn': {
+                hero: {
+                    title: 'Business Network',
+                    subtitle: 'Et nettverk for kristne ledere og næringsdrivende som ønsker å bruke sine ressurser for Guds rike.',
+                    bg: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+                },
+                intro: {
+                    label: 'Nettverk',
+                    title: 'Mer enn bare business',
+                    text: 'BNN er et fellesskap der vi kombinerer faglig kompetanse med åndelig fokus. Vi tror på at næringslivet spiller en nøkkelrolle i å finansiere og drive misjon fremover.'
+                },
+                features: {
+                    f1: { title: 'Nettverkssamlinger', text: 'Møt likesinnede ledere for inspirasjon og erfaringsutveksling.' },
+                    f2: { title: 'Inspirasjon', text: 'Få undervisning spesielt rettet mot kristent lederskap i arbeidslivet.' },
+                    f3: { title: 'Vekst', text: 'Se hvordan din bedrift kan være en plattform for Guds rike.' }
+                },
+                cta: {
+                    btnText: 'Bli en del av nettverket'
+                }
+            }
+        };
+
+        const globalData = {
+            'settings_global': {
+                footer: {
+                    description: 'His Kingdom Ministry er en non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.',
+                    title_about: 'Om oss',
+                    title_resources: 'Ressurser',
+                    title_media: 'Media',
+                    title_involvement: 'Involvering',
+                    title_follow: 'Følg oss',
+                    title_contact: 'Kontakt oss'
+                }
+            },
+            'collection_blog': { items: [] },
+            'collection_testimonials': { items: [] }
+        };
+
+        runBtn.addEventListener('click', async () => {
+            runBtn.disabled = true;
+            logEl.innerHTML = '';
+            log('Starter migrering...');
+
+            try {
+                if (!firebaseService) throw new Error('firebaseService er ikke lastet.');
+
+                // Forsikre oss om at Firebase får tid til å auto-initiere basert på config scriptet
+                let waitCount = 0;
+                while (!firebaseService.isInitialized && waitCount < 40) {
+                    await new Promise(r => setTimeout(r, 100));
+                    waitCount++;
+                }
+
+                if (!firebaseService.isInitialized) {
+                    throw new Error('Firebase klarte ikke å initialisere. Sjekk konsollen for feil.');
+                }
+
+                log('Firebase initialisert!');
+
+                // 1. Sider
+                for (const [pageId, content] of Object.entries(data)) {
+                    log(`Lagrer side: ${pageId}...`);
+                    await firebaseService.savePageContent(pageId, content);
+                    log(`✅ Side ${pageId} fullført.`, 'success');
+                }
+
+                // 2. Globale innstillinger & Samlinger
+                for (const [docId, content] of Object.entries(globalData)) {
+                    log(`Lagrer dokument: ${docId}...`);
+                    await firebaseService.savePageContent(docId, content);
+                    log(`✅ Dokument ${docId} fullført.`, 'success');
+                }
+
+                log('🚀 Alle data er migrert til Firestore!', 'success');
+                log('Du kan nå laste forsiden på nytt. Advarslene skal være borte.');
+            } catch (error) {
+                log(`❌ Feil: ${error.message}`, 'error');
+                console.error(error);
+            } finally {
+                runBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

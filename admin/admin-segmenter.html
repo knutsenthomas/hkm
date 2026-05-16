@@ -14,10 +14,10 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/dashboard.css">
-    <link rel="stylesheet" href="css/crm.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260426h">
+    <link rel="stylesheet" href="css/crm.css?v=20260426h">
     <link rel="stylesheet" href="css/crm-segmenter.css">
-    <link rel="stylesheet" href="css/admin-unified.css">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260509_G46">
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -26,26 +26,44 @@
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <!-- Core Firebase Logic -->
-    <script defer src="../js/firebase-config.js"></script>
-    <script defer src="../js/firebase-service.js"></script>
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js"></script>
+    <!-- Loader Safety Net -->
+    <script type="module">
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
 <body class="crm-body">
     <div class="crm-layout">
         <!-- Sidebar Navigation -->
         <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="logo">
-                    <img src="img/logo_circular.png" alt="HKM Logo">
+            <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="logo" style="margin-bottom: 0;">
+                    <img src="/img/logo-hkm.png" alt="HKM Logo">
                     <h1 class="logo-text">HKM Studio</h1>
                 </div>
+                <button id="mobile-sidebar-close" style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;" class="mobile-sidebar-close-btn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
 
             <nav class="sidebar-nav">
                 <div class="nav-group">
                     <ul class="nav-list">
                         <li class="nav-item visible" data-nav-category="all">
-                            <a href="index.html" class="nav-link" data-section="overview">
+                            <a href="/admin/index.html" class="nav-link" data-section="overview">
                                 <span class="material-symbols-outlined">home</span>
                                 <span>Oversikt</span>
                             </a>
@@ -53,91 +71,105 @@
                         <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
                                 class="material-symbols-outlined expand-icon">expand_more</span></li>
                         <li class="nav-item" data-nav-category="nettsted">
-                            <a href="index.html#content" class="nav-link" data-section="content">
+                            <a href="/admin/index.html#content" class="nav-link" data-section="content">
                                 <span class="material-symbols-outlined">description</span>
                                 <span>Sideinnhold</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="nettsted">
-                            <a href="index.html#blog" class="nav-link" data-section="blog">
+                            <a href="/admin/index.html#blog" class="nav-link" data-section="blog">
                                 <span class="material-symbols-outlined">edit_note</span>
                                 <span>Blogg</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="nettsted">
-                            <a href="index.html#media" class="nav-link" data-section="media">
+                            <a href="/admin/index.html#media" class="nav-link" data-section="media">
                                 <span class="material-symbols-outlined">image</span>
                                 <span>Media</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="nettsted">
-                            <a href="index.html#hero" class="nav-link" data-section="hero">
+                            <a href="/admin/index.html#hero" class="nav-link" data-section="hero">
                                 <span class="material-symbols-outlined">view_carousel</span>
                                 <span>Hero Slider</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="nettsted">
-                            <a href="index.html#teaching" class="nav-link" data-section="teaching">
+                            <a href="/admin/index.html#teaching" class="nav-link" data-section="teaching">
                                 <span class="material-symbols-outlined">school</span>
                                 <span>Undervisning</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="nettsted">
-                            <a href="index.html#design" class="nav-link" data-section="design">
+                            <a href="/admin/index.html#design" class="nav-link" data-section="design">
                                 <span class="material-symbols-outlined">palette</span>
                                 <span>Design & Logo</span>
                             </a>
                         </li>
                         <li class="nav-category-header" data-target-category="kommunikasjon">
                             <span>Kommunikasjon</span><span
-                                class="material-symbols-outlined expand-icon">expand_more</span></li>
+                                class="material-symbols-outlined expand-icon">expand_more</span>
+                        </li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
-                            <a href="index.html#events" class="nav-link" data-section="events">
+                            <a href="/admin/index.html#events" class="nav-link" data-section="events">
                                 <span class="material-symbols-outlined">event</span>
                                 <span>Arrangementer</span>
                             </a>
                         </li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
-                            <a href="admin-kommunikasjon.html" class="nav-link">
+                            <a href="/admin/admin-kommunikasjon.html" class="nav-link">
                                 <span class="material-symbols-outlined">group</span>
                                 <span>Kontakter</span>
                             </a>
                         </li>
                         <li class="nav-item visible" data-nav-category="kommunikasjon">
-                            <a href="admin-nyhetsbrev.html" class="nav-link">
+                            <a href="/admin/admin-segmenter.html" class="nav-link active">
+                                <span class="material-symbols-outlined">segment</span>
+                                <span>Segmenter</span>
+                            </a>
+                        </li>
+                        <li class="nav-item visible" data-nav-category="kommunikasjon">
+                            <a href="/admin/admin-meldinger.html" class="nav-link">
+                                <span class="material-symbols-outlined">mail</span>
+                                <span>Meldinger</span>
+                            </a>
+                        </li>
+                        <li class="nav-item visible" data-nav-category="kommunikasjon">
+                            <a href="/admin/admin-nyhetsbrev.html" class="nav-link">
                                 <span class="material-symbols-outlined">mail_outline</span>
                                 <span>Nyhetsbrev</span>
                             </a>
                         </li>
                         <li class="nav-category-header" data-target-category="administrasjon">
                             <span>Administrasjon</span><span
-                                class="material-symbols-outlined expand-icon">expand_more</span></li>
+                                class="material-symbols-outlined expand-icon">expand_more</span>
+                        </li>
                         <li class="nav-item" data-nav-category="administrasjon">
-                            <a href="index.html#causes" class="nav-link" data-section="causes">
+                            <a href="/admin/index.html#causes" class="nav-link" data-section="causes">
                                 <span class="material-symbols-outlined">volunteer_activism</span>
                                 <span>Gaver</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="administrasjon">
-                            <a href="index.html#users" class="nav-link" data-section="users">
+                            <a href="/admin/index.html#users" class="nav-link" data-section="users">
                                 <span class="material-symbols-outlined">group</span>
                                 <span>Brukere</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="administrasjon">
-                            <a href="index.html#seo" class="nav-link" data-section="seo">
+                            <a href="/admin/index.html#seo" class="nav-link" data-section="seo">
                                 <span class="material-symbols-outlined">search_check</span>
                                 <span>SEO & Meta</span>
                             </a>
                         </li>
                         <li class="nav-item" data-nav-category="administrasjon">
-                            <a href="index.html#settings" class="nav-link" data-section="settings">
+                            <a href="/admin/index.html#settings" class="nav-link" data-section="settings">
                                 <span class="material-symbols-outlined">settings</span>
                                 <span>Innstillinger</span>
                             </a>
                         </li>
                         <li class="nav-item visible" data-nav-category="administrasjon">
-                            <a href="admin-logger.html" class="nav-link">
+                            <a href="/admin/admin-logger.html" class="nav-link">
                                 <span class="material-symbols-outlined">assignment</span>
                                 <span>Systemlogger</span>
                             </a>
@@ -148,7 +180,7 @@
                 <div class="nav-group bottom">
                     <ul class="nav-list">
                         <li class="nav-item visible" data-nav-category="all">
-                            <a href="../minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
+                            <a href="/minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
                                 <span class="material-symbols-outlined">account_circle</span>
                                 <span>Min Side</span>
                             </a>
@@ -171,57 +203,40 @@
         </aside>
         <!-- Main Content -->
         <main class="crm-main">
-            <!-- Unified Header -->
-            <header class="main-header">
-                <div class="header-left">
-                    <div class="welcome-banner">
-                        <h1 class="welcome-title">His Kingdom Ministry</h1>
-                        <p class="welcome-subtitle">Admin Dashboard</p>
-                    </div>
-                </div>
-
-                <div class="header-right">
-                    <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
-                    <button class="notification-btn">
-                        <span class="material-symbols-outlined">notifications</span>
-                    </button>
-
-                    <a href="#" class="user-profile-link" id="admin-profile-trigger">
-                        <div class="user-info-text">
-                            <span id="admin-name" class="user-name">Laster...</span>
-                            <span class="user-role">Administrator</span>
-                        </div>
-                        <div id="admin-avatar" class="user-avatar">?</div>
-                    </a>
-
-                    <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-                </div>
-            </header>
-
             <!-- Page Header -->
-            <header class="crm-header">
-                <div class="header-left">
-                    <a href="admin-kommunikasjon.html" class="btn-back">
-                        <span class="material-symbols-outlined">arrow_back</span>
-                    </a>
-                    <div class="header-titles">
-                        <h1>Segmenter</h1>
-                        <p>Organiser kontaktene dine i grupper for målrettet kommunikasjon.</p>
+            <div id="dashboard-main-header" class="main-header">
+                <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                    <div class="section-header-icon">
+                        <span class="material-symbols-outlined">segment</span>
+                    </div>
+                    <div class="section-header-content">
+                        <div class="section-header-titles">
+                            <h2 class="section-title">Segmenter</h2>
+                            <p class="section-subtitle">Organiser kontaktene dine i målgrupper.</p>
+                        </div>
+                        <div class="section-header-actions">
+                        <!-- Search bar removed to match Gold Standard dashboard -->
+
+                            <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
+                                <div class="user-info-text">
+                                    <span id="admin-name" class="user-name">Laster...</span>
+                                    <span class="user-role">Administrator</span>
+                                </div>
+                                <div id="admin-avatar" class="user-avatar">TK</div>
+                            </a>
+
+                            <button id="messages-bell" class="notification-btn">
+                                <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                                <span id="notification-dot" class="notification-dot"></span>
+                            </button>
+
+                            <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                                <span class="material-symbols-outlined">menu</span>
+                            </button>
+                        </div>
                     </div>
                 </div>
-
-                <div class="header-actions">
-                    <button class="btn btn-primary" id="create-segment-btn">
-                        <span class="material-symbols-outlined">add</span>
-                        Opprett segment
-                    </button>
-                </div>
-            </header>
-
+            </div>
 
 
             <div class="crm-content">
@@ -262,7 +277,7 @@
                             <button class="btn btn-outline">Import/eksport</button>
                         </div>
                     </div>
-                    <div id="segments-content-area" class="table-container">
+                    <div id="segments-content-area" class="table-container full-bleed">
                         <!-- Empty state or list will be rendered here by JS -->
                         <div class="empty-state-placeholder segment-empty-state">
                             <h3 class="segment-empty-title">Nå ut til rett målgruppe til rett tid</h3>
@@ -282,23 +297,24 @@
     </div>
 
     <nav class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item" data-section="overview">
+        <a href="/admin/index.html" class="mobile-nav-item" data-section="overview">
             <span class="material-symbols-outlined">grid_view</span>
             <span>Oversikt</span>
         </a>
-        <a href="admin-kommunikasjon.html" class="mobile-nav-item active">
+        <a href="/admin/admin-kommunikasjon.html" class="mobile-nav-item active">
             <span class="material-symbols-outlined">group</span>
             <span>Kontakter</span>
         </a>
-        <a href="../minside/index.html" class="mobile-nav-item">
+        <a href="/minside/index.html" class="mobile-nav-item">
             <span class="material-symbols-outlined">account_circle</span>
             <span>Min Side</span>
         </a>
-        <a href="index.html#settings" class="mobile-nav-item" data-section="settings">
+        <a href="/admin/index.html#settings" class="mobile-nav-item" data-section="settings">
             <span class="material-symbols-outlined">settings</span>
             <span>Innstillinger</span>
         </a>
     </nav>
+</main>
 
     <!-- FAB Menu -->
     <div class="fab-menu-container">
@@ -323,17 +339,14 @@
                 <span class="fab-label">Ny bruker</span>
                 <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
             </button>
-            <button class="fab-item" onclick="triggerFabAction('kommunikasjon', 'push-title')">
-                <span class="fab-label">Ny push-varsling</span>
-                <div class="fab-icon"><span class="material-symbols-outlined">send_to_mobile</span></div>
-            </button>
+
         </div>
         <button class="mobile-fab" id="main-fab">
             <span class="material-symbols-outlined">add</span>
         </button>
     </div>
 
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const mainFab = document.getElementById('main-fab');
             const fabMenu = document.getElementById('fab-menu');
@@ -358,8 +371,9 @@
         });
     </script>
 
-    <script type="module" src="js/admin-header.js"></script>
-    <script defer src="js/crm-segmenter.js"></script>
+    <script type="module" src="../js/admin-utils.js"></script>
+    <script type="module" src="js/admin-header.js?v=2026.05.08.G1"></script>
+    <script type="module" src="js/crm-segmenter.js"></script>
 </body>
 
 </html>

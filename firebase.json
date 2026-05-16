@@ -11,12 +11,29 @@
       ]
     }
   ],
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
   "hosting": {
     "public": "public",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "cleanUrls": true,
+    "rewrites": [
+      {
+        "source": "/api/facebook-feed",
+        "function": "facebookFeed"
+      },
+      {
+        "source": "/seoSuggest",
+        "function": "seoSuggest"
+      }
     ]
   }
 }

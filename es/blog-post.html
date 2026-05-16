@@ -6,10 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Entrada del Blog | His Kingdom Ministry</title>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;0,900;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -17,35 +17,74 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../css/cookie-consent.css">
-
-    <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="../css/subpage-hero.css?v=2026.05.01.5">
+    <link rel="stylesheet" href="../css/interactions.css">
+    <link rel="stylesheet" href="../css/blog-content.css?v=2.5">
+    <!-- Tailwind config (guarded if Play CDN is absent) -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-orange': '#f39c12',
-                        'primary-red': '#e74c3c',
-                        'text-dark': '#333333',
+        if (window.tailwind) {
+            window.tailwind.config = {
+                theme: {
+                    extend: {
+                        colors: {
+                            'primary-orange': '#f39c12',
+                            'primary-red': '#e74c3c',
+                            'text-dark': '#333333',
+                        }
                     }
                 }
-            }
+            };
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <style>
+        @media (max-width: 768px) {
+            #blog-hero {
+                padding-top: 170px !important;
+                padding-bottom: 90px !important;
+            }
+            #blog-hero .container {
+                width: 100% !important;
+                text-align: center !important;
+            }
+            #single-post-title {
+                font-size: clamp(1.4rem, 5.5vw, 2rem) !important;
+                line-height: 1.15 !important;
+                font-weight: 900 !important;
+            }
+            .subpage-hero + .section,
+            .subpage-hero + .blog-post-section,
+            .blog-post-section {
+                padding-top: 16px !important;
+            }
+        }
+    </style>
 </head>
 
-<body>
+<body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/es/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
-                        class="w-full h-full object-cover">
+                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo" class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
             </a>
@@ -55,27 +94,27 @@
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                        <i class="fas fa-globe text-lg"></i> <span>ES</span>
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="no">🇳🇴 Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="en">🇺🇸 English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="es">🇪🇸 Español</a>
                     </div>
                 </div>
-                <a href="donasjoner.html"
+                <a href="/es/donaciones"
                     class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
-                    Gi gave <i class="fas fa-heart text-sm"></i>
+                    Donar <i class="fas fa-heart heart text-sm" style="vertical-align: middle;"></i>
                 </a>
 
                 <!-- Unified Toggle Button -->
                 <button
                     class="menu-toggle h-10 w-10 rounded-full flex items-center justify-center text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] transition-transform hover:scale-105 focus:outline-none focus:ring-0 relative"
-                    id="menu-toggle" aria-label="Toggle meny">
+                    id="menu-toggle" aria-label="Toggle menu">
                     <i class="fas fa-bars text-lg open-icon"></i>
                     <i class="fas fa-times text-lg close-icon hidden"></i>
                 </button>
@@ -85,13 +124,14 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="¿Qué estás buscando?"
+                    <input type="text" placeholder="Buscar..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
@@ -100,13 +140,16 @@
                     <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../blogg-post.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="/" class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../en/blog-post.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">EN</a>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="blog-post.html" class="text-sm font-bold text-primary-orange">ES</a>
+                            <a href="/es/"
+                                class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
@@ -115,77 +158,133 @@
             <div class="mega-menu-body">
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
-                    <!-- Column 1: Get Involved -->
+                    <!-- Column 1: Participa -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Involúcrate</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Participa</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="donaciones.html">Apoya el trabajo</a></li>
-                            <li><a href="donaciones.html#faste-givere">Hazte donante mensual</a></li>
-                            <li><a href="para-iglesias.html">Para iglesias</a></li>
-                            <li><a href="para-empresas.html">Para empresas</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li><a href="/es/donaciones" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Apoya el trabajo</a></li>
+                            <li><a href="/es/hacerse-donante" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Hazte donante regular</a></li>
+                            <li><a href="/es/para-iglesias" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">Para iglesias</a></li>
+                            <li><a href="/es/para-empresas" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">Para empresas</a></li>
+                            <li><a href="/es/oracion" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Red de Negocios</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 2: Get to Know Us -->
+                    <!-- Column 2: Conócenos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Conócenos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Conócenos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="sobre-nosotros.html">Sobre la fundación</a></li>
-                            <li><a href="sobre-nosotros.html#historie">Nuestra historia</a></li>
-                            <li><a href="contacto.html">Dónde trabajamos</a></li>
-                            <li><a href="contacto.html">Contáctanos</a></li>
+                            <li><a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Sobre nosotros</a></li>
+                            <li><a href="/es/contacto" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contáctenos</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Resources & Media -->
+                    <!-- Column 3: Recursos & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Recursos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Recursos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="eventos.html">Eventos</a></li>
-                            <li><a href="media.html">Medios y Podcast</a></li>
-                            <li><a href="blog.html">Noticias y Blog</a></li>
-                            <li><a href="../minside/index.html">Mi Cuenta</a></li>
+                            <li><a href="/es/tienda" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Tienda</a></li>
+                            <li><a href="/es/eventos" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Eventos</a></li>
+                            <li><a href="/es/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="/es/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Noticias & Blog</a></li>
+                            <li><a href="/es/cursos" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Cursos</a></li>
+                            <li><a href="/mi-pagina/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Mi Página</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donaciones.html" class="btn btn-primary btn-large btn-block">Apoya ahora <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donaciones.html#skattefradrag">Deducción de impuestos</a>
-                        <a href="sobre-nosotros.html">Sobre nosotros</a>
-                        <a href="privacidad.html">Privacidad</a>
+                        <a href="/es/tienda" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción de Impuestos</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Política de Privacidad</a>
+                        <a href="/es/condiciones" data-content-doc="settings_global" data-content-key="menu.footer.terms">Términos y Condiciones</a>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
-
-    <!-- Blog Post Hero -->
-    <section class="page-hero" data-content-key="hero.backgroundImage" id="blog-hero"
-        style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); padding-top: 160px;">
-        <div class="container">
-            <h1 class="page-hero-title" id="single-post-title">Entrada del Blog</h1>
-            <div class="blog-meta"
-                style="display: flex; gap: 20px; justify-content: center; color: white; margin-top: 20px; flex-wrap: wrap;">
-                <span id="single-post-date"><i class="far fa-calendar"></i> </span>
-                <span id="single-post-author"><i class="far fa-user"></i> </span>
-                <span id="single-post-category"><i class="fas fa-tag"></i> </span>
-                <span id="single-post-readingtime" style="display:none;"><i class="far fa-clock"></i> 5 min de
-                    lectura</span>
+    <section class="page-hero subpage-hero relative" id="blog-hero"
+        style="background-image: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); margin-top: 0; transition: opacity 0.4s ease;">
+        <div class="container" style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <!-- Title hidden until JS populates it -->
+            <h1 class="page-hero-title" id="single-post-title" style="opacity:0; transition: opacity 0.4s ease; margin:0;">Entrada del Blog</h1>
+            <div class="blog-meta" id="blog-meta-row"
+                style="display:flex; flex-direction:column; gap:8px; justify-content:center; align-items:center; color:white; margin-top:20px; opacity:0; transition:opacity 0.4s ease; width:100%;">
+                <div class="blog-meta-top"
+                    style="display:flex; align-items:center; justify-content:center; gap:10px; flex-wrap:nowrap; white-space:nowrap; max-width:100%;">
+                    <img id="single-post-author-avatar" src="" alt="" loading="lazy"
+                        style="display:none; width:40px; height:40px; border-radius:50%; object-fit:cover; border:2px solid rgba(255,255,255,0.7); flex-shrink:0;">
+                    <span id="single-post-author" style="font-weight:600; font-size:0.95rem;"></span>
+                    <span id="single-post-date" style="font-size:0.9rem; opacity:0.9;"></span>
+                </div>
+                <div class="blog-meta-bottom"
+                    style="display:flex; align-items:center; justify-content:center; gap:12px; font-size:0.85rem; opacity:0.9; flex-wrap:nowrap; white-space:nowrap; max-width:100%;">
+                    <span id="single-post-readingtime" style="display:none;"></span>
+                    <span id="single-post-views" style="display:none;"></span>
+                </div>
+                <span id="single-post-category" style="display:none;"><i class="fas fa-tag"></i> </span>
             </div>
         </div>
     </section>
 
     <!-- Blog Post Content -->
-    <section class="section" style="padding: 40px 20px 80px 20px;">
-        <div class="container" style="max-width: 800px;">
-            <article class="blog-post-content" id="single-post-content">
-                <p>Cargando publicación...</p>
+    <section class="section blog-post-section">
+        <div class="container" style="max-width: 840px;">
+            <!-- Skeleton loader shown while content is loading -->
+            <div id="post-skeleton" style="animation: skeletonPulse 1.5s ease-in-out infinite;">
+                <div style="height: 36px; background: #e2e8f0; border-radius: 8px; margin-bottom: 20px; width: 70%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 100%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 95%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 88%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 24px; width: 60%;">
+                </div>
+                <div style="height: 28px; background: #e2e8f0; border-radius: 8px; margin-bottom: 16px; width: 50%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 100%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 92%;">
+                </div>
+                <div style="height: 16px; background: #e2e8f0; border-radius: 6px; margin-bottom: 12px; width: 80%;">
+                </div>
+            </div>
+            <style>
+                @keyframes skeletonPulse {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.4; }
+                }
+            </style>
+            <article class="blog-post-content" id="single-post-content" style="display:none;">
             </article>
 
             <!-- Tags Section (Populated by JS) -->
@@ -194,38 +293,53 @@
             </div>
 
             <div class="blog-share" style="border-top: 1px solid #eee; padding-top: 30px; margin-top: 50px;">
-                <h4>Comparte esta publicación</h4>
+                <h4>Compartir esta entrada</h4>
                 <div style="display: flex; gap: 15px; margin-top: 15px;">
-                        <a href="#" class="social-link" onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href), 'facebook-share-dialog', 'width=800,height=600'); return false;"
-                            style="background: #3b5998; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
-                                class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="social-link" onclick="window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent(document.title), 'twitter-share-dialog', 'width=800,height=600'); return false;"
-                            style="background: #000000; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><svg xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 512 512" fill="white"><path d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z"/></svg></a>
-                        <a href="#" class="social-link" onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title), 'linkedin-share-dialog', 'width=800,height=600'); return false;"
-                            style="background: #0077b5; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
-                                class="fab fa-linkedin-in"></i></a>
-                        <a href="https://instagram.com" target="_blank" class="social-link"
-                            style="background: #E1306C; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
-                                class="fab fa-instagram"></i></a>
-                        <a href="#" class="social-link" onclick="window.print(); return false;"
-                            style="background: #6c757d; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Skriv ut"><i
-                                class="fas fa-print"></i></a>
-                        <a href="#" class="social-link" onclick="if(navigator.share) { navigator.share({title: document.title, url: window.location.href}).catch(console.error); } else { alert('Deling er ikke støttet på denne enheten.'); } return false;"
-                            style="background: #f39c12; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;" title="Del med app"><i
-                                class="fas fa-share-nodes"></i></a>
-            </div>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="window.open('https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(window.location.href), 'facebook-share-dialog', 'width=800,height=600'); return false;"
+                        style="background: #3b5998; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
+                            class="fab fa-facebook-f"></i></a>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="window.open('https://twitter.com/intent/tweet?url=' + encodeURIComponent(window.location.href) + '&text=' + encodeURIComponent(document.title), 'twitter-share-dialog', 'width=800,height=600'); return false;"
+                        style="background: #000000; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><svg
+                            xmlns="http://www.w3.org/2000/svg" height="18" width="18" viewBox="0 0 512 512"
+                            fill="white">
+                            <path
+                                d="M389.2 48h70.6L305.6 224.2 487 464H345L233.7 318.6 106.5 464H35.8L200.7 275.5 26.8 48H172.4L272.9 180.9 389.2 48zM364.4 421.8h39.1L151.1 88h-42L364.4 421.8z" />
+                        </svg></a>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="window.open('https://www.linkedin.com/shareArticle?mini=true&url=' + encodeURIComponent(window.location.href) + '&title=' + encodeURIComponent(document.title), 'linkedin-share-dialog', 'width=800,height=600'); return false;"
+                        style="background: #0077b5; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
+                            class="fab fa-linkedin-in"></i></a>
+                    <a href="https://instagram.com" target="_blank" class="social-link"
+                        style="background: #E1306C; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"><i
+                            class="fab fa-instagram"></i></a>
+                    <a href="javascript:void(0)" class="social-link" onclick="window.print(); return false;"
+                        style="background: #6c757d; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
+                        title="Imprimir"><i class="fas fa-print"></i></a>
+                    <a href="javascript:void(0)" class="social-link"
+                        onclick="if(navigator.share) { navigator.share({title: document.title, url: window.location.href}).catch(console.error); } else { alert('Compartir no es compatible con este dispositivo.'); } return false;"
+                        style="background: #f39c12; color: white; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%;"
+                        title="Compartir con app"><i class="fas fa-share-nodes"></i></a>
+                </div>
             </div>
 
-            
-            <!-- Related Posts Container -->
-            <div id="single-post-related" style="margin-top: 60px; display: none;">
+
+            <!-- Interactions (Likes & Comments) -->
+            <div id="blog-interactions"></div>
+        </div>
+
+        <!-- Related Posts Container (Wider) -->
+        <div class="container" style="max-width: 1200px; margin-top: 64px;">
+            <div id="single-post-related" style="display: none;">
                 <!-- Content injected by JS -->
             </div>
+        </div>
 
+        <div class="container" style="max-width: 840px;">
             <div class="blog-navigation"
-
                 style="display: flex; justify-content: space-between; margin-top: 60px; padding-top: 30px; border-top: 1px solid #eee;">
-                <a href="blog.html" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Volver al Blog</a>
+                <a href="/es/blog" id="back-btn" class="btn btn-outline"><i class="fas fa-arrow-left"></i> Volver al blog</a>
             </div>
         </div>
     </section>
@@ -238,56 +352,58 @@
                 <div class="footer-left">
                     <!-- Brand / Intro -->
                     <div class="footer-brand">
-                        <a href="index.html" class="logo">
+                        <a href="/es/" class="logo">
                             <div class="logo-icon">
                                 <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
-                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro
-                            dedicada al crecimiento espiritual a través de la enseñanza, podcasts y viajes misioneros.
-                        </p>
+                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro dedicada al crecimiento espiritual a través de la enseñanza, los podcasts y el ministerio de viajes.</p>
                     </div>
 
                     <!-- Links Grid -->
                     <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4>Sobre nosotros</h4>
+                            <h4>Sobre Nosotros</h4>
                             <ul>
-                                <li><a href="index.html#hjem">Inicio</a></li>
-                                <li><a href="sobre-nosotros.html">Quiénes somos</a></li>
-                                <li><a href="sobre-nosotros.html#visjon">Nuestra visión</a></li>
-                                <li><a href="contacto.html">Contáctanos</a></li>
+                                <li><a href="/es/">Inicio</a></li>
+                                <li><a href="/es/sobre-nosotros">Sobre Nosotros</a></li>
+                                <li><a href="/es/sobre-nosotros">Nuestra Visión</a></li>
+                                <li><a href="/es/contacto">Contáctenos</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Recursos</h4>
                             <ul>
-                                <li><a href="media.html#teaching-section">Enseñanza</a></li>
-                                <li><a href="eventos.html">Cursos en línea</a></li>
-                                <li><a href="blog.html">Libros y Blog</a></li>
-                                <li><a href="../minside/index.html" target="_blank">Mi Cuenta</a></li>
+                                <li><a href="/es/media">Enseñanza</a></li>
+                                <li><a href="/es/eventos">Eventos</a></li>
+                                <li><a href="/es/blog">Noticias & Blog</a></li>
+                                <li><a href="/mi-pagina/index.html" target="_blank">Mi Página</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Medios</h4>
+                            <h4>Media</h4>
                             <ul>
-                                <li><a href="media.html#podcast-section">Podcast</a></li>
-                                <li><a href="media.html">Videos</a></li>
+                                <li><a href="/es/media">Podcast</a></li>
+                                <li><a href="/es/media">Videos</a></li>
                                 <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
                                 </li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Involúcrate</h4>
+                            <h4>Participación</h4>
                             <ul>
-                                <li><a href="eventos.html">Calendario</a></li>
-                                <li><a href="donaciones.html">Hacer una donación</a></li>
-                                <li><a href="privacidad.html">Privacidad</a></li>
-                                <li><a href="accesibilidad.html">Accesibilidad</a></li>
+                                <li><a href="/es/eventos">Calendario</a></li>
+                                <li><a href="/es/donaciones">Dar un regalo</a></li>
+                                <li><a href="/es/privacidad">Política de Privacidad</a></li>
+                                <li><a href="/es/condiciones">Términos y Condiciones</a></li>
+                                <li><a href="/es/accesibilidad">Accesibilidad</a></li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;">Cookies</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -310,17 +426,25 @@
 
                     <!-- Contact Us Card -->
                     <div class="footer-card contact-card">
-                        <h3>Contáctanos</h3>
-                        <a href="contacto.html" class="btn btn-primary btn-block btn-sm">Formulario de contacto</a>
+                        <h3>Contáctenos</h3>
+                        <a href="/es/contacto" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
 
                         <div class="contact-details">
                             <div class="detail-item">
-                                <strong>Correo:</strong>
+                                <strong>Email:</strong>
                                 <p>post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
                                 <strong>Teléfono:</strong>
                                 <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Cuenta No.:</strong>
+                                <p>3000.66.08759</p>
                             </div>
                         </div>
                     </div>
@@ -329,7 +453,7 @@
 
             <div class="footer-bottom">
                 <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Todos los derechos reservados.</p>
-                <a href="../admin/login.html" class="admin-link">Admin</a>
+                <a href="/admin/login.html" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -342,21 +466,35 @@
 
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
+
+    <script type="module" src="../js/user-roles.js"></script>
 
     <!-- App Scripts -->
-    <script type="module" src="../script.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
-    <script type="module" src="../js/cookie-consent.js"></script>
     <script type="module" src="../js/i18n.js"></script>
-
-    <!-- Init Language -->
+    <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.11.6"></script>
+    <script type="module" src="../js/cookie-consent.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            if (window.i18n) {
-                window.i18n.init();
+        // Force mobile spacing overrides via inline styles (beats all CSS cascade)
+        function applyMobileHeroFix() {
+            if (window.innerWidth > 768) return;
+            var hero = document.getElementById('blog-hero');
+            if (hero) {
+                hero.style.setProperty('padding-top', '140px', 'important');
+                hero.style.setProperty('padding-bottom', '70px', 'important');
             }
-        });
+            var section = hero && hero.nextElementSibling;
+            if (section) {
+                section.style.setProperty('padding-top', '16px', 'important');
+            }
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', applyMobileHeroFix);
+        } else {
+            applyMobileHeroFix();
+        }
+        window.addEventListener('resize', applyMobileHeroFix);
     </script>
 </body>
 

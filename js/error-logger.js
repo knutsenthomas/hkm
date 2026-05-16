@@ -24,9 +24,11 @@
                     type,
                     message,
                     severity,
+                    level: severity.toLowerCase(), // For compatibility with admin-logger
+                    source: 'Nettside',           // So you know where it came from
                     url: window.location.href,
                     userAgent: navigator.userAgent,
-                    userId: getUserId(), // Helper to get ID if logged in
+                    userId: getUserId(),
                     additionalData
                 })
             });

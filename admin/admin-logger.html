@@ -18,7 +18,7 @@
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" />
 
     <!-- CSS -->
-    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/dashboard.css?v=20260508_G41">
 
     <style>
         .logs-container {
@@ -180,7 +180,28 @@
         }
     </style>
 
-    <link rel="stylesheet" href="css/admin-unified.css">
+    <link rel="stylesheet" href="css/admin-unified.css?v=20260509_G46">
+
+    <style>
+        body.admin-logs-page .content-wrapper {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 24px 40px 28px !important;
+            box-sizing: border-box !important;
+        }
+
+        body.admin-logs-page .logs-container {
+            width: 100% !important;
+            max-width: none !important;
+        }
+
+        @media (max-width: 1024px) {
+            body.admin-logs-page .content-wrapper {
+                padding: 16px !important;
+            }
+        }
+    </style>
 
     <!-- Firebase SDK (Compat) -->
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
@@ -189,124 +210,146 @@
     <script defer src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
 
     <!-- Core Firebase Logic -->
-    <script defer src="../js/firebase-config.js"></script>
-    <script defer src="../js/firebase-service.js"></script>
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js"></script>
+    <!-- Loader Safety Net -->
+    <script type="module">
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
-<body class="admin-body">
+<body class="admin-body admin-logs-page">
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="logo">
-                <img src="img/logo_circular.png" alt="HKM Logo">
-                <h1 class="logo-text">HKM Studio</h1>
+            <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+                <div class="logo" style="margin-bottom: 0;">
+                    <img src="/img/logo-hkm.png" alt="HKM Logo">
+                    <h1 class="logo-text">HKM Studio</h1>
+                </div>
+                <button id="mobile-sidebar-close" style="display: none; background: none; border: none; font-size: 24px; color: #64748b; cursor: pointer; align-items: center; justify-content: center;" class="mobile-sidebar-close-btn">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
             </div>
-        </div>
 
         <nav class="sidebar-nav">
             <div class="nav-group">
                 <ul class="nav-list">
                     <li class="nav-item visible" data-nav-category="all">
-                        <a href="index.html" class="nav-link" data-section="overview">
+                        <a href="/admin/index.html" class="nav-link" data-section="overview">
                             <span class="material-symbols-outlined">home</span>
                             <span>Oversikt</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="nettsted">
-                        <a href="index.html#content" class="nav-link" data-section="content">
+                    <li class="nav-category-header" data-target-category="nettsted"><span>Nettsted</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="nettsted">
+                        <a href="/admin/index.html#content" class="nav-link" data-section="content">
                             <span class="material-symbols-outlined">description</span>
                             <span>Sideinnhold</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="nettsted">
-                        <a href="index.html#blog" class="nav-link" data-section="blog">
+                        <a href="/admin/index.html#blog" class="nav-link" data-section="blog">
                             <span class="material-symbols-outlined">edit_note</span>
                             <span>Blogg</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="nettsted">
-                        <a href="index.html#media" class="nav-link" data-section="media">
+                        <a href="/admin/index.html#media" class="nav-link" data-section="media">
                             <span class="material-symbols-outlined">image</span>
                             <span>Media</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="nettsted">
-                        <a href="index.html#hero" class="nav-link" data-section="hero">
+                        <a href="/admin/index.html#hero" class="nav-link" data-section="hero">
                             <span class="material-symbols-outlined">view_carousel</span>
                             <span>Hero Slider</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="nettsted">
-                        <a href="index.html#teaching" class="nav-link" data-section="teaching">
+                        <a href="/admin/index.html#teaching" class="nav-link" data-section="teaching">
                             <span class="material-symbols-outlined">school</span>
                             <span>Undervisning</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="nettsted">
-                        <a href="index.html#design" class="nav-link" data-section="design">
+                        <a href="/admin/index.html#design" class="nav-link" data-section="design">
                             <span class="material-symbols-outlined">palette</span>
                             <span>Design & Logo</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="kommunikasjon">
-                        <a href="index.html#events" class="nav-link" data-section="events">
+                    <li class="nav-category-header" data-target-category="kommunikasjon"><span>Kommunikasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="kommunikasjon">
+                        <a href="/admin/index.html#events" class="nav-link" data-section="events">
                             <span class="material-symbols-outlined">event</span>
                             <span>Arrangementer</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="kommunikasjon">
-                        <a href="admin-kommunikasjon.html" class="nav-link">
+                        <a href="/admin/admin-kommunikasjon.html" class="nav-link">
                             <span class="material-symbols-outlined">group</span>
                             <span>Kontakter</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="kommunikasjon">
-                        <a href="admin-segmenter.html" class="nav-link">
+                        <a href="/admin/admin-segmenter.html" class="nav-link">
                             <span class="material-symbols-outlined">segment</span>
                             <span>Segmenter</span>
                         </a>
                     </li>
+                        <li class="nav-item visible" data-nav-category="kommunikasjon">
+                            <a href="/admin/admin-meldinger.html" class="nav-link">
+                                <span class="material-symbols-outlined">mail</span>
+                                <span>Meldinger</span>
+                            </a>
+                        </li>
                     <li class="nav-item" data-nav-category="kommunikasjon">
-                        <a href="index.html#messages" class="nav-link" data-section="messages">
-                            <span class="material-symbols-outlined">mail</span>
-                            <span>Meldinger</span>
-                        </a>
-                    </li>
-                    <li class="nav-item" data-nav-category="kommunikasjon">
-                        <a href="admin-nyhetsbrev.html" class="nav-link">
+                        <a href="/admin/admin-nyhetsbrev.html" class="nav-link">
                             <span class="material-symbols-outlined">mail_outline</span>
                             <span>Nyhetsbrev</span>
                         </a>
                     </li>
-                    <li class="nav-category-header" data-target-category="administrasjon"><span>Administrasjon</span><span class="material-symbols-outlined expand-icon">expand_more</span></li>
-                        <li class="nav-item" data-nav-category="administrasjon">
-                        <a href="index.html#causes" class="nav-link" data-section="causes">
+                    <li class="nav-category-header" data-target-category="administrasjon">
+                        <span>Administrasjon</span><span
+                            class="material-symbols-outlined expand-icon">expand_more</span></li>
+                    <li class="nav-item" data-nav-category="administrasjon">
+                        <a href="/admin/index.html#causes" class="nav-link" data-section="causes">
                             <span class="material-symbols-outlined">volunteer_activism</span>
                             <span>Gaver</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="administrasjon">
-                        <a href="index.html#users" class="nav-link" data-section="users">
+                        <a href="/admin/index.html#users" class="nav-link" data-section="users">
                             <span class="material-symbols-outlined">group</span>
                             <span>Brukere</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="administrasjon">
-                        <a href="index.html#seo" class="nav-link" data-section="seo">
+                        <a href="/admin/index.html#seo" class="nav-link" data-section="seo">
                             <span class="material-symbols-outlined">search_check</span>
                             <span>SEO & Meta</span>
                         </a>
                     </li>
                     <li class="nav-item" data-nav-category="administrasjon">
-                        <a href="index.html#settings" class="nav-link" data-section="settings">
+                        <a href="/admin/index.html#settings" class="nav-link" data-section="settings">
                             <span class="material-symbols-outlined">settings</span>
                             <span>Innstillinger</span>
                         </a>
                     </li>
                     <li class="nav-item visible" data-nav-category="administrasjon">
-                        <a href="admin-logger.html" class="nav-link active">
+                        <a href="/admin/admin-logger.html" class="nav-link active">
                             <span class="material-symbols-outlined">assignment</span>
                             <span>Systemlogger</span>
                         </a>
@@ -317,7 +360,7 @@
             <div class="nav-group bottom">
                 <ul class="nav-list">
                     <li class="nav-item visible" data-nav-category="all">
-                        <a href="../minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
+                        <a href="/minside/index.html" class="nav-link" id="admin-profile-trigger-sidebar">
                             <span class="material-symbols-outlined">account_circle</span>
                             <span>Min Side</span>
                         </a>
@@ -342,40 +385,41 @@
     <!-- Main Content Area -->
     <main class="main-content">
         <!-- Header -->
-        <header class="main-header">
-            <div class="header-left">
-                <a href="index.html" class="btn-back">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                </a>
-                <div class="welcome-banner">
-                    <h1 class="welcome-title">Systemlogger</h1>
-                    <p class="welcome-subtitle">Oversikt over systemhendelser og feilmeldinger.</p>
+        <div id="dashboard-main-header" class="main-header">
+            <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                <div class="section-header-icon">
+                    <span class="material-symbols-outlined">assignment</span>
+                </div>
+                <div class="section-header-content">
+                    <div class="section-header-titles">
+                        <h2 class="section-title">Systemlogger</h2>
+                        <p class="section-subtitle">Se hendelser og feilmeldinger i systemet.</p>
+                    </div>
+                    <div class="section-header-actions">
+                        <!-- Search bar removed to match Gold Standard dashboard -->
+
+                        <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">Laster...</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar">TK</div>
+                        </a>
+
+                        <button id="messages-bell" class="notification-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
+                        </button>
+
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
+                        </button>
+                    </div>
                 </div>
             </div>
+        </div>
 
-            <div class="header-right">
-                <button id="global-search-opener" class="notification-btn" aria-label="Søk" title="Søk på siden">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
-                    <button class="notification-btn">
-                    <span class="material-symbols-outlined">notifications</span>
-                </button>
-
-                <a href="#" class="user-profile-link" id="admin-profile-trigger">
-                    <div class="user-info-text">
-                        <span id="admin-name" class="user-name">Laster...</span>
-                        <span class="user-role">Administrator</span>
-                    </div>
-                    <div id="admin-avatar" class="user-avatar">?</div>
-                </a>
-
-                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-            </div>
-        </header>
-
-        <div class="content-wrapper" style="padding: 40px;">
+        <div class="content-wrapper">
             <div class="logs-container">
                 <div class="logs-header">
                     <div class="logs-filters">
@@ -389,7 +433,7 @@
                     </div>
                 </div>
 
-                <div class="logs-table-wrap">
+                <div class="logs-table-wrap full-bleed">
                     <table class="logs-table">
                         <thead>
                             <tr>
@@ -409,19 +453,19 @@
     </main>
 
     <nav class="mobile-bottom-nav">
-        <a href="index.html" class="mobile-nav-item" data-section="overview">
+        <a href="/admin/index.html" class="mobile-nav-item" data-section="overview">
             <span class="material-symbols-outlined">grid_view</span>
             <span>Oversikt</span>
         </a>
-        <a href="admin-kommunikasjon.html" class="mobile-nav-item">
+        <a href="/admin/admin-kommunikasjon.html" class="mobile-nav-item">
             <span class="material-symbols-outlined">group</span>
             <span>Kontakter</span>
         </a>
-        <a href="../minside/index.html" class="mobile-nav-item">
+        <a href="/minside/index.html" class="mobile-nav-item">
             <span class="material-symbols-outlined">account_circle</span>
             <span>Min Side</span>
         </a>
-        <a href="index.html#settings" class="mobile-nav-item" data-section="settings">
+        <a href="/admin/index.html#settings" class="mobile-nav-item" data-section="settings">
             <span class="material-symbols-outlined">settings</span>
             <span>Innstillinger</span>
         </a>
@@ -450,17 +494,14 @@
                 <span class="fab-label">Ny bruker</span>
                 <div class="fab-icon"><span class="material-symbols-outlined">person_add</span></div>
             </button>
-            <button class="fab-item" onclick="triggerFabAction('kommunikasjon', 'push-title')">
-                <span class="fab-label">Ny push-varsling</span>
-                <div class="fab-icon"><span class="material-symbols-outlined">send_to_mobile</span></div>
-            </button>
+
         </div>
         <button class="mobile-fab" id="main-fab">
             <span class="material-symbols-outlined">add</span>
         </button>
     </div>
 
-    <script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', () => {
             const mainFab = document.getElementById('main-fab');
             const fabMenu = document.getElementById('fab-menu');
@@ -485,58 +526,58 @@
         });
     </script>
 
-    <script type="module" src="js/admin-header.js"></script>
-    <script>
+    <script type="module" src="../js/admin-utils.js"></script>
+    <script type="module" src="js/admin-header.js?v=20260508_G41"></script>
+    <script type="module">
         document.addEventListener('DOMContentLoaded', async () => {
             const logsBody = document.getElementById('logs-body');
             const logCount = document.getElementById('log-count');
 
-            // Mock Data Generator for demo/fallback
-            const generateMockLogs = () => {
-                const types = ['info', 'warn', 'error', 'success'];
-                const sources = ['System', 'Firebase', 'Auth', 'UserAction'];
-                const messages = [
-                    'Database backup completed successfully',
-                    'Failed to load user profile image',
-                    'New user registered: thomas@hkm.no',
-                    'API rate limit approaching',
-                    'Page cache cleared manually',
-                    'Login attempt failed from IP 192.168.1.1',
-                    'Settings updated by Admin'
-                ];
 
-                return Array.from({ length: 15 }, (_, i) => {
-                    const date = new Date();
-                    date.setMinutes(date.getMinutes() - i * 12);
-                    const type = types[Math.floor(Math.random() * types.length)];
-                    return {
-                        timestamp: date.toISOString(),
-                        level: type,
-                        message: messages[Math.floor(Math.random() * messages.length)],
-                        source: sources[Math.floor(Math.random() * sources.length)]
-                    };
-                });
-            };
 
-            // Fetch logs (Replace with real Firebase fetches later if needed)
-            // For now we use mock data to populate the view as requested
+            // Fetch logs from Firestore
             let logs = [];
 
-            try {
-                // If real collection exists:
-                // const snapshot = await firebase.firestore().collection('system_logs').orderBy('timestamp', 'desc').limit(50).get();
-                // logs = snapshot.docs.map(doc => doc.data());
-
-                // Fallback to mock if empty or not implemented
-                if (logs.length === 0) logs = generateMockLogs();
-            } catch (e) {
-                console.warn('Could not fetch real logs, using mock data', e);
-                logs = generateMockLogs();
-            }
+            const fetchLogs = async () => {
+                try {
+                    if (typeof firebase === 'undefined') {
+                        throw new Error('Firebase not loaded');
+                    }
+                    
+                    const snapshot = await firebase.firestore()
+                        .collection('system_logs')
+                        .orderBy('timestamp', 'desc')
+                        .limit(100)
+                        .get();
+                    
+                    logs = snapshot.docs.map(doc => {
+                        const data = doc.data();
+                        return {
+                            ...data,
+                            // Convert Firestore timestamp to ISO string if it exists
+                            timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : new Date().toISOString()
+                        };
+                    });
+                } catch (e) {
+                    console.error('Firestore fetch failed:', e);
+                    // Minimal fallback
+                    logs = [{
+                        timestamp: new Date().toISOString(),
+                        level: 'error',
+                        message: 'Kunne ikke hente logg fra databasen: ' + e.message,
+                        source: 'System'
+                    }];
+                }
+            };
 
             const renderLogs = (filter = 'all') => {
                 const filtered = logs.filter(log => filter === 'all' || log.level === filter);
                 logCount.textContent = filtered.length;
+
+                if (filtered.length === 0) {
+                    logsBody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color:#64748b;">Ingen logger funnet i databasen.</td></tr>`;
+                    return;
+                }
 
                 logsBody.innerHTML = filtered.map(log => `
                     <tr>
@@ -548,13 +589,18 @@
                 `).join('');
             };
 
+            // Initial load
+            await fetchLogs();
             renderLogs();
 
             // Filter Click Handlers
             document.querySelectorAll('.log-filter-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', async (e) => {
                     document.querySelectorAll('.log-filter-btn').forEach(b => b.classList.remove('active'));
                     e.target.classList.add('active');
+                    
+                    // Refresh logs on filter change to get latest
+                    await fetchLogs();
                     renderLogs(e.target.dataset.filter);
                 });
             });

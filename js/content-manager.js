@@ -1,12 +1,16 @@
 // ===================================
 // Public Content Manager (Global version)
 // ===================================
-const firebaseService = window.firebaseService;
+
+import { InteractionsManager } from './interactions.js';
+
 
 class ContentManager {
     constructor() {
         this.pageId = this.detectPageId();
         this.currentDate = new Date();
+        this._renderHtmlSignatures = new Map();
+        this._errorNoticeTimestamps = new Map();
 
         // Tag body with page-specific class (e.g. page-index, page-om-oss)
         const body = document.body;
@@ -14,71 +18,474 @@ class ContentManager {
             body.classList.add(`page-${this.pageId}`);
         }
 
+        this.ensureResponsiveHeroTitleStyles();
+
         this.init();
         this.agendaMonthsToShow = 1;
     }
 
+    ensureResponsiveHeroTitleStyles() {
+        if (typeof document === 'undefined') return;
+        if (document.getElementById('hkm-hero-title-responsive-style')) return;
+
+        const styleEl = document.createElement('style');
+        styleEl.id = 'hkm-hero-title-responsive-style';
+        styleEl.textContent = `
+            .page-hero .page-hero-title,
+            .page-hero .hero-title {
+                font-size: clamp(2rem, 4.6vw, 3rem) !important;
+                line-height: 1.12 !important;
+            }
+
+            @media (max-width: 1024px) {
+                .page-hero .page-hero-title,
+                .page-hero .hero-title {
+                    font-size: clamp(1.85rem, 5.6vw, 2.55rem) !important;
+                }
+            }
+
+            @media (max-width: 768px) {
+                .page-hero .page-hero-title,
+                .page-hero .hero-title {
+                    font-size: clamp(1.55rem, 7.3vw, 2.15rem) !important;
+                    max-width: 92vw !important;
+                    margin-left: auto !important;
+                    margin-right: auto !important;
+                }
+            }
+        `;
+
+        document.head.appendChild(styleEl);
+    }
+
     detectPageId() {
-        const path = window.location.pathname;
-        if (path === '/' || path.endsWith('/') || path.includes('index.html')) return 'index';
-        if (path.includes('arrangementer.html') || path.includes('events.html') || path.includes('eventos.html')) return 'arrangementer';
-        if (path.includes('kalender.html')) return 'kalender';
-        if (path.includes('arrangement-detaljer.html') || path.includes('event-details.html') || path.includes('detalles-evento.html')) return 'arrangement-detaljer';
-        if (path.includes('blogg.html') || path.includes('blog.html')) return 'blogg';
-        if (path.includes('blogg-post.html') || path.includes('blog-post.html')) return 'blogg-post';
-        if (path.includes('undervisningsserier.html') || path.includes('teaching.html')) return 'undervisningsserier';
-        if (path.includes('media.html')) return 'media';
-        if (path.includes('om-oss.html') || path.includes('about.html') || path.includes('sobre-nosotros.html')) return 'om-oss';
-        if (path.includes('kontakt.html') || path.includes('contact.html') || path.includes('contacto.html')) return 'kontakt';
-        if (path.includes('donasjoner.html') || path.includes('donations.html') || path.includes('donaciones.html')) return 'donasjoner';
-        if (path.includes('for-menigheter.html') || path.includes('for-churches.html') || path.includes('para-iglesias.html')) return 'for-menigheter';
-        if (path.includes('for-bedrifter.html') || path.includes('for-businesses.html') || path.includes('para-empresas.html')) return 'for-bedrifter';
-        if (path.includes('bnn.html')) return 'bnn';
-        if (path.includes('youtube.html')) return 'youtube';
-        if (path.includes('podcast.html')) return 'podcast';
-        if (path.includes('undervisning.html')) return 'undervisning';
-        if (path.includes('seminarer.html')) return 'seminarer';
+        // Strip .html for cleanUrls support (Vercel/Firebase cleanUrls removes extension from pathname)
+        const path = window.location.pathname.replace(/\.html$/, '').replace(/\/$/, '');
+        const p = (s) => new RegExp('(?:^|/)' + s + '(?:/|$)').test(path);
+        if (path === '' || path === '/' || /^\/(en|es)$/.test(path) || path.endsWith('/') || p('index')) return 'index';
+        if (p('arrangementer') || p('events') || p('eventos')) return 'arrangementer';
+        if (p('kalender') || p('calendar') || p('calendario')) return 'kalender';
+        if (p('arrangement-detaljer') || p('event-details') || p('detalles-evento')) return 'arrangement-detaljer';
+        if (p('blogg-post') || p('blog-post') || p('post-blog')) return 'blogg-post';
+        if (p('blogg') || p('blog')) return 'blogg';
+        if (p('butikk') || p('shop')) return 'butikk';
+        if (p('undervisningsserier') || p('teaching') || p('ensenanza')) return 'undervisningsserier';
+        if (p('media')) return 'media';
+        if (p('om-oss') || p('about') || p('sobre-nosotros')) return 'om-oss';
+        if (p('kontakt') || p('contact') || p('contacto')) return 'kontakt';
+        if (p('donasjoner') || p('donations') || p('donaciones')) return 'donasjoner';
+        if (p('for-menigheter') || p('for-churches') || p('para-iglesias')) return 'for-menigheter';
+        if (p('for-bedrifter') || p('for-businesses') || p('para-empresas')) return 'for-bedrifter';
+        if (p('bnn')) return 'bnn';
+        if (p('youtube')) return 'youtube';
+        if (p('podcast')) return 'podcast';
+        if (p('undervisning')) return 'undervisning';
+        if (p('seminarer')) return 'seminarer';
         return '';
     }
 
     getLocalizedLink(noFile) {
-        let lang = document.documentElement.lang || 'no';
-        if (lang.includes('-')) lang = lang.split('-')[0]; // Handle es-ES -> es
+        const lang = this.getCurrentLanguage();
+        const cleanNoFile = noFile.replace(/\.html$/, '');
 
-        if (lang === 'no') return noFile;
+        if (lang === 'no') return '/' + (cleanNoFile === 'index' ? '' : cleanNoFile);
+
+        let mapped = cleanNoFile;
         if (window.i18n && typeof window.i18n.mapFileName === 'function') {
-            return window.i18n.mapFileName(noFile, lang);
+            mapped = window.i18n.mapFileName(cleanNoFile, lang);
+        } else {
+            const mappings = {
+                'en': { 'blogg': 'blog', 'blogg-post': 'blog-post', 'om-oss': 'about', 'arrangementer': 'events' },
+                'es': { 'blogg': 'blog', 'blogg-post': 'blog-post', 'om-oss': 'sobre-nosotros', 'arrangementer': 'eventos' }
+            };
+            mapped = (mappings[lang] && mappings[lang][cleanNoFile]) || cleanNoFile;
         }
-        // Fallback logic if i18n not yet loaded
-        const mappings = {
-            'en': {
-                'index.html': 'index.html',
-                'om-oss.html': 'about.html',
-                'arrangementer.html': 'events.html',
-                'kontakt.html': 'contact.html',
-                'donasjoner.html': 'donations.html',
-                'for-menigheter.html': 'for-churches.html',
-                'for-bedrifter.html': 'for-businesses.html',
-                'bnn.html': 'bnn.html',
-                'arrangement-detaljer.html': 'event-details.html',
-                'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html'
-            },
-            'es': {
-                'index.html': 'index.html',
-                'om-oss.html': 'sobre-nosotros.html',
-                'arrangementer.html': 'eventos.html',
-                'kontakt.html': 'contacto.html',
-                'donasjoner.html': 'donaciones.html',
-                'for-menigheter.html': 'para-iglesias.html',
-                'for-bedrifter.html': 'para-empresas.html',
-                'bnn.html': 'bnn.html',
-                'arrangement-detaljer.html': 'detalles-evento.html',
-                'blogg.html': 'blog.html',
-                'blogg-post.html': 'blog-post.html'
+
+        const safeMapped = mapped === 'index' ? '' : mapped;
+        return `/${lang}/${safeMapped}`;
+    }
+
+
+    getCurrentLanguage() {
+        let lang = document.documentElement.lang || 'no';
+        if (lang.includes('-')) lang = lang.split('-')[0];
+        if (!['no', 'en', 'es'].includes(lang)) return 'no';
+        return lang;
+    }
+
+    getCollectionItems(data) {
+        if (Array.isArray(data)) return data;
+        if (!data || typeof data !== 'object') return [];
+        if (Array.isArray(data.items)) return data.items;
+        if (data.items && typeof data.items === 'object') return Object.values(data.items);
+        return [];
+    }
+
+    getContentItemStableId(item) {
+        if (!item || typeof item !== 'object') return '';
+        return item.id
+            || item._id
+            || item.externalGuid
+            || item.wixGuid
+            || item.postId
+            || item.legacyId
+            || item.slug
+            || item.title
+            || '';
+    }
+
+    getContentItemLookupIds(item) {
+        if (!item || typeof item !== 'object') return [];
+
+        const rawValues = [
+            this.getContentItemStableId(item),
+            item.id,
+            item.title,
+            item.postID,
+            item.referenceId,
+            item.commentResourceId,
+            item.commentContextId,
+            item.guid,
+            item.legacyId,
+            item.slug,
+            item.url,
+            item.link,
+            item.title
+        ];
+
+        const ids = new Set();
+        rawValues.forEach((value) => {
+            if (value === null || value === undefined) return;
+            const str = String(value).trim();
+            if (!str) return;
+            ids.add(str);
+            ids.add(encodeURIComponent(str));
+            try {
+                ids.add(decodeURIComponent(str));
+            } catch (error) {
+                // Keep going for malformed URI fragments.
             }
+        });
+
+        return Array.from(ids);
+    }
+
+    normalizeLookupToken(value) {
+        if (value === null || value === undefined) return '';
+        return String(value)
+            .trim()
+            .toLowerCase()
+            .replace(/^\/+|\/+$/g, '');
+    }
+
+    extractIdFromLinkValue(value) {
+        if (typeof value !== 'string' || !value.trim()) return '';
+        const raw = value.trim();
+
+        const pickFromSearch = (searchParams) => {
+            if (!searchParams || typeof searchParams.get !== 'function') return '';
+            const keys = ['id', 'postId', 'postid', 'blogId', 'blogid'];
+            for (const key of keys) {
+                const found = searchParams.get(key);
+                if (found && String(found).trim()) return String(found).trim();
+            }
+            return '';
         };
-        return (mappings[lang] && mappings[lang][noFile]) || noFile;
+
+        try {
+            const withScheme = /^https?:\/\//i.test(raw) ? raw : `https://example.local${raw.startsWith('/') ? '' : '/'}${raw}`;
+            const parsed = new URL(withScheme);
+            const idFromQuery = pickFromSearch(parsed.searchParams);
+            if (idFromQuery && idFromQuery.trim()) return idFromQuery.trim();
+
+            const pathSegments = parsed.pathname.split('/').filter(Boolean);
+            if (pathSegments.length > 0) {
+                return pathSegments[pathSegments.length - 1].trim();
+            }
+        } catch (error) {
+            // Fall through to regex parsing for non-standard strings.
+        }
+
+        const queryMatch = raw.match(/[?&](?:id|postId|postid|blogId|blogid)=([^&#]+)/i);
+        if (queryMatch && queryMatch[1]) {
+            return queryMatch[1].trim();
+        }
+
+        const pathMatch = raw.match(/\/([^/?#]+)(?:[?#]|$)/);
+        if (pathMatch && pathMatch[1]) {
+            return pathMatch[1].trim();
+        }
+
+        return '';
+    }
+
+    normalizeBlogKeyValue(value) {
+        if (typeof value !== 'string') return '';
+        return value
+            .toLowerCase()
+            .trim()
+            .replace(/\s+/g, ' ');
+    }
+
+    getBlogUrlPath(value) {
+        if (typeof value !== 'string' || !value.trim()) return '';
+
+        try {
+            const raw = value.trim();
+            const normalizedUrl = /^https?:\/\//i.test(raw) ? raw : `https://${raw.replace(/^\/+/, '')}`;
+            const urlObj = new URL(normalizedUrl);
+            return (urlObj.pathname || '').replace(/\/+$/, '').toLowerCase();
+        } catch (error) {
+            return value
+                .trim()
+                .replace(/^https?:\/\/[^/]+/i, '')
+                .replace(/[?#].*$/, '')
+                .replace(/\/+$/, '')
+                .toLowerCase();
+        }
+    }
+
+    buildBlogCanonicalKey(item, index = 0) {
+        if (!item || typeof item !== 'object') return `fallback:${index}`;
+
+        const title = this.normalizeBlogKeyValue(item.title || '');
+        
+        // Fix for specific duplicate post and general safety for long titles
+        if (title && (title.includes('hvordan leve et liv i tjeneste') || title.length > 15)) {
+            return `title:${title}`;
+        }
+
+        return `id:${item.id || ''}`;
+
+        const urlPath = this.getBlogUrlPath(item.url || item.link || '');
+        if (urlPath) return `url:${urlPath}`;
+
+        const slug = this.normalizeBlogKeyValue(item.slug || '');
+        if (slug) return `slug:${slug}`;
+
+        const date = typeof item.date === 'string' ? item.date.slice(0, 10) : '';
+        if (title && date) return `title-date:${title}:${date}`;
+        if (title) return `title:${title}`;
+
+        const stableId = this.normalizeBlogKeyValue(this.getContentItemStableId(item));
+        if (stableId) return `stable:${stableId}`;
+
+        return `fallback:${index}`;
+    }
+
+    mergeDuplicateBlogItems(existingItem, nextItem) {
+        if (!existingItem) return nextItem;
+        if (!nextItem) return existingItem;
+
+        // --- Priority Rule 1: Dashboard-edited content always wins over legacy/sync content ---
+        if (nextItem.dashboardEdited && !existingItem.dashboardEdited) return nextItem;
+        if (existingItem.dashboardEdited && !nextItem.dashboardEdited) return existingItem;
+
+        // --- Priority Rule 2: Most recent dashboard edit wins ---
+        if (nextItem.dashboardEdited && existingItem.dashboardEdited) {
+            const nextTime = new Date(nextItem.dashboardEditedAt || 0).getTime();
+            const existingTime = new Date(existingItem.dashboardEditedAt || 0).getTime();
+            return nextTime >= existingTime ? nextItem : existingItem;
+        }
+
+        // --- Fallback: Score-based logic for legacy items ---
+        const existingContent = typeof existingItem.content === 'string' ? existingItem.content.trim() : '';
+        const nextContent = typeof nextItem.content === 'string' ? nextItem.content.trim() : '';
+        const existingExcerpt = typeof existingItem.excerpt === 'string' ? existingItem.excerpt.trim() : '';
+        const nextExcerpt = typeof nextItem.excerpt === 'string' ? nextItem.excerpt.trim() : '';
+
+        const existingScore = existingContent.length + Math.min(existingExcerpt.length, 240) + (existingItem.imageUrl ? 80 : 0);
+        const nextScore = nextContent.length + Math.min(nextExcerpt.length, 240) + (nextItem.imageUrl ? 80 : 0);
+
+        const preferred = nextScore >= existingScore ? nextItem : existingItem;
+        const fallback = preferred === nextItem ? existingItem : nextItem;
+
+        return {
+            ...fallback,
+            ...preferred,
+            content: preferred.content || fallback.content || '',
+            excerpt: preferred.excerpt || fallback.excerpt || '',
+            imageUrl: preferred.imageUrl || fallback.imageUrl || '',
+        };
+    }
+
+    dedupeBlogItems(items) {
+        const list = Array.isArray(items) ? items : [];
+        const merged = new Map();
+
+        list.forEach((item, index) => {
+            const key = this.buildBlogCanonicalKey(item, index);
+            const existing = merged.get(key);
+            merged.set(key, this.mergeDuplicateBlogItems(existing, item));
+        });
+
+        return Array.from(merged.values());
+    }
+
+    getDedupedBlogItems(data) {
+        return this.dedupeBlogItems(this.getCollectionItems(data));
+    }
+
+    extractContentText(value) {
+        if (typeof value === 'string') return value;
+        if (!value || typeof value !== 'object') return '';
+        if (Array.isArray(value.blocks)) {
+            return value.blocks.map((block) => {
+                const data = block && typeof block === 'object' ? block.data : null;
+                if (!data || typeof data !== 'object') return '';
+                if (typeof data.text === 'string') return data.text;
+                if (Array.isArray(data.items)) return data.items.join(' ');
+                return '';
+            }).join(' ');
+        }
+        if (typeof value.text === 'string') return value.text;
+        if (typeof value.content === 'string') return value.content;
+        return '';
+    }
+
+    hasTranslationServiceWarning(value) {
+        const text = this.extractContentText(value).toUpperCase();
+        if (!text) return false;
+        return text.includes('MYMEMORY WARNING')
+            || text.includes('YOU USED ALL AVAILABLE FREE TRANSLATIONS')
+            || text.includes('TRANSLATED.NET/DOC/USAGELIMITS');
+    }
+
+    isUsableLocalizedString(value) {
+        return typeof value === 'string'
+            && value.trim()
+            && !this.hasTranslationServiceWarning(value);
+    }
+
+    isUsableLocalizedContent(value) {
+        if (typeof value === 'string') {
+            return this.isUsableLocalizedString(value);
+        }
+        if (value && typeof value === 'object' && Array.isArray(value.blocks) && value.blocks.length > 0) {
+            return !this.hasTranslationServiceWarning(value);
+        }
+        return false;
+    }
+
+    getLocalizedContentItem(item, lang = this.getCurrentLanguage()) {
+        if (!item || typeof item !== 'object') return item;
+        if (lang === 'no') {
+            return {
+                ...item,
+                __stableId: this.getContentItemStableId(item)
+            };
+        }
+
+        const translations = (item.translations && typeof item.translations === 'object')
+            ? item.translations
+            : {};
+        const localized = (translations[lang] && typeof translations[lang] === 'object')
+            ? translations[lang]
+            : null;
+
+        if (!localized) {
+            return {
+                ...item,
+                __stableId: this.getContentItemStableId(item)
+            };
+        }
+
+        return {
+            ...item,
+            title: this.isUsableLocalizedString(localized.title) ? localized.title : item.title,
+            content: this.isUsableLocalizedContent(localized.content) ? localized.content : item.content,
+            category: this.isUsableLocalizedString(localized.category) ? localized.category : item.category,
+            seoTitle: this.isUsableLocalizedString(localized.seoTitle) ? localized.seoTitle : item.seoTitle,
+            seoDescription: this.isUsableLocalizedString(localized.seoDescription) ? localized.seoDescription : item.seoDescription,
+            tags: Array.isArray(localized.tags) && localized.tags.length ? localized.tags : item.tags,
+            __stableId: this.getContentItemStableId(item)
+        };
+    }
+
+    hasUsableLocalizedTranslation(item, lang = this.getCurrentLanguage()) {
+        if (!item || typeof item !== 'object' || lang === 'no') return true;
+
+        const translations = (item.translations && typeof item.translations === 'object')
+            ? item.translations
+            : null;
+        const localized = (translations && translations[lang] && typeof translations[lang] === 'object')
+            ? translations[lang]
+            : null;
+
+        if (!localized) return false;
+
+        return this.isUsableLocalizedString(localized.title)
+            || this.isUsableLocalizedContent(localized.content)
+            || this.isUsableLocalizedString(localized.category)
+            || this.isUsableLocalizedString(localized.seoTitle)
+            || this.isUsableLocalizedString(localized.seoDescription);
+    }
+
+    localizeBlogItems(items) {
+        const lang = this.getCurrentLanguage();
+        try {
+            const list = Array.isArray(items) ? items : [];
+            const filtered = lang === 'no'
+                ? list
+                : list.filter((item) => this.hasUsableLocalizedTranslation(item, lang));
+            return filtered.map((item) => this.getLocalizedContentItem(item, lang));
+        } catch (error) {
+            console.warn('[ContentManager] localizeBlogItems fallback to source language', error);
+            return Array.isArray(items) ? items : [];
+        }
+    }
+
+    findContentItemById(items, itemId) {
+        if (!Array.isArray(items) || !itemId) return null;
+        const targetRaw = String(itemId).trim();
+        if (!targetRaw) return null;
+
+        const targetIdFromLink = this.extractIdFromLinkValue(targetRaw);
+
+        const targetVariants = new Set([
+            targetRaw,
+            encodeURIComponent(targetRaw),
+            targetIdFromLink
+        ].filter(Boolean));
+        try {
+            targetVariants.add(decodeURIComponent(targetRaw));
+        } catch (error) {
+            // Ignore invalid URI sequences.
+        }
+        if (targetIdFromLink) {
+            try {
+                targetVariants.add(decodeURIComponent(targetIdFromLink));
+            } catch (error) {
+                // Ignore invalid URI sequences.
+            }
+        }
+
+        const normalizedTargets = Array.from(targetVariants)
+            .map((value) => this.normalizeLookupToken(value))
+            .filter(Boolean);
+
+        return items.find((item) => {
+            const candidates = this.getContentItemLookupIds(item);
+            const linkIdCandidates = [item?.url, item?.link]
+                .map((value) => this.extractIdFromLinkValue(value))
+                .filter(Boolean);
+            const allCandidates = [...candidates, ...linkIdCandidates];
+
+            const hasExact = allCandidates.some((candidate) => targetVariants.has(candidate));
+            if (hasExact) return true;
+
+            const normalizedCandidates = allCandidates
+                .map((candidate) => this.normalizeLookupToken(candidate))
+                .filter(Boolean);
+
+            return normalizedCandidates.some((candidate) =>
+                normalizedTargets.some((target) =>
+                    candidate === target
+                    || (target.length >= 8 && candidate.includes(target))
+                    || (candidate.length >= 8 && target.includes(candidate))
+                )
+            );
+        }) || null;
     }
 
     setLoading(isLoading) {
@@ -91,37 +498,170 @@ class ContentManager {
         }
     }
 
+    setContentReady(isReady) {
+        const body = document.body;
+        if (!body) return;
+        if (isReady) {
+            body.classList.add('cms-content-ready');
+        } else {
+            body.classList.remove('cms-content-ready');
+        }
+    }
+
+    notifyUser(message, type = 'warning', duration = 5000) {
+        if (!message) return;
+        if (typeof window.showToast === 'function') {
+            window.showToast(message, type, duration);
+        }
+    }
+
+    reportError(scope, error, { notifyUser = false, userMessage = '' } = {}) {
+        const err = error instanceof Error ? error : new Error(String(error || 'Unknown error'));
+        const scopeKey = `${scope}:${err.message}`;
+        const now = Date.now();
+        const lastAt = this._errorNoticeTimestamps.get(scopeKey) || 0;
+
+        console.error(`[ContentManager] ${scope}:`, err);
+        if (window.hkmLogger) {
+            window.hkmLogger.error(`[ContentManager:${scope}] ${err.message}`);
+        }
+
+        if (notifyUser && now - lastAt > 12000) {
+            this._errorNoticeTimestamps.set(scopeKey, now);
+            this.notifyUser(userMessage || 'Noe innhold kunne ikke lastes akkurat nå.', 'warning', 5000);
+        }
+    }
+
+    async getContentDoc(pageId, { silent = false } = {}) {
+        const service = window.firebaseService;
+        const canReadPublicContent = service
+            && typeof service.canReadPublicContent === 'function'
+            && service.canReadPublicContent();
+
+        if (!service || (!service.isInitialized && !canReadPublicContent) || typeof service.getPageContent !== 'function') {
+            if (!silent) {
+                this.reportError('firebase-unavailable', new Error(`Firebase not initialized for ${pageId}`), {
+                    notifyUser: true,
+                    userMessage: 'Tilkobling til innholdstjenesten er ikke klar ennå.'
+                });
+            }
+            return null;
+        }
+
+        try {
+            return await service.getPageContent(pageId, { silent });
+        } catch (error) {
+            if (!silent) {
+                this.reportError(`getContentDoc:${pageId}`, error, {
+                    notifyUser: true,
+                    userMessage: 'Kunne ikke hente oppdatert innhold. Viser lagret innhold hvis tilgjengelig.'
+                });
+            }
+            return null;
+        }
+    }
+
+    async getContentDocs(pageIds, { silent = false } = {}) {
+        const service = window.firebaseService;
+        const canReadPublicContent = service
+            && typeof service.canReadPublicContent === 'function'
+            && service.canReadPublicContent();
+        if (!service || (!service.isInitialized && !canReadPublicContent) || typeof service.getPageContent !== 'function') return {};
+
+        try {
+            if (typeof service.getManyPageContents === 'function') {
+                return await service.getManyPageContents(pageIds, { silent });
+            }
+
+            const pairs = await Promise.all(
+                (pageIds || []).map(async (id) => [id, await this.getContentDoc(id, { silent })])
+            );
+            return Object.fromEntries(pairs);
+        } catch (error) {
+            if (!silent) {
+                this.reportError('getContentDocs', error, {
+                    notifyUser: true,
+                    userMessage: 'Noe innhold kunne ikke lastes akkurat nå.'
+                });
+            }
+            return {};
+        }
+    }
+
+    cacheLocalJson(key, value) {
+        if (!key) return;
+        try {
+            localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+            console.warn(`[ContentManager] Failed local cache write for ${key}`, error);
+        }
+    }
+
+    setHTMLIfChanged(container, html, signatureKey) {
+        if (!container) return false;
+        const signature = `${signatureKey}:${html}`;
+        if (this._renderHtmlSignatures.get(signatureKey) === signature) {
+            return false;
+        }
+        this._renderHtmlSignatures.set(signatureKey, signature);
+        if (container.innerHTML !== html) {
+            container.innerHTML = html;
+        }
+        return true;
+    }
+
     async init() {
+        let pageContentHydrated = false;
+        const revealIfHydrated = () => {
+            if (!pageContentHydrated) return;
+            this.setContentReady(true);
+            this.setLoading(false);
+        };
+
+        this.setContentReady(false);
+
         // 1. Try to apply cached global settings INSTANTLY (pre-Firebase)
         try {
             const cachedDesign = localStorage.getItem('hkm_cache_settings_design');
             if (cachedDesign) {
-                this.applyGlobalSettings(JSON.parse(cachedDesign));
+                const parsedDesign = JSON.parse(cachedDesign);
+                if (parsedDesign && typeof parsedDesign === 'object') {
+                    this.applyGlobalSettings(parsedDesign);
+                }
             }
             const cachedSEO = localStorage.getItem('hkm_cache_settings_seo');
             if (cachedSEO) {
-                this.handleSEO(JSON.parse(cachedSEO));
+                const parsedSeo = JSON.parse(cachedSEO);
+                if (parsedSeo && typeof parsedSeo === 'object') {
+                    this.handleSEO(parsedSeo);
+                }
             }
-            // Also try to update some DOM for current page if cached
-            const cachedPage = localStorage.getItem(`hkm_cache_page_${this.pageId}`);
-            if (cachedPage) {
-                this.updateDOM(JSON.parse(cachedPage));
-            }
+            // Do not hydrate text content from cache to avoid visible text switching.
+            // We only apply fresh Firestore content below.
 
             const cachedHero = localStorage.getItem('hkm_cache_hero_slides');
             if (cachedHero) {
                 const heroData = JSON.parse(cachedHero);
                 if (heroData && heroData.slides) this.renderHeroSlides(heroData.slides);
             }
+
         } catch (e) {
             console.warn("[ContentManager] Early cache read failed", e);
         }
 
         let service = window.firebaseService;
-        if (!service || !service.isInitialized) {
-            // Wait for firebase module (reduced timeout and check frequency)
+        const canReadPublicContent = () => Boolean(
+            window.firebaseService
+            && typeof window.firebaseService.canReadPublicContent === 'function'
+            && window.firebaseService.canReadPublicContent()
+        );
+        if (!service || (!service.isInitialized && !canReadPublicContent())) {
+            // Wait for firebase module (increased timeout to 4s total)
             let count = 0;
-            while ((!window.firebaseService || !window.firebaseService.isInitialized) && count < 40) {
+            while (
+                (!window.firebaseService || (!window.firebaseService.isInitialized && !canReadPublicContent()))
+                && count < 80
+            ) {
                 await new Promise(r => setTimeout(r, 50));
                 count++;
             }
@@ -129,33 +669,63 @@ class ContentManager {
 
         service = window.firebaseService;
         try {
-            if (!service || !service.isInitialized) {
-                console.warn("⚠️ Firebase failed to initialize in time. Content may be limited.");
+            if (!service || (!service.isInitialized && !canReadPublicContent())) {
+                console.warn("⚠️ Firebase failed to initialize in time (4s). Content may be limited.");
             }
 
             // 1. Parallel Initial Load (Firestore defaults to cache if enabled)
-            const [content, globalSettings, seoSettings] = await Promise.all([
-                service ? service.getPageContent(this.pageId) : null,
-                service ? service.getPageContent('settings_design') : null,
-                service ? service.getPageContent('settings_seo') : null
-            ]);
+            const docIds = [this.pageId, 'settings_design', 'settings_seo', 'settings_global'];
+            if (this.pageId === 'index') {
+                docIds.push('settings_facebook_feed');
+            }
+            const docs = service && (service.isInitialized || canReadPublicContent())
+                ? await this.getContentDocs(docIds)
+                : {};
+            const content = docs[this.pageId] ?? null;
+            const globalSettings = docs.settings_design ?? null;
+            const seoSettings = docs.settings_seo ?? null;
+            const globalContent = docs.settings_global ?? null;
+            const facebookFeedSettings = docs.settings_facebook_feed ?? null;
 
-            localStorage.setItem(`hkm_cache_page_${this.pageId}`, JSON.stringify(content));
-            localStorage.setItem('hkm_cache_settings_design', JSON.stringify(globalSettings));
-            localStorage.setItem('hkm_cache_settings_seo', JSON.stringify(seoSettings));
+            this.cacheLocalJson(`hkm_cache_page_${this.pageId}`, content);
+            this.cacheLocalJson('hkm_cache_settings_design', globalSettings);
+            this.cacheLocalJson('hkm_cache_settings_seo', seoSettings);
+            this.cacheLocalJson('hkm_cache_settings_global', globalContent);
+            if (this.pageId === 'index') {
+                this.cacheLocalJson('hkm_cache_settings_facebook_feed', facebookFeedSettings);
+            }
 
             if (globalSettings) this.applyGlobalSettings(globalSettings);
-            if (content) this.updateDOM(content);
+            if (globalContent) this.updateDOM(globalContent, { docId: 'settings_global' }); // Apply global text (footer, etc)
+            if (content) {
+                this.updateDOM(content, { docId: this.pageId });
+                pageContentHydrated = true;
+            }
+            if (facebookFeedSettings) {
+                this.updateDOM(facebookFeedSettings, { docId: 'settings_facebook_feed' });
+            }
+
+            revealIfHydrated();
 
             // 2. SEO & Meta (Non-blocking)
             if (seoSettings) this.handleSEO(seoSettings);
 
-            // 3. Specialized Loaders
-            await this.loadSpecializedContent();
+            // 3. Specialized Loaders (Non-blocking if we already hydrated from cache)
+            if (pageContentHydrated) {
+                this.loadSpecializedContent().catch(e => this.reportError('loadSpecializedContent:async', e));
+            } else {
+                await this.loadSpecializedContent();
+            }
 
         } catch (error) {
-            console.error("[ContentManager] Init error:", error);
+            this.reportError('init', error, {
+                notifyUser: true,
+                userMessage: 'Noe innhold kunne ikke lastes. Siden kan være delvis oppdatert.'
+            });
         } finally {
+            if (pageContentHydrated) {
+                this.setContentReady(true);
+            }
             this.setLoading(false);
             window.dispatchEvent(new CustomEvent('cmsContentLoaded'));
         }
@@ -167,18 +737,21 @@ class ContentManager {
         const itemId = urlParams.get('id');
 
         if (itemId) {
-            const blogData = await firebaseService.getPageContent('collection_blog');
-            const teachingData = await firebaseService.getPageContent('collection_teaching');
+            const [blogData, teachingData] = await Promise.all([
+                this.getContentDoc('collection_blog', { silent: true }),
+                this.getContentDoc('collection_teaching', { silent: true })
+            ]);
             const allItems = [
-                ...(Array.isArray(blogData) ? blogData : (blogData?.items || [])),
-                ...(Array.isArray(teachingData) ? teachingData : (teachingData?.items || []))
+                ...this.getDedupedBlogItems(blogData),
+                ...this.getCollectionItems(teachingData)
             ];
-            const item = allItems.find(i => i.title === itemId || i.id === itemId);
-            if (item && (item.seoTitle || item.seoDescription || item.geoPosition)) {
+            const item = this.findContentItemById(allItems, itemId);
+            const localizedItem = item ? this.getLocalizedContentItem(item) : null;
+            if (localizedItem && (localizedItem.seoTitle || localizedItem.seoDescription || localizedItem.geoPosition)) {
                 itemSEO = {
-                    title: item.seoTitle,
-                    description: item.seoDescription,
-                    geoPosition: item.geoPosition
+                    title: localizedItem.seoTitle,
+                    description: localizedItem.seoDescription,
+                    geoPosition: localizedItem.geoPosition
                 };
             }
         }
@@ -187,21 +760,42 @@ class ContentManager {
 
     async loadSpecializedContent() {
         if (this.pageId === 'index') {
-            const heroData = await firebaseService.getPageContent('hero_slides');
+            const [heroData, events, blogData, teachingData, causes] = await Promise.all([
+                this.getContentDoc('hero_slides', { silent: true }),
+                this.loadEvents(),
+                this.getContentDoc('collection_blog', { silent: true }),
+                this.getContentDoc('collection_teaching', { silent: true }),
+                this.loadCauses()
+            ]);
+
             if (heroData && heroData.slides) {
-                localStorage.setItem('hkm_cache_hero_slides', JSON.stringify(heroData));
+                this.cacheLocalJson('hkm_cache_hero_slides', heroData);
                 this.renderHeroSlides(heroData.slides);
             }
 
-            const events = await this.loadEvents();
             this.renderEvents(events || []);
 
-            const blogData = await firebaseService.getPageContent('collection_blog');
-            const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
-            if (blogItems.length > 0) this.renderBlogPosts(blogItems.slice(0, 3), '#blogg .blog-grid');
+            try {
+                await this.loadFacebookFeed();
+            } catch (error) {
+                this.reportError('loadFacebookFeed:index', error, {
+                    notifyUser: false
+                });
+            }
 
-            const teachingData = await firebaseService.getPageContent('collection_teaching');
-            const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
+            // 4. Testimonials
+            const testimonialsData = await this.getContentDoc('collection_testimonials', { silent: true });
+            const testimonials = this.getCollectionItems(testimonialsData);
+            this.renderTestimonials(testimonials);
+
+            const blogItems = this.getDedupedBlogItems(blogData);
+            const localizedBlogItems = this.localizeBlogItems(blogItems);
+            if (localizedBlogItems.length > 0) {
+                // NO uses #blogg, EN/ES use #blog
+                this.renderBlogPosts(localizedBlogItems.slice(0, 3), '#blogg .blog-grid, #blog .blog-grid');
+            }
+
+            const teachingItems = this.getCollectionItems(teachingData);
             const frontTeachingContainer = document.getElementById('siste-undervisning');
             if (teachingItems.length > 0 && frontTeachingContainer) {
                 // Show up to 3 most recent teachings
@@ -209,7 +803,6 @@ class ContentManager {
                 this.renderTeachingSeries(teachingItems.slice(0, 3), '#front-teaching-grid');
             }
 
-            const causes = await this.loadCauses();
             this.renderCauses(causes);
 
             this.enableHeroAnimations();
@@ -220,7 +813,7 @@ class ContentManager {
         }
 
         if (this.pageId === 'arrangementer') {
-            const settings = await firebaseService.getPageContent('settings_integrations') || {};
+            const settings = await window.firebaseService.getPageContent('settings_integrations') || {};
             const events = await this.loadEvents();
 
             // 1. Month View
@@ -245,7 +838,7 @@ class ContentManager {
         }
 
         if (this.pageId === 'kalender') {
-            const settings = await firebaseService.getPageContent('settings_integrations') || {};
+            const settings = await window.firebaseService.getPageContent('settings_integrations') || {};
             if (settings.showMonthView !== false) {
                 const events = await this.loadEvents();
                 this.setupCalendarNavigation();
@@ -255,12 +848,12 @@ class ContentManager {
                 const container = document.querySelector('.calendar-section') || document.querySelector('main');
                 if (container) {
                     const lang = document.documentElement.lang || 'no';
-                    const eventsLink = this.getLocalizedLink('arrangementer.html');
+                    const eventsLink = this.getLocalizedLink('arrangementer');
                     const title = lang === 'en' ? 'Calendar is temporarily disabled.' : (lang === 'es' ? 'El calendario está desactivado temporalmente.' : 'Kalenderen er midlertidig deaktivert.');
                     const p = lang === 'en' ? 'Please check our events in the list above.' : (lang === 'es' ? 'Consulte nuestros eventos en la lista de arriba.' : 'Vennligst sjekk våre arrangementer i listen over.');
                     const btn = lang === 'en' ? 'See events' : (lang === 'es' ? 'Ver eventos' : 'Se arrangementer');
 
-                    container.innerHTML = `<div class="container" style="padding: 100px 20px; text-align: center;"><h2>${title}</h2><p>${p}</p><a href="${eventsLink}" class="btn btn-primary" style="margin-top: 20px;">${btn}</a></div>`;
+                    container.innerHTML = `<div class="container cms-calendar-disabled-state"><h2>${title}</h2><p>${p}</p><a href="${eventsLink}" class="btn btn-primary cms-calendar-disabled-cta">${btn}</a></div>`;
                 }
             }
         }
@@ -272,18 +865,30 @@ class ContentManager {
         if (this.pageId === 'blogg') {
             console.log("[ContentManager] Loading content for 'blogg' page...");
             try {
-                const blogData = await firebaseService.getPageContent('collection_blog');
+                const blogData = await window.firebaseService.getPageContent('collection_blog');
                 console.log("[ContentManager] Blog data received:", blogData);
 
-                const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
+                const blogItems = this.getDedupedBlogItems(blogData);
+                const localizedBlogItems = this.localizeBlogItems(blogItems);
                 console.log("[ContentManager] Parsed blog items:", blogItems);
+                const currentLang = this.getCurrentLanguage();
+                const postsToRender = currentLang === 'no'
+                    ? (localizedBlogItems.length > 0 ? localizedBlogItems : blogItems)
+                    : localizedBlogItems;
 
-                if (blogItems.length > 0) {
-                    this.renderBlogPosts(blogItems, '.blog-page .blog-grid');
+                if (postsToRender.length > 0) {
+                    this.renderBlogPosts(postsToRender, '.blog-page .blog-grid');
                 } else {
                     console.warn("[ContentManager] No blog posts found in 'collection_blog'.");
                     const container = document.querySelector('.blog-page .blog-grid');
-                    if (container) container.innerHTML = '<p style="text-align:center; padding: 20px;">Ingen blogginnlegg funnet. Kjør seed-scriptet.</p>';
+                    if (container) {
+                        const msg = currentLang === 'en'
+                            ? 'No translated blog posts are available in English yet.'
+                            : (currentLang === 'es'
+                                ? 'Todavia no hay entradas de blog traducidas al espanol.'
+                                : 'Ingen blogginnlegg funnet. Kjor seed-scriptet.');
+                        container.innerHTML = `<p class="cms-empty-copy">${msg}</p>`;
+                    }
                 }
             } catch (err) {
                 console.error("[ContentManager] Error loading blog posts:", err);
@@ -300,10 +905,10 @@ class ContentManager {
 
     async loadCauses() {
         try {
-            const data = await firebaseService.getPageContent('collection_causes');
-            return Array.isArray(data) ? data : (data?.items || []);
+            const data = await this.getContentDoc('collection_causes');
+            return this.getCollectionItems(data);
         } catch (e) {
-            console.warn('[ContentManager] Failed to load causes:', e);
+            this.reportError('loadCauses', e);
             return [];
         }
     }
@@ -321,32 +926,48 @@ class ContentManager {
 
         section.style.display = 'block';
 
-        container.innerHTML = causes.map(cause => `
+        const pageContent = (window.HKM_PAGE_CONTENT && this.pageId && window.HKM_PAGE_CONTENT[this.pageId]) || {};
+        const fallbackTitle = this.getValueByPath(pageContent, 'causes.card.defaultTitle') || 'Innsamlingsaksjon';
+        const collectedLabel = this.getValueByPath(pageContent, 'causes.card.collectedLabel') || 'samlet inn';
+        const goalLabel = this.getValueByPath(pageContent, 'causes.card.goalLabel') || 'Mål';
+        const ctaText = this.getValueByPath(pageContent, 'causes.card.cta') || 'Støtt prosjektet';
+
+        container.innerHTML = causes.map(cause => {
+            const imageUrl = cause.imageUrl || cause.image || 'img/placeholder-event.jpg';
+            const title = cause.title || fallbackTitle;
+            const description = cause.description || '';
+            const raised = Number(cause.raised ?? cause.collected ?? 0) || 0;
+            const goal = Number(cause.goal ?? 0) || 0;
+            const progress = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
+            const link = cause.link || this.getLocalizedLink('donasjoner');
+
+            return `
             <div class="cause-card">
                 <div class="cause-image">
-                    <img src="${cause.imageUrl || 'img/placeholder.jpg'}" alt="${cause.title}">
+                    <img src="${imageUrl}" alt="${title}">
                     ${cause.tag ? `<span class="cause-tag">${cause.tag}</span>` : ''}
                 </div>
                 <div class="cause-content">
-                    <h3 class="cause-title">${cause.title}</h3>
-                    <p class="cause-description">${cause.description}</p>
+                    <h3 class="cause-title">${title}</h3>
+                    <p class="cause-description">${description}</p>
                     
-                    ${cause.goal ? `
+                    ${goal ? `
                     <div class="cause-progress">
                         <div class="progress-bar">
-                            <div class="progress-fill" style="width: ${Math.min((cause.raised / cause.goal) * 100, 100)}%"></div>
+                            <div class="progress-fill" style="width: ${progress}%"></div>
                         </div>
                         <div class="progress-stats">
-                            <span>${cause.raised ? cause.raised.toLocaleString() : '0'} kr samlet inn</span>
-                            <span>Mål: ${cause.goal.toLocaleString()} kr</span>
+                            <span>${raised.toLocaleString('no-NO')} kr ${collectedLabel}</span>
+                            <span>${goalLabel}: ${goal.toLocaleString('no-NO')} kr</span>
                         </div>
                     </div>
                     ` : ''}
                     
-                    <a href="${cause.link || '#gi-gave'}" class="btn btn-primary btn-block">Støtt prosjektet</a>
+                    <a href="${link}" class="btn btn-primary btn-block">${ctaText}</a>
                 </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     }
 
     async renderSingleBlogPost() {
@@ -359,40 +980,143 @@ class ContentManager {
 
         if (!container) return;
 
+        const revealPostContainer = () => {
+            const skeleton = document.getElementById('post-skeleton');
+            if (skeleton) skeleton.style.display = 'none';
+            container.style.display = 'block';
+            if (!container.style.transition) {
+                requestAnimationFrame(() => {
+                    container.style.opacity = '0';
+                    container.style.transition = 'opacity 0.4s ease';
+                    requestAnimationFrame(() => { container.style.opacity = '1'; });
+                });
+            }
+        };
+
+        try {
+
         const urlParams = new URLSearchParams(window.location.search);
         const itemId = urlParams.get('id');
 
         if (!itemId) {
             container.innerHTML = '<p>Fant ikke innlegget.</p>';
+            revealPostContainer();
             return;
         }
 
-        const blogData = await firebaseService.getPageContent('collection_blog');
-        const teachingData = await firebaseService.getPageContent('collection_teaching');
-        const blogItems = Array.isArray(blogData) ? blogData : (blogData?.items || []);
-        const teachingItems = Array.isArray(teachingData) ? teachingData : (teachingData?.items || []);
-        const blogItem = blogItems.find(i => i.title === itemId || i.id === itemId);
-        const teachingItem = teachingItems.find(i => i.title === itemId || i.id === itemId);
-        const item = blogItem || teachingItem;
+        console.log(`[ContentManager] Fetching data for single post (ID: ${itemId})...`);
+        const blogData = await window.firebaseService.getPageContent('collection_blog');
+        const teachingData = await window.firebaseService.getPageContent('collection_teaching');
+        
+        console.log(`[ContentManager] Data received. Blog items: ${blogData?.items?.length || 0}, Teaching items: ${teachingData?.items?.length || 0}`);
+        const blogItems = this.getDedupedBlogItems(blogData);
+        const teachingItems = this.getCollectionItems(teachingData);
+        let blogItem = this.findContentItemById(blogItems, itemId);
+        let teachingItem = this.findContentItemById(teachingItems, itemId);
+        
+        // Fallback: If not found in deduped items, check raw items
+        if (!blogItem && blogData && Array.isArray(blogData.items)) {
+            blogItem = this.findContentItemById(blogData.items, itemId);
+        }
+        if (!teachingItem && teachingData && Array.isArray(teachingData.items)) {
+            teachingItem = this.findContentItemById(teachingData.items, itemId);
+        }
+        
+        const sourceItem = blogItem || teachingItem;
+        const item = sourceItem ? this.getLocalizedContentItem(sourceItem) : null;
         const isTeaching = !!teachingItem;
+        const postId = sourceItem ? (sourceItem.__stableId || this.getContentItemStableId(sourceItem)) : null;
 
         if (!item) {
-            container.innerHTML = '<p>Innholdet ble ikke funnet.</p>';
+            const lang = this.getCurrentLanguage();
+            const msg = lang === 'en' ? 'The content could not be found.' : (lang === 'es' ? 'No se pudo encontrar el contenido.' : 'Innholdet ble ikke funnet.');
+            container.innerHTML = `<p>${msg}</p>`;
+            revealPostContainer();
             return;
         }
 
         if (titleEl) titleEl.textContent = item.title || 'Blogginnlegg';
         if (breadcrumbEl) breadcrumbEl.textContent = item.title || 'Blogginnlegg';
 
-        if (dateEl) {
-            const dateStr = item.date ? this.formatDate(item.date) : '';
-            dateEl.innerHTML = `<i class="far fa-calendar"></i> ${dateStr}`;
-        }
-
         const authorEl = document.getElementById('single-post-author');
         if (authorEl) {
-            const auth = item.author || 'Ukjent forfatter';
-            authorEl.innerHTML = `<i class="fas fa-user"></i> ${auth}`;
+            const auth = item.author || sourceItem?.author || 'Ukjent forfatter';
+            authorEl.textContent = auth;
+        }
+
+        // Populate author avatar in hero
+        const avatarEl = document.getElementById('single-post-author-avatar');
+        if (avatarEl) {
+            // HKM Fix: Use actual author photo or a professional icon fallback
+            let avatarUrl = item.authorPhoto || sourceItem?.authorPhoto;
+            const authorName = item.author || sourceItem?.author || '';
+            
+            const renderAvatar = (url) => {
+                const el = document.getElementById('single-post-author-avatar');
+                if (!el) return;
+                
+                if (url && url !== 'img/author-placeholder.png') {
+                    if (el.tagName === 'DIV') {
+                        const img = document.createElement('img');
+                        img.id = 'single-post-author-avatar';
+                        img.className = el.className;
+                        img.style.cssText = el.style.cssText;
+                        img.src = url;
+                        img.alt = `Forfatterens bilde: ${authorName}`;
+                        el.replaceWith(img);
+                    } else {
+                        el.src = url;
+                        el.alt = `Forfatterens bilde: ${authorName}`;
+                        el.style.display = 'inline-block';
+                    }
+                } else if (el.tagName === 'IMG') {
+                    // Fallback: Show a nice FontAwesome icon instead of a broken/wrong image
+                    const iconContainer = document.createElement('div');
+                    iconContainer.id = 'single-post-author-avatar';
+                    // Copy styles from the original img for layout consistency
+                    iconContainer.style.width = '40px';
+                    iconContainer.style.height = '40px';
+                    iconContainer.style.borderRadius = '50%';
+                    iconContainer.style.backgroundColor = 'rgba(255,255,255,0.2)';
+                    iconContainer.style.display = 'inline-flex';
+                    iconContainer.style.alignItems = 'center';
+                    iconContainer.style.justifyContent = 'center';
+                    iconContainer.style.border = '2px solid rgba(255,255,255,0.7)';
+                    iconContainer.style.flexShrink = '0';
+                    iconContainer.style.color = 'white';
+                    iconContainer.style.fontSize = '18px';
+                    
+                    iconContainer.innerHTML = '<i class="fas fa-user"></i>';
+                    el.replaceWith(iconContainer);
+                }
+            };
+
+            // First render whatever we have locally
+            renderAvatar(avatarUrl);
+
+            // Then asynchronously ask the Users database for the freshest picture!
+            if (authorName && window.firebaseService && window.firebaseService.db) {
+                window.firebaseService.db.collection('users')
+                    .where('displayName', '==', authorName)
+                    .limit(1)
+                    .get()
+                    .then(snap => {
+                        if (!snap.empty) {
+                            const latestPhoto = snap.docs[0].data().photoURL;
+                            if (latestPhoto && latestPhoto !== avatarUrl) {
+                                renderAvatar(latestPhoto);
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.warn('[ContentManager] Kunne ikke hente ferskt brukerbilde:', err);
+                    });
+            }
+        }
+
+        if (dateEl) {
+            const dateStr = item.date ? this.formatDate(item.date) : '';
+            dateEl.textContent = dateStr;
         }
 
         if (categoryEl) {
@@ -400,82 +1124,93 @@ class ContentManager {
             categoryEl.innerHTML = cat ? `<i class="fas fa-tag"></i> ${cat}` : '';
         }
 
-        if (heroEl && item.imageUrl) {
-            heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${item.imageUrl}')`;
+        const articleHtml = this.resolveArticleHtml(item, sourceItem);
+        const heroImage = this.getContentItemImage(item, sourceItem, articleHtml);
+        if (heroEl && heroImage) {
+            heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${heroImage}')`;
+            heroEl.style.backgroundSize = 'cover';
+            heroEl.style.backgroundPosition = 'center center';
+            heroEl.style.backgroundRepeat = 'no-repeat';
         }
 
         // --- Calculate Reading Time ---
-        let readingTime = 5; // default fallback
-        if (item.content) {
-            const textContent = this.stripHtml(this.parseBlocks(item.content));
+        let readingTime = Number(item?.minutesToRead ?? sourceItem?.minutesToRead ?? 0);
+        if (!(Number.isFinite(readingTime) && readingTime > 0) && articleHtml) {
+            const textContent = this.stripHtml(articleHtml);
             const wordCount = textContent.split(/\s+/).filter(word => word.length > 0).length;
             readingTime = Math.max(1, Math.ceil(wordCount / 225)); // 225 words per minute
+        }
+        if (!(Number.isFinite(readingTime) && readingTime > 0)) {
+            readingTime = 5;
         }
 
         const readingTimeEl = document.getElementById('single-post-readingtime');
         if (readingTimeEl) {
             const timeLabel = this.getTranslation('reading_time') || 'min lesing';
-            readingTimeEl.innerHTML = `<i class="far fa-clock"></i> ${readingTime} ${timeLabel}`;
+            readingTimeEl.textContent = `${readingTime} ${timeLabel}`;
             readingTimeEl.style.display = 'inline-block';
-        }
-
-        // --- View Counter ---
-        const postId = item.id || item.title;
-        let viewCount = 1;
-
-        if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
-            try {
-                // Determine doc reference based on a secure collection pattern.
-                // In an ideal world we don't spam get/set. If cache works, rely on it. Just trigger an increment.
-                const docRef = window.firebaseService.db.collection('blog_stats').doc(postId);
-
-                // Read current stats (if exists) before incrementing, allows immediate update while updating remote.
-                const docSnap = await docRef.get();
-                if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
-                    viewCount = docSnap.data().views + 1;
-                }
-
-                // Increment view asynchronously
-                docRef.set({
-                    views: window.firebase.firestore.FieldValue.increment(1)
-                }, { merge: true }).catch(err => {
-                    console.warn('[ContentManager] Kunne ikke oppdatere visninger, kanskje manglende tilgang:', err);
-                });
-            } catch (err) {
-                console.warn('[ContentManager] Feil ved henting av visninger:', err);
-            }
         }
 
         let viewsEl = document.getElementById('single-post-views');
         if (!viewsEl && document.querySelector('.blog-meta')) {
             viewsEl = document.createElement('span');
             viewsEl.id = 'single-post-views';
-
-            // Insert after readingTimeEl if we can, otherwise just append to meta box
             if (readingTimeEl && readingTimeEl.parentNode) {
                 readingTimeEl.parentNode.appendChild(viewsEl);
             } else {
                 document.querySelector('.blog-meta').appendChild(viewsEl);
             }
         }
-        if (viewsEl) {
+
+        const updateViewsUI = (localViews) => {
+            if (!viewsEl) return;
+            const viewCount = localViews;
             const viewsLabel = this.getTranslation('views') || 'visninger';
             viewsEl.innerHTML = `<i class="far fa-eye"></i> ${viewCount} ${viewsLabel}`;
             viewsEl.style.display = 'inline-block';
+        };
+
+        // Render initial view count
+        updateViewsUI(0);
+
+        if (postId && window.firebaseService && window.firebaseService.db && window.firebase && window.firebase.firestore) {
+            (async () => {
+                try {
+                    const docRef = window.firebaseService.db.collection('blog_stats').doc(postId);
+                    const docSnap = await Promise.race([
+                        docRef.get(),
+                        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 3000))
+                    ]);
+                    if (docSnap.exists && typeof docSnap.data().views !== 'undefined') {
+                        const existingLocalViews = Number(docSnap.data().views);
+                        const finalViews = Number.isFinite(existingLocalViews) ? Math.max(0, Math.floor(existingLocalViews)) + 1 : 1;
+                        updateViewsUI(finalViews);
+                    }
+                    docRef.set({
+                        views: window.firebase.firestore.FieldValue.increment(1)
+                    }, { merge: true }).catch(err => {
+                        console.warn('[ContentManager] Kunne ikke oppdatere visninger:', err);
+                    });
+                } catch (err) {
+                    console.warn('[ContentManager] Feil ved henting av visninger:', err);
+                }
+            })();
         }
 
-        container.innerHTML = this.parseBlocks(item.content) || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+        if (container) {
+            try {
+                const finalHtml = this.cleanLegacyHtml(articleHtml);
+                container.innerHTML = finalHtml || '<p>Dette innlegget har foreløpig ikke noe innhold.</p>';
+            } catch (err) {
+                console.error('[ContentManager] Render error:', err);
+            }
+        }
+
+        // Reveal content
+
 
         // Hide skeleton, reveal real content with fade-in
-        const skeleton = document.getElementById('post-skeleton');
-        if (skeleton) skeleton.style.display = 'none';
-        container.style.display = 'block';
-        // Small rAF so display:block takes effect before opacity transition
-        requestAnimationFrame(() => {
-            container.style.opacity = '0';
-            container.style.transition = 'opacity 0.4s ease';
-            requestAnimationFrame(() => { container.style.opacity = '1'; });
-        });
+        revealPostContainer();
         // Fade in hero title and meta row
         const heroTitle = document.getElementById('single-post-title');
         const metaRow = document.getElementById('blog-meta-row');
@@ -487,10 +1222,10 @@ class ContentManager {
         if (backBtn) {
             if (isTeaching) {
                 backBtn.href = 'media.html#teaching-section';
-                backBtn.innerHTML = '<i class="fas fa-arrow-left" style="margin-right:8px;"></i> Tilbake til undervisning';
+                backBtn.innerHTML = '<i class="fas fa-arrow-left cms-inline-icon-gap"></i> Tilbake til undervisning';
             } else {
                 backBtn.href = 'blogg.html';
-                backBtn.innerHTML = '<i class="fas fa-arrow-left" style="margin-right:8px;"></i> Tilbake til blogg';
+                backBtn.innerHTML = '<i class="fas fa-arrow-left cms-inline-icon-gap"></i> Tilbake til blogg';
             }
         }
 
@@ -503,12 +1238,12 @@ class ContentManager {
                 authorBox.style.background = '#f8fafc';
                 authorBox.style.padding = '20px';
 
-                const tagsHtml = `<div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 15px;">
+                const tagsHtml = `<div class="cms-post-tags-wrap">
                     ${item.tags.map(t => `<span class="blog-tag">${t}</span>`).join('')}
                 </div>`;
 
                 authorBox.innerHTML = `
-                    <h4 style="margin: 0; font-size: 1rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Emner</h4>
+                    <h4 class="cms-post-tags-title">Emner</h4>
                     ${tagsHtml}
                 `;
             } else {
@@ -521,22 +1256,22 @@ class ContentManager {
         const relatedContainer = document.getElementById('single-post-related');
         if (relatedContainer) {
             let relatedItems = [];
-            let heading = 'Relaterte innlegg';
-            let ctaLabel = 'Les mer';
+            let heading = this.getTranslation('related_posts');
+            let ctaLabel = this.getTranslation('read_more');
 
             if (isTeaching) {
-                heading = 'Relatert undervisning';
-                ctaLabel = 'Les undervisning';
-                const seriesIds = Array.isArray(item.seriesItems) ? item.seriesItems : [];
+                heading = this.getTranslation('related_teaching');
+                ctaLabel = this.getTranslation('read_teaching');
+                const seriesIds = Array.isArray(sourceItem?.seriesItems) ? sourceItem.seriesItems : [];
                 if (seriesIds.length > 0) {
                     relatedItems = teachingItems.filter(i =>
                         (seriesIds.includes(i.id) || seriesIds.includes(i.title)) &&
-                        (i.id || i.title) !== postId
+                        this.getContentItemStableId(i) !== postId
                     );
                 } else {
-                    const teachingType = item.teachingType || item.category;
+                    const teachingType = sourceItem?.teachingType || sourceItem?.category || item.teachingType || item.category;
                     relatedItems = teachingItems
-                        .filter(i => (i.id || i.title) !== postId)
+                        .filter(i => this.getContentItemStableId(i) !== postId)
                         .filter(i => {
                             if (!teachingType) return true;
                             return (i.teachingType || i.category) === teachingType;
@@ -544,41 +1279,45 @@ class ContentManager {
                         .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
                         .slice(0, 3);
                 }
-            } else if (item.relatedPosts && Array.isArray(item.relatedPosts) && item.relatedPosts.length > 0) {
+            } else if (sourceItem?.relatedPosts && Array.isArray(sourceItem.relatedPosts) && sourceItem.relatedPosts.length > 0) {
                 // Fetch manually selected ones
-                relatedItems = blogItems.filter(i => (item.relatedPosts.includes(i.id) || item.relatedPosts.includes(i.title)) && (i.id || i.title) !== postId);
+                relatedItems = blogItems.filter(i =>
+                    (sourceItem.relatedPosts.includes(i.id) || sourceItem.relatedPosts.includes(i.title)) &&
+                    this.getContentItemStableId(i) !== postId
+                );
             } else {
                 // Fallback: 3 most recent posts excluding current one
                 relatedItems = blogItems
-                    .filter(i => (i.id || i.title) !== postId)
+                    .filter(i => this.getContentItemStableId(i) !== postId)
                     .sort((a, b) => new Date(b.date) - new Date(a.date))
                     .slice(0, 3);
             }
 
             if (relatedItems.length > 0) {
+                const localizedRelatedItems = this.localizeBlogItems(relatedItems);
                 relatedContainer.style.display = 'block';
                 relatedContainer.innerHTML = `
-                    <h3 style="margin-bottom: 30px; font-size: 1.5rem; color: #334155; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+                    <h3 class="cms-related-heading">
                         ${heading}
                     </h3>
-                    <div class="blog-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px;">
-                        ${relatedItems.map(post => `
-                            <article class="blog-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #f1f5f9; transition: transform 0.2s ease;">
-                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" style="text-decoration: none; color: inherit; display: block;">
-                                    <div class="blog-image" style="height: 180px; overflow: hidden; position: relative;">
-                                        <img src="${post.imageUrl || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
+                    <div class="blog-grid cms-related-grid">
+                        ${localizedRelatedItems.map(post => `
+                            <article class="blog-card cms-related-card">
+                                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.__stableId || this.getContentItemStableId(post))}" class="cms-related-card-link">
+                                    <div class="blog-image cms-related-image">
+                                        <img src="${this.getContentItemImage(post) || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'}" 
                                              alt="${post.title}" 
-                                             style="width: 100%; height: 100%; object-fit: cover;">
-                                        ${post.category ? `<span style="position: absolute; bottom: 10px; right: 10px; background: var(--secondary-color, #ff6b2b); color: white; padding: 2px 10px; border-radius: 4px; font-size: 11px; font-weight: 600;">${post.category}</span>` : ''}
+                                             class="cms-related-image-el">
+                                        ${post.category ? `<span class="cms-related-category">${post.category}</span>` : ''}
                                     </div>
-                                    <div class="blog-content" style="padding: 20px;">
-                                        <div class="blog-meta" style="font-size: 12px; color: #64748b; margin-bottom: 10px; display: flex; gap: 15px;">
+                                    <div class="blog-content cms-related-content">
+                                        <div class="blog-meta cms-related-meta">
                                             <span><i class="far fa-calendar"></i> ${post.date ? this.formatDate(post.date) : ''}</span>
                                             ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : ''}
                                         </div>
-                                        <h4 style="font-size: 1.1rem; margin-bottom: 15px; line-height: 1.4; font-weight: 700; color: #1e293b;">${post.title}</h4>
-                                        <span style="color: var(--primary-color, #ff6b2b); font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 5px;">
-                                           ${ctaLabel} <i class="fas fa-arrow-right" style="font-size: 12px;"></i>
+                                        <h4 class="cms-related-title">${post.title}</h4>
+                                        <span class="cms-related-cta">
+                                           ${ctaLabel} <i class="fas fa-arrow-right cms-related-cta-icon"></i>
                                         </span>
                                     </div>
                                 </a>
@@ -590,15 +1329,31 @@ class ContentManager {
                 relatedContainer.style.display = 'none';
             }
         }
+
+        // --- Interactions (Likes & Comments) ---
+        if (postId) {
+            if (this._currentInteractionsManager) {
+                this._currentInteractionsManager.cleanup();
+            }
+            this._currentInteractionsManager = new InteractionsManager('blog-interactions', postId);
+        }
+        } catch (error) {
+            console.error('[ContentManager] renderSingleBlogPost failed:', error);
+            container.innerHTML = '<p>Kunne ikke laste innlegget akkurat nå.</p>';
+            revealPostContainer();
+        }
     }
 
     async loadEvents(forceRefresh = false) {
         try {
             const { startIso, endIso } = this.getMonthRangeIso(this.currentDate);
-            const cacheKey = `hkm_events_${startIso}_${endIso}`;
+            const cacheKey = `hkm_events_v2_${startIso}_${endIso}`;
+            const isLocalDev = ['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase());
+            const integrations = await this.getContentDoc('settings_integrations', { silent: true }) || {};
+            let finalEvents = [];
 
             // 1. Check Cache (Use localStorage for better persistence)
-            if (!forceRefresh) {
+            if (!forceRefresh && !isLocalDev) {
                 try {
                     const cached = localStorage.getItem(cacheKey);
                     if (cached) {
@@ -622,16 +1377,19 @@ class ContentManager {
                 if (!eventDate) return false;
                 return eventDate >= rangeStart && eventDate <= rangeEnd;
             });
-
-            let finalEvents = [];
-
-            // 2. Prefer direct GCal fetch when configured
-            const integrations = await firebaseService.getPageContent('settings_integrations');
             const gcal = integrations?.googleCalendar || {};
             const apiKey = gcal.apiKey || '';
-            const calendarList = Array.isArray(integrations?.googleCalendars)
+            const calendarListRaw = Array.isArray(integrations?.googleCalendars)
                 ? integrations.googleCalendars
                 : [];
+            const calendarList = calendarListRaw
+                .filter((item) => item && typeof item === 'object')
+                .map((item) => ({
+                    id: item.id || item.calendarId || '',
+                    label: item.label || item.name || ''
+                }))
+                .filter((item) => item.id);
+
             const calendars = calendarList.length > 0
                 ? calendarList
                 : (gcal.calendarId ? [{ id: gcal.calendarId, label: gcal.label || 'Arrangementer' }] : []);
@@ -652,7 +1410,7 @@ class ContentManager {
             }
 
             // 3. Fetch Firestore events (always, to allow overrides or manual events)
-            const eventData = await firebaseService.getPageContent('collection_events');
+            const eventData = await this.getContentDoc('collection_events', { silent: true });
             const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
             const taggedFirebase = firebaseItems.map(event => ({
                 ...event,
@@ -679,20 +1437,53 @@ class ContentManager {
                 finalEvents = [...taggedFirebase, ...monthHolidays];
             }
 
+            if (isLocalDev) {
+                try {
+                    console.info('[ContentManager] loadEvents debug', {
+                        forceRefresh: Boolean(forceRefresh),
+                        apiKeyConfigured: Boolean(apiKey),
+                        calendarsConfigured: calendars.length,
+                        gcalEvents: gcalEvents.length,
+                        firebaseManualEvents: taggedFirebase.length,
+                        holidays: monthHolidays.length,
+                        finalEvents: finalEvents.length,
+                        nonHolidayEvents: finalEvents.filter(e => !e?.isHoliday).length,
+                        firstNonHoliday: finalEvents.find(e => !e?.isHoliday) || null
+                    });
+                } catch (debugErr) {
+                    // noop
+                }
+            }
+
+            // If we only ended up with holidays while event sources are configured, a stale/partial state
+            // may have slipped through. Retry once without cache before giving up.
+            const nonHolidayCount = finalEvents.filter(e => !e?.isHoliday).length;
+            const hasEventSourcesConfigured = Boolean((apiKey && calendars.length > 0) || taggedFirebase.length > 0);
+            if (!forceRefresh && hasEventSourcesConfigured && nonHolidayCount === 0) {
+                console.warn('[ContentManager] loadEvents returned only holidays/empty. Retrying once with forceRefresh...');
+                return this.loadEvents(true);
+            }
+
             // Save to Cache
-            try {
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    timestamp: Date.now(),
-                    events: finalEvents
-                }));
-            } catch (e) {
-                console.warn('[ContentManager] Failed to cache events', e);
+            if (!isLocalDev) {
+                try {
+                    localStorage.setItem(cacheKey, JSON.stringify({
+                        timestamp: Date.now(),
+                        events: finalEvents
+                    }));
+                } catch (e) {
+                    console.warn('[ContentManager] Failed to cache events', e);
+                }
             }
 
             return finalEvents;
 
         } catch (err) {
-            console.error('[ContentManager] loadEvents critical error:', err);
+            const isLocalFile = window.location.protocol === 'file:';
+            this.reportError('loadEvents', err, {
+                notifyUser: !isLocalFile, // Only notify if NOT a local file
+                userMessage: 'Kunne ikke laste arrangementer akkurat nå.'
+            });
             return [];
         }
     }
@@ -915,8 +1706,13 @@ class ContentManager {
             cellEvents.forEach(e => {
                 const tag = document.createElement('div');
                 tag.className = 'cal-event-tag';
+
+                // Add past event class if applicable
+                if (this.isEventPast(e)) {
+                    tag.classList.add('cms-past-event-tag');
+                }
+
                 tag.innerText = e.title;
-                const startValue = e.start || e.date;
                 const eventTime = this.parseEventDate(startValue);
                 const hasTime = this.eventHasTime(startValue);
                 const timeLabel = eventTime && hasTime
@@ -1014,20 +1810,36 @@ class ContentManager {
             this.setEventCache(events);
 
             if (!events || events.length === 0) {
-                container.innerHTML = '<div class="events-empty-state" style="grid-column: 1/-1; display: block; width: 100%; padding: 40px; text-align: center; background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; color: var(--text-dark);"><h3 style="margin-bottom: 10px;">Ingen kommende arrangementer</h3><p>Vi har foreløpig ingen planlagte arrangementer i kalenderen.</p></div>';
+                container.innerHTML = `
+                    <div class="events-empty-state cms-events-empty-state">
+                        <h3 class="cms-events-empty-title">Ingen kommende arrangementer</h3>
+                        <p>Vi har foreløpig ingen planlagte arrangementer i kalenderen.</p>
+                    </div>
+                `;
                 return;
             }
 
-            // DEBUG: Log first event
-            if (window.cmsLog && events.length > 0) {
-                try {
-                    console.log('[CMS] First event:', events[0]);
-                } catch (e) { }
+            // Filter out holidays from the "boxes" (cards) view
+            // AND filter out past events from boxes correctly
+            const now = new Date();
+            const filteredEvents = (events || []).filter(e => {
+                if (e.isHoliday) return false;
+
+                // For "boxes", we only want future events (or events currently happening)
+                return !this.isEventPast(e);
+            });
+
+            const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
+
+            if (['localhost', '127.0.0.1'].includes(String(window.location.hostname || '').toLowerCase())) {
+                console.info('[ContentManager] renderEvents debug', {
+                    pageId: this.pageId,
+                    inputEvents: Array.isArray(events) ? events.length : 0,
+                    nonHolidayEvents: filteredEvents.length,
+                    displayEvents: displayEvents.length
+                });
             }
 
-            // Filter out holidays from the "boxes" (cards) view
-            const filteredEvents = (events || []).filter(e => !e.isHoliday);
-            const displayEvents = this.pageId === 'index' ? filteredEvents.slice(0, 3) : filteredEvents;
             const html = displayEvents.map(event => {
                 try {
                     const eventKey = this.getEventKey(event);
@@ -1140,8 +1952,12 @@ class ContentManager {
             const timeLabel = timeStr ? timeStr : 'Tid ikke satt';
             const location = event.location || 'Sted ikke satt';
 
+            // Check if event is in the past for graying out
+            const isPast = this.isEventPast(event);
+            const pastClass = isPast ? 'cms-past-event-agenda' : '';
+
             return `
-                < li class="calendar-agenda-item" >
+                <li class="calendar-agenda-item ${pastClass}">
                     <div class="agenda-date-col">
                         <span class="agenda-day">${dayNum}</span>
                         <span class="agenda-month">${monthStr}</span>
@@ -1156,7 +1972,7 @@ class ContentManager {
                         <span class="agenda-meta">${location}</span>
                     </div>
                     <button type="button" class="agenda-link event-modal-trigger" data-event-key="${eventKey}">Detaljer</button>
-                </li >
+                </li>
                 `;
         }).join('');
 
@@ -1198,6 +2014,254 @@ class ContentManager {
     getEventKey(event) {
         if (!event) return '';
         return event.id || `${event.title || 'event'}| ${event.start || event.date || ''} `;
+    }
+
+    /**
+     * Dynamically render Testimonials or fallback to empty
+     */
+    renderTestimonials(testimonials) {
+        const container = document.querySelector('.testimonial-track');
+        const section = document.querySelector('.testimonials');
+        if (!container) return;
+
+        if (!testimonials || testimonials.length === 0) {
+            container.innerHTML = '';
+            if (section) section.style.display = 'none';
+            return;
+        }
+
+        if (section) section.style.display = 'block';
+
+        const testimonialsMarkup = testimonials.map((t, idx) => `
+            <div class="testimonial-card ${idx === 0 ? 'active' : ''}">
+                <div class="testimonial-image">
+                    <img src="${t.imageUrl || 'https://via.placeholder.com/150'}" alt="${t.name}">
+                </div>
+                <p class="testimonial-text">"${t.text || ''}"</p>
+                <h4 class="testimonial-name">${t.name || ''}</h4>
+                <span class="testimonial-role">${t.role || 'Deltaker'}</span>
+            </div>
+        `).join('');
+
+        this.setHTMLIfChanged(container, testimonialsMarkup, '__testimonials-html');
+
+        // Re-initialize Testimonial Slider
+        if (window.testimonialSlider) {
+            window.testimonialSlider.init();
+        }
+    }
+
+    extractFacebookPageIdentifier(value) {
+        if (typeof value !== 'string') return '';
+        const trimmed = value.trim();
+        if (!trimmed) return '';
+
+        if (!/^https?:\/\//i.test(trimmed)) {
+            if (/facebook\.com\//i.test(trimmed)) {
+                return this.extractFacebookPageIdentifier(`https://${trimmed.replace(/^\/+/, '')}`);
+            }
+            return trimmed.replace(/^@+/, '').trim();
+        }
+
+        try {
+            const parsed = new URL(trimmed);
+            const queryId = parsed.searchParams.get('id');
+            if (queryId && queryId.trim()) {
+                return queryId.trim();
+            }
+
+            const ignoredSegments = new Set([
+                'pages',
+                'pg',
+                'profile.php',
+                'posts',
+                'events',
+                'watch',
+                'photos',
+                'videos',
+                'reel',
+                'share'
+            ]);
+            const segments = parsed.pathname
+                .split('/')
+                .map((segment) => segment.trim())
+                .filter(Boolean);
+
+            for (const segment of segments) {
+                if (!ignoredSegments.has(segment.toLowerCase())) {
+                    return segment.replace(/^@+/, '').trim();
+                }
+            }
+        } catch (error) {
+            return trimmed
+                .replace(/^https?:\/\//i, '')
+                .replace(/^www\./i, '')
+                .replace(/^facebook\.com\//i, '')
+                .split(/[/?#]/)[0]
+                .replace(/^@+/, '')
+                .trim();
+        }
+
+        return '';
+    }
+
+    getFacebookFeedConfig() {
+        const section = document.getElementById('facebook-feed');
+        const pageContent = (window.HKM_PAGE_CONTENT && this.pageId && window.HKM_PAGE_CONTENT[this.pageId]) || {};
+        const feedDoc = (window.HKM_CONTENT_DOCS && window.HKM_CONTENT_DOCS.settings_facebook_feed) || null;
+        const sectionLink = section ? section.querySelector('.facebook-feed-cta') : null;
+        const feedContent = this.getValueByPath(feedDoc || {}, 'facebookFeed')
+            || this.getValueByPath(pageContent, 'facebookFeed')
+            || {};
+        const cardCount = section ? section.querySelectorAll('.facebook-post-card').length : 3;
+        let livePostCount = Number(feedContent.livePostCount);
+
+        if (!Number.isFinite(livePostCount)) {
+            livePostCount = cardCount || 3;
+        }
+
+        livePostCount = Math.min(Math.max(Math.round(livePostCount), 1), Math.max(cardCount, 1));
+
+        return {
+            section,
+            enabled: feedContent.enabled !== false,
+            useLiveFeed: feedContent.useLiveFeed !== false,
+            livePostCount,
+            pageId: (typeof feedContent.pageId === 'string' ? feedContent.pageId.trim() : '')
+                || this.extractFacebookPageIdentifier(typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl : '')
+                || this.extractFacebookPageIdentifier(sectionLink?.getAttribute('href') || ''),
+            pageUrl: (typeof feedContent.pageUrl === 'string' ? feedContent.pageUrl.trim() : '')
+                || (sectionLink?.getAttribute('href') || '').trim()
+        };
+    }
+
+    getFacebookFeedUrls(limit = 3, { pageId = '', pageUrl = '' } = {}) {
+        const params = new URLSearchParams({ limit: String(limit) });
+        if (pageId) params.set('pageId', pageId);
+        if (pageUrl) params.set('pageUrl', pageUrl);
+        const projectId = (window.firebaseConfig && window.firebaseConfig.projectId) || 'his-kingdom-ministry';
+        const urls = [`/api/facebook-feed?${params.toString()}`];
+        const cloudFunctionUrl = `https://us-central1-his-kingdom-ministry.cloudfunctions.net/facebookFeed?${params.toString()}`;
+
+        if (!urls.includes(cloudFunctionUrl)) {
+            urls.push(cloudFunctionUrl);
+        }
+
+        return urls;
+    }
+
+    async loadFacebookFeed() {
+        const config = this.getFacebookFeedConfig();
+        const { section } = config;
+        if (!section) return;
+
+        if (!config.enabled) {
+            section.style.display = 'none';
+            return;
+        }
+
+        // Only show immediately if we are NOT using live feed (showing static/cached content)
+        if (!config.useLiveFeed) {
+            section.style.display = '';
+            return;
+        }
+
+        let lastError = null;
+
+        for (const url of this.getFacebookFeedUrls(config.livePostCount, {
+            pageId: config.pageId,
+            pageUrl: config.pageUrl
+        })) {
+            try {
+                const response = await fetch(url, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    lastError = new Error(`Facebook feed request failed with ${response.status}`);
+                    continue;
+                }
+
+                const payload = await response.json();
+                const items = Array.isArray(payload?.items) ? payload.items : [];
+
+                if (!items.length) {
+                    continue;
+                }
+
+                this.renderFacebookFeed(items, payload.pageUrl || config.pageUrl || '');
+                return;
+            } catch (error) {
+                lastError = error;
+            }
+        }
+
+        if (lastError) {
+            console.warn('[ContentManager] Could not load live Facebook feed. Hiding section.', lastError);
+            section.style.display = 'none'; // Hide if live feed fails and we have no fallback content
+        }
+    }
+
+    renderFacebookFeed(posts, pageUrl = '') {
+        const section = document.getElementById('facebook-feed');
+        if (!section) return;
+
+        // Ensure section is visible once we have data to render
+        section.style.display = '';
+
+        const cards = Array.from(section.querySelectorAll('.facebook-post-card'));
+        const pageLink = section.querySelector('.facebook-feed-cta');
+        const normalizedPosts = Array.isArray(posts) ? posts.slice(0, cards.length) : [];
+
+        if (!normalizedPosts.length) return;
+
+        if (pageLink && pageUrl) {
+            pageLink.href = pageUrl;
+        }
+
+        cards.forEach((card, index) => {
+            const post = normalizedPosts[index];
+            if (!post) {
+                card.style.display = 'none';
+                return;
+            }
+
+            card.style.display = '';
+
+            if (post.link) {
+                card.href = post.link;
+            }
+
+            const dateEl = card.querySelector('[data-content-key$=".date"]');
+            const titleEl = card.querySelector('[data-content-key$=".title"]');
+            const excerptEl = card.querySelector('[data-content-key$=".excerpt"]');
+            const ctaEl = card.querySelector('[data-content-key$=".cta"]');
+            const imageEl = card.querySelector('.facebook-post-image');
+            const imageWrap = card.querySelector('.facebook-post-image-wrap');
+
+            if (dateEl && post.date) dateEl.textContent = post.date;
+            if (titleEl && post.title) titleEl.textContent = post.title;
+            if (excerptEl && post.excerpt) excerptEl.textContent = post.excerpt;
+            if (ctaEl && post.cta) ctaEl.textContent = post.cta;
+
+            if (imageEl) {
+                const fallbackSrc = imageEl.getAttribute('data-fallback-src') || '';
+                const liveImage = typeof post.image === 'string' ? post.image.trim() : '';
+                const effectiveImage = liveImage || fallbackSrc;
+
+                if (effectiveImage) {
+                    if (imageEl.getAttribute('src') !== effectiveImage) {
+                        imageEl.setAttribute('src', effectiveImage);
+                    }
+                    imageWrap?.classList.remove('is-empty');
+                } else {
+                    imageEl.removeAttribute('src');
+                    imageWrap?.classList.add('is-empty');
+                }
+            }
+        });
     }
 
     bindEventModalTriggers(root) {
@@ -1263,16 +2327,22 @@ class ContentManager {
         const imageSrc = this._getEventImage(event);
         imageEl.src = imageSrc;
         imageEl.alt = event.title || 'Arrangement';
-        imageWrap.style.display = 'block';
+        imageWrap.classList.remove('cms-hidden');
 
         const videoLink = this.extractVideoLink(event);
         const videoLinkEl = modal.querySelector('.event-modal-video-link');
 
         if (videoLink && videoLinkEl) {
-            videoLinkEl.innerHTML = `< a href = "${videoLink}" target = "_blank" rel = "noopener noreferrer" class="btn btn-primary" style = "display: inline-flex; align-items: center; gap: 8px; margin-bottom: 12px;" > <i class="fas fa-video"></i> Bli med på nettmøtet</a > `;
-            videoLinkEl.style.display = 'block';
+            videoLinkEl.innerHTML = `
+                <a href="${videoLink}" target="_blank" rel="noopener noreferrer" class="btn btn-primary event-modal-video-cta">
+                    <i class="fas fa-video"></i>
+                    Bli med på nettmøtet
+                </a>
+            `;
+            videoLinkEl.classList.remove('cms-hidden');
         } else if (videoLinkEl) {
-            videoLinkEl.style.display = 'none';
+            videoLinkEl.innerHTML = '';
+            videoLinkEl.classList.add('cms-hidden');
         }
 
         modal.classList.add('active');
@@ -1284,8 +2354,8 @@ class ContentManager {
             overlay = document.createElement('div');
             overlay.className = 'event-modal-overlay';
             overlay.innerHTML = `
-                < div class="event-modal" >
-                    <div class="event-modal-image-wrap" style="display: none;">
+                <div class="event-modal">
+                    <div class="event-modal-image-wrap cms-hidden">
                         <img class="event-modal-image" alt="">
                     </div>
                     <div class="event-modal-header">
@@ -1299,15 +2369,15 @@ class ContentManager {
                                 <span class="event-modal-time"></span>
                                 <span class="event-modal-location"></span>
                             </div>
-                            <div class="event-modal-video-link" style="display: none;"></div>
+                            <div class="event-modal-video-link cms-hidden"></div>
                         </div>
                         <div class="event-modal-right">
                             <h4 class="event-modal-section-title">Mer om arrangement</h4>
                             <p class="event-modal-description"></p>
                         </div>
                     </div>
-                </div >
-                `;
+                </div>
+            `;
             document.body.appendChild(overlay);
 
             overlay.addEventListener('click', (e) => {
@@ -1325,14 +2395,14 @@ class ContentManager {
         const body = overlay.querySelector('.event-modal-body');
         if (body && !body.querySelector('.event-modal-left')) {
             body.innerHTML = `
-                < div class="event-modal-left" >
+                <div class="event-modal-left">
                     <div class="event-modal-meta">
                         <span class="event-modal-date"></span>
                         <span class="event-modal-time"></span>
                         <span class="event-modal-location"></span>
                     </div>
-                    <div class="event-modal-video-link" style="display: none;"></div>
-                </div >
+                    <div class="event-modal-video-link cms-hidden"></div>
+                </div>
                 <div class="event-modal-right">
                     <h4 class="event-modal-section-title">Mer om arrangement</h4>
                     <p class="event-modal-description"></p>
@@ -1368,6 +2438,17 @@ class ContentManager {
 
     parseEventDate(value) {
         if (!value) return null;
+
+        // Handle Firebase Timestamp objects
+        if (value && typeof value === 'object' && typeof value.toDate === 'function') {
+            return value.toDate();
+        }
+
+        // Handle Firestore-like timestamp objects {seconds, nanoseconds}
+        if (value && typeof value === 'object' && typeof value.seconds === 'number') {
+            return new Date(value.seconds * 1000);
+        }
+
         if (value instanceof Date) {
             return Number.isNaN(value.getTime()) ? null : value;
         }
@@ -1375,8 +2456,8 @@ class ContentManager {
         if (typeof value === 'string') {
             const trimmed = value.trim();
 
-            // Handle dd.mm.yyyy or dd/mm/yyyy (with optional time)
-            const dmY = trimmed.match(/^(\d{2})[./](\d{2})[./](\d{4})(?:\s+(\d{2}):(\d{2}))?$/);
+            // Handle d.m.yyyy or dd.mm.yyyy (with optional time) - more flexible regex
+            const dmY = trimmed.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})(?:\s+(\d{1,2}):(\d{1,2}))?$/);
             if (dmY) {
                 const day = Number(dmY[1]);
                 const month = Number(dmY[2]) - 1;
@@ -1402,6 +2483,24 @@ class ContentManager {
 
         const parsed = new Date(value);
         return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    isEventPast(event) {
+        const startValue = event.end || event.start || event.date;
+        const endDate = this.parseEventDate(startValue);
+        if (!endDate) return false;
+
+        const now = new Date();
+
+        // If it's a date-only string (no time set), treat it as an all-day event
+        // and only count it as "past" once the day is completely over.
+        if (!this.eventHasTime(startValue)) {
+            const endOfDay = new Date(endDate);
+            endOfDay.setHours(23, 59, 59, 999);
+            return endOfDay < now;
+        }
+
+        return endDate < now;
     }
 
     eventHasTime(value) {
@@ -1515,8 +2614,25 @@ class ContentManager {
      * Update DOM elements based on Firestore data
      * @param {object} data 
      */
-    updateDOM(data) {
+    updateDOM(data, { docId = this.pageId } = {}) {
         if (!data) return;
+
+        if (docId) {
+            window.HKM_CONTENT_DOCS = window.HKM_CONTENT_DOCS || {};
+            window.HKM_CONTENT_DOCS[docId] = data;
+        }
+        if (docId === this.pageId && this.pageId) {
+            window.HKM_PAGE_CONTENT = window.HKM_PAGE_CONTENT || {};
+            window.HKM_PAGE_CONTENT[this.pageId] = data;
+        }
+        if (docId === this.pageId && this.pageId === 'butikk') {
+            window.HKM_STORE_CONTENT = data;
+        }
+        try {
+            document.dispatchEvent(new CustomEvent('hkm:page-content-updated', {
+                detail: { pageId: this.pageId, docId, data }
+            }));
+        } catch (_) { }
 
         // Skip updateDOM for translated pages (EN/ES) to preserve HTML translations
         const lang = document.documentElement.lang || 'no';
@@ -1529,14 +2645,67 @@ class ContentManager {
         const elements = document.querySelectorAll("[data-content-key]");
 
         elements.forEach(el => {
+            const targetDoc = el.getAttribute('data-content-doc');
+            if (targetDoc && targetDoc !== docId) return;
+
             const key = el.getAttribute("data-content-key");
             const value = this.getValueByPath(data, key);
             if (value === undefined) return;
+
+            const contentAttr = el.getAttribute('data-content-attr');
+            if (contentAttr) {
+                const visibilityTargetSelector = el.getAttribute('data-visibility-target');
+                const visibilityTarget = visibilityTargetSelector ? el.closest(visibilityTargetSelector) : null;
+                const fallbackSrc = el.getAttribute('data-fallback-src') || '';
+                contentAttr
+                    .split(',')
+                    .map(attr => attr.trim())
+                    .filter(Boolean)
+                    .forEach(attr => {
+                        if (attr === 'src' && el.tagName === 'IMG') {
+                            const imageValue = typeof value === 'string' ? value.trim() : '';
+                            const effectiveImage = imageValue || fallbackSrc;
+                            el.onerror = () => {
+                                const currentFallback = el.getAttribute('data-fallback-src') || '';
+                                const currentSrc = el.getAttribute('src') || '';
+                                if (currentFallback && currentSrc !== currentFallback) {
+                                    el.setAttribute('src', currentFallback);
+                                    if (visibilityTarget) visibilityTarget.classList.remove('is-empty');
+                                    return;
+                                }
+                                el.removeAttribute('src');
+                                if (visibilityTarget) visibilityTarget.classList.add('is-empty');
+                            };
+                            if (!effectiveImage) {
+                                el.removeAttribute('src');
+                                if (visibilityTarget) visibilityTarget.classList.add('is-empty');
+                                return;
+                            }
+                            if (el.getAttribute('src') !== effectiveImage) {
+                                el.setAttribute('src', effectiveImage);
+                            }
+                            if (visibilityTarget) visibilityTarget.classList.remove('is-empty');
+                            return;
+                        }
+                        el.setAttribute(attr, String(value));
+                    });
+                return;
+            }
 
             // Images kan trygt oppdateres direkte
             if (el.tagName === "IMG") {
                 if (el.src !== value) {
                     el.src = value;
+                }
+                return;
+            }
+
+            // Inputs/textareaer brukes enkelte steder for placeholder-tekster
+            if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+                if (el.hasAttribute("placeholder")) {
+                    el.placeholder = String(value);
+                } else if (typeof el.value === "string") {
+                    el.value = String(value);
                 }
                 return;
             }
@@ -1553,10 +2722,15 @@ class ContentManager {
                     'blogg': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
                     'bnn': "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
                     'om-oss': "https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'personvern': "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'betingelser': "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
+                    'tilgjengelighet': "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80",
                     'for-menigheter': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080",
                     'for-bedrifter': "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=1080"
                 }[this.pageId] || "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80";
-                const bgUrl = value || defaultBg;
+                const rawBg = typeof value === 'string' ? value.trim() : '';
+                const isValidBgUrl = /^https?:\/\//i.test(rawBg) || rawBg.startsWith('/') || rawBg.startsWith('//');
+                const bgUrl = isValidBgUrl ? rawBg : defaultBg;
                 const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
                 if (heroEl) {
                     heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
@@ -1589,10 +2763,7 @@ class ContentManager {
             }
             // Strict: Only set hero subtitle as text
             if (isHeroSubtitle) {
-                el.textContent = value || {
-                    'bnn': 'Et nettverk for kristne ledere og næringsdrivende som ønsker å bruke sine ressurser for Guds rike.',
-                    'om-oss': 'Lær mer om vår visjon, oppdrag og historie'
-                }[this.pageId] || '';
+                el.textContent = value || '';
                 return;
             }
 
@@ -1625,6 +2796,32 @@ class ContentManager {
      * Apply global branding and typography
      */
     applyGlobalSettings(data) {
+        if (!data || typeof data !== 'object') return;
+
+        const normalizeHex = (value) => {
+            if (typeof value !== 'string') return '';
+            let raw = value.trim();
+            if (!raw) return '';
+            if (!raw.startsWith('#')) raw = `#${raw}`;
+            if (/^#([0-9a-f]{3})$/i.test(raw)) {
+                const short = raw.slice(1);
+                return `#${short.split('').map((c) => c + c).join('').toUpperCase()}`;
+            }
+            if (/^#([0-9a-f]{6})$/i.test(raw)) return raw.toUpperCase();
+            return '';
+        };
+
+        const setVar = (cssVar, value, suffix = '') => {
+            if (value !== undefined && value !== null && value !== '') {
+                document.documentElement.style.setProperty(cssVar, `${value}${suffix}`);
+            }
+        };
+
+        const setColorVar = (cssVar, value) => {
+            const safeHex = normalizeHex(value);
+            if (safeHex) setVar(cssVar, safeHex);
+        };
+
         if (data.logoUrl) {
             const logos = document.querySelectorAll('.logo img');
             logos.forEach(img => img.src = data.logoUrl);
@@ -1648,36 +2845,51 @@ class ContentManager {
             document.title = data.siteTitle;
         }
 
-        // Apply Typography
-        if (data.mainFont) {
-            document.body.style.fontFamily = `'${data.mainFont}', sans-serif`;
-            if (!document.getElementById('google-font-injection')) {
-                const link = document.createElement('link');
-                link.id = 'google-font-injection';
-                link.href = `https://fonts.googleapis.com/css2?family=${data.mainFont.replace(/ /g, '+')}:wght@300;400;500;600;700&display=swap`;
-                link.rel = 'stylesheet';
-                document.head.appendChild(link);
-            }
+        // Apply Fonts
+        const headingFont = data.headingFont || 'Inter';
+        const mainFont = data.mainFont || 'Inter';
+        setVar('--heading-font', `'${headingFont}', sans-serif`);
+        setVar('--main-font', `'${mainFont}', sans-serif`);
+
+        // Inject Google Fonts
+        const fontsToLoad = [...new Set([headingFont, mainFont])];
+        const fontId = 'hkm-google-fonts-injection';
+        let fontLink = document.getElementById(fontId);
+        if (!fontLink) {
+            fontLink = document.createElement('link');
+            fontLink.id = fontId;
+            fontLink.rel = 'stylesheet';
+            document.head.appendChild(fontLink);
         }
-        // Font size variables for global CSS
-        if (data.fontSizeBase) {
-            document.documentElement.style.setProperty('--fs-body', `${data.fontSizeBase}px`);
-        }
-        if (data.fontSizeH1Desktop) {
-            document.documentElement.style.setProperty('--fs-h1-desktop', `${data.fontSizeH1Desktop}px`);
-        }
-        if (data.fontSizeH1Mobile) {
-            document.documentElement.style.setProperty('--fs-h1-mobile', `${data.fontSizeH1Mobile}px`);
-        }
-        if (data.fontSizeH2Desktop) {
-            document.documentElement.style.setProperty('--fs-h2-desktop', `${data.fontSizeH2Desktop}px`);
-        }
-        if (data.fontSizeH2Mobile) {
-            document.documentElement.style.setProperty('--fs-h2-mobile', `${data.fontSizeH2Mobile}px`);
-        }
-        if (data.primaryColor) {
-            document.documentElement.style.setProperty('--primary-color', data.primaryColor);
-        }
+        const families = fontsToLoad.map(f => `${f.replace(/ /g, '+')}:wght@300;400;500;600;700;800`).join('&family=');
+        fontLink.href = `https://fonts.googleapis.com/css2?family=${families}&display=swap`;
+
+        // Responsive Font Sizes
+        setVar('--fs-body-desktop', data.fontSizeBodyDesktop, 'px');
+        setVar('--fs-body-mobile', data.fontSizeBodyMobile, 'px');
+        setVar('--fs-h1-desktop', data.fontSizeH1Desktop, 'px');
+        setVar('--fs-h1-mobile', data.fontSizeH1Mobile, 'px');
+        setVar('--fs-h2-desktop', data.fontSizeH2Desktop, 'px');
+        setVar('--fs-h2-mobile', data.fontSizeH2Mobile, 'px');
+
+        // Colors
+        setColorVar('--primary-color', data.primaryColor);
+        setColorVar('--secondary-color', data.secondaryColor || data.primaryColor);
+        setColorVar('--primary-orange', data.primaryColor); // Legacy mapping
+        setColorVar('--bg-light', data.backgroundColor);
+        setColorVar('--bg-white', data.surfaceColor);
+        setColorVar('--text-dark', data.textColor);
+        setColorVar('--text-light', data.textLightColor);
+        setColorVar('--header-bg', data.headerBg);
+        setColorVar('--footer-bg', data.footerBg || data.secondaryColor);
+        setColorVar('--footer-text', data.footerText);
+        setColorVar('--newsletter-bg', data.newsletterBg);
+        setColorVar('--newsletter-text', data.newsletterText);
+        setColorVar('--btn-primary-bg', data.btnPrimaryBg || data.primaryColor);
+        setColorVar('--btn-primary-text', data.btnPrimaryText);
+        setColorVar('--btn-secondary-bg', data.btnSecondaryBg);
+        setColorVar('--btn-secondary-text', data.btnSecondaryText || data.primaryColor);
+        setColorVar('--accent-color', data.accentColor || data.textLightColor);
     }
 
     /**
@@ -1748,11 +2960,27 @@ class ContentManager {
         if (!sliderContainer) return;
 
         if (slides && slides.length > 0) {
+            const normalizedIncomingSlides = slides.map(slide => ({
+                title: (slide.title || '').trim(),
+                subtitle: (slide.subtitle || '').trim(),
+                imageUrl: (slide.imageUrl || '').trim(),
+                videoUrl: (slide.videoUrl || '').trim(),
+                youtubeId: (slide.youtubeId || '').trim(),
+                btnText: (slide.btnText || '').trim(),
+                btnLink: (slide.btnLink || '').trim()
+            }));
+            const incomingSignature = JSON.stringify(normalizedIncomingSlides);
+            if (this._renderHtmlSignatures.get('__hero-slides-data') === incomingSignature) {
+                return;
+            }
+
             // Extract current data from DOM for comparison to avoid flicker if same
             const currentSlides = Array.from(sliderContainer.querySelectorAll('.hero-slide')).map(s => ({
                 title: s.querySelector('.hero-title')?.textContent?.trim() || '',
                 subtitle: s.querySelector('.hero-subtitle')?.textContent?.trim() || '',
                 imageUrl: (s.querySelector('.hero-bg')?.style.backgroundImage || '').replace(/url\(["']?(.*?)["']?\)/, '$1') || '',
+                videoUrl: s.querySelector('.hero-video source')?.getAttribute('src') || '',
+                youtubeId: s.querySelector('.hero-youtube-iframe')?.getAttribute('data-youtube-id') || '',
                 btnText: s.querySelector('.btn')?.textContent?.trim() || '',
                 btnLink: s.querySelector('.btn')?.getAttribute('href') || ''
             }));
@@ -1772,9 +3000,16 @@ class ContentManager {
                 const currentImg = clean(current.imageUrl);
                 const incomingImg = clean(slide.imageUrl);
 
+                const currentVideo = (current.videoUrl || '').trim();
+                const incomingVideo = (slide.videoUrl || '').trim();
+                const currentYoutube = (current.youtubeId || '').trim();
+                const incomingYoutube = (slide.youtubeId || '').trim();
+
                 return title !== current.title ||
                     subtitle !== current.subtitle ||
                     currentImg !== incomingImg ||
+                    currentVideo !== incomingVideo ||
+                    currentYoutube !== incomingYoutube ||
                     btnText !== current.btnText ||
                     btnLink !== current.btnLink;
             });
@@ -1783,9 +3018,36 @@ class ContentManager {
                 console.log("[ContentManager] Hero content changed or updated from dashboard, re-rendering...");
                 document.body.classList.remove('hero-animate');
 
-                sliderContainer.innerHTML = slides.map((slide, index) => `
-                    <div class="hero-slide ${index === 0 ? 'active' : ''}">
-                        <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                const heroMarkup = slides.map((slide, index) => {
+                    const videoUrl = (slide.videoUrl || '').trim();
+                    const youtubeId = (slide.youtubeId || '').trim();
+                    const hasYoutube = !!youtubeId;
+                    const hasVideo = !!videoUrl && !hasYoutube;
+
+                    const duration = slide.duration || 4;
+
+                    return `
+                    <div class="hero-slide ${index === 0 ? 'active' : ''}" data-duration="${duration}">
+                        ${hasYoutube ? `
+                            <div class="hero-video-wrapper">
+                                <iframe 
+                                    class="hero-youtube-iframe"
+                                    data-youtube-id="${youtubeId}"
+                                    src="https://www.youtube.com/embed/${youtubeId}?autoplay=${index === 0 ? 1 : 0}&mute=1&controls=0&loop=1&playlist=${youtubeId}&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&enablejsapi=1" 
+                                    frameborder="0" 
+                                    allow="autoplay; encrypted-media" 
+                                    allowfullscreen
+                                    style="position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.77vh; transform: translate(-50%, -50%); pointer-events: none;">
+                                </iframe>
+                                <div class="hero-video-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.2);"></div>
+                            </div>
+                        ` : (hasVideo ? `
+                            <video class="hero-video" ${index === 0 ? 'autoplay' : ''} muted loop playsinline poster="${slide.imageUrl}">
+                                <source src="${videoUrl}" type="video/mp4">
+                            </video>
+                        ` : `
+                            <div class="hero-bg" style="background-image: url('${slide.imageUrl}')"></div>
+                        `)}
                         <div class="container hero-container">
                             <div class="hero-content">
                                 <h1 class="hero-title">${slide.title}</h1>
@@ -1798,7 +3060,10 @@ class ContentManager {
                             </div>
                         </div>
                     </div>
-                `).join('');
+                `}).join('');
+
+                this.setHTMLIfChanged(sliderContainer, heroMarkup, '__hero-slides-html');
+                this._renderHtmlSignatures.set('__hero-slides-data', incomingSignature);
 
                 // Re-init HeroSlider from script.js
                 if (window.heroSlider) {
@@ -1810,6 +3075,7 @@ class ContentManager {
 
                 this.enableHeroAnimations();
             } else {
+                this._renderHtmlSignatures.set('__hero-slides-data', incomingSignature);
                 console.log("[ContentManager] Hero content matches DOM, skipping re-render to prevent flicker.");
             }
         }
@@ -1827,29 +3093,43 @@ class ContentManager {
         const container = document.querySelector(selector);
         if (!container) return;
 
-        if (posts.length > 0) {
-            container.innerHTML = posts.map(post => `
+        const localizedPosts = this.localizeBlogItems(posts);
+        const renderPosts = localizedPosts.length > 0 ? localizedPosts : (Array.isArray(posts) ? posts : []);
+        if (!renderPosts.length) {
+            const lang = this.getCurrentLanguage();
+            const emptyMsg = lang === 'en'
+                ? 'No translated blog posts are available in English yet.'
+                : (lang === 'es'
+                    ? 'Todavia no hay entradas de blog traducidas al espanol.'
+                    : 'Ingen blogginnlegg tilgjengelig enda.');
+            this.setHTMLIfChanged(container, `<p class="cms-empty-copy">${emptyMsg}</p>`, `blog-empty:${selector}`);
+            return;
+        }
+
+        if (renderPosts.length > 0) {
+            const html = renderPosts.map(post => {
+                const stableId = post.__stableId || this.getContentItemStableId(post);
+                const postImage = this.getContentItemImage(post) || 'https://via.placeholder.com/600x400?text=Ingen+bilde';
+                return `
                 <article class="blog-card">
                     <div class="blog-image">
-                        <img src="${post.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${post.title}">
-                        ${post.category ? `<span class="blog-category" style="position: absolute; top: 15px; left: 15px; background: var(--secondary-color, #ff6b2b); color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">${post.category}</span>` : ''}
+                        <img src="${postImage}" alt="${post.title}">
+                        ${post.category ? `<span class="blog-category cms-blog-category-badge">${post.category}</span>` : ''}
                     </div>
-                    <div class="blog-content" style="padding: 25px;">
-                        <div class="blog-meta" style="display: flex; gap: 15px; font-size: 13px; color: #6c757d; margin-bottom: 10px;">
+                    <div class="blog-content cms-blog-content">
+                        <div class="blog-meta cms-blog-meta">
                             ${post.date ? `<span><i class="fas fa-calendar-alt"></i> ${this.formatDate(post.date)}</span>` : ''}
                             ${post.author ? `<span><i class="fas fa-user"></i> ${post.author}</span>` : '<span><i class="fas fa-user"></i> Admin</span>'}
                         </div>
-                        ${post.tags && Array.isArray(post.tags) && post.tags.length > 0 ? `
-                        <div class="blog-tags" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
-                            ${post.tags.map(tag => `<span style="font-size: 11px; background: #fff0ea; color: #ff6b2b; padding: 2px 8px; border-radius: 12px; font-weight: 600;">#${tag}</span>`).join('')}
-                        </div>
-                        ` : ''}
-                        <h3 class="blog-title" style="margin-bottom: 12px; font-size: 1.25rem;">${post.title}</h3>
-                        <p class="blog-excerpt" style="color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px;">${this.generateExcerpt(post.content, post.title)}...</p>
-                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(post.id || post.title)}" class="blog-link" style="color: var(--primary-color); font-weight: 600; text-decoration: none;">${this.getTranslation('read_more')} <i class="fas fa-arrow-right" style="margin-left: 5px;"></i></a>
+                        <h3 class="blog-title cms-blog-title">${post.title}</h3>
+                        <p class="blog-excerpt cms-blog-excerpt">${this.generateExcerpt(post.content, post.title)}...</p>
+                        <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(stableId)}" class="blog-link cms-blog-link">${this.getTranslation('read_more')} <i class="fas fa-arrow-right cms-blog-link-icon"></i></a>
                     </div>
                 </article>
-            `).join('');
+            `;
+            }).join('');
+
+            this.setHTMLIfChanged(container, html, `blog:${selector}`);
         }
     }
 
@@ -1861,25 +3141,30 @@ class ContentManager {
         if (!container) return;
 
         if (series.length > 0) {
-            container.innerHTML = series.map(item => `
-                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card" style="text-decoration: none; color: inherit; display: block;">
+            const html = series.map(item => {
+                const itemImage = this.getContentItemImage(item) || 'https://via.placeholder.com/600x400?text=Ingen+bilde';
+                return `
+                <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card cms-media-card-link">
                     <div class="media-thumbnail">
-                        <img src="${item.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${item.title}">
+                        <img src="${itemImage}" alt="${item.title}">
                         <div class="media-play-button">
                             <i class="fas fa-chalkboard-teacher"></i>
                         </div>
-                        ${item.category ? `<span class="media-duration" style="background: var(--primary-color); left: 10px; right: auto; padding: 3px 10px; border-radius: 4px;">${item.category}</span>` : ''}
+                        ${item.category ? `<span class="media-duration cms-media-duration-badge">${item.category}</span>` : ''}
                     </div>
                     <div class="media-content">
                         <h3 class="media-title">${item.title}</h3>
                         <p class="media-description">${this.generateExcerpt(item.content, item.title)}...</p>
-                        <div class="media-meta" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 12px; color: #6c757d;"><i class="fas fa-user"></i> ${item.author || 'His Kingdom'}</span>
-                            <span style="font-size: 12px; color: #6c757d;"><i class="fas fa-calendar"></i> ${item.date ? this.formatDate(item.date) : ''}</span>
+                        <div class="media-meta cms-media-meta">
+                            <span class="cms-media-meta-item"><i class="fas fa-user"></i> ${item.author || 'His Kingdom'}</span>
+                            <span class="cms-media-meta-item"><i class="fas fa-calendar"></i> ${item.date ? this.formatDate(item.date) : ''}</span>
                         </div>
                     </div>
                 </a>
-            `).join('');
+            `;
+            }).join('');
+
+            this.setHTMLIfChanged(container, html, `teaching:${selector}`);
         }
     }
 
@@ -1922,7 +3207,7 @@ class ContentManager {
 
         // 3. Background Sync for specific event (Google Calendar direct)
         // This ensures the page is always up to date even if cache is stale or event range is outside standard load
-        const integrations = await firebaseService.getPageContent('settings_integrations');
+        const integrations = await window.firebaseService.getPageContent('settings_integrations');
         const gcal = integrations?.googleCalendar || {};
         const apiKey = gcal.apiKey;
         if (apiKey) {
@@ -1936,7 +3221,7 @@ class ContentManager {
                     const freshEvent = await this.fetchSingleGoogleCalendarEvent(apiKey, calendar.id, eventKey);
                     if (freshEvent) {
                         // Load Firestore items to ensure overrides (images and text from dashboard) are applied
-                        const eventData = await firebaseService.getPageContent('collection_events');
+                        const eventData = await window.firebaseService.getPageContent('collection_events');
                         const firebaseItems = Array.isArray(eventData) ? eventData : (eventData?.items || []);
                         event = this._mergeEventWithFirestore(freshEvent, firebaseItems);
                         this.populateEventDetailsDOM(event);
@@ -1977,7 +3262,10 @@ class ContentManager {
                 'no_description': 'Ingen beskrivelse tilgjengelig.',
                 'read_more': 'Les mer',
                 'reading_time': 'min lesing',
-                'views': 'visninger'
+                'views': 'visninger',
+                'related_posts': 'Relaterte innlegg',
+                'related_teaching': 'Relatert undervisning',
+                'read_teaching': 'Les undervisning'
             },
             'en': {
                 'loading': 'Loading...',
@@ -1988,7 +3276,10 @@ class ContentManager {
                 'no_description': 'No description available.',
                 'read_more': 'Read more',
                 'reading_time': 'min read',
-                'views': 'views'
+                'views': 'views',
+                'related_posts': 'Related posts',
+                'related_teaching': 'Related teaching',
+                'read_teaching': 'Read teaching'
             },
             'es': {
                 'loading': 'Cargando...',
@@ -1999,7 +3290,10 @@ class ContentManager {
                 'no_description': 'No hay descripción disponible.',
                 'read_more': 'Leer más',
                 'reading_time': 'min lectura',
-                'views': 'vistas'
+                'views': 'vistas',
+                'related_posts': 'Entradas relacionadas',
+                'related_teaching': 'Enseñanza relacionada',
+                'read_teaching': 'Leer enseñanza'
             }
         };
         return (strings[lang] && strings[lang][key]) || strings['no'][key] || key;
@@ -2180,6 +3474,24 @@ class ContentManager {
         return text;
     }
 
+    formatDate(date) {
+        if (!date) return '';
+        try {
+            // Handle Firebase Timestamp objects or standard Date strings/objects
+            const d = (date && typeof date.toDate === 'function') ? date.toDate() : new Date(date);
+            if (isNaN(d.getTime())) return String(date);
+            
+            const lang = document.documentElement.lang || 'no';
+            const locales = { 'no': 'nb-NO', 'en': 'en-US', 'es': 'es-ES' };
+            const locale = locales[lang] || 'nb-NO';
+            
+            return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+        } catch (e) {
+            console.warn('[ContentManager] formatDate error:', e);
+            return String(date || '');
+        }
+    }
+
     /**
      * Generate a clean excerpt from blog content, excluding the title
      * @param {string|object} content - Blog content (HTML string or Editor.js JSON)
@@ -2234,12 +3546,293 @@ class ContentManager {
         return text.substring(0, 120);
     }
 
-    /**
-     * Generate a relevant image URL from Unsplash based on event title
-     * @param {string} title - Event title
-     * @returns {string} - Unsplash image URL
-     */
-    // --- Editor.js Helper ---
+    formatEditorListItem(item) {
+        if (item === null || item === undefined) return '';
+
+        const raw = String(item).trim();
+        if (!raw) return '';
+
+        if (/<[^>]+>/.test(raw)) {
+            return `<li>${raw}</li>`;
+        }
+
+        const compact = raw.replace(/\s+/g, ' ').trim();
+
+        const splitJoinedListItem = (value) => {
+            if (typeof value !== 'string' || value.length < 18) return null;
+
+            for (let i = 2; i < value.length - 12; i += 1) {
+                const prev = value[i - 1];
+                const curr = value[i];
+                if (!prev || !curr) continue;
+
+                const isLowerToUpper = /[a-zæøå]/.test(prev) && /[A-ZÆØÅ]/.test(curr);
+                if (!isLowerToUpper) continue;
+
+                const lead = value.slice(0, i).trim();
+                const tail = value.slice(i).trim();
+                const leadWordCount = lead.split(/\s+/).filter(Boolean).length;
+
+                if (lead.length < 4 || lead.length > 56) continue;
+                if (leadWordCount < 2 || leadWordCount > 7) continue;
+                if (tail.length < 12) continue;
+
+                return { lead, tail };
+            }
+
+            return null;
+        };
+
+        const split = splitJoinedListItem(compact);
+        if (split) {
+            return `<li><strong>${this.escapeHtml(split.lead)}</strong> ${this.escapeHtml(split.tail)}</li>`;
+        }
+
+        return `<li>${this.escapeHtml(compact)}</li>`;
+    }
+
+    isMeaningfulHtml(html) {
+        if (typeof html !== 'string') return false;
+
+        const trimmed = html.trim();
+        if (!trimmed) return false;
+
+        const textLength = this.stripHtml(trimmed).replace(/\s+/g, ' ').trim().length;
+        if (textLength >= 24) return true;
+
+        return /<(p|h[1-6]|ul|ol|li|blockquote|figure|img|iframe|video)\b/i.test(trimmed);
+    }
+
+
+    getElementPlainText(el) {
+        return (el && el.textContent ? el.textContent : '').replace(/\s+/g, ' ').trim();
+    }
+
+    isParagraphElement(el) {
+        return el && el.nodeType === 1 && el.tagName && el.tagName.toLowerCase() === 'p';
+    }
+
+    isBoldLeadParagraph(el) {
+        if (!this.isParagraphElement(el)) return false;
+        const text = this.getElementPlainText(el);
+        if (!text || text.length > 90) return false;
+        const strong = el.querySelector('strong, b');
+        if (!strong) return false;
+        const strongText = this.getElementPlainText(strong);
+        return strongText && text.startsWith(strongText);
+    }
+
+
+
+    resolveArticleHtml(item, sourceItem) {
+        const candidates = [
+            item?.content,
+            sourceItem?.content,
+            item?.contentHtml,
+            sourceItem?.contentHtml,
+            item?.html,
+            sourceItem?.html,
+            item?.body,
+            sourceItem?.body,
+            item?.contentText,
+            sourceItem?.contentText
+        ];
+
+        for (const candidate of candidates) {
+            const parsed = this.parseBlocks(candidate);
+            if (this.isMeaningfulHtml(parsed)) return parsed;
+        }
+
+        return '';
+    }
+
+    firstString(...values) {
+        for (const value of values) {
+            if (typeof value === 'string' && value.trim()) return value.trim();
+        }
+        return '';
+    }
+
+    normalizePublicImageUrl(value) {
+        if (typeof value !== 'string') return '';
+        const url = value.trim();
+        if (!url) return '';
+        return url;
+    }
+
+    isRenderableImageUrl(value) {
+        if (typeof value !== 'string') return false;
+        const url = value.trim();
+        if (!url) return false;
+        const invalid = ['[object Object]', 'undefined', 'null', 'about:blank'];
+        if (invalid.includes(url)) return false;
+        return /^https?:\/\/|^\/|^data:image\//i.test(url);
+    }
+
+    getImageFromHtml(html) {
+        if (typeof html !== 'string' || !html.trim()) return '';
+        // Try src first, then data-src as fallback
+        const srcMatch = html.match(/<img\b[^>]*\bsrc=["']([^"']+)["']/i);
+        if (srcMatch && srcMatch[1]) return srcMatch[1].trim();
+        
+        const dataSrcMatch = html.match(/<img\b[^>]*\bdata-src=["']([^"']+)["']/i);
+        if (dataSrcMatch && dataSrcMatch[1]) return dataSrcMatch[1].trim();
+        
+        return '';
+    }
+
+    getContentItemImage(item, fallbackItem = null, articleHtml = '') {
+        const candidates = [item, fallbackItem].filter(Boolean);
+        for (const current of candidates) {
+            if (!current || typeof current !== 'object') continue;
+            
+            // Standard image fields
+            const img = current.imageUrl || current.image || current.coverImage || current.featuredImage || current.thumbnail;
+            const normalized = this.normalizePublicImageUrl(img);
+            if (this.isRenderableImageUrl(normalized)) return normalized;
+        }
+
+        // Try to extract from content if not found in metadata
+        const content = articleHtml || candidates[0]?.content || candidates[0]?.contentHtml || candidates[0]?.html || candidates[0]?.body || candidates[0]?.excerpt || '';
+        const htmlImage = this.normalizePublicImageUrl(this.getImageFromHtml(content));
+        if (this.isRenderableImageUrl(htmlImage)) return htmlImage;
+
+        return '';
+    }
+
+
+    getRichMediaUrl(media) {
+        if (!media) return '';
+        if (typeof media === 'string') return media.trim();
+        if (typeof media !== 'object') return '';
+
+        const src = media.src && typeof media.src === 'object' ? media.src : {};
+        return this.firstString(
+            media.url,
+            media.fileUrl,
+            media.imageUrl,
+            typeof media.src === 'string' ? media.src : '',
+            src.url,
+            src.fileUrl,
+            src.imageUrl
+        );
+    }
+
+    getRichLinkUrl(value) {
+        if (!value || typeof value !== 'object') return '';
+        const link = value.link && typeof value.link === 'object' ? value.link : value;
+        return this.firstString(link.url, link.href, value.url, value.href);
+    }
+
+    getYoutubeEmbedUrl(url) {
+        if (typeof url !== 'string') return '';
+        const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+        return match ? `https://www.youtube.com/embed/${match[1]}` : '';
+    }
+
+    getVimeoEmbedUrl(url) {
+        if (typeof url !== 'string') return '';
+        const match = url.match(/vimeo\.com\/(?:video\/)?(\d+)/);
+        return match ? `https://player.vimeo.com/video/${match[1]}` : '';
+    }
+
+    renderRichMediaLink(url, label = 'Åpne innhold') {
+        if (!url) return '';
+        return `<p><a href="${this.escapeHtml(url)}" target="_blank" rel="noopener noreferrer">${this.escapeHtml(label)}</a></p>`;
+    }
+
+    renderRichIframe(url, title = 'Innebygd innhold') {
+        const embedUrl = this.getYoutubeEmbedUrl(url) || this.getVimeoEmbedUrl(url);
+        if (!embedUrl) return '';
+        return `<div class="cms-embed"><iframe src="${this.escapeHtml(embedUrl)}" title="${this.escapeHtml(title)}" loading="lazy" allowfullscreen></iframe></div>`;
+    }
+
+    getRichTextStyleAttr(data = {}) {
+        const textStyle = data.textStyle && typeof textStyle === 'object' ? data.textStyle : {};
+        const styles = [];
+        const align = this.firstString(textStyle.textAlignment).toUpperCase();
+        const lineHeight = this.firstString(textStyle.lineHeight);
+        const indentation = Number(data.indentation || 0);
+
+        if (['LEFT', 'RIGHT', 'CENTER', 'JUSTIFY'].includes(align)) {
+            styles.push(`text-align:${align.toLowerCase()}`);
+        }
+        if (/^\d+(\.\d+)?$/.test(lineHeight)) {
+            styles.push(`line-height:${lineHeight}`);
+        }
+        if (Number.isFinite(indentation) && indentation > 0) {
+            styles.push(`margin-left:${Math.min(4, indentation) * 1.5}rem`);
+        }
+
+        return styles.length ? ` style="${styles.join(';')}"` : '';
+    }
+
+    getRichNodeStyleAttr(node = {}) {
+        const nodeStyle = node.style && typeof node.style === 'object' ? node.style : {};
+        const styles = [];
+
+        const paddingTop = this.firstString(nodeStyle.paddingTop);
+        const paddingBottom = this.firstString(nodeStyle.paddingBottom);
+        const backgroundColor = this.firstString(nodeStyle.backgroundColor);
+
+        if (/^\d+(\.\d+)?(px|rem|em|%)?$/.test(paddingTop)) styles.push(`padding-top:${paddingTop}`);
+        if (/^\d+(\.\d+)?(px|rem|em|%)?$/.test(paddingBottom)) styles.push(`padding-bottom:${paddingBottom}`);
+        if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(backgroundColor)) styles.push(`background-color:${backgroundColor}`);
+
+        return styles.length ? ` style="${styles.join(';')}"` : '';
+    }
+
+    applyRichTextDecorations(html, decorations) {
+        if (!html || !Array.isArray(decorations)) return html;
+
+        return decorations.reduce((acc, decoration) => {
+            if (!decoration || typeof decoration !== 'object') return acc;
+            const type = this.firstString(decoration.type).toUpperCase();
+
+            if (type === 'BOLD') return `<strong>${acc}</strong>`;
+            if (type === 'ITALIC') return `<em>${acc}</em>`;
+            if (type === 'UNDERLINE') return `<u>${acc}</u>`;
+            if (type === 'STRIKETHROUGH') return `<s>${acc}</s>`;
+            if (type === 'SUPERSCRIPT') return `<sup>${acc}</sup>`;
+            if (type === 'SUBSCRIPT') return `<sub>${acc}</sub>`;
+
+            if (type === 'LINK' || type === 'EXTERNAL') {
+                const href = this.getRichLinkUrl(decoration.linkData || decoration);
+                return href ? `<a href="${this.escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${acc}</a>` : acc;
+            }
+
+            if (type === 'COLOR') {
+                const colorData = decoration.colorData && typeof decoration.colorData === 'object' ? decoration.colorData : {};
+                const styles = [];
+                if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(colorData.foreground || '')) {
+                    styles.push(`color:${colorData.foreground}`);
+                }
+                if (/^#([0-9a-f]{3}|[0-9a-f]{6}|[0-9a-f]{8})$/i.test(colorData.background || '')) {
+                    styles.push(`background-color:${colorData.background}`);
+                }
+                return styles.length ? `<span style="${styles.join(';')}">${acc}</span>` : acc;
+            }
+
+            if (type === 'FONT_SIZE') {
+                const fontSizeData = decoration.fontSizeData && typeof decoration.fontSizeData === 'object' ? decoration.fontSizeData : {};
+                const value = Number(fontSizeData.value);
+                const unit = this.firstString(fontSizeData.unit).toLowerCase() || 'px';
+                if (Number.isFinite(value) && value > 0 && value <= 96 && ['px', 'em', 'rem'].includes(unit)) {
+                    return `<span style="font-size:${value}${unit}">${acc}</span>`;
+                }
+            }
+
+            return acc;
+        }, html);
+    }
+
+    stripOuterParagraph(html) {
+        if (typeof html !== 'string') return '';
+        const trimmed = html.trim();
+        const match = trimmed.match(/^<p(?:\s[^>]*)?>([\s\S]*)<\/p>$/i);
+        return match ? match[1].trim() : trimmed;
+    }
+
     parseBlocks(content) {
         if (!content) return '';
 
@@ -2248,66 +3841,99 @@ class ContentManager {
             return content;
         }
 
+        // Handle object payloads that already contain HTML/text fields
+        if (typeof content === 'object' && content !== null) {
+            const htmlLike = [
+                content.html,
+                content.content,
+                content.contentHtml,
+                content.body,
+                content.contentText
+            ].find((value) => typeof value === 'string' && value.trim());
+
+            if (typeof htmlLike === 'string') {
+                return htmlLike;
+            }
+        }
+
         // Handle Editor.js JSON
         if (typeof content === 'object' && content.blocks) {
-            return content.blocks.map(block => {
-                switch (block.type) {
-                    case 'header':
-                        return `<h${block.data.level} class="block-header">${block.data.text}</h${block.data.level}>`;
-                    case 'paragraph':
-                        return `<p class="block-paragraph">${block.data.text}</p>`;
-                    case 'list':
-                        const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
-                        const items = block.data.items.map(item => `<li>${item}</li>`).join('');
-                        return `<${listTag} class="block-list">${items}</${listTag}>`;
-                    case 'image':
-                        const caption = block.data.caption ? `<figcaption>${block.data.caption}</figcaption>` : '';
-                        const classes = [
-                            'block-image',
-                            block.data.withBorder ? 'with-border' : '',
-                            block.data.withBackground ? 'with-background' : '',
-                            block.data.stretched ? 'stretched' : ''
-                        ].join(' ');
-                        return `<figure class="${classes}"><img src="${block.data.file.url}" alt="${block.data.caption || ''}">${caption}</figure>`;
-                    case 'quote':
-                        return `<blockquote class="block-quote"><p>${block.data.text}</p><cite>${block.data.caption}</cite></blockquote>`;
-                    case 'delimiter':
-                        return `<div class="block-delimiter">***</div>`;
-                    case 'youtubeVideo': {
-                        const ytUrl = block.data?.url || '';
-                        const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                        const ytId = ytMatch ? ytMatch[1] : null;
-                        if (!ytId) return '';
-                        return `
-                            <div class="block-embed-wrapper" style="margin: 28px 0;">
-                                <div class="block-embed" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; box-shadow: 0 4px 24px rgba(0,0,0,0.10);">
-                                    <iframe
-                                        src="https://www.youtube.com/embed/${ytId}"
-                                        frameborder="0"
-                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                        allowfullscreen
-                                        style="position:absolute; top:0; left:0; width:100%; height:100%; border-radius:12px;">
-                                    </iframe>
-                                </div>
-                            </div>
-                        `;
+            const isIgnorableParagraph = (block) => {
+                if (!block || block.type !== 'paragraph') return false;
+                const html = String(block?.data?.text || '')
+                    .replace(/&nbsp;/gi, ' ')
+                    .replace(/<br\s*\/?>/gi, ' ')
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                return html.length === 0;
+            };
+
+            const rawBlocks = Array.isArray(content.blocks) ? content.blocks : [];
+
+            // Intelligent image filtering for leading hero images
+            let startIndex = 0;
+            while (startIndex < rawBlocks.length && (rawBlocks[startIndex]?.type === 'image' || isIgnorableParagraph(rawBlocks[startIndex]))) {
+                startIndex += 1;
+            }
+
+            // Only strip leading images if there is actual content following them
+            const hasTextAfterLeading = rawBlocks.slice(startIndex).some((b) => {
+                if (!b) return false;
+                const type = String(b.type || '').toLowerCase();
+                return type === 'paragraph' || type === 'header' || type === 'list';
+            });
+
+            const blocksForRender = (startIndex > 0 && hasTextAfterLeading) ? rawBlocks.slice(startIndex) : rawBlocks;
+
+            return blocksForRender.map((block) => {
+                try {
+                    if (!block || typeof block !== 'object') return '';
+
+                    const type = String(block.type || '').toLowerCase();
+                    const data = block.data || {};
+
+                    switch (type) {
+                        case 'header': {
+                            const level = Math.min(Math.max(Number(data.level) || 2, 1), 6);
+                            return `<h${level} class="block-header">${data.text || ''}</h${level}>`;
+                        }
+                        case 'paragraph':
+                            if (isIgnorableParagraph(block)) return '';
+                            return `<p class="block-paragraph">${data.text || ''}</p>`;
+                        case 'list': {
+                            const listTag = data.style === 'ordered' ? 'ol' : 'ul';
+                            const items = (Array.isArray(data.items) ? data.items : [])
+                                .map(item => `<li>${typeof item === 'string' ? item : (item?.content || item?.text || '')}</li>`)
+                                .join('');
+                            return `<${listTag} class="block-list">${items}</${listTag}>`;
+                        }
+                        case 'image': {
+                            const imageUrl = data?.file?.url || data?.url || '';
+                            if (!imageUrl) return '';
+                            const caption = data.caption ? `<figcaption>${data.caption}</figcaption>` : '';
+                            return `<figure class="block-image"><img src="${imageUrl}" alt="${data.caption || ''}">${caption}</figure>`;
+                        }
+                        case 'quote':
+                            return `<blockquote class="block-quote"><p>${data.text || ''}</p>${data.caption ? `<cite>${data.caption}</cite>` : ''}</blockquote>`;
+                        case 'delimiter':
+                            return `<div class="block-delimiter">***</div>`;
+                        case 'youtubevideo':
+                        case 'video': {
+                            const url = data?.url || data?.embed || '';
+                            if (!url) return '';
+                            const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                            const embedUrl = ytMatch ? `https://www.youtube.com/embed/${ytMatch[1]}` : url;
+                            return `<div class="block-embed"><iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe></div>`;
+                        }
+                        default:
+                            return '';
                     }
-                    case 'embed': // Keep for backward compatibility
-                    case 'video': // Legacy key
-                        return `
-                            <div class="block-embed-wrapper">
-                                <div class="block-embed">
-                                    <iframe src="${block.data.embed}" width="${block.data.width}" height="${block.data.height}" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-                                </div>
-                                ${block.data.caption ? `<div class="block-embed-caption">${block.data.caption}</div>` : ''}
-                            </div>
-                        `;
-                    default:
-                        return '';
+                } catch (err) {
+                    return '';
                 }
             }).join('');
         }
-
         return '';
     }
 
@@ -2401,15 +4027,6 @@ class ContentManager {
         return gEvent;
     }
 
-    formatDate(dateStr) {
-        if (!dateStr) return '';
-        try {
-            const d = new Date(dateStr);
-            return d.toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' });
-        } catch (e) {
-            return dateStr;
-        }
-    }
 
     isSameDay(d1, d2) {
         if (!d1 || !d2) return false;
@@ -2419,10 +4036,166 @@ class ContentManager {
     }
 
     /**
-     * Helper to get nested object values
-     * @param {object} obj 
-     * @param {string} path - e.g. "hero.title"
+     * Cleans legacy HTML content from Wix/Wordpress artifacts
+     * @param {string} html 
      */
+    cleanLegacyHtml(html) {
+        if (!html || typeof html !== 'string') return html;
+        
+        let cleaned = html;
+
+        // 1. Initial cleanup: Remove Wix-specific IDs and known junk tags
+        cleaned = cleaned.replace(/\bid=["']comp-[^"']*["']/gi, '');
+        cleaned = cleaned.replace(/<(object|embed|iframe)\b[^>]*\bsrc=["'][^"']*wix\.com[^"']*["'][^>]*>.*?<\/\1>/gi, '');
+
+        // 2. DOM-based structural cleanup (Image Clusters/Galleries)
+        try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(cleaned, 'text/html');
+            const body = doc.body;
+
+            // Remove containers that act as image clusters (Galleries)
+            // If a container has 3+ images and minimal text, it's a legacy gallery artifact
+            const containers = body.querySelectorAll('div, figure, section, span');
+            containers.forEach(el => {
+                const imgs = el.querySelectorAll('img');
+                const textContent = el.textContent.trim();
+                
+                // If it contains many images and very little actual content, it's a gallery residue
+                if (imgs.length >= 2 && textContent.length < 50) {
+                    const hasWixImg = Array.from(imgs).some(img => (img.src || '').includes('wixstatic.com') || (img.src || '').includes('wixmp.com'));
+                    if (hasWixImg || imgs.length >= 3) {
+                        console.log('[Cleanup] Removing legacy image gallery artifact (HTML)');
+                        el.remove();
+                    }
+                }
+            });
+
+            // Remove sequences of siblings that are just images or empty paragraphs (another gallery format)
+            const children = Array.from(body.children);
+            for (let i = 0; i < children.length; i++) {
+                let cluster = [];
+                let j = i;
+                
+                while (j < children.length) {
+                    const child = children[j];
+                    const isImg = child.tagName === 'IMG';
+                    const isImgWrapper = (child.tagName === 'DIV' || child.tagName === 'P' || child.tagName === 'FIGURE') && 
+                                        child.querySelectorAll('img').length > 0 && 
+                                        child.textContent.trim().length < 20;
+                    const isEmptyPara = (child.tagName === 'P' || child.tagName === 'DIV') && 
+                                       child.textContent.trim().length === 0 && 
+                                       child.querySelectorAll('img').length === 0;
+
+                    if (isImg || isImgWrapper) {
+                        cluster.push(child);
+                    } else if (isEmptyPara && cluster.length > 0) {
+                        // Keep track of empty paras inside/between images to remove them too
+                        cluster.push(child);
+                    } else {
+                        break;
+                    }
+                    j++;
+                }
+                
+                const imgCount = cluster.filter(c => c.tagName === 'IMG' || c.querySelectorAll('img').length > 0).length;
+                if (imgCount >= 2) {
+                    console.log(`[Cleanup] Removing HTML image sequence of size ${imgCount}`);
+                    cluster.forEach(item => item.remove());
+                    i = j - 1;
+                }
+            }
+
+            cleaned = body.innerHTML;
+        } catch (e) {
+            console.warn('[Cleanup] DOM parsing failed:', e);
+        }
+
+        // 3. Text style cleanup (Existing logic)
+        cleaned = cleaned.replace(/<(p|span|h1|h2|h3|h4|h5|h6|li)\b[^>]*\bstyle=["'][^"']*["']/gi, (match) => {
+            const alignMatch = match.match(/text-align\s*:\s*([^;"]+)/i);
+            const tagMatch = match.match(/^<[a-z0-9]+/i);
+            if (alignMatch && tagMatch) {
+                return `${tagMatch[0]} style="text-align: ${alignMatch[1]}"`;
+            }
+            return tagMatch[0];
+        });
+
+        // 4. Final Wix class removal
+        cleaned = cleaned.replace(/\bclass=["']([^"']*\b)?wix-[^"']*["']/gi, '');
+
+        return cleaned;
+    }
+
+    /**
+     * Cleans EditorJS blocks from legacy Wix artifacts (e.g. image clusters)
+     * @param {object} content EditorJS data object
+     */
+    cleanEditorBlocks(content) {
+        if (!content || !Array.isArray(content.blocks)) return content;
+        
+        const blocks = content.blocks;
+        const newBlocks = [];
+        let i = 0;
+        
+        while (i < blocks.length) {
+            const block = blocks[i];
+            
+            // 1. Detect Wix image clusters (including empty paragraphs between them)
+            let cluster = [];
+            let j = i;
+            let imagesInCluster = 0;
+            
+            while (j < blocks.length) {
+                const b = blocks[j];
+                const isImage = b.type === 'image' || b.type === 'imageGallery';
+                const isEmpty = (b.type === 'paragraph' && (!b.data.text || b.data.text.trim() === ''));
+                
+                if (isImage) {
+                    cluster.push(j);
+                    imagesInCluster++;
+                } else if (isEmpty && imagesInCluster > 0) {
+                    cluster.push(j);
+                } else {
+                    break;
+                }
+                j++;
+            }
+            
+            // If cluster has 2+ Wix images OR 3+ any images, it's likely a Wix artifact
+            let shouldPrune = false;
+            if (imagesInCluster >= 3) shouldPrune = true;
+            if (imagesInCluster >= 2) {
+                // Check for wix domains in the URLs
+                const hasWixDomain = cluster.some(idx => {
+                    const b = blocks[idx];
+                    if (b.type !== 'image') return false;
+                    const url = b.data?.file?.url || b.data?.url || '';
+                    return url.includes('wixstatic.com') || url.includes('wixmp.com');
+                });
+                if (hasWixDomain) shouldPrune = true;
+            }
+            
+            if (shouldPrune) {
+                console.log(`[Cleanup] Pruning EditorJS cluster: ${imagesInCluster} images across ${cluster.length} blocks`);
+                i = j; // Skip the entire cluster
+                continue;
+            }
+            
+            // 2. Individual Wix image removal (optional, but let's keep it safe for now)
+            // If it's a single Wix image that is NOT the only image in the post, 
+            // we could remove it, but let's stick to clusters for now to avoid false positives.
+
+            newBlocks.push(blocks[i]);
+            i++;
+        }
+        
+        return {
+            ...content,
+            blocks: newBlocks
+        };
+    }
+
     getValueByPath(obj, path) {
         return path.split('.').reduce((prev, curr) => {
             return prev ? prev[curr] : undefined;
@@ -2434,11 +4207,9 @@ class ContentManager {
 function startContentManager() {
     if (!window.contentManager) {
         window.contentManager = new ContentManager();
+        console.log('[ContentManager] Initialized.');
     }
 }
 
-if (document.readyState === 'loading') {
-    window.addEventListener('DOMContentLoaded', startContentManager);
-} else {
-    startContentManager();
-}
+// Execute immediately
+startContentManager();

@@ -10,144 +10,159 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+    <link rel="stylesheet" href="../admin/css/dashboard.css">
+    <link rel="stylesheet" href="../admin/css/admin-unified.css">
     <link rel="stylesheet" href="css/minside.css">
+    
+    <!-- Firebase Config & Service (Moved to head for early loading) -->
+    <script type="module" src="../js/firebase-config.js"></script>
+    <script type="module" src="../js/firebase-service.js"></script>
+    <!-- Loader Safety Net -->
+    <script type="module">
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json?v=20260508c">
+    <meta name="theme-color" content="#cc6f2c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/img/logo-hkm.png">
+    <!-- PWA Service Worker -->
+    <script type="module">
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+            window.addEventListener('load', async () => {
+                try {
+                    const reg = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker registrert for PWA!', reg);
+                } catch (err) {
+                    console.log('Service Worker feilet:', err);
+                }
+            });
+        })();
+    </script>
 </head>
 
-<body>
-    <div id="app">
-
-        <!-- ── Profile Header ─────────────────────────────────────── -->
-        <header class="profile-header">
-            <div class="profile-header-inner">
-                <div class="ph-left">
-                    <div class="ph-avatar-wrap">
-                        <div id="ph-avatar" class="ph-avatar">?</div>
-                        <label for="ph-upload" class="ph-avatar-overlay" title="Endre bilde">
-                            <span class="material-symbols-outlined">photo_camera</span>
-                        </label>
-                        <input type="file" id="ph-upload" accept="image/*" style="display:none">
-                    </div>
-                    <div class="ph-info">
-                        <h1 id="ph-name">Laster...</h1>
-                        <div class="ph-meta">
-                            <span id="ph-email" class="ph-meta-item">
-                                <span class="material-symbols-outlined">mail</span>
-                                <span id="ph-email-text">—</span>
-                            </span>
-                            <span id="ph-phone" class="ph-meta-item">
-                                <span class="material-symbols-outlined">phone</span>
-                                <span id="ph-phone-text">—</span>
-                            </span>
-                        </div>
+<body class="admin-body minside-body cms-loading">
+            <!-- Sidebar Navigation (Matching Admin Style) -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header" style="display: flex; align-items: center; justify-content: space-between;">
+                    <div class="logo" style="margin-bottom: 0;">
+                        <img src="/img/logo-hkm.png" alt="HKM Logo">
+                        <h1 class="logo-text">Min side</h1>
                     </div>
                 </div>
-                <div class="ph-right">
-                    <div class="ph-badges">
-                        <span class="role-chip">
-                            <span class="material-symbols-outlined">person</span>
-                            <span id="ph-role">Medlem</span>
-                        </span>
+
+                <nav class="sidebar-nav">
+                    <div class="nav-group">
+                        <ul class="nav-list">
+                            <li class="nav-item visible"><a href="/" target="_blank" class="nav-link"><span class="material-symbols-outlined">visibility</span><span>Se nettside</span></a></li>
+                            <li class="nav-item visible"><a href="#overview" class="nav-link active" data-view="overview"><span class="material-symbols-outlined">home</span><span>Oversikt</span></a></li>
+                            
+                            <li class="nav-category-header"><span>MITT MEDLEMSKAP</span></li>
+                            <li class="nav-item visible"><a href="#profile" class="nav-link" data-view="profile"><span class="material-symbols-outlined">person</span><span>Profil</span></a></li>
+                            <li class="nav-item visible"><a href="#courses" class="nav-link" data-view="courses"><span class="material-symbols-outlined">school</span><span>Kurs & Undervisning</span></a></li>
+                            <li class="nav-item visible"><a href="#giving" class="nav-link" data-view="giving"><span class="material-symbols-outlined">volunteer_activism</span><span>Gaver & Betalinger</span></a></li>
+                            
+                            <li class="nav-category-header"><span>AKTIVITET</span></li>
+                            <li class="nav-item visible"><a href="#notifications" class="nav-link" data-view="notifications"><span class="material-symbols-outlined">notifications</span><span>Varslinger</span><span id="notif-badge" class="nav-badge" style="display:none">0</span></a></li>
+                            <li class="nav-item visible"><a href="#activity" class="nav-link" data-view="activity"><span class="material-symbols-outlined">history</span><span>Logg</span></a></li>
+                            <li class="nav-item visible"><a href="#notes" class="nav-link" data-view="notes"><span class="material-symbols-outlined">notes</span><span>Notater</span></a></li>
+                        </ul>
                     </div>
-                    <div class="actions-wrap">
-                        <button class="actions-btn" id="actions-btn">
-                            Handlinger
-                            <span class="material-symbols-outlined">expand_more</span>
-                        </button>
-                        <div class="actions-menu" id="actions-menu">
-                            <button class="actions-item" onclick="document.getElementById('ph-upload').click()">
-                                <span class="material-symbols-outlined">photo_camera</span> Endre profilbilde
-                            </button>
-                            <a href="../index.html" class="actions-item">
-                                <span class="material-symbols-outlined">home</span> Til HKM.no
-                            </a>
-                            <div class="actions-divider"></div>
-                            <button id="logout-btn" class="actions-item danger">
-                                <span class="material-symbols-outlined">logout</span> Logg ut
-                            </button>
-                        </div>
+
+                    <div class="nav-group bottom">
+                        <ul class="nav-list">
+                            <li class="nav-item visible"><a href="/admin/index.html" class="nav-link is-hidden" id="sidebar-admin-link"><span class="material-symbols-outlined">dashboard_customize</span><span>Administrasjon</span></a></li>
+                            <li class="nav-item visible">
+                                <button id="sidebar-logout-btn" class="nav-link logout" style="width: 100%; border: none; background: none; cursor: pointer; text-align: left;">
+                                    <span class="material-symbols-outlined">logout</span>
+                                    <span>Logg ut</span>
+                                </button>
+                            </li>
+                        </ul>
                     </div>
-                    <button id="mobile-toggle" class="mobile-toggle-btn">
-                        <span class="material-symbols-outlined">menu</span>
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <!-- ── Body Layout ────────────────────────────────────────── -->
-        <div class="body-layout">
-
-            <!-- Sidebar -->
-            <nav class="sidebar" id="sidebar">
-                <ul class="nav-list">
-                    <li>
-                        <a href="#overview" class="nav-link active" data-view="overview">
-                            <span class="material-symbols-outlined">home</span>
-                            <span>Oversikt</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#profile" class="nav-link" data-view="profile">
-                            <span class="material-symbols-outlined">person</span>
-                            <span>Profil</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#activity" class="nav-link" data-view="activity">
-                            <span class="material-symbols-outlined">history</span>
-                            <span>Aktivitet</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#notifications" class="nav-link" data-view="notifications">
-                            <span class="material-symbols-outlined">notifications</span>
-                            <span>Varslinger</span>
-                            <span id="notif-badge" class="nav-badge" style="display:none">0</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#giving" class="nav-link" data-view="giving">
-                            <span class="material-symbols-outlined">volunteer_activism</span>
-                            <span>Gaver & Betalinger</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#courses" class="nav-link" data-view="courses">
-                            <span class="material-symbols-outlined">school</span>
-                            <span>Kurs & Undervisning</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#notes" class="nav-link" data-view="notes">
-                            <span class="material-symbols-outlined">notes</span>
-                            <span>Notater</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <!-- Main Content -->
+                </nav>
+            </aside>
             <main class="main-content" id="content-area">
-                <div class="loading-state">
-                    <div class="spinner"></div>
-                    <p>Laster innhold...</p>
-                </div>
-            </main>
-        </div>
+                <!-- ── Profile Header (Identical to Admin Style) ────────────────────────── -->
+                <div id="dashboard-main-header" class="main-header">
+                    <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                        <div class="section-header-icon">
+                            <span id="dashboard-main-header-icon" class="material-symbols-outlined">grid_view</span>
+                        </div>
+                        <div class="section-header-content">
+                            <div class="section-header-titles">
+                                <h2 id="dashboard-main-header-title" class="section-title">Oversikt</h2>
+                                <p id="dashboard-main-header-subtitle" class="section-subtitle">Min Side | His Kingdom Ministry</p>
+                            </div>
 
+                            <div class="section-header-actions">
+                                <!-- User Profile Link -->
+                                <a href="javascript:void(0)" class="user-profile-link" id="actions-btn">
+                                    <div class="user-info-text">
+                                        <span id="ph-name" class="user-name">Laster...</span>
+                                        <span id="ph-role" class="user-role">Medlem</span>
+                                    </div>
+                                    <div id="ph-avatar" class="user-avatar">?</div>
+                                </a>
+
+                                <!-- Actions dropdown menu -->
+                                <div class="actions-menu" id="actions-menu">
+                                    <a href="/admin/index.html" class="actions-item is-hidden" id="ph-admin-link">
+                                        <span class="material-symbols-outlined">dashboard</span> Tilbake til admin
+                                    </a>
+                                    <a href="/" class="actions-item">
+                                        <span class="material-symbols-outlined">home</span> Til HKM.no
+                                    </a>
+                                    <div class="actions-divider"></div>
+                                    <button id="logout-btn" class="actions-item danger">
+                                        <span class="material-symbols-outlined">logout</span> Logg ut
+                                    </button>
+                                </div>
+
+                                <button class="notification-btn" onclick="window.minSideManager.loadView('notifications')">
+                                    <span class="material-symbols-outlined">notifications</span>
+                                    <span id="notif-badge-header" class="notification-dot" style="display:none"></span>
+                                </button>
+
+                                <button id="mobile-toggle" class="mobile-nav-toggle">
+                                    <span class="material-symbols-outlined">menu</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="view-container">
+                    <div class="loading-state">
+                        <div class="spinner"></div>
+                        <p>Laster innhold...</p>
+                    </div>
+                </div>
         <!-- Mobile overlay -->
         <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    </div>
+    </main>
 
     <!-- Firebase SDKs -->
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
-    <script type="module" src="../js/firebase-config.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
     <script type="module" src="../js/user-roles.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
-    <script type="module" src="js/minside.js?v=pco_v2"></script>
+    <script type="module" src="js/minside.js"></script>
 </body>
 
 </html>

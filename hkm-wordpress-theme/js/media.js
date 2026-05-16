@@ -108,7 +108,32 @@ async function loadMediaSettings() {
     if (!svc || !svc.isInitialized) {
         return null;
     }
-    return await svc.getPageContent('settings_media');
+
+    const [mediaSettings, podcastSettings] = await Promise.all([
+        svc.getPageContent('settings_media').catch(() => ({})),
+        svc.getPageContent('settings_podcast').catch(() => ({}))
+    ]);
+
+    return {
+        ...(mediaSettings || {}),
+        ...(podcastSettings || {})
+    };
+}
+
+function updatePlatformLinks(settings = {}) {
+    const linksContainer = document.getElementById('podcast-links-container');
+    if (!linksContainer) return;
+
+    const spotifyLink = linksContainer.querySelector('.platform-spotify');
+    const appleLink = linksContainer.querySelector('.platform-apple');
+
+    if (settings.spotifyUrl && spotifyLink) {
+        spotifyLink.href = settings.spotifyUrl;
+    }
+
+    if (settings.appleUrl && appleLink) {
+        appleLink.href = settings.appleUrl;
+    }
 }
 
 /**
@@ -499,11 +524,30 @@ function getEpisodeId(episode) {
     return guid || asText(episode.link) || asText(episode.title);
 }
 
-function getEpisodeCategory(episode) {
+function normalizePodcastOverrideCategories(value) {
+    if (Array.isArray(value)) {
+        return value
+            .map((entry) => String(entry || '').trim())
+            .filter(Boolean);
+    }
+
+    const normalized = String(value || '').trim();
+    if (!normalized) return [];
+
+    return normalized
+        .split(',')
+        .map((entry) => entry.trim())
+        .filter(Boolean);
+}
+
+function getEpisodeCategories(episode) {
     // 1. Sjekk manuell overstyring først
     const id = getEpisodeId(episode);
-    if (podcastOverrides && podcastOverrides[id]) {
-        return podcastOverrides[id];
+    if (podcastOverrides && Object.prototype.hasOwnProperty.call(podcastOverrides, id)) {
+        const overrideCategories = normalizePodcastOverrideCategories(podcastOverrides[id]);
+        if (overrideCategories.length) {
+            return overrideCategories;
+        }
     }
 
     // 2. Bruk nøkkelord hvis ingen overstyring finnes
@@ -511,12 +555,80 @@ function getEpisodeCategory(episode) {
     const description = asText(episode.description) || asText(episode["itunes:summary"]);
     const text = (title + " " + description).toLowerCase();
 
+    const matched = [];
     for (const [category, keywords] of Object.entries(PODCAST_KEYWORDS)) {
         if (keywords.some(keyword => text.includes(keyword))) {
-            return category;
+            matched.push(category);
         }
     }
-    return 'other';
+
+    return matched.length ? matched : ['other'];
+}
+
+function getEpisodeCategory(episode) {
+    const categories = getEpisodeCategories(episode);
+    return categories[0] || 'other';
+}
+
+function formatPodcastCategoryLabel(category) {
+    const normalized = String(category || '').trim();
+    if (!normalized) return '';
+
+    const map = {
+        tro: 'Tro',
+        bibel: 'Bibel',
+        bønn: 'Bønn',
+        undervisning: 'Undervisning',
+    };
+
+    if (map[normalized]) return map[normalized];
+
+    return normalized
+        .split(/[-_\s]+/)
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(' ');
+}
+
+function ensureDynamicPodcastCategoryButtons() {
+    const container = document.getElementById('podcast-categories');
+    if (!container) return;
+
+    const existingFilters = new Set(
+        Array.from(container.querySelectorAll('[data-filter]'))
+            .map((button) => String(button.getAttribute('data-filter') || '').trim())
+            .filter(Boolean)
+    );
+
+    const dynamicCategories = new Set();
+    allPodcastEpisodes.forEach((episode) => {
+        const categories = Array.isArray(episode?.categories)
+            ? episode.categories
+            : (episode?.category ? [episode.category] : []);
+        categories.forEach((category) => {
+            const normalized = String(category || '').trim();
+            if (!normalized || normalized === 'all') return;
+            dynamicCategories.add(normalized);
+        });
+    });
+
+    const preferredOrder = ['tro', 'bibel', 'bønn', 'undervisning'];
+    const orderedCategories = [
+        ...preferredOrder.filter((category) => dynamicCategories.has(category)),
+        ...Array.from(dynamicCategories)
+            .filter((category) => !preferredOrder.includes(category))
+            .sort((a, b) => a.localeCompare(b, 'no'))
+    ];
+
+    orderedCategories.forEach((category) => {
+        if (existingFilters.has(category)) return;
+        const button = document.createElement('button');
+        button.className = 'category-btn';
+        button.setAttribute('data-filter', category);
+        button.textContent = formatPodcastCategoryLabel(category);
+        container.appendChild(button);
+        existingFilters.add(category);
+    });
 }
 
 async function initPodcastRSS() {
@@ -557,7 +669,8 @@ async function initPodcastRSS() {
                     thumbnail: getChannelImage(channel) || getItunesImage(episode),
                     audioUrl: (Array.isArray(episode.enclosure) ? episode.enclosure[0]?.$?.url : episode.enclosure?.$?.url) || episode.enclosure?.url,
                     episodeNumber: episodes.length - index,
-                    category: getEpisodeCategory(episode)
+                    categories: getEpisodeCategories(episode),
+                category: getEpisodeCategory(episode)
                 };
             });
 
@@ -571,6 +684,8 @@ async function initPodcastRSS() {
 }
 
 function initPodcastControls() {
+    ensureDynamicPodcastCategoryButtons();
+
     const filterButtons = document.querySelectorAll('#podcast-categories [data-filter]');
     const sortSelect = document.getElementById('podcast-sort-select');
 
@@ -599,7 +714,12 @@ function renderPodcastEpisodes() {
 
     // Filtrering
     if (currentPodcastFilter !== 'all') {
-        filtered = filtered.filter(ep => ep.category === currentPodcastFilter);
+        filtered = filtered.filter((ep) => {
+            const categories = Array.isArray(ep.categories)
+                ? ep.categories
+                : (ep.category ? [ep.category] : []);
+            return categories.includes(currentPodcastFilter);
+        });
     }
 
     // Sortering
@@ -700,6 +820,7 @@ function toggleAudio(url, title, thumbnail, btn, episodeIndex) {
         audio.src = url;
         barTitle.textContent = title;
         barImg.src = thumbnail;
+        barImg.style.display = thumbnail ? '' : 'none';
         audio.play();
         document.getElementById('podcast-player-bar').classList.add('active');
         updatePlayIcons(true, btn);
@@ -724,7 +845,7 @@ function createPlayerBar() {
         <div class="player-container">
             <audio id="global-audio-element"></audio>
             <div class="player-info">
-                <img src="" class="player-info-img">
+                <img src="" class="player-info-img" style="display:none;">
                 <div class="player-info-text"><span class="player-info-title">${t('selectEpisode')}</span></div>
             </div>
             <div class="player-controls">

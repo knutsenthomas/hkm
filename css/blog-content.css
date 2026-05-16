@@ -1,0 +1,285 @@
+/* 
+   ==========================================================================
+   Blog Content Styles - High Fidelity Editor Parity
+   ========================================================================== 
+*/
+
+:root {
+    --rte-font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    --rte-title-font: 'Inter', system-ui, -apple-system, sans-serif;
+    --rte-text-color: #1a202c;
+    --rte-header-color: #000000;
+    --rte-line-height: 1.85;
+    --rte-paragraph-spacing: 1rem; /* Reduced from 1.25rem (20px) to 16px */
+    --rte-max-width: 840px;
+}
+
+/* Base Container */
+.blog-post-content {
+    max-width: var(--rte-max-width);
+    margin: 0 auto;
+    font-family: var(--rte-font-family);
+    color: var(--rte-text-color);
+    line-height: var(--rte-line-height);
+    padding: 0; /* Removed internal padding to avoid doubling with .container */
+    box-sizing: border-box;
+    overflow-x: hidden;
+    font-size: 1.125rem; /* Desktop 18px base size */
+}
+
+/* Global Image & Element Guard */
+.blog-post-content *:not(.block-embed):not(.block-embed iframe) {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    position: static !important;
+    transform: none !important;
+    left: 0 !important;
+    right: 0 !important;
+}
+
+/* Reset Wix/Legacy Divs that might shrink text */
+.blog-post-content div, 
+.blog-post-content p {
+    margin-bottom: var(--rte-paragraph-spacing);
+}
+
+.blog-post-content img, 
+.blog-post-content figure,
+.blog-post-content .wix-image-container {
+    max-width: 100% !important;
+    height: auto !important;
+    margin: 2rem auto !important; /* Reduced from 3rem */
+    display: block !important;
+}
+
+.blog-post-content table {
+    table-layout: fixed !important;
+    width: 100% !important;
+    border-collapse: collapse;
+    margin: 2rem 0 !important;
+}
+
+.blog-post-content img {
+    border-radius: 12px;
+    clear: both;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+/* Hide tiny tracker pixels or icons from Wix */
+.blog-post-content img[width="1"], 
+.blog-post-content img[height="1"] {
+    display: none !important;
+}
+
+.blog-post-content hr {
+    max-width: 100% !important;
+    margin: 3rem 0;
+}
+
+/* Unified Block Classes (from EditorJS) */
+
+.block-header {
+    font-family: var(--rte-title-font);
+    color: var(--rte-header-color);
+    font-weight: 800;
+    line-height: 1.25;
+    margin-top: 1rem; /* Reduced from 1.5rem */
+    margin-bottom: 0.5rem; /* Reduced from 0.75rem */
+    letter-spacing: -0.01em;
+}
+
+h1.block-header { font-size: 2.25rem; } /* 36px */
+h2.block-header { font-size: 1.75rem; } /* 28px */
+h3.block-header { font-size: 1.4rem; }  /* 22px */
+h4.block-header { font-size: 1.25rem; } /* 20px */
+
+.block-paragraph {
+    margin-bottom: var(--rte-paragraph-spacing);
+    font-weight: 400;
+    color: var(--rte-text-color);
+    word-break: break-word;
+    letter-spacing: -0.011em;
+}
+
+/* First paragraph treatment - Matching user request for consistent weight */
+.block-paragraph:first-of-type {
+    line-height: 1.6;
+    color: #1e293b;
+    font-weight: 400; /* Normal weight as requested */
+}
+
+.block-list {
+    margin-bottom: var(--rte-paragraph-spacing);
+    padding-left: 1.5rem;
+    list-style-position: outside;
+}
+
+.block-list li {
+    margin-bottom: 1rem;
+    padding-left: 0.5rem;
+    line-height: var(--rte-line-height);
+}
+
+ul.block-list { list-style-type: disc; }
+ol.block-list { list-style-type: decimal; }
+
+.block-quote {
+    position: relative;
+    margin: 2rem 0; /* Reduced from 3rem */
+    padding: 2rem 2.5rem;
+    background: #f8fafc;
+    border-left: 4px solid #1B4965;
+    border-radius: 0 12px 12px 0;
+}
+
+.block-quote p {
+    font-family: var(--rte-title-font);
+    font-style: italic;
+    font-size: 1.35rem;
+    line-height: 1.6;
+    color: #0f172a;
+    margin-bottom: 0.5rem;
+}
+
+.block-quote cite {
+    display: block;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-style: normal;
+}
+
+.block-delimiter {
+    text-align: center;
+    font-size: 2.5rem;
+    letter-spacing: 1rem;
+    color: #e2e8f0;
+    margin: 4rem 0;
+    font-weight: 300;
+}
+
+/* Image & Media Styling */
+.block-image {
+    margin: 4rem 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.block-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+    transition: transform 0.5s ease;
+}
+
+.block-image figcaption {
+    margin-top: 1rem;
+    text-align: center;
+    font-size: 0.95rem;
+    color: #64748b;
+    font-style: italic;
+    font-family: var(--rte-font-family);
+}
+
+/* Automatic Gallery Layout (Grid) */
+.block-image-gallery {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 3rem 0;
+}
+
+.block-image-gallery .block-image {
+    margin: 0;
+}
+
+.block-image-gallery[data-items="1"] { grid-template-columns: 1fr; }
+.block-image-gallery[data-items="3"] { grid-template-columns: repeat(3, 1fr); }
+.block-image-gallery[data-items="4"] { grid-template-columns: repeat(2, 1fr); }
+
+.block-image-gallery.gallery-3-col { grid-template-columns: repeat(3, 1fr); }
+.block-image-gallery.gallery-2-col { grid-template-columns: repeat(2, 1fr); }
+
+/* Embeds */
+.block-embed-wrapper {
+    margin: 3rem 0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15);
+}
+
+.block-embed {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+}
+
+.block-embed iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+/* Links */
+.block-paragraph a, .block-list a {
+    color: #1B4965;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.block-paragraph a:hover, .block-list a:hover {
+    color: #d17d39;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .blog-post-content {
+        padding: 0;
+        font-size: 1rem; /* Fix: Ensure base size is 16px on mobile for all elements */
+    }
+    
+    h1.block-header { font-size: 1.7rem; }
+    h2.block-header { font-size: 1.35rem; }
+    
+    .block-paragraph {
+        /* Inherits from .blog-post-content (1rem/16px) */
+    }
+    
+    .block-paragraph:first-of-type {
+        font-weight: 400;
+    }
+    
+    .block-list li {
+        /* Inherits from .blog-post-content (1rem/16px) */
+    }
+    
+    .block-image-gallery {
+        display: block;
+        grid-template-columns: 1fr;
+    }
+    
+    .block-image-gallery .block-image {
+        margin-bottom: 2rem;
+    }
+    
+    .block-image-gallery .block-image:last-child {
+        margin-bottom: 0;
+    }
+    
+    .block-quote {
+        padding: 1.5rem;
+    }
+    
+    .block-quote p {
+        font-size: 1.15rem;
+    }
+}

@@ -4278,11 +4278,13 @@ ol.block-list {
 }
 
 .hero-nav.prev {
-    right: 100px;
+    left: 40px;
+    right: auto;
 }
 
 .hero-nav.next {
-    right: 40px;
+    left: 100px;
+    right: auto;
 }
 
 @media (max-width: 768px) {
@@ -4298,12 +4300,13 @@ ol.block-list {
     }
 
     .hero-nav.prev {
-        right: auto;
         left: 20px;
+        right: auto;
     }
 
     .hero-nav.next {
-        right: 20px;
+        left: 74px;
+        right: auto;
     }
 }
 
@@ -4842,5 +4845,84 @@ ol.block-list {
     .header-actions .header-donate-btn,
     .header-actions .lang-switcher {
         display: none !important;
+    }
+}
+
+/* Unified subpage hero sizing and centering */
+:root {
+    --subpage-hero-height-desktop: 540px;
+    --subpage-hero-height-mobile: 320px;
+}
+
+.page-hero,
+.page-hero.subpage-hero,
+#blog-hero {
+    height: var(--subpage-hero-height-desktop) !important;
+    min-height: var(--subpage-hero-height-desktop) !important;
+    max-height: var(--subpage-hero-height-desktop) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+/* Explicit lock for key pages requested by user */
+body.page-template-page-bli-fast-giver-php .page-hero,
+body.page-template-page-donasjoner-php .page-hero,
+body.page-template-page-bnn-php .page-hero {
+    height: var(--subpage-hero-height-desktop) !important;
+    min-height: var(--subpage-hero-height-desktop) !important;
+    max-height: var(--subpage-hero-height-desktop) !important;
+}
+
+.page-hero .container,
+.page-hero-content {
+    width: 100%;
+    text-align: center;
+    height: 100%;
+}
+
+.page-hero-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-hero .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.page-hero-title,
+.page-hero-subtitle,
+.page-hero .page-title,
+.page-hero .breadcrumbs {
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@media (max-width: 768px) {
+    .page-hero,
+    .page-hero.subpage-hero,
+    #blog-hero {
+        height: var(--subpage-hero-height-mobile) !important;
+        min-height: var(--subpage-hero-height-mobile) !important;
+        max-height: var(--subpage-hero-height-mobile) !important;
+    }
+
+    body.page-template-page-bli-fast-giver-php .page-hero,
+    body.page-template-page-donasjoner-php .page-hero,
+    body.page-template-page-bnn-php .page-hero {
+        height: var(--subpage-hero-height-mobile) !important;
+        min-height: var(--subpage-hero-height-mobile) !important;
+        max-height: var(--subpage-hero-height-mobile) !important;
     }
 }

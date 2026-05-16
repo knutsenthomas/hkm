@@ -214,8 +214,7 @@
         }
     </style>
     <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
+    <script type="module">
         tailwind.config = {
             theme: {
                 extend: {
@@ -228,9 +227,44 @@
             }
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script type="module">
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json?v=20260508c">
+    <meta name="theme-color" content="#cc6f2c">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="/img/logo-hkm.png">
+    <!-- PWA Service Worker -->
+    <script type="module">
+        (function () {
+            if (!('serviceWorker' in navigator)) return;
+            window.addEventListener('load', async () => {
+                try {
+                    const reg = await navigator.serviceWorker.register('/sw.js');
+                    console.log('Service Worker registrert for PWA!', reg);
+                } catch (err) {
+                    console.log('Service Worker feilet:', err);
+                }
+            });
+        })();
+    </script>
 </head>
 
-<body>
+<body class="cms-loading">
     <div class="login-card">
         <img src="../img/logo-hkm.png" alt="HKM Logo" class="logo-icon">
         <h1 class="login-title">Min Side</h1>
@@ -315,7 +349,7 @@
             Google
         </button>
 
-        <a href="../index.html" class="back-link">Tilbake til nettsiden</a>
+        <a href="/index" class="back-link">Tilbake til nettsiden</a>
     </div>
 
     <!-- Firebase SDK (Compat) -->

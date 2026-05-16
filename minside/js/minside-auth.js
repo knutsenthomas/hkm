@@ -146,7 +146,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             await routeByRole();
         } catch (error) {
             console.error(error);
-            showMessage(getErrorMessage(error), 'error');
+            let msg = getErrorMessage(error);
+            if (error.code === 'auth/unauthorized-domain') {
+                msg = 'Domenet "' + window.location.hostname + '" er ikke godkjent i Firebase (Authorized Domains). Legg det til i Firebase Console.';
+            }
+            showMessage(msg, 'error');
         }
     });
 
@@ -171,22 +175,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         const service = window.firebaseService;
         const user = firebase.auth().currentUser;
         if (!user || !service) {
-            window.location.href = 'index.html';
+            window.location.href = '/minside/index.html';
             return;
         }
 
         let role = 'medlem';
+        let roleLookupFailed = false;
         try {
-            role = await service.getUserRole(user.uid);
+            role = await service.getUserRole(user.uid, { timeoutMs: 2500 });
         } catch (err) {
+            roleLookupFailed = true;
             console.warn('Kunne ikke hente rolle:', err);
         }
 
-        const canAccessAdmin = window.HKM_PERMISSIONS
-            && Array.isArray(window.HKM_PERMISSIONS.ACCESS_ADMIN)
-            && window.HKM_PERMISSIONS.ACCESS_ADMIN.includes(role);
+        if (roleLookupFailed) {
+            // Avoid misrouting admins to member area when Firestore is temporarily slow.
+            showMessage('Innlogging er gjennomført, men rolleverifisering er treg. Prøver medlemssiden først.', 'success');
+            window.location.href = '/minside/index.html';
+            return;
+        }
 
-        window.location.href = canAccessAdmin ? '../admin/index.html' : 'index.html';
+        const normalizedRole = String(role || '').trim().toLowerCase();
+        const canAccessAdmin = normalizedRole === 'admin' || normalizedRole === 'superadmin';
+
+        window.location.href = canAccessAdmin ? '/admin/index.html' : '/minside/index.html';
     }
 
     function getErrorMessage(error) {

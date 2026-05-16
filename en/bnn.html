@@ -19,7 +19,6 @@
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../css/cookie-consent.css">
     <!-- Tailwind CSS Play CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -33,18 +32,33 @@
             }
         }
     </script>
+    <!-- Loader Safety Net -->
+    <script>
+        (function() {
+            // Safety net: Remove loading screen if CMS fails to initialize within 4 seconds
+            setTimeout(function() {
+                if (document.body && document.body.classList.contains('cms-loading')) {
+                    console.warn('CMS loading timeout - forcing visibility');
+                    document.body.classList.remove('cms-loading');
+                    var loader = document.getElementById('loader-wrapper');
+                    if (loader) loader.style.display = 'none';
+                }
+            }, 4000);
+        })();
+    </script>
+    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
 </head>
 
 <body class="cms-loading">
     <!-- Header -->
     <header class="header fixed top-0 left-0 w-full z-[10001] transition-all duration-300" id="header">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-[100px] transition-all duration-300"
             id="header-container">
             <!-- Logo -->
-            <a href="index.html" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
+            <a href="/en/" class="flex items-center gap-3 font-bold text-white transition-all duration-300 logo">
                 <div
                     class="w-[45px] h-[45px] flex items-center justify-center rounded-full overflow-hidden shrink-0 logo-icon">
-                    <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo"
                         class="w-full h-full object-cover">
                 </div>
                 <span class="text-xl">His Kingdom Ministry</span>
@@ -55,19 +69,19 @@
                 <div class="lang-switcher relative group">
                     <button
                         class="flex items-center gap-2 text-white font-medium hover:text-primary-orange transition-colors lang-btn">
-                        <i class="fas fa-globe text-lg"></i> <span>NO</span>
+                        <i class="fas fa-globe text-lg"></i> <span>EN</span>
                     </button>
                     <div
                         class="lang-dropdown absolute right-0 mt-2 w-40 bg-white shadow-xl rounded-lg py-2 hidden group-hover:block border border-gray-100">
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="no">🇳🇴 Norsk</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/en/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="en">🇺🇸 English</a>
-                        <a href="#" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
+                        <a href="/es/" class="block px-4 py-2 text-gray-800 hover:bg-gray-50 lang-switch-btn"
                             data-lang="es">🇪🇸 Español</a>
                     </div>
                 </div>
-                <a href="donasjoner.html"
+                <a href="/en/donations"
                     class="hidden md:flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-white bg-gradient-to-br from-[#f39c12] to-[#e74c3c] hover:scale-105 transition-transform header-donate-btn">
                     Gi gave <i class="fas fa-heart text-sm"></i>
                 </a>
@@ -85,80 +99,105 @@
 
     <!-- Full-screen Mega Menu Overlay -->
     <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
-        id="mega-menu">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+        id="mega-menu" aria-hidden="true">
+        <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
             <!-- Menu Top Controls (Search & Mobile Lang) -->
             <div class="flex flex-col gap-6">
-                <div class="relative w-full">
+                <div class="relative w-full md:hidden">
                     <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
-                    <input type="text" placeholder="Search..."
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
                         class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
                 </div>
 
                 <!-- Mobile Language Selector (Pill Style) -->
                 <div class="flex md:hidden">
-                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-100">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
                         <i class="fas fa-globe text-gray-400"></i>
                         <div class="flex gap-4 items-center">
-                            <a href="../bnn.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">NO</a>
+                            <a href="/en/../index" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="bnn.html" class="text-sm font-bold text-primary-orange">EN</a>
+                            <a href="/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
                             <div class="w-px h-3 bg-gray-300"></div>
-                            <a href="../es/bnn.html"
-                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange">ES</a>
+                            <a href="/en/../es/index"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="mega-menu-body">
-
                 <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
                     <!-- Column 1: Get Involved -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Get Involved</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Get Involved</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="donations.html">Support the work</a></li>
-                            <li><a href="regular-donors.html">Become a regular donor</a></li>
-                            <li><a href="for-churches.html">For churches</a></li>
-                            <li><a href="for-businesses.html">For businesses</a></li>
-                            <li><a href="bnn.html">Business Network</a></li>
+                            <li><a href="/en/donations" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Support the Work</a></li>
+                            <li><a href="/en/regular-donors" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Become a Monthly Donor</a></li>
+                            <li><a href="/en/for-churches" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For Churches</a></li>
+                            <li><a href="/en/for-businesses" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For Businesses</a></li>
+                            <li><a href="/en/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Get to Know Us -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Get to Know Us</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Get to Know Us</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="about.html">About the foundation</a></li>
-                            <li><a href="about.html#history">Our history</a></li>
-                            <li><a href="contact.html">Where we work</a></li>
-                            <li><a href="contact.html">Contact us</a></li>
+                            <li><a href="/en/about" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">About Us</a></li>
+                            <li><a href="/en/contact" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contact Us</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 3: Resources & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Resources</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Resources</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="events.html">Events</a></li>
-                            <li><a href="media.html">Media & Podcast</a></li>
-                            <li><a href="blog.html">News & Blog</a></li>
-                            <li><a href="../minside/index.html">My Page</a></li>
+                            <li><a href="/en/../butikk" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Store</a></li>
+                            <li><a href="/en/events" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Events</a></li>
+                            <li><a href="/en/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="/en/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">News & Blog</a></li>
+                            <li><a href="/en/teaching" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.courses">Courses</a></li>
+                            <li><a href="/en/../minside/index" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">My Page</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Menu Footer -->
                 <div class="mega-menu-footer">
-                    <a href="donations.html" class="btn btn-primary btn-large btn-block">Support now <i
-                            class="fas fa-heart"></i></a>
+                    <a href="/en/donations" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Support Now</span><i
+                            class="fas fa-heart heart"></i></a>
                     <div class="menu-footer-links">
-                        <a href="donations.html#tax-deduction">Tax Deduction</a>
-                        <a href="about.html">About us</a>
-                        <a href="privacy.html">Privacy Policy</a>
+                        <a href="/en/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Store</a>
+                        <a href="/en/donations" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Tax Deduction</a>
+                        <a href="/en/about" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">About Us</a>
+                        <a href="/en/privacy" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacy</a>
                     </div>
                 </div>
             </div>
@@ -167,12 +206,15 @@
 
     <main>
         <!-- Page Hero -->
-        <section class="page-hero" data-content-key="hero.backgroundImage"
-            style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'); padding-top: 160px;">
+        <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
+            style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
             <div class="container">
-                <h1 class="page-hero-title">Business Network (BNN)</h1>
-                <p class="page-hero-subtitle">A network for Christian leaders and entrepreneurs who want to use their
-                    resources for God's Kingdom.</p>
+                <h1 class="page-title">Business Network (BNN)</h1>
+                <div class="breadcrumbs">
+                    <a href="/">Home</a>
+                    <i class="fas fa-chevron-right"></i>
+                    <span>Business Network</span>
+                </div>
             </div>
         </section>
 
@@ -205,7 +247,7 @@
                 </div>
 
                 <div style="margin-top: 80px;">
-                    <a href="contact.html" class="btn btn-primary">Join the network</a>
+                    <a href="/en/contact" class="btn btn-primary">Join the network</a>
                 </div>
             </div>
         </section>
@@ -218,9 +260,9 @@
                     <div class="footer-left">
                         <!-- Brand / Intro -->
                         <div class="footer-brand">
-                            <a href="index.html" class="logo">
+                            <a href="/en/" class="logo">
                                 <div class="logo-icon">
-                                    <img src="../img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                    <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
                                 </div>
                                 <span class="logo-text">His Kingdom Ministry</span>
                             </a>
@@ -233,28 +275,28 @@
                             <div class="nav-col">
                                 <h4>About us</h4>
                                 <ul>
-                                    <li><a href="index.html">Home</a></li>
-                                    <li><a href="about.html">Who are we?</a></li>
-                                    <li><a href="about.html#vision">Our vision</a></li>
-                                    <li><a href="contact.html">Contact us</a></li>
+                                    <li><a href="/">Home</a></li>
+                                    <li><a href="/en/about">Who are we?</a></li>
+                                    <li><a href="/en/about">Our vision</a></li>
+                                    <li><a href="/en/contact">Contact us</a></li>
                                 </ul>
                             </div>
 
                             <div class="nav-col">
                                 <h4>Resources</h4>
                                 <ul>
-                                    <li><a href="media.html#teaching-section">Teaching</a></li>
-                                    <li><a href="events.html">E-courses</a></li>
-                                    <li><a href="blog.html">Books & Blog</a></li>
-                                    <li><a href="../minside/index.html">My Page</a></li>
+                                    <li><a href="/en/media">Teaching</a></li>
+                                    <li><a href="/en/events">E-courses</a></li>
+                                    <li><a href="/en/blog">Books & Blog</a></li>
+                                    <li><a href="/en/../minside/index">My Page</a></li>
                                 </ul>
                             </div>
 
                             <div class="nav-col">
                                 <h4>Media</h4>
                                 <ul>
-                                    <li><a href="media.html#podcast-section">Podcast</a></li>
-                                    <li><a href="media.html">Videos</a></li>
+                                    <li><a href="/en/media">Podcast</a></li>
+                                    <li><a href="/en/media">Videos</a></li>
                                     <li><a href="https://www.youtube.com/@HisKingdomMinistry"
                                             target="_blank">YouTube</a>
                                     </li>
@@ -264,10 +306,10 @@
                             <div class="nav-col">
                                 <h4>Involvement</h4>
                                 <ul>
-                                    <li><a href="events.html">Calendar</a></li>
-                                    <li><a href="donations.html">Give a gift</a></li>
-                                    <li><a href="privacy.html">Privacy Policy</a></li>
-                                    <li><a href="accessibility.html">Accessibility</a></li>
+                                    <li><a href="/en/events">Calendar</a></li>
+                                    <li><a href="/en/donations">Give a gift</a></li>
+                                    <li><a href="/en/privacy">Privacy Policy</a></li>
+                                    <li><a href="/en/accessibility">Accessibility</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -291,7 +333,7 @@
                         <!-- Contact Us Card -->
                         <div class="footer-card contact-card">
                             <h3>Contact Us</h3>
-                            <a href="contact.html" class="btn btn-primary btn-block btn-sm">Contact Form</a>
+                            <a href="/en/contact" class="btn btn-primary btn-block btn-sm">Contact Form</a>
 
                             <div class="contact-details">
                                 <div class="detail-item">
@@ -313,7 +355,7 @@
 
                 <div class="footer-bottom">
                     <p>&copy; 2026 His Kingdom Ministry. All rights reserved.</p>
-                    <a href="../admin/login.html" class="admin-link">Admin</a>
+                    <a href="/en/../admin/login" class="admin-link">Admin</a>
                 </div>
             </div>
         </footer>
@@ -327,12 +369,12 @@
 
     <!-- Firebase Config & Service -->
     <script type="module" src="../js/firebase-config.js"></script>
-    <script type="module" src="../js/firebase-service.js"></script>
+    <script type="module" src="../js/firebase-service.js?v=2026.05.10.1"></script>
 
     <!-- App Scripts -->
     <script type="module" src="../js/i18n.js"></script>
-    <script type="module" src="../script.js"></script>
-    <script type="module" src="../js/content-manager.js?v=author"></script>
+    <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
+    <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
     <script type="module" src="../js/cookie-consent.js"></script>
 </body>
 

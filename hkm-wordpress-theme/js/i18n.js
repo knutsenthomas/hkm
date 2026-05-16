@@ -17,12 +17,15 @@ const i18nManager = {
      * Detects language from localStorage, browser settings, or URL path.
      */
     detectLanguage() {
-        const path = window.location.pathname;
+        const path = window.location.pathname || '';
+        const htmlLang = (document.documentElement.getAttribute('lang') || '').toLowerCase();
         let currentLang = 'no';
 
         // Set language based strictly on the URL path
         if (path.includes('/en/')) currentLang = 'en';
         else if (path.includes('/es/')) currentLang = 'es';
+        else if (htmlLang.startsWith('en')) currentLang = 'en';
+        else if (htmlLang.startsWith('es')) currentLang = 'es';
 
         document.documentElement.lang = currentLang;
     },
@@ -32,52 +35,39 @@ const i18nManager = {
      * @param {string} lang - 'no', 'en', or 'es'
      * @param {boolean} redirect - Whether to navigate to the language-specific page
      */
-    setLanguage(lang, redirect = true) {
+    setLanguage(lang, redirect = true, targetUrl = '') {
         if (!this.languages.includes(lang)) lang = this.defaultLang;
 
         localStorage.setItem(this.storageKey, lang);
         document.documentElement.lang = lang;
 
         if (redirect) {
-            this.redirectToLanguage(lang);
+            this.redirectToLanguage(lang, targetUrl);
         }
     },
 
     /**
      * Navigates to the corresponding page in the target language.
      */
-    redirectToLanguage(lang) {
-        const currentPath = window.location.pathname;
-        const currentFile = currentPath.split('/').pop() || 'index.html';
-
-        let newPath = '';
-
-        // Remove existing lang folders from path
-        let cleanPath = currentFile;
-        // If we are deep in a subdirectory, this logic might need adjustment, 
-        // but for HKM, most files are at root or one level deep.
-
-        if (lang === 'no') {
-            newPath = `../${currentFile}`; // Moving up from /en/ or /es/
-            // If already at root, just currentFile
-            if (!currentPath.includes('/en/') && !currentPath.includes('/es/')) {
-                newPath = currentFile;
-            }
-        } else {
-            // Targetting EN or ES
-            if (currentPath.includes('/en/') || currentPath.includes('/es/')) {
-                // Switching between EN/ES
-                newPath = `../${lang}/${currentFile}`;
-            } else {
-                // Moving from root to lang folder
-                newPath = `${lang}/${currentFile}`;
-            }
+    redirectToLanguage(lang, targetUrl = '') {
+        if (typeof targetUrl === 'string' && targetUrl.trim() && targetUrl !== '#') {
+            window.location.href = targetUrl;
+            return;
         }
 
-        // Special mappings (e.g., om-oss.html -> about.html)
-        newPath = this.mapFileName(newPath, lang);
+        const currentUrl = new URL(window.location.href);
+        let normalizedPath = currentUrl.pathname.replace(/^\/(en|es)(\/|$)/, '/');
+        if (!normalizedPath.startsWith('/')) normalizedPath = `/${normalizedPath}`;
 
-        window.location.href = newPath;
+        let nextPath = normalizedPath;
+        if (lang === 'en' || lang === 'es') {
+            nextPath = `/${lang}${normalizedPath === '/' ? '' : normalizedPath}`;
+        }
+
+        const mappedPath = this.mapFileName(nextPath, lang);
+        const finalPath = mappedPath.replace(/\/{2,}/g, '/');
+        const finalUrl = `${currentUrl.origin}${finalPath}${currentUrl.search}${currentUrl.hash}`;
+        window.location.assign(finalUrl);
     },
 
     /**
@@ -161,7 +151,8 @@ const i18nManager = {
             if (langBtn) {
                 e.preventDefault();
                 const lang = langBtn.getAttribute('data-lang');
-                this.setLanguage(lang);
+                const href = langBtn.getAttribute('href') || '';
+                this.setLanguage(lang, true, href);
                 return;
             }
 
