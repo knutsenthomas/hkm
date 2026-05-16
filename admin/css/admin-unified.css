@@ -1894,6 +1894,64 @@ body.admin-body .welcome-subtitle {
 }
 
 .design-ui-brand-profile h3 {
+  margin: 8px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+/* Global Admin Pills / Badges */
+.cms-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 22px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.cms-pill--success {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+.cms-pill--warning {
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.cms-pill--danger {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.cms-pill--info {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.cms-pill--muted {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.cms-pill--amber {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.cms-pill--green-outline {
+  background: #dcfce7;
+  color: #166534;
+}
   margin: 8px 0 8px;
   font-size: 24px;
   line-height: 1.05;

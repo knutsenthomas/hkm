@@ -7213,9 +7213,9 @@ class AdminManager {
             const podcastAudit = isPodcastTranscriptCollection ? this.getPodcastTranscriptAudit(item) : null;
             const statusPill = isPodcastTranscriptCollection
                 ? `
-                    <div style="display:flex; gap:8px; flex-wrap:nowrap;">
-                        <span style="background:${podcastAudit.hasTranscript ? '#ecfdf5' : '#fef2f2'}; color:${podcastAudit.hasTranscript ? '#047857' : '#b91c1c'}; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:0.03em;">${podcastAudit.hasTranscript ? 'TEKST OK' : 'MANGLER TEKST'}</span>
-                        <span style="background:${podcastAudit.hasSummary ? '#eff6ff' : '#fff7ed'}; color:${podcastAudit.hasSummary ? '#1d4ed8' : '#c2410c'}; padding:4px 10px; border-radius:999px; font-size:11px; font-weight:800; letter-spacing:0.03em;">${podcastAudit.hasSummary ? 'OPPSUMMERING OK' : 'MANGLER OPPSUMMERING'}</span>
+                    <div style="display:flex; gap:8px; flex-wrap:nowrap; align-items:center;">
+                        <span class="cms-pill ${podcastAudit.hasTranscript ? 'cms-pill--success' : 'cms-pill--danger'}">${podcastAudit.hasTranscript ? 'TEKST OK' : 'MANGLER TEKST'}</span>
+                        <span class="cms-pill ${podcastAudit.hasSummary ? 'cms-pill--info' : 'cms-pill--warning'}">${podcastAudit.hasSummary ? 'OPPSUMMERING OK' : 'MANGLER OPPSUMMERING'}</span>
                     </div>
                 `
                 : (() => {
@@ -7224,33 +7224,33 @@ class AdminManager {
                         const hasTranscript = !!(item.text || item.content);
                         const hasSummary = !!(item.summary || item.description);
                         const publishedPill = item.published === false
-                            ? '<span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">UTKAST</span>'
-                            : '<span style="background:#ecfdf5;color:#047857;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">PUBLISERT</span>';
+                            ? '<span class="cms-pill cms-pill--warning">UTKAST</span>'
+                            : '<span class="cms-pill cms-pill--success">PUBLISERT</span>';
                         
                         let extraBadges = '';
                         if (collectionId === 'teaching') {
                             if (hasTranscript) {
-                                extraBadges += `<span style="background:#dcfce7;color:#166534;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">TEKST</span>`;
+                                extraBadges += `<span class="cms-pill cms-pill--green-outline">TEKST</span>`;
                             }
                             if (hasSummary) {
-                                extraBadges += `<span style="background:#eff6ff;color:#1e40af;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">AI</span>`;
+                                extraBadges += `<span class="cms-pill cms-pill--info">AI</span>`;
                             }
                         }
 
                         let translationPill = '';
                         if (translationStats.level === 'ok') {
-                            translationPill = `<span style="background:#eff6ff;color:#1d4ed8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
+                            translationPill = `<span class="cms-pill cms-pill--info">OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
                         } else if (translationStats.level === 'partial') {
-                            translationPill = `<span style="background:#fef3c7;color:#92400e;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">DELVIS OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
+                            translationPill = `<span class="cms-pill cms-pill--amber">DELVIS OVERSATT (${translationStats.upToDate}/${translationStats.total})</span>`;
                         } else if (translationStats.level === 'stale') {
-                            translationPill = `<span style="background:#fff7ed;color:#c2410c;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">UTDATERT (${translationStats.upToDate}/${translationStats.total})</span>`;
+                            translationPill = `<span class="cms-pill cms-pill--warning">UTDATERT (${translationStats.upToDate}/${translationStats.total})</span>`;
                         } else {
-                            translationPill = '<span style="background:#f1f5f9;color:#94a3b8;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:0.03em;">IKKE OVERSATT</span>';
+                            translationPill = '<span class="cms-pill cms-pill--muted">IKKE OVERSATT</span>';
                         }
-                        return `<div style="display:flex;gap:6px;flex-wrap:nowrap;">${publishedPill}${extraBadges}${translationPill}</div>`;
+                        return `<div style="display:flex;gap:6px;flex-wrap:nowrap;align-items:center;">${publishedPill}${extraBadges}${translationPill}</div>`;
                     }
                     return item.isSynced
-                        ? '<span style="background:#f1f5f9;color:#64748b;padding:4px 12px;border-radius:6px;font-size:11px;font-weight:800;letter-spacing:0.05em;">SYNKRONISERT</span>'
+                        ? '<span class="cms-pill cms-pill--muted">SYNKRONISERT</span>'
                         : '';
                 })();
             const imageCell = item.imageUrl
