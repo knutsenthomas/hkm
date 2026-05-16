@@ -3868,9 +3868,11 @@ th {
 /* CSS Variables */
 
 :root {
-  --primary-color: var(--primary-color);
-  --secondary-color: var(--secondary-color);
-  --primary-orange: var(--primary-orange);
+  --heading-font: 'Inter', system-ui, sans-serif;
+  --main-font: 'Inter', system-ui, sans-serif;
+  --primary-color: #1B4965;
+  --secondary-color: #1B4965;
+  --primary-orange: #d17d39;
   --primary-green: #21543D;
   --accent-green: #00b050;
   --primary-red: var(--primary-red);
@@ -4058,10 +4060,11 @@ html {
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--main-font, 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
   color: var(--text-dark);
   line-height: 1.6;
   overflow-x: hidden;
+  font-size: var(--fs-body, 16px);
 }
 
 h1,
@@ -4070,9 +4073,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: var(--heading-font, 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
   font-weight: 700;
-  line-height: 1.3;
+  line-height: 1.2;
   margin-bottom: 1rem;
 }
 

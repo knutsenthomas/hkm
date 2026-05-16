@@ -10520,10 +10520,14 @@ class AdminManager {
         if (!section) return;
 
         const DEFAULT_THEME = {
+            headingFont: 'Inter',
             mainFont: 'Inter',
             fontSizeH1Desktop: 48,
+            fontSizeH1Mobile: 32,
+            fontSizeH2Desktop: 32,
+            fontSizeH2Mobile: 24,
             fontSizeBase: 16,
-            primaryColor: '#c8682a',
+            primaryColor: '#1B4965',
             secondaryColor: '#1B4965',
             backgroundColor: '#F8F9FA',
             surfaceColor: '#FFFFFF',
@@ -10532,13 +10536,13 @@ class AdminManager {
             headerBg: '#FFFFFF',
             footerBg: '#1B4965',
             footerText: '#FFFFFF',
-            newsletterBg: 'linear-gradient(135deg, #D17D39, #B54D2B)',
+            newsletterBg: '#1B4965',
             newsletterText: '#FFFFFF',
-            btnPrimaryBg: '#c8682a',
+            btnPrimaryBg: '#1B4965',
             btnPrimaryText: '#FFFFFF',
             btnSecondaryBg: '#FFFFFF',
-            btnSecondaryText: '#c8682a',
-            btnSecondaryBorder: '#c8682a'
+            btnSecondaryText: '#1B4965',
+            btnSecondaryBorder: '#1B4965'
         };
 
         section.innerHTML = `
@@ -10771,33 +10775,74 @@ class AdminManager {
                             <div class="design-ui-panel-body">
                                 <div class="design-ui-typography-layout">
                                     <div class="design-ui-control-stack">
-                                        <div class="form-group">
-                                            <label>Fontfamilie</label>
-                                            <select id="main-font-select" class="form-control">
-                                                <option value="Inter">Inter</option>
-                                                <option value="DM Sans">DM Sans</option>
-                                                <option value="Outfit">Outfit</option>
-                                                <option value="Montserrat">Montserrat</option>
-                                                <option value="Open Sans">Open Sans</option>
-                                                <option value="Roboto">Roboto</option>
-                                                <option value="Merriweather">Merriweather</option>
-                                            </select>
+                                        <div class="design-ui-form-grid">
+                                            <div class="form-group">
+                                                <label>Overskrift font</label>
+                                                <select id="heading-font-select" class="form-control">
+                                                    <option value="Inter">Inter</option>
+                                                    <option value="DM Sans">DM Sans</option>
+                                                    <option value="Outfit">Outfit</option>
+                                                    <option value="Montserrat">Montserrat</option>
+                                                    <option value="Open Sans">Open Sans</option>
+                                                    <option value="Roboto">Roboto</option>
+                                                    <option value="Merriweather">Merriweather</option>
+                                                    <option value="Playfair Display">Playfair Display</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label>Brødtekst font</label>
+                                                <select id="main-font-select" class="form-control">
+                                                    <option value="Inter">Inter</option>
+                                                    <option value="DM Sans">DM Sans</option>
+                                                    <option value="Outfit">Outfit</option>
+                                                    <option value="Montserrat">Montserrat</option>
+                                                    <option value="Open Sans">Open Sans</option>
+                                                    <option value="Roboto">Roboto</option>
+                                                    <option value="Merriweather">Merriweather</option>
+                                                </select>
+                                            </div>
                                         </div>
 
-                                        <div class="premium-range-group">
-                                            <div class="premium-range-header">
-                                                <label>Overskrift (H1 desktop)</label>
-                                                <span class="premium-range-val" id="font-size-h1-desktop-val">48px</span>
+                                        <div class="design-ui-range-grid">
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H1 Overskrift (Desktop)</label>
+                                                    <span class="premium-range-val" id="font-size-h1-desktop-val">48px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h1-desktop" class="premium-slider" min="24" max="80" value="48">
                                             </div>
-                                            <input type="range" id="font-size-h1-desktop" class="premium-slider" min="24" max="80" value="48">
-                                        </div>
 
-                                        <div class="premium-range-group">
-                                            <div class="premium-range-header">
-                                                <label>Brødtekst</label>
-                                                <span class="premium-range-val" id="font-size-base-val">16px</span>
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H1 Overskrift (Mobil)</label>
+                                                    <span class="premium-range-val" id="font-size-h1-mobile-val">32px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h1-mobile" class="premium-slider" min="18" max="48" value="32">
                                             </div>
-                                            <input type="range" id="font-size-base" class="premium-slider" min="12" max="24" value="16">
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H2 Overskrift (Desktop)</label>
+                                                    <span class="premium-range-val" id="font-size-h2-desktop-val">32px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h2-desktop" class="premium-slider" min="20" max="60" value="32">
+                                            </div>
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>H2 Overskrift (Mobil)</label>
+                                                    <span class="premium-range-val" id="font-size-h2-mobile-val">24px</span>
+                                                </div>
+                                                <input type="range" id="font-size-h2-mobile" class="premium-slider" min="16" max="40" value="24">
+                                            </div>
+
+                                            <div class="premium-range-group full-width">
+                                                <div class="premium-range-header">
+                                                    <label>Brødtekst (Base)</label>
+                                                    <span class="premium-range-val" id="font-size-base-val">16px</span>
+                                                </div>
+                                                <input type="range" id="font-size-base" class="premium-slider" min="12" max="24" value="16">
+                                            </div>
                                         </div>
                                     </div>
 
@@ -10977,9 +11022,8 @@ class AdminManager {
         ];
 
         const normalizeThemeColors = (raw = {}) => {
-            const primaryColor = normalizeHex(raw.primaryColor) || DEFAULT_THEME.primaryColor;
             return {
-                primaryColor,
+                primaryColor: normalizeHex(raw.primaryColor) || DEFAULT_THEME.primaryColor,
                 secondaryColor: normalizeHex(raw.secondaryColor) || DEFAULT_THEME.secondaryColor,
                 backgroundColor: normalizeHex(raw.backgroundColor || raw.bgLightColor || raw.bgLight) || DEFAULT_THEME.backgroundColor,
                 surfaceColor: normalizeHex(raw.surfaceColor || raw.bgWhiteColor || raw.bgWhite) || DEFAULT_THEME.surfaceColor,
@@ -10993,7 +11037,15 @@ class AdminManager {
                 btnPrimaryBg: normalizeHex(raw.btnPrimaryBg) || DEFAULT_THEME.btnPrimaryBg,
                 btnPrimaryText: normalizeHex(raw.btnPrimaryText) || DEFAULT_THEME.btnPrimaryText,
                 btnSecondaryBg: normalizeHex(raw.btnSecondaryBg) || DEFAULT_THEME.btnSecondaryBg,
-                btnSecondaryText: normalizeHex(raw.btnSecondaryText) || DEFAULT_THEME.btnSecondaryText
+                btnSecondaryText: normalizeHex(raw.btnSecondaryText) || DEFAULT_THEME.btnSecondaryText,
+                // Typography fields
+                headingFont: raw.headingFont || DEFAULT_THEME.headingFont,
+                mainFont: raw.mainFont || DEFAULT_THEME.mainFont,
+                fontSizeH1Desktop: Number(raw.fontSizeH1Desktop) || DEFAULT_THEME.fontSizeH1Desktop,
+                fontSizeH1Mobile: Number(raw.fontSizeH1Mobile) || DEFAULT_THEME.fontSizeH1Mobile,
+                fontSizeH2Desktop: Number(raw.fontSizeH2Desktop) || DEFAULT_THEME.fontSizeH2Desktop,
+                fontSizeH2Mobile: Number(raw.fontSizeH2Mobile) || DEFAULT_THEME.fontSizeH2Mobile,
+                fontSizeBase: Number(raw.fontSizeBase) || DEFAULT_THEME.fontSizeBase
             };
         };
 
@@ -11062,32 +11114,48 @@ class AdminManager {
 
         // Logic for Dynamic Preview
         const updateLivePreview = () => {
-            const font = document.getElementById('main-font-select')?.value || DEFAULT_THEME.mainFont;
+            const headingFont = document.getElementById('heading-font-select')?.value || DEFAULT_THEME.headingFont;
+            const mainFont = document.getElementById('main-font-select')?.value || DEFAULT_THEME.mainFont;
+            
             const h1Size = Number(document.getElementById('font-size-h1-desktop')?.value || DEFAULT_THEME.fontSizeH1Desktop);
+            const h2Size = Number(document.getElementById('font-size-h2-desktop')?.value || DEFAULT_THEME.fontSizeH2Desktop);
             const bodySize = Number(document.getElementById('font-size-base')?.value || DEFAULT_THEME.fontSizeBase);
+            
             const palette = getPaletteFromInputs();
             const previewText = document.getElementById('typography-preview-text');
             const previewBox = document.getElementById('live-preview-area');
             const previewBody = document.getElementById('design-preview-body-copy');
+            const previewCardTitle = section.querySelector('.design-ui-preview-card-title');
+            const previewCardText = section.querySelector('.design-ui-preview-card-text');
             const previewPrimaryBtn = document.getElementById('design-preview-primary-btn');
             const previewSecondaryBtn = document.getElementById('design-preview-secondary-btn');
 
             if (previewText) {
-                previewText.style.fontFamily = `'${font}', sans-serif`;
+                previewText.style.fontFamily = `'${headingFont}', sans-serif`;
                 previewText.style.fontSize = `${h1Size}px`;
                 previewText.style.color = palette.textColor;
             }
             if (previewBox) {
-                previewBox.style.fontFamily = `'${font}', sans-serif`;
+                previewBox.style.fontFamily = `'${mainFont}', sans-serif`;
             }
             if (previewBody) {
+                previewBody.style.fontFamily = `'${mainFont}', sans-serif`;
                 previewBody.style.fontSize = `${bodySize}px`;
                 previewBody.style.color = palette.textLightColor;
             }
+            if (previewCardTitle) {
+                previewCardTitle.style.fontFamily = `'${headingFont}', sans-serif`;
+                previewCardTitle.style.fontSize = `${h2Size}px`;
+            }
+            if (previewCardText) {
+                previewCardText.style.fontFamily = `'${mainFont}', sans-serif`;
+            }
             if (previewPrimaryBtn) {
+                previewPrimaryBtn.style.fontFamily = `'${mainFont}', sans-serif`;
                 previewPrimaryBtn.style.background = palette.primaryColor;
             }
             if (previewSecondaryBtn) {
+                previewSecondaryBtn.style.fontFamily = `'${mainFont}', sans-serif`;
                 previewSecondaryBtn.style.borderColor = palette.secondaryColor;
                 previewSecondaryBtn.style.color = palette.secondaryColor;
             }
@@ -11104,11 +11172,13 @@ class AdminManager {
                 updateLivePreview();
             };
         };
-        syncRange('font-size-base');
-        syncRange('font-size-h1-desktop');
 
-        const fontSelect = document.getElementById('main-font-select');
-        if (fontSelect) fontSelect.onchange = updateLivePreview;
+        ['font-size-h1-desktop', 'font-size-h1-mobile', 'font-size-h2-desktop', 'font-size-h2-mobile', 'font-size-base'].forEach(syncRange);
+
+        const headingFontSelect = document.getElementById('heading-font-select');
+        const mainFontSelect = document.getElementById('main-font-select');
+        if (headingFontSelect) headingFontSelect.onchange = updateLivePreview;
+        if (mainFontSelect) mainFontSelect.onchange = updateLivePreview;
 
         const syncColor = (pickerId, hexId, fallbackHex) => {
             const picker = document.getElementById(pickerId);
@@ -11140,26 +11210,25 @@ class AdminManager {
         const resetBtn = document.getElementById('reset-design-settings');
         if (resetBtn) {
             resetBtn.onclick = async () => {
-                if (!confirm('Er du sikker på at du vil tilbakestille alle farger og fonter til HKM-standard? Dette vil overskrive nåværende lagrede innstillinger.')) return;
+                if (!confirm('Er du sikker på at du vil tilbakestille alle farger og fonter til HKM-standard?')) return;
 
-                const fontEl = document.getElementById('main-font-select');
-                const h1El = document.getElementById('font-size-h1-desktop');
-                const baseEl = document.getElementById('font-size-base');
-
-                if (fontEl) fontEl.value = DEFAULT_THEME.mainFont;
-                if (h1El) h1El.value = String(DEFAULT_THEME.fontSizeH1Desktop);
-                if (baseEl) baseEl.value = String(DEFAULT_THEME.fontSizeBase);
                 applyPaletteToInputs(DEFAULT_THEME);
+                
+                if (document.getElementById('heading-font-select')) document.getElementById('heading-font-select').value = DEFAULT_THEME.headingFont;
+                if (document.getElementById('main-font-select')) document.getElementById('main-font-select').value = DEFAULT_THEME.mainFont;
 
-                const h1ValEl = document.getElementById('font-size-h1-desktop-val');
-                const baseValEl = document.getElementById('font-size-base-val');
-                if (h1ValEl) h1ValEl.textContent = `${DEFAULT_THEME.fontSizeH1Desktop}px`;
-                if (baseValEl) baseValEl.textContent = `${DEFAULT_THEME.fontSizeBase}px`;
+                ['h1-desktop', 'h1-mobile', 'h2-desktop', 'h2-mobile', 'base'].forEach(key => {
+                    const id = `font-size-${key}`;
+                    const el = document.getElementById(id);
+                    const valEl = document.getElementById(`${id}-val`);
+                    const themeKey = `fontSize${key.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('')}`;
+                    if (el) el.value = DEFAULT_THEME[themeKey];
+                    if (valEl) valEl.textContent = `${DEFAULT_THEME[themeKey]}px`;
+                });
 
                 updateLivePreview();
 
-                // Save to Firestore automatically
-                const dataToSave = {
+                const resetData = {
                     ...DEFAULT_THEME,
                     logoUrl: document.getElementById('site-logo-url')?.value || '',
                     faviconUrl: document.getElementById('site-favicon-url')?.value || '',
@@ -11169,8 +11238,8 @@ class AdminManager {
                 };
 
                 try {
-                    await firebaseService.savePageContent('settings_design', dataToSave);
-                    this.showToast('✅ Tema er tilbakestilt til HKM-standard og lagret!', 'success', 5000);
+                    await firebaseService.savePageContent('settings_design', resetData);
+                    this.showToast('✅ Tema er tilbakestilt og lagret!', 'success', 5000);
                 } catch (err) {
                     console.error('Reset save error:', err);
                     this.showToast('❌ Feil ved lagring av tilbakestilling', 'error', 5000);
@@ -11192,16 +11261,30 @@ class AdminManager {
                 }
                 if (data.siteTitle) document.getElementById('site-title-seo').value = data.siteTitle;
                 if (data.logoText) document.getElementById('site-logo-text').value = data.logoText;
+                
+                if (data.headingFont) document.getElementById('heading-font-select').value = data.headingFont;
                 if (data.mainFont) document.getElementById('main-font-select').value = data.mainFont;
-                if (data.fontSizeBase) {
-                    document.getElementById('font-size-base').value = data.fontSizeBase;
-                    document.getElementById('font-size-base-val').textContent = `${data.fontSizeBase}px`;
-                }
-                if (data.fontSizeH1Desktop) {
-                    document.getElementById('font-size-h1-desktop').value = data.fontSizeH1Desktop;
-                    document.getElementById('font-size-h1-desktop-val').textContent = `${data.fontSizeH1Desktop}px`;
-                }
+                
+                const syncDataRange = (key, id) => {
+                    const el = document.getElementById(id);
+                    const valEl = document.getElementById(`${id}-val`);
+                    if (data[key] !== undefined && data[key] !== null) {
+                        if (el) el.value = data[key];
+                        if (valEl) valEl.textContent = `${data[key]}px`;
+                    } else if (DEFAULT_THEME[key] !== undefined) {
+                        if (el) el.value = DEFAULT_THEME[key];
+                        if (valEl) valEl.textContent = `${DEFAULT_THEME[key]}px`;
+                    }
+                };
+
+                syncDataRange('fontSizeH1Desktop', 'font-size-h1-desktop');
+                syncDataRange('fontSizeH1Mobile', 'font-size-h1-mobile');
+                syncDataRange('fontSizeH2Desktop', 'font-size-h2-desktop');
+                syncDataRange('fontSizeH2Mobile', 'font-size-h2-mobile');
+                syncDataRange('fontSizeBase', 'font-size-base');
+
                 applyPaletteToInputs(data);
+                updateLivePreview();
             }
         } catch (e) {
             console.error("Load design error:", e);
@@ -11212,41 +11295,33 @@ class AdminManager {
             const btn = document.getElementById('save-design-settings');
             const palette = getPaletteFromInputs();
             const data = {
+                ...palette,
                 logoUrl: document.getElementById('site-logo-url').value,
                 faviconUrl: document.getElementById('site-favicon-url').value,
                 logoText: document.getElementById('site-logo-text').value,
                 siteTitle: document.getElementById('site-title-seo').value,
+                headingFont: document.getElementById('heading-font-select').value,
                 mainFont: document.getElementById('main-font-select').value,
-                fontSizeBase: document.getElementById('font-size-base').value,
-                fontSizeH1Desktop: document.getElementById('font-size-h1-desktop').value,
-                primaryColor: palette.primaryColor,
-                secondaryColor: palette.secondaryColor,
-                backgroundColor: palette.backgroundColor,
-                surfaceColor: palette.surfaceColor,
-                textColor: palette.textColor,
-                textLightColor: palette.textLightColor,
-                headerBg: palette.headerBg,
-                footerBg: palette.footerBg,
-                footerText: palette.footerText,
-                // Alias for backwards compatibility with older preview logic.
-                accentColor: palette.textLightColor,
+                fontSizeBase: Number(document.getElementById('font-size-base').value),
+                fontSizeH1Desktop: Number(document.getElementById('font-size-h1-desktop').value),
+                fontSizeH1Mobile: Number(document.getElementById('font-size-h1-mobile').value),
+                fontSizeH2Desktop: Number(document.getElementById('font-size-h2-desktop').value),
+                fontSizeH2Mobile: Number(document.getElementById('font-size-h2-mobile').value),
                 updatedAt: new Date().toISOString()
             };
-            Object.assign(data, normalizeThemeColors(data));
 
-            await this._withButtonLoading(btn, async () => {
-                return this._runWriteLocked('design-settings', async () => {
-                    try {
-                        await firebaseService.savePageContent('settings_design', data);
-                        this.showToast('✅ Design-innstillinger er lagret!', 'success', 5000);
-                    } catch (err) {
-                        console.error('Save design settings error:', err);
-                        this.showToast('❌ Feil ved lagring', 'error', 5000);
-                    }
-                });
-            }, {
-                loadingText: '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Lagrer...'
-            });
+            try {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="material-symbols-outlined spin">sync</span> Lagrer...';
+                await firebaseService.savePageContent('settings_design', data);
+                this.showToast('✅ Design lagret!', 'success', 3000);
+            } catch (err) {
+                console.error('Save error:', err);
+                this.showToast('❌ Kunne ikke lagre', 'error', 5000);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined">save</span> Lagre Design';
+            }
         };
 
         // Preview URL inputs

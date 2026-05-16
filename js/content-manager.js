@@ -2811,11 +2811,15 @@ class ContentManager {
             return '';
         };
 
+        const setVar = (cssVar, value, suffix = '') => {
+            if (value !== undefined && value !== null && value !== '') {
+                document.documentElement.style.setProperty(cssVar, `${value}${suffix}`);
+            }
+        };
+
         const setColorVar = (cssVar, value) => {
             const safeHex = normalizeHex(value);
-            if (safeHex) {
-                document.documentElement.style.setProperty(cssVar, safeHex);
-            }
+            if (safeHex) setVar(cssVar, safeHex);
         };
 
         if (data.logoUrl) {
@@ -2841,48 +2845,49 @@ class ContentManager {
             document.title = data.siteTitle;
         }
 
-        // Apply Typography
-        if (data.mainFont) {
-            document.body.style.fontFamily = `'${data.mainFont}', sans-serif`;
-            if (!document.getElementById('google-font-injection')) {
-                const link = document.createElement('link');
-                link.id = 'google-font-injection';
-                link.href = `https://fonts.googleapis.com/css2?family=${data.mainFont.replace(/ /g, '+')}:wght@300;400;500;600;700&display=swap`;
-                link.rel = 'stylesheet';
-                document.head.appendChild(link);
-            }
+        // Apply Fonts
+        const headingFont = data.headingFont || 'Inter';
+        const mainFont = data.mainFont || 'Inter';
+        setVar('--heading-font', `'${headingFont}', sans-serif`);
+        setVar('--main-font', `'${mainFont}', sans-serif`);
+
+        // Inject Google Fonts
+        const fontsToLoad = [...new Set([headingFont, mainFont])];
+        const fontId = 'hkm-google-fonts-injection';
+        let fontLink = document.getElementById(fontId);
+        if (!fontLink) {
+            fontLink = document.createElement('link');
+            fontLink.id = fontId;
+            fontLink.rel = 'stylesheet';
+            document.head.appendChild(fontLink);
         }
-        // Font size variables for global CSS
-        if (data.fontSizeBase) {
-            document.documentElement.style.setProperty('--fs-body', `${data.fontSizeBase}px`);
-        }
-        if (data.fontSizeH1Desktop) {
-            document.documentElement.style.setProperty('--fs-h1-desktop', `${data.fontSizeH1Desktop}px`);
-        }
-        if (data.fontSizeH1Mobile) {
-            document.documentElement.style.setProperty('--fs-h1-mobile', `${data.fontSizeH1Mobile}px`);
-        }
-        if (data.fontSizeH2Desktop) {
-            document.documentElement.style.setProperty('--fs-h2-desktop', `${data.fontSizeH2Desktop}px`);
-        }
-        if (data.fontSizeH2Mobile) {
-            document.documentElement.style.setProperty('--fs-h2-mobile', `${data.fontSizeH2Mobile}px`);
-        }
+        const families = fontsToLoad.map(f => `${f.replace(/ /g, '+')}:wght@300;400;500;600;700;800`).join('&family=');
+        fontLink.href = `https://fonts.googleapis.com/css2?family=${families}&display=swap`;
+
+        // Responsive Font Sizes
+        setVar('--fs-body', data.fontSizeBase, 'px');
+        setVar('--fs-h1-desktop', data.fontSizeH1Desktop, 'px');
+        setVar('--fs-h1-mobile', data.fontSizeH1Mobile, 'px');
+        setVar('--fs-h2-desktop', data.fontSizeH2Desktop, 'px');
+        setVar('--fs-h2-mobile', data.fontSizeH2Mobile, 'px');
+
+        // Colors
         setColorVar('--primary-color', data.primaryColor);
-        setColorVar('--secondary-color', data.secondaryColor);
-        setColorVar('--bg-light', data.backgroundColor || data.bgLightColor || data.bgLight);
-        setColorVar('--bg-white', data.surfaceColor || data.bgWhiteColor || data.bgWhite);
-        setColorVar('--text-dark', data.textColor || data.textDarkColor || data.textDark);
-        setColorVar('--text-light', data.textLightColor || data.accentColor || data.textMutedColor);
+        setColorVar('--secondary-color', data.secondaryColor || data.primaryColor);
+        setColorVar('--primary-orange', data.primaryColor); // Legacy mapping
+        setColorVar('--bg-light', data.backgroundColor);
+        setColorVar('--bg-white', data.surfaceColor);
+        setColorVar('--text-dark', data.textColor);
+        setColorVar('--text-light', data.textLightColor);
         setColorVar('--header-bg', data.headerBg);
-        setColorVar('--footer-bg', data.footerBg);
+        setColorVar('--footer-bg', data.footerBg || data.secondaryColor);
         setColorVar('--footer-text', data.footerText);
         setColorVar('--newsletter-bg', data.newsletterBg);
         setColorVar('--newsletter-text', data.newsletterText);
-        setColorVar('--btn-primary-bg', data.btnPrimaryBg);
+        setColorVar('--btn-primary-bg', data.btnPrimaryBg || data.primaryColor);
         setColorVar('--btn-primary-text', data.btnPrimaryText);
         setColorVar('--btn-secondary-bg', data.btnSecondaryBg);
-        setColorVar('--btn-secondary-text', data.btnSecondaryText);
+        setColorVar('--btn-secondary-text', data.btnSecondaryText || data.primaryColor);
         setColorVar('--accent-color', data.accentColor || data.textLightColor);
     }
 

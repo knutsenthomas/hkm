@@ -145,8 +145,8 @@ th {
 
 .category-btn {
     background: #fff;
-    color: #c46b2d;
-    border: 2px solid #c46b2d;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
     border-radius: 24px;
     padding: 8px 22px;
     font-size: 1rem;
@@ -160,9 +160,9 @@ th {
 
 .category-btn:hover,
 .category-btn.active {
-    background: #c46b2d;
+    background: var(--primary-color);
     color: #fff;
-    border-color: #c46b2d;
+    border-color: var(--primary-color);
 }
 
 /* ===================================
@@ -171,7 +171,11 @@ th {
 
 /* CSS Variables */
 :root {
-    --primary-orange: var(--primary-orange);
+    --heading-font: 'Inter', system-ui, sans-serif;
+    --main-font: 'Inter', system-ui, sans-serif;
+    --primary-color: #1B4965;
+    --secondary-color: #1B4965;
+    --primary-orange: #d17d39;
     --primary-green: #21543D;
     --accent-green: #00b050;
     /* Vibrant green for buttons */
@@ -342,10 +346,11 @@ html {
 }
 
 body {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--main-font, 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     color: var(--text-dark);
     line-height: 1.6;
     overflow-x: hidden;
+    font-size: var(--fs-body, 16px);
 }
 
 
@@ -355,9 +360,9 @@ h3,
 h4,
 h5,
 h6 {
-    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: var(--heading-font, 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.2;
     margin-bottom: 1rem;
 }
 
