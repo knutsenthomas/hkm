@@ -10526,7 +10526,8 @@ class AdminManager {
             fontSizeH1Mobile: 32,
             fontSizeH2Desktop: 32,
             fontSizeH2Mobile: 24,
-            fontSizeBase: 16,
+            fontSizeBodyDesktop: 16,
+            fontSizeBodyMobile: 16,
             primaryColor: '#1B4965',
             secondaryColor: '#1B4965',
             backgroundColor: '#F8F9FA',
@@ -10836,19 +10837,37 @@ class AdminManager {
                                                 <input type="range" id="font-size-h2-mobile" class="premium-slider" min="16" max="40" value="24">
                                             </div>
 
-                                            <div class="premium-range-group full-width">
+                                            <div class="premium-range-group">
                                                 <div class="premium-range-header">
-                                                    <label>Brødtekst (Base)</label>
-                                                    <span class="premium-range-val" id="font-size-base-val">16px</span>
+                                                    <label>Brødtekst (PC)</label>
+                                                    <span class="premium-range-val" id="font-size-body-desktop-val">16px</span>
                                                 </div>
-                                                <input type="range" id="font-size-base" class="premium-slider" min="12" max="24" value="16">
+                                                <input type="range" id="font-size-body-desktop" class="premium-slider" min="12" max="24" value="16">
+                                            </div>
+
+                                            <div class="premium-range-group">
+                                                <div class="premium-range-header">
+                                                    <label>Brødtekst (Mobil)</label>
+                                                    <span class="premium-range-val" id="font-size-body-mobile-val">16px</span>
+                                                </div>
+                                                <input type="range" id="font-size-body-mobile" class="premium-slider" min="12" max="24" value="16">
                                             </div>
                                         </div>
                                     </div>
 
                                     <div class="live-preview-box design-ui-live-preview" id="live-preview-area">
-                                        <div class="design-ui-preview-label">Live forhåndsvisning</div>
-                                        <div class="design-ui-preview-frame">
+                                        <div class="design-ui-preview-header-flex">
+                                            <div class="design-ui-preview-label">Live forhåndsvisning</div>
+                                            <div class="design-ui-preview-toggles">
+                                                <button type="button" class="preview-toggle active" data-device="desktop">
+                                                    <span class="material-symbols-outlined">desktop_windows</span>
+                                                </button>
+                                                <button type="button" class="preview-toggle" data-device="mobile">
+                                                    <span class="material-symbols-outlined">smartphone</span>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="design-ui-preview-frame" id="design-preview-frame">
                                             <div class="design-ui-preview-top">
                                                 <div class="design-ui-preview-brand">
                                                     <div class="design-ui-preview-brand-dot"></div>
@@ -11045,7 +11064,8 @@ class AdminManager {
                 fontSizeH1Mobile: Number(raw.fontSizeH1Mobile) || DEFAULT_THEME.fontSizeH1Mobile,
                 fontSizeH2Desktop: Number(raw.fontSizeH2Desktop) || DEFAULT_THEME.fontSizeH2Desktop,
                 fontSizeH2Mobile: Number(raw.fontSizeH2Mobile) || DEFAULT_THEME.fontSizeH2Mobile,
-                fontSizeBase: Number(raw.fontSizeBase) || DEFAULT_THEME.fontSizeBase
+                fontSizeBodyDesktop: Number(raw.fontSizeBodyDesktop) || raw.fontSizeBase || DEFAULT_THEME.fontSizeBodyDesktop,
+                fontSizeBodyMobile: Number(raw.fontSizeBodyMobile) || raw.fontSizeBase || DEFAULT_THEME.fontSizeBodyMobile
             };
         };
 
@@ -11117,9 +11137,12 @@ class AdminManager {
             const headingFont = document.getElementById('heading-font-select')?.value || DEFAULT_THEME.headingFont;
             const mainFont = document.getElementById('main-font-select')?.value || DEFAULT_THEME.mainFont;
             
-            const h1Size = Number(document.getElementById('font-size-h1-desktop')?.value || DEFAULT_THEME.fontSizeH1Desktop);
-            const h2Size = Number(document.getElementById('font-size-h2-desktop')?.value || DEFAULT_THEME.fontSizeH2Desktop);
-            const bodySize = Number(document.getElementById('font-size-base')?.value || DEFAULT_THEME.fontSizeBase);
+            const activeDevice = section.querySelector('.preview-toggle.active')?.getAttribute('data-device') || 'desktop';
+            const isMobile = activeDevice === 'mobile';
+
+            const h1Size = Number(document.getElementById(isMobile ? 'font-size-h1-mobile' : 'font-size-h1-desktop')?.value || (isMobile ? DEFAULT_THEME.fontSizeH1Mobile : DEFAULT_THEME.fontSizeH1Desktop));
+            const h2Size = Number(document.getElementById(isMobile ? 'font-size-h2-mobile' : 'font-size-h2-desktop')?.value || (isMobile ? DEFAULT_THEME.fontSizeH2Mobile : DEFAULT_THEME.fontSizeH2Desktop));
+            const bodySize = Number(document.getElementById(isMobile ? 'font-size-body-mobile' : 'font-size-body-desktop')?.value || (isMobile ? DEFAULT_THEME.fontSizeBodyMobile : DEFAULT_THEME.fontSizeBodyDesktop));
             
             const palette = getPaletteFromInputs();
             const previewText = document.getElementById('typography-preview-text');
@@ -11160,7 +11183,27 @@ class AdminManager {
                 previewSecondaryBtn.style.color = palette.secondaryColor;
             }
             updatePalettePreview(palette);
+
+            const previewFrame = document.getElementById('design-preview-frame');
+            if (previewFrame) {
+                if (isMobile) {
+                    previewFrame.style.width = '375px';
+                    previewFrame.style.margin = '0 auto';
+                } else {
+                    previewFrame.style.width = '100%';
+                    previewFrame.style.margin = '0';
+                }
+            }
         };
+
+        // Device Toggle Listeners
+        section.querySelectorAll('.preview-toggle').forEach(btn => {
+            btn.onclick = () => {
+                section.querySelectorAll('.preview-toggle').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                updateLivePreview();
+            };
+        });
 
         // Add Listeners
         const syncRange = (id) => {
@@ -11173,7 +11216,7 @@ class AdminManager {
             };
         };
 
-        ['font-size-h1-desktop', 'font-size-h1-mobile', 'font-size-h2-desktop', 'font-size-h2-mobile', 'font-size-base'].forEach(syncRange);
+        ['font-size-h1-desktop', 'font-size-h1-mobile', 'font-size-h2-desktop', 'font-size-h2-mobile', 'font-size-body-desktop', 'font-size-body-mobile'].forEach(syncRange);
 
         const headingFontSelect = document.getElementById('heading-font-select');
         const mainFontSelect = document.getElementById('main-font-select');
@@ -11217,7 +11260,7 @@ class AdminManager {
                 if (document.getElementById('heading-font-select')) document.getElementById('heading-font-select').value = DEFAULT_THEME.headingFont;
                 if (document.getElementById('main-font-select')) document.getElementById('main-font-select').value = DEFAULT_THEME.mainFont;
 
-                ['h1-desktop', 'h1-mobile', 'h2-desktop', 'h2-mobile', 'base'].forEach(key => {
+                ['h1-desktop', 'h1-mobile', 'h2-desktop', 'h2-mobile', 'body-desktop', 'body-mobile'].forEach(key => {
                     const id = `font-size-${key}`;
                     const el = document.getElementById(id);
                     const valEl = document.getElementById(`${id}-val`);
@@ -11281,7 +11324,8 @@ class AdminManager {
                 syncDataRange('fontSizeH1Mobile', 'font-size-h1-mobile');
                 syncDataRange('fontSizeH2Desktop', 'font-size-h2-desktop');
                 syncDataRange('fontSizeH2Mobile', 'font-size-h2-mobile');
-                syncDataRange('fontSizeBase', 'font-size-base');
+                syncDataRange('fontSizeBodyDesktop', 'font-size-body-desktop');
+                syncDataRange('fontSizeBodyMobile', 'font-size-body-mobile');
 
                 applyPaletteToInputs(data);
                 updateLivePreview();
@@ -11302,7 +11346,8 @@ class AdminManager {
                 siteTitle: document.getElementById('site-title-seo').value,
                 headingFont: document.getElementById('heading-font-select').value,
                 mainFont: document.getElementById('main-font-select').value,
-                fontSizeBase: Number(document.getElementById('font-size-base').value),
+                fontSizeBodyDesktop: Number(document.getElementById('font-size-body-desktop').value),
+                fontSizeBodyMobile: Number(document.getElementById('font-size-body-mobile').value),
                 fontSizeH1Desktop: Number(document.getElementById('font-size-h1-desktop').value),
                 fontSizeH1Mobile: Number(document.getElementById('font-size-h1-mobile').value),
                 fontSizeH2Desktop: Number(document.getElementById('font-size-h2-desktop').value),

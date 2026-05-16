@@ -80,7 +80,8 @@
     --fs-h1-mobile: 32px !important;
     --fs-h2-desktop: 28px !important;
     --fs-h2-mobile: 20px !important;
-    --fs-body: 16px !important;
+    --fs-body-desktop: 16px !important;
+    --fs-body-mobile: 16px !important;
 }
 
 /* === Global Text Wrapping === */
@@ -350,7 +351,7 @@ body {
     color: var(--text-dark);
     line-height: 1.6;
     overflow-x: hidden;
-    font-size: var(--fs-body, 16px);
+    font-size: var(--fs-body-desktop, 16px);
 }
 
 
@@ -443,7 +444,7 @@ p,
 li,
 td,
 th {
-    font-size: var(--fs-body, 16px);
+    font-size: var(--fs-body-desktop, 16px);
 }
 
 @media (max-width: 700px) {
@@ -454,6 +455,13 @@ th {
     h2,
     h3 {
         font-size: var(--fs-h2-mobile, 20px);
+    }
+
+    p,
+    li,
+    td,
+    th {
+        font-size: var(--fs-body-mobile, 16px);
     }
 }
 

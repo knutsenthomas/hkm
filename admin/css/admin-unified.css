@@ -1500,7 +1500,52 @@ body.admin-body .welcome-subtitle {
   color: #94a3b8;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 10px;
+  margin-bottom: 0;
+}
+
+.design-ui-preview-header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.design-ui-preview-toggles {
+  display: flex;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 10px;
+  gap: 4px;
+}
+
+.preview-toggle {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.preview-toggle:hover {
+  background: rgba(255, 255, 255, 0.5);
+  color: #334155;
+}
+
+.preview-toggle.active {
+  background: white;
+  color: var(--accent-color, #f97316);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.preview-toggle .material-symbols-outlined {
+  font-size: 18px;
 }
 
 .design-ui-preview-frame {
@@ -1512,6 +1557,7 @@ body.admin-body .welcome-subtitle {
   width: 100%;
   max-width: 480px;
   text-align: center;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .design-ui-preview-top {

@@ -2865,7 +2865,8 @@ class ContentManager {
         fontLink.href = `https://fonts.googleapis.com/css2?family=${families}&display=swap`;
 
         // Responsive Font Sizes
-        setVar('--fs-body', data.fontSizeBase, 'px');
+        setVar('--fs-body-desktop', data.fontSizeBodyDesktop, 'px');
+        setVar('--fs-body-mobile', data.fontSizeBodyMobile, 'px');
         setVar('--fs-h1-desktop', data.fontSizeH1Desktop, 'px');
         setVar('--fs-h1-mobile', data.fontSizeH1Mobile, 'px');
         setVar('--fs-h2-desktop', data.fontSizeH2Desktop, 'px');
