@@ -1483,11 +1483,15 @@ body.admin-body .welcome-subtitle {
 }
 
 .design-ui-live-preview {
-  min-height: 260px;
+  min-height: 320px;
   background: var(--design-bg, #f8fafc);
   border: 1px solid #e2e8f0;
-  border-radius: 16px;
-  padding: 12px;
+  border-radius: 24px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .design-ui-preview-label {
@@ -1501,18 +1505,21 @@ body.admin-body .welcome-subtitle {
 
 .design-ui-preview-frame {
   background: var(--design-surface, #ffffff);
-  border-radius: 14px;
+  border-radius: 20px;
   border: 1px solid #e2e8f0;
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.04);
-  padding: 14px;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  text-align: center;
 }
 
 .design-ui-preview-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .design-ui-preview-brand {
@@ -1544,31 +1551,36 @@ body.admin-body .welcome-subtitle {
 }
 
 #design-section #typography-preview-text {
-  margin: 0;
+  margin: 0 0 16px;
   font-size: 38px;
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #0f172a;
 }
 
 #design-section #design-preview-body-copy {
-  margin: 10px 0 0;
+  margin: 0 0 32px;
   color: #64748b;
-  line-height: 1.5;
-  font-size: 15px;
+  line-height: 1.6;
+  font-size: 16px;
+  max-width: 90%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .design-ui-preview-actions {
-  margin-top: 14px;
   display: flex;
-  gap: 10px;
+  gap: 16px;
   flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 32px;
 }
 
 .design-ui-preview-btn {
   border-radius: 12px;
-  min-height: 38px;
-  padding: 0 14px;
-  font-size: 13px;
+  min-height: 48px;
+  padding: 0 24px;
+  font-size: 14px;
   font-weight: 700;
   border: 1px solid transparent;
   cursor: default;
@@ -1588,11 +1600,11 @@ body.admin-body .welcome-subtitle {
 }
 
 .design-ui-preview-card {
-  margin-top: 14px;
-  padding: 12px;
-  border-radius: 12px;
+  padding: 24px;
+  border-radius: 16px;
   border: 1px solid #e2e8f0;
-  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  background: #f8fafc;
+  text-align: center;
 }
 
 .design-ui-preview-card-title {
