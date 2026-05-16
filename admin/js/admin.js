@@ -10915,6 +10915,7 @@ class AdminManager {
             if (typeof value !== 'string') return '';
             let raw = value.trim();
             if (!raw) return '';
+            if (raw.startsWith('linear-gradient')) return raw;
             if (!raw.startsWith('#')) raw = `#${raw}`;
             const shortHex = /^#([0-9a-f]{3})$/i;
             const fullHex = /^#([0-9a-f]{6})$/i;
@@ -10923,7 +10924,7 @@ class AdminManager {
                 return `#${rgb.split('').map((c) => c + c).join('').toUpperCase()}`;
             }
             if (fullHex.test(raw)) return raw.toUpperCase();
-            return '';
+            return raw; // Return as-is if it's something else we don't recognize but might be valid CSS
         };
 
         const hexToRgb = (hex) => {
@@ -11138,7 +11139,9 @@ class AdminManager {
 
         const resetBtn = document.getElementById('reset-design-settings');
         if (resetBtn) {
-            resetBtn.onclick = () => {
+            resetBtn.onclick = async () => {
+                if (!confirm('Er du sikker på at du vil tilbakestille alle farger og fonter til HKM-standard? Dette vil overskrive nåværende lagrede innstillinger.')) return;
+
                 const fontEl = document.getElementById('main-font-select');
                 const h1El = document.getElementById('font-size-h1-desktop');
                 const baseEl = document.getElementById('font-size-base');
@@ -11154,7 +11157,24 @@ class AdminManager {
                 if (baseValEl) baseValEl.textContent = `${DEFAULT_THEME.fontSizeBase}px`;
 
                 updateLivePreview();
-                this.showToast('Tema forhåndsvisning er tilbakestilt til HKM-standard.', 'success', 3000);
+
+                // Save to Firestore automatically
+                const dataToSave = {
+                    ...DEFAULT_THEME,
+                    logoUrl: document.getElementById('site-logo-url')?.value || '',
+                    faviconUrl: document.getElementById('site-favicon-url')?.value || '',
+                    logoText: document.getElementById('site-logo-text')?.value || '',
+                    siteTitle: document.getElementById('site-title-seo')?.value || '',
+                    updatedAt: new Date().toISOString()
+                };
+
+                try {
+                    await firebaseService.savePageContent('settings_design', dataToSave);
+                    this.showToast('✅ Tema er tilbakestilt til HKM-standard og lagret!', 'success', 5000);
+                } catch (err) {
+                    console.error('Reset save error:', err);
+                    this.showToast('❌ Feil ved lagring av tilbakestilling', 'error', 5000);
+                }
             };
         }
 

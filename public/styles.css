@@ -171,12 +171,12 @@ th {
 
 /* CSS Variables */
 :root {
-    --primary-orange: #D17D39;
+    --primary-orange: var(--primary-orange);
     --primary-green: #21543D;
     --accent-green: #00b050;
     /* Vibrant green for buttons */
     /* Dark green from Ingen Utelatt */
-    --primary-red: #B54D2B;
+    --primary-red: var(--primary-red);
     --accent-blue: #3498DB;
     --accent-yellow: #F39C12;
     --text-dark: #2C3E50;
@@ -522,9 +522,9 @@ a.button {
 .button-primary,
 a.btn-primary,
 a.button-primary {
-    background: #c8682a !important;
+    background: var(--primary-color) !important;
     color: #fff !important;
-    border-color: #c8682a !important;
+    border-color: var(--primary-color) !important;
     padding: 12px 28px !important;
     border-radius: 50px !important;
     font-weight: bold !important;
@@ -539,8 +539,8 @@ a.button-primary {
 a.btn-secondary,
 a.button-secondary {
     background: #fff !important;
-    color: #c8682a !important;
-    border-color: #c8682a !important;
+    color: var(--primary-color) !important;
+    border-color: var(--primary-color) !important;
     padding: 12px 28px !important;
     border-radius: 50px !important;
     font-weight: bold !important;

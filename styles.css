@@ -2546,7 +2546,7 @@ video {
 }
 
 .from-orange-500 {
-  --tw-gradient-from: #f97316 var(--tw-gradient-from-position);
+  --tw-gradient-from: var(--primary-color) var(--tw-gradient-from-position);
   --tw-gradient-to: rgb(249 115 22 / 0) var(--tw-gradient-to-position);
   --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
@@ -3270,7 +3270,7 @@ video {
 }
 
 .accent-orange-500 {
-  accent-color: #f97316;
+  accent-color: var(--primary-color);
 }
 
 .opacity-0 {
@@ -3868,12 +3868,12 @@ th {
 /* CSS Variables */
 
 :root {
-  --primary-color: #c8682a;
-  --secondary-color: #1B4965;
-  --primary-orange: #D17D39;
+  --primary-color: var(--primary-color);
+  --secondary-color: var(--secondary-color);
+  --primary-orange: var(--primary-orange);
   --primary-green: #21543D;
   --accent-green: #00b050;
-  --primary-red: #B54D2B;
+  --primary-red: var(--primary-red);
   --accent-blue: #3498DB;
   --accent-yellow: #F39C12;
   --text-dark: #2C3E50;
@@ -3881,14 +3881,14 @@ th {
   --bg-light: #F8F9FA;
   --bg-white: #FFFFFF;
   --header-bg: #FFFFFF;
-  --footer-bg: #1B4965;
+  --footer-bg: var(--secondary-color);
   --footer-text: #FFFFFF;
-  --newsletter-bg: linear-gradient(135deg, #D17D39, #B54D2B);
+  --newsletter-bg: linear-gradient(135deg, var(--primary-orange), var(--primary-red));
   --newsletter-text: #FFFFFF;
-  --btn-primary-bg: #c8682a;
+  --btn-primary-bg: var(--primary-color);
   --btn-primary-text: #FFFFFF;
   --btn-secondary-bg: #FFFFFF;
-  --btn-secondary-text: #c8682a;
+  --btn-secondary-text: var(--primary-color);
   --border-color: #E0E0E0;
   --shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 10px 30px rgba(0, 0, 0, 0.15);
@@ -5335,8 +5335,8 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-sear
 }
 
 .cal-filter-btn.active {
-  background: #f97316;
-  border-color: #f97316;
+  background: var(--primary-color);
+  border-color: var(--primary-color);
   color: #fff;
 }
 

@@ -1620,8 +1620,8 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-sear
 }
 
 .cal-filter-btn.active {
-    background: #f97316;
-    border-color: #f97316;
+    background: var(--primary-color);
+    border-color: var(--primary-color);
     color: #fff;
 }
 
