@@ -10869,7 +10869,7 @@ class AdminManager {
 
                                     <!-- Favicon Upload Card -->
                                     <div class="design-ui-upload-card">
-                                        <div class="design-ui-upload-card-preview design-ui-upload-card-preview--favicon" id="favicon-preview-container">
+                                        <div class="design-ui-upload-card-preview" id="favicon-preview-container">
                                             <div class="design-ui-upload-card-placeholder">
                                                 <span class="material-symbols-outlined">web_asset</span>
                                                 <span>Ingen favicon lastet opp</span>
