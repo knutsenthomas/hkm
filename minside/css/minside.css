@@ -2003,3 +2003,14 @@ body {
         flex-shrink: 0 !important;
     }
 }
+
+/* Hardened Defensive Guard: Completely hide visitor chatbot on all Min Side customer portal pages */
+#hkm-visitor-chat-widget,
+.hkm-chat-toggle,
+.hkm-chat-panel,
+.hkm-chat-dot {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+}

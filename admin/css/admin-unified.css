@@ -5556,3 +5556,14 @@ body.builder-active .main-header [id="admin-avatar"] {
   border-radius: 6px;
   text-align: center;
 }
+
+/* Hardened Defensive Guard: Completely hide visitor chatbot on all admin portal pages */
+#hkm-visitor-chat-widget,
+.hkm-chat-toggle,
+.hkm-chat-panel,
+.hkm-chat-dot {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
