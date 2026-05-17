@@ -66,6 +66,8 @@
         /* Spacing adhering to 8px Grid Rule */
         .analytics-header-row {
             display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
@@ -79,6 +81,29 @@
             padding: 4px;
             border: 1px solid #e2e8f0;
             gap: 4px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+        }
+        
+        .period-selector::-webkit-scrollbar {
+            display: none; /* Chrome/Safari */
+        }
+
+        @media (max-width: 768px) {
+            .analytics-header-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            .period-selector {
+                width: 100%;
+            }
+            .period-btn {
+                flex: 1 0 auto;
+                text-align: center;
+                white-space: nowrap;
+            }
         }
 
         .period-btn {
