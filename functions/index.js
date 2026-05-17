@@ -13,6 +13,7 @@ const vippsMsnParam = defineSecret('VIPPS_MSN');
 const googleChatWebhookUrlParam = defineSecret('GOOGLE_CHAT_WEBHOOK_URL');
 const googleChatBridgeTokenParam = defineSecret('GOOGLE_CHAT_BRIDGE_TOKEN');
 const stripeSecretKeyParam = defineSecret('STRIPE_SECRET_KEY');
+const stripeWebhookSecretParam = defineSecret('STRIPE_WEBHOOK_SECRET');
 
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
@@ -2394,6 +2395,7 @@ exports.createPaymentIntent = onRequest({
         customer_zip: customerDetails.zip,
         customer_city: customerDetails.city,
         message: customerDetails.message,
+        user_id: customerDetails.userId || "",
       },
       shipping: customerDetails.name && customerDetails.address ? {
         name: customerDetails.name,
@@ -2417,6 +2419,21 @@ exports.createPaymentIntent = onRequest({
 
     // Opprett PaymentIntent
     const paymentIntent = await stripe.paymentIntents.create(paymentIntentPayload);
+
+    // Lagre en "pending" donasjon i databasen slik at Webhooken vet hvem donasjonen tilhører
+    await db.collection('donations').doc(paymentIntent.id).set({
+      transactionId: paymentIntent.id,
+      amount: parsedAmount,
+      currency: normalizedCurrency,
+      method: "stripe",
+      status: "pending",
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      userId: customerDetails.userId || null,
+      donorName: customerDetails.name || "Ukjent",
+      donorEmail: customerDetails.email || "Ukjent",
+      message: customerDetails.message || "",
+      type: "Gave"
+    });
 
     // Returner clientSecret til frontend
     res.status(200).send({
@@ -2515,12 +2532,29 @@ exports.createVippsPayment = onRequest({
         donorName: customerDetails.name || "",
         donorEmail: customerDetails.email || "",
         donorMessage: customerDetails.message || "",
+        userId: customerDetails.userId || "",
       },
     };
 
     if (phoneNumber) {
       paymentRequest.customer = { phoneNumber };
     }
+
+    // Lagre en "pending" donasjon i databasen før vi i det hele tatt spør Vipps
+    // Dette gjør at Webhooken enkelt kan finne referansen og sette status til "completed"
+    await db.collection('donations').doc(reference).set({
+      transactionId: reference,
+      amount: parsedAmount,
+      currency: "NOK",
+      method: "vipps",
+      status: "pending",
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      userId: customerDetails.userId || null,
+      donorName: customerDetails.name || "Ukjent",
+      donorEmail: customerDetails.email || "Ukjent",
+      message: customerDetails.message || "",
+      type: "Gave"
+    });
 
     const idempotencyKey = crypto.randomUUID ?
       crypto.randomUUID() :
@@ -2628,6 +2662,87 @@ exports.finalizeVippsPayment = onRequest({
   } catch (error) {
     console.error("Vipps finalize payment failed:", error);
     res.status(500).send({ error: error && error.message ? error.message : "Unknown Vipps error" });
+  }
+});
+
+/**
+ * STRIPE WEBHOOK: Lytter etter fullførte Stripe-betalinger og oppdaterer databasen
+ */
+exports.stripeWebhook = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [stripeSecretKeyParam, stripeWebhookSecretParam],
+}, async (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  const endpointSecret = stripeWebhookSecretParam.value();
+  let event;
+  
+  try {
+    const stripeKey = getStripeSecretKey();
+    const stripe = stripeInit(stripeKey);
+    event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
+  } catch (err) {
+    console.error(`Stripe Webhook Error: ${err.message}`);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+    return;
+  }
+
+  // Vi bryr oss bare om betalinger som faktisk går igjennom
+  if (event.type === 'payment_intent.succeeded') {
+    const paymentIntent = event.data.object;
+    
+    try {
+      await db.collection('donations').doc(paymentIntent.id).set({
+        status: 'completed',
+        completedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      
+      console.log("Stripe donasjon godkjent og oppdatert i db:", paymentIntent.id);
+    } catch (dbError) {
+      console.error("Feil ved lagring av Stripe-donasjon til db:", dbError);
+    }
+  }
+
+  res.status(200).send({received: true});
+});
+
+/**
+ * VIPPS WEBHOOK: Lytter etter fullførte Vipps-betalinger og oppdaterer databasen
+ * Merk: Vipps eCom Webhook sender en forenklet payload med orderId/reference
+ */
+exports.vippsWebhook = onRequest({
+  cors: true,
+  invoker: "public",
+}, async (req, res) => {
+  try {
+    const payload = req.body;
+    
+    // Vipps Webhook payload (avhenger litt av ePayment v1 strukturen)
+    // De sender normalt "name" (event name) og "reference" eller "orderId"
+    const reference = payload.reference || payload.orderId;
+    const eventName = payload.name; // F.eks. "payment.captured" eller "payment.authorized"
+    
+    if (!reference) {
+      res.status(400).send("Missing reference");
+      return;
+    }
+
+    // Hvis betalingen er reservert (authorized) eller trukket (captured), anser vi gaven som mottatt
+    if (eventName === 'payment.captured' || eventName === 'payment.authorized' || !eventName) {
+      
+      // Vi oppdaterer den eksisterende "pending"-posten vi opprettet i createVippsPayment
+      await db.collection('donations').doc(reference).set({
+         status: 'completed',
+         completedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      
+      console.log("Vipps donasjon godkjent og oppdatert i db:", reference);
+    }
+    
+    res.status(200).send("OK");
+  } catch (error) {
+    console.error("Vipps Webhook Error:", error);
+    res.status(500).send("Internal Server Error");
   }
 });
 

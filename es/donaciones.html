@@ -600,7 +600,8 @@
                                 address: getValue('donor-address'),
                                 zip: getValue('donor-zip'),
                                 city: getValue('donor-city'),
-                                message: getValue('donor-message')
+                                message: getValue('donor-message'),
+                                userId: (window.firebase && firebase.auth && firebase.auth().currentUser) ? firebase.auth().currentUser.uid : null
                             };
 
                             initializeStripe(amount, customerDetails);
