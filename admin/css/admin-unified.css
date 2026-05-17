@@ -4706,6 +4706,13 @@ body.minside-body .sidebar-nav {
   scrollbar-color: #cbd5e1 transparent !important;
 }
 
+@media (max-width: 1024px) {
+  body.admin-body .sidebar-nav,
+  body.minside-body .sidebar-nav {
+    padding-bottom: 90px !important; /* Avoid fixed bottom nav covering last items */
+  }
+}
+
 body.admin-body .sidebar-nav::-webkit-scrollbar-thumb {
   background: #cbd5e1 !important;
 }
