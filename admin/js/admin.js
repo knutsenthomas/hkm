@@ -12616,49 +12616,51 @@ class AdminManager {
                         </div>
                     </div>
 
-                    <div id="manual-donation-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
+                    <div id="manual-donation-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
                         <div class="modal-backdrop" onclick="window.adminManager?.closeManualDonationModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
                         <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
-                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
                                 <div>
-                                    <h3 style="margin:0;">Registrer manuell gave</h3>
-                                    <p class="section-subtitle" style="margin:4px 0 0;">For bank, kontant, Vipps utenom nettbetaling eller andre tjenester.</p>
+                                    <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer manuell gave</h3>
+                                    <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">For bank, kontant, Vipps utenom nettbetaling eller andre tjenester.</p>
                                 </div>
-                                <button class="modal-close" type="button" onclick="window.adminManager?.closeManualDonationModal?.()">×</button>
+                                <button class="modal-close" type="button" onclick="window.adminManager?.closeManualDonationModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
+                                    <span class="material-symbols-outlined" style="font-size:24px;">close</span>
+                                </button>
                             </div>
                             <form id="manual-donation-form">
-                                <div class="modal-body" style="display:grid;gap:16px;">
+                                <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                                     <div class="form-group" style="margin:0;">
-                                        <label>Koble til eksisterende bruker</label>
-                                        <select id="manual-donation-user" class="form-control">
+                                        <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
+                                        <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                             <option value="">Ikke koble til profil</option>
                                             ${manualDonationUserOptions}
                                         </select>
                                     </div>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
                                         <div class="form-group" style="margin:0;">
-                                            <label>Givers navn</label>
-                                            <input id="manual-donor-name" class="form-control" type="text" placeholder="Fullt navn">
+                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
+                                            <input id="manual-donor-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         </div>
                                         <div class="form-group" style="margin:0;">
-                                            <label>Givers e-post</label>
-                                            <input id="manual-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no">
-                                        </div>
-                                    </div>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">
-                                        <div class="form-group" style="margin:0;">
-                                            <label>Beløp (NOK)</label>
-                                            <input id="manual-donation-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="500">
-                                        </div>
-                                        <div class="form-group" style="margin:0;">
-                                            <label>Dato</label>
-                                            <input id="manual-donation-date" class="form-control" type="datetime-local" required>
+                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
+                                            <input id="manual-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         </div>
                                     </div>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
                                         <div class="form-group" style="margin:0;">
-                                            <label>Metode</label>
-                                            <select id="manual-donation-method" class="form-control">
+                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beløp (NOK)</label>
+                                            <input id="manual-donation-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="500" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                        </div>
+                                        <div class="form-group" style="margin:0;">
+                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato</label>
+                                            <input id="manual-donation-date" class="form-control" type="datetime-local" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                                        <div class="form-group" style="margin:0;">
+                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
+                                            <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                                 <option value="bank">Bank</option>
                                                 <option value="manual">Manuell</option>
                                                 <option value="vipps_manual">Vipps manuelt</option>
@@ -12667,27 +12669,27 @@ class AdminManager {
                                             </select>
                                         </div>
                                         <div class="form-group" style="margin:0;">
-                                            <label>Status</label>
-                                            <select id="manual-donation-status" class="form-control">
+                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
+                                            <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                                 <option value="completed">Fullført</option>
                                                 <option value="pending">Venter</option>
                                                 <option value="processing">Behandles</option>
                                             </select>
                                         </div>
                                         <div class="form-group" style="margin:0;">
-                                            <label>Referanse</label>
-                                            <input id="manual-donation-reference" class="form-control" type="text" placeholder="Bankreferanse e.l.">
+                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Referanse</label>
+                                            <input id="manual-donation-reference" class="form-control" type="text" placeholder="Bankreferanse e.l." style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         </div>
                                     </div>
                                     <div class="form-group" style="margin:0;">
-                                        <label>Notat</label>
-                                        <textarea id="manual-donation-note" class="form-control" rows="3" placeholder="Valgfritt internt notat"></textarea>
+                                        <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Notat</label>
+                                        <textarea id="manual-donation-note" class="form-control" rows="3" placeholder="Valgfritt internt notat" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease; resize:vertical;"></textarea>
                                     </div>
                                 </div>
-                                <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
-                                    <button class="btn-secondary" type="button" id="cancel-manual-donation-btn">Avbryt</button>
-                                    <button class="btn-primary" type="submit" id="save-manual-donation-btn">
-                                        <span class="material-symbols-outlined">save</span>
+                                <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; align-items:center; gap:16px;">
+                                    <button class="btn-secondary" type="button" id="cancel-manual-donation-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Avbryt</button>
+                                    <button class="btn-primary" type="submit" id="save-manual-donation-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease;">
+                                        <span class="material-symbols-outlined" style="font-size:20px;">save</span>
                                         Lagre gave
                                     </button>
                                 </div>
