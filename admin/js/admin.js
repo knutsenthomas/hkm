@@ -4421,6 +4421,64 @@ class AdminManager {
                         justify-content: center !important;
                     }
                 }
+                
+                /* Override dashboard.css SaaS styles with premium buttons */
+                .overview-hero-action {
+                    height: 48px !important;
+                    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+                    color: white !important;
+                    border-radius: 8px !important;
+                    padding: 0 24px !important;
+                    font-weight: 600 !important;
+                    border: none !important;
+                    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
+                    cursor: pointer !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 10px !important;
+                    font-family: 'Inter', sans-serif !important;
+                    transition: all 0.2s ease !important;
+                    font-size: 14px !important;
+                    white-space: nowrap !important;
+                    margin: 0 !important;
+                }
+                .overview-hero-action:hover {
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.35) !important;
+                    filter: brightness(1.05) !important;
+                }
+                .overview-hero-action-secondary {
+                    height: 48px !important;
+                    background: #ffffff !important;
+                    color: #475569 !important;
+                    border-radius: 8px !important;
+                    padding: 0 24px !important;
+                    font-weight: 600 !important;
+                    border: 1px solid #cbd5e1 !important;
+                    box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
+                    cursor: pointer !important;
+                    display: flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    gap: 10px !important;
+                    font-family: 'Inter', sans-serif !important;
+                    transition: all 0.2s ease !important;
+                    font-size: 14px !important;
+                    white-space: nowrap !important;
+                    margin: 0 !important;
+                }
+                .overview-hero-action-secondary:hover {
+                    background: #f8fafc !important;
+                    color: #0f172a !important;
+                    border-color: #94a3b8 !important;
+                    transform: translateY(-1px) !important;
+                }
+                .overview-hero-action .material-symbols-outlined,
+                .overview-hero-action-secondary .material-symbols-outlined {
+                    font-size: 20px !important;
+                    color: inherit !important;
+                }
             </style>
             <div class="overview-hero-card" style="background: var(--admin-orange-gradient); border-radius: 16px; padding: 48px; position: relative; overflow: hidden; color: white;">
                 <div class="overview-hero-content" style="position: relative; z-index: 2;">
@@ -4429,12 +4487,12 @@ class AdminManager {
                         Her har du en fullstendig oversikt over HKM Studio. Se sanntidsdata, administrer innhold og svar på meldinger fra én sentral flate.
                     </p>
                     <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; align-items: center !important; justify-content: flex-start !important;">
-                        <button type="button" class="overview-hero-action" style="height: 48px !important; background: #ffffff !important; color: #bd4f2a !important; border-radius: 8px !important; padding: 0 24px !important; font-weight: 600 !important; border: 1px solid transparent !important; box-shadow: 0 4px 12px rgba(0,0,0,0.1) !important; cursor: pointer !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; font-family: 'Inter', sans-serif !important; transition: all 0.2s ease !important; font-size: 14px !important; white-space: nowrap !important; box-sizing: border-box !important; margin: 0 !important;" onclick="window.location.href='/admin/admin-meldinger.html'" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 16px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';">
-                            <span class="material-symbols-outlined" style="font-size: 20px !important;">mail</span>
+                        <button type="button" class="overview-hero-action" onclick="window.location.href='/admin/admin-meldinger.html'">
+                            <span class="material-symbols-outlined">mail</span>
                             Gå til meldinger
                         </button>
-                        <button type="button" class="overview-hero-action-secondary" style="height: 48px !important; background: rgba(255,255,255,0.1) !important; color: white !important; border-radius: 8px !important; padding: 0 24px !important; font-weight: 600 !important; border: 1px solid rgba(255,255,255,0.4) !important; backdrop-filter: blur(8px) !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; transition: all 0.2s ease !important; display: flex !important; align-items: center !important; justify-content: center !important; gap: 10px !important; font-size: 14px !important; white-space: nowrap !important; box-sizing: border-box !important; margin: 0 !important;" onclick="window.location.href='/admin/index.html#content'" onmouseover="this.style.background='rgba(255,255,255,0.2)'; this.style.borderColor='rgba(255,255,255,0.6)';" onmouseout="this.style.background='rgba(255,255,255,0.1)'; this.style.borderColor='rgba(255,255,255,0.4)';">
-                            <span class="material-symbols-outlined" style="font-size: 20px !important;">dashboard_customize</span>
+                        <button type="button" class="overview-hero-action-secondary" onclick="window.location.href='/admin/index.html#content'">
+                            <span class="material-symbols-outlined">dashboard_customize</span>
                             Se sideinnhold
                         </button>
                     </div>
