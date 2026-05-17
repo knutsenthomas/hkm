@@ -11506,28 +11506,311 @@ class AdminManager {
         }
     }
 
+    normalizeDonationAmountNok(donation) {
+        const raw = donation || {};
+        const explicitNok = raw.amountNok ?? raw.amountNOK ?? raw.totalNok;
+        if (explicitNok != null) {
+            return typeof adminUtils.normalizeAmountNok === 'function'
+                ? adminUtils.normalizeAmountNok(explicitNok)
+                : Number(explicitNok || 0);
+        }
+
+        const explicitOre = raw.amountOre ?? raw.amountCents;
+        if (explicitOre != null) return (Number(explicitOre) || 0) / 100;
+
+        const amount = Number(raw.amount || 0);
+        if (!Number.isFinite(amount)) return 0;
+        if (raw.paymentIntentId && !raw.transactionId) return amount / 100;
+        return amount;
+    }
+
+    getDonationDate(donation) {
+        const raw = donation || {};
+        return raw.completedAt?.toDate?.()
+            || raw.timestamp?.toDate?.()
+            || raw.createdAt?.toDate?.()
+            || (raw.completedAt ? new Date(raw.completedAt) : null)
+            || (raw.timestamp ? new Date(raw.timestamp) : null)
+            || (raw.createdAt ? new Date(raw.createdAt) : null);
+    }
+
+    formatDonationCurrency(amount) {
+        return (Number(amount) || 0).toLocaleString('no-NO', {
+            style: 'currency',
+            currency: 'NOK',
+            maximumFractionDigits: 0
+        });
+    }
+
+    getDonationStatusLabel(status) {
+        const normalized = String(status || '').toLowerCase();
+        const labels = {
+            completed: 'Fullført',
+            succeeded: 'Fullført',
+            captured: 'Fullført',
+            pending: 'Venter',
+            processing: 'Behandles',
+            failed: 'Feilet',
+            canceled: 'Avbrutt',
+            cancelled: 'Avbrutt'
+        };
+        return labels[normalized] || (status || 'Ukjent');
+    }
+
+    getDonationDonorName(donation, userMap = new Map()) {
+        const user = donation.userId ? userMap.get(donation.userId) : null;
+        return donation.donorName
+            || donation.name
+            || user?.displayName
+            || user?.fullName
+            || user?.email
+            || donation.donorEmail
+            || donation.email
+            || 'Ukjent giver';
+    }
+
+    getDonationDonorEmail(donation, userMap = new Map()) {
+        const user = donation.userId ? userMap.get(donation.userId) : null;
+        return String(donation.donorEmail || donation.email || user?.email || '').trim().toLowerCase();
+    }
+
+    buildDonationDateRange(preset, startValue, endValue) {
+        const now = new Date();
+        const startOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
+        const endOfDay = (date) => new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+        const todayStart = startOfDay(now);
+        const todayEnd = endOfDay(now);
+
+        if (preset === 'all') return { start: null, end: null };
+        if (preset === 'today') return { start: todayStart, end: todayEnd };
+        if (preset === '7') return { start: new Date(todayStart.getTime() - 6 * 86400000), end: todayEnd };
+        if (preset === '30') return { start: new Date(todayStart.getTime() - 29 * 86400000), end: todayEnd };
+        if (preset === 'month') return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: todayEnd };
+        if (preset === 'year') return { start: new Date(now.getFullYear(), 0, 1), end: todayEnd };
+
+        const start = startValue ? startOfDay(new Date(`${startValue}T00:00:00`)) : null;
+        const end = endValue ? endOfDay(new Date(`${endValue}T00:00:00`)) : null;
+        return { start, end };
+    }
+
+    getFilteredDonationRecords() {
+        const records = Array.isArray(this.allDonationRecords) ? this.allDonationRecords : [];
+        const filters = this.donationFilters || {};
+        const { start, end } = this.buildDonationDateRange(filters.preset || '30', filters.start || '', filters.end || '');
+        const query = String(filters.query || '').trim().toLowerCase();
+        const status = String(filters.status || 'all').toLowerCase();
+        const method = String(filters.method || 'all').toLowerCase();
+
+        return records.filter((record) => {
+            const date = this.getDonationDate(record);
+            if (start && (!date || date < start)) return false;
+            if (end && (!date || date > end)) return false;
+            const recordStatus = String(record.status || '').toLowerCase();
+            if (status !== 'all') {
+                if (status === 'completed' && !['completed', 'succeeded', 'captured'].includes(recordStatus)) return false;
+                if (status !== 'completed' && recordStatus !== status) return false;
+            }
+            if (method !== 'all' && String(record.method || '').toLowerCase() !== method) return false;
+            if (!query) return true;
+            const haystack = [
+                record.id,
+                record.transactionId,
+                record.donorName,
+                record.donorEmail,
+                record.email,
+                record.method,
+                record.status,
+                record.type
+            ].join(' ').toLowerCase();
+            return haystack.includes(query);
+        });
+    }
+
+    buildDonorSummaries(records) {
+        const userMap = this.adminUserMap || new Map();
+        const donors = new Map();
+
+        records.forEach((record) => {
+            const email = this.getDonationDonorEmail(record, userMap);
+            const key = record.userId || email || record.donorName || record.id;
+            const existing = donors.get(key) || {
+                key,
+                name: this.getDonationDonorName(record, userMap),
+                email,
+                userId: record.userId || '',
+                giftCount: 0,
+                completedCount: 0,
+                total: 0,
+                latestDate: null,
+                methods: new Set(),
+                statuses: new Set()
+            };
+
+            const amount = this.normalizeDonationAmountNok(record);
+            const date = this.getDonationDate(record);
+            existing.giftCount += 1;
+            if (['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase())) {
+                existing.completedCount += 1;
+                existing.total += amount;
+            }
+            if (date && (!existing.latestDate || date > existing.latestDate)) existing.latestDate = date;
+            if (record.method) existing.methods.add(String(record.method));
+            if (record.status) existing.statuses.add(String(record.status));
+
+            donors.set(key, existing);
+        });
+
+        return Array.from(donors.values()).sort((a, b) => b.total - a.total || b.giftCount - a.giftCount);
+    }
+
+    renderDonationAdminViews() {
+        const records = this.getFilteredDonationRecords();
+        const userMap = this.adminUserMap || new Map();
+        const todayRange = this.buildDonationDateRange('today');
+        const todayRecords = (this.allDonationRecords || []).filter((record) => {
+            const date = this.getDonationDate(record);
+            return date && date >= todayRange.start && date <= todayRange.end;
+        });
+        const isCompleted = (record) => ['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase());
+        const todayTotal = todayRecords.filter(isCompleted).reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
+        const filteredTotal = records.filter(isCompleted).reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
+        const pendingCount = records.filter(record => String(record.status || '').toLowerCase() === 'pending').length;
+        const unmatchedCount = records.filter(record => !record.userId).length;
+        const donors = this.buildDonorSummaries(records);
+
+        const todayAmountEl = document.getElementById('donation-today-amount');
+        const todayCountEl = document.getElementById('donation-today-count');
+        const periodAmountEl = document.getElementById('donation-period-amount');
+        const periodCountEl = document.getElementById('donation-period-count');
+        const donorCountEl = document.getElementById('donation-donor-count');
+        const pendingEl = document.getElementById('donation-pending-count');
+        const unmatchedEl = document.getElementById('donation-unmatched-count');
+
+        if (todayAmountEl) todayAmountEl.textContent = this.formatDonationCurrency(todayTotal);
+        if (todayCountEl) todayCountEl.textContent = `${todayRecords.length} registrert i dag`;
+        if (periodAmountEl) periodAmountEl.textContent = this.formatDonationCurrency(filteredTotal);
+        if (periodCountEl) periodCountEl.textContent = `${records.length} transaksjoner i valgt periode`;
+        if (donorCountEl) donorCountEl.textContent = donors.length.toLocaleString('no-NO');
+        if (pendingEl) pendingEl.textContent = `${pendingCount} venter`;
+        if (unmatchedEl) unmatchedEl.textContent = `${unmatchedCount} uten profilkobling`;
+
+        const transactionsBody = document.getElementById('donation-transactions-body');
+        if (transactionsBody) {
+            const visibleRecords = records.slice(0, 100);
+            transactionsBody.innerHTML = visibleRecords.length ? visibleRecords.map((record) => {
+                const date = this.getDonationDate(record);
+                const name = this.escapeHtml(this.getDonationDonorName(record, userMap));
+                const email = this.escapeHtml(this.getDonationDonorEmail(record, userMap) || 'Ingen e-post');
+                const status = this.escapeHtml(this.getDonationStatusLabel(record.status));
+                const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
+                const method = this.escapeHtml(record.method || 'Ukjent');
+                const profileStatus = record.userId ? 'Koblet' : 'Ukoblet';
+                const profileColor = record.userId ? '#166534' : '#92400e';
+                return `
+                    <tr>
+                        <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
+                        <td>
+                            <strong>${name}</strong>
+                            <div style="font-size:12px;color:#64748b;">${email}</div>
+                        </td>
+                        <td><span class="method-tag">${method}</span></td>
+                        <td><span class="method-tag">${status}</span></td>
+                        <td><span style="color:${profileColor};font-weight:700;">${profileStatus}</span></td>
+                        <td class="text-right"><strong>${amount}</strong></td>
+                    </tr>
+                `;
+            }).join('') : `
+                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen gaver matcher filteret.</td></tr>
+            `;
+        }
+
+        const donorsBody = document.getElementById('donation-donors-body');
+        if (donorsBody) {
+            const query = String(this.donationFilters?.donorQuery || '').trim().toLowerCase();
+            const visibleDonors = donors
+                .filter((donor) => !query || [donor.name, donor.email, donor.userId].join(' ').toLowerCase().includes(query))
+                .slice(0, 100);
+
+            donorsBody.innerHTML = visibleDonors.length ? visibleDonors.map((donor) => {
+                const methodText = Array.from(donor.methods).join(', ') || 'Ukjent';
+                return `
+                    <tr>
+                        <td>
+                            <strong>${this.escapeHtml(donor.name || 'Ukjent giver')}</strong>
+                            <div style="font-size:12px;color:#64748b;">${this.escapeHtml(donor.email || 'Ingen e-post')}</div>
+                        </td>
+                        <td>${donor.completedCount} / ${donor.giftCount}</td>
+                        <td>${this.escapeHtml(methodText)}</td>
+                        <td>${donor.latestDate ? donor.latestDate.toLocaleDateString('no-NO') : 'Ukjent'}</td>
+                        <td>${donor.userId ? '<span style="color:#166534;font-weight:700;">Koblet</span>' : '<span style="color:#92400e;font-weight:700;">Ukoblet</span>'}</td>
+                        <td class="text-right"><strong>${this.formatDonationCurrency(donor.total)}</strong></td>
+                    </tr>
+                `;
+            }).join('') : `
+                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen givere matcher søket.</td></tr>
+            `;
+        }
+    }
+
+    bindDonationAdminFilters() {
+        const setFilter = (key, value) => {
+            this.donationFilters = { ...(this.donationFilters || {}), [key]: value };
+            const customVisible = this.donationFilters.preset === 'custom';
+            const customDates = document.getElementById('donation-custom-dates');
+            if (customDates) customDates.style.display = customVisible ? 'grid' : 'none';
+            this.renderDonationAdminViews();
+        };
+
+        document.getElementById('donation-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
+        document.getElementById('donation-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
+        document.getElementById('donation-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+        document.getElementById('donation-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
+        document.getElementById('donation-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
+        document.getElementById('donation-search')?.addEventListener('input', (event) => setFilter('query', event.target.value));
+        document.getElementById('donor-search')?.addEventListener('input', (event) => setFilter('donorQuery', event.target.value));
+        document.getElementById('donation-clear-filters')?.addEventListener('click', () => {
+            this.donationFilters = { preset: '30', status: 'all', method: 'all', query: '', donorQuery: '', start: '', end: '' };
+            document.getElementById('donation-date-preset').value = '30';
+            document.getElementById('donation-status-filter').value = 'all';
+            document.getElementById('donation-method-filter').value = 'all';
+            document.getElementById('donation-search').value = '';
+            document.getElementById('donor-search').value = '';
+            document.getElementById('donation-start-date').value = '';
+            document.getElementById('donation-end-date').value = '';
+            const customDates = document.getElementById('donation-custom-dates');
+            if (customDates) customDates.style.display = 'none';
+            this.renderDonationAdminViews();
+        });
+    }
+
     async renderCausesManager() {
         const section = document.getElementById('causes-section');
         if (!section) return;
 
         let totalDonations = 0;
         let donationCount = 0;
+        let completedDonationCount = 0;
         let averageDonation = 0;
+        let donationRecords = [];
+        let users = [];
 
         try {
             if (firebaseService.db) {
                 const donationsSnapshot = await firebaseService.db.collection('donations').get();
-                donationCount = donationsSnapshot.size;
+                donationRecords = donationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                donationCount = donationRecords.length;
                 if (!donationsSnapshot.empty) {
-                    donationsSnapshot.forEach(doc => {
-                        const data = doc.data();
-                        if (data.amount) {
-                            totalDonations += (data.amount / 100);
+                    donationRecords.forEach(data => {
+                        if (['completed', 'succeeded', 'captured'].includes(String(data.status || '').toLowerCase())) {
+                            completedDonationCount++;
+                            totalDonations += this.normalizeDonationAmountNok(data);
                         }
                     });
                 }
-                if (donationCount > 0) {
-                    averageDonation = totalDonations / donationCount;
+                const usersSnapshot = await firebaseService.db.collection('users').get();
+                users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (completedDonationCount > 0) {
+                    averageDonation = totalDonations / completedDonationCount;
                 }
             }
         } catch (e) {
@@ -11536,10 +11819,17 @@ class AdminManager {
 
         const formattedTotal = totalDonations.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
         const formattedAverage = averageDonation.toLocaleString('no-NO', { style: 'currency', currency: 'NOK', maximumFractionDigits: 0 });
+        this.allDonationRecords = donationRecords.sort((a, b) => {
+            const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+            const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+            return bDate - aDate;
+        });
+        this.adminUserMap = new Map(users.map(user => [user.id, user]));
+        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', query: '', donorQuery: '', start: '', end: '' };
 
 
         section.innerHTML = `
-            ${this.renderSectionHeader('volunteer_activism', 'Gaver & Donasjoner', 'Oversikt over alle inntekter og aktive innsamlingsaksjoner.')}
+            ${this.renderSectionHeader('volunteer_activism', 'Gaver & Donasjoner', 'Følg dagens gaver, filtrer historikk og se giveroversikt.')}
             
             <div class="stats-grid" style="margin-bottom: 32px;">
                 <div class="stat-card modern">
@@ -11547,9 +11837,9 @@ class AdminManager {
                         <span class="material-symbols-outlined">payments</span>
                     </div>
                     <div class="stat-content">
-                        <h3 class="stat-label">Total Inntekt</h3>
+                        <h3 class="stat-label">Fullført totalt</h3>
                         <p class="stat-value">${formattedTotal}</p>
-                        <p class="stat-trend">Siste 30 dager</p>
+                        <p class="stat-trend">Alle fullførte gaver</p>
                     </div>
                 </div>
 
@@ -11577,13 +11867,153 @@ class AdminManager {
 
                         <div class="stat-card modern">
                             <div class="stat-icon-wrap purple">
-                                <span class="material-symbols-outlined">pie_chart</span>
+                                <span class="material-symbols-outlined">today</span>
                             </div>
                             <div class="stat-content">
-                                <h3 class="stat-label">Konvertering</h3>
-                                <p class="stat-value">-- %</p>
-                                <span class="stat-meta">Besøkende til givere</span>
+                                <h3 class="stat-label">Dagens gaver</h3>
+                                <p class="stat-value" id="donation-today-amount">--</p>
+                                <span class="stat-meta" id="donation-today-count">Laster...</span>
                             </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div class="card-header flex-between">
+                            <div>
+                                <h3 class="card-title">Gaveoversikt</h3>
+                                <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på dato, status, metode eller giver.</p>
+                            </div>
+                            <button type="button" class="btn-secondary" id="donation-clear-filters">
+                                <span class="material-symbols-outlined">filter_alt_off</span>
+                                Nullstill
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label>Periode</label>
+                                    <select id="donation-date-preset" class="form-control">
+                                        <option value="today">I dag</option>
+                                        <option value="7">Siste 7 dager</option>
+                                        <option value="30" selected>Siste 30 dager</option>
+                                        <option value="month">Denne måneden</option>
+                                        <option value="year">I år</option>
+                                        <option value="all">Alle</option>
+                                        <option value="custom">Egendefinert</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Status</label>
+                                    <select id="donation-status-filter" class="form-control">
+                                        <option value="all">Alle statuser</option>
+                                        <option value="completed">Fullført</option>
+                                        <option value="pending">Venter</option>
+                                        <option value="processing">Behandles</option>
+                                        <option value="failed">Feilet</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Metode</label>
+                                    <select id="donation-method-filter" class="form-control">
+                                        <option value="all">Alle metoder</option>
+                                        <option value="stripe">Stripe</option>
+                                        <option value="vipps">Vipps</option>
+                                        <option value="card">Kort</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Søk</label>
+                                    <input id="donation-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
+                                </div>
+                            </div>
+                            <div id="donation-custom-dates" style="display:none;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label>Fra dato</label>
+                                    <input id="donation-start-date" class="form-control" type="date">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label>Til dato</label>
+                                    <input id="donation-end-date" class="form-control" type="date">
+                                </div>
+                            </div>
+
+                            <div class="stats-grid" style="margin-bottom: 20px;">
+                                <div class="stat-card modern">
+                                    <div class="stat-content">
+                                        <h3 class="stat-label">Valgt periode</h3>
+                                        <p class="stat-value" id="donation-period-amount">--</p>
+                                        <span class="stat-meta" id="donation-period-count">Laster...</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card modern">
+                                    <div class="stat-content">
+                                        <h3 class="stat-label">Givere</h3>
+                                        <p class="stat-value" id="donation-donor-count">--</p>
+                                        <span class="stat-meta">Unike givere i filteret</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card modern">
+                                    <div class="stat-content">
+                                        <h3 class="stat-label">Under behandling</h3>
+                                        <p class="stat-value" id="donation-pending-count">--</p>
+                                        <span class="stat-meta">Ikke fullført ennå</span>
+                                    </div>
+                                </div>
+                                <div class="stat-card modern">
+                                    <div class="stat-content">
+                                        <h3 class="stat-label">Ukoblede</h3>
+                                        <p class="stat-value" id="donation-unmatched-count">--</p>
+                                        <span class="stat-meta">Mangler profilkobling</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="overflow-x:auto;">
+                                <table class="data-table" style="width:100%;">
+                                    <thead>
+                                        <tr>
+                                            <th>Dato</th>
+                                            <th>Giver</th>
+                                            <th>Metode</th>
+                                            <th>Status</th>
+                                            <th>Profil</th>
+                                            <th class="text-right">Beløp</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="donation-transactions-body">
+                                        <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster gaver...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div class="card-header flex-between">
+                            <div>
+                                <h3 class="card-title">Givere</h3>
+                                <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
+                            </div>
+                            <div class="form-group" style="margin:0;min-width:240px;">
+                                <input id="donor-search" class="form-control" type="search" placeholder="Søk etter giver">
+                            </div>
+                        </div>
+                        <div class="card-body" style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th>Giver</th>
+                                        <th>Fullført / totalt</th>
+                                        <th>Metoder</th>
+                                        <th>Siste gave</th>
+                                        <th>Profil</th>
+                                        <th class="text-right">Sum</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="donation-donors-body">
+                                    <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
 
@@ -11646,6 +12076,8 @@ class AdminManager {
                     `;
         section.setAttribute('data-rendered', 'true');
 
+        this.bindDonationAdminFilters();
+        this.renderDonationAdminViews();
         await this.loadCauses();
 
         document.getElementById('add-cause-btn').addEventListener('click', () => {

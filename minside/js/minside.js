@@ -275,6 +275,68 @@ class MinSideManager {
         };
     }
 
+    _normalizeDonationAmountNok(donation) {
+        const raw = donation || {};
+        const explicitNok = raw.amountNok ?? raw.amountNOK ?? raw.totalNok;
+        if (explicitNok != null) return this._parseAmountNumber(explicitNok);
+
+        const explicitOre = raw.amountOre ?? raw.amountCents;
+        if (explicitOre != null) return this._parseAmountNumber(explicitOre) / 100;
+
+        const amount = this._parseAmountNumber(raw.amount);
+        if (!amount) return 0;
+
+        // Older Stripe client records stored amount in ore, while server-created
+        // Stripe/Vipps donation records store amount in NOK.
+        if (raw.paymentIntentId && !raw.transactionId) return amount / 100;
+        return amount;
+    }
+
+    _parseAmountNumber(value) {
+        if (typeof value === 'number' && Number.isFinite(value)) return value;
+        if (typeof value === 'string') {
+            const parsed = Number(value.replace(',', '.').replace(/[^\d.-]/g, ''));
+            return Number.isFinite(parsed) ? parsed : 0;
+        }
+        return 0;
+    }
+
+    async _fetchCurrentUserDonations({ order = false } = {}) {
+        const uid = this.currentUser?.uid;
+        const email = (this.currentUser?.email || '').trim().toLowerCase();
+        if (!uid && !email) return [];
+
+        const db = firebase.firestore();
+        const byId = new Map();
+        const addSnap = (snap) => {
+            snap.forEach(doc => byId.set(doc.id, { id: doc.id, ...doc.data() }));
+        };
+
+        const queries = [];
+        if (uid) {
+            let q = db.collection('donations').where('userId', '==', uid);
+            if (order) q = q.orderBy('timestamp', 'desc');
+            queries.push(q.get());
+        }
+        if (email) {
+            queries.push(db.collection('donations').where('donorEmail', '==', email).get());
+            queries.push(db.collection('donations').where('email', '==', email).get());
+        }
+
+        const results = await Promise.allSettled(queries);
+        results.forEach(result => {
+            if (result.status === 'fulfilled') addSnap(result.value);
+        });
+
+        const donations = Array.from(byId.values());
+        donations.sort((a, b) => {
+            const at = a.timestamp?.toMillis?.() || a.timestamp?.toDate?.()?.getTime?.() || 0;
+            const bt = b.timestamp?.toMillis?.() || b.timestamp?.toDate?.()?.getTime?.() || 0;
+            return bt - at;
+        });
+        return donations;
+    }
+
     async refreshProfileSubCollections(uid) {
         if (!uid) {
             this.profileData.subCollections = this._emptyProfileSubCollections();
@@ -547,11 +609,10 @@ class MinSideManager {
         // Parallel fetches
         const uid = user?.uid;
         try {
-            const [notifSnap, donationsSnap, coursesSnap, recentSnap] = await Promise.all([
+            const [notifSnap, donations, coursesSnap, recentSnap] = await Promise.all([
                 firebase.firestore().collection('user_notifications')
                     .where('userId', '==', uid).where('read', '==', false).get(),
-                firebase.firestore().collection('donations')
-                    .where('userId', '==', uid).get(),
+                this._fetchCurrentUserDonations(),
                 firebase.firestore().collection('teaching').get(),
                 firebase.firestore().collection('user_notifications')
                     .where('userId', '==', uid).orderBy('createdAt', 'desc').limit(4).get(),
@@ -563,10 +624,9 @@ class MinSideManager {
 
             // Year total giving
             let yearTotal = 0;
-            donationsSnap.forEach(d => {
-                const donation = d.data();
+            donations.forEach(donation => {
                 if (donation.timestamp?.toDate?.()?.getFullYear?.() === new Date().getFullYear()) {
-                    yearTotal += (donation.amount || 0) / 100;
+                    yearTotal += this._normalizeDonationAmountNok(donation);
                 }
             });
             const yearEl = document.getElementById('ov-year-total');
@@ -1123,18 +1183,14 @@ class MinSideManager {
 
         let donations = [];
         try {
-            const snap = await firebase.firestore()
-                .collection('donations')
-                .where('userId', '==', uid)
-                .orderBy('timestamp', 'desc')
-                .get();
-            snap.forEach(d => donations.push({ id: d.id, ...d.data() }));
+            donations = await this._fetchCurrentUserDonations({ order: true });
         } catch (e) { }
 
         const currentYear = new Date().getFullYear();
         const yearTotal = donations.filter(d => d.timestamp?.toDate?.()?.getFullYear?.() === currentYear)
-            .reduce((s, d) => s + (d.amount || 0) / 100, 0);
+            .reduce((s, d) => s + this._normalizeDonationAmountNok(d), 0);
         const lastGift = donations[0];
+        const lastGiftAmount = lastGift ? this._normalizeDonationAmountNok(lastGift) : 0;
 
         container.innerHTML = `
         <div>
@@ -1145,7 +1201,7 @@ class MinSideManager {
                 </div>
                 <div class="stat-chip">
                     <div class="stat-chip-label">Siste gave</div>
-                    <div class="stat-chip-value">${lastGift ? `kr ${(lastGift.amount / 100).toLocaleString('no-NO')}` : '—'}</div>
+                    <div class="stat-chip-value">${lastGift ? `kr ${lastGiftAmount.toLocaleString('no-NO')}` : '—'}</div>
                     <div class="stat-chip-sub">${lastGift?.timestamp?.toDate ? lastGift.timestamp.toDate().toLocaleDateString('no-NO') : ''}</div>
                 </div>
                 <div class="stat-chip">
@@ -1177,11 +1233,12 @@ class MinSideManager {
                         <tbody>
                             ${donations.map(d => {
             const date = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
+            const amountNok = this._normalizeDonationAmountNok(d);
             return `<tr>
                                     <td>${date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
                                     <td>${d.type || 'Gave'}</td>
                                     <td><span class="method-tag">${d.method || 'Kort'}</span></td>
-                                    <td class="text-right"><strong>kr ${(d.amount / 100).toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
+                                    <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
                                 </tr>`;
         }).join('')}
                         </tbody>

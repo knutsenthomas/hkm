@@ -655,15 +655,22 @@
                                 return el ? el.value : '';
                             };
 
+                            const currentUser = (window.firebase && firebase.auth && firebase.auth().currentUser)
+                                ? firebase.auth().currentUser
+                                : null;
+                            const donorEmail = getValue('donor-email').trim();
+                            const currentUserEmail = (currentUser && currentUser.email ? currentUser.email : '').trim().toLowerCase();
+                            const shouldAttachCurrentUser = currentUser && donorEmail.toLowerCase() === currentUserEmail;
+
                             const customerDetails = {
                                 name: getValue('donor-name'),
-                                email: getValue('donor-email'),
+                                email: donorEmail,
                                 phone: getValue('donor-phone'),
                                 address: getValue('donor-address'),
                                 zip: getValue('donor-zip'),
                                 city: getValue('donor-city'),
                                 message: getValue('donor-message'),
-                                userId: (window.firebase && firebase.auth && firebase.auth().currentUser) ? firebase.auth().currentUser.uid : null
+                                userId: shouldAttachCurrentUser ? currentUser.uid : null
                             };
 
                             if (selectedPaymentMethod.value === 'vipps') {

@@ -36,6 +36,25 @@ const db = admin.firestore();
 const { FieldValue, Timestamp } = admin.firestore;
 const cors = require("cors")({ origin: true });
 
+async function resolveDonationUserId(customerDetails = {}) {
+  const donorEmail = typeof customerDetails.email === "string" ?
+    customerDetails.email.trim().toLowerCase() : "";
+
+  if (donorEmail) {
+    try {
+      const userSnap = await db.collection("users")
+        .where("email", "==", donorEmail)
+        .limit(1)
+        .get();
+      if (!userSnap.empty) return userSnap.docs[0].id;
+    } catch (error) {
+      console.warn("Could not resolve donation user by email:", error);
+    }
+  }
+
+  return customerDetails.userId || null;
+}
+
 // Constants for podcast transcription
 const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 3;
 const PODCAST_TRANSCRIPT_RETRY_MS = 1000 * 60 * 60 * 24; // 24 hours
@@ -2373,6 +2392,9 @@ exports.createPaymentIntent = onRequest({
       return;
     }
 
+    const resolvedUserId = await resolveDonationUserId(customerDetails);
+    const amountOre = Math.round(parsedAmount * 100);
+
     // Initialize Stripe lazily
     const stripeKey = stripeSecretKeyParam.value();
     if (!stripeKey) {
@@ -2383,7 +2405,7 @@ exports.createPaymentIntent = onRequest({
     const stripe = require('stripe')(stripeKey);
 
     const paymentIntentPayload = {
-      amount: Math.round(parsedAmount * 100), // Stripe bruker ore (cents)
+      amount: amountOre, // Stripe bruker ore (cents)
       currency: normalizedCurrency,
       receipt_email: customerDetails.email || undefined,
       description: `Donasjon fra ${customerDetails.name || "Ukjent"}`,
@@ -2395,7 +2417,7 @@ exports.createPaymentIntent = onRequest({
         customer_zip: customerDetails.zip,
         customer_city: customerDetails.city,
         message: customerDetails.message,
-        user_id: customerDetails.userId || "",
+        user_id: resolvedUserId || "",
       },
       shipping: customerDetails.name && customerDetails.address ? {
         name: customerDetails.name,
@@ -2424,11 +2446,13 @@ exports.createPaymentIntent = onRequest({
     await db.collection('donations').doc(paymentIntent.id).set({
       transactionId: paymentIntent.id,
       amount: parsedAmount,
+      amountNok: parsedAmount,
+      amountOre,
       currency: normalizedCurrency,
       method: "stripe",
       status: "pending",
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      userId: customerDetails.userId || null,
+      userId: resolvedUserId,
       donorName: customerDetails.name || "Ukjent",
       donorEmail: customerDetails.email || "Ukjent",
       message: customerDetails.message || "",
@@ -2500,6 +2524,9 @@ exports.createVippsPayment = onRequest({
       return;
     }
 
+    const resolvedUserId = await resolveDonationUserId(customerDetails);
+    const amountOre = Math.round(parsedAmount * 100);
+
     const config = getVippsConfig();
     if (!config.isValid) {
       console.error("Vipps configuration missing:", config.missing);
@@ -2519,7 +2546,7 @@ exports.createVippsPayment = onRequest({
     const paymentRequest = {
       amount: {
         currency: "NOK",
-        value: Math.round(parsedAmount * 100),
+        value: amountOre,
       },
       paymentMethod: {
         type: "WALLET",
@@ -2532,7 +2559,7 @@ exports.createVippsPayment = onRequest({
         donorName: customerDetails.name || "",
         donorEmail: customerDetails.email || "",
         donorMessage: customerDetails.message || "",
-        userId: customerDetails.userId || "",
+        userId: resolvedUserId || "",
       },
     };
 
@@ -2545,11 +2572,13 @@ exports.createVippsPayment = onRequest({
     await db.collection('donations').doc(reference).set({
       transactionId: reference,
       amount: parsedAmount,
+      amountNok: parsedAmount,
+      amountOre,
       currency: "NOK",
       method: "vipps",
       status: "pending",
       timestamp: admin.firestore.FieldValue.serverTimestamp(),
-      userId: customerDetails.userId || null,
+      userId: resolvedUserId,
       donorName: customerDetails.name || "Ukjent",
       donorEmail: customerDetails.email || "Ukjent",
       message: customerDetails.message || "",
