@@ -4881,10 +4881,15 @@ body.builder-active .user-avatar,
 body.admin-body .main-content,
 body.minside-body .main-content,
 body.crm-body .main-content,
+body.builder-active .builder-workspace {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  box-sizing: border-box !important;
+}
+
 body.crm-body .inbox-container,
 body.minside-body .inbox-container,
 body.builder-active .newsletter-builder-container,
-body.builder-active .builder-workspace,
 body.admin-body .segments-container,
 body.admin-body .content-wrapper,
 body.admin-body .section-container {
