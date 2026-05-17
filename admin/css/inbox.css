@@ -900,9 +900,10 @@
     }
 
     .folder-item.active {
-        background: var(--inbox-accent) !important;
+        background: var(--brand-gradient) !important;
         color: #fff !important;
-        border-color: var(--inbox-accent) !important;
+        border: none !important;
+        box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3) !important;
     }
     .folder-item.active::before {
         display: none;
@@ -932,6 +933,10 @@
         top: -1px !important;
         box-sizing: border-box !important;
         overflow: hidden !important;
+    }
+    .folder-item.active .folder-badge {
+        background-color: #ffffff !important;
+        color: var(--inbox-orange) !important;
     }
     .inbox-threads {
         width: 100% !important;
