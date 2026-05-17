@@ -12584,7 +12584,7 @@ class AdminManager {
                     <div id="bank-import-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
                         <div class="modal-backdrop" onclick="window.adminManager?.closeBankImportModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
                         <div class="modal-content" style="max-width:1100px;position:relative;max-height:min(92vh,820px);overflow:auto;">
-                            <div class="modal-header">
+                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                                 <div>
                                     <h3 style="margin:0;">Importer bankgaver</h3>
                                     <p class="section-subtitle" style="margin:4px 0 0;">Last opp CSV eller CAMT/XML fra nettbanken. Du får forhåndsvisning før lagring.</p>
@@ -12606,7 +12606,7 @@ class AdminManager {
                                     <div style="padding:24px;text-align:center;color:#64748b;">Velg en CSV- eller CAMT/XML-fil fra nettbanken.</div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
                                 <button class="btn-secondary" type="button" id="cancel-bank-import-btn">Avbryt</button>
                                 <button class="btn-primary" type="button" id="save-bank-import-btn" disabled>
                                     <span class="material-symbols-outlined">cloud_upload</span>
@@ -12619,7 +12619,7 @@ class AdminManager {
                     <div id="manual-donation-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
                         <div class="modal-backdrop" onclick="window.adminManager?.closeManualDonationModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
                         <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
-                            <div class="modal-header">
+                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                                 <div>
                                     <h3 style="margin:0;">Registrer manuell gave</h3>
                                     <p class="section-subtitle" style="margin:4px 0 0;">For bank, kontant, Vipps utenom nettbetaling eller andre tjenester.</p>
@@ -12684,7 +12684,7 @@ class AdminManager {
                                         <textarea id="manual-donation-note" class="form-control" rows="3" placeholder="Valgfritt internt notat"></textarea>
                                     </div>
                                 </div>
-                                <div class="modal-footer">
+                                <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
                                     <button class="btn-secondary" type="button" id="cancel-manual-donation-btn">Avbryt</button>
                                     <button class="btn-primary" type="submit" id="save-manual-donation-btn">
                                         <span class="material-symbols-outlined">save</span>
@@ -12714,7 +12714,7 @@ class AdminManager {
                     <div id="cause-form-modal" style="display: none;">
                         <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
                         <div class="modal-content" style="max-width: 600px;">
-                            <div class="modal-header">
+                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
                                 <h3 id="form-title">Ny innsamlingsaksjon</h3>
                                 <button class="modal-close" onclick="document.getElementById('cause-form-modal').style.display = 'none'">×</button>
                             </div>
@@ -12745,7 +12745,7 @@ class AdminManager {
                                     </div>
                                 </div>
                             </div>
-                            <div class="modal-footer">
+                            <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
                                 <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').style.display = 'none'">Avbryt</button>
                                 <button class="btn-primary" id="save-cause-btn">Lagre</button>
                             </div>
