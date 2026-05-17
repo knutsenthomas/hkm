@@ -2374,13 +2374,13 @@ exports.createPaymentIntent = onRequest({
     }
 
     // Initialize Stripe lazily
-    const stripeKey = getStripeSecretKey();
+    const stripeKey = stripeSecretKeyParam.value();
     if (!stripeKey) {
       console.error("Stripe Secret Key is missing!");
       res.status(500).send({ error: "Server configuration error: Missing Stripe Key." });
       return;
     }
-    const stripe = stripeInit(stripeKey);
+    const stripe = require('stripe')(stripeKey);
 
     const paymentIntentPayload = {
       amount: Math.round(parsedAmount * 100), // Stripe bruker ore (cents)
@@ -2678,8 +2678,8 @@ exports.stripeWebhook = onRequest({
   let event;
   
   try {
-    const stripeKey = getStripeSecretKey();
-    const stripe = stripeInit(stripeKey);
+    const stripeKey = stripeSecretKeyParam.value();
+    const stripe = require('stripe')(stripeKey);
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
     console.error(`Stripe Webhook Error: ${err.message}`);
