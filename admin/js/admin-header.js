@@ -113,9 +113,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (!adminAvatar) return;
 
-        adminAvatar.textContent = getInitials(safeName);
+        // Clear any previous state
+        adminAvatar.textContent = '';
+        adminAvatar.innerHTML = '';
         adminAvatar.title = safeName;
         if (photoURL) adminAvatar.dataset.photoUrl = photoURL;
+
+        if (photoURL && photoURL.trim().length > 5) {
+            // Show actual photo
+            const img = document.createElement('img');
+            img.src = photoURL;
+            img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
+            
+            // Fallback if image fails to load
+            img.onerror = () => {
+                adminAvatar.innerHTML = '';
+                adminAvatar.textContent = getInitials(safeName);
+            };
+            
+            adminAvatar.appendChild(img);
+        } else {
+            // Fallback: Use initials
+            adminAvatar.textContent = getInitials(safeName);
+        }
     };
 
     const authFallbackName = (user) => user?.displayName || user?.email || 'Administrator';
