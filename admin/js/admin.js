@@ -11672,6 +11672,10 @@ class AdminManager {
             return date && date >= todayRange.start && date <= todayRange.end;
         });
         const isCompleted = (record) => ['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase());
+        const allRecords = this.allDonationRecords || [];
+        const allCompletedRecords = allRecords.filter(isCompleted);
+        const allCompletedTotal = allCompletedRecords.reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
+        const allAverage = allCompletedRecords.length ? allCompletedTotal / allCompletedRecords.length : 0;
         const todayTotal = todayRecords.filter(isCompleted).reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
         const filteredTotal = records.filter(isCompleted).reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
         const pendingCount = records.filter(record => String(record.status || '').toLowerCase() === 'pending').length;
@@ -11685,7 +11689,13 @@ class AdminManager {
         const donorCountEl = document.getElementById('donation-donor-count');
         const pendingEl = document.getElementById('donation-pending-count');
         const unmatchedEl = document.getElementById('donation-unmatched-count');
+        const topTotalEl = document.getElementById('donation-total-amount');
+        const topCountEl = document.getElementById('donation-total-count');
+        const topAverageEl = document.getElementById('donation-average-amount');
 
+        if (topTotalEl) topTotalEl.textContent = this.formatDonationCurrency(allCompletedTotal);
+        if (topCountEl) topCountEl.textContent = allRecords.length.toLocaleString('no-NO');
+        if (topAverageEl) topAverageEl.textContent = this.formatDonationCurrency(allAverage);
         if (todayAmountEl) todayAmountEl.textContent = this.formatDonationCurrency(todayTotal);
         if (todayCountEl) todayCountEl.textContent = `${todayRecords.length} registrert i dag`;
         if (periodAmountEl) periodAmountEl.textContent = this.formatDonationCurrency(filteredTotal);
@@ -11752,6 +11762,524 @@ class AdminManager {
         }
     }
 
+    openManualDonationModal() {
+        const modal = document.getElementById('manual-donation-modal');
+        if (!modal) return;
+
+        const now = new Date();
+        const pad = (value) => String(value).padStart(2, '0');
+        const localDateTime = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+        const form = document.getElementById('manual-donation-form');
+        if (form) form.reset();
+        const dateInput = document.getElementById('manual-donation-date');
+        if (dateInput) dateInput.value = localDateTime;
+        const statusInput = document.getElementById('manual-donation-status');
+        if (statusInput) statusInput.value = 'completed';
+        const methodInput = document.getElementById('manual-donation-method');
+        if (methodInput) methodInput.value = 'bank';
+        modal.style.display = 'flex';
+    }
+
+    closeManualDonationModal() {
+        const modal = document.getElementById('manual-donation-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    handleManualDonationUserSelect(userId) {
+        const user = userId ? this.adminUserMap?.get(userId) : null;
+        const nameInput = document.getElementById('manual-donor-name');
+        const emailInput = document.getElementById('manual-donor-email');
+        if (!user) return;
+
+        if (nameInput) {
+            nameInput.value = user.displayName || user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '';
+        }
+        if (emailInput) emailInput.value = user.email || '';
+    }
+
+    async saveManualDonation() {
+        const saveBtn = document.getElementById('save-manual-donation-btn');
+        const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
+        const amountNok = Number(getValue('manual-donation-amount').replace(',', '.'));
+        const selectedUserId = getValue('manual-donation-user');
+        const donorName = getValue('manual-donor-name');
+        const donorEmail = getValue('manual-donor-email').toLowerCase();
+        const method = getValue('manual-donation-method') || 'manual';
+        const status = getValue('manual-donation-status') || 'completed';
+        const dateValue = getValue('manual-donation-date');
+        const note = getValue('manual-donation-note');
+        const reference = getValue('manual-donation-reference');
+        const selectedUser = selectedUserId ? this.adminUserMap?.get(selectedUserId) : null;
+        const resolvedUserId = selectedUserId || '';
+        const resolvedName = donorName || selectedUser?.displayName || selectedUser?.fullName || selectedUser?.email || 'Ukjent giver';
+        const resolvedEmail = donorEmail || selectedUser?.email || '';
+
+        if (!Number.isFinite(amountNok) || amountNok <= 0) {
+            this.showToast('Skriv inn et gyldig beløp.', 'warning', 3500);
+            return;
+        }
+
+        if (!resolvedName && !resolvedEmail) {
+            this.showToast('Velg en bruker eller skriv inn navn/e-post for giveren.', 'warning', 3500);
+            return;
+        }
+
+        const donationDate = dateValue ? new Date(dateValue) : new Date();
+        if (Number.isNaN(donationDate.getTime())) {
+            this.showToast('Datoen er ikke gyldig.', 'warning', 3500);
+            return;
+        }
+
+        await this._runWriteLocked('manual-donation:create', async () => this._withButtonLoading(saveBtn, async () => {
+            const docRef = firebaseService.db.collection('donations').doc();
+            const docId = docRef.id;
+            const timestamp = firebase.firestore.Timestamp.fromDate(donationDate);
+            const amountOre = Math.round(amountNok * 100);
+            const currentAdmin = firebase.auth().currentUser;
+            const payload = {
+                transactionId: docId,
+                manualDonationId: docId,
+                amount: amountNok,
+                amountNok,
+                amountOre,
+                currency: 'NOK',
+                method,
+                status,
+                timestamp,
+                completedAt: ['completed', 'succeeded', 'captured'].includes(String(status).toLowerCase()) ? timestamp : null,
+                userId: resolvedUserId || null,
+                donorName: resolvedName,
+                donorEmail: resolvedEmail || 'Ukjent',
+                message: note,
+                reference,
+                type: 'Gave',
+                source: 'manual_admin',
+                matchMethod: resolvedUserId ? 'manual_user_select' : 'manual_unmatched',
+                registeredBy: currentAdmin?.uid || null,
+                registeredByEmail: currentAdmin?.email || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await docRef.set(payload);
+
+            this.allDonationRecords = [{ id: docId, ...payload, createdAt: new Date(), updatedAt: new Date() }, ...(this.allDonationRecords || [])]
+                .sort((a, b) => {
+                    const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+                    const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+                    return bDate - aDate;
+                });
+
+            this.closeManualDonationModal();
+            this.renderDonationAdminViews();
+            this.showToast('Gaven er registrert.', 'success', 4000);
+        }, {
+            loadingText: 'Lagrer...'
+        }));
+    }
+
+    openBankImportModal() {
+        const modal = document.getElementById('bank-import-modal');
+        if (!modal) return;
+        const fileInput = document.getElementById('bank-import-file');
+        const preview = document.getElementById('bank-import-preview');
+        const summary = document.getElementById('bank-import-summary');
+        const saveBtn = document.getElementById('save-bank-import-btn');
+        if (fileInput) fileInput.value = '';
+        if (preview) preview.innerHTML = '<div style="padding:24px;text-align:center;color:#64748b;">Velg en CSV- eller CAMT/XML-fil fra nettbanken.</div>';
+        if (summary) summary.textContent = '';
+        if (saveBtn) saveBtn.disabled = true;
+        this.pendingBankImportRows = [];
+        modal.style.display = 'flex';
+    }
+
+    closeBankImportModal() {
+        const modal = document.getElementById('bank-import-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    async handleBankImportFile(file) {
+        if (!file) return;
+        const preview = document.getElementById('bank-import-preview');
+        const summary = document.getElementById('bank-import-summary');
+        const saveBtn = document.getElementById('save-bank-import-btn');
+        if (preview) preview.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Leser fil...</p></div>';
+        if (saveBtn) saveBtn.disabled = true;
+
+        try {
+            const text = await this.readTextFile(file);
+            const rows = this.parseBankImportText(text, file.name || '');
+            this.pendingBankImportRows = rows.map((row, index) => {
+                const match = this.matchBankImportUser(row);
+                const isDuplicate = this.isLikelyDuplicateBankDonation(row);
+                return {
+                    ...row,
+                    importId: `bank-import-${Date.now()}-${index}`,
+                    selected: row.amountNok > 0 && !isDuplicate,
+                    isDuplicate,
+                    userId: match?.user?.id || '',
+                    matchLabel: isDuplicate ? 'Mulig duplikat - ikke valgt' : (match?.label || 'Ingen sikker match')
+                };
+            });
+
+            if (summary) {
+                const matched = this.pendingBankImportRows.filter(row => row.userId).length;
+                summary.textContent = `${this.pendingBankImportRows.length} innbetalinger funnet. ${matched} foreslått koblet til profil.`;
+            }
+            this.renderBankImportPreview();
+            if (saveBtn) saveBtn.disabled = this.pendingBankImportRows.length === 0;
+        } catch (error) {
+            console.error('Bank import parse failed:', error);
+            this.pendingBankImportRows = [];
+            if (preview) preview.innerHTML = `<div style="padding:24px;text-align:center;color:#991b1b;">Kunne ikke lese filen: ${this.escapeHtml(error.message || 'Ukjent feil')}</div>`;
+            if (summary) summary.textContent = '';
+        }
+    }
+
+    readTextFile(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result || ''));
+            reader.onerror = () => reject(new Error('Kunne ikke lese filen.'));
+            reader.readAsText(file, 'utf-8');
+        });
+    }
+
+    parseBankImportText(text, filename = '') {
+        const trimmed = String(text || '').trim();
+        if (!trimmed) throw new Error('Filen er tom.');
+        const looksXml = filename.toLowerCase().endsWith('.xml') || trimmed.startsWith('<');
+        const rows = looksXml ? this.parseCamtBankImport(trimmed) : this.parseCsvBankImport(trimmed);
+        const incoming = rows
+            .map(row => ({
+                ...row,
+                amountNok: this.parseBankAmount(row.amountNok ?? row.amount),
+                date: row.date instanceof Date ? row.date : this.parseBankDate(row.date),
+                text: String(row.text || row.description || row.message || '').trim(),
+                reference: String(row.reference || row.kid || row.transactionId || '').trim(),
+                donorName: String(row.donorName || row.name || row.payer || '').trim(),
+                donorEmail: String(row.donorEmail || row.email || '').trim().toLowerCase()
+            }))
+            .filter(row => row.amountNok > 0)
+            .filter(row => row.date && !Number.isNaN(row.date.getTime()));
+
+        if (!incoming.length) throw new Error('Fant ingen positive innbetalinger i filen.');
+        return incoming;
+    }
+
+    parseCsvBankImport(text) {
+        const lines = String(text || '').split(/\r?\n/).filter(line => line.trim());
+        if (lines.length < 2) throw new Error('CSV-filen mangler rader.');
+        const delimiter = this.detectCsvDelimiter(lines[0]);
+        const rows = lines.map(line => this.parseCsvLine(line, delimiter));
+        const headers = rows[0].map(header => this.normalizeBankHeader(header));
+
+        return rows.slice(1).map((values) => {
+            const raw = {};
+            headers.forEach((header, index) => {
+                raw[header] = values[index] || '';
+            });
+
+            const amount = raw.amount || raw.belop || raw.innbetalt || raw.inn || raw.credit || raw.kredit || raw.sum || raw.valuta;
+            const outAmount = raw.ut || raw.debet || raw.debit || raw.withdrawal;
+            const resolvedAmount = amount || (outAmount ? `-${outAmount}` : '');
+
+            return {
+                date: raw.dato || raw.date || raw.bokfortdato || raw.valutadato || raw.posteringsdato,
+                amountNok: resolvedAmount,
+                donorName: raw.navn || raw.name || raw.avsender || raw.fra || raw.betaler || raw.payer,
+                donorEmail: raw.epost || raw.email,
+                text: raw.tekst || raw.beskrivelse || raw.description || raw.melding || raw.message || raw.info || raw.detaljer,
+                reference: raw.kid || raw.referanse || raw.reference || raw.bilag || raw.transactionid || raw.transaksjonsid
+            };
+        });
+    }
+
+    detectCsvDelimiter(headerLine) {
+        const candidates = [';', ',', '\t'];
+        return candidates
+            .map(delimiter => ({ delimiter, count: String(headerLine).split(delimiter).length }))
+            .sort((a, b) => b.count - a.count)[0].delimiter;
+    }
+
+    parseCsvLine(line, delimiter) {
+        const result = [];
+        let current = '';
+        let quoted = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"' && line[i + 1] === '"') {
+                current += '"';
+                i++;
+            } else if (char === '"') {
+                quoted = !quoted;
+            } else if (char === delimiter && !quoted) {
+                result.push(current.trim());
+                current = '';
+            } else {
+                current += char;
+            }
+        }
+        result.push(current.trim());
+        return result;
+    }
+
+    normalizeBankHeader(value) {
+        return String(value || '')
+            .trim()
+            .toLowerCase()
+            .replace(/[æ]/g, 'ae')
+            .replace(/[ø]/g, 'o')
+            .replace(/[å]/g, 'a')
+            .replace(/[^a-z0-9]+/g, '');
+    }
+
+    parseCamtBankImport(xmlText) {
+        const doc = new DOMParser().parseFromString(xmlText, 'text/xml');
+        if (doc.getElementsByTagName('parsererror').length) throw new Error('XML-filen kunne ikke tolkes.');
+        const entries = Array.from(doc.getElementsByTagName('*')).filter(node => node.localName === 'Ntry');
+        return entries.map((entry) => {
+            const getText = (root, localName) => {
+                const found = Array.from(root.getElementsByTagName('*')).find(node => node.localName === localName);
+                return found ? String(found.textContent || '').trim() : '';
+            };
+            const amountNode = Array.from(entry.getElementsByTagName('*')).find(node => node.localName === 'Amt');
+            const creditDebit = getText(entry, 'CdtDbtInd');
+            const rawAmount = amountNode ? amountNode.textContent : '';
+            const signedAmount = creditDebit === 'DBIT' ? `-${rawAmount}` : rawAmount;
+            const remittance = getText(entry, 'Ustrd') || getText(entry, 'AddtlNtryInf');
+            const reference = getText(entry, 'EndToEndId') || getText(entry, 'AcctSvcrRef') || getText(entry, 'NtryRef');
+            const debtorNameNode = Array.from(entry.getElementsByTagName('*')).find(node => node.localName === 'Dbtr');
+            const donorName = debtorNameNode ? getText(debtorNameNode, 'Nm') : '';
+
+            return {
+                date: getText(entry, 'Dt'),
+                amountNok: signedAmount,
+                donorName,
+                text: remittance,
+                reference
+            };
+        });
+    }
+
+    parseBankAmount(value) {
+        if (typeof value === 'number' && Number.isFinite(value)) return value;
+        let raw = String(value || '').trim();
+        if (!raw) return 0;
+        const isNegative = raw.includes('-') || raw.includes('−');
+        raw = raw
+            .replace(/\s/g, '')
+            .replace(/[^\d,.-]/g, '')
+            .replace(/\.(?=\d{3}(\D|$))/g, '')
+            .replace(',', '.');
+        const parsed = Number(raw);
+        if (!Number.isFinite(parsed)) return 0;
+        return isNegative && parsed > 0 ? -parsed : parsed;
+    }
+
+    parseBankDate(value) {
+        const raw = String(value || '').trim();
+        if (!raw) return null;
+        if (/^\d{4}-\d{2}-\d{2}/.test(raw)) return new Date(raw);
+        const dotMatch = raw.match(/^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})/);
+        if (dotMatch) {
+            const day = dotMatch[1].padStart(2, '0');
+            const month = dotMatch[2].padStart(2, '0');
+            const year = dotMatch[3].length === 2 ? `20${dotMatch[3]}` : dotMatch[3];
+            return new Date(`${year}-${month}-${day}T12:00:00`);
+        }
+        const parsed = new Date(raw);
+        return Number.isNaN(parsed.getTime()) ? null : parsed;
+    }
+
+    matchBankImportUser(row) {
+        const users = Array.from(this.adminUserMap?.values?.() || []);
+        const haystack = `${row.donorName || ''} ${row.donorEmail || ''} ${row.text || ''} ${row.reference || ''}`.toLowerCase();
+        const emailMatch = haystack.match(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i);
+        if (emailMatch) {
+            const user = users.find(candidate => String(candidate.email || '').toLowerCase() === emailMatch[0].toLowerCase());
+            if (user) return { user, label: `E-post: ${user.email}` };
+        }
+
+        const normalizedReference = String(row.reference || '').replace(/\D/g, '');
+        if (normalizedReference) {
+            const user = users.find(candidate => {
+                const refs = [candidate.kid, candidate.donationKid, candidate.giverKid, candidate.membershipNumber, candidate.customerNumber]
+                    .map(value => String(value || '').replace(/\D/g, ''))
+                    .filter(Boolean);
+                return refs.includes(normalizedReference);
+            });
+            if (user) return { user, label: `Referanse/KID: ${normalizedReference}` };
+        }
+
+        const donorName = String(row.donorName || '').trim().toLowerCase();
+        if (donorName && donorName.length >= 5) {
+            const user = users.find(candidate => {
+                const name = String(candidate.displayName || candidate.fullName || `${candidate.firstName || ''} ${candidate.lastName || ''}`.trim()).toLowerCase();
+                return name && (name === donorName || donorName.includes(name) || name.includes(donorName));
+            });
+            if (user) return { user, label: `Navn: ${user.displayName || user.fullName || user.email}` };
+        }
+
+        return null;
+    }
+
+    isLikelyDuplicateBankDonation(row) {
+        const rowRef = String(row.reference || '').trim().toLowerCase();
+        const rowDate = row.date instanceof Date ? row.date : this.parseBankDate(row.date);
+        const rowAmount = Number(row.amountNok || 0);
+        return (this.allDonationRecords || []).some((record) => {
+            const recordAmount = this.normalizeDonationAmountNok(record);
+            if (Math.abs(recordAmount - rowAmount) > 0.01) return false;
+
+            const recordRef = String(record.reference || record.transactionId || '').trim().toLowerCase();
+            if (rowRef && recordRef && rowRef === recordRef) return true;
+
+            const recordDate = this.getDonationDate(record);
+            if (!rowDate || !recordDate) return false;
+            const sameDay = rowDate.toDateString() === recordDate.toDateString();
+            const sameText = row.text && record.message && String(record.message).toLowerCase() === String(row.text).toLowerCase();
+            return sameDay && sameText;
+        });
+    }
+
+    renderBankImportPreview() {
+        const preview = document.getElementById('bank-import-preview');
+        if (!preview) return;
+        const rows = this.pendingBankImportRows || [];
+        if (!rows.length) {
+            preview.innerHTML = '<div style="padding:24px;text-align:center;color:#64748b;">Ingen innbetalinger klare for import.</div>';
+            return;
+        }
+
+        const userOptions = Array.from(this.adminUserMap?.values?.() || [])
+            .slice()
+            .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
+            .map(user => {
+                const label = user.displayName || user.fullName || user.email || user.id;
+                const email = user.email ? ` (${user.email})` : '';
+                return `<option value="${this.escapeHtml(user.id)}">${this.escapeHtml(label + email)}</option>`;
+            })
+            .join('');
+
+        preview.innerHTML = `
+            <div style="overflow:auto;max-height:420px;border:1px solid #e2e8f0;border-radius:14px;">
+                <table class="data-table" style="width:100%;">
+                    <thead>
+                        <tr>
+                            <th>Importer</th>
+                            <th>Dato</th>
+                            <th>Giver/tekst</th>
+                            <th>Kobling</th>
+                            <th class="text-right">Beløp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map((row, index) => `
+                            <tr>
+                                <td><input type="checkbox" class="bank-import-select" data-index="${index}" ${row.selected ? 'checked' : ''}></td>
+                                <td>${row.date ? row.date.toLocaleDateString('no-NO') : 'Ukjent'}</td>
+                                <td>
+                                    <strong>${this.escapeHtml(row.donorName || 'Ukjent giver')}</strong>
+                                    <div style="font-size:12px;color:#64748b;max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.escapeHtml(row.text || row.reference || '')}</div>
+                                    ${row.reference ? `<div style="font-size:12px;color:#94a3b8;">Ref: ${this.escapeHtml(row.reference)}</div>` : ''}
+                                </td>
+                                <td>
+                                    <select class="form-control bank-import-user" data-index="${index}" style="min-width:220px;">
+                                        <option value="">Ukoblet</option>
+                                        ${userOptions}
+                                    </select>
+                                    <div style="font-size:11px;color:${row.userId ? '#166534' : '#92400e'};margin-top:4px;">${this.escapeHtml(row.matchLabel || '')}</div>
+                                </td>
+                                <td class="text-right"><strong>${this.formatDonationCurrency(row.amountNok)}</strong></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        preview.querySelectorAll('.bank-import-user').forEach(select => {
+            const index = Number(select.dataset.index);
+            select.value = rows[index]?.userId || '';
+            select.addEventListener('change', event => {
+                const row = this.pendingBankImportRows[index];
+                if (!row) return;
+                row.userId = event.target.value;
+                row.matchLabel = row.userId ? 'Valgt manuelt' : 'Ukoblet';
+            });
+        });
+        preview.querySelectorAll('.bank-import-select').forEach(input => {
+            input.addEventListener('change', event => {
+                const row = this.pendingBankImportRows[Number(event.target.dataset.index)];
+                if (row) row.selected = event.target.checked;
+            });
+        });
+    }
+
+    async saveBankImportRows() {
+        const rows = (this.pendingBankImportRows || []).filter(row => row.selected);
+        if (!rows.length) {
+            this.showToast('Velg minst én rad å importere.', 'warning', 3500);
+            return;
+        }
+
+        const saveBtn = document.getElementById('save-bank-import-btn');
+        await this._runWriteLocked('bank-import:create', async () => this._withButtonLoading(saveBtn, async () => {
+            const batch = firebase.firestore().batch();
+            const currentAdmin = firebase.auth().currentUser;
+            const importedRecords = [];
+
+            rows.forEach((row) => {
+                const docRef = firebaseService.db.collection('donations').doc();
+                const docId = docRef.id;
+                const user = row.userId ? this.adminUserMap?.get(row.userId) : null;
+                const timestamp = firebase.firestore.Timestamp.fromDate(row.date || new Date());
+                const amountOre = Math.round(row.amountNok * 100);
+                const payload = {
+                    transactionId: docId,
+                    manualDonationId: docId,
+                    bankImportId: docId,
+                    amount: row.amountNok,
+                    amountNok: row.amountNok,
+                    amountOre,
+                    currency: 'NOK',
+                    method: 'bank',
+                    status: 'completed',
+                    timestamp,
+                    completedAt: timestamp,
+                    userId: row.userId || null,
+                    donorName: row.donorName || user?.displayName || user?.fullName || user?.email || 'Ukjent giver',
+                    donorEmail: row.donorEmail || user?.email || 'Ukjent',
+                    message: row.text || '',
+                    reference: row.reference || '',
+                    type: 'Gave',
+                    source: 'bank_import',
+                    matchMethod: row.userId ? (row.matchLabel || 'bank_import_match') : 'bank_import_unmatched',
+                    registeredBy: currentAdmin?.uid || null,
+                    registeredByEmail: currentAdmin?.email || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                batch.set(docRef, payload);
+                importedRecords.push({ id: docId, ...payload, createdAt: new Date(), updatedAt: new Date() });
+            });
+
+            await batch.commit();
+            this.allDonationRecords = [...importedRecords, ...(this.allDonationRecords || [])].sort((a, b) => {
+                const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+                const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+                return bDate - aDate;
+            });
+            this.closeBankImportModal();
+            this.renderDonationAdminViews();
+            this.showToast(`Importerte ${importedRecords.length} bankgaver.`, 'success', 5000);
+        }, {
+            loadingText: 'Importerer...'
+        }));
+    }
+
     bindDonationAdminFilters() {
         const setFilter = (key, value) => {
             this.donationFilters = { ...(this.donationFilters || {}), [key]: value };
@@ -11768,6 +12296,17 @@ class AdminManager {
         document.getElementById('donation-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
         document.getElementById('donation-search')?.addEventListener('input', (event) => setFilter('query', event.target.value));
         document.getElementById('donor-search')?.addEventListener('input', (event) => setFilter('donorQuery', event.target.value));
+        document.getElementById('add-manual-donation-btn')?.addEventListener('click', () => this.openManualDonationModal());
+        document.getElementById('open-bank-import-btn')?.addEventListener('click', () => this.openBankImportModal());
+        document.getElementById('cancel-bank-import-btn')?.addEventListener('click', () => this.closeBankImportModal());
+        document.getElementById('bank-import-file')?.addEventListener('change', (event) => this.handleBankImportFile(event.target.files?.[0]));
+        document.getElementById('save-bank-import-btn')?.addEventListener('click', () => this.saveBankImportRows());
+        document.getElementById('cancel-manual-donation-btn')?.addEventListener('click', () => this.closeManualDonationModal());
+        document.getElementById('manual-donation-user')?.addEventListener('change', (event) => this.handleManualDonationUserSelect(event.target.value));
+        document.getElementById('manual-donation-form')?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            this.saveManualDonation();
+        });
         document.getElementById('donation-clear-filters')?.addEventListener('click', () => {
             this.donationFilters = { preset: '30', status: 'all', method: 'all', query: '', donorQuery: '', start: '', end: '' };
             document.getElementById('donation-date-preset').value = '30';
@@ -11826,6 +12365,15 @@ class AdminManager {
         });
         this.adminUserMap = new Map(users.map(user => [user.id, user]));
         this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', query: '', donorQuery: '', start: '', end: '' };
+        const manualDonationUserOptions = users
+            .slice()
+            .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
+            .map(user => {
+                const label = user.displayName || user.fullName || user.email || user.id;
+                const email = user.email ? ` (${user.email})` : '';
+                return `<option value="${this.escapeHtml(user.id)}">${this.escapeHtml(label + email)}</option>`;
+            })
+            .join('');
 
 
         section.innerHTML = `
@@ -11838,7 +12386,7 @@ class AdminManager {
                     </div>
                     <div class="stat-content">
                         <h3 class="stat-label">Fullført totalt</h3>
-                        <p class="stat-value">${formattedTotal}</p>
+                        <p class="stat-value" id="donation-total-amount">${formattedTotal}</p>
                         <p class="stat-trend">Alle fullførte gaver</p>
                     </div>
                 </div>
@@ -11849,7 +12397,7 @@ class AdminManager {
                             </div>
                             <div class="stat-content">
                                 <h3 class="stat-label">Antall gaver</h3>
-                                <p class="stat-value">${donationCount}</p>
+                                <p class="stat-value" id="donation-total-count">${donationCount}</p>
                                 <span class="stat-meta">Registrerte transaksjoner</span>
                             </div>
                         </div>
@@ -11860,7 +12408,7 @@ class AdminManager {
                             </div>
                             <div class="stat-content">
                                 <h3 class="stat-label">Snittgave</h3>
-                                <p class="stat-value">${formattedAverage}</p>
+                                <p class="stat-value" id="donation-average-amount">${formattedAverage}</p>
                                 <span class="stat-meta">Per donasjon</span>
                             </div>
                         </div>
@@ -11883,10 +12431,20 @@ class AdminManager {
                                 <h3 class="card-title">Gaveoversikt</h3>
                                 <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på dato, status, metode eller giver.</p>
                             </div>
-                            <button type="button" class="btn-secondary" id="donation-clear-filters">
-                                <span class="material-symbols-outlined">filter_alt_off</span>
-                                Nullstill
-                            </button>
+                            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                                <button type="button" class="btn-primary" id="add-manual-donation-btn">
+                                    <span class="material-symbols-outlined">add_card</span>
+                                    Registrer gave
+                                </button>
+                                <button type="button" class="btn-secondary" id="open-bank-import-btn">
+                                    <span class="material-symbols-outlined">upload_file</span>
+                                    Importer bank
+                                </button>
+                                <button type="button" class="btn-secondary" id="donation-clear-filters">
+                                    <span class="material-symbols-outlined">filter_alt_off</span>
+                                    Nullstill
+                                </button>
+                            </div>
                         </div>
                         <div class="card-body">
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
@@ -11910,6 +12468,7 @@ class AdminManager {
                                         <option value="pending">Venter</option>
                                         <option value="processing">Behandles</option>
                                         <option value="failed">Feilet</option>
+                                        <option value="cancelled">Avbrutt</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin:0;">
@@ -11918,7 +12477,12 @@ class AdminManager {
                                         <option value="all">Alle metoder</option>
                                         <option value="stripe">Stripe</option>
                                         <option value="vipps">Vipps</option>
+                                        <option value="vipps_manual">Vipps manuelt</option>
                                         <option value="card">Kort</option>
+                                        <option value="bank">Bank</option>
+                                        <option value="cash">Kontant</option>
+                                        <option value="manual">Manuell</option>
+                                        <option value="other">Annen tjeneste</option>
                                     </select>
                                 </div>
                                 <div class="form-group" style="margin:0;">
@@ -12014,6 +12578,120 @@ class AdminManager {
                                     <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <div id="bank-import-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
+                        <div class="modal-backdrop" onclick="window.adminManager?.closeBankImportModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+                        <div class="modal-content" style="max-width:1100px;position:relative;max-height:min(92vh,820px);overflow:auto;">
+                            <div class="modal-header">
+                                <div>
+                                    <h3 style="margin:0;">Importer bankgaver</h3>
+                                    <p class="section-subtitle" style="margin:4px 0 0;">Last opp CSV eller CAMT/XML fra nettbanken. Du får forhåndsvisning før lagring.</p>
+                                </div>
+                                <button class="modal-close" type="button" onclick="window.adminManager?.closeBankImportModal?.()">×</button>
+                            </div>
+                            <div class="modal-body" style="display:grid;gap:16px;">
+                                <div style="display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:14px;align-items:end;">
+                                    <div class="form-group" style="margin:0;">
+                                        <label>Bankfil</label>
+                                        <input id="bank-import-file" class="form-control" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml">
+                                    </div>
+                                    <div style="font-size:12px;line-height:1.5;color:#64748b;padding-bottom:8px;">
+                                        Støtter vanlige CSV-filer og ISO 20022 CAMT XML.
+                                    </div>
+                                </div>
+                                <div id="bank-import-summary" style="font-size:13px;color:#475569;font-weight:700;"></div>
+                                <div id="bank-import-preview">
+                                    <div style="padding:24px;text-align:center;color:#64748b;">Velg en CSV- eller CAMT/XML-fil fra nettbanken.</div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn-secondary" type="button" id="cancel-bank-import-btn">Avbryt</button>
+                                <button class="btn-primary" type="button" id="save-bank-import-btn" disabled>
+                                    <span class="material-symbols-outlined">cloud_upload</span>
+                                    Importer valgte
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="manual-donation-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
+                        <div class="modal-backdrop" onclick="window.adminManager?.closeManualDonationModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+                        <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
+                            <div class="modal-header">
+                                <div>
+                                    <h3 style="margin:0;">Registrer manuell gave</h3>
+                                    <p class="section-subtitle" style="margin:4px 0 0;">For bank, kontant, Vipps utenom nettbetaling eller andre tjenester.</p>
+                                </div>
+                                <button class="modal-close" type="button" onclick="window.adminManager?.closeManualDonationModal?.()">×</button>
+                            </div>
+                            <form id="manual-donation-form">
+                                <div class="modal-body" style="display:grid;gap:16px;">
+                                    <div class="form-group" style="margin:0;">
+                                        <label>Koble til eksisterende bruker</label>
+                                        <select id="manual-donation-user" class="form-control">
+                                            <option value="">Ikke koble til profil</option>
+                                            ${manualDonationUserOptions}
+                                        </select>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;">
+                                        <div class="form-group" style="margin:0;">
+                                            <label>Givers navn</label>
+                                            <input id="manual-donor-name" class="form-control" type="text" placeholder="Fullt navn">
+                                        </div>
+                                        <div class="form-group" style="margin:0;">
+                                            <label>Givers e-post</label>
+                                            <input id="manual-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no">
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;">
+                                        <div class="form-group" style="margin:0;">
+                                            <label>Beløp (NOK)</label>
+                                            <input id="manual-donation-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="500">
+                                        </div>
+                                        <div class="form-group" style="margin:0;">
+                                            <label>Dato</label>
+                                            <input id="manual-donation-date" class="form-control" type="datetime-local" required>
+                                        </div>
+                                    </div>
+                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;">
+                                        <div class="form-group" style="margin:0;">
+                                            <label>Metode</label>
+                                            <select id="manual-donation-method" class="form-control">
+                                                <option value="bank">Bank</option>
+                                                <option value="manual">Manuell</option>
+                                                <option value="vipps_manual">Vipps manuelt</option>
+                                                <option value="cash">Kontant</option>
+                                                <option value="other">Annen tjeneste</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group" style="margin:0;">
+                                            <label>Status</label>
+                                            <select id="manual-donation-status" class="form-control">
+                                                <option value="completed">Fullført</option>
+                                                <option value="pending">Venter</option>
+                                                <option value="processing">Behandles</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group" style="margin:0;">
+                                            <label>Referanse</label>
+                                            <input id="manual-donation-reference" class="form-control" type="text" placeholder="Bankreferanse e.l.">
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="margin:0;">
+                                        <label>Notat</label>
+                                        <textarea id="manual-donation-note" class="form-control" rows="3" placeholder="Valgfritt internt notat"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn-secondary" type="button" id="cancel-manual-donation-btn">Avbryt</button>
+                                    <button class="btn-primary" type="submit" id="save-manual-donation-btn">
+                                        <span class="material-symbols-outlined">save</span>
+                                        Lagre gave
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
 
