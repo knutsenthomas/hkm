@@ -5448,21 +5448,20 @@ class AdminManager {
                 <div class="media-breadcrumbs" id="media-breadcrumbs" style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: #64748b;">
                 </div>
 
-                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b;">
+                <div style="display: flex; gap: 16px; align-items: center; flex-wrap: wrap; justify-content: flex-end;">
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: #64748b; margin: 0;">
                         Område:
-                        <select id="media-location-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px;">
+                        <select id="media-location-select" style="height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 600; cursor: pointer; outline: none; min-width: 150px; box-sizing: border-box;">
                             ${this._getMediaLocationOptionsHtml()}
                         </select>
                     </label>
-                    <button id="btn-new-folder" class="btn-secondary" style="padding: 8px 14px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+                    <button id="btn-new-folder" class="btn-secondary" style="height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-sizing: border-box; margin: 0;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
                         Ny mappe
                     </button>
-                    <div style="width: 1px; height: 24px; background: #e2e8f0;"></div>
                     <div style="display: flex; align-items: center; gap: 8px;">
                         <span style="font-size: 13px; color: #64748b;">Sorter:</span>
-                        <select id="media-sort-select" style="padding: 6px 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none;">
+                        <select id="media-sort-select" style="height: 36px; padding: 0 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: white; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; outline: none; box-sizing: border-box;">
                             <option value="date-desc">Nyeste først</option>
                             <option value="date-asc">Eldste først</option>
                             <option value="name-asc">Navn (A-Å)</option>
