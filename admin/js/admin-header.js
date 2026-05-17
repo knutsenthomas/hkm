@@ -189,6 +189,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const mainItems = [
             { label: 'Oversikt', icon: 'home', section: 'overview', href: '/admin/index.html#overview', alwaysVisible: true },
+            { label: 'Min Side', icon: 'account_circle', href: '/minside/index.html', alwaysVisible: true, id: 'admin-profile-trigger-sidebar' },
+            { label: 'Se nettside', icon: 'visibility', href: '/', alwaysVisible: true, target: '_blank' },
             { header: 'nettsted', label: 'Nettsted' },
             { label: 'Sideinnhold', icon: 'description', section: 'content', category: 'nettsted' },
             { label: 'Blogg', icon: 'edit_note', section: 'blog', category: 'nettsted' },
@@ -216,10 +218,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
         ];
 
-        const footerItems = [
-            { label: 'Min Side', icon: 'account_circle', href: '/minside/index.html', alwaysVisible: true, id: 'admin-profile-trigger-sidebar' },
-            { label: 'Se nettside', icon: 'visibility', href: '/', alwaysVisible: true, target: '_blank' },
-        ];
+        const footerItems = [];
 
         const mainHtml = mainItems.map((item) => (
             item.header ? renderHeader(item.header, item.label) : renderItem(item)
