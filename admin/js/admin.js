@@ -4009,7 +4009,8 @@ class AdminManager {
     }
 
     _formatAnalyticsRangeLabel(days = this.analyticsRangeDays) {
-        return `Siste ${days} ${days === 1 ? 'dag' : 'dager'}`;
+        if (days === 1) return 'Siste døgnet';
+        return `Siste ${days} dager`;
     }
 
     initAnalyticsRangeControl() {
@@ -4296,7 +4297,7 @@ class AdminManager {
                         <div style="display:flex; gap: 8px; align-items:center;">
                             <label for="analytics-range-days" class="sr-only">Velg periode</label>
                             <select id="analytics-range-days" class="analytics-range-select" aria-label="Velg periode for Google Analytics">
-                                ${[7, 14, 30, 60, 90, 180, 365].map(days => `
+                                ${[1, 7, 14, 30, 60, 90, 180, 365].map(days => `
                                     <option value="${days}" ${days === this.analyticsRangeDays ? 'selected' : ''}>${this._formatAnalyticsRangeLabel(days)}</option>
                                 `).join('')}
                             </select>
