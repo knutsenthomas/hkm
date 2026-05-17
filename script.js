@@ -3573,6 +3573,21 @@ window.addEventListener('load', () => {
 
     function initVisitorChat() {
         if (mounted) return;
+        
+        // Skip chatbot on all admin/CRM/minside pages to keep the portal clean
+        const isPortal = window.location.pathname.includes('/admin/') || 
+                         window.location.pathname.includes('/minside/') || 
+                         (document.body && (
+                             document.body.classList.contains('admin-body') || 
+                             document.body.classList.contains('crm-body') || 
+                             document.body.classList.contains('minside-body')
+                         ));
+                         
+        if (isPortal) {
+            console.log('[VisitorChat] Chatbot disabled on admin/CRM/minside portals.');
+            return;
+        }
+        
         waitForFirebaseService();
     }
 
