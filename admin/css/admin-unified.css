@@ -5567,3 +5567,8 @@ body.builder-active .main-header [id="admin-avatar"] {
   opacity: 0 !important;
   pointer-events: none !important;
 }
+
+/* Global scroll guard: Prevent horizontal trackpad scrolling on all admin pages */
+html, body {
+  overflow-x: hidden !important;
+}

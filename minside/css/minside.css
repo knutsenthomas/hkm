@@ -2014,3 +2014,8 @@ body {
     opacity: 0 !important;
     pointer-events: none !important;
 }
+
+/* Global scroll guard: Prevent horizontal trackpad scrolling on all Min Side pages */
+html, body {
+  overflow-x: hidden !important;
+}
