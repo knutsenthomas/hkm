@@ -211,17 +211,19 @@ class MinSideManager {
     _setAvatarEl(el, photoURL, name) {
         if (!el) return;
         
-        // Match Admin Dashboard behavior: Always show initials, ignore photoURL in header
-        const initials = (name || '?')
-            .split(' ')
-            .filter(n => n.length > 0)
-            .map(n => n[0].toUpperCase())
-            .slice(0, 2)
-            .join('');
+        if (photoURL) {
+            el.innerHTML = `<img src="${photoURL}" alt="${name}" style="width: 100%; height: 100%; border-radius: inherit; object-fit: cover;">`;
+        } else {
+            const initials = (name || '?')
+                .split(' ')
+                .filter(n => n.length > 0)
+                .map(n => n[0].toUpperCase())
+                .slice(0, 2)
+                .join('');
+            
+            el.innerHTML = `<span style="color: white !important; font-weight: 900 !important; visibility: visible !important; opacity: 1 !important; display: block !important;">${initials || '?'}</span>`;
+        }
         
-        el.innerHTML = `<span style="color: white !important; font-weight: 900 !important; visibility: visible !important; opacity: 1 !important; display: block !important;">${initials || '?'}</span>`;
-        
-        // Store photoURL in dataset for parity, though not currently used for rendering
         if (photoURL) el.dataset.photoUrl = photoURL;
     }
 
