@@ -12426,22 +12426,22 @@ class AdminManager {
                     </div>
 
                     <div class="card" style="margin-bottom: 24px;">
-                        <div class="card-header flex-between">
+                        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
                             <div>
                                 <h3 class="card-title">Gaveoversikt</h3>
                                 <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på dato, status, metode eller giver.</p>
                             </div>
-                            <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-                                <button type="button" class="btn-primary" id="add-manual-donation-btn">
-                                    <span class="material-symbols-outlined">add_card</span>
+                            <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                                <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">add_card</span>
                                     Registrer gave
                                 </button>
-                                <button type="button" class="btn-secondary" id="open-bank-import-btn">
-                                    <span class="material-symbols-outlined">upload_file</span>
+                                <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
                                     Importer bank
                                 </button>
-                                <button type="button" class="btn-secondary" id="donation-clear-filters">
-                                    <span class="material-symbols-outlined">filter_alt_off</span>
+                                <button type="button" class="btn-secondary" id="donation-clear-filters" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
                                     Nullstill
                                 </button>
                             </div>
