@@ -3122,6 +3122,8 @@ body.admin-body .section-content > .design-ui-header > .section-header-content {
   min-width: 0;
   flex: 1;
   display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
   align-items: center;
   justify-content: space-between;
 }
