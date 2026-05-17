@@ -1110,6 +1110,12 @@ class AdminManager {
         if (typeof post.text === 'string') {
             translation.text = await this._translateRichText(post.text, targetLang, 'no');
         }
+        if (typeof post.summary === 'string') {
+            translation.summary = await this._translateRichText(post.summary, targetLang, 'no');
+        }
+        if (typeof post.description === 'string') {
+            translation.description = await this._translateRichText(post.description, targetLang, 'no');
+        }
         return translation;
     }
 
@@ -1149,12 +1155,13 @@ class AdminManager {
 
         const titleTranslated = this._isMeaningfullyTranslatedField(sourcePost?.title, translatedPost?.title);
         const contentTranslated = this._isMeaningfullyTranslatedField(sourcePost?.content, translatedPost?.content);
+        const textTranslated = this._isMeaningfullyTranslatedField(sourcePost?.text, translatedPost?.text);
         const seoTitleTranslated = this._isMeaningfullyTranslatedField(sourcePost?.seoTitle, translatedPost?.seoTitle);
         const seoDescriptionTranslated = this._isMeaningfullyTranslatedField(sourcePost?.seoDescription, translatedPost?.seoDescription);
 
-        // Title and content are the most important fields for blog output.
+        // Title and content/text are the most important fields for blog and podcast output.
         // Allow SEO-only posts as a weak fallback if both SEO fields changed.
-        return titleTranslated || contentTranslated || (seoTitleTranslated && seoDescriptionTranslated);
+        return titleTranslated || contentTranslated || textTranslated || (seoTitleTranslated && seoDescriptionTranslated);
     }
 
     async ensureBlogPostTranslations(post, { force = false } = {}) {
@@ -1175,7 +1182,7 @@ class AdminManager {
                 && !existing._translationFailed
                 && existing._sourceHash === sourceHash
                 && existing.title
-                && existing.content;
+                && (existing.content || existing.text);
             if (!force && isUpToDate) continue;
 
             const translated = await this._buildBlogTranslation(updatedPost, lang);
@@ -10012,11 +10019,15 @@ class AdminManager {
                                 throw new Error('Ingen språk ble oversatt. Oversettelsestjenesten svarte uten gyldig oversettelse. Prøv igjen, eller bytt provider i Integrasjoner.');
                             }
 
-                            const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
-                            const list = this._getCollectionItems(currentData);
-                            upsertItemInList(list, translatedItem);
+                            if (collectionId === 'podcast_transcripts') {
+                                await firebase.firestore().collection('podcast_transcripts').doc(translatedItem.id).set(translatedItem, { merge: true });
+                            } else {
+                                const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                                const list = this._getCollectionItems(currentData);
+                                upsertItemInList(list, translatedItem);
 
-                            await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+                                await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+                            }
                             Object.assign(item, translatedItem);
                             this._renderBlogTranslationStatusBadge(item);
                             if (successfulLanguages.length === targetLanguages.length) {

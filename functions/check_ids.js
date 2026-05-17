@@ -9,16 +9,26 @@ const db = admin.firestore();
 
 async function checkIds() {
   const snap = await db.collection('podcast_transcripts').get();
-  let translatedCount = 0;
+  let completedCount = 0;
+  console.log('--- AUDITING PODCAST TRANSCRIPTS ---');
   snap.forEach(doc => {
     const data = doc.data();
-    if (data.translations || data.summary) {
-      translatedCount++;
-      console.log(`Document ${doc.id} HAS data (Summary: ${!!data.summary}, Translations: ${!!data.translations})`);
+    const hasSummary = !!data.summary;
+    const hasTranslations = !!data.translations && Object.keys(data.translations).length > 0;
+    const hasText = !!data.text;
+    
+    if (hasSummary && hasTranslations && hasText) {
+      completedCount++;
+    } else {
+      console.log(`Document [${doc.id}] (${data.title || 'Uten tittel'}):`);
+      console.log(`  - Text: ${hasText}`);
+      console.log(`  - Summary: ${hasSummary}`);
+      console.log(`  - Translations: ${hasTranslations}`);
     }
   });
+  console.log('-----------------------------------');
   console.log(`Total documents: ${snap.size}`);
-  console.log(`Documents with summaries/translations: ${translatedCount}`);
+  console.log(`Fully complete documents: ${completedCount}`);
 }
 
 checkIds();
