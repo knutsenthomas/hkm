@@ -11937,7 +11937,7 @@ class AdminManager {
                                 </div>
                             </div>
 
-                            <div class="stats-grid" style="margin-bottom: 20px;">
+                            <div class="stats-grid donation-metrics-grid" style="margin-bottom: 20px;">
                                 <div class="stat-card modern">
                                     <div class="stat-content">
                                         <h3 class="stat-label">Valgt periode</h3>

@@ -5572,3 +5572,23 @@ body.builder-active .main-header [id="admin-avatar"] {
 html, body {
   overflow-x: hidden !important;
 }
+
+/* Donation admin metrics need denser type than dashboard hero stats. */
+body.admin-body #causes-section .donation-metrics-grid .stat-card.modern {
+  min-height: 104px !important;
+  padding: 20px !important;
+}
+
+body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-value {
+  font-size: clamp(24px, 2.1vw, 30px) !important;
+  line-height: 1.08 !important;
+  overflow-wrap: anywhere;
+}
+
+body.admin-body #causes-section .donation-metrics-grid .stat-card.modern .stat-meta {
+  display: block !important;
+  margin-top: 8px !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  color: #64748b !important;
+}
