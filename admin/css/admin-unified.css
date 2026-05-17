@@ -2602,7 +2602,7 @@ body.builder-active {
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 /* Container Constraint & Visual Balance - UI Audit */
@@ -5587,7 +5587,7 @@ body.builder-active .main-header [id="admin-avatar"] {
 
 /* Global scroll guard: Prevent horizontal trackpad scrolling on all admin pages */
 html, body {
-  overflow-x: hidden !important;
+  overflow-x: clip !important;
 }
 
 /* Donation admin metrics need denser type than dashboard hero stats. */
