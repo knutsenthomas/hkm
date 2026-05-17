@@ -2621,6 +2621,18 @@ body.builder-active {
   box-sizing: border-box;
 }
 
+/* Remove island styling when in topbar */
+.main-header > .design-ui-header,
+.main-header > .section-header {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  margin: 0 !important;
+}
+
 /* Ensure the main-header background stays full width but content is centered */
 .main-header {
   padding: 0 !important;
@@ -2637,7 +2649,7 @@ body.builder-active .main-header {
   height: 72px !important;
   min-height: 72px !important;
   background: #ffffff !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
   padding: 0 32px !important;
   position: sticky !important;
   top: 0 !important;
@@ -2645,7 +2657,7 @@ body.builder-active .main-header {
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+  box-shadow: none !important;
 }
 
 @media (min-width: 1280px) {
@@ -4785,7 +4797,7 @@ body.minside-body #dashboard-main-header,
 body.builder-active #dashboard-main-header {
   height: 72px !important;
   min-height: 72px !important;
-  background-color: #f4f7fa !important;
+  background-color: #ffffff !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
