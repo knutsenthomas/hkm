@@ -3521,20 +3521,22 @@ body.builder-active .newsletter-canvas {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-    order: -10 !important; /* Move to the beginning of the header actions */
-    margin-right: 8px !important;
+    order: 10 !important; /* Keep on the far right of the header actions */
+    margin-left: 8px !important;
+    margin-right: 0 !important;
   }
 
-  /* On mobile, we want the actions to be able to sit on the left if needed */
+  /* Keep mobile layout aligned with desktop: title on left, actions on right */
   body.admin-body .main-header .section-header-content {
     flex-direction: row !important;
-    justify-content: flex-start !important;
+    justify-content: space-between !important;
+    align-items: center !important;
     gap: 12px !important;
   }
 
   body.admin-body .main-header .section-header-actions {
-    margin-left: 0 !important; /* Move actions to the left */
-    order: -1 !important; /* Put actions (with hamburger) before the title */
+    margin-left: auto !important;
+    order: 0 !important; /* Keep same order as desktop! */
   }
 
   /* Spacing for CRM components on smaller screens */
