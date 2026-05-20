@@ -3394,7 +3394,7 @@ exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
     }
 
     try {
-      const { targetRole, title, body, icon, click_action, selectedUserIds } = req.body;
+      const { targetRole, title, body, icon, click_action, selectedUserIds, category } = req.body;
 
       if ((!targetRole && !selectedUserIds) || !title || !body) {
         res.status(400).send({ error: "Mangler målgruppe, tittel eller melding." });
@@ -3412,10 +3412,20 @@ exports.sendPushNotification = onRequest({ cors: true }, async (req, res) => {
         users = await getAllUsers(targetRole);
       }
 
+      // Filter out users who have globally disabled push OR opted out of this specific category
+      users = users.filter(user => {
+        if (user.pushEnabled === false) return false;
+        if (category === 'teaching' && user.pushTeachings === false) return false;
+        if (category === 'podcast' && user.pushPodcasts === false) return false;
+        if (category === 'blog' && user.pushBlogs === false) return false;
+        return true;
+      });
+
       if (users.length === 0) {
         res.status(404).send({ error: "Ingen brukere funnet for den valgte målgruppen." });
         return;
       }
+
 
       // Create a map of token to user ID
       const tokenUserMap = new Map();

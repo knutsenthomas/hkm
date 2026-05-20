@@ -13145,12 +13145,64 @@ class AdminManager {
                                 </div>
 
                                 <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main); border-top: 1px solid var(--border-color); padding-top: 32px;">Kommunikasjon</h4>
-                                <div class="form-group" style="margin-bottom: 32px;">
-                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 14px; color: var(--text-main);">
-                                        <input type="checkbox" name="newsletter" style="width: 18px; height: 18px; accent-color: var(--primary-color);">
-                                        Motta nyhetsbrev på e-post
-                                    </label>
+                                <div style="margin-bottom: 24px; padding: 20px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 10px;">
+                                    <!-- Newsletter toggle -->
+                                    <div class="admin-setting-row">
+                                        <div>
+                                            <div class="admin-setting-row-label">E-postvarslinger</div>
+                                            <div class="admin-setting-row-sub">Motta nyhetsbrev og oppdateringer på e-post</div>
+                                        </div>
+                                        <label class="admin-toggle">
+                                            <input type="checkbox" name="newsletter" id="admin-newsletter-toggle">
+                                            <span class="admin-toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <!-- Push toggle -->
+                                    <div class="admin-setting-row">
+                                        <div>
+                                            <div class="admin-setting-row-label">Push-varslinger</div>
+                                            <div class="admin-setting-row-sub">Motta push-varslinger på denne enheten</div>
+                                        </div>
+                                        <label class="admin-toggle">
+                                            <input type="checkbox" name="pushEnabled" id="admin-push-toggle">
+                                            <span class="admin-toggle-slider"></span>
+                                        </label>
+                                    </div>
+                                    <!-- Push sub-category toggles -->
+                                    <div class="admin-push-sub-settings" id="admin-push-sub-settings" style="display:none;">
+                                        <div class="admin-setting-row admin-setting-row-sub-item">
+                                            <div>
+                                                <div class="admin-setting-row-label">Ny undervisning</div>
+                                                <div class="admin-setting-row-sub">Få pushvarsel når ny undervisning publiseres</div>
+                                            </div>
+                                            <label class="admin-toggle admin-toggle-sm">
+                                                <input type="checkbox" name="pushTeachings" id="admin-push-teachings-toggle">
+                                                <span class="admin-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="admin-setting-row admin-setting-row-sub-item">
+                                            <div>
+                                                <div class="admin-setting-row-label">Ny podcast</div>
+                                                <div class="admin-setting-row-sub">Få pushvarsel når ny podcastepisode legges ut</div>
+                                            </div>
+                                            <label class="admin-toggle admin-toggle-sm">
+                                                <input type="checkbox" name="pushPodcasts" id="admin-push-podcasts-toggle">
+                                                <span class="admin-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                        <div class="admin-setting-row admin-setting-row-sub-item">
+                                            <div>
+                                                <div class="admin-setting-row-label">Nytt blogginnlegg</div>
+                                                <div class="admin-setting-row-sub">Få pushvarsel når nytt blogginnlegg publiseres</div>
+                                            </div>
+                                            <label class="admin-toggle admin-toggle-sm">
+                                                <input type="checkbox" name="pushBlogs" id="admin-push-blogs-toggle">
+                                                <span class="admin-toggle-slider"></span>
+                                            </label>
+                                        </div>
+                                    </div>
                                 </div>
+
 
                                 <h4 style="margin: 0 0 16px 0; font-size: 15px; font-weight: 600; color: var(--text-main); border-top: 1px solid var(--border-color); padding-top: 32px;">Personvern & Samtykke</h4>
                                 <div id="admin-consent-status-display" style="padding: 16px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 32px; font-size: 14px;">
@@ -13189,6 +13241,10 @@ class AdminManager {
         const mergedPhone = (userProfile && userProfile.phone) || (profile && profile.phone) || '';
         const mergedBio = (userProfile && userProfile.bio) || (profile && profile.bio) || '';
         const mergedNewsletter = userProfile && typeof userProfile.newsletter === 'boolean' ? userProfile.newsletter : true;
+        const mergedPushEnabled = userProfile && typeof userProfile.pushEnabled === 'boolean' ? userProfile.pushEnabled : false;
+        const mergedPushTeachings = userProfile && typeof userProfile.pushTeachings === 'boolean' ? userProfile.pushTeachings : true;
+        const mergedPushPodcasts = userProfile && typeof userProfile.pushPodcasts === 'boolean' ? userProfile.pushPodcasts : true;
+        const mergedPushBlogs = userProfile && typeof userProfile.pushBlogs === 'boolean' ? userProfile.pushBlogs : true;
 
         const form = document.getElementById('admin-profile-full-form');
         if (!form) return;
@@ -13200,6 +13256,25 @@ class AdminManager {
         form.querySelector('[name="city"]').value = mergedCity;
         form.querySelector('[name="phone"]').value = mergedPhone;
         form.querySelector('[name="newsletter"]').checked = mergedNewsletter;
+        form.querySelector('[name="pushEnabled"]').checked = mergedPushEnabled;
+        form.querySelector('[name="pushTeachings"]').checked = mergedPushTeachings;
+        form.querySelector('[name="pushPodcasts"]').checked = mergedPushPodcasts;
+        form.querySelector('[name="pushBlogs"]').checked = mergedPushBlogs;
+
+        // Show/hide sub-settings based on saved state
+        const adminPushSubSettings = document.getElementById('admin-push-sub-settings');
+        if (adminPushSubSettings) {
+            adminPushSubSettings.style.display = mergedPushEnabled ? '' : 'none';
+        }
+
+        // Wire push toggle show/hide
+        const adminPushToggle = document.getElementById('admin-push-toggle');
+        if (adminPushToggle && adminPushSubSettings) {
+            adminPushToggle.addEventListener('change', (e) => {
+                adminPushSubSettings.style.display = e.target.checked ? '' : 'none';
+            });
+        }
+
 
         const pictureContainer = document.getElementById('profile-picture-container-admin');
         if (mergedPhoto) {
@@ -13304,6 +13379,10 @@ class AdminManager {
         form.onsubmit = async (event) => {
             event.preventDefault();
             const btn = document.getElementById('save-profile-btn');
+            const pushEnabled = form.querySelector('[name="pushEnabled"]')?.checked ?? false;
+            const pushTeachings = form.querySelector('[name="pushTeachings"]')?.checked ?? true;
+            const pushPodcasts = form.querySelector('[name="pushPodcasts"]')?.checked ?? true;
+            const pushBlogs = form.querySelector('[name="pushBlogs"]')?.checked ?? true;
             const data = {
                 fullName: form.querySelector('[name="displayName"]').value || '',
                 address: form.querySelector('[name="address"]').value || '',
@@ -13316,8 +13395,8 @@ class AdminManager {
                 updatedAt: new Date().toISOString()
             };
 
-            const original = btn.textContent;
-            btn.textContent = 'Lagrer...';
+            const original = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px;">sync</span> Lagrer...';
             btn.disabled = true;
 
             try {
@@ -13335,10 +13414,18 @@ class AdminManager {
                     phone: data.phone,
                     bio: data.bio,
                     newsletter: data.newsletter,
+                    pushEnabled,
+                    pushTeachings,
+                    pushPodcasts,
+                    pushBlogs,
                     photoURL: data.photoUrl,
                     email: authUser.email || '',
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
+
+                if (pushEnabled) {
+                    await this._requestAdminPushPermission(authUser.uid);
+                }
 
                 await firebaseService.savePageContent('settings_profile', data);
                 this.showToast('✅ Profilen er lagret!', 'success', 5000);
@@ -13347,11 +13434,35 @@ class AdminManager {
                 console.error(err);
                 this.showToast('❌ Feil ved lagring', 'error', 5000);
             } finally {
-                btn.textContent = original;
+                btn.innerHTML = original;
                 btn.disabled = false;
             }
         };
     }
+
+    async _requestAdminPushPermission(uid) {
+        try {
+            if (!('Notification' in window)) return;
+            if (!firebase.messaging || !firebase.messaging.isSupported()) return;
+            const perm = await Notification.requestPermission();
+            if (perm !== 'granted') return;
+            const msg = firebase.messaging();
+            // Use the existing admin PWA service worker registration to avoid collisions
+            const registration = await navigator.serviceWorker.ready;
+            const token = await msg.getToken({
+                vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
+                serviceWorkerRegistration: registration
+            });
+            if (token) {
+                await firebase.firestore().collection('users').doc(uid).update({
+                    fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
+                });
+            }
+        } catch (e) {
+            console.warn('admin push permission:', e);
+        }
+    }
+
 
     renderHeroSlides(slides) {
         const container = document.getElementById('hero-slides-list');

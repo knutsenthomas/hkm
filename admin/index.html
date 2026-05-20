@@ -156,6 +156,70 @@
         .podcast-table tr:hover {
             background: #f8fafc;
         }
+
+        /* Push notification toggle styles (matches Min Side UI) */
+        .admin-setting-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+            transition: background 0.15s;
+        }
+        .admin-setting-row:last-child { border-bottom: none; }
+        .admin-setting-row-label {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .admin-setting-row-sub {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .admin-push-sub-settings {
+            background: #f8fafc;
+            border-left: 3px solid #1B4965;
+            border-radius: 0 0 6px 6px;
+            overflow: hidden;
+        }
+        .admin-setting-row-sub-item {
+            padding-left: 32px;
+        }
+        .admin-setting-row-sub-item .admin-setting-row-label {
+            font-size: 0.82rem;
+        }
+        /* Toggle component */
+        .admin-toggle {
+            position: relative;
+            width: 40px;
+            height: 22px;
+            flex-shrink: 0;
+        }
+        .admin-toggle input { opacity: 0; width: 0; height: 0; }
+        .admin-toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: #e2e8f0;
+            border-radius: 99px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        .admin-toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 16px; height: 16px;
+            left: 3px; top: 3px;
+            background: #fff;
+            border-radius: 50%;
+            transition: 0.3s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .admin-toggle input:checked + .admin-toggle-slider { background: #1B4965; }
+        .admin-toggle input:checked + .admin-toggle-slider::before { transform: translateX(18px); }
+        .admin-toggle-sm { width: 34px; height: 19px; }
+        .admin-toggle-sm .admin-toggle-slider::before { width: 13px; height: 13px; }
+        .admin-toggle-sm input:checked + .admin-toggle-slider::before { transform: translateX(15px); }
     </style>
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->
@@ -1316,6 +1380,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-functions-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js"></script>
     
     <!-- Image Compression Library -->
     <script src="https://cdn.jsdelivr.net/npm/browser-image-compression@2.0.2/dist/browser-image-compression.js"></script>

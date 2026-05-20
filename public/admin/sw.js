@@ -83,3 +83,32 @@ self.addEventListener('fetch', (event) => {
         }
     })());
 });
+
+// Firebase Cloud Messaging compat scripts
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging-compat.js');
+
+// Initialize Firebase App in service worker
+firebase.initializeApp({
+    apiKey: "AIzaSyAelVsZnTU5xjQsjewWG7RjYEsQSHH-bkE",
+    authDomain: "his-kingdom-ministry.firebaseapp.com",
+    projectId: "his-kingdom-ministry",
+    messagingSenderId: "791237361706",
+    appId: "1:791237361706:web:63516ba3d74436f23ac353"
+});
+
+const messaging = firebase.messaging();
+
+// Handle background push messages (admin scope)
+messaging.onBackgroundMessage((payload) => {
+    console.log('[admin/sw.js] Bakgrunnsmelding mottatt:', payload);
+    const title = payload.notification?.title || 'Ny oppdatering';
+    const options = {
+        body: payload.notification?.body || '',
+        icon: payload.notification?.image || '/img/logo-hkm.png',
+        badge: '/icons/icon-192.png',
+        data: payload.data
+    };
+    self.registration.showNotification(title, options);
+});
+

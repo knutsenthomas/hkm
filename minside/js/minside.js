@@ -136,6 +136,12 @@ const minsideTranslations = {
         'profile.notificationPreferences': 'Varslingspreferanser',
         'profile.pushNotifications': 'Push-varslinger',
         'profile.pushNotificationsSub': 'Mottar varslinger når HKM sender meldinger',
+        'profile.pushTeachings': 'Ny undervisning',
+        'profile.pushTeachingsSub': 'Få pushvarsel når ny undervisning blir publisert',
+        'profile.pushPodcasts': 'Ny podcast',
+        'profile.pushPodcastsSub': 'Få pushvarsel når en ny podcastepisode legges ut',
+        'profile.pushBlogs': 'Nytt blogginnlegg',
+        'profile.pushBlogsSub': 'Få pushvarsel når et nytt blogginnlegg publiseres',
         'profile.emailNotifications': 'E-postvarslinger',
         'profile.emailNotificationsSub': 'Mottar nyhetsbrev og oppdateringer',
         'profile.savePreferences': 'Lagre preferanser',
@@ -372,6 +378,12 @@ const minsideTranslations = {
         'profile.notificationPreferences': 'Notification Preferences',
         'profile.pushNotifications': 'Push Notifications',
         'profile.pushNotificationsSub': 'Receive notifications when HKM sends messages',
+        'profile.pushTeachings': 'New Teaching',
+        'profile.pushTeachingsSub': 'Get notified when a new teaching is published',
+        'profile.pushPodcasts': 'New Podcast',
+        'profile.pushPodcastsSub': 'Get notified when a new podcast episode is available',
+        'profile.pushBlogs': 'New Blog Post',
+        'profile.pushBlogsSub': 'Get notified when a new blog post is published',
         'profile.emailNotifications': 'Email Notifications',
         'profile.emailNotificationsSub': 'Receive newsletters and updates',
         'profile.savePreferences': 'Save preferences',
@@ -608,6 +620,12 @@ const minsideTranslations = {
         'profile.notificationPreferences': 'Preferencias de Notificación',
         'profile.pushNotifications': 'Notificaciones Push',
         'profile.pushNotificationsSub': 'Recibir notificaciones cuando HKM envíe mensajes',
+        'profile.pushTeachings': 'Nueva Enseñanza',
+        'profile.pushTeachingsSub': 'Recibe un aviso cuando se publique una nueva enseñanza',
+        'profile.pushPodcasts': 'Nuevo Podcast',
+        'profile.pushPodcastsSub': 'Recibe un aviso cuando haya un nuevo episodio de podcast',
+        'profile.pushBlogs': 'Nueva Entrada de Blog',
+        'profile.pushBlogsSub': 'Recibe un aviso cuando se publique una nueva entrada de blog',
         'profile.emailNotifications': 'Notificaciones por Correo',
         'profile.emailNotificationsSub': 'Recibir boletines y actualizaciones',
         'profile.savePreferences': 'Guardar preferencias',
@@ -1877,6 +1895,39 @@ class MinSideManager {
                             <span class="toggle-slider"></span>
                         </label>
                     </div>
+                    <div class="push-sub-settings" id="push-sub-settings" style="${p.pushEnabled ? '' : 'display:none;'}">
+                        <div class="setting-row setting-row-sub-item">
+                            <div>
+                                <div class="setting-row-label">${t('profile.pushTeachings')}</div>
+                                <div class="setting-row-sub">${t('profile.pushTeachingsSub')}</div>
+                            </div>
+                            <label class="toggle toggle-sm">
+                                <input type="checkbox" id="push-teachings-toggle" ${p.pushTeachings !== false ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row setting-row-sub-item">
+                            <div>
+                                <div class="setting-row-label">${t('profile.pushPodcasts')}</div>
+                                <div class="setting-row-sub">${t('profile.pushPodcastsSub')}</div>
+                            </div>
+                            <label class="toggle toggle-sm">
+                                <input type="checkbox" id="push-podcasts-toggle" ${p.pushPodcasts !== false ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="setting-row setting-row-sub-item">
+                            <div>
+                                <div class="setting-row-label">${t('profile.pushBlogs')}</div>
+                                <div class="setting-row-sub">${t('profile.pushBlogsSub')}</div>
+                            </div>
+                            <label class="toggle toggle-sm">
+                                <input type="checkbox" id="push-blogs-toggle" ${p.pushBlogs !== false ? 'checked' : ''}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
                     <div class="setting-row">
                         <div>
                             <div class="setting-row-label">${t('profile.emailNotifications')}</div>
@@ -1932,7 +1983,14 @@ class MinSideManager {
             this.loadView('profile');
         });
 
-        // Push toggle
+        // Push toggle - show/hide sub-settings
+        document.getElementById('push-toggle')?.addEventListener('change', (e) => {
+            const subSettings = document.getElementById('push-sub-settings');
+            if (subSettings) {
+                subSettings.style.display = e.target.checked ? '' : 'none';
+            }
+        });
+
         this._wireFamilySearch();
         this._wireAddressAutocomplete();
 
@@ -1944,15 +2002,32 @@ class MinSideManager {
 
         document.getElementById('save-prefs-btn')?.addEventListener('click', async () => {
             const pushEnabled = document.getElementById('push-toggle')?.checked;
+            const pushTeachings = document.getElementById('push-teachings-toggle')?.checked ?? true;
+            const pushPodcasts = document.getElementById('push-podcasts-toggle')?.checked ?? true;
+            const pushBlogs = document.getElementById('push-blogs-toggle')?.checked ?? true;
             const emailConsent = document.getElementById('email-toggle')?.checked;
+            const btn = document.getElementById('save-prefs-btn');
+            if (btn) { btn.disabled = true; }
             try {
                 await firebase.firestore().collection('users').doc(this.currentUser.uid).set(
-                    { pushEnabled, emailConsent, updatedAt: firebase.firestore.FieldValue.serverTimestamp() },
+                    {
+                        pushEnabled,
+                        pushTeachings,
+                        pushPodcasts,
+                        pushBlogs,
+                        emailConsent,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    },
                     { merge: true }
                 );
                 if (pushEnabled) await this._requestPushPermission();
-            } catch (e) { console.warn('save prefs:', e); }
+                if (btn) { btn.textContent = '✓ Lagret!'; setTimeout(() => { if (btn) { btn.disabled = false; btn.innerHTML = `<span class="material-symbols-outlined">save</span> ${t('profile.savePreferences')}`; } }, 2000); }
+            } catch (e) {
+                console.warn('save prefs:', e);
+                if (btn) { btn.disabled = false; }
+            }
         });
+
 
         // Delete account
         document.getElementById('delete-account-btn')?.addEventListener('click', () => this.showDeleteConfirmModal());
@@ -2207,11 +2282,17 @@ class MinSideManager {
 
     async _requestPushPermission() {
         try {
+            if (!('Notification' in window)) return;
             if (!firebase.messaging || !firebase.messaging.isSupported()) return;
             const perm = await Notification.requestPermission();
             if (perm !== 'granted') return;
             const msg = firebase.messaging();
-            const token = await msg.getToken({ vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA' });
+            // Use the existing PWA service worker registration to avoid collisions with /firebase-messaging-sw.js
+            const registration = await navigator.serviceWorker.ready;
+            const token = await msg.getToken({
+                vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
+                serviceWorkerRegistration: registration
+            });
             if (token) {
                 await firebase.firestore().collection('users').doc(this.currentUser.uid).update({
                     fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
@@ -2219,6 +2300,7 @@ class MinSideManager {
             }
         } catch (e) { console.warn('push permission:', e); }
     }
+
 
     async handlePhotoUpload(e) {
         const file = e.target.files?.[0];

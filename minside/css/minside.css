@@ -1031,6 +1031,43 @@ body {
     transform: translateX(18px);
 }
 
+/* Sub-settings panel (expands under main push toggle) */
+.push-sub-settings {
+    background: var(--main-bg);
+    border-left: 3px solid var(--accent-color);
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+    transition: opacity 0.25s ease;
+}
+
+.setting-row-sub-item {
+    padding-left: 36px;
+    opacity: 0.9;
+}
+
+.setting-row-sub-item .setting-row-label {
+    font-size: 0.83rem;
+    font-weight: 600;
+}
+
+/* Smaller toggle for sub-settings */
+.toggle.toggle-sm {
+    width: 34px;
+    height: 19px;
+}
+
+.toggle.toggle-sm .toggle-slider::before {
+    width: 13px;
+    height: 13px;
+    left: 3px;
+    top: 3px;
+}
+
+.toggle.toggle-sm input:checked+.toggle-slider::before {
+    transform: translateX(15px);
+}
+
+
 /* ══════════════════════════════════════════════════════════════════
    ACTIVITY / NOTIFICATIONS
    ══════════════════════════════════════════════════════════════════ */
