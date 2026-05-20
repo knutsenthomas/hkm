@@ -753,7 +753,9 @@ class MinSideManager {
         } catch (e) { }
 
         const p = { ...this.profileData, ...data };
-        const val = v => v ? `<span class="info-row-value">${v}</span>` : `<span class="info-row-value empty">—</span>`;
+        const esc = value => this._escapeHtml(value);
+        const val = v => v ? `<span class="info-row-value">${esc(v)}</span>` : `<span class="info-row-value empty">—</span>`;
+        const inputValue = v => esc(v || '');
 
         const joinYear = p.createdAt?.toDate
             ? p.createdAt.toDate().getFullYear()
@@ -765,142 +767,130 @@ class MinSideManager {
             <div class="profile-left">
 
                 <!-- Contact information -->
-                <div class="info-card">
+                <div class="info-card profile-edit-card" id="contact-card">
                     <div class="info-card-header">
                         <h3>Kontaktinformasjon</h3>
-                        <button class="edit-icon-btn" id="toggle-contact-edit" title="Rediger">
+                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-contact-edit" title="Rediger" type="button">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
                     </div>
-                    <div class="info-rows" id="contact-display">
+                    <div class="info-rows">
+                        <div class="info-row editable-info-row">
+                            <span class="material-symbols-outlined info-row-icon">badge</span>
+                            <div class="info-row-content">
+                                <div class="info-row-label">Fullt navn</div>
+                                <div class="info-row-display">${val(p.displayName || this.currentUser.displayName)}</div>
+                                <div class="info-row-edit">
+                                    <input name="displayName" value="${inputValue(p.displayName || this.currentUser.displayName)}" autocomplete="name">
+                                </div>
+                            </div>
+                        </div>
                         <div class="info-row">
                             <span class="material-symbols-outlined info-row-icon">mail</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">E-post</div>
-                                ${val(this.currentUser.email)}
+                                <div class="info-row-display">${val(this.currentUser.email)}</div>
                             </div>
                         </div>
-                        <div class="info-row">
+                        <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">phone</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Telefon</div>
-                                ${val(p.phone)}
+                                <div class="info-row-display">${val(p.phone)}</div>
+                                <div class="info-row-edit">
+                                    <input name="phone" type="tel" value="${inputValue(p.phone)}" autocomplete="tel">
+                                </div>
                             </div>
                         </div>
-                        <div class="info-row">
+                        <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">location_on</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Adresse</div>
-                                ${p.address || p.zip || p.city
-                ? `<span class="info-row-value">${[p.address, [p.zip, p.city].filter(Boolean).join(' ')].filter(Boolean).join('<br>')}</span>`
-                : `<span class="info-row-value empty">—</span>`}
+                                <div class="info-row-display">${p.address || p.zip || p.city
+                ? `<span class="info-row-value">${[esc(p.address), [esc(p.zip), esc(p.city)].filter(Boolean).join(' ')].filter(Boolean).join('<br>')}</span>`
+                : `<span class="info-row-value empty">—</span>`}</div>
+                                <div class="info-row-edit">
+                                    <input name="address" value="${inputValue(p.address)}" autocomplete="street-address" placeholder="Gateadresse">
+                                    <div class="profile-inline-grid">
+                                        <input name="zip" value="${inputValue(p.zip)}" autocomplete="postal-code" placeholder="Postnr">
+                                        <input name="city" value="${inputValue(p.city)}" autocomplete="address-level2" placeholder="By">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Inline edit form -->
-                    <div class="edit-form is-hidden" id="contact-edit-form">
-                        <div class="form-group">
-                            <label>Fullt navn</label>
-                            <input name="displayName" value="${p.displayName || ''}" autocomplete="name">
-                        </div>
-                        <div class="form-group">
-                            <label>Telefon</label>
-                            <input name="phone" type="tel" value="${p.phone || ''}">
-                        </div>
-                        <div class="form-group">
-                            <label>Gateadresse</label>
-                            <input name="address" value="${p.address || ''}">
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Postnr</label>
-                                <input name="zip" value="${p.zip || ''}">
-                            </div>
-                            <div class="form-group">
-                                <label>By</label>
-                                <input name="city" value="${p.city || ''}">
-                            </div>
-                        </div>
-                        <div class="edit-form-actions">
-                            <button class="btn btn-ghost btn-sm" id="cancel-contact-edit">Avbryt</button>
-                            <button class="btn btn-primary btn-sm" id="save-contact-btn">
-                                <span class="material-symbols-outlined">save</span> Lagre
-                            </button>
-                        </div>
+                    <div class="profile-edit-actions">
+                        <button class="btn btn-ghost btn-sm" id="cancel-contact-edit" type="button">Avbryt</button>
+                        <button class="btn btn-primary btn-sm" id="save-contact-btn" type="button">
+                            <span class="material-symbols-outlined">save</span> Lagre
+                        </button>
                     </div>
                 </div>
 
                 <!-- Personal information -->
-                <div class="info-card">
+                <div class="info-card profile-edit-card" id="personal-card">
                     <div class="info-card-header">
                         <h3>Personlig informasjon</h3>
-                        <button class="edit-icon-btn" id="toggle-personal-edit">
+                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-personal-edit" title="Rediger" type="button">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
                     </div>
-                    <div class="info-rows" id="personal-display">
-                        <div class="info-row">
+                    <div class="info-rows">
+                        <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">person</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Kjønn</div>
-                                ${val(p.gender)}
+                                <div class="info-row-display">${val(p.gender)}</div>
+                                <div class="info-row-edit">
+                                    <select name="gender">
+                                        <option value="">Velg...</option>
+                                        <option value="Mann" ${p.gender === 'Mann' ? 'selected' : ''}>Mann</option>
+                                        <option value="Kvinne" ${p.gender === 'Kvinne' ? 'selected' : ''}>Kvinne</option>
+                                        <option value="Annet" ${p.gender === 'Annet' ? 'selected' : ''}>Annet</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                        <div class="info-row">
+                        <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">cake</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Fødselsdato</div>
-                                ${val(p.birthday ? new Date(p.birthday).toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}
+                                <div class="info-row-display">${val(p.birthday ? new Date(p.birthday).toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}</div>
+                                <div class="info-row-edit">
+                                    <input type="date" name="birthday" value="${inputValue(p.birthday)}">
+                                </div>
                             </div>
                         </div>
-                        <div class="info-row">
+                        <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">favorite</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Sivilstatus</div>
-                                ${val(p.maritalStatus)}
+                                <div class="info-row-display">${val(p.maritalStatus)}</div>
+                                <div class="info-row-edit">
+                                    <select name="maritalStatus">
+                                        <option value="">Velg...</option>
+                                        <option value="Ugift" ${p.maritalStatus === 'Ugift' ? 'selected' : ''}>Ugift</option>
+                                        <option value="Gift" ${p.maritalStatus === 'Gift' ? 'selected' : ''}>Gift</option>
+                                        <option value="Samboer" ${p.maritalStatus === 'Samboer' ? 'selected' : ''}>Samboer</option>
+                                        <option value="Skilt" ${p.maritalStatus === 'Skilt' ? 'selected' : ''}>Skilt</option>
+                                        <option value="Enke/Enkemann" ${p.maritalStatus === 'Enke/Enkemann' ? 'selected' : ''}>Enke/Enkemann</option>
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div class="info-row">
                             <span class="material-symbols-outlined info-row-icon">calendar_today</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Medlem siden</div>
-                                <span class="info-row-value">${joinYear}</span>
+                                <div class="info-row-display"><span class="info-row-value">${joinYear}</span></div>
                             </div>
                         </div>
                     </div>
-                    <div class="edit-form is-hidden" id="personal-edit-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Kjønn</label>
-                                <select name="gender">
-                                    <option value="">Velg...</option>
-                                    <option value="Mann" ${p.gender === 'Mann' ? 'selected' : ''}>Mann</option>
-                                    <option value="Kvinne" ${p.gender === 'Kvinne' ? 'selected' : ''}>Kvinne</option>
-                                    <option value="Annet" ${p.gender === 'Annet' ? 'selected' : ''}>Annet</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Sivilstatus</label>
-                                <select name="maritalStatus">
-                                    <option value="">Velg...</option>
-                                    <option value="Ugift"     ${p.maritalStatus === 'Ugift' ? 'selected' : ''}>Ugift</option>
-                                    <option value="Gift"      ${p.maritalStatus === 'Gift' ? 'selected' : ''}>Gift</option>
-                                    <option value="Samboer"   ${p.maritalStatus === 'Samboer' ? 'selected' : ''}>Samboer</option>
-                                    <option value="Skilt"     ${p.maritalStatus === 'Skilt' ? 'selected' : ''}>Skilt</option>
-                                    <option value="Enke/Enkemann" ${p.maritalStatus === 'Enke/Enkemann' ? 'selected' : ''}>Enke/Enkemann</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Fødselsdato</label>
-                            <input type="date" name="birthday" value="${p.birthday || ''}">
-                        </div>
-                        <div class="edit-form-actions">
-                            <button class="btn btn-ghost btn-sm" id="cancel-personal-edit">Avbryt</button>
-                            <button class="btn btn-primary btn-sm" id="save-personal-btn">
-                                <span class="material-symbols-outlined">save</span> Lagre
-                            </button>
-                        </div>
+                    <div class="profile-edit-actions">
+                        <button class="btn btn-ghost btn-sm" id="cancel-personal-edit" type="button">Avbryt</button>
+                        <button class="btn btn-primary btn-sm" id="save-personal-btn" type="button">
+                            <span class="material-symbols-outlined">save</span> Lagre
+                        </button>
                     </div>
                 </div>
 
@@ -992,17 +982,16 @@ class MinSideManager {
         // ── Wire up events ──
         // Contact edit toggle
         const toggleContact = document.getElementById('toggle-contact-edit');
-        const contactForm = document.getElementById('contact-edit-form');
-        const contactDisp = document.getElementById('contact-display');
+        const contactCard = document.getElementById('contact-card');
         toggleContact?.addEventListener('click', () => {
-            if (!contactForm) return;
-            contactForm.classList.toggle('is-hidden');
+            contactCard?.classList.toggle('is-editing');
+            contactCard?.querySelector('[name="displayName"]')?.focus();
         });
         document.getElementById('cancel-contact-edit')?.addEventListener('click', () => {
-            contactForm?.classList.add('is-hidden');
+            contactCard?.classList.remove('is-editing');
         });
         document.getElementById('save-contact-btn')?.addEventListener('click', async () => {
-            await this._saveProfileFields(contactForm, ['displayName', 'phone', 'address', 'zip', 'city']);
+            await this._saveProfileFields(contactCard, ['displayName', 'phone', 'address', 'zip', 'city']);
             this.profileData = await this.getMergedProfile(this.currentUser);
             this.updateHeader();
             this.loadView('profile');
@@ -1010,15 +999,16 @@ class MinSideManager {
 
         // Personal edit toggle
         const togglePersonal = document.getElementById('toggle-personal-edit');
-        const personalForm = document.getElementById('personal-edit-form');
+        const personalCard = document.getElementById('personal-card');
         togglePersonal?.addEventListener('click', () => {
-            personalForm?.classList.toggle('is-hidden');
+            personalCard?.classList.toggle('is-editing');
+            personalCard?.querySelector('[name="gender"]')?.focus();
         });
         document.getElementById('cancel-personal-edit')?.addEventListener('click', () => {
-            personalForm?.classList.add('is-hidden');
+            personalCard?.classList.remove('is-editing');
         });
         document.getElementById('save-personal-btn')?.addEventListener('click', async () => {
-            await this._saveProfileFields(personalForm, ['gender', 'maritalStatus', 'birthday']);
+            await this._saveProfileFields(personalCard, ['gender', 'maritalStatus', 'birthday']);
             this.loadView('profile');
         });
 
@@ -1041,6 +1031,7 @@ class MinSideManager {
 
     async _saveProfileFields(formEl, fields) {
         if (!this.currentUser) return;
+        if (!formEl) return;
         const btn = formEl.querySelector('button[id^="save-"]');
         if (btn) { btn.disabled = true; btn.textContent = 'Lagrer...'; }
         try {

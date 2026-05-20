@@ -476,6 +476,65 @@ body {
     font-style: italic;
 }
 
+.info-row-edit {
+    display: none;
+    width: 100%;
+}
+
+.profile-edit-card.is-editing .editable-info-row .info-row-display {
+    display: none;
+}
+
+.profile-edit-card.is-editing .info-row-edit {
+    display: grid;
+    gap: 8px;
+}
+
+.profile-edit-card.is-editing .profile-edit-toggle {
+    color: var(--accent-color);
+    background: var(--accent-light);
+}
+
+.info-row-edit input,
+.info-row-edit select {
+    width: 100%;
+    padding: 9px 12px;
+    background: var(--card-bg);
+    border: 1.5px solid var(--border-solid);
+    border-radius: var(--radius-sm);
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.info-row-edit input:focus,
+.info-row-edit select:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.profile-inline-grid {
+    display: grid;
+    grid-template-columns: minmax(100px, 0.7fr) minmax(0, 1.3fr);
+    gap: 8px;
+}
+
+.profile-edit-actions {
+    display: none;
+    justify-content: flex-end;
+    gap: 8px;
+    padding: 14px 22px;
+    border-top: 1px solid var(--border-color);
+    background: var(--main-bg);
+}
+
+.profile-edit-card.is-editing .profile-edit-actions {
+    display: flex;
+}
+
 /* ── Edit Forms ────────────────────────────────────────────────── */
 .edit-form {
     padding: 18px 22px;
@@ -1577,6 +1636,10 @@ body {
     }
 
     .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .profile-inline-grid {
         grid-template-columns: 1fr;
     }
 
