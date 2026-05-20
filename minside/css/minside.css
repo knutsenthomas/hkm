@@ -140,6 +140,56 @@ body {
     animation: dropIn 0.2s ease;
 }
 
+/* ── LANGUAGE SWITCHER ───────────────────────────────────────────────────── */
+.lang-switcher {
+    position: relative;
+    display: inline-block;
+}
+
+.lang-switcher .lang-dropdown {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+    width: 150px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-solid);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-md);
+    z-index: 500;
+    display: none;
+    overflow: hidden;
+    padding: 4px 0;
+}
+
+.lang-switcher.active .lang-dropdown {
+    display: block !important;
+    animation: dropIn 0.2s ease;
+}
+
+.lang-switcher .lang-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0 12px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--border-solid);
+    background: var(--card-bg);
+    color: var(--text-main);
+    font-size: 0.83rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    box-shadow: var(--shadow-sm);
+}
+
+.lang-switcher .lang-btn:hover {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+    color: var(--accent-color);
+}
+
 @keyframes dropIn {
     from {
         opacity: 0;

@@ -2,6 +2,749 @@
    MIN SIDE — PCO-inspired Member Profile
    ═══════════════════════════════════════════════════════ */
 
+// ── Multilingual Translation Dictionary ──────────────────────────
+const minsideTranslations = {
+    no: {
+        'common.loading': 'Laster',
+        'common.initError': 'Feil ved oppstart',
+        'common.errorOccurred': 'Noe gikk galt',
+        'common.save': 'Lagre',
+        'common.cancel': 'Avbryt',
+        'common.edit': 'Rediger',
+        'common.saving': 'Lagrer...',
+        'common.saved': 'Lagret ✓',
+        'common.saveError': 'Feil ved lagring',
+        'common.search': 'Søker...',
+        'common.searchError': 'Kunne ikke hente forslag.',
+        'common.noResults': 'Ingen treff.',
+        
+        // Sidebar & Header Static (also used statically in DOM)
+        'sidebar.title': 'Min side',
+        'sidebar.seNettside': 'Se nettside',
+        'sidebar.oversikt': 'Oversikt',
+        'sidebar.mittMedlemskap': 'MITT MEDLEMSKAP',
+        'sidebar.profil': 'Profil',
+        'sidebar.kurs': 'Kurs & Undervisning',
+        'sidebar.gaver': 'Gaver & Betalinger',
+        'sidebar.aktivitet': 'AKTIVITET',
+        'sidebar.varslinger': 'Varslinger',
+        'sidebar.logg': 'Logg',
+        'sidebar.notater': 'Notater',
+        'sidebar.admin': 'Administrasjon',
+        'sidebar.loggut': 'Logg ut',
+        'header.oversikt': 'Oversikt',
+        'header.subtitle': 'Min Side | His Kingdom Ministry',
+        'header.roleMedlem': 'Medlem',
+        'header.backToAdmin': 'Tilbake til admin',
+        'header.toHkm': 'Til HKM.no',
+        'header.logout': 'Logg ut',
+        
+        // Roles
+        'role.superadmin': 'Administrator',
+        'role.admin': 'Administrator',
+        'role.pastor': 'Pastor',
+        'role.leader': 'Leder',
+        'role.volunteer': 'Frivillig',
+        'role.donor': 'Fast Giver',
+        'role.member': 'Medlem',
+        'role.fallbackUser': 'Bruker',
+
+        // Time ago
+        'time.justNow': 'Akkurat nå',
+        'time.minutesAgo': '{n} min siden',
+        'time.hoursAgo': '{n} t siden',
+        'time.daysAgo': '{n} d siden',
+
+        // View names
+        'view.overview': 'Oversikt',
+        'view.profile': 'Min Profil',
+        'view.activity': 'Aktivitet',
+        'view.notifications': 'Varslinger',
+        'view.giving': 'Gaver & Betalinger',
+        'view.courses': 'Kurs & Undervisning',
+        'view.notes': 'Notater',
+
+        // Overview
+        'overview.goodMorning': 'God morgen',
+        'overview.hello': 'Hei',
+        'overview.goodEvening': 'God kveld',
+        'overview.quote': '"For jeg vet hvilke tanker jeg har med dere, sier Herren..." — Jer 29:11',
+        'overview.memberSince': 'Medlem siden',
+        'overview.unreadNotifications': 'Uleste varslinger',
+        'overview.clickToViewAll': 'Trykk for å se alle',
+        'overview.totalGiven': 'Gitt totalt i',
+        'overview.seeGivingHistory': 'Se gavehistorikk',
+        'overview.availableCourses': 'Tilgjengelige kurs',
+        'overview.teachingFromHkm': 'Undervisning fra HKM',
+        'overview.quickLinks': 'Hurtiglenker',
+        'overview.btnProfileLabel': 'Min profil',
+        'overview.btnProfileSub': 'Kontakt & personlig info',
+        'overview.btnGivingLabel': 'Gaver',
+        'overview.btnGivingSub': 'Gavehistorikk',
+        'overview.btnCoursesLabel': 'Kurs',
+        'overview.btnCoursesSub': 'Undervisning fra HKM',
+        'overview.btnNotificationsLabel': 'Varslinger',
+        'overview.btnNotificationsSub': 'Meldinger fra HKM',
+        'overview.recentNotifications': 'Siste varslinger',
+        'overview.seeAll': 'Se alle',
+        'overview.noNotificationsYet': 'Ingen varslinger ennå.',
+        'overview.showAllNotifications': 'Vis alle varslinger',
+        'overview.givingNone': 'Ingen',
+
+        // Profile
+        'profile.contactInfo': 'Kontaktinformasjon',
+        'profile.fullName': 'Fullt navn',
+        'profile.email': 'E-post',
+        'profile.phone': 'Telefon',
+        'profile.phonePlaceholder': 'Telefonnummer',
+        'profile.address': 'Adresse',
+        'profile.addressSearchPlaceholder': 'Søk etter adresse i hele verden',
+        'profile.searchingAddresses': 'Søker etter adresser...',
+        'profile.noAddressSuggestions': 'Ingen adresseforslag.',
+        'profile.couldNotFetchAddresses': 'Kunne ikke hente adresseforslag.',
+        'profile.addressSelected': 'Adresse valgt.',
+        'profile.selectedCountry': 'Valgt: {country}',
+        'profile.zipPlaceholder': 'Postnr',
+        'profile.cityPlaceholder': 'By',
+        'profile.countryPlaceholder': 'Land',
+        'profile.personalInfo': 'Personlig informasjon',
+        'profile.gender': 'Kjønn',
+        'profile.select': 'Velg...',
+        'profile.genderMale': 'Mann',
+        'profile.genderFemale': 'Kvinne',
+        'profile.genderOther': 'Annet',
+        'profile.birthday': 'Fødselsdato',
+        'profile.maritalStatus': 'Sivilstatus',
+        'profile.maritalSingle': 'Ugift',
+        'profile.maritalMarried': 'Gift',
+        'profile.maritalPartner': 'Samboer',
+        'profile.maritalDivorced': 'Skilt',
+        'profile.maritalWidowed': 'Enke/Enkemann',
+        'profile.accountAdmin': 'Kontoadministrasjon',
+        'profile.deleteAccountNotice': 'Sletting av konto er permanent og kan ikke angres.',
+        'profile.deleteAccountBtn': 'Slett konto',
+        'profile.family': 'Familie',
+        'profile.familySearchPlaceholder': 'Søk etter navn, e-post eller telefon',
+        'profile.searching': 'Søker...',
+        'profile.noMatches': 'Ingen treff.',
+        'profile.searchUnavailable': 'Søk er ikke tilgjengelig akkurat nå.',
+        'profile.couldNotSearch': 'Kunne ikke søke akkurat nå.',
+        'profile.household': 'Husstand',
+        'profile.noFamilyRegistered': 'Ingen familiemedlemmer registrert.',
+        'profile.familyMemberRole': 'Familiemedlem',
+        'profile.notificationPreferences': 'Varslingspreferanser',
+        'profile.pushNotifications': 'Push-varslinger',
+        'profile.pushNotificationsSub': 'Mottar varslinger når HKM sender meldinger',
+        'profile.emailNotifications': 'E-postvarslinger',
+        'profile.emailNotificationsSub': 'Mottar nyhetsbrev og oppdateringer',
+        'profile.savePreferences': 'Lagre preferanser',
+
+        // Activity
+        'activity.noActivityYet': 'Ingen aktivitet ennå',
+        'activity.noActivitySub': 'Aktivitet som push-varslinger og meldinger du mottar vil vises her.',
+        'activity.loadErrorNotice': 'Kunne ikke laste aktivitet akkurat nå.',
+        'activity.loadErrorCopy': 'Kunne ikke laste aktivitet.',
+
+        // Notifications
+        'notifications.title': 'Varslinger',
+        'notifications.markAllRead': 'Merk alle lest',
+        'notifications.noNotifications': 'Ingen varslinger',
+        'notifications.noNotificationsSub': 'Du har ingen varslinger ennå.',
+        'notifications.loadErrorNotice': 'Kunne ikke laste varslinger akkurat nå.',
+        'notifications.loadErrorCopy': 'Kunne ikke laste varslinger.',
+        'notifications.deleting': 'Sletter...',
+        'notifications.alert': 'Varsel',
+        'notifications.openLink': 'Åpne lenke',
+        'notifications.deleteAlert': 'Slett varsel',
+        'notifications.deleteConfirm': 'Er du sikker på at du vil slette dette varselet?',
+        'notifications.deleteError': 'Kunne ikke slette varsel',
+
+        // Giving
+        'giving.totalGiftsCount': 'Totalt antall gaver',
+        'giving.lastGift': 'Siste gave',
+        'giving.givenInYear': 'Gitt i {year}',
+        'giving.givingHistory': 'Gavehistorikk',
+        'giving.noGiftsYet': 'Ingen gaver ennå',
+        'giving.noGiftsSub': 'Dine donasjoner til HKM vises her.',
+        'giving.colDate': 'Dato',
+        'giving.colType': 'Type',
+        'giving.colMethod': 'Metode',
+        'giving.colAmount': 'Beløp',
+        'giving.typeGift': 'Gave',
+        'giving.statusCompleted': 'Fullført',
+        'giving.statusPending': 'Venter',
+        'giving.statusProcessing': 'Behandles',
+        'giving.statusFailed': 'Feilet',
+        'giving.statusCanceled': 'Avbrutt',
+        'giving.statusUnknown': 'Ukjent',
+        'giving.methodCard': 'Kort',
+        'giving.methodStripe': 'Stripe',
+        'giving.methodVipps': 'Vipps',
+        'giving.methodBank': 'Bank',
+        'giving.methodManual': 'Manuell',
+        'giving.methodCash': 'Kontant',
+        'giving.methodUnknown': 'Ukjent',
+        'giving.detailsTitle': 'Gavedetaljer',
+        'giving.lblAmount': 'Beløp',
+        'giving.lblDate': 'Dato',
+        'giving.lblPaidWith': 'Betalt med',
+        'giving.lblStatus': 'Status',
+        'giving.lblType': 'Type',
+        'giving.lblReference': 'Referanse',
+        'giving.referenceNotRegistered': 'Ikke registrert',
+        'giving.lblMessage': 'Melding',
+        'giving.lblCurrency': 'Valuta',
+
+        // Courses
+        'courses.noCoursesYet': 'Ingen kurs ennå',
+        'courses.noCoursesSub': 'Undervisnings- og kursinnhold fra HKM vil vises her.',
+        'courses.watchVideo': 'Se video',
+        'courses.untitled': 'Uten tittel',
+
+        // Notes
+        'notes.myNotes': 'Mine notater',
+        'notes.personalNotesSub': 'Personlige notater som bare du kan se',
+        'notes.newNote': 'Nytt notat',
+        'notes.title': 'Tittel',
+        'notes.titlePlaceholder': 'Gi notatet en tittel...',
+        'notes.content': 'Innhold',
+        'notes.contentPlaceholder': 'Skriv notat her...',
+        'notes.cancel': 'Avbryt',
+        'notes.saveNote': 'Lagre notat',
+        'notes.emptyPersonalNotes': 'Du har ingen egne notater ennå.<br>Trykk «Nytt notat» for å begynne.',
+        'notes.hkmNotes': 'Notater fra HKM',
+        'notes.deleteConfirm': 'Er du sikker på at du vil slette dette notatet?',
+        'notes.saving': 'Lagrer...',
+        'notes.saveError': 'Feil ved lagring',
+        'notes.error': 'Feil',
+        'notes.updateError': 'Feil ved oppdatering',
+        'notes.editNote': 'Rediger notat',
+        'notes.save': 'Lagre',
+        'notes.untitled': 'Uten tittel',
+        'notes.hkmTeam': 'HKM-teamet',
+        'notes.toolBold': 'Fet',
+        'notes.toolItalic': 'Kursiv',
+        'notes.toolUnderline': 'Understrek',
+        'notes.toolHeader': 'Overskrift',
+        'notes.toolParagraph': 'Avsnitt',
+        'notes.toolBulletList': 'Punktliste',
+        'notes.toolOrderedList': 'Numrert liste',
+        'notes.toolClear': 'Fjern formatering',
+
+        // Delete Account
+        'deleteAccount.modalTitle': 'Slett konto?',
+        'deleteAccount.modalMessage': 'Dette vil permanent slette kontoen din og all tilknyttet data. Handlingen kan ikke angres. Du vil bli bedt om å bekrefte identiteten din.',
+        'deleteAccount.deleteBtn': 'Slett konto',
+        'deleteAccount.cancelBtn': 'Avbryt',
+        'deleteAccount.doubleConfirm': 'ER DU HELT SIKKER? Dette vil permanent slette all din data og din brukerprofil. Denne handlingen er 100% permanent og kan ikke angres.',
+        'deleteAccount.reauthRequest': 'Vennligst logg inn på nytt for å bekrefte sletting.'
+    },
+    en: {
+        'common.loading': 'Loading',
+        'common.initError': 'Initialization Error',
+        'common.errorOccurred': 'Something went wrong',
+        'common.save': 'Save',
+        'common.cancel': 'Cancel',
+        'common.edit': 'Edit',
+        'common.saving': 'Saving...',
+        'common.saved': 'Saved ✓',
+        'common.saveError': 'Error saving',
+        'common.search': 'Searching...',
+        'common.searchError': 'Could not fetch suggestions.',
+        'common.noResults': 'No matches.',
+        
+        // Sidebar & Header Static (also used statically in DOM)
+        'sidebar.title': 'My Page',
+        'sidebar.seNettside': 'View Website',
+        'sidebar.oversikt': 'Overview',
+        'sidebar.mittMedlemskap': 'MY MEMBERSHIP',
+        'sidebar.profil': 'Profile',
+        'sidebar.kurs': 'Courses & Teaching',
+        'sidebar.gaver': 'Giving & Payments',
+        'sidebar.aktivitet': 'ACTIVITY',
+        'sidebar.varslinger': 'Notifications',
+        'sidebar.logg': 'Log',
+        'sidebar.notater': 'Notes',
+        'sidebar.admin': 'Administration',
+        'sidebar.loggut': 'Log Out',
+        'header.oversikt': 'Overview',
+        'header.subtitle': 'My Page | His Kingdom Ministry',
+        'header.roleMedlem': 'Member',
+        'header.backToAdmin': 'Back to Admin',
+        'header.toHkm': 'To HKM.no',
+        'header.logout': 'Log Out',
+        
+        // Roles
+        'role.superadmin': 'Administrator',
+        'role.admin': 'Administrator',
+        'role.pastor': 'Pastor',
+        'role.leader': 'Leader',
+        'role.volunteer': 'Volunteer',
+        'role.donor': 'Regular Donor',
+        'role.member': 'Member',
+        'role.fallbackUser': 'User',
+
+        // Time ago
+        'time.justNow': 'Just now',
+        'time.minutesAgo': '{n}m ago',
+        'time.hoursAgo': '{n}h ago',
+        'time.daysAgo': '{n}d ago',
+
+        // View names
+        'view.overview': 'Overview',
+        'view.profile': 'My Profile',
+        'view.activity': 'Activity',
+        'view.notifications': 'Notifications',
+        'view.giving': 'Giving & Payments',
+        'view.courses': 'Courses & Teaching',
+        'view.notes': 'Notes',
+
+        // Overview
+        'overview.goodMorning': 'Good morning',
+        'overview.hello': 'Hello',
+        'overview.goodEvening': 'Good evening',
+        'overview.quote': '"For I know the plans I have for you," declares the Lord... — Jer 29:11',
+        'overview.memberSince': 'Member since',
+        'overview.unreadNotifications': 'Unread notifications',
+        'overview.clickToViewAll': 'Click to view all',
+        'overview.totalGiven': 'Total given in',
+        'overview.seeGivingHistory': 'See giving history',
+        'overview.availableCourses': 'Available courses',
+        'overview.teachingFromHkm': 'Teaching from HKM',
+        'overview.quickLinks': 'Quick Links',
+        'overview.btnProfileLabel': 'My Profile',
+        'overview.btnProfileSub': 'Contact & personal info',
+        'overview.btnGivingLabel': 'Giving',
+        'overview.btnGivingSub': 'Giving history',
+        'overview.btnCoursesLabel': 'Courses',
+        'overview.btnCoursesSub': 'Teaching from HKM',
+        'overview.btnNotificationsLabel': 'Notifications',
+        'overview.btnNotificationsSub': 'Messages from HKM',
+        'overview.recentNotifications': 'Recent notifications',
+        'overview.seeAll': 'See all',
+        'overview.noNotificationsYet': 'No notifications yet.',
+        'overview.showAllNotifications': 'Show all notifications',
+        'overview.givingNone': 'None',
+
+        // Profile
+        'profile.contactInfo': 'Contact Information',
+        'profile.fullName': 'Full Name',
+        'profile.email': 'Email',
+        'profile.phone': 'Phone',
+        'profile.phonePlaceholder': 'Phone number',
+        'profile.address': 'Address',
+        'profile.addressSearchPlaceholder': 'Search for address worldwide',
+        'profile.searchingAddresses': 'Searching for addresses...',
+        'profile.noAddressSuggestions': 'No address suggestions.',
+        'profile.couldNotFetchAddresses': 'Could not fetch address suggestions.',
+        'profile.addressSelected': 'Address selected.',
+        'profile.selectedCountry': 'Selected: {country}',
+        'profile.zipPlaceholder': 'Zip',
+        'profile.cityPlaceholder': 'City',
+        'profile.countryPlaceholder': 'Country',
+        'profile.personalInfo': 'Personal Information',
+        'profile.gender': 'Gender',
+        'profile.select': 'Select...',
+        'profile.genderMale': 'Male',
+        'profile.genderFemale': 'Female',
+        'profile.genderOther': 'Other',
+        'profile.birthday': 'Date of birth',
+        'profile.maritalStatus': 'Marital Status',
+        'profile.maritalSingle': 'Single',
+        'profile.maritalMarried': 'Married',
+        'profile.maritalPartner': 'Partner',
+        'profile.maritalDivorced': 'Divorced',
+        'profile.maritalWidowed': 'Widowed',
+        'profile.accountAdmin': 'Account Administration',
+        'profile.deleteAccountNotice': 'Account deletion is permanent and cannot be undone.',
+        'profile.deleteAccountBtn': 'Delete Account',
+        'profile.family': 'Family',
+        'profile.familySearchPlaceholder': 'Search by name, email or phone',
+        'profile.searching': 'Searching...',
+        'profile.noMatches': 'No matches.',
+        'profile.searchUnavailable': 'Search is not available right now.',
+        'profile.couldNotSearch': 'Could not search right now.',
+        'profile.household': 'Household',
+        'profile.noFamilyRegistered': 'No family members registered.',
+        'profile.familyMemberRole': 'Family member',
+        'profile.notificationPreferences': 'Notification Preferences',
+        'profile.pushNotifications': 'Push Notifications',
+        'profile.pushNotificationsSub': 'Receive notifications when HKM sends messages',
+        'profile.emailNotifications': 'Email Notifications',
+        'profile.emailNotificationsSub': 'Receive newsletters and updates',
+        'profile.savePreferences': 'Save preferences',
+
+        // Activity
+        'activity.noActivityYet': 'No activity yet',
+        'activity.noActivitySub': 'Activity like push notifications and messages you receive will appear here.',
+        'activity.loadErrorNotice': 'Could not load activity right now.',
+        'activity.loadErrorCopy': 'Could not load activity.',
+
+        // Notifications
+        'notifications.title': 'Notifications',
+        'notifications.markAllRead': 'Mark all as read',
+        'notifications.noNotifications': 'No notifications',
+        'notifications.noNotificationsSub': 'You have no notifications yet.',
+        'notifications.loadErrorNotice': 'Could not load notifications right now.',
+        'notifications.loadErrorCopy': 'Could not load notifications.',
+        'notifications.deleting': 'Deleting...',
+        'notifications.alert': 'Notification',
+        'notifications.openLink': 'Open link',
+        'notifications.deleteAlert': 'Delete notification',
+        'notifications.deleteConfirm': 'Are you sure you want to delete this notification?',
+        'notifications.deleteError': 'Could not delete notification',
+
+        // Giving
+        'giving.totalGiftsCount': 'Total number of gifts',
+        'giving.lastGift': 'Last gift',
+        'giving.givenInYear': 'Given in {year}',
+        'giving.givingHistory': 'Giving History',
+        'giving.noGiftsYet': 'No gifts yet',
+        'giving.noGiftsSub': 'Your donations to HKM will appear here.',
+        'giving.colDate': 'Date',
+        'giving.colType': 'Type',
+        'giving.colMethod': 'Method',
+        'giving.colAmount': 'Amount',
+        'giving.typeGift': 'Gift',
+        'giving.statusCompleted': 'Completed',
+        'giving.statusPending': 'Pending',
+        'giving.statusProcessing': 'Processing',
+        'giving.statusFailed': 'Failed',
+        'giving.statusCanceled': 'Canceled',
+        'giving.statusUnknown': 'Unknown',
+        'giving.methodCard': 'Card',
+        'giving.methodStripe': 'Stripe',
+        'giving.methodVipps': 'Vipps',
+        'giving.methodBank': 'Bank',
+        'giving.methodManual': 'Manual',
+        'giving.methodCash': 'Cash',
+        'giving.methodUnknown': 'Unknown',
+        'giving.detailsTitle': 'Gift Details',
+        'giving.lblAmount': 'Amount',
+        'giving.lblDate': 'Date',
+        'giving.lblPaidWith': 'Paid with',
+        'giving.lblStatus': 'Status',
+        'giving.lblType': 'Type',
+        'giving.lblReference': 'Reference',
+        'giving.referenceNotRegistered': 'Not registered',
+        'giving.lblMessage': 'Message',
+        'giving.lblCurrency': 'Currency',
+
+        // Courses
+        'courses.noCoursesYet': 'No courses yet',
+        'courses.noCoursesSub': 'Teaching and course content from HKM will appear here.',
+        'courses.watchVideo': 'Watch video',
+        'courses.untitled': 'Untitled',
+
+        // Notes
+        'notes.myNotes': 'My notes',
+        'notes.personalNotesSub': 'Personal notes that only you can see',
+        'notes.newNote': 'New note',
+        'notes.title': 'Title',
+        'notes.titlePlaceholder': 'Give the note a title...',
+        'notes.content': 'Content',
+        'notes.contentPlaceholder': 'Write note here...',
+        'notes.cancel': 'Cancel',
+        'notes.saveNote': 'Save note',
+        'notes.emptyPersonalNotes': 'You have no personal notes yet.<br>Press "New note" to begin.',
+        'notes.hkmNotes': 'Notes from HKM',
+        'notes.deleteConfirm': 'Are you sure you want to delete this note?',
+        'notes.saving': 'Saving...',
+        'notes.saveError': 'Error saving',
+        'notes.error': 'Error',
+        'notes.updateError': 'Error updating',
+        'notes.editNote': 'Edit note',
+        'notes.save': 'Save',
+        'notes.untitled': 'Untitled',
+        'notes.hkmTeam': 'HKM Team',
+        'notes.toolBold': 'Bold',
+        'notes.toolItalic': 'Italic',
+        'notes.toolUnderline': 'Underline',
+        'notes.toolHeader': 'Heading',
+        'notes.toolParagraph': 'Paragraph',
+        'notes.toolBulletList': 'Bullet List',
+        'notes.toolOrderedList': 'Numbered List',
+        'notes.toolClear': 'Clear Formatting',
+
+        // Delete Account
+        'deleteAccount.modalTitle': 'Delete Account?',
+        'deleteAccount.modalMessage': 'This will permanently delete your account and all associated data. This action cannot be undone. You will be asked to confirm your identity.',
+        'deleteAccount.deleteBtn': 'Delete Account',
+        'deleteAccount.cancelBtn': 'Cancel',
+        'deleteAccount.doubleConfirm': 'ARE YOU ABSOLUTELY SURE? This will permanently delete all your data and your user profile. This action is 100% permanent and cannot be undone.',
+        'deleteAccount.reauthRequest': 'Please log in again to confirm deletion.'
+    },
+    es: {
+        'common.loading': 'Cargando',
+        'common.initError': 'Error de inicio',
+        'common.errorOccurred': 'Algo salió mal',
+        'common.save': 'Guardar',
+        'common.cancel': 'Cancelar',
+        'common.edit': 'Editar',
+        'common.saving': 'Guardando...',
+        'common.saved': 'Guardado ✓',
+        'common.saveError': 'Error al guardar',
+        'common.search': 'Buscando...',
+        'common.searchError': 'No se pudieron obtener sugerencias.',
+        'common.noResults': 'Sin coincidencias.',
+        
+        // Sidebar & Header Static (also used statically in DOM)
+        'sidebar.title': 'Mi página',
+        'sidebar.seNettside': 'Ver Sitio Web',
+        'sidebar.oversikt': 'Resumen',
+        'sidebar.mittMedlemskap': 'MI MEMBRESÍA',
+        'sidebar.profil': 'Perfil',
+        'sidebar.kurs': 'Cursos y Enseñanza',
+        'sidebar.gaver': 'Ofrendas y Pagos',
+        'sidebar.aktivitet': 'ACTIVIDAD',
+        'sidebar.varslinger': 'Notificaciones',
+        'sidebar.logg': 'Historial',
+        'sidebar.notater': 'Notas',
+        'sidebar.admin': 'Administración',
+        'sidebar.loggut': 'Cerrar Sesión',
+        'header.oversikt': 'Resumen',
+        'header.subtitle': 'Mi Página | His Kingdom Ministry',
+        'header.roleMedlem': 'Miembro',
+        'header.backToAdmin': 'Volver a Admin',
+        'header.toHkm': 'A HKM.no',
+        'header.logout': 'Cerrar Sesión',
+        
+        // Roles
+        'role.superadmin': 'Administrador',
+        'role.admin': 'Administrador',
+        'role.pastor': 'Pastor',
+        'role.leader': 'Líder',
+        'role.volunteer': 'Voluntario',
+        'role.donor': 'Donante Regular',
+        'role.member': 'Miembro',
+        'role.fallbackUser': 'Usuario',
+
+        // Time ago
+        'time.justNow': 'Justo ahora',
+        'time.minutesAgo': 'hace {n} min',
+        'time.hoursAgo': 'hace {n} h',
+        'time.daysAgo': 'hace {n} d',
+
+        // View names
+        'view.overview': 'Resumen',
+        'view.profile': 'Mi Perfil',
+        'view.activity': 'Actividad',
+        'view.notifications': 'Notificaciones',
+        'view.giving': 'Ofrendas y Pagos',
+        'view.courses': 'Cursos y Enseñanza',
+        'view.notes': 'Notas',
+
+        // Overview
+        'overview.goodMorning': 'Buen día',
+        'overview.hello': 'Hola',
+        'overview.goodEvening': 'Buenas noches',
+        'overview.quote': '"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová... — Jer 29:11',
+        'overview.memberSince': 'Miembro desde',
+        'overview.unreadNotifications': 'Notificaciones no leídas',
+        'overview.clickToViewAll': 'Haz clic para ver todas',
+        'overview.totalGiven': 'Total ofrendado en',
+        'overview.seeGivingHistory': 'Ver historial de ofrendas',
+        'overview.availableCourses': 'Cursos disponibles',
+        'overview.teachingFromHkm': 'Enseñanza de HKM',
+        'overview.quickLinks': 'Enlaces rápidos',
+        'overview.btnProfileLabel': 'Mi Perfil',
+        'overview.btnProfileSub': 'Contacto e info personal',
+        'overview.btnGivingLabel': 'Ofrendas',
+        'overview.btnGivingSub': 'Historial de ofrendas',
+        'overview.btnCoursesLabel': 'Cursos',
+        'overview.btnCoursesSub': 'Enseñanza de HKM',
+        'overview.btnNotificationsLabel': 'Notificaciones',
+        'overview.btnNotificationsSub': 'Mensajes de HKM',
+        'overview.recentNotifications': 'Últimas notificaciones',
+        'overview.seeAll': 'Ver todas',
+        'overview.noNotificationsYet': 'No hay notificaciones aún.',
+        'overview.showAllNotifications': 'Mostrar todas las notificaciones',
+        'overview.givingNone': 'Ninguna',
+
+        // Profile
+        'profile.contactInfo': 'Información de Contacto',
+        'profile.fullName': 'Nombre Completo',
+        'profile.email': 'Correo electrónico',
+        'profile.phone': 'Teléfono',
+        'profile.phonePlaceholder': 'Número de teléfono',
+        'profile.address': 'Dirección',
+        'profile.addressSearchPlaceholder': 'Buscar dirección en todo el mundo',
+        'profile.searchingAddresses': 'Buscando direcciones...',
+        'profile.noAddressSuggestions': 'No hay sugerencias de dirección.',
+        'profile.couldNotFetchAddresses': 'No se pudieron obtener sugerencias.',
+        'profile.addressSelected': 'Dirección seleccionada.',
+        'profile.selectedCountry': 'Seleccionado: {country}',
+        'profile.zipPlaceholder': 'Código Postal',
+        'profile.cityPlaceholder': 'Ciudad',
+        'profile.countryPlaceholder': 'País',
+        'profile.personalInfo': 'Información Personal',
+        'profile.gender': 'Género',
+        'profile.select': 'Seleccionar...',
+        'profile.genderMale': 'Hombre',
+        'profile.genderFemale': 'Mujer',
+        'profile.genderOther': 'Otro',
+        'profile.birthday': 'Fecha de nacimiento',
+        'profile.maritalStatus': 'Estado civil',
+        'profile.maritalSingle': 'Soltero',
+        'profile.maritalMarried': 'Casado',
+        'profile.maritalPartner': 'Pareja de hecho',
+        'profile.maritalDivorced': 'Divorciado',
+        'profile.maritalWidowed': 'Viudo',
+        'profile.accountAdmin': 'Administración de la Cuenta',
+        'profile.deleteAccountNotice': 'La eliminación de la cuenta es permanente y no se puede deshacer.',
+        'profile.deleteAccountBtn': 'Eliminar cuenta',
+        'profile.family': 'Familia',
+        'profile.familySearchPlaceholder': 'Buscar por nombre, correo o teléfono',
+        'profile.searching': 'Buscando...',
+        'profile.noMatches': 'Sin coincidencias.',
+        'profile.searchUnavailable': 'La búsqueda no está disponible ahora.',
+        'profile.couldNotSearch': 'No se pudo buscar en este momento.',
+        'profile.household': 'Hogar',
+        'profile.noFamilyRegistered': 'No hay miembros de la familia registrados.',
+        'profile.familyMemberRole': 'Miembro de la familia',
+        'profile.notificationPreferences': 'Preferencias de Notificación',
+        'profile.pushNotifications': 'Notificaciones Push',
+        'profile.pushNotificationsSub': 'Recibir notificaciones cuando HKM envíe mensajes',
+        'profile.emailNotifications': 'Notificaciones por Correo',
+        'profile.emailNotificationsSub': 'Recibir boletines y actualizaciones',
+        'profile.savePreferences': 'Guardar preferencias',
+
+        // Activity
+        'activity.noActivityYet': 'Sin actividad aún',
+        'activity.noActivitySub': 'La actividad, como las notificaciones push y los mensajes que recibas, aparecerá aquí.',
+        'activity.loadErrorNotice': 'No se pudo cargar la actividad ahora mismo.',
+        'activity.loadErrorCopy': 'No se pudo cargar la actividad.',
+
+        // Notifications
+        'notifications.title': 'Notificaciones',
+        'notifications.markAllRead': 'Marcar todas como leídas',
+        'notifications.noNotifications': 'Sin notificaciones',
+        'notifications.noNotificationsSub': 'No tienes notificaciones todavía.',
+        'notifications.loadErrorNotice': 'No se pudieron cargar las notificaciones ahora.',
+        'notifications.loadErrorCopy': 'No se pudieron cargar las notificaciones.',
+        'notifications.deleting': 'Eliminando...',
+        'notifications.alert': 'Notificación',
+        'notifications.openLink': 'Abrir enlace',
+        'notifications.deleteAlert': 'Eliminar notificación',
+        'notifications.deleteConfirm': '¿Estás seguro de que deseas eliminar esta notificación?',
+        'notifications.deleteError': 'No se pudo eliminar la notificación',
+
+        // Giving
+        'giving.totalGiftsCount': 'Número total de ofrendas',
+        'giving.lastGift': 'Última ofrenda',
+        'giving.givenInYear': 'Ofrendado en {year}',
+        'giving.givingHistory': 'Historial de Ofrendas',
+        'giving.noGiftsYet': 'No hay ofrendas aún',
+        'giving.noGiftsSub': 'Tus donaciones a HKM aparecerán aquí.',
+        'giving.colDate': 'Fecha',
+        'giving.colType': 'Tipo',
+        'giving.colMethod': 'Método',
+        'giving.colAmount': 'Monto',
+        'giving.typeGift': 'Ofrenda',
+        'giving.statusCompleted': 'Completado',
+        'giving.statusPending': 'Pendiente',
+        'giving.statusProcessing': 'Procesando',
+        'giving.statusFailed': 'Fallido',
+        'giving.statusCanceled': 'Cancelado',
+        'giving.statusUnknown': 'Desconocido',
+        'giving.methodCard': 'Tarjeta',
+        'giving.methodStripe': 'Stripe',
+        'giving.methodVipps': 'Vipps',
+        'giving.methodBank': 'Banco',
+        'giving.methodManual': 'Manual',
+        'giving.methodCash': 'Efectivo',
+        'giving.methodUnknown': 'Desconocido',
+        'giving.detailsTitle': 'Detalles de la Ofrenda',
+        'giving.lblAmount': 'Monto',
+        'giving.lblDate': 'Fecha',
+        'giving.lblPaidWith': 'Pagado con',
+        'giving.lblStatus': 'Estado',
+        'giving.lblType': 'Tipo',
+        'giving.lblReference': 'Referencia',
+        'giving.referenceNotRegistered': 'No registrado',
+        'giving.lblMessage': 'Mensaje',
+        'giving.lblCurrency': 'Moneda',
+
+        // Courses
+        'courses.noCoursesYet': 'No hay cursos aún',
+        'courses.noCoursesSub': 'El contenido de enseñanza y cursos de HKM aparecerá aquí.',
+        'courses.watchVideo': 'Ver video',
+        'courses.untitled': 'Sin título',
+
+        // Notes
+        'notes.myNotes': 'Mis notas',
+        'notes.personalNotesSub': 'Notas personales que solo tú puedes ver',
+        'notes.newNote': 'Nueva nota',
+        'notes.title': 'Título',
+        'notes.titlePlaceholder': 'Dale un título a la nota...',
+        'notes.content': 'Contenido',
+        'notes.contentPlaceholder': 'Escribe la nota aquí...',
+        'notes.cancel': 'Cancelar',
+        'notes.saveNote': 'Guardar nota',
+        'notes.emptyPersonalNotes': 'No tienes notas personales todavía.<br>Presiona "Nueva nota" para comenzar.',
+        'notes.hkmNotes': 'Notas de HKM',
+        'notes.deleteConfirm': '¿Estás seguro de que deseas eliminar esta nota?',
+        'notes.saving': 'Guardando...',
+        'notes.saveError': 'Error al guardar',
+        'notes.error': 'Error',
+        'notes.updateError': 'Error al actualizar',
+        'notes.editNote': 'Editar nota',
+        'notes.save': 'Guardar',
+        'notes.untitled': 'Sin título',
+        'notes.hkmTeam': 'Equipo HKM',
+        'notes.toolBold': 'Negrita',
+        'notes.toolItalic': 'Cursiva',
+        'notes.toolUnderline': 'Subrayado',
+        'notes.toolHeader': 'Título',
+        'notes.toolParagraph': 'Párrafo',
+        'notes.toolBulletList': 'Viñetas',
+        'notes.toolOrderedList': 'Lista numerada',
+        'notes.toolClear': 'Limpiar Formato',
+
+        // Delete Account
+        'deleteAccount.modalTitle': '¿Eliminar cuenta?',
+        'deleteAccount.modalMessage': 'Esto eliminará permanentemente tu cuenta y todos los datos asociados. Esta acción no se puede deshacer. Se te pedirá que confirmes tu identidad.',
+        'deleteAccount.deleteBtn': 'Eliminar cuenta',
+        'deleteAccount.cancelBtn': 'Cancelar',
+        'deleteAccount.doubleConfirm': '¿ESTÁS ABSOLUTAMENTE SEGURO? Esto eliminará permanentemente todos tus datos y tu perfil de usuario. Esta acción es 100% permanente y no se puede deshacer.',
+        'deleteAccount.reauthRequest': 'Por favor, inicia sesión de nuevo para confirmar la eliminación.'
+    }
+};
+
+// Translation Helper
+function t(key, vars = {}) {
+    const lang = document.documentElement.lang || 'no';
+    let text = minsideTranslations[lang]?.[key] || minsideTranslations['no']?.[key] || key;
+    Object.entries(vars).forEach(([k, v]) => {
+        text = text.replace(`{${k}}`, v);
+    });
+    return text;
+}
+
+// Static DOM Translation Utility
+function translateStaticHTML() {
+    const lang = document.documentElement.lang || 'no';
+    
+    // Elements with data-i18n
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        const translated = minsideTranslations[lang]?.[key] || minsideTranslations['no']?.[key];
+        if (translated) {
+            el.textContent = translated;
+        }
+    });
+
+    // Inputs with data-i18n-placeholder
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        const translated = minsideTranslations[lang]?.[key] || minsideTranslations['no']?.[key];
+        if (translated) {
+            el.setAttribute('placeholder', translated);
+        }
+    });
+}
+
+
 class MinSideManager {
     constructor() {
         this.currentUser = null;
@@ -17,6 +760,8 @@ class MinSideManager {
             notes: this.renderNotes,
         };
 
+        // Run initial translation on static elements (sidebar, headers)
+        translateStaticHTML();
         this.init();
     }
 
@@ -45,6 +790,9 @@ class MinSideManager {
                     this.initNotificationBadge();
                     this.showPendingFlashNotice();
 
+                    // Translate immediately on auth state change
+                    translateStaticHTML();
+
                     const startView = window.location.hash.replace('#', '') || 'overview';
                     this.loadView(startView);
                 } else {
@@ -54,7 +802,7 @@ class MinSideManager {
                 console.error('Init Error:', error);
                 const area = document.getElementById('view-container') || document.getElementById('content-area');
                 if (area) {
-                    area.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Feil ved oppstart</h3><p>${error.message}</p></div>`;
+                    area.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>${t('common.initError')}</h3><p>${error.message}</p></div>`;
                 }
             }
         });
@@ -100,23 +848,34 @@ class MinSideManager {
         document.getElementById('sidebar-overlay')?.classList.toggle('active', show);
     }
 
+    // Dynamic Language Switching Routine
+    handleLanguageChange(lang) {
+        document.documentElement.lang = lang;
+        translateStaticHTML();
+        this.updateHeader();
+        
+        // Reload current view with translated strings
+        const currentView = window.location.hash.replace('#', '') || 'overview';
+        this.loadView(currentView);
+    }
+
     loadView(viewId) {
         if (!this.views[viewId]) viewId = 'overview';
         window.location.hash = viewId;
 
-        // View info mapping for header
+        // View info mapping for header (Dynamic)
         const viewInfo = {
-            overview: { title: 'Oversikt', icon: 'grid_view' },
-            profile: { title: 'Min Profil', icon: 'person' },
-            activity: { title: 'Aktivitet', icon: 'history' },
-            notifications: { title: 'Varslinger', icon: 'notifications' },
-            giving: { title: 'Gaver & Betalinger', icon: 'volunteer_activism' },
-            courses: { title: 'Kurs & Undervisning', icon: 'school' },
-            notes: { title: 'Notater', icon: 'notes' },
+            overview: { title: t('view.overview'), icon: 'grid_view' },
+            profile: { title: t('view.profile'), icon: 'person' },
+            activity: { title: t('view.activity'), icon: 'history' },
+            notifications: { title: t('view.notifications'), icon: 'notifications' },
+            giving: { title: t('view.giving'), icon: 'volunteer_activism' },
+            courses: { title: t('view.courses'), icon: 'school' },
+            notes: { title: t('view.notes'), icon: 'notes' },
         };
 
         // Update Header Title and Icon (Admin Style)
-        const info = viewInfo[viewId] || { title: 'Min Side', icon: 'person' };
+        const info = viewInfo[viewId] || { title: t('sidebar.title'), icon: 'person' };
         const titleEl = document.getElementById('dashboard-main-header-title');
         const iconEl = document.getElementById('dashboard-main-header-icon');
         
@@ -127,14 +886,14 @@ class MinSideManager {
         document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active');
 
         const container = document.getElementById('view-container') || document.getElementById('content-area');
-        container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>Laster...</p></div>`;
+        container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>${t('common.loading')}...</p></div>`;
 
         setTimeout(async () => {
             try {
                 await this.views[viewId].call(this, container);
             } catch (err) {
                 console.error(`View "${viewId}" error:`, err);
-                container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>Noe gikk galt</h3><p>${err.message}</p></div>`;
+                container.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><h3>${t('common.errorOccurred')}</h3><p>${err.message}</p></div>`;
             }
         }, 80);
     }
@@ -187,7 +946,7 @@ class MinSideManager {
     // ──────────────────────────────────────────────────────────
     updateHeader() {
         const p = this.profileData;
-        const name = p.displayName || this.currentUser?.email || 'Bruker';
+        const name = p.displayName || this.currentUser?.email || t('role.fallbackUser');
 
         // Name
         const nameEl = document.getElementById('ph-name');
@@ -229,14 +988,14 @@ class MinSideManager {
 
     _roleLabel(role) {
         const map = {
-            superadmin: 'Administrator',
-            admin: 'Administrator',
-            pastor: 'Pastor',
-            leder: 'Leder',
-            frivillig: 'Frivillig',
-            giver: 'Fast Giver'
+            superadmin: t('role.superadmin'),
+            admin: t('role.admin'),
+            pastor: t('role.pastor'),
+            leder: t('role.leader'),
+            frivillig: t('role.volunteer'),
+            giver: t('role.donor')
         };
-        return map[role] || 'Medlem';
+        return map[role] || t('role.member');
     }
 
     // ──────────────────────────────────────────────────────────
@@ -254,7 +1013,7 @@ class MinSideManager {
         const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
         return {
             id: docLike?.id || raw.id || '',
-            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : 'Varsling',
+            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notifications.alert'),
             body: typeof raw.body === 'string' ? raw.body : '',
             type: typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default',
             link: typeof raw.link === 'string' ? raw.link : '',
@@ -267,9 +1026,9 @@ class MinSideManager {
         const raw = typeof docLike?.data === 'function' ? (docLike.data() || {}) : (docLike || {});
         return {
             id: docLike?.id || raw.id || '',
-            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : 'Uten tittel',
+            title: typeof raw.title === 'string' && raw.title.trim() ? raw.title.trim() : t('notes.untitled'),
             text: typeof raw.text === 'string' ? raw.text : '',
-            authorName: typeof raw.authorName === 'string' && raw.authorName.trim() ? raw.authorName.trim() : 'HKM-teamet',
+            authorName: typeof raw.authorName === 'string' && raw.authorName.trim() ? raw.authorName.trim() : t('notes.hkmTeam'),
             createdAt: raw.createdAt || null,
             updatedAt: raw.updatedAt || null,
             source: raw.source || fallbackSource,
@@ -331,29 +1090,29 @@ class MinSideManager {
     _getDonationStatusLabel(status) {
         const normalized = String(status || '').trim().toLowerCase();
         const labels = {
-            completed: 'Fullført',
-            succeeded: 'Fullført',
-            captured: 'Fullført',
-            pending: 'Venter',
-            processing: 'Behandles',
-            failed: 'Feilet',
-            canceled: 'Avbrutt',
-            cancelled: 'Avbrutt'
+            completed: t('giving.statusCompleted'),
+            succeeded: t('giving.statusCompleted'),
+            captured: t('giving.statusCompleted'),
+            pending: t('giving.statusPending'),
+            processing: t('giving.statusProcessing'),
+            failed: t('giving.statusFailed'),
+            canceled: t('giving.statusCanceled'),
+            cancelled: t('giving.statusCanceled')
         };
-        return labels[normalized] || (status || 'Ukjent');
+        return labels[normalized] || (status || t('giving.statusUnknown'));
     }
 
     _getDonationMethodLabel(method) {
         const normalized = String(method || '').trim().toLowerCase();
         const labels = {
-            card: 'Kort',
-            stripe: 'Stripe',
-            vipps: 'Vipps',
-            bank: 'Bank',
-            manual: 'Manuell',
-            cash: 'Kontant'
+            card: t('giving.methodCard'),
+            stripe: t('giving.methodStripe'),
+            vipps: t('giving.methodVipps'),
+            bank: t('giving.methodBank'),
+            manual: t('giving.methodManual'),
+            cash: t('giving.methodCash')
         };
-        return labels[normalized] || (method || 'Ukjent');
+        return labels[normalized] || (method || t('giving.methodUnknown'));
     }
 
     _getDonationReference(donation) {
@@ -638,12 +1397,13 @@ class MinSideManager {
         const date = (dateVal instanceof Date) ? dateVal : (dateVal?.toDate ? dateVal.toDate() : new Date(dateVal));
         if (isNaN(date.getTime())) return '';
         const s = Math.floor((Date.now() - date.getTime()) / 1000);
-        if (s < 0) return 'Akkurat nå';
-        if (s < 60) return 'Akkurat nå';
-        if (s < 3600) return `${Math.floor(s / 60)} min siden`;
-        if (s < 86400) return `${Math.floor(s / 3600)} t siden`;
-        if (s < 604800) return `${Math.floor(s / 86400)} d siden`;
-        return date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+        const lang = document.documentElement.lang || 'no';
+        const localeCode = lang === 'en' ? 'en-US' : lang === 'es' ? 'es-ES' : 'no-NO';
+        if (s < 0 || s < 60) return t('time.justNow');
+        if (s < 3600) return t('time.minutesAgo', { n: Math.floor(s / 60) });
+        if (s < 86400) return t('time.hoursAgo', { n: Math.floor(s / 3600) });
+        if (s < 604800) return t('time.daysAgo', { n: Math.floor(s / 86400) });
+        return date.toLocaleDateString(localeCode, { day: 'numeric', month: 'short', year: 'numeric' });
     }
 
     // ══════════════════════════════════════════════════════════
@@ -652,10 +1412,10 @@ class MinSideManager {
     async renderOverview(container) {
         const p = this.profileData;
         const user = this.currentUser;
-        const name = (p.displayName || user?.displayName || user?.email || 'Venn').split(' ')[0];
+        const name = (p.displayName || user?.displayName || user?.email || t('role.fallbackUser')).split(' ')[0];
         const year = new Date().getFullYear();
         const hour = new Date().getHours();
-        const greeting = hour < 12 ? 'God morgen' : hour < 17 ? 'Hei' : 'God kveld';
+        const greeting = hour < 12 ? t('overview.goodMorning') : hour < 17 ? t('overview.hello') : t('overview.goodEvening');
 
         container.innerHTML = `
         <div class="ms-overview-wrap">
@@ -667,43 +1427,43 @@ class MinSideManager {
                         ${greeting}, ${name}! 👋
                     </h2>
                     <p class="ms-overview-banner-quote">
-                        "For jeg vet hvilke tanker jeg har med dere, sier Herren..." — Jer 29:11
+                        ${t('overview.quote')}
                     </p>
                 </div>
                 <div class="ms-overview-banner-chip">
-                    <div class="ms-overview-banner-chip-label">Medlem siden</div>
+                    <div class="ms-overview-banner-chip-label">${t('overview.memberSince')}</div>
                     <div class="ms-overview-banner-chip-value" id="ov-member-since">—</div>
                 </div>
             </div>
 
             <!-- Stats row -->
             <div class="ms-overview-stats">
-                <div class="stat-chip">
-                    <div class="stat-chip-label">Uleste varslinger</div>
+                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('notifications')">
+                    <div class="stat-chip-label">${t('overview.unreadNotifications')}</div>
                     <div class="stat-chip-value" id="ov-notif-count">—</div>
-                    <div class="stat-chip-sub">Trykk for å se alle</div>
+                    <div class="stat-chip-sub">${t('overview.clickToViewAll')}</div>
                 </div>
-                <div class="stat-chip">
-                    <div class="stat-chip-label">Gitt totalt i ${year}</div>
+                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('giving')">
+                    <div class="stat-chip-label">${t('overview.totalGiven')} ${year}</div>
                     <div class="stat-chip-value" id="ov-year-total">—</div>
-                    <div class="stat-chip-sub" id="ov-year-sub">Se gavehistorikk</div>
+                    <div class="stat-chip-sub" id="ov-year-sub">${t('overview.seeGivingHistory')}</div>
                 </div>
-                <div class="stat-chip">
-                    <div class="stat-chip-label">Tilgjengelige kurs</div>
+                <div class="stat-chip" style="cursor: pointer;" onclick="window.minSideManager.loadView('courses')">
+                    <div class="stat-chip-label">${t('overview.availableCourses')}</div>
                     <div class="stat-chip-value" id="ov-courses-count">—</div>
-                    <div class="stat-chip-sub">Undervisning fra HKM</div>
+                    <div class="stat-chip-sub">${t('overview.teachingFromHkm')}</div>
                 </div>
             </div>
 
             <!-- Quick actions -->
             <div class="info-card ms-overview-card-gap">
-                <div class="info-card-header"><h3>Hurtiglenker</h3></div>
+                <div class="info-card-header"><h3>${t('overview.quickLinks')}</h3></div>
                 <div class="ms-overview-actions-grid">
                     ${[
-                { view: 'profile', icon: 'person', label: 'Min profil', sub: 'Kontakt & personlig info' },
-                { view: 'giving', icon: 'volunteer_activism', label: 'Gaver', sub: 'Gavehistorikk' },
-                { view: 'courses', icon: 'school', label: 'Kurs', sub: 'Undervisning fra HKM' },
-                { view: 'notifications', icon: 'notifications', label: 'Varslinger', sub: 'Meldinger fra HKM' },
+                { view: 'profile', icon: 'person', label: t('overview.btnProfileLabel'), sub: t('overview.btnProfileSub') },
+                { view: 'giving', icon: 'volunteer_activism', label: t('overview.btnGivingLabel'), sub: t('overview.btnGivingSub') },
+                { view: 'courses', icon: 'school', label: t('overview.btnCoursesLabel'), sub: t('overview.btnCoursesSub') },
+                { view: 'notifications', icon: 'notifications', label: t('overview.btnNotificationsLabel'), sub: t('overview.btnNotificationsSub') },
             ].map(a => `
                     <button class="ov-action-btn" data-view="${a.view}">
                         <div class="ms-overview-action-icon-wrap">
@@ -718,9 +1478,9 @@ class MinSideManager {
             <!-- Recent notifications -->
             <div class="info-card">
                 <div class="info-card-header">
-                    <h3>Siste varslinger</h3>
+                    <h3>${t('overview.recentNotifications')}</h3>
                     <button class="btn btn-ghost btn-sm" onclick="window.minSideManager.loadView('notifications')">
-                        Se alle
+                        ${t('overview.seeAll')}
                     </button>
                 </div>
                 <div id="ov-recent-notifs">
@@ -769,7 +1529,7 @@ class MinSideManager {
             const yearEl = document.getElementById('ov-year-total');
             if (yearEl) yearEl.textContent = yearTotal > 0
                 ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}`
-                : 'Ingen';
+                : t('overview.givingNone');
 
             // Courses count
             const coursesEl = document.getElementById('ov-courses-count');
@@ -779,7 +1539,7 @@ class MinSideManager {
             const recentEl = document.getElementById('ov-recent-notifs');
             if (recentEl) {
                 if (recentSnap.empty) {
-                    recentEl.innerHTML = `<div class="ms-overview-notifs-empty">Ingen varslinger ennå.</div>`;
+                    recentEl.innerHTML = `<div class="ms-overview-notifs-empty">${t('overview.noNotificationsYet')}</div>`;
                 } else {
                     recentEl.innerHTML = recentSnap.docs.map(doc => {
                         const d = this._normalizeNotificationDoc(doc);
@@ -795,7 +1555,7 @@ class MinSideManager {
                     }).join('') + `<div class="ms-overview-notifs-footer">
                         <button class="btn btn-ghost btn-sm ms-btn-full"
                             onclick="window.minSideManager.loadView('notifications')">
-                            Vis alle varslinger
+                            ${t('overview.showAllNotifications')}
                         </button></div>`;
                 }
             }
@@ -841,8 +1601,8 @@ class MinSideManager {
                 <!-- Contact information -->
                 <div class="info-card profile-edit-card" id="contact-card">
                     <div class="info-card-header">
-                        <h3>Kontaktinformasjon</h3>
-                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-contact-edit" title="Rediger" type="button">
+                        <h3>${t('profile.contactInfo')}</h3>
+                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-contact-edit" title="${t('common.edit')}" type="button">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
                     </div>
@@ -850,7 +1610,7 @@ class MinSideManager {
                         <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">badge</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">Fullt navn</div>
+                                <div class="info-row-label">${t('profile.fullName')}</div>
                                 <div class="info-row-display">${val(p.displayName || this.currentUser.displayName)}</div>
                                 <div class="info-row-edit">
                                     <input name="displayName" value="${inputValue(p.displayName || this.currentUser.displayName)}" autocomplete="name">
@@ -860,19 +1620,19 @@ class MinSideManager {
                         <div class="info-row">
                             <span class="material-symbols-outlined info-row-icon">mail</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">E-post</div>
+                                <div class="info-row-label">${t('profile.email')}</div>
                                 <div class="info-row-display">${val(this.currentUser.email)}</div>
                             </div>
                         </div>
                         <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">phone</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">Telefon</div>
+                                <div class="info-row-label">${t('profile.phone')}</div>
                                 <div class="info-row-display">${val(phoneDisplay)}</div>
                                 <div class="info-row-edit">
                                     <div class="phone-inline-grid">
                                         <select name="phoneCountryCode" autocomplete="tel-country-code">${phoneCountryOptions}</select>
-                                        <input name="phone" type="tel" value="${inputValue(p.phone)}" autocomplete="tel-national" placeholder="Telefonnummer">
+                                        <input name="phone" type="tel" value="${inputValue(p.phone)}" autocomplete="tel-national" placeholder="${t('profile.phonePlaceholder')}">
                                     </div>
                                 </div>
                             </div>
@@ -880,27 +1640,27 @@ class MinSideManager {
                         <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">location_on</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">Adresse</div>
+                                <div class="info-row-label">${t('profile.address')}</div>
                                 <div class="info-row-display">${p.address || p.zip || p.city || p.country
                 ? `<span class="info-row-value">${[esc(p.address), [esc(p.zip), esc(p.city)].filter(Boolean).join(' '), esc(p.country)].filter(Boolean).join('<br>')}</span>`
                 : `<span class="info-row-value empty">—</span>`}</div>
                                 <div class="info-row-edit">
-                                    <input id="profile-address-input" name="address" value="${inputValue(p.address)}" autocomplete="street-address" placeholder="Søk etter adresse i hele verden">
+                                    <input id="profile-address-input" name="address" value="${inputValue(p.address)}" autocomplete="street-address" placeholder="${t('profile.addressSearchPlaceholder')}">
                                     <div id="address-search-status" class="address-search-status"></div>
                                     <div id="address-search-results" class="address-search-results"></div>
                                     <div class="profile-inline-grid">
-                                        <input name="zip" value="${inputValue(p.zip)}" autocomplete="postal-code" placeholder="Postnr">
-                                        <input name="city" value="${inputValue(p.city)}" autocomplete="address-level2" placeholder="By">
+                                        <input name="zip" value="${inputValue(p.zip)}" autocomplete="postal-code" placeholder="${t('profile.zipPlaceholder')}">
+                                        <input name="city" value="${inputValue(p.city)}" autocomplete="address-level2" placeholder="${t('profile.cityPlaceholder')}">
                                     </div>
-                                    <input name="country" value="${inputValue(p.country)}" autocomplete="country-name" placeholder="Land">
+                                    <input name="country" value="${inputValue(p.country)}" autocomplete="country-name" placeholder="${t('profile.countryPlaceholder')}">
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="profile-edit-actions">
-                        <button class="btn btn-ghost btn-sm" id="cancel-contact-edit" type="button">Avbryt</button>
+                        <button class="btn btn-ghost btn-sm" id="cancel-contact-edit" type="button">${t('common.cancel')}</button>
                         <button class="btn btn-primary btn-sm" id="save-contact-btn" type="button">
-                            <span class="material-symbols-outlined">save</span> Lagre
+                            <span class="material-symbols-outlined">save</span> ${t('common.save')}
                         </button>
                     </div>
                 </div>
@@ -908,8 +1668,8 @@ class MinSideManager {
                 <!-- Personal information -->
                 <div class="info-card profile-edit-card" id="personal-card">
                     <div class="info-card-header">
-                        <h3>Personlig informasjon</h3>
-                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-personal-edit" title="Rediger" type="button">
+                        <h3>${t('profile.personalInfo')}</h3>
+                        <button class="edit-icon-btn profile-edit-toggle" id="toggle-personal-edit" title="${t('common.edit')}" type="button">
                             <span class="material-symbols-outlined">edit</span>
                         </button>
                     </div>
@@ -917,14 +1677,14 @@ class MinSideManager {
                         <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">person</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">Kjønn</div>
-                                <div class="info-row-display">${val(p.gender)}</div>
+                                <div class="info-row-label">${t('profile.gender')}</div>
+                                <div class="info-row-display">${val(p.gender ? t(`profile.gender${p.gender}`) : '')}</div>
                                 <div class="info-row-edit">
                                     <select name="gender">
-                                        <option value="">Velg...</option>
-                                        <option value="Mann" ${p.gender === 'Mann' ? 'selected' : ''}>Mann</option>
-                                        <option value="Kvinne" ${p.gender === 'Kvinne' ? 'selected' : ''}>Kvinne</option>
-                                        <option value="Annet" ${p.gender === 'Annet' ? 'selected' : ''}>Annet</option>
+                                        <option value="">${t('profile.select')}</option>
+                                        <option value="Mann" ${p.gender === 'Mann' ? 'selected' : ''}>${t('profile.genderMale')}</option>
+                                        <option value="Kvinne" ${p.gender === 'Kvinne' ? 'selected' : ''}>${t('profile.genderFemale')}</option>
+                                        <option value="Annet" ${p.gender === 'Annet' ? 'selected' : ''}>${t('profile.genderOther')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -932,8 +1692,8 @@ class MinSideManager {
                         <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">cake</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">Fødselsdato</div>
-                                <div class="info-row-display">${val(p.birthday ? new Date(p.birthday).toLocaleDateString('no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}</div>
+                                <div class="info-row-label">${t('profile.birthday')}</div>
+                                <div class="info-row-display">${val(p.birthday ? new Date(p.birthday).toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: 'numeric', month: 'long', year: 'numeric' }) : '')}</div>
                                 <div class="info-row-edit">
                                     <input type="date" name="birthday" value="${inputValue(p.birthday)}">
                                 </div>
@@ -942,16 +1702,16 @@ class MinSideManager {
                         <div class="info-row editable-info-row">
                             <span class="material-symbols-outlined info-row-icon">favorite</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">Sivilstatus</div>
-                                <div class="info-row-display">${val(p.maritalStatus)}</div>
+                                <div class="info-row-label">${t('profile.maritalStatus')}</div>
+                                <div class="info-row-display">${val(p.maritalStatus ? t(`profile.marital${p.maritalStatus.replace('Enke/Enkemann', 'Widowed')}`) : '')}</div>
                                 <div class="info-row-edit">
                                     <select name="maritalStatus">
-                                        <option value="">Velg...</option>
-                                        <option value="Ugift" ${p.maritalStatus === 'Ugift' ? 'selected' : ''}>Ugift</option>
-                                        <option value="Gift" ${p.maritalStatus === 'Gift' ? 'selected' : ''}>Gift</option>
-                                        <option value="Samboer" ${p.maritalStatus === 'Samboer' ? 'selected' : ''}>Samboer</option>
-                                        <option value="Skilt" ${p.maritalStatus === 'Skilt' ? 'selected' : ''}>Skilt</option>
-                                        <option value="Enke/Enkemann" ${p.maritalStatus === 'Enke/Enkemann' ? 'selected' : ''}>Enke/Enkemann</option>
+                                        <option value="">${t('profile.select')}</option>
+                                        <option value="Ugift" ${p.maritalStatus === 'Ugift' ? 'selected' : ''}>${t('profile.maritalSingle')}</option>
+                                        <option value="Gift" ${p.maritalStatus === 'Gift' ? 'selected' : ''}>${t('profile.maritalMarried')}</option>
+                                        <option value="Samboer" ${p.maritalStatus === 'Samboer' ? 'selected' : ''}>${t('profile.maritalPartner')}</option>
+                                        <option value="Skilt" ${p.maritalStatus === 'Skilt' ? 'selected' : ''}>${t('profile.maritalDivorced')}</option>
+                                        <option value="Enke/Enkemann" ${p.maritalStatus === 'Enke/Enkemann' ? 'selected' : ''}>${t('profile.maritalWidowed')}</option>
                                     </select>
                                 </div>
                             </div>
@@ -959,15 +1719,15 @@ class MinSideManager {
                         <div class="info-row">
                             <span class="material-symbols-outlined info-row-icon">calendar_today</span>
                             <div class="info-row-content">
-                                <div class="info-row-label">Medlem siden</div>
+                                <div class="info-row-label">${t('profile.memberSince')}</div>
                                 <div class="info-row-display"><span class="info-row-value">${joinYear}</span></div>
                             </div>
                         </div>
                     </div>
                     <div class="profile-edit-actions">
-                        <button class="btn btn-ghost btn-sm" id="cancel-personal-edit" type="button">Avbryt</button>
+                        <button class="btn btn-ghost btn-sm" id="cancel-personal-edit" type="button">${t('common.cancel')}</button>
                         <button class="btn btn-primary btn-sm" id="save-personal-btn" type="button">
-                            <span class="material-symbols-outlined">save</span> Lagre
+                            <span class="material-symbols-outlined">save</span> ${t('common.save')}
                         </button>
                     </div>
                 </div>
@@ -975,15 +1735,15 @@ class MinSideManager {
                 <!-- Danger Zone -->
                 <div class="info-card">
                     <div class="info-card-header">
-                        <h3>Kontoadministrasjon</h3>
+                        <h3>${t('profile.accountAdmin')}</h3>
                     </div>
                     <div class="ms-card-body-pad">
                         <p class="ms-danger-copy">
-                            Sletting av konto er permanent og kan ikke angres.
+                            ${t('profile.deleteAccountNotice')}
                         </p>
                         <button class="btn btn-danger" id="delete-account-btn">
                             <span class="material-symbols-outlined">delete_forever</span>
-                            Slett konto
+                            ${t('profile.deleteAccountBtn')}
                         </button>
                     </div>
                 </div>
@@ -995,19 +1755,19 @@ class MinSideManager {
                 <!-- Household -->
                 <div class="info-card">
                     <div class="info-card-header">
-                        <h3>Familie</h3>
+                        <h3>${t('profile.family')}</h3>
                     </div>
                     <div class="family-search">
                         <div class="family-search-box">
                             <span class="material-symbols-outlined">search</span>
-                            <input id="family-search-input" type="search" placeholder="Søk etter navn, e-post eller telefon" autocomplete="off">
+                            <input id="family-search-input" type="search" placeholder="${t('profile.familySearchPlaceholder')}" autocomplete="off">
                         </div>
                         <div id="family-search-status" class="family-search-status"></div>
                         <div id="family-search-results" class="family-search-results"></div>
                     </div>
                     <div id="household-content">
                         ${p.familyMembers?.length ? `
-                            <p class="household-name">${esc(p.displayName?.split(' ').pop() || '')} Husstand</p>
+                            <p class="household-name">${esc(p.displayName?.split(' ').pop() || '')} ${t('profile.household')}</p>
                             <div class="household-members">
                                 ${p.familyMembers.map(m => `
                                     <div class="member-row">
@@ -1016,7 +1776,7 @@ class MinSideManager {
                                             <div class="member-info-name">${esc(m.name || 'Uten navn')}</div>
                                             <div class="member-info-sub">${esc(m.role || m.email || '')}</div>
                                         </div>
-                                        <button class="member-remove-btn" data-member-uid="${esc(m.uid || '')}" type="button" title="Fjern">
+                                        <button class="member-remove-btn" data-member-uid="${esc(m.uid || '')}" type="button" title="${t('common.cancel')}">
                                             <span class="material-symbols-outlined">close</span>
                                         </button>
                                     </div>
@@ -1025,7 +1785,7 @@ class MinSideManager {
                         ` : `
                             <div class="empty-state ms-empty-state-compact">
                                 <span class="material-symbols-outlined ms-empty-state-icon-compact">group_off</span>
-                                <p class="ms-empty-state-copy-compact">Ingen familiemedlemmer registrert.</p>
+                                <p class="ms-empty-state-copy-compact">${t('profile.noFamilyRegistered')}</p>
                             </div>
                         `}
                     </div>
@@ -1034,12 +1794,12 @@ class MinSideManager {
                 <!-- Push Notifications Toggle -->
                 <div class="info-card">
                     <div class="info-card-header">
-                        <h3>Varslingspreferanser</h3>
+                        <h3>${t('profile.notificationPreferences')}</h3>
                     </div>
                     <div class="setting-row">
                         <div>
-                            <div class="setting-row-label">Push-varslinger</div>
-                            <div class="setting-row-sub">Mottar varslinger når HKM sender meldinger</div>
+                            <div class="setting-row-label">${t('profile.pushNotifications')}</div>
+                            <div class="setting-row-sub">${t('profile.pushNotificationsSub')}</div>
                         </div>
                         <label class="toggle">
                             <input type="checkbox" id="push-toggle" ${p.pushEnabled ? 'checked' : ''}>
@@ -1048,8 +1808,8 @@ class MinSideManager {
                     </div>
                     <div class="setting-row">
                         <div>
-                            <div class="setting-row-label">E-postvarslinger</div>
-                            <div class="setting-row-sub">Mottar nyhetsbrev og oppdateringer</div>
+                            <div class="setting-row-label">${t('profile.emailNotifications')}</div>
+                            <div class="setting-row-sub">${t('profile.emailNotificationsSub')}</div>
                         </div>
                         <label class="toggle">
                             <input type="checkbox" id="email-toggle" ${p.emailConsent !== false ? 'checked' : ''}>
@@ -1059,7 +1819,7 @@ class MinSideManager {
                     <div class="ms-card-footer-pad">
                         <div class="edit-form-actions" style="justify-content:flex-start">
                             <button class="btn btn-primary" id="save-prefs-btn">
-                                <span class="material-symbols-outlined">save</span> Lagre preferanser
+                                <span class="material-symbols-outlined">save</span> ${t('profile.savePreferences')}
                             </button>
                         </div>
                     </div>
@@ -1131,7 +1891,7 @@ class MinSideManager {
         if (!this.currentUser) return;
         if (!formEl) return;
         const btn = formEl.querySelector('button[id^="save-"]');
-        if (btn) { btn.disabled = true; btn.textContent = 'Lagrer...'; }
+        if (btn) { btn.disabled = true; btn.textContent = t('common.saving'); }
         try {
             const updates = { updatedAt: firebase.firestore.FieldValue.serverTimestamp() };
             fields.forEach(f => {
@@ -1144,9 +1904,9 @@ class MinSideManager {
             await firebase.firestore().collection('users').doc(this.currentUser.uid).set(updates, { merge: true });
         } catch (e) {
             console.error('saveProfileFields:', e);
-            alert('Feil ved lagring: ' + e.message);
+            alert(t('common.saveError') + ': ' + e.message);
         } finally {
-            if (btn) { btn.disabled = false; btn.textContent = 'Lagret ✓'; }
+            if (btn) { btn.disabled = false; btn.textContent = t('common.saved'); }
         }
     }
 
@@ -1167,7 +1927,7 @@ class MinSideManager {
                 return;
             }
 
-            statusEl.textContent = 'Søker etter adresser...';
+            statusEl.textContent = t('profile.searchingAddresses');
             this._addressSearchTimer = setTimeout(() => {
                 this.searchGlobalAddresses(query);
             }, 350);
@@ -1212,7 +1972,7 @@ class MinSideManager {
 
             if (!this._addressSuggestions.length) {
                 resultsEl.innerHTML = '';
-                statusEl.textContent = 'Ingen adresseforslag.';
+                statusEl.textContent = t('profile.noAddressSuggestions');
                 return;
             }
 
@@ -1236,7 +1996,7 @@ class MinSideManager {
             if (error.name === 'AbortError') return;
             console.error('searchGlobalAddresses:', error);
             resultsEl.innerHTML = '';
-            statusEl.textContent = 'Kunne ikke hente adresseforslag.';
+            statusEl.textContent = t('profile.couldNotFetchAddresses');
         }
     }
 
@@ -1256,7 +2016,7 @@ class MinSideManager {
         if (cityInput) cityInput.value = item.city || '';
         if (countryInput) countryInput.value = item.country || '';
         if (resultsEl) resultsEl.innerHTML = '';
-        if (statusEl) statusEl.textContent = item.country ? `Valgt: ${item.country}` : 'Adresse valgt.';
+        if (statusEl) statusEl.textContent = item.country ? t('profile.selectedCountry', { country: item.country }) : t('profile.addressSelected');
     }
 
     _wireFamilySearch() {
@@ -1275,7 +2035,7 @@ class MinSideManager {
                 return;
             }
 
-            statusEl.textContent = 'Søker...';
+            statusEl.textContent = t('profile.searching');
             this._familySearchTimer = setTimeout(() => {
                 this.searchFamilyMembers(query);
             }, 300);
@@ -1288,7 +2048,7 @@ class MinSideManager {
         if (!resultsEl || !statusEl) return;
 
         if (!firebase.functions) {
-            statusEl.textContent = 'Søk er ikke tilgjengelig akkurat nå.';
+            statusEl.textContent = t('profile.searchUnavailable');
             return;
         }
 
@@ -1300,7 +2060,7 @@ class MinSideManager {
 
             if (!members.length) {
                 resultsEl.innerHTML = '';
-                statusEl.textContent = 'Ingen treff.';
+                statusEl.textContent = t('profile.noMatches');
                 return;
             }
 
@@ -1328,7 +2088,7 @@ class MinSideManager {
         } catch (error) {
             console.error('searchFamilyMembers:', error);
             resultsEl.innerHTML = '';
-            statusEl.textContent = 'Kunne ikke søke akkurat nå.';
+            statusEl.textContent = t('profile.couldNotSearch');
         }
     }
 
@@ -1345,7 +2105,7 @@ class MinSideManager {
                 name: member.name || 'Uten navn',
                 email: member.email || '',
                 photoURL: member.photoURL || '',
-                role: member.role || 'Familiemedlem'
+                role: member.role || t('profile.familyMemberRole')
             }
         ];
 
@@ -1402,7 +2162,7 @@ class MinSideManager {
             this._setAvatarEl(document.getElementById('ph-avatar'), url, this.profileData.displayName);
         } catch (err) {
             console.error('Photo upload failed:', err);
-            alert('Feil ved opplasting: ' + err.message);
+            alert(t('common.saveError') + ': ' + err.message);
         }
     }
 
@@ -1425,8 +2185,8 @@ class MinSideManager {
             if (snap.empty) {
                 list.innerHTML = `<div class="empty-state">
                     <span class="material-symbols-outlined">history</span>
-                    <h3>Ingen aktivitet ennå</h3>
-                    <p>Aktivitet som push-varslinger og meldinger du mottar vil vises her.</p>
+                    <h3>${t('activity.noActivityYet')}</h3>
+                    <p>${t('activity.noActivitySub')}</p>
                 </div>`;
                 return;
             }
@@ -1465,8 +2225,8 @@ class MinSideManager {
 
         } catch (err) {
             console.error('renderActivity error:', err);
-            this._notify('Kunne ikke laste aktivitet akkurat nå.', 'warning');
-            list.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><p>Kunne ikke laste aktivitet.</p></div>`;
+            this._notify(t('activity.loadErrorNotice'), 'warning');
+            list.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">error</span><p>${t('activity.loadErrorCopy')}</p></div>`;
         }
     }
 
@@ -1478,8 +2238,8 @@ class MinSideManager {
         container.innerHTML = `
         <div class="ms-full-width">
             <div class="ms-section-header-row">
-                <h2 class="ms-section-title">Varslinger</h2>
-                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">Merk alle lest</button>
+                <h2 class="ms-section-title">${t('notifications.title')}</h2>
+                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">${t('notifications.markAllRead')}</button>
             </div>
             <div id="notifs-inner"><div class="loading-state ms-loading-min-80"><div class="spinner"></div></div></div>
         </div>`;
@@ -1496,8 +2256,8 @@ class MinSideManager {
             if (snap.empty) {
                 inner.innerHTML = `<div class="empty-state">
                     <span class="material-symbols-outlined">notifications_off</span>
-                    <h3>Ingen varslinger</h3>
-                    <p>Du har ingen varslinger ennå.</p>
+                    <h3>${t('notifications.noNotifications')}</h3>
+                    <p>${t('notifications.noNotificationsSub')}</p>
                 </div>`;
                 return;
             }
@@ -1553,8 +2313,8 @@ class MinSideManager {
 
         } catch (err) {
             console.error('renderNotifications error:', err);
-            this._notify('Kunne ikke laste varslinger akkurat nå.', 'warning');
-            inner.innerHTML = `<div class="empty-state"><p>Kunne ikke laste varslinger.</p></div>`;
+            this._notify(t('notifications.loadErrorNotice'), 'warning');
+            inner.innerHTML = `<div class="empty-state"><p>${t('notifications.loadErrorCopy')}</p></div>`;
         }
     }
 
@@ -1581,38 +2341,38 @@ class MinSideManager {
         <div>
             <div class="giving-stats">
                 <div class="stat-chip">
-                    <div class="stat-chip-label">Gitt i ${currentYear}</div>
+                    <div class="stat-chip-label">${t('giving.givenInYear', { year: currentYear })}</div>
                     <div class="stat-chip-value">${yearTotal > 0 ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}` : '—'}</div>
                 </div>
                 <div class="stat-chip">
-                    <div class="stat-chip-label">Siste gave</div>
+                    <div class="stat-chip-label">${t('giving.lastGift')}</div>
                     <div class="stat-chip-value">${lastGift ? `kr ${lastGiftAmount.toLocaleString('no-NO')}` : '—'}</div>
-                    <div class="stat-chip-sub">${lastGift ? (this._getDonationDate(lastGift)?.toLocaleDateString('no-NO') || '') : ''}</div>
+                    <div class="stat-chip-sub">${lastGift ? (this._getDonationDate(lastGift)?.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO') || '') : ''}</div>
                 </div>
                 <div class="stat-chip">
-                    <div class="stat-chip-label">Totalt antall gaver</div>
+                    <div class="stat-chip-label">${t('giving.totalGiftsCount')}</div>
                     <div class="stat-chip-value">${donations.length || '—'}</div>
                 </div>
             </div>
 
             <div class="table-card">
                 <div class="table-card-header">
-                    <h3>Gavehistorikk</h3>
+                    <h3>${t('giving.givingHistory')}</h3>
                 </div>
                 ${donations.length === 0 ? `
                     <div class="empty-state ms-empty-state-giving">
                         <span class="material-symbols-outlined">volunteer_activism</span>
-                        <h3>Ingen gaver ennå</h3>
-                        <p>Dine donasjoner til HKM vises her.</p>
+                        <h3>${t('giving.noGiftsYet')}</h3>
+                        <p>${t('giving.noGiftsSub')}</p>
                     </div>
                 ` : `
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Dato</th>
-                                <th>Type</th>
-                                <th>Metode</th>
-                                <th class="text-right">Beløp</th>
+                                <th>${t('giving.colDate')}</th>
+                                <th>${t('giving.colType')}</th>
+                                <th>${t('giving.colMethod')}</th>
+                                <th class="text-right">${t('giving.colAmount')}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -1620,8 +2380,8 @@ class MinSideManager {
             const date = this._getDonationDate(d) || new Date();
             const amountNok = this._normalizeDonationAmountNok(d);
             return `<tr class="donation-row" data-donation-id="${this._escapeHtml(d.id)}" tabindex="0">
-                                    <td>${date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                                    <td>${this._escapeHtml(d.type || 'Gave')}</td>
+                                    <td>${date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                    <td>${this._escapeHtml(d.type || t('giving.typeGift'))}</td>
                                     <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
                                     <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
                                 </tr>`;
@@ -1656,15 +2416,15 @@ class MinSideManager {
         const date = this._getDonationDate(donation);
         const reference = this._getDonationReference(donation);
         const rows = [
-            ['Beløp', `kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`],
-            ['Dato', date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent'],
-            ['Betalt med', this._getDonationMethodLabel(donation.method)],
-            ['Status', this._getDonationStatusLabel(donation.status)],
-            ['Type', donation.type || 'Gave'],
-            ['Referanse', reference || 'Ikke registrert']
+            [t('giving.lblAmount'), `kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`],
+            [t('giving.lblDate'), date ? date.toLocaleString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : t('giving.statusUnknown')],
+            [t('giving.lblPaidWith'), this._getDonationMethodLabel(donation.method)],
+            [t('giving.lblStatus'), this._getDonationStatusLabel(donation.status)],
+            [t('giving.lblType'), donation.type || t('giving.typeGift')],
+            [t('giving.lblReference'), reference || t('giving.referenceNotRegistered')]
         ];
-        if (donation.message) rows.push(['Melding', donation.message]);
-        if (donation.currency) rows.push(['Valuta', String(donation.currency).toUpperCase()]);
+        if (donation.message) rows.push([t('giving.lblMessage'), donation.message]);
+        if (donation.currency) rows.push([t('giving.lblCurrency'), String(donation.currency).toUpperCase()]);
 
         const modal = document.createElement('div');
         modal.id = 'donation-detail-modal';
@@ -1673,8 +2433,8 @@ class MinSideManager {
             <div class="hkm-modal-container ms-donation-detail-modal">
                 <div class="ms-note-modal-header">
                     <div>
-                        <div class="hkm-modal-title ms-note-modal-title">Gavedetaljer</div>
-                        <div class="ms-donation-detail-subtitle">${this._escapeHtml(date ? date.toLocaleDateString('no-NO') : '')}</div>
+                        <div class="hkm-modal-title ms-note-modal-title">${t('giving.detailsTitle')}</div>
+                        <div class="ms-donation-detail-subtitle">${this._escapeHtml(date ? date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO') : '')}</div>
                     </div>
                     <button id="close-donation-detail-modal" class="ms-icon-button" type="button">
                         <span class="material-symbols-outlined">close</span>
@@ -1724,8 +2484,8 @@ class MinSideManager {
         if (courses.length === 0) {
             container.innerHTML = `<div class="ms-full-width"><div class="empty-state">
                 <span class="material-symbols-outlined">school</span>
-                <h3>Ingen kurs ennå</h3>
-                <p>Undervisnings- og kursinnhold fra HKM vil vises her.</p>
+                <h3>${t('courses.noCoursesYet')}</h3>
+                <p>${t('courses.noCoursesSub')}</p>
             </div></div>`;
             return;
         }
@@ -1738,10 +2498,10 @@ class MinSideManager {
                     ${c.category ? `<span class="course-badge">${c.category}</span>` : ''}
                 </div>
                 <div class="course-body">
-                    <div class="course-title">${c.title || 'Uten tittel'}</div>
+                    <div class="course-title">${c.title || t('courses.untitled')}</div>
                     <div class="course-desc">${c.excerpt || c.intro || ''}</div>
                     ${c.videoUrl ? `<a href="${c.videoUrl}" target="_blank" class="btn btn-primary btn-sm">
-                        <span class="material-symbols-outlined">play_circle</span> Se video
+                        <span class="material-symbols-outlined">play_circle</span> ${t('courses.watchVideo')}
                     </a>` : ''}
                 </div>
             </div>`).join('')}
@@ -1780,7 +2540,7 @@ class MinSideManager {
             hkmNotes.sort(sortByDate);
         } catch (e) {
             console.warn('renderNotes fetch:', e);
-            this._notify('Kunne ikke laste notater akkurat nå.', 'warning');
+            this._notify(t('notifications.loadErrorNotice'), 'warning');
         }
 
         this._renderNotesUI(container, personalNotes, hkmNotes);
@@ -1790,13 +2550,13 @@ class MinSideManager {
         const makePNote = (n) => `
         <div class="personal-note-card" data-id="${n.id}">
             <div class="personal-note-header">
-                <div class="personal-note-title">${n.title || 'Uten tittel'}</div>
+                <div class="personal-note-title">${n.title || t('notes.untitled')}</div>
                 <div class="personal-note-meta">${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}</div>
                 <div class="personal-note-actions">
-                    <button class="note-btn-edit" data-id="${n.id}" title="Rediger">
+                    <button class="note-btn-edit" data-id="${n.id}" title="${t('common.edit')}">
                         <span class="material-symbols-outlined">edit</span>
                     </button>
-                    <button class="note-btn-delete" data-id="${n.id}" title="Slett">
+                    <button class="note-btn-delete" data-id="${n.id}" title="${t('profile.remove')}">
                         <span class="material-symbols-outlined">delete</span>
                     </button>
                 </div>
@@ -1810,48 +2570,48 @@ class MinSideManager {
             <!-- Header row -->
             <div class="ms-section-header-row ms-section-header-lg">
                 <div>
-                    <h2 class="ms-section-title ms-section-title-lg">Mine notater</h2>
+                    <h2 class="ms-section-title ms-section-title-lg">${t('notes.myNotes')}</h2>
                     <p class="ms-section-subtitle">
-                        Personlige notater som bare du kan se
+                        ${t('notes.personalNotesSub')}
                     </p>
                 </div>
                 <button class="btn btn-primary" id="new-note-btn">
                     <span class="material-symbols-outlined">add</span>
-                    Nytt notat
+                    ${t('notes.newNote')}
                 </button>
             </div>
 
             <!-- New note form (hidden by default) -->
             <div class="new-note-form is-hidden" id="new-note-form">
                 <div class="form-group">
-                    <label>Tittel</label>
-                    <input id="note-title-input" placeholder="Gi notatet en tittel..." autocomplete="off">
+                    <label>${t('notes.title')}</label>
+                    <input id="note-title-input" placeholder="${t('notes.titlePlaceholder')}" autocomplete="off">
                 </div>
                 <div class="form-group ms-form-group-gap-10">
-                    <label>Innhold</label>
+                    <label>${t('notes.content')}</label>
                     <div class="rte-wrapper">
                         <div class="rte-toolbar" id="rte-toolbar-new">
-                            <button type="button" class="rte-btn" data-cmd="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
-                            <button type="button" class="rte-btn" data-cmd="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
-                            <button type="button" class="rte-btn" data-cmd="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
+                            <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
+                            <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
+                            <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
                             <div class="rte-divider"></div>
-                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="Overskrift"><span class="material-symbols-outlined">title</span></button>
-                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="Avsnitt"><span class="material-symbols-outlined">format_paragraph</span></button>
+                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
+                            <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
                             <div class="rte-divider"></div>
-                            <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-                            <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Numrert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                            <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                            <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
                             <div class="rte-divider"></div>
-                            <button type="button" class="rte-btn" data-cmd="removeFormat" title="Fjern formatering"><span class="material-symbols-outlined">format_clear</span></button>
+                            <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
                         </div>
                         <div class="rte-editor" id="note-body-editor" contenteditable="true"
-                            data-placeholder="Skriv notat her..."></div>
+                            data-placeholder="${t('notes.contentPlaceholder')}"></div>
                     </div>
                 </div>
                 <div class="ms-actions-row-end">
-                    <button class="btn btn-ghost btn-sm" id="cancel-note-btn">Avbryt</button>
+                    <button class="btn btn-ghost btn-sm" id="cancel-note-btn">${t('common.cancel')}</button>
                     <button class="btn btn-primary btn-sm" id="save-note-btn">
                         <span class="material-symbols-outlined">save</span>
-                        Lagre notat
+                        ${t('notes.saveNote')}
                     </button>
                 </div>
             </div>
@@ -1861,7 +2621,7 @@ class MinSideManager {
                 ${personalNotes.length === 0
                 ? `<div class="note-empty-personal">
                         <span class="material-symbols-outlined">edit_note</span>
-                        <p>Du har ingen egne notater ennå.<br>Trykk «Nytt notat» for å begynne.</p>
+                        <p>${t('notes.emptyPersonalNotes')}</p>
                        </div>`
                 : personalNotes.map(makePNote).join('')}
             </div>
@@ -1872,7 +2632,7 @@ class MinSideManager {
                 <div class="ms-divider-row">
                     <div class="ms-divider-line"></div>
                     <span class="ms-divider-label">
-                        Notater fra HKM
+                        ${t('notes.hkmNotes')}
                     </span>
                     <div class="ms-divider-line"></div>
                 </div>
@@ -1881,7 +2641,7 @@ class MinSideManager {
                     <div class="note-card">
                         <div class="note-author">
                             <span class="material-symbols-outlined ms-note-author-icon">shield_person</span>
-                            ${n.authorName || 'HKM-teamet'} · ${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}
+                            ${n.authorName || t('notes.hkmTeam')} · ${n.createdAt?.toDate ? this._timeAgo(n.createdAt.toDate()) : ''}
                         </div>
                         ${n.title ? `<div class="ms-note-title">${n.title}</div>` : ''}
                         <div class="note-text">${n.text || ''}</div>
@@ -1921,24 +2681,24 @@ class MinSideManager {
             if (!plain) { editor?.focus(); return; }
 
             const btn = document.getElementById('save-note-btn');
-            btn.disabled = true; btn.textContent = 'Lagrer...';
+            btn.disabled = true; btn.textContent = t('common.saving');
 
             try {
                 const ref = await firebase.firestore().collection('personal_notes').add({
                     userId: uid,
-                    title: title || 'Uten tittel',
+                    title: title || t('notes.untitled'),
                     text,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
                 });
                 // Prepend new note immediately
-                personalNotes.unshift({ id: ref.id, title: title || 'Uten tittel', text, createdAt: null });
+                personalNotes.unshift({ id: ref.id, title: title || t('notes.untitled'), text, createdAt: null });
                 this._renderNotesUI(container, personalNotes, hkmNotes);
             } catch (e) {
                 console.error('Save note error:', e);
-                alert('Feil ved lagring: ' + e.message);
+                alert(t('notes.saveError') + ': ' + e.message);
                 btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined">save</span> Lagre notat';
+                btn.innerHTML = `<span class="material-symbols-outlined">save</span> ${t('notes.saveNote')}`;
             }
         });
 
@@ -1957,7 +2717,7 @@ class MinSideManager {
                         });
                         note.title = newTitle; note.text = newText;
                         this._renderNotesUI(container, personalNotes, hkmNotes);
-                    } catch (e) { alert('Feil ved oppdatering: ' + e.message); }
+                    } catch (e) { alert(t('notes.updateError') + ': ' + e.message); }
                 });
             });
         });
@@ -1966,13 +2726,13 @@ class MinSideManager {
         container.querySelectorAll('.note-btn-delete').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
-                if (!confirm('Er du sikker på at du vil slette dette notatet?')) return;
+                if (!confirm(t('notes.deleteConfirm'))) return;
                 firebase.firestore().collection('personal_notes').doc(id).delete()
                     .then(() => {
                         personalNotes = personalNotes.filter(n => n.id !== id);
                         this._renderNotesUI(container, personalNotes, hkmNotes);
                     })
-                    .catch(e => alert('Feil: ' + e.message));
+                    .catch(e => alert(t('notes.error') + ': ' + e.message));
             });
         });
     }
@@ -1987,37 +2747,37 @@ class MinSideManager {
         modal.innerHTML = `
         <div class="hkm-modal-container ms-note-modal-wide">
             <div class="ms-note-modal-header">
-                <div class="hkm-modal-title ms-note-modal-title">Rediger notat</div>
+                <div class="hkm-modal-title ms-note-modal-title">${t('notes.editNote')}</div>
                 <button id="close-note-modal" class="ms-icon-button">
                     <span class="material-symbols-outlined ms-icon-button-icon">close</span>
                 </button>
             </div>
             <div class="form-group">
-                <label>Tittel</label>
+                <label>${t('notes.title')}</label>
                 <input id="edit-note-title" value="${(note.title || '').replace(/"/g, '&quot;')}" autocomplete="off">
             </div>
             <div class="form-group ms-form-group-gap-12">
-                <label>Innhold</label>
+                <label>${t('notes.content')}</label>
                 <div class="rte-wrapper">
                     <div class="rte-toolbar" id="rte-toolbar-edit">
-                        <button type="button" class="rte-btn" data-cmd="bold" title="Fet"><span class="material-symbols-outlined">format_bold</span></button>
-                        <button type="button" class="rte-btn" data-cmd="italic" title="Kursiv"><span class="material-symbols-outlined">format_italic</span></button>
-                        <button type="button" class="rte-btn" data-cmd="underline" title="Understrek"><span class="material-symbols-outlined">format_underlined</span></button>
+                        <button type="button" class="rte-btn" data-cmd="bold" title="${t('notes.toolBold')}"><span class="material-symbols-outlined">format_bold</span></button>
+                        <button type="button" class="rte-btn" data-cmd="italic" title="${t('notes.toolItalic')}"><span class="material-symbols-outlined">format_italic</span></button>
+                        <button type="button" class="rte-btn" data-cmd="underline" title="${t('notes.toolUnderline')}"><span class="material-symbols-outlined">format_underlined</span></button>
                         <div class="rte-divider"></div>
-                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="Overskrift"><span class="material-symbols-outlined">title</span></button>
-                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="Avsnitt"><span class="material-symbols-outlined">format_paragraph</span></button>
+                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="H2" title="${t('notes.toolHeader')}"><span class="material-symbols-outlined">title</span></button>
+                        <button type="button" class="rte-btn" data-cmd="formatBlock" data-val="P" title="${t('notes.toolParagraph')}"><span class="material-symbols-outlined">format_paragraph</span></button>
                         <div class="rte-divider"></div>
-                        <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="Punktliste"><span class="material-symbols-outlined">format_list_bulleted</span></button>
-                        <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="Numrert liste"><span class="material-symbols-outlined">format_list_numbered</span></button>
-                        <button type="button" class="rte-btn" data-cmd="removeFormat" title="Fjern formatering"><span class="material-symbols-outlined">format_clear</span></button>
+                        <button type="button" class="rte-btn" data-cmd="insertUnorderedList" title="${t('notes.toolBulletList')}"><span class="material-symbols-outlined">format_list_bulleted</span></button>
+                        <button type="button" class="rte-btn" data-cmd="insertOrderedList" title="${t('notes.toolOrderedList')}"><span class="material-symbols-outlined">format_list_numbered</span></button>
+                        <button type="button" class="rte-btn" data-cmd="removeFormat" title="${t('notes.toolClear')}"><span class="material-symbols-outlined">format_clear</span></button>
                     </div>
                     <div class="rte-editor" id="edit-note-body" contenteditable="true"></div>
                 </div>
             </div>
             <div class="hkm-modal-actions ms-modal-actions-top">
-                <button class="btn btn-ghost hkm-modal-btn" id="cancel-note-modal">Avbryt</button>
+                <button class="btn btn-ghost hkm-modal-btn" id="cancel-note-modal">${t('common.cancel')}</button>
                 <button class="btn btn-primary hkm-modal-btn" id="save-note-modal">
-                    <span class="material-symbols-outlined">save</span> Lagre
+                    <span class="material-symbols-outlined">save</span> ${t('notes.save')}
                 </button>
             </div>
         </div>`;
@@ -2045,8 +2805,8 @@ class MinSideManager {
             const text = editor?.innerHTML?.trim() || '';
             const plain = editor?.innerText?.trim() || '';
             if (!plain) { editor?.focus(); return; }
-            btn.disabled = true; btn.textContent = 'Lagrer...';
-            await onSave(title || 'Uten tittel', text);
+            btn.disabled = true; btn.textContent = t('common.saving');
+            await onSave(title || t('notes.untitled'), text);
             close();
         });
     }
@@ -2098,7 +2858,7 @@ class MinSideManager {
         modal.innerHTML = `
         <div class="hkm-modal-container">
             <div class="ms-note-modal-header" style="margin-bottom: 16px;">
-                <div class="hkm-modal-title" style="margin-bottom:0; padding-right: 32px;">${notif.title || 'Varsel'}</div>
+                <div class="hkm-modal-title" style="margin-bottom:0; padding-right: 32px;">${notif.title || t('notifications.alert')}</div>
                 <button id="close-notif-modal" class="ms-icon-button">
                     <span class="material-symbols-outlined ms-icon-button-icon">close</span>
                 </button>
@@ -2106,12 +2866,12 @@ class MinSideManager {
             ${notif.body ? `<div class="hkm-modal-message" style="text-align:left; white-space:pre-wrap; line-height:1.6; color:var(--text);">${notif.body}</div>` : ''}
             ${notif.link ? `<div style="margin-top: 24px;">
                 <a href="${notif.link}" target="_blank" class="btn btn-primary" style="display:inline-flex; align-items:center; justify-content:center; gap:8px; width:100%;">
-                    Åpne lenke <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>
+                    ${t('notifications.openLink')} <span class="material-symbols-outlined" style="font-size:20px;">open_in_new</span>
                 </a>
             </div>` : ''}
             <div class="hkm-modal-actions ms-modal-actions-top" style="margin-top: 32px; border-top: 1px solid var(--border); padding-top: 16px;">
                 <button class="btn btn-ghost hkm-modal-btn" id="delete-notif-modal" style="color: var(--danger); justify-content: center;">
-                    <span class="material-symbols-outlined">delete</span> Slett varsel
+                    <span class="material-symbols-outlined">delete</span> ${t('notifications.deleteAlert')}
                 </button>
             </div>
         </div>`;
@@ -2125,10 +2885,10 @@ class MinSideManager {
 
         // Delete action
         modal.querySelector('#delete-notif-modal').addEventListener('click', async () => {
-            if (!confirm('Er du sikker på at du vil slette dette varselet?')) return;
+            if (!confirm(t('notifications.deleteConfirm'))) return;
             const btn = modal.querySelector('#delete-notif-modal');
             btn.disabled = true;
-            btn.textContent = 'Sletter...';
+            btn.textContent = t('notifications.deleting');
 
             try {
                 if (notif.id) {
@@ -2139,9 +2899,9 @@ class MinSideManager {
                 close();
             } catch (err) {
                 console.error('Error deleting notification:', err);
-                alert('Kunne ikke slette varsel: ' + err.message);
+                alert(t('notifications.deleteError') + ': ' + err.message);
                 btn.disabled = false;
-                btn.innerHTML = '<span class="material-symbols-outlined">delete</span> Slett varsel';
+                btn.innerHTML = `<span class="material-symbols-outlined">delete</span> ${t('notifications.deleteAlert')}`;
             }
         });
 
@@ -2150,7 +2910,7 @@ class MinSideManager {
             firebase.firestore().collection('user_notifications').doc(notif.id).set({ read: true }, { merge: true })
                 .catch(e => console.warn('Could not mark notification as read.', e));
             notif.read = true;
-            this._loadUnreadBadge(); // Update bell icon badge
+            this._setBadge(0);
         }
     }
 
@@ -2165,20 +2925,19 @@ class MinSideManager {
         modal.id = 'confirm-delete-modal';
         modal.className = 'hkm-modal-overlay';
         modal.innerHTML = `
-                    < div class= "hkm-modal-container" >
+        <div class="hkm-modal-container">
             <div class="hkm-modal-icon">
                 <span class="material-symbols-outlined">warning</span>
             </div>
-            <div class="hkm-modal-title">Slett konto?</div>
+            <div class="hkm-modal-title">${t('deleteAccount.modalTitle')}</div>
             <p class="hkm-modal-message">
-                Dette vil permanent slette kontoen din og all tilknyttet data. 
-                Handlingen kan ikke angres. Du vil bli bedt om å bekrefte identiteten din.
+                ${t('deleteAccount.modalMessage')}
             </p>
             <div class="hkm-modal-actions">
-                <button class="btn btn-ghost hkm-modal-btn" id="cancel-delete-btn">Avbryt</button>
-                <button class="btn btn-danger hkm-modal-btn" id="confirm-delete-btn">Slett konto</button>
+                <button class="btn btn-ghost hkm-modal-btn" id="cancel-delete-btn">${t('deleteAccount.cancelBtn')}</button>
+                <button class="btn btn-danger hkm-modal-btn" id="confirm-delete-btn">${t('deleteAccount.deleteBtn')}</button>
             </div>
-        </div > `;
+        </div>`;
 
         document.body.appendChild(modal);
         requestAnimationFrame(() => modal.classList.add('active'));
@@ -2189,7 +2948,7 @@ class MinSideManager {
         });
 
         modal.querySelector('#confirm-delete-btn').addEventListener('click', async () => {
-            if (!confirm('ER DU HELT SIKKER? Dette vil permanent slette all din data og din brukerprofil. Denne handlingen er 100% permanent og kan ikke angres.')) return;
+            if (!confirm(t('deleteAccount.doubleConfirm'))) return;
             await this.performAccountDeletion();
             modal.remove();
         });
@@ -2211,7 +2970,7 @@ class MinSideManager {
             window.location.href = '/';
         } catch (error) {
             if (error.code === 'auth/requires-recent-login') {
-                alert('Vennligst logg inn på nytt for å bekrefte sletting.');
+                alert(t('deleteAccount.reauthRequest'));
                 await firebase.auth().signOut();
                 window.location.href = '/minside/login.html';
             } else {

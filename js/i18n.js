@@ -131,9 +131,13 @@ const i18nManager = {
         const path = window.location.pathname;
         let currentLang = 'no';
 
-        // Set language based strictly on the URL path
-        if (/^\/en(\/|$)/.test(path)) currentLang = 'en';
-        else if (/^\/es(\/|$)/.test(path)) currentLang = 'es';
+        if (path.includes('/minside/')) {
+            currentLang = localStorage.getItem(this.storageKey) || 'no';
+        } else {
+            // Set language based strictly on the URL path
+            if (/^\/en(\/|$)/.test(path)) currentLang = 'en';
+            else if (/^\/es(\/|$)/.test(path)) currentLang = 'es';
+        }
 
         document.documentElement.lang = currentLang;
         return currentLang;
@@ -169,7 +173,16 @@ const i18nManager = {
         this.syncCurrentLanguageBadge(lang);
 
         if (redirect) {
-            this.redirectToLanguage(lang);
+            if (window.location.pathname.includes('/minside/')) {
+                // Trigger dynamic re-render/translation on Min Side pages
+                if (window.minSideManager && typeof window.minSideManager.handleLanguageChange === 'function') {
+                    window.minSideManager.handleLanguageChange(lang);
+                } else if (typeof window.minsideAuthLanguageChange === 'function') {
+                    window.minsideAuthLanguageChange(lang);
+                }
+            } else {
+                this.redirectToLanguage(lang);
+            }
         }
     },
 
