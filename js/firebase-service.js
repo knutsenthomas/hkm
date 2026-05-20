@@ -662,11 +662,33 @@ class FirebaseService {
         return this.auth.signInWithEmailAndPassword(email, password);
     }
 
-    async loginWithGoogle() {
+    async loginWithGoogle(options = {}) {
         if (!this.isInitialized) throw new Error("Firebase not initialized");
         await this.ensureAuthPersistence();
         const provider = new firebase.auth.GoogleAuthProvider();
-        return this.auth.signInWithPopup(provider);
+        try {
+            return await this.auth.signInWithPopup(provider);
+        } catch (error) {
+            const redirectFallbackCodes = new Set([
+                'auth/cancelled-popup-request',
+                'auth/operation-not-supported-in-this-environment',
+                'auth/popup-blocked',
+                'auth/popup-closed-by-user'
+            ]);
+
+            if (options.redirectFallback && redirectFallbackCodes.has(error?.code)) {
+                await this.auth.signInWithRedirect(provider);
+                return null;
+            }
+
+            throw error;
+        }
+    }
+
+    async getGoogleRedirectResult() {
+        if (!this.isInitialized) throw new Error("Firebase not initialized");
+        await this.ensureAuthPersistence();
+        return this.auth.getRedirectResult();
     }
 
     async logout() {

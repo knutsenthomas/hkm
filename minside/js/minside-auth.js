@@ -44,6 +44,44 @@ document.addEventListener('DOMContentLoaded', async () => {
         feedbackBox.style.display = 'none';
     }
 
+    function isGoogleRedirectError(error) {
+        return error && error.code && String(error.code).startsWith('auth/');
+    }
+
+    async function ensureMemberProfile(user) {
+        const service = window.firebaseService;
+        if (!service || !service.isInitialized || !user) return;
+
+        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+        if (!userDoc.exists) {
+            await firebase.firestore().collection('users').doc(user.uid).set({
+                email: user.email,
+                displayName: user.displayName || '',
+                photoURL: user.photoURL || '',
+                role: 'medlem',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        }
+    }
+
+    try {
+        const service = window.firebaseService;
+        if (service && service.isInitialized && typeof service.getGoogleRedirectResult === 'function') {
+            const redirectResult = await service.getGoogleRedirectResult();
+            if (redirectResult && redirectResult.user) {
+                showMessage('Google-innlogging fullført. Sender deg videre...', 'success');
+                await ensureMemberProfile(redirectResult.user);
+                await routeByRole();
+                return;
+            }
+        }
+    } catch (error) {
+        if (isGoogleRedirectError(error)) {
+            console.error(error);
+            showMessage(getErrorMessage(error), 'error');
+        }
+    }
+
     // --- 1. Email/Password Login ---
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -127,22 +165,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // --- 4. Google Login ---
     document.getElementById('google-login').addEventListener('click', async () => {
+        const btn = document.getElementById('google-login');
+        btn.disabled = true;
+        btn.textContent = 'Åpner Google...';
+        hideMessage();
+
         try {
             const service = window.firebaseService;
             if (!service || !service.isInitialized) throw new Error("Firebase mismatch");
-            const result = await service.loginWithGoogle();
-            const user = result.user;
+            const result = await service.loginWithGoogle({ redirectFallback: true });
+            if (!result) return;
 
-            // Check if user already has a doc, if not create one as 'medlem'
-            const role = await service.getUserRole(user.uid);
-            if (!role) {
-                await firebase.firestore().collection('users').doc(user.uid).set({
-                    email: user.email,
-                    role: 'medlem',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-            }
-
+            await ensureMemberProfile(result.user);
             await routeByRole();
         } catch (error) {
             console.error(error);
@@ -151,6 +185,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                 msg = 'Domenet "' + window.location.hostname + '" er ikke godkjent i Firebase (Authorized Domains). Legg det til i Firebase Console.';
             }
             showMessage(msg, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '<img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" width="18" alt="Google"> Google';
         }
     });
 
@@ -207,6 +243,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'auth/wrong-password': return 'Feil passord.';
             case 'auth/email-already-in-use': return 'Denne e-posten er allerede i bruk.';
             case 'auth/weak-password': return 'Passordet må ha minst 6 tegn.';
+            case 'auth/popup-blocked': return 'Google-vinduet ble blokkert. Prøver redirect-innlogging.';
+            case 'auth/popup-closed-by-user': return 'Google-innlogging ble lukket før den var ferdig.';
+            case 'auth/unauthorized-domain': return 'Domenet "' + window.location.hostname + '" er ikke godkjent for Google-innlogging i Firebase.';
             default: return error.message;
         }
     }
