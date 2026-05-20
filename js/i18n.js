@@ -148,7 +148,7 @@ const i18nManager = {
         const normalized = this.languages.includes(activeLang) ? activeLang : this.defaultLang;
         const label = normalized.toUpperCase();
 
-        document.querySelectorAll('.lang-btn span').forEach((el) => {
+        document.querySelectorAll('.lang-btn span:not(.material-symbols-outlined)').forEach((el) => {
             el.textContent = label;
         });
 
