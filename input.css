@@ -4087,6 +4087,15 @@ body {
     transform: translateY(-3px);
 }
 
+.view-btn {
+  outline: none !important;
+}
+
+.view-btn:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 /* Podcast View Toggle & List View Adjustments */
 
 .view-btn:hover {
