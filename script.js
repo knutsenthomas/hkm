@@ -3575,8 +3575,8 @@ window.addEventListener('load', () => {
         if (mounted) return;
         
         // Skip chatbot on all admin/CRM/minside pages to keep the portal clean
-        const isPortal = window.location.pathname.includes('/admin/') || 
-                         window.location.pathname.includes('/minside/') || 
+        const isPortal = /^\/admin(\/|$)/.test(window.location.pathname) || 
+                         /^\/minside(\/|$)/.test(window.location.pathname) || 
                          (document.body && (
                              document.body.classList.contains('admin-body') || 
                              document.body.classList.contains('crm-body') || 

@@ -131,7 +131,7 @@ const i18nManager = {
         const path = window.location.pathname;
         let currentLang = 'no';
 
-        if (path.includes('/minside/')) {
+        if (/^\/minside(\/|$)/.test(path)) {
             currentLang = localStorage.getItem(this.storageKey) || 'no';
         } else {
             // Set language based strictly on the URL path
@@ -173,7 +173,7 @@ const i18nManager = {
         this.syncCurrentLanguageBadge(lang);
 
         if (redirect) {
-            if (window.location.pathname.includes('/minside/')) {
+            if (/^\/minside(\/|$)/.test(window.location.pathname)) {
                 // Trigger dynamic re-render/translation on Min Side pages
                 if (window.minSideManager && typeof window.minSideManager.handleLanguageChange === 'function') {
                     window.minSideManager.handleLanguageChange(lang);
