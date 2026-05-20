@@ -502,6 +502,7 @@ let podcastOverrides = {};
 let podcastTranscriptDataById = new Map();
 let currentPodcastFilter = 'all';
 let currentPodcastSort = 'newest';
+let currentPodcastView = localStorage.getItem('hkm_podcast_view') || 'grid';
 
 // Spillerkø / nåværende episode (for Spotify-lignende navigasjon)
 let currentEpisodeOrder = [];
@@ -1035,6 +1036,8 @@ function initPodcastControls() {
 
     const filterButtons = document.querySelectorAll('#podcast-categories [data-filter]');
     const sortSelect = document.getElementById('podcast-sort-select');
+    const viewGridBtn = document.getElementById('view-grid-btn');
+    const viewListBtn = document.getElementById('view-list-btn');
 
     filterButtons.forEach(btn => {
         btn.addEventListener('click', () => {
@@ -1049,6 +1052,37 @@ function initPodcastControls() {
         sortSelect.addEventListener('change', (e) => {
             currentPodcastSort = e.target.value;
             renderPodcastEpisodes();
+        });
+    }
+
+    if (viewGridBtn && viewListBtn) {
+        // Sync active state from currentPodcastView
+        if (currentPodcastView === 'list') {
+            viewGridBtn.classList.remove('active');
+            viewListBtn.classList.add('active');
+        } else {
+            viewGridBtn.classList.add('active');
+            viewListBtn.classList.remove('active');
+        }
+
+        viewGridBtn.addEventListener('click', () => {
+            if (currentPodcastView !== 'grid') {
+                currentPodcastView = 'grid';
+                localStorage.setItem('hkm_podcast_view', 'grid');
+                viewListBtn.classList.remove('active');
+                viewGridBtn.classList.add('active');
+                renderPodcastEpisodes();
+            }
+        });
+
+        viewListBtn.addEventListener('click', () => {
+            if (currentPodcastView !== 'list') {
+                currentPodcastView = 'list';
+                localStorage.setItem('hkm_podcast_view', 'list');
+                viewGridBtn.classList.remove('active');
+                viewListBtn.classList.add('active');
+                renderPodcastEpisodes();
+            }
         });
     }
 }
@@ -1075,6 +1109,13 @@ function ensurePodcastBarVisibleOnPodcastPage() {
 function renderPodcastEpisodes() {
     const grid = document.getElementById('podcast-grid');
     if (!grid) return;
+
+    // Legg til eller fjern list-view klasse basert på lagret tilstand
+    if (currentPodcastView === 'list') {
+        grid.classList.add('list-view');
+    } else {
+        grid.classList.remove('list-view');
+    }
 
     let filtered = [...allPodcastEpisodes];
 

@@ -229,7 +229,13 @@
                     <button class="category-btn" data-filter="undervisning">Undervisning</button>
                 </div>
 
-                <div class="podcast-sort" style="display: flex; align-items: center; gap: 10px;">
+                <div class="podcast-sort" style="display: flex; align-items: center; gap: 15px;">
+                    <!-- Podcast View Toggle -->
+                    <div class="podcast-view-toggle" style="display: flex; align-items: center; gap: 8px; margin-right: 15px;">
+                        <button class="view-btn active" id="view-grid-btn" title="Rutenett" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-color); background: white; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);"><i class="fas fa-th-large"></i></button>
+                        <button class="view-btn" id="view-list-btn" title="Liste" style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid var(--border-color); background: white; color: var(--text-dark); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: var(--transition);"><i class="fas fa-list"></i></button>
+                    </div>
+
                     <span style="font-size: 0.9rem; color: var(--text-light); font-weight: 600;">Sorter etter:</span>
                     <select id="podcast-sort-select"
                         style="padding: 8px 15px; border-radius: 20px; border: 2px solid var(--border-color); background: white; font-family: inherit; font-size: 0.9rem; color: var(--text-dark); outline: none; cursor: pointer;">
