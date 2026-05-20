@@ -2189,6 +2189,7 @@ class MinSideManager {
         });
 
         modal.querySelector('#confirm-delete-btn').addEventListener('click', async () => {
+            if (!confirm('ER DU HELT SIKKER? Dette vil permanent slette all din data og din brukerprofil. Denne handlingen er 100% permanent og kan ikke angres.')) return;
             await this.performAccountDeletion();
             modal.remove();
         });

@@ -16068,6 +16068,7 @@ class AdminManager {
 
         // Confirm deletion
         confirmBtn.onclick = async () => {
+            if (!confirm('ER DU HELT SIKKER? Dette vil permanent slette brukerens profildata. Denne handlingen er 100% permanent og kan ikke angres.')) return;
             confirmBtn.disabled = true;
             confirmBtn.textContent = 'Sletter...';
             await this.deleteUser(userId);
