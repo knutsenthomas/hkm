@@ -190,10 +190,17 @@ const i18nManager = {
      * Navigates to the corresponding page in the target language.
      */
     redirectToLanguage(lang) {
-        const currentPath = window.location.pathname;
-        // Strip leading/trailing slashes and .html extension
-        let currentFile = currentPath.split('/').pop().replace(/\.html$/, '') || 'index';
-        if (!currentFile || currentFile === '/') currentFile = 'index';
+        const currentPath = window.location.pathname || '/';
+        const pathParts = currentPath
+            .split('/')
+            .filter(Boolean)
+            .map(part => part.replace(/\.html$/, ''));
+
+        if (pathParts[0] === 'en' || pathParts[0] === 'es') {
+            pathParts.shift();
+        }
+
+        let currentFile = pathParts[pathParts.length - 1] || 'index';
         
         const mappedFile = this.mapFileName(currentFile, lang);
         let newPath = '';
@@ -304,7 +311,7 @@ const i18nManager = {
 
     bindEvents() {
         document.addEventListener('click', (e) => {
-            const langBtn = e.target.closest('.lang-switch-btn');
+            const langBtn = e.target.closest('.lang-switch-btn, .mega-menu-lang [data-lang]');
             if (langBtn) {
                 e.preventDefault();
                 const lang = langBtn.getAttribute('data-lang') || this.inferLanguageFromElement(langBtn);
