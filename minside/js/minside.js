@@ -303,6 +303,16 @@ class MinSideManager {
         return 0;
     }
 
+    _escapeHtml(value) {
+        return String(value ?? '').replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        }[char]));
+    }
+
     _getDonationDate(donation) {
         const raw = donation || {};
         return raw.completedAt?.toDate?.()
@@ -316,6 +326,44 @@ class MinSideManager {
     _donationStatusIsVisible(donation) {
         const status = String(donation?.status || '').trim().toLowerCase();
         return !status || ['completed', 'succeeded', 'captured', 'pending', 'processing'].includes(status);
+    }
+
+    _getDonationStatusLabel(status) {
+        const normalized = String(status || '').trim().toLowerCase();
+        const labels = {
+            completed: 'Fullført',
+            succeeded: 'Fullført',
+            captured: 'Fullført',
+            pending: 'Venter',
+            processing: 'Behandles',
+            failed: 'Feilet',
+            canceled: 'Avbrutt',
+            cancelled: 'Avbrutt'
+        };
+        return labels[normalized] || (status || 'Ukjent');
+    }
+
+    _getDonationMethodLabel(method) {
+        const normalized = String(method || '').trim().toLowerCase();
+        const labels = {
+            card: 'Kort',
+            stripe: 'Stripe',
+            vipps: 'Vipps',
+            bank: 'Bank',
+            manual: 'Manuell',
+            cash: 'Kontant'
+        };
+        return labels[normalized] || (method || 'Ukjent');
+    }
+
+    _getDonationReference(donation) {
+        const raw = donation || {};
+        return raw.reference
+            || raw.transactionId
+            || raw.paymentIntentId
+            || raw.manualDonationId
+            || raw.id
+            || '';
     }
 
     async _fetchCurrentUserDonations({ order = false } = {}) {
@@ -1208,6 +1256,7 @@ class MinSideManager {
         try {
             donations = await this._fetchCurrentUserDonations({ order: true });
         } catch (e) { }
+        this.currentGivingDonations = donations;
 
         const currentYear = new Date().getFullYear();
         const yearTotal = donations.filter(d => this._getDonationDate(d)?.getFullYear?.() === currentYear)
@@ -1257,10 +1306,10 @@ class MinSideManager {
                             ${donations.map(d => {
             const date = this._getDonationDate(d) || new Date();
             const amountNok = this._normalizeDonationAmountNok(d);
-            return `<tr>
+            return `<tr class="donation-row" data-donation-id="${this._escapeHtml(d.id)}" tabindex="0">
                                     <td>${date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                                    <td>${d.type || 'Gave'}</td>
-                                    <td><span class="method-tag">${d.method || 'Kort'}</span></td>
+                                    <td>${this._escapeHtml(d.type || 'Gave')}</td>
+                                    <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
                                     <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
                                 </tr>`;
         }).join('')}
@@ -1270,6 +1319,82 @@ class MinSideManager {
             </div>
 
         </div>`;
+
+        container.querySelectorAll('.donation-row').forEach(row => {
+            const open = () => this.showDonationDetails(row.dataset.donationId);
+            row.addEventListener('click', open);
+            row.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    open();
+                }
+            });
+        });
+    }
+
+    showDonationDetails(donationId) {
+        const donation = (this.currentGivingDonations || []).find(item => item.id === donationId);
+        if (!donation) return;
+
+        const existing = document.getElementById('donation-detail-modal');
+        if (existing) existing.remove();
+
+        const amountNok = this._normalizeDonationAmountNok(donation);
+        const date = this._getDonationDate(donation);
+        const reference = this._getDonationReference(donation);
+        const rows = [
+            ['Beløp', `kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}`],
+            ['Dato', date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent'],
+            ['Betalt med', this._getDonationMethodLabel(donation.method)],
+            ['Status', this._getDonationStatusLabel(donation.status)],
+            ['Type', donation.type || 'Gave'],
+            ['Referanse', reference || 'Ikke registrert']
+        ];
+        if (donation.message) rows.push(['Melding', donation.message]);
+        if (donation.currency) rows.push(['Valuta', String(donation.currency).toUpperCase()]);
+
+        const modal = document.createElement('div');
+        modal.id = 'donation-detail-modal';
+        modal.className = 'hkm-modal-overlay';
+        modal.innerHTML = `
+            <div class="hkm-modal-container ms-donation-detail-modal">
+                <div class="ms-note-modal-header">
+                    <div>
+                        <div class="hkm-modal-title ms-note-modal-title">Gavedetaljer</div>
+                        <div class="ms-donation-detail-subtitle">${this._escapeHtml(date ? date.toLocaleDateString('no-NO') : '')}</div>
+                    </div>
+                    <button id="close-donation-detail-modal" class="ms-icon-button" type="button">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                </div>
+                <div class="ms-donation-detail-amount">kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</div>
+                <div class="ms-donation-detail-grid">
+                    ${rows.map(([label, value]) => `
+                        <div class="ms-donation-detail-row">
+                            <span>${this._escapeHtml(label)}</span>
+                            <strong>${this._escapeHtml(value)}</strong>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('active'));
+
+        const onEsc = (event) => {
+            if (event.key === 'Escape') close();
+        };
+        const close = () => {
+            document.removeEventListener('keydown', onEsc);
+            modal.classList.remove('active');
+            setTimeout(() => modal.remove(), 300);
+        };
+        modal.querySelector('#close-donation-detail-modal')?.addEventListener('click', close);
+        modal.addEventListener('click', event => {
+            if (event.target === modal) close();
+        });
+        document.addEventListener('keydown', onEsc);
     }
 
     // ══════════════════════════════════════════════════════════
