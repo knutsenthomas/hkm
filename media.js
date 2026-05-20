@@ -1033,9 +1033,6 @@ async function initPodcastRSS() {
 function initPodcastControls() {
     ensureDynamicPodcastCategoryButtons();
 
-        if (window.location.pathname.includes('/podcast')) {
-            ensurePodcastBarVisibleOnPodcastPage();
-        }
     const filterButtons = document.querySelectorAll('#podcast-categories [data-filter]');
     const sortSelect = document.getElementById('podcast-sort-select');
 
