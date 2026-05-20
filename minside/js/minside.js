@@ -1201,7 +1201,7 @@ class MinSideManager {
             if (this._addressSearchAbort) this._addressSearchAbort.abort();
             this._addressSearchAbort = new AbortController();
 
-            const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6&lang=no`;
+            const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6`;
             const response = await fetch(url, { signal: this._addressSearchAbort.signal });
             if (!response.ok) throw new Error(`Address search failed: ${response.status}`);
 
