@@ -4087,6 +4087,90 @@ body {
     transform: translateY(-3px);
 }
 
+/* Podcast View Toggle & List View Adjustments */
+
+.view-btn:hover {
+  background: var(--bg-light) !important;
+  color: var(--primary-orange) !important;
+  border-color: var(--primary-orange) !important;
+}
+
+.view-btn.active {
+  background: var(--primary-orange) !important;
+  color: white !important;
+  border-color: var(--primary-orange) !important;
+}
+
+/* List View Layout for Podcast Grid */
+.podcast-grid.list-view {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+}
+
+.podcast-grid.list-view .podcast-card {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 25px !important;
+  padding: 20px !important;
+  text-align: left !important;
+}
+
+.podcast-grid.list-view .podcast-artwork {
+  width: 120px !important;
+  height: 120px !important;
+  padding-top: 0 !important; /* Overstyrer 1:1 trikset */
+  flex-shrink: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.podcast-grid.list-view .podcast-artwork img {
+  position: static !important; /* Fjern absolutte posisjoneringen */
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 8px !important;
+}
+
+.podcast-grid.list-view .podcast-content {
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.podcast-grid.list-view .podcast-description {
+  margin-bottom: 10px !important;
+}
+
+.podcast-grid.list-view .podcast-meta {
+  margin-bottom: 10px !important;
+}
+
+.podcast-grid.list-view .podcast-actions {
+  padding-top: 15px !important;
+  border-top: 1px solid var(--border-color) !important;
+  justify-content: flex-start !important;
+}
+
+/* Responsiv liste-visning på mobil */
+@media (max-width: 768px) {
+  .podcast-grid.list-view .podcast-card {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 15px !important;
+    padding: 20px !important;
+  }
+
+  .podcast-grid.list-view .podcast-artwork {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9 !important; /* Bruk 16:9 for landskapsbilder på mobil-liste */
+  }
+
+  .podcast-grid.list-view .podcast-artwork img {
+    object-fit: cover !important;
+  }
+}
+
 /* Podcast Platforms */
 .section-footer {
     margin-top: 40px;
