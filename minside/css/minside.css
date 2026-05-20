@@ -522,6 +522,67 @@ body {
     gap: 8px;
 }
 
+.phone-inline-grid {
+    display: grid;
+    grid-template-columns: minmax(120px, 0.8fr) minmax(0, 1.2fr);
+    gap: 8px;
+}
+
+.address-search-status {
+    min-height: 17px;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    font-weight: 600;
+}
+
+.address-search-results {
+    display: grid;
+    gap: 6px;
+}
+
+.address-result-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    padding: 9px 10px;
+    color: var(--text-main);
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.address-result-row:hover {
+    border-color: var(--accent-color);
+    background: var(--accent-light);
+}
+
+.address-result-row .material-symbols-outlined {
+    color: var(--accent-color);
+    font-size: 18px;
+    margin-top: 1px;
+}
+
+.address-result-row span:last-child {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+}
+
+.address-result-row strong {
+    font-size: 0.84rem;
+    line-height: 1.25;
+}
+
+.address-result-row small {
+    color: var(--text-muted);
+    font-size: 0.73rem;
+    line-height: 1.3;
+}
+
 .profile-edit-actions {
     display: none;
     justify-content: flex-end;
@@ -1735,6 +1796,10 @@ body {
     }
 
     .profile-inline-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .phone-inline-grid {
         grid-template-columns: 1fr;
     }
 

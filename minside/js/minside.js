@@ -366,6 +366,72 @@ class MinSideManager {
             || '';
     }
 
+    _getPhoneCountries() {
+        return [
+            ['NO', '+47', 'Norge'], ['SE', '+46', 'Sverige'], ['DK', '+45', 'Danmark'], ['FI', '+358', 'Finland'],
+            ['IS', '+354', 'Island'], ['GB', '+44', 'Storbritannia'], ['US', '+1', 'USA'], ['CA', '+1', 'Canada'],
+            ['AF', '+93', 'Afghanistan'], ['AL', '+355', 'Albania'], ['DZ', '+213', 'Algerie'], ['AS', '+1684', 'Amerikansk Samoa'],
+            ['AD', '+376', 'Andorra'], ['AO', '+244', 'Angola'], ['AI', '+1264', 'Anguilla'], ['AG', '+1268', 'Antigua og Barbuda'],
+            ['AR', '+54', 'Argentina'], ['AM', '+374', 'Armenia'], ['AW', '+297', 'Aruba'], ['AU', '+61', 'Australia'],
+            ['AT', '+43', 'Østerrike'], ['AZ', '+994', 'Aserbajdsjan'], ['BS', '+1242', 'Bahamas'], ['BH', '+973', 'Bahrain'],
+            ['BD', '+880', 'Bangladesh'], ['BB', '+1246', 'Barbados'], ['BY', '+375', 'Belarus'], ['BE', '+32', 'Belgia'],
+            ['BZ', '+501', 'Belize'], ['BJ', '+229', 'Benin'], ['BM', '+1441', 'Bermuda'], ['BT', '+975', 'Bhutan'],
+            ['BO', '+591', 'Bolivia'], ['BA', '+387', 'Bosnia-Hercegovina'], ['BW', '+267', 'Botswana'], ['BR', '+55', 'Brasil'],
+            ['IO', '+246', 'Britisk territorium i Indiahavet'], ['VG', '+1284', 'De britiske jomfruøyene'], ['BN', '+673', 'Brunei'],
+            ['BG', '+359', 'Bulgaria'], ['BF', '+226', 'Burkina Faso'], ['BI', '+257', 'Burundi'], ['KH', '+855', 'Kambodsja'],
+            ['CM', '+237', 'Kamerun'], ['CV', '+238', 'Kapp Verde'], ['KY', '+1345', 'Caymanøyene'], ['CF', '+236', 'Den sentralafrikanske republikk'],
+            ['TD', '+235', 'Tsjad'], ['CL', '+56', 'Chile'], ['CN', '+86', 'Kina'], ['CX', '+61', 'Christmasøya'],
+            ['CC', '+61', 'Kokosøyene'], ['CO', '+57', 'Colombia'], ['KM', '+269', 'Komorene'], ['CG', '+242', 'Kongo-Brazzaville'],
+            ['CD', '+243', 'Kongo-Kinshasa'], ['CK', '+682', 'Cookøyene'], ['CR', '+506', 'Costa Rica'], ['CI', '+225', 'Elfenbenskysten'],
+            ['HR', '+385', 'Kroatia'], ['CU', '+53', 'Cuba'], ['CW', '+599', 'Curaçao'], ['CY', '+357', 'Kypros'],
+            ['CZ', '+420', 'Tsjekkia'], ['DJ', '+253', 'Djibouti'], ['DM', '+1767', 'Dominica'], ['DO', '+1809', 'Den dominikanske republikk'],
+            ['EC', '+593', 'Ecuador'], ['EG', '+20', 'Egypt'], ['SV', '+503', 'El Salvador'], ['GQ', '+240', 'Ekvatorial-Guinea'],
+            ['ER', '+291', 'Eritrea'], ['EE', '+372', 'Estland'], ['SZ', '+268', 'Eswatini'], ['ET', '+251', 'Etiopia'],
+            ['FK', '+500', 'Falklandsøyene'], ['FO', '+298', 'Færøyene'], ['FJ', '+679', 'Fiji'], ['FR', '+33', 'Frankrike'],
+            ['GF', '+594', 'Fransk Guyana'], ['PF', '+689', 'Fransk Polynesia'], ['GA', '+241', 'Gabon'], ['GM', '+220', 'Gambia'],
+            ['GE', '+995', 'Georgia'], ['DE', '+49', 'Tyskland'], ['GH', '+233', 'Ghana'], ['GI', '+350', 'Gibraltar'],
+            ['GR', '+30', 'Hellas'], ['GL', '+299', 'Grønland'], ['GD', '+1473', 'Grenada'], ['GP', '+590', 'Guadeloupe'],
+            ['GU', '+1671', 'Guam'], ['GT', '+502', 'Guatemala'], ['GG', '+44', 'Guernsey'], ['GN', '+224', 'Guinea'],
+            ['GW', '+245', 'Guinea-Bissau'], ['GY', '+592', 'Guyana'], ['HT', '+509', 'Haiti'], ['HN', '+504', 'Honduras'],
+            ['HK', '+852', 'Hongkong'], ['HU', '+36', 'Ungarn'], ['IN', '+91', 'India'], ['ID', '+62', 'Indonesia'],
+            ['IR', '+98', 'Iran'], ['IQ', '+964', 'Irak'], ['IE', '+353', 'Irland'], ['IM', '+44', 'Man'],
+            ['IL', '+972', 'Israel'], ['IT', '+39', 'Italia'], ['JM', '+1876', 'Jamaica'], ['JP', '+81', 'Japan'],
+            ['JE', '+44', 'Jersey'], ['JO', '+962', 'Jordan'], ['KZ', '+7', 'Kasakhstan'], ['KE', '+254', 'Kenya'],
+            ['KI', '+686', 'Kiribati'], ['XK', '+383', 'Kosovo'], ['KW', '+965', 'Kuwait'], ['KG', '+996', 'Kirgisistan'],
+            ['LA', '+856', 'Laos'], ['LV', '+371', 'Latvia'], ['LB', '+961', 'Libanon'], ['LS', '+266', 'Lesotho'],
+            ['LR', '+231', 'Liberia'], ['LY', '+218', 'Libya'], ['LI', '+423', 'Liechtenstein'], ['LT', '+370', 'Litauen'],
+            ['LU', '+352', 'Luxembourg'], ['MO', '+853', 'Macao'], ['MG', '+261', 'Madagaskar'], ['MW', '+265', 'Malawi'],
+            ['MY', '+60', 'Malaysia'], ['MV', '+960', 'Maldivene'], ['ML', '+223', 'Mali'], ['MT', '+356', 'Malta'],
+            ['MH', '+692', 'Marshalløyene'], ['MQ', '+596', 'Martinique'], ['MR', '+222', 'Mauritania'], ['MU', '+230', 'Mauritius'],
+            ['YT', '+262', 'Mayotte'], ['MX', '+52', 'Mexico'], ['FM', '+691', 'Mikronesia'], ['MD', '+373', 'Moldova'],
+            ['MC', '+377', 'Monaco'], ['MN', '+976', 'Mongolia'], ['ME', '+382', 'Montenegro'], ['MS', '+1664', 'Montserrat'],
+            ['MA', '+212', 'Marokko'], ['MZ', '+258', 'Mosambik'], ['MM', '+95', 'Myanmar'], ['NA', '+264', 'Namibia'],
+            ['NR', '+674', 'Nauru'], ['NP', '+977', 'Nepal'], ['NL', '+31', 'Nederland'], ['NC', '+687', 'Ny-Caledonia'],
+            ['NZ', '+64', 'New Zealand'], ['NI', '+505', 'Nicaragua'], ['NE', '+227', 'Niger'], ['NG', '+234', 'Nigeria'],
+            ['NU', '+683', 'Niue'], ['NF', '+672', 'Norfolkøya'], ['KP', '+850', 'Nord-Korea'], ['MK', '+389', 'Nord-Makedonia'],
+            ['MP', '+1670', 'Nord-Marianene'], ['OM', '+968', 'Oman'], ['PK', '+92', 'Pakistan'], ['PW', '+680', 'Palau'],
+            ['PS', '+970', 'Palestina'], ['PA', '+507', 'Panama'], ['PG', '+675', 'Papua Ny-Guinea'], ['PY', '+595', 'Paraguay'],
+            ['PE', '+51', 'Peru'], ['PH', '+63', 'Filippinene'], ['PL', '+48', 'Polen'], ['PT', '+351', 'Portugal'],
+            ['PR', '+1787', 'Puerto Rico'], ['QA', '+974', 'Qatar'], ['RE', '+262', 'Réunion'], ['RO', '+40', 'Romania'],
+            ['RU', '+7', 'Russland'], ['RW', '+250', 'Rwanda'], ['WS', '+685', 'Samoa'], ['SM', '+378', 'San Marino'],
+            ['ST', '+239', 'São Tomé og Príncipe'], ['SA', '+966', 'Saudi-Arabia'], ['SN', '+221', 'Senegal'], ['RS', '+381', 'Serbia'],
+            ['SC', '+248', 'Seychellene'], ['SL', '+232', 'Sierra Leone'], ['SG', '+65', 'Singapore'], ['SX', '+1721', 'Sint Maarten'],
+            ['SK', '+421', 'Slovakia'], ['SI', '+386', 'Slovenia'], ['SB', '+677', 'Salomonøyene'], ['SO', '+252', 'Somalia'],
+            ['ZA', '+27', 'Sør-Afrika'], ['KR', '+82', 'Sør-Korea'], ['SS', '+211', 'Sør-Sudan'], ['ES', '+34', 'Spania'],
+            ['LK', '+94', 'Sri Lanka'], ['BL', '+590', 'Saint-Barthélemy'], ['SH', '+290', 'St. Helena'], ['KN', '+1869', 'Saint Kitts og Nevis'],
+            ['LC', '+1758', 'Saint Lucia'], ['MF', '+590', 'Saint-Martin'], ['PM', '+508', 'Saint-Pierre og Miquelon'], ['VC', '+1784', 'Saint Vincent og Grenadinene'],
+            ['SD', '+249', 'Sudan'], ['SR', '+597', 'Surinam'], ['CH', '+41', 'Sveits'], ['SY', '+963', 'Syria'],
+            ['TW', '+886', 'Taiwan'], ['TJ', '+992', 'Tadsjikistan'], ['TZ', '+255', 'Tanzania'], ['TH', '+66', 'Thailand'],
+            ['TL', '+670', 'Timor-Leste'], ['TG', '+228', 'Togo'], ['TK', '+690', 'Tokelau'], ['TO', '+676', 'Tonga'],
+            ['TT', '+1868', 'Trinidad og Tobago'], ['TN', '+216', 'Tunisia'], ['TR', '+90', 'Tyrkia'], ['TM', '+993', 'Turkmenistan'],
+            ['TC', '+1649', 'Turks- og Caicosøyene'], ['TV', '+688', 'Tuvalu'], ['UG', '+256', 'Uganda'], ['UA', '+380', 'Ukraina'],
+            ['AE', '+971', 'De forente arabiske emirater'], ['UY', '+598', 'Uruguay'], ['UZ', '+998', 'Usbekistan'], ['VU', '+678', 'Vanuatu'],
+            ['VA', '+379', 'Vatikanstaten'], ['VE', '+58', 'Venezuela'], ['VN', '+84', 'Vietnam'], ['VI', '+1340', 'De amerikanske jomfruøyene'],
+            ['WF', '+681', 'Wallis og Futuna'], ['EH', '+212', 'Vest-Sahara'], ['YE', '+967', 'Jemen'], ['ZM', '+260', 'Zambia'],
+            ['ZW', '+263', 'Zimbabwe']
+        ];
+    }
+
     async _fetchCurrentUserDonations({ order = false } = {}) {
         const uid = this.currentUser?.uid;
         const email = (this.currentUser?.email || '').trim().toLowerCase();
@@ -756,6 +822,12 @@ class MinSideManager {
         const esc = value => this._escapeHtml(value);
         const val = v => v ? `<span class="info-row-value">${esc(v)}</span>` : `<span class="info-row-value empty">—</span>`;
         const inputValue = v => esc(v || '');
+        const phoneCountryCode = p.phoneCountryCode || (String(p.phone || '').trim().startsWith('+') ? '' : '+47');
+        const phoneDisplay = [phoneCountryCode, p.phone].filter(Boolean).join(' ').trim();
+        const phoneCountryOptions = this._getPhoneCountries().map(([iso, dial, name]) => {
+            const selected = dial === phoneCountryCode ? 'selected' : '';
+            return `<option value="${esc(dial)}" data-country="${esc(iso)}" ${selected}>${esc(`${dial} ${name}`)}</option>`;
+        }).join('');
 
         const joinYear = p.createdAt?.toDate
             ? p.createdAt.toDate().getFullYear()
@@ -796,9 +868,12 @@ class MinSideManager {
                             <span class="material-symbols-outlined info-row-icon">phone</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Telefon</div>
-                                <div class="info-row-display">${val(p.phone)}</div>
+                                <div class="info-row-display">${val(phoneDisplay)}</div>
                                 <div class="info-row-edit">
-                                    <input name="phone" type="tel" value="${inputValue(p.phone)}" autocomplete="tel">
+                                    <div class="phone-inline-grid">
+                                        <select name="phoneCountryCode" autocomplete="tel-country-code">${phoneCountryOptions}</select>
+                                        <input name="phone" type="tel" value="${inputValue(p.phone)}" autocomplete="tel-national" placeholder="Telefonnummer">
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -806,15 +881,18 @@ class MinSideManager {
                             <span class="material-symbols-outlined info-row-icon">location_on</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">Adresse</div>
-                                <div class="info-row-display">${p.address || p.zip || p.city
-                ? `<span class="info-row-value">${[esc(p.address), [esc(p.zip), esc(p.city)].filter(Boolean).join(' ')].filter(Boolean).join('<br>')}</span>`
+                                <div class="info-row-display">${p.address || p.zip || p.city || p.country
+                ? `<span class="info-row-value">${[esc(p.address), [esc(p.zip), esc(p.city)].filter(Boolean).join(' '), esc(p.country)].filter(Boolean).join('<br>')}</span>`
                 : `<span class="info-row-value empty">—</span>`}</div>
                                 <div class="info-row-edit">
-                                    <input name="address" value="${inputValue(p.address)}" autocomplete="street-address" placeholder="Gateadresse">
+                                    <input id="profile-address-input" name="address" value="${inputValue(p.address)}" autocomplete="street-address" placeholder="Søk etter adresse i hele verden">
+                                    <div id="address-search-status" class="address-search-status"></div>
+                                    <div id="address-search-results" class="address-search-results"></div>
                                     <div class="profile-inline-grid">
                                         <input name="zip" value="${inputValue(p.zip)}" autocomplete="postal-code" placeholder="Postnr">
                                         <input name="city" value="${inputValue(p.city)}" autocomplete="address-level2" placeholder="By">
                                     </div>
+                                    <input name="country" value="${inputValue(p.country)}" autocomplete="country-name" placeholder="Land">
                                 </div>
                             </div>
                         </div>
@@ -1002,7 +1080,7 @@ class MinSideManager {
             contactCard?.classList.remove('is-editing');
         });
         document.getElementById('save-contact-btn')?.addEventListener('click', async () => {
-            await this._saveProfileFields(contactCard, ['displayName', 'phone', 'address', 'zip', 'city']);
+            await this._saveProfileFields(contactCard, ['displayName', 'phoneCountryCode', 'phone', 'address', 'zip', 'city', 'country']);
             this.profileData = await this.getMergedProfile(this.currentUser);
             this.updateHeader();
             this.loadView('profile');
@@ -1025,6 +1103,7 @@ class MinSideManager {
 
         // Push toggle
         this._wireFamilySearch();
+        this._wireAddressAutocomplete();
 
         document.querySelectorAll('.member-remove-btn').forEach(button => {
             button.addEventListener('click', async () => {
@@ -1069,6 +1148,115 @@ class MinSideManager {
         } finally {
             if (btn) { btn.disabled = false; btn.textContent = 'Lagret ✓'; }
         }
+    }
+
+    _wireAddressAutocomplete() {
+        const input = document.getElementById('profile-address-input');
+        const resultsEl = document.getElementById('address-search-results');
+        const statusEl = document.getElementById('address-search-status');
+        if (!input || !resultsEl || !statusEl) return;
+
+        input.addEventListener('input', () => {
+            clearTimeout(this._addressSearchTimer);
+            const query = input.value.trim();
+
+            if (query.length < 3) {
+                this._addressSuggestions = [];
+                resultsEl.innerHTML = '';
+                statusEl.textContent = '';
+                return;
+            }
+
+            statusEl.textContent = 'Søker etter adresser...';
+            this._addressSearchTimer = setTimeout(() => {
+                this.searchGlobalAddresses(query);
+            }, 350);
+        });
+    }
+
+    _formatPhotonAddress(properties = {}) {
+        const street = [properties.street, properties.housenumber].filter(Boolean).join(' ').trim();
+        const primary = properties.name && !street ? properties.name : street || properties.name || '';
+        const locality = properties.city || properties.locality || properties.district || properties.county || properties.state || '';
+        const regionLine = [properties.postcode, locality].filter(Boolean).join(' ').trim();
+        const country = properties.country || '';
+        const label = [primary, regionLine, country].filter(Boolean).join(', ');
+
+        return {
+            address: primary || label,
+            zip: properties.postcode || '',
+            city: locality,
+            country,
+            countryCode: properties.countrycode || '',
+            label
+        };
+    }
+
+    async searchGlobalAddresses(query) {
+        const resultsEl = document.getElementById('address-search-results');
+        const statusEl = document.getElementById('address-search-status');
+        if (!resultsEl || !statusEl) return;
+
+        try {
+            if (this._addressSearchAbort) this._addressSearchAbort.abort();
+            this._addressSearchAbort = new AbortController();
+
+            const url = `https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=6&lang=no`;
+            const response = await fetch(url, { signal: this._addressSearchAbort.signal });
+            if (!response.ok) throw new Error(`Address search failed: ${response.status}`);
+
+            const data = await response.json();
+            this._addressSuggestions = (data.features || [])
+                .map(feature => this._formatPhotonAddress(feature.properties || {}))
+                .filter(item => item.label);
+
+            if (!this._addressSuggestions.length) {
+                resultsEl.innerHTML = '';
+                statusEl.textContent = 'Ingen adresseforslag.';
+                return;
+            }
+
+            statusEl.textContent = '';
+            resultsEl.innerHTML = this._addressSuggestions.map((item, index) => `
+                <button class="address-result-row" type="button" data-address-index="${index}">
+                    <span class="material-symbols-outlined">location_on</span>
+                    <span>
+                        <strong>${this._escapeHtml(item.address || item.label)}</strong>
+                        <small>${this._escapeHtml([item.zip, item.city, item.country].filter(Boolean).join(', '))}</small>
+                    </span>
+                </button>
+            `).join('');
+
+            resultsEl.querySelectorAll('.address-result-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    this.selectAddressSuggestion(Number(row.dataset.addressIndex));
+                });
+            });
+        } catch (error) {
+            if (error.name === 'AbortError') return;
+            console.error('searchGlobalAddresses:', error);
+            resultsEl.innerHTML = '';
+            statusEl.textContent = 'Kunne ikke hente adresseforslag.';
+        }
+    }
+
+    selectAddressSuggestion(index) {
+        const item = (this._addressSuggestions || [])[index];
+        if (!item) return;
+
+        const addressInput = document.querySelector('[name="address"]');
+        const zipInput = document.querySelector('[name="zip"]');
+        const cityInput = document.querySelector('[name="city"]');
+        const countryInput = document.querySelector('[name="country"]');
+        const resultsEl = document.getElementById('address-search-results');
+        const statusEl = document.getElementById('address-search-status');
+
+        if (addressInput) addressInput.value = item.address || item.label;
+        if (zipInput) zipInput.value = item.zip || '';
+        if (cityInput) cityInput.value = item.city || '';
+        if (countryInput) countryInput.value = item.country || '';
+        if (resultsEl) resultsEl.innerHTML = '';
+        if (statusEl) statusEl.textContent = item.country ? `Valgt: ${item.country}` : 'Adresse valgt.';
     }
 
     _wireFamilySearch() {
