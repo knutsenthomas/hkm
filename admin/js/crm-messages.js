@@ -1179,7 +1179,10 @@ class MessagesManager {
             let payload = { targetRole, title, body, click_action: link };
 
             if (targetRole === 'selected') {
-                const selectedIds = Array.from(document.querySelectorAll('.user-select-checkbox:checked')).map(cb => cb.value);
+                const selectionRoot = document.getElementById('push-user-selection') || document;
+                const selectedIds = Array.from(
+                    selectionRoot.querySelectorAll('.user-select-checkbox:checked, .inbox-user-select:checked')
+                ).map(cb => cb.value);
                 if (selectedIds.length === 0) throw new Error("Velg minst én bruker.");
                 payload.selectedUserIds = selectedIds;
             }
