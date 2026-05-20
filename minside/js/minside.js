@@ -120,6 +120,7 @@ const minsideTranslations = {
         'profile.maritalPartner': 'Samboer',
         'profile.maritalDivorced': 'Skilt',
         'profile.maritalWidowed': 'Enke/Enkemann',
+        'profile.memberSince': 'Medlem siden',
         'profile.accountAdmin': 'Kontoadministrasjon',
         'profile.deleteAccountNotice': 'Sletting av konto er permanent og kan ikke angres.',
         'profile.deleteAccountBtn': 'Slett konto',
@@ -355,6 +356,7 @@ const minsideTranslations = {
         'profile.maritalPartner': 'Partner',
         'profile.maritalDivorced': 'Divorced',
         'profile.maritalWidowed': 'Widowed',
+        'profile.memberSince': 'Member since',
         'profile.accountAdmin': 'Account Administration',
         'profile.deleteAccountNotice': 'Account deletion is permanent and cannot be undone.',
         'profile.deleteAccountBtn': 'Delete Account',
@@ -590,6 +592,7 @@ const minsideTranslations = {
         'profile.maritalPartner': 'Pareja de hecho',
         'profile.maritalDivorced': 'Divorciado',
         'profile.maritalWidowed': 'Viudo',
+        'profile.memberSince': 'Miembro desde',
         'profile.accountAdmin': 'Administración de la Cuenta',
         'profile.deleteAccountNotice': 'La eliminación de la cuenta es permanente y no se puede deshacer.',
         'profile.deleteAccountBtn': 'Eliminar cuenta',
@@ -1638,6 +1641,29 @@ class MinSideManager {
             ? p.createdAt.toDate().getFullYear()
             : new Date().getFullYear();
 
+        const genderKeys = {
+            'Mann': 'profile.genderMale',
+            'Male': 'profile.genderMale',
+            'Kvinne': 'profile.genderFemale',
+            'Female': 'profile.genderFemale',
+            'Annet': 'profile.genderOther',
+            'Other': 'profile.genderOther'
+        };
+        const maritalKeys = {
+            'Ugift': 'profile.maritalSingle',
+            'Single': 'profile.maritalSingle',
+            'Gift': 'profile.maritalMarried',
+            'Married': 'profile.maritalMarried',
+            'Samboer': 'profile.maritalPartner',
+            'Partner': 'profile.maritalPartner',
+            'Skilt': 'profile.maritalDivorced',
+            'Divorced': 'profile.maritalDivorced',
+            'Enke/Enkemann': 'profile.maritalWidowed',
+            'Widowed': 'profile.maritalWidowed'
+        };
+        const genderVal = p.gender ? (t(genderKeys[p.gender]) || p.gender) : '';
+        const maritalVal = p.maritalStatus ? (t(maritalKeys[p.maritalStatus]) || p.maritalStatus) : '';
+
         container.innerHTML = `
         <div class="profile-grid">
             <!-- ── LEFT COLUMN ── -->
@@ -1723,7 +1749,7 @@ class MinSideManager {
                             <span class="material-symbols-outlined info-row-icon">person</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.gender')}</div>
-                                <div class="info-row-display">${val(p.gender ? t(`profile.gender${p.gender}`) : '')}</div>
+                                <div class="info-row-display">${val(genderVal)}</div>
                                 <div class="info-row-edit">
                                     <select name="gender">
                                         <option value="">${t('profile.select')}</option>
@@ -1748,7 +1774,7 @@ class MinSideManager {
                             <span class="material-symbols-outlined info-row-icon">favorite</span>
                             <div class="info-row-content">
                                 <div class="info-row-label">${t('profile.maritalStatus')}</div>
-                                <div class="info-row-display">${val(p.maritalStatus ? t(`profile.marital${p.maritalStatus.replace('Enke/Enkemann', 'Widowed')}`) : '')}</div>
+                                <div class="info-row-display">${val(maritalVal)}</div>
                                 <div class="info-row-edit">
                                     <select name="maritalStatus">
                                         <option value="">${t('profile.select')}</option>
