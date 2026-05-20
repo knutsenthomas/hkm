@@ -55,6 +55,64 @@ async function resolveDonationUserId(customerDetails = {}) {
   return customerDetails.userId || null;
 }
 
+function normalizeSearchText(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function publicMemberResult(doc) {
+  const data = doc.data() || {};
+  return {
+    uid: doc.id,
+    name: data.displayName || data.name || data.email || "Uten navn",
+    email: data.email || "",
+    photoURL: data.photoURL || "",
+    role: data.familyRole || data.memberType || "",
+  };
+}
+
+exports.searchFamilyMembers = onCall(async (request) => {
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "Du må være logget inn for å søke.");
+  }
+
+  const query = normalizeSearchText(request.data?.query);
+  if (query.length < 2) {
+    return { members: [] };
+  }
+
+  const currentUid = request.auth.uid;
+  const matches = [];
+
+  try {
+    const snap = await db.collection("users").limit(1000).get();
+
+    snap.forEach(doc => {
+      if (doc.id === currentUid || matches.length >= 10) return;
+
+      const data = doc.data() || {};
+      const haystack = normalizeSearchText([
+        data.displayName,
+        data.name,
+        data.email,
+        data.phone,
+      ].filter(Boolean).join(" "));
+
+      if (haystack.includes(query)) {
+        matches.push(publicMemberResult(doc));
+      }
+    });
+
+    return { members: matches };
+  } catch (error) {
+    console.error("searchFamilyMembers failed:", error);
+    throw new HttpsError("internal", "Kunne ikke søke etter familiemedlemmer.");
+  }
+});
+
 // Constants for podcast transcription
 const PODCAST_TRANSCRIPT_MAX_AUTO_EPISODES_PER_RUN = 3;
 const PODCAST_TRANSCRIPT_RETRY_MS = 1000 * 60 * 60 * 24; // 24 hours

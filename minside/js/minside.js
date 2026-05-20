@@ -919,17 +919,28 @@ class MinSideManager {
                     <div class="info-card-header">
                         <h3>Familie</h3>
                     </div>
+                    <div class="family-search">
+                        <div class="family-search-box">
+                            <span class="material-symbols-outlined">search</span>
+                            <input id="family-search-input" type="search" placeholder="Søk etter navn, e-post eller telefon" autocomplete="off">
+                        </div>
+                        <div id="family-search-status" class="family-search-status"></div>
+                        <div id="family-search-results" class="family-search-results"></div>
+                    </div>
                     <div id="household-content">
                         ${p.familyMembers?.length ? `
-                            <p class="household-name">${p.displayName?.split(' ').pop() || ''} Husstand</p>
+                            <p class="household-name">${esc(p.displayName?.split(' ').pop() || '')} Husstand</p>
                             <div class="household-members">
                                 ${p.familyMembers.map(m => `
                                     <div class="member-row">
-                                        <div class="member-avatar">${(m.name || '?').charAt(0).toUpperCase()}</div>
+                                        <div class="member-avatar">${m.photoURL ? `<img src="${esc(m.photoURL)}" alt="">` : esc((m.name || '?').charAt(0).toUpperCase())}</div>
                                         <div class="member-info">
-                                            <div class="member-info-name">${m.name}</div>
-                                            <div class="member-info-sub">${m.role || ''}</div>
+                                            <div class="member-info-name">${esc(m.name || 'Uten navn')}</div>
+                                            <div class="member-info-sub">${esc(m.role || m.email || '')}</div>
                                         </div>
+                                        <button class="member-remove-btn" data-member-uid="${esc(m.uid || '')}" type="button" title="Fjern">
+                                            <span class="material-symbols-outlined">close</span>
+                                        </button>
                                     </div>
                                 `).join('')}
                             </div>
@@ -1013,6 +1024,14 @@ class MinSideManager {
         });
 
         // Push toggle
+        this._wireFamilySearch();
+
+        document.querySelectorAll('.member-remove-btn').forEach(button => {
+            button.addEventListener('click', async () => {
+                await this.removeFamilyMember(button.dataset.memberUid);
+            });
+        });
+
         document.getElementById('save-prefs-btn')?.addEventListener('click', async () => {
             const pushEnabled = document.getElementById('push-toggle')?.checked;
             const emailConsent = document.getElementById('email-toggle')?.checked;
@@ -1050,6 +1069,121 @@ class MinSideManager {
         } finally {
             if (btn) { btn.disabled = false; btn.textContent = 'Lagret ✓'; }
         }
+    }
+
+    _wireFamilySearch() {
+        const input = document.getElementById('family-search-input');
+        const resultsEl = document.getElementById('family-search-results');
+        const statusEl = document.getElementById('family-search-status');
+        if (!input || !resultsEl || !statusEl) return;
+
+        input.addEventListener('input', () => {
+            clearTimeout(this._familySearchTimer);
+            const query = input.value.trim();
+
+            if (query.length < 2) {
+                resultsEl.innerHTML = '';
+                statusEl.textContent = '';
+                return;
+            }
+
+            statusEl.textContent = 'Søker...';
+            this._familySearchTimer = setTimeout(() => {
+                this.searchFamilyMembers(query);
+            }, 300);
+        });
+    }
+
+    async searchFamilyMembers(query) {
+        const resultsEl = document.getElementById('family-search-results');
+        const statusEl = document.getElementById('family-search-status');
+        if (!resultsEl || !statusEl) return;
+
+        if (!firebase.functions) {
+            statusEl.textContent = 'Søk er ikke tilgjengelig akkurat nå.';
+            return;
+        }
+
+        try {
+            const callable = firebase.functions().httpsCallable('searchFamilyMembers');
+            const response = await callable({ query });
+            const existingIds = new Set((this.profileData.familyMembers || []).map(member => member.uid).filter(Boolean));
+            const members = (response.data?.members || []).filter(member => !existingIds.has(member.uid));
+
+            if (!members.length) {
+                resultsEl.innerHTML = '';
+                statusEl.textContent = 'Ingen treff.';
+                return;
+            }
+
+            statusEl.textContent = '';
+            resultsEl.innerHTML = members.map(member => `
+                <button class="family-result-row" type="button" data-member='${this._escapeHtml(JSON.stringify(member))}'>
+                    <span class="member-avatar">${member.photoURL ? `<img src="${this._escapeHtml(member.photoURL)}" alt="">` : this._escapeHtml((member.name || '?').charAt(0).toUpperCase())}</span>
+                    <span class="member-info">
+                        <span class="member-info-name">${this._escapeHtml(member.name || 'Uten navn')}</span>
+                        <span class="member-info-sub">${this._escapeHtml(member.email || '')}</span>
+                    </span>
+                    <span class="material-symbols-outlined family-result-add">add</span>
+                </button>
+            `).join('');
+
+            resultsEl.querySelectorAll('.family-result-row').forEach(row => {
+                row.addEventListener('click', async () => {
+                    try {
+                        await this.addFamilyMember(JSON.parse(row.dataset.member || '{}'));
+                    } catch (error) {
+                        console.warn('family add parse:', error);
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('searchFamilyMembers:', error);
+            resultsEl.innerHTML = '';
+            statusEl.textContent = 'Kunne ikke søke akkurat nå.';
+        }
+    }
+
+    async addFamilyMember(member) {
+        if (!this.currentUser || !member?.uid || member.uid === this.currentUser.uid) return;
+
+        const existing = Array.isArray(this.profileData.familyMembers) ? this.profileData.familyMembers : [];
+        if (existing.some(item => item.uid === member.uid)) return;
+
+        const nextMembers = [
+            ...existing,
+            {
+                uid: member.uid,
+                name: member.name || 'Uten navn',
+                email: member.email || '',
+                photoURL: member.photoURL || '',
+                role: member.role || 'Familiemedlem'
+            }
+        ];
+
+        await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+            familyMembers: nextMembers,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        this.profileData.familyMembers = nextMembers;
+        this.loadView('profile');
+    }
+
+    async removeFamilyMember(memberUid) {
+        if (!this.currentUser || !memberUid) return;
+
+        const existing = Array.isArray(this.profileData.familyMembers) ? this.profileData.familyMembers : [];
+        const nextMembers = existing.filter(member => member.uid !== memberUid);
+        if (nextMembers.length === existing.length) return;
+
+        await firebase.firestore().collection('users').doc(this.currentUser.uid).set({
+            familyMembers: nextMembers,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+
+        this.profileData.familyMembers = nextMembers;
+        this.loadView('profile');
     }
 
     async _requestPushPermission() {

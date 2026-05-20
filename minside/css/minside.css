@@ -687,6 +687,78 @@ body {
 }
 
 /* HOUSEHOLD */
+.family-search {
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.family-search-box {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    border: 1.5px solid var(--border-solid);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    padding: 0 11px;
+}
+
+.family-search-box .material-symbols-outlined {
+    color: #94a3b8;
+    font-size: 18px;
+}
+
+.family-search-box input {
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    outline: none;
+    padding: 10px 0;
+    background: transparent;
+    color: var(--text-main);
+    font-family: inherit;
+    font-size: 0.86rem;
+    font-weight: 600;
+}
+
+.family-search-status {
+    min-height: 18px;
+    margin-top: 8px;
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 600;
+}
+
+.family-search-results {
+    display: grid;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.family-result-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--card-bg);
+    padding: 9px 10px;
+    text-align: left;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.family-result-row:hover {
+    border-color: var(--accent-color);
+    background: var(--accent-light);
+}
+
+.family-result-add {
+    margin-left: auto;
+    color: var(--accent-color);
+    font-size: 19px !important;
+}
+
 .household-name {
     font-size: 0.72rem;
     font-weight: 700;
@@ -706,6 +778,29 @@ body {
     gap: 12px;
     padding: 10px 22px;
     transition: background 0.15s;
+}
+
+.member-remove-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.member-remove-btn:hover {
+    color: #ef4444;
+    background: #fef2f2;
+}
+
+.member-remove-btn .material-symbols-outlined {
+    font-size: 18px;
 }
 
 .member-row:hover {
