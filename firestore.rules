@@ -161,7 +161,10 @@ service cloud.firestore {
     function canReadOwnDonation() {
       return signedIn() &&
         ((hasKey(resource.data, 'userId') && resource.data.userId == request.auth.uid) ||
-         (hasKey(resource.data, 'uid') && resource.data.uid == request.auth.uid));
+         (hasKey(resource.data, 'uid') && resource.data.uid == request.auth.uid) ||
+         (request.auth.token.email is string &&
+          ((hasKey(resource.data, 'donorEmail') && resource.data.donorEmail == request.auth.token.email) ||
+           (hasKey(resource.data, 'email') && resource.data.email == request.auth.token.email))));
     }
 
     // Public CMS content (website pages + collections)

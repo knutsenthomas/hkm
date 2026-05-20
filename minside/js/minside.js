@@ -303,9 +303,25 @@ class MinSideManager {
         return 0;
     }
 
+    _getDonationDate(donation) {
+        const raw = donation || {};
+        return raw.completedAt?.toDate?.()
+            || raw.timestamp?.toDate?.()
+            || raw.createdAt?.toDate?.()
+            || (raw.completedAt ? new Date(raw.completedAt) : null)
+            || (raw.timestamp ? new Date(raw.timestamp) : null)
+            || (raw.createdAt ? new Date(raw.createdAt) : null);
+    }
+
+    _donationStatusIsVisible(donation) {
+        const status = String(donation?.status || '').trim().toLowerCase();
+        return !status || ['completed', 'succeeded', 'captured', 'pending', 'processing'].includes(status);
+    }
+
     async _fetchCurrentUserDonations({ order = false } = {}) {
         const uid = this.currentUser?.uid;
         const email = (this.currentUser?.email || '').trim().toLowerCase();
+        const authEmail = (firebase.auth().currentUser?.email || '').trim();
         if (!uid && !email) return [];
 
         const db = firebase.firestore();
@@ -324,16 +340,21 @@ class MinSideManager {
             queries.push(db.collection('donations').where('donorEmail', '==', email).get());
             queries.push(db.collection('donations').where('email', '==', email).get());
         }
+        if (authEmail && authEmail !== email) {
+            queries.push(db.collection('donations').where('donorEmail', '==', authEmail).get());
+            queries.push(db.collection('donations').where('email', '==', authEmail).get());
+        }
 
         const results = await Promise.allSettled(queries);
         results.forEach(result => {
             if (result.status === 'fulfilled') addSnap(result.value);
+            if (result.status === 'rejected') console.warn('Kunne ikke hente gave-spørring:', result.reason);
         });
 
-        const donations = Array.from(byId.values());
+        const donations = Array.from(byId.values()).filter(donation => this._donationStatusIsVisible(donation));
         donations.sort((a, b) => {
-            const at = a.timestamp?.toMillis?.() || a.timestamp?.toDate?.()?.getTime?.() || 0;
-            const bt = b.timestamp?.toMillis?.() || b.timestamp?.toDate?.()?.getTime?.() || 0;
+            const at = this._getDonationDate(a)?.getTime?.() || 0;
+            const bt = this._getDonationDate(b)?.getTime?.() || 0;
             return bt - at;
         });
         return donations;
@@ -627,7 +648,7 @@ class MinSideManager {
             // Year total giving
             let yearTotal = 0;
             donations.forEach(donation => {
-                if (donation.timestamp?.toDate?.()?.getFullYear?.() === new Date().getFullYear()) {
+                if (this._getDonationDate(donation)?.getFullYear?.() === new Date().getFullYear()) {
                     yearTotal += this._normalizeDonationAmountNok(donation);
                 }
             });
@@ -1189,7 +1210,7 @@ class MinSideManager {
         } catch (e) { }
 
         const currentYear = new Date().getFullYear();
-        const yearTotal = donations.filter(d => d.timestamp?.toDate?.()?.getFullYear?.() === currentYear)
+        const yearTotal = donations.filter(d => this._getDonationDate(d)?.getFullYear?.() === currentYear)
             .reduce((s, d) => s + this._normalizeDonationAmountNok(d), 0);
         const lastGift = donations[0];
         const lastGiftAmount = lastGift ? this._normalizeDonationAmountNok(lastGift) : 0;
@@ -1204,7 +1225,7 @@ class MinSideManager {
                 <div class="stat-chip">
                     <div class="stat-chip-label">Siste gave</div>
                     <div class="stat-chip-value">${lastGift ? `kr ${lastGiftAmount.toLocaleString('no-NO')}` : '—'}</div>
-                    <div class="stat-chip-sub">${lastGift?.timestamp?.toDate ? lastGift.timestamp.toDate().toLocaleDateString('no-NO') : ''}</div>
+                    <div class="stat-chip-sub">${lastGift ? (this._getDonationDate(lastGift)?.toLocaleDateString('no-NO') || '') : ''}</div>
                 </div>
                 <div class="stat-chip">
                     <div class="stat-chip-label">Totalt antall gaver</div>
@@ -1234,7 +1255,7 @@ class MinSideManager {
                         </thead>
                         <tbody>
                             ${donations.map(d => {
-            const date = d.timestamp?.toDate ? d.timestamp.toDate() : new Date();
+            const date = this._getDonationDate(d) || new Date();
             const amountNok = this._normalizeDonationAmountNok(d);
             return `<tr>
                                     <td>${date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
