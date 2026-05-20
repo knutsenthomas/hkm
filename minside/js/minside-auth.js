@@ -44,6 +44,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         feedbackBox.style.display = 'none';
     }
 
+    async function waitForFirebaseReady(timeoutMs = 5000) {
+        const startedAt = Date.now();
+
+        while (Date.now() - startedAt < timeoutMs) {
+            const service = window.firebaseService;
+            if (service && typeof service.tryAutoInit === 'function') {
+                service.tryAutoInit();
+            }
+
+            if (window.firebaseService?.isInitialized && typeof firebase !== 'undefined') {
+                return window.firebaseService;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 100));
+        }
+
+        return window.firebaseService || null;
+    }
+
     function isGoogleRedirectError(error) {
         return error && error.code && String(error.code).startsWith('auth/');
     }
@@ -65,7 +84,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     try {
-        const service = window.firebaseService;
+        const service = await waitForFirebaseReady();
         if (service && service.isInitialized && typeof service.getGoogleRedirectResult === 'function') {
             const redirectResult = await service.getGoogleRedirectResult();
             if (redirectResult && redirectResult.user) {
@@ -94,7 +113,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideMessage();
 
         try {
-            const service = window.firebaseService;
+            const service = await waitForFirebaseReady();
             if (!service || !service.isInitialized) throw new Error("Firebase mismatch");
             await service.login(email, password);
             await routeByRole();
@@ -124,6 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideMessage();
 
         try {
+            await waitForFirebaseReady();
             const userCredential = await firebaseService.register(email, password);
             await userCredential.user.updateProfile({ displayName: name });
             await routeByRole();
@@ -151,6 +171,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         try {
+            await waitForFirebaseReady();
             await firebase.auth().sendSignInLinkToEmail(email, actionCodeSettings);
             window.localStorage.setItem('emailForSignIn', email);
             showMessage('Vi har sendt en magisk link til din e-post!', 'success');
@@ -171,7 +192,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         hideMessage();
 
         try {
-            const service = window.firebaseService;
+            const service = await waitForFirebaseReady();
             if (!service || !service.isInitialized) throw new Error("Firebase mismatch");
             const result = await service.loginWithGoogle({ redirectFallback: true });
             if (!result) return;
@@ -191,7 +212,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     // --- 5. Verify Magic Link on Load ---
-    if (firebase.auth().isSignInWithEmailLink(window.location.href)) {
+    if (typeof firebase !== 'undefined' && firebase.auth().isSignInWithEmailLink(window.location.href)) {
         let email = window.localStorage.getItem('emailForSignIn');
         if (!email) {
             email = window.prompt('Bekreft din e-postadresse:');
