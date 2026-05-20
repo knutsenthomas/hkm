@@ -1393,6 +1393,51 @@ class MinSideManager {
         }
     }
 
+    _getDailyVerse(lang) {
+        const verses = [
+            {
+                no: '"For jeg vet hvilke tanker jeg har med dere, sier Herren..." — Jer 29:11',
+                en: '"For I know the plans I have for you," declares the Lord... — Jer 29:11',
+                es: '"Porque yo sé los pensamientos que tengo acerca de vosotros, dice Jehová... — Jer 29:11'
+            },
+            {
+                no: '"Alt makter jeg i ham som gjør meg sterk." — Fil 4:13',
+                en: '"I can do all things through him who strengthens me." — Phil 4:13',
+                es: '"Todo lo puedo en Cristo que me fortalece." — Fil 4:13'
+            },
+            {
+                no: '"Herren er min hyrde, jeg mangler ingenting." — Sal 23:1',
+                en: '"The Lord is my shepherd; I shall not want." — Ps 23:1',
+                es: '"Jehová es mi pastor; nada me faltará." — Sal 23:1'
+            },
+            {
+                no: '"Men de som venter på Herren, får ny kraft." — Jes 40:31',
+                en: '"But those who trust in the Lord will renew their strength." — Isa 40:31',
+                es: '"Pero los que esperan a Jehová tendrán nuevas fuerzas." — Is 40:31'
+            },
+            {
+                no: '"Vi vet at alt samvirker til det gode for dem som elsker Gud." — Rom 8:28',
+                en: '"And we know that in all things God works for the good of those who love him." — Rom 8:28',
+                es: '"Y sabemos que a los que aman a Dios, todas las cosas les ayudan a bien." — Rom 8:28'
+            },
+            {
+                no: '"Stol på Herren av hele ditt hjerte, og stol ikke på din egen forstand." — Ordsp 3:5',
+                en: '"Trust in the Lord with all your heart and lean not on your own understanding." — Prov 3:5',
+                es: '"Fíate de Jehová de todo tu corazón, y no te apoyes en tu propia prudencia." — Prov 3:5'
+            },
+            {
+                no: '"Vær modig og sterk! Vær ikke redd, for Herren din Gud er med deg." — Jos 1:9',
+                en: '"Be strong and courageous. Do not be afraid; the Lord your God will be with you." — Josh 1:9',
+                es: '"Mira que te mando que te esfuerces y seas valiente; no temas, porque Jehová tu Dios estará contigo." — Jos 1:9'
+            }
+        ];
+
+        // Pick verse based on the day of the week (0 = Sunday, 1 = Monday, etc.)
+        const dayIndex = new Date().getDay();
+        const verse = verses[dayIndex] || verses[0];
+        return verse[lang] || verse['no'];
+    }
+
     _timeAgo(dateVal) {
         const date = (dateVal instanceof Date) ? dateVal : (dateVal?.toDate ? dateVal.toDate() : new Date(dateVal));
         if (isNaN(date.getTime())) return '';
@@ -1427,7 +1472,7 @@ class MinSideManager {
                         ${greeting}, ${name}! 👋
                     </h2>
                     <p class="ms-overview-banner-quote">
-                        ${t('overview.quote')}
+                        ${this._getDailyVerse(document.documentElement.lang || 'no')}
                     </p>
                 </div>
                 <div class="ms-overview-banner-chip">
