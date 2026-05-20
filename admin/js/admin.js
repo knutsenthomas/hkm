@@ -5383,8 +5383,17 @@ class AdminManager {
     async fetchAnalyticsData(days = this.analyticsRangeDays) {
         try {
             const safeDays = [7, 14, 30, 60, 90, 180, 365].includes(Number(days)) ? Number(days) : 30;
-            // Call the Firebase Function
-            const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${safeDays}`);
+            
+            const user = firebase.auth().currentUser;
+            if (!user) throw new Error('Du er ikke logget inn.');
+            const idToken = await user.getIdToken();
+
+            // Call the Firebase Function with Authorization header
+            const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${safeDays}`, {
+                headers: {
+                    'Authorization': `Bearer ${idToken}`
+                }
+            });
             
             const result = await response.json().catch(() => ({ error: `HTTP error ${response.status}` }));
             

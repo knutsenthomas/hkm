@@ -82,6 +82,20 @@ function getSecretOrEnv(param, envKeys = []) {
 }
 
 /**
+ * Helper to get Google Chat webhook URL
+ */
+function getGoogleChatWebhookUrl() {
+  return getSecretOrEnv(googleChatWebhookUrlParam, ["GOOGLE_CHAT_WEBHOOK_URL"]);
+}
+
+/**
+ * Helper to get Google Chat bridge token
+ */
+function getGoogleChatBridgeToken() {
+  return getSecretOrEnv(googleChatBridgeTokenParam, ["GOOGLE_CHAT_BRIDGE_TOKEN"]);
+}
+
+/**
  * Helper to fetch podcast episodes from RSS feed
  */
 async function fetchPodcastEpisodesFromRss(limit = 10) {
@@ -587,7 +601,8 @@ exports.getAnalyticsOverview = onRequest({
   secrets: [gaPropertyIdParam, gaServiceAccountEmailParam, gaServiceAccountPrivateKeyParam]
 }, async (req, res) => {
   return cors(req, res, async () => {
-    try {
+    await verifyAdmin(req, res, async () => {
+      try {
       let propertyId = gaPropertyIdParam.value();
       let clientEmail = gaServiceAccountEmailParam.value();
       let privateKeyRaw = gaServiceAccountPrivateKeyParam.value();
@@ -753,6 +768,7 @@ exports.getAnalyticsOverview = onRequest({
       console.error("Analytics Error:", error);
       res.status(500).json({ error: error.message });
     }
+    });
   });
 });
 
@@ -2554,13 +2570,7 @@ exports.createVippsPayment = onRequest({
       reference,
       returnUrl: paymentReturnUrl,
       userFlow: "WEB_REDIRECT",
-      paymentDescription: "Donasjon til His Kingdom Ministry",
-      metadata: {
-        donorName: customerDetails.name || "",
-        donorEmail: customerDetails.email || "",
-        donorMessage: customerDetails.message || "",
-        userId: resolvedUserId || "",
-      },
+      paymentDescription: "Donasjon til His Kingdom Ministry"
     };
 
     if (phoneNumber) {
@@ -3214,7 +3224,7 @@ async function getAllUsers(role) {
  * Verifies that the user is an admin.
  * Express-style middleware for use in onRequest functions.
  */
-const verifyAdmin = async (req, res, next) => {
+async function verifyAdmin(req, res, next) {
   const idToken = req.headers.authorization?.split('Bearer ')[1];
 
   if (!idToken) {
@@ -3240,7 +3250,7 @@ const verifyAdmin = async (req, res, next) => {
     console.error('Error verifying admin token:', error);
     res.status(401).send({ error: 'Unauthorized: Invalid token.' });
   }
-};
+}
 
 /**
  * Utsendelse av e-post til en gruppe brukere.

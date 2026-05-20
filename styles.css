@@ -238,6 +238,7 @@ button,
 [type='reset'],
 [type='submit'] {
   -webkit-appearance: button;
+  appearance: button;
   /* 1 */
   background-color: transparent;
   /* 2 */
@@ -285,6 +286,7 @@ Correct the cursor style of increment and decrement buttons in Safari.
 
 [type='search'] {
   -webkit-appearance: textfield;
+  appearance: textfield;
   /* 1 */
   outline-offset: -2px;
   /* 2 */
@@ -424,8 +426,6 @@ embed,
 object {
   display: block;
   /* 1 */
-  vertical-align: middle;
-  /* 2 */
 }
 
 /*
@@ -938,6 +938,7 @@ video {
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 
 .line-clamp-none {
@@ -945,6 +946,7 @@ video {
   display: block;
   -webkit-box-orient: horizontal;
   -webkit-line-clamp: none;
+  line-clamp: none;
 }
 
 .\!block {
@@ -3667,26 +3669,6 @@ video {
   forced-color-adjust: none;
 }
 
-.\[-\:\.\] {
-  -: .;
-}
-
-.\[options\:IParseOptions\] {
-  options: IParseOptions;
-}
-
-.\[root\:Root\] {
-  root: Root;
-}
-
-.\[vite\:css\] {
-  vite: css;
-}
-
-.\[vite\:html\] {
-  vite: html;
-}
-
 /* Profil-ikon i header */
 
 .profile-btn {
@@ -5048,7 +5030,7 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-sear
 
 .header.scrolled,
 .header.menu-open {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   -webkit-backdrop-filter: blur(10px);
           backdrop-filter: blur(10px);
@@ -9128,7 +9110,7 @@ ol.block-list {
 /* Support for menu state and scrolled state in new Tailwind Header */
 
 .header.scrolled {
-  background: rgba(255, 255, 255, 0.98);
+  background: rgba(255, 255, 255, 0.8);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
