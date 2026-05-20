@@ -17,6 +17,9 @@ class MessagesManager {
         this.currentAdminEmail = '';
         this.selectedThreads = new Set();
         this.pushNotifications = [];
+        this.adminBellUnsubs = [];
+        this.unreadUserNotifications = 0;
+        this.unreadInboxMessages = 0;
         this.init();
     }
 
@@ -37,8 +40,10 @@ class MessagesManager {
         window.firebaseService.onAuthChange((user) => {
             if (user) {
                 this.currentAdminEmail = user.email || '';
+                this.startAdminBellListeners(user.uid);
                 this.loadUnifiedInbox();
             } else {
+                this.stopAdminBellListeners();
                 window.location.href = '/admin/login.html';
             }
         });
@@ -103,6 +108,21 @@ class MessagesManager {
         const bulkDeleteBtn = document.getElementById('bulk-delete-btn');
         if (bulkDeleteBtn) {
             bulkDeleteBtn.onclick = () => this.deleteSelectedThreads();
+        }
+
+        const bell = document.getElementById('messages-bell');
+        if (bell) {
+            bell.onclick = () => {
+                if (this.unreadInboxMessages === 0 && this.unreadUserNotifications > 0) {
+                    const pushFolder = document.querySelector('.folder-item[data-filter="push"]');
+                    if (pushFolder) {
+                        pushFolder.click();
+                        return;
+                    }
+                }
+                const unreadFolder = document.querySelector('.folder-item[data-filter="unread"]');
+                if (unreadFolder) unreadFolder.click();
+            };
         }
 
         // Folders
@@ -190,6 +210,68 @@ class MessagesManager {
         } catch (error) {
             console.error("Error loading unified inbox:", error);
             listEl.innerHTML = '<p class="inbox-empty" style="color:red; padding: 20px;">Kunne ikke laste innboks.</p>';
+        }
+    }
+
+    stopAdminBellListeners() {
+        this.adminBellUnsubs.forEach((unsubscribe) => {
+            if (typeof unsubscribe === 'function') unsubscribe();
+        });
+        this.adminBellUnsubs = [];
+        this.unreadUserNotifications = 0;
+        this.unreadInboxMessages = 0;
+        this.updateAdminBell();
+    }
+
+    startAdminBellListeners(uid) {
+        this.stopAdminBellListeners();
+        if (!uid || !window.firebaseService?.db) return;
+
+        const messageUnsub = window.firebaseService.db
+            .collection('contactMessages')
+            .where('status', '==', 'ny')
+            .onSnapshot((snapshot) => {
+                this.unreadInboxMessages = snapshot.size;
+                this.updateAdminBell();
+            }, (error) => {
+                console.error('Could not listen for unread messages:', error);
+            });
+
+        const notificationUnsub = window.firebaseService.db
+            .collection('user_notifications')
+            .where('userId', '==', uid)
+            .where('read', '==', false)
+            .onSnapshot((snapshot) => {
+                this.unreadUserNotifications = snapshot.size;
+                this.updateAdminBell();
+            }, (error) => {
+                console.error('Could not listen for admin notifications:', error);
+            });
+
+        this.adminBellUnsubs = [messageUnsub, notificationUnsub];
+    }
+
+    updateAdminBell() {
+        const count = this.unreadInboxMessages + this.unreadUserNotifications;
+        const bell = document.getElementById('messages-bell');
+        const icon = document.getElementById('notification-icon');
+        const dot = document.getElementById('notification-dot');
+        const badge = document.getElementById('messages-badge');
+        const displayCount = count > 99 ? '99+' : String(count);
+
+        if (bell) {
+            bell.classList.toggle('has-unread', count > 0);
+            bell.setAttribute('aria-label', count > 0 ? `${displayCount} uleste varsler` : 'Ingen uleste varsler');
+            bell.title = count > 0 ? `${displayCount} uleste varsler` : 'Ingen uleste varsler';
+        }
+        if (icon) icon.classList.toggle('has-unread', count > 0);
+        if (dot) {
+            dot.style.display = count > 0 ? 'flex' : 'none';
+            dot.textContent = count > 0 ? displayCount : '';
+        }
+        if (badge) {
+            badge.style.display = count > 0 ? 'flex' : 'none';
+            badge.textContent = displayCount;
         }
     }
 
@@ -1215,15 +1297,35 @@ class MessagesManager {
             }
 
             // 2. Call FCM Cloud Function
+            let phoneDeliveryStatus = {
+                ok: true,
+                message: 'Push-varsling er sendt!'
+            };
+
             try {
                 const response = await fetch('https://sendpushnotification-42bhgdjkcq-uc.a.run.app', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${idToken}` },
                     body: JSON.stringify(payload)
                 });
-                if (!response.ok) console.warn("Cloud Function reported error, but notification was saved in-app.");
+
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok || result.success === false) {
+                    const reason = result.error || result.message || 'Telefon-push kunne ikke leveres.';
+                    phoneDeliveryStatus = {
+                        ok: false,
+                        message: `Varslet ble lagret i appen, men ikke sendt til telefon: ${reason}`
+                    };
+                    console.warn("Cloud Function reported error, but notification was saved in-app.", result);
+                } else {
+                    phoneDeliveryStatus.message = result.message || phoneDeliveryStatus.message;
+                }
             } catch (fcmErr) {
                 console.warn("FCM failed:", fcmErr);
+                phoneDeliveryStatus = {
+                    ok: false,
+                    message: 'Varslet ble lagret i appen, men telefon-push feilet. Prøv igjen eller sjekk at brukeren har aktivert push på enheten.'
+                };
             }
 
             // 3. Log to push_log
@@ -1236,8 +1338,8 @@ class MessagesManager {
                 sentAt: window.firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            statusEl.textContent = 'Push-varsling er sendt!';
-            statusEl.className = 'status-message success';
+            statusEl.textContent = phoneDeliveryStatus.message;
+            statusEl.className = phoneDeliveryStatus.ok ? 'status-message success' : 'status-message warning';
             e.target.reset();
             
             // Refresh log

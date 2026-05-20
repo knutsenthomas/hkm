@@ -483,6 +483,46 @@ body.crm-body {
     border: 1px solid #e5e7eb;
 }
 
+.status-message {
+    display: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.45;
+}
+
+.status-message.info,
+.status-message.success,
+.status-message.warning,
+.status-message.error {
+    display: block;
+}
+
+.status-message.info {
+    color: #1e40af;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+.status-message.success {
+    color: #166534;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+.status-message.warning {
+    color: #9a3412;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+.status-message.error {
+    color: #991b1b;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
 .label-pill {
     display: inline-block;
     padding: 2px 8px;
