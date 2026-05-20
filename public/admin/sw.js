@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hkm-admin-app-v1';
+const CACHE_NAME = 'hkm-admin-app-v2';
 const SHELL_ASSETS = [
     '/admin/index.html',
     '/admin/login.html',
