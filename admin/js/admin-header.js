@@ -446,28 +446,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     item.style.setProperty('display', 'none', 'important');
                 });
             }
-            sessionStorage.setItem(`nav_cat_${category}`, shouldBeOpen ? 'open' : 'closed');
         }
 
         categoryHeaders.forEach(header => {
             const cat = header.getAttribute('data-target-category');
-            const path = window.location.pathname.toLowerCase();
             
-            // Auto-detect if we should be open
-            const hasActiveLink = document.querySelector(`.nav-item[data-nav-category="${cat}"] .nav-link.active`) !== null;
-            const savedState = sessionStorage.getItem(`nav_cat_${cat}`);
-            
-            // Priority: 1. Active Link, 2. URL Match, 3. Saved State, 4. Default (All categories open)
-            let shouldBeOpen = true; 
-            if (savedState) shouldBeOpen = (savedState === 'open');
-            if (hasActiveLink) shouldBeOpen = true; 
-
-            // Force open Communication category if on related pages
-            if (cat === 'kommunikasjon' && (path.includes('kommunikasjon') || path.includes('segmenter') || path.includes('meldinger') || path.includes('nyhetsbrev'))) {
-                shouldBeOpen = true;
-            }
-
-            setCategory(cat, shouldBeOpen);
+            // All categories are open as standard on page load
+            setCategory(cat, true);
 
             // Use direct onclick to ensure it's not blocked by other listeners
             header.onclick = (e) => {

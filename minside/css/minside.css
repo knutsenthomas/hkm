@@ -2447,3 +2447,18 @@ body {
 html, body {
   overflow-x: hidden !important;
 }
+
+/* Hide scrollbar for sidebar and sidebar-nav across all browsers (Chrome, Safari, Firefox, Edge) */
+.sidebar::-webkit-scrollbar,
+.sidebar-nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.sidebar,
+.sidebar-nav {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+

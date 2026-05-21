@@ -7020,3 +7020,20 @@ body.admin-body .notification-dot {
         padding: 0;
     }
 }
+
+/* Hide scrollbar for sidebar and sidebar-nav across all browsers (Chrome, Safari, Firefox, Edge) */
+.sidebar::-webkit-scrollbar,
+.sidebar-nav::-webkit-scrollbar,
+body.admin-body .sidebar-nav::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.sidebar,
+.sidebar-nav,
+body.admin-body .sidebar-nav {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
