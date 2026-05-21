@@ -349,8 +349,8 @@ body.builder-active {
 
 .subject-input-modern:focus {
     background: #fff;
-    border-color: #1B4965;
-    box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.1);
+    border-color: #d17d39;
+    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.1);
 }
 
 .device-toggles {
@@ -375,12 +375,12 @@ body.builder-active {
 }
 
 .device-btn:hover {
-    color: #1B4965;
+    color: #d17d39;
 }
 
 .device-btn.active {
     background: #fff;
-    color: #1B4965;
+    color: #d17d39;
     box-shadow: var(--shadow-sm);
 }
 
@@ -423,18 +423,18 @@ body.builder-active {
 }
 
 .toolbar-action-btn.primary {
-    background: #1B4965;
+    background: #d17d39;
     color: #fff;
-    box-shadow: 0 4px 14px rgba(27, 73, 101, 0.2);
+    box-shadow: 0 4px 14px rgba(209, 125, 57, 0.2);
 }
 
 .toolbar-action-btn.primary:hover {
-    background: #14374a;
-    box-shadow: 0 6px 20px rgba(27, 73, 101, 0.3);
+    background: #bd4f2a;
+    box-shadow: 0 6px 20px rgba(209, 125, 57, 0.3);
 }
 
 .toolbar-action-btn.primary:active {
-    background: #0f2a39;
+    background: #9c3c1f;
 }
 
 .toolbar-action-btn span {

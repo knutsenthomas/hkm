@@ -76,7 +76,7 @@
 .comments-header {
     font-size: 24px;
     font-weight: 700;
-    color: #1B4965; /* Mørkeblå */
+    color: #d17d39; /* Brand orange */
     margin-bottom: 8px;
 }
 
@@ -118,8 +118,8 @@
 .comment-input-group input:focus,
 .comment-input-group textarea:focus {
     outline: none;
-    border-color: #1B4965;
-    box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.1);
+    border-color: #d17d39;
+    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.1);
 }
 
 .comment-input-group textarea {
@@ -143,9 +143,9 @@
 }
 
 .comment-submit-btn:hover {
-    background: #12344a;
+    background: #bd4f2a;
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px -4px rgba(27, 73, 101, 0.2);
+    box-shadow: 0 8px 16px -4px rgba(209, 125, 57, 0.2);
 }
 
 .comment-submit-btn:active {
@@ -181,7 +181,7 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #1B4965, #3498DB);
+    background: linear-gradient(135deg, #d17d39, #bd4f2a);
     color: #ffffff;
     display: flex;
     align-items: center;

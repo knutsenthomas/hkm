@@ -334,14 +334,9 @@ class AdminManager {
             
             if (confirmBtn) {
                 confirmBtn.textContent = confirmText;
-                if (confirmText === 'Slett') {
-                    const orangeGradient = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
-                    confirmBtn.style.background = orangeGradient;
-                    if (headerEl) headerEl.style.background = orangeGradient;
-                } else {
-                    confirmBtn.style.background = '#1B4965';
-                    if (headerEl) headerEl.style.background = '#1B4965';
-                }
+                const orangeGradient = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
+                confirmBtn.style.background = orangeGradient;
+                if (headerEl) headerEl.style.background = orangeGradient;
             }
 
             const cleanup = () => {
@@ -3104,7 +3099,7 @@ class AdminManager {
                                     const isSelected = normalizedCurrentCats.includes(cat.value.toLowerCase());
                                     return `
                                         <button type="button" class="podcast-modal-chip" data-value="${cat.value}" data-selected="${isSelected}"
-                                            style="padding:10px 18px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; border:1px solid ${isSelected ? '#1B4965' : '#e2e8f0'}; background:${isSelected ? '#1B4965' : 'white'}; color:${isSelected ? 'white' : '#64748b'};">
+                                            style="padding:10px 18px; border-radius:999px; font-size:13px; font-weight:700; cursor:pointer; transition:all 0.2s; border:1px solid ${isSelected ? '#d17d39' : '#e2e8f0'}; background:${isSelected ? '#d17d39' : 'white'}; color:${isSelected ? 'white' : '#64748b'};">
                                             ${cat.label}
                                         </button>
                                     `;
@@ -3112,7 +3107,7 @@ class AdminManager {
                             </div>
                             
                             <!-- AI-knapp for tagger/SEO/meta -->
-                            <button id="ai-suggest-seo" type="button" style="margin:16px 0 8px 0; display:flex; align-items:center; gap:8px; background:#f1f5f9; color:#1B4965; border:none; border-radius:8px; padding:10px 18px; font-weight:700; font-size:14px; cursor:pointer;">
+                            <button id="ai-suggest-seo" type="button" style="margin:16px 0 8px 0; display:flex; align-items:center; gap:8px; background:#f1f5f9; color:#d17d39; border:none; border-radius:8px; padding:10px 18px; font-weight:700; font-size:14px; cursor:pointer;">
                                 <span class="material-symbols-outlined" style="vertical-align:middle;">auto_awesome</span>
                                 Foreslå tagger og SEO med AI
                             </button>
@@ -3143,7 +3138,7 @@ class AdminManager {
 
                         <div style="background:#f8fafc; border-radius:16px; padding:20px; border:1px solid #e2e8f0;">
                             <h4 style="margin:0 0 8px; font-size:14px; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:8px;">
-                                <span class="material-symbols-outlined" style="font-size:18px; color:#1B4965;">info</span>
+                                <span class="material-symbols-outlined" style="font-size:18px; color:#d17d39;">info</span>
                                 Info
                             </h4>
                             <p style="margin:0; font-size:13px; color:#64748b; line-height:1.6;">
@@ -3153,7 +3148,7 @@ class AdminManager {
                     </div>
                     <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
                         <button class="btn btn-secondary cancel-btn" style="padding:12px 24px; font-weight:700;">Avbryt</button>
-                        <button class="btn btn-primary save-btn" style="padding:12px 24px; font-weight:700; background:#1B4965;">Lagre innstillinger</button>
+                        <button class="btn btn-primary save-btn" style="padding:12px 24px; font-weight:700; background:linear-gradient(135deg, #d17d39, #bd4f2a);">Lagre innstillinger</button>
                     </div>
                 </div>
             `;
@@ -3240,9 +3235,9 @@ class AdminManager {
                     const isSelected = chip.getAttribute('data-selected') === 'true';
                     const newVal = !isSelected;
                     chip.setAttribute('data-selected', newVal);
-                    chip.style.background = newVal ? '#1B4965' : 'white';
+                    chip.style.background = newVal ? '#d17d39' : 'white';
                     chip.style.color = newVal ? 'white' : '#64748b';
-                    chip.style.borderColor = newVal ? '#1B4965' : '#e2e8f0';
+                    chip.style.borderColor = newVal ? '#d17d39' : '#e2e8f0';
                 };
             });
 
@@ -4243,7 +4238,7 @@ class AdminManager {
                                 : 'Henter dine siste besøkstall eller venter på konfigurasjon...'}
                         </p>
                         ${this._analyticsFetchFailed ? `
-                            <button onclick="window.adminManager.onSectionSwitch('integrations')" style="background: #1B4965; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
+                            <button onclick="window.adminManager.onSectionSwitch('integrations')" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
                                 <span class="material-symbols-outlined" style="font-size: 18px;">settings_input_component</span>
                                 Åpne Integrasjoner
                             </button>
@@ -5456,7 +5451,7 @@ class AdminManager {
 
             <div class="media-library-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 32px;">
                 <div class="stat-card" style="padding: 20px; background: white; border-radius: 16px; border: 1px solid #e2e8f0; display: flex; align-items: center; gap: 16px;">
-                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(27, 73, 101, 0.1); color: #1B4965; display: flex; align-items: center; justify-content: center;">
+                    <div style="width: 48px; height: 48px; border-radius: 12px; background: rgba(209, 125, 57, 0.1); color: #d17d39; display: flex; align-items: center; justify-content: center;">
                         <span class="material-symbols-outlined">image</span>
                     </div>
                     <div>
@@ -5486,7 +5481,7 @@ class AdminManager {
                             ${this._getMediaLocationOptionsHtml()}
                         </select>
                     </label>
-                    <button id="btn-new-folder" class="btn-secondary" style="height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-sizing: border-box; margin: 0;">
+                    <button id="btn-new-folder" class="btn-secondary" style="height: 36px; padding: 0 14px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; color: #d17d39; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; box-sizing: border-box; margin: 0;">
                         <span class="material-symbols-outlined" style="font-size: 18px;">create_new_folder</span>
                         Ny mappe
                     </button>
@@ -5507,7 +5502,7 @@ class AdminManager {
             <div id="media-dropzone" class="media-dropzone" style="border: 2px dashed #cbd5e1; border-radius: 20px; padding: 40px; text-align: center; background: #f8fafc; margin-bottom: 32px; transition: all 0.3s ease; cursor: pointer;">
                 <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 12px;">cloud_upload</span>
                 <h3 style="margin: 0; font-size: 18px; color: #334155;">Dra bilder hit eller klikk for å laste opp</h3>
-                <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #1B4965;">Mediebibliotek</strong></p>
+                <p style="margin: 8px 0 0; color: #64748b; font-size: 14px;">Bilder lastes opp til: <strong id="current-upload-path" style="color: #d17d39;">Mediebibliotek</strong></p>
                 <input type="file" id="media-file-input" style="display: none;" accept="image/*" multiple>
             </div>
 
@@ -5786,12 +5781,12 @@ class AdminManager {
         // Update breadcrumbs
         if (breadcrumbsEl) {
             const parts = this.currentMediaPath.replace('editor/', '').split('/').filter(Boolean);
-            let html = `<span class="breadcrumb-item" data-path="editor/" style="cursor: pointer; color: #1B4965; hover: underline;">Hjem</span>`;
+            let html = `<span class="breadcrumb-item" data-path="editor/" style="cursor: pointer; color: #d17d39; hover: underline;">Hjem</span>`;
             
             let accumulatedPath = 'editor/';
             parts.forEach((part, index) => {
                 accumulatedPath += part + '/';
-                html += ` <span style="color: #cbd5e1;">/</span> <span class="breadcrumb-item" data-path="${accumulatedPath}" style="cursor: pointer; color: ${index === parts.length - 1 ? '#64748b' : '#1B4965'};">${part}</span>`;
+                html += ` <span style="color: #cbd5e1;">/</span> <span class="breadcrumb-item" data-path="${accumulatedPath}" style="cursor: pointer; color: ${index === parts.length - 1 ? '#64748b' : '#d17d39'};">${part}</span>`;
             });
             breadcrumbsEl.innerHTML = html;
 
@@ -5837,8 +5832,8 @@ class AdminManager {
             const folderHtml = folders.map(folder => `
                 <div class="media-card media-folder" data-path="${folder.fullPath}/" style="background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; cursor: pointer; transition: all 0.2s ease; position: relative;">
                     <div style="height: 140px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="font-size: 48px; color: #1B4965;">folder</span>
-                        <span style="font-size: 14px; font-weight: 600; color: #1B4965;">${folder.name}</span>
+                        <span class="material-symbols-outlined" style="font-size: 48px; color: #d17d39;">folder</span>
+                        <span style="font-size: 14px; font-weight: 600; color: #1e293b;">${folder.name}</span>
                     </div>
                     <div class="media-actions" style="position: absolute; top: 8px; right: 8px; display: flex; gap: 4px; opacity: 0; transition: opacity 0.2s;">
                         <button class="btn-delete-folder" data-path="${folder.fullPath}" title="Slett mappe" style="width: 32px; height: 32px; border-radius: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center;">
@@ -5862,7 +5857,7 @@ class AdminManager {
                         <p style="font-size: 12px; font-weight: 600; color: #1e293b; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${file.name}">${file.name}</p>
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 8px;">
                             <span style="font-size: 10px; color: #64748b;">${file.size ? (file.size / 1024).toFixed(1) + ' KB' : ''}</span>
-                            <button class="btn-copy-url" data-url="${file.url}" style="font-size: 11px; font-weight: 700; color: #1B4965; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;">Kopier URL</button>
+                            <button class="btn-copy-url" data-url="${file.url}" style="font-size: 11px; font-weight: 700; color: #d17d39; background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: 4px; transition: background 0.2s;">Kopier URL</button>
                         </div>
                     </div>
                 </div>
@@ -5885,8 +5880,8 @@ class AdminManager {
                 style.innerHTML = `
                     .media-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #cbd5e1 !important; }
                     .media-card:hover .media-actions { opacity: 1 !important; }
-                    .btn-copy-url:hover { background: rgba(27, 73, 101, 0.05); }
-                    .media-folder:hover { background: #eff6ff !important; border-color: #1B4965 !important; }
+                    .btn-copy-url:hover { background: rgba(209, 125, 57, 0.05); }
+                    .media-folder:hover { background: #fff7ed !important; border-color: #d17d39 !important; }
                 `;
                 document.head.appendChild(style);
             }
@@ -5969,8 +5964,8 @@ class AdminManager {
         // Drag & Drop
         dropzone.ondragover = (e) => {
             e.preventDefault();
-            dropzone.style.borderColor = '#1B4965';
-            dropzone.style.background = '#eff6ff';
+            dropzone.style.borderColor = '#d17d39';
+            dropzone.style.background = '#fff7ed';
         };
 
         dropzone.ondragleave = () => {
@@ -6004,7 +5999,7 @@ class AdminManager {
                     copyBtn.style.color = '#10b981';
                     setTimeout(() => {
                         copyBtn.innerText = originalText;
-                        copyBtn.style.color = '#1B4965';
+                        copyBtn.style.color = '#d17d39';
                     }, 2000);
                 } catch (err) {
                     alert('Kunne ikke kopiere URL');
@@ -6189,7 +6184,7 @@ class AdminManager {
             const rootItem = document.createElement('span');
             rootItem.className = 'breadcrumb-item';
             rootItem.style.cursor = 'pointer';
-            rootItem.style.color = '#1B4965';
+            rootItem.style.color = '#d17d39';
             rootItem.innerHTML = 'Hjem';
             rootItem.onclick = () => { currentPath = 'editor/'; loadModalMedia(); };
             breadcrumbsContainer.appendChild(rootItem);
@@ -6203,7 +6198,7 @@ class AdminManager {
                 item.className = 'breadcrumb-item';
                 item.style.cursor = 'pointer';
                 item.style.fontWeight = (i === parts.length - 1) ? '600' : 'normal';
-                item.style.color = (i === parts.length - 1) ? '#64748b' : '#1B4965';
+                item.style.color = (i === parts.length - 1) ? '#64748b' : '#d17d39';
                 item.innerText = part;
                 const currentAcc = (parts[0] === 'editor' ? '' : 'editor/') + pathAcc;
                 item.onclick = () => { currentPath = currentAcc; loadModalMedia(); };
@@ -7726,10 +7721,10 @@ class AdminManager {
                                               <button type="button" id="sidebar-img-upload-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #475569;">
                                                   <span class="material-symbols-outlined" style="font-size: 20px;">upload</span> Last opp
                                               </button>
-                                              <button type="button" id="sidebar-img-library-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #1B4965;">
+                                              <button type="button" id="sidebar-img-library-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #d17d39;">
                                                   <span class="material-symbols-outlined" style="font-size: 20px;">photo_library</span> Bibliotek
                                               </button>
-                                              <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #1B4965;">
+                                              <button type="button" id="unsplash-trigger-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 13px; font-weight: 600; color: #d17d39;">
                                                   <span class="material-symbols-outlined" style="font-size: 20px;">image_search</span> Unsplash
                                               </button>
                                               <button type="button" id="sidebar-img-remove-btn" class="btn-ghost" style="flex: 1 1 120px; justify-content: center; padding: 10px; border-radius: 10px; border: 1px solid #fee2e2; background: #fef2f2; font-size: 13px; font-weight: 600; color: #b91c1c; display: ${item.imageUrl ? 'flex' : 'none'};">
@@ -7751,7 +7746,7 @@ class AdminManager {
                                 Skriv innhold med AI
                             </button>
 
-                            <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:12px; width:100%; min-height: 48px; border-radius: 12px; font-weight: 600; border: 1px solid #e2e8f0; background: #f8fafc; color: #1B4965; transition: all 0.3s ease;">
+                            <button type="button" class="btn-secondary" id="ai-suggest-seo" style="margin-bottom:16px; display:flex; align-items:center; justify-content:center; gap:12px; width:100%; min-height: 48px; border-radius: 12px; font-weight: 600; border: 1px solid #e2e8f0; background: #f8fafc; color: #d17d39; transition: all 0.3s ease;">
                                 <span class="material-symbols-outlined" style="font-size: 22px;">auto_awesome</span>
                                 Foreslå tagger og SEO med AI
                             </button>
@@ -8048,15 +8043,15 @@ class AdminManager {
 
                 render() {
                     const btn = document.createElement('div');
-                    btn.style.cssText = 'padding: 24px; border: 2px dashed #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; color: #1B4965; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s ease;';
+                    btn.style.cssText = 'padding: 24px; border: 2px dashed #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; color: #d17d39; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s ease;';
                     btn.innerHTML = `
                         <span class="material-symbols-outlined" style="font-size: 32px;">image_search</span>
                         <span>Klikk for å hente bilde fra Unsplash</span>
                     `;
                     
                     btn.onmouseover = () => {
-                        btn.style.background = '#f0f9ff';
-                        btn.style.borderColor = '#1B4965';
+                        btn.style.background = '#fff7ed';
+                        btn.style.borderColor = '#d17d39';
                     };
                     btn.onmouseout = () => {
                         btn.style.background = 'transparent';
@@ -8103,15 +8098,15 @@ class AdminManager {
 
                 render() {
                     const btn = document.createElement('div');
-                    btn.style.cssText = 'padding: 24px; border: 2px dashed #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; color: #1B4965; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s ease;';
+                    btn.style.cssText = 'padding: 24px; border: 2px dashed #e2e8f0; border-radius: 12px; text-align: center; cursor: pointer; color: #d17d39; font-weight: 600; display: flex; flex-direction: column; align-items: center; gap: 8px; transition: all 0.2s ease;';
                     btn.innerHTML = `
                         <span class="material-symbols-outlined" style="font-size: 32px;">photo_library</span>
                         <span>Klikk for å hente bilde fra mediebibliotek</span>
                     `;
                     
                     btn.onmouseover = () => {
-                        btn.style.background = '#eff6ff';
-                        btn.style.borderColor = '#1B4965';
+                        btn.style.background = '#fff7ed';
+                        btn.style.borderColor = '#d17d39';
                     };
                     btn.onmouseout = () => {
                         btn.style.background = 'transparent';
@@ -9645,8 +9640,8 @@ class AdminManager {
                 // Drag & Drop Listeners
                 imgTrigger.ondragover = (e) => { 
                     e.preventDefault(); 
-                    imgTrigger.style.borderColor = '#1B4965';
-                    imgTrigger.style.background = '#f0f9ff';
+                    imgTrigger.style.borderColor = '#d17d39';
+                    imgTrigger.style.background = '#fff7ed';
                 };
                 imgTrigger.ondragleave = (e) => { 
                     e.preventDefault(); 
@@ -10627,8 +10622,8 @@ class AdminManager {
             fontSizeH2Mobile: 24,
             fontSizeBodyDesktop: 16,
             fontSizeBodyMobile: 16,
-            primaryColor: '#1B4965',
-            secondaryColor: '#1B4965',
+            primaryColor: '#d17d39',
+            secondaryColor: '#d17d39',
             backgroundColor: '#F8F9FA',
             surfaceColor: '#FFFFFF',
             textColor: '#2C3E50',
@@ -10636,13 +10631,13 @@ class AdminManager {
             headerBg: '#FFFFFF',
             footerBg: '#1B4965',
             footerText: '#FFFFFF',
-            newsletterBg: '#1B4965',
+            newsletterBg: '#d17d39',
             newsletterText: '#FFFFFF',
-            btnPrimaryBg: '#1B4965',
+            btnPrimaryBg: '#d17d39',
             btnPrimaryText: '#FFFFFF',
             btnSecondaryBg: '#FFFFFF',
-            btnSecondaryText: '#1B4965',
-            btnSecondaryBorder: '#1B4965'
+            btnSecondaryText: '#d17d39',
+            btnSecondaryBorder: '#d17d39'
         };
 
         section.innerHTML = `
@@ -10759,8 +10754,8 @@ class AdminManager {
                                         <div class="form-group" style="margin-bottom:0;">
                                             <label>Nyhetsbrev Bakgrunn</label>
                                             <div class="premium-color-wrapper">
-                                                <input type="color" id="newsletter-bg-picker" class="premium-color-picker-input" value="#1B4965">
-                                                <input type="text" id="newsletter-bg-hex" class="premium-color-hex" value="#1B4965" placeholder="#1B4965">
+                                                <input type="color" id="newsletter-bg-picker" class="premium-color-picker-input" value="#d17d39">
+                                                <input type="text" id="newsletter-bg-hex" class="premium-color-hex" value="#d17d39" placeholder="#d17d39">
                                             </div>
                                         </div>
                                         <div class="form-group" style="margin-bottom:0;">
@@ -10779,8 +10774,8 @@ class AdminManager {
                                         <div class="form-group" style="margin-bottom:0;">
                                             <label>Primærknapp Bakgrunn</label>
                                             <div class="premium-color-wrapper">
-                                                <input type="color" id="btn-primary-bg-picker" class="premium-color-picker-input" value="#1B4965">
-                                                <input type="text" id="btn-primary-bg-hex" class="premium-color-hex" value="#1B4965" placeholder="#1B4965">
+                                                <input type="color" id="btn-primary-bg-picker" class="premium-color-picker-input" value="#d17d39">
+                                                <input type="text" id="btn-primary-bg-hex" class="premium-color-hex" value="#d17d39" placeholder="#d17d39">
                                             </div>
                                         </div>
                                         <div class="form-group" style="margin-bottom:0;">
@@ -10800,8 +10795,8 @@ class AdminManager {
                                         <div class="form-group" style="margin-bottom:0;">
                                             <label>Sekundærknapp Tekst/Ramme</label>
                                             <div class="premium-color-wrapper">
-                                                <input type="color" id="btn-secondary-text-picker" class="premium-color-picker-input" value="#1B4965">
-                                                <input type="text" id="btn-secondary-text-hex" class="premium-color-hex" value="#1B4965" placeholder="#1B4965">
+                                                <input type="color" id="btn-secondary-text-picker" class="premium-color-picker-input" value="#d17d39">
+                                                <input type="text" id="btn-secondary-text-hex" class="premium-color-hex" value="#d17d39" placeholder="#d17d39">
                                             </div>
                                         </div>
                                     </div>
@@ -17365,7 +17360,7 @@ class AdminManager {
                 transform: scale(0.99) !important;
             }
             .admin-address-result-row .material-symbols-outlined {
-                color: #1B4965 !important;
+                color: #d17d39 !important;
                 font-size: 24px !important;
                 flex-shrink: 0 !important;
             }

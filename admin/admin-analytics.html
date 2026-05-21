@@ -138,7 +138,7 @@
         }
 
         .period-btn:hover {
-            color: #1B4965;
+            color: #d17d39;
         }
 
         .period-btn.active {
@@ -233,7 +233,7 @@
         .stat-card-value {
             font-size: 32px;
             font-weight: 800;
-            color: #1B4965;
+            color: #1e293b;
             line-height: 1;
             margin-bottom: 8px;
             font-feature-settings: "tnum";
@@ -322,7 +322,7 @@
         }
 
         .stat-action-btn:hover {
-            background: #1B4965;
+            background: #d17d39;
             color: white;
             transform: scale(1.05);
         }
@@ -371,7 +371,7 @@
         .chart-card-title {
             font-size: 16px;
             font-weight: 700;
-            color: #1B4965;
+            color: #1e293b;
             margin: 0;
             display: flex;
             align-items: center;
@@ -432,8 +432,8 @@
             font-family: 'Fira Code', monospace;
             font-size: 12px;
             font-weight: 700;
-            color: #1B4965;
-            background: #eff6ff;
+            color: #d17d39;
+            background: #fff7ed;
             padding: 2px 8px;
             border-radius: 4px;
         }
@@ -449,7 +449,7 @@
         .top-page-bar {
             height: 100%;
             border-radius: 3px;
-            background: linear-gradient(to right, #1B4965, #3b82f6);
+            background: linear-gradient(to right, #bd4f2a, #d17d39);
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -567,7 +567,7 @@
         .donut-center-val {
             font-size: 28px;
             font-weight: 800;
-            color: #1B4965;
+            color: #1e293b;
             line-height: 1;
         }
 
@@ -609,7 +609,7 @@
         }
 
         .legend-color-dot.direkte { background: #bd4f2a; }
-        .legend-color-dot.sok { background: #1B4965; }
+        .legend-color-dot.sok { background: #d17d39; }
         .legend-color-dot.sosial { background: #cbd5e1; }
 
         .legend-name {
@@ -736,14 +736,23 @@
         }
 
         .btn-premium-primary {
-            background: #1B4965;
+            background: linear-gradient(135deg, #d17d39, #bd4f2a);
             color: white;
-            border-color: #1B4965;
+            border: none;
+            box-shadow: 0 4px 10px rgba(209, 125, 57, 0.2);
+            transition: all 0.3s ease;
         }
 
         .btn-premium-primary:hover {
-            background: #153a50;
-            border-color: #153a50;
+            box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3);
+            filter: brightness(1.05);
+            transform: translateY(-1px);
+        }
+
+        .btn-premium-primary:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 10px rgba(209, 125, 57, 0.2);
+            filter: brightness(0.95);
         }
     </style>
     <!-- Admin PWA -->
@@ -818,7 +827,7 @@
         <div class="analytics-container">
             <!-- Period Selector Row (8px spacing guidelines) -->
             <div class="analytics-header-row">
-                <h2 style="font-size: 18px; font-weight: 700; color: #1B4965; margin: 0;">Analyseoversikt</h2>
+                <h2 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Analyseoversikt</h2>
                 <div class="period-selector">
                     <button class="period-btn" data-period="1">Siste døgn</button>
                     <button class="period-btn active" data-period="7">Siste 7 dager</button>
@@ -895,7 +904,7 @@
                     </div>
                     <div style="flex-grow: 1;">
                         <p style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin: 0;">Blogginnlegg</p>
-                        <h4 id="real-blog-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1B4965;">15</h4>
+                        <h4 id="real-blog-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">15</h4>
                         <span style="font-size: 11px; color: #94a3b8;">Publisert totalt</span>
                     </div>
                     <a href="/admin/index.html#blog" class="stat-action-btn" title="Gå til Blogg-redigering">
@@ -910,7 +919,7 @@
                     </div>
                     <div style="flex-grow: 1;">
                         <p style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin: 0;">Podcast-episoder</p>
-                        <h4 id="real-podcast-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1B4965;">47</h4>
+                        <h4 id="real-podcast-count" style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">47</h4>
                         <span style="font-size: 11px; color: #94a3b8;">Siste: Media & Undervisning</span>
                     </div>
                     <a href="/admin/index.html#podcast" class="stat-action-btn" title="Gå til Podcast-kontroll">
@@ -925,7 +934,7 @@
                     </div>
                     <div style="flex-grow: 1;">
                         <p style="font-size: 11px; color: #64748b; font-weight: 700; text-transform: uppercase; margin: 0;">Donasjoner</p>
-                        <h4 style="font-size: 20px; font-weight: 700; margin: 0; color: #1B4965;">kr 0</h4>
+                        <h4 style="font-size: 20px; font-weight: 700; margin: 0; color: #1e293b;">kr 0</h4>
                         <span style="font-size: 11px; color: #94a3b8;">Denne måneden</span>
                     </div>
                 </div>
@@ -981,7 +990,7 @@
                                     <div>
                                         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                                             <span style="font-weight: 600; color: #334155;">Norge</span>
-                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #1B4965;">94.2%</span>
+                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #d17d39;">94.2%</span>
                                         </div>
                                         <div class="top-page-bar-wrapper">
                                             <div class="top-page-bar" style="width: 94.2%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
@@ -990,7 +999,7 @@
                                     <div>
                                         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                                             <span style="font-weight: 600; color: #334155;">Sverige</span>
-                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #1B4965;">3.1%</span>
+                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #d17d39;">3.1%</span>
                                         </div>
                                         <div class="top-page-bar-wrapper">
                                             <div class="top-page-bar" style="width: 3.1%;"></div>
@@ -999,7 +1008,7 @@
                                     <div>
                                         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
                                             <span style="font-weight: 600; color: #334155;">Danmark</span>
-                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #1B4965;">1.2%</span>
+                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #d17d39;">1.2%</span>
                                         </div>
                                         <div class="top-page-bar-wrapper">
                                             <div class="top-page-bar" style="width: 1.2%;"></div>
@@ -1074,7 +1083,7 @@
                         <div class="chart-card-header">
                             <div class="chart-card-title-group">
                                 <h3 class="chart-card-title">
-                                    <span class="material-symbols-outlined" style="font-size: 20px; color: #1B4965;">pie_chart</span>
+                                    <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39;">pie_chart</span>
                                     Trafikkilder
                                 </h3>
                                 <p class="chart-card-subtitle">Kanalene brukerne kom fra</p>
@@ -1134,7 +1143,7 @@
         <div class="modal-card-premium">
             <div class="modal-header-premium">
                 <div>
-                    <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: #1B4965;">Alle Sideresultater</h2>
+                    <h2 style="font-size: 18px; font-weight: 800; margin: 0; color: #1e293b;">Alle Sideresultater</h2>
                     <p style="font-size: 13px; color: #64748b; margin: 4px 0 0 0;">Oversikt over sidevisninger for hele nettstedet.</p>
                 </div>
                 <button class="close-btn-premium" id="close-pages-modal-btn">&times;</button>
@@ -1276,9 +1285,8 @@
             const ctxSources = document.getElementById('sources-donut-chart').getContext('2d');
 
             // Colors
-            const colorBrandBlue = '#1B4965';
-            const colorAccentOrange = '#bd4f2a';
-            const colorDashedOrange = '#d17d39';
+            const colorBrandOrange = '#d17d39';
+            const colorAccentRed = '#bd4f2a';
 
             // Dataset values for different periods
             const dataSets = {
@@ -1321,13 +1329,13 @@
             };
 
             // Gradients for line charts
-            const gradientBlue = ctxTraffic.createLinearGradient(0, 0, 0, 300);
-            gradientBlue.addColorStop(0, 'rgba(27, 73, 101, 0.3)');
-            gradientBlue.addColorStop(1, 'rgba(27, 73, 101, 0.0)');
+            const gradientPrimary = ctxTraffic.createLinearGradient(0, 0, 0, 300);
+            gradientPrimary.addColorStop(0, 'rgba(209, 125, 57, 0.3)');
+            gradientPrimary.addColorStop(1, 'rgba(209, 125, 57, 0.0)');
 
-            const gradientOrange = ctxTraffic.createLinearGradient(0, 0, 0, 300);
-            gradientOrange.addColorStop(0, 'rgba(209, 125, 57, 0.2)');
-            gradientOrange.addColorStop(1, 'rgba(209, 125, 57, 0.0)');
+            const gradientSecondary = ctxTraffic.createLinearGradient(0, 0, 0, 300);
+            gradientSecondary.addColorStop(0, 'rgba(189, 79, 42, 0.2)');
+            gradientSecondary.addColorStop(1, 'rgba(189, 79, 42, 0.0)');
 
             // 2a. Traffic Line Chart initialization
             const trafficChart = new Chart(ctxTraffic, {
@@ -1338,30 +1346,30 @@
                         {
                             label: 'Brukersesjoner',
                             data: dataSets['7'].sessions,
-                            borderColor: colorBrandBlue,
-                            backgroundColor: gradientBlue,
+                            borderColor: colorBrandOrange,
+                            backgroundColor: gradientPrimary,
                             borderWidth: 3,
                             fill: true,
                             tension: 0.4,
-                            pointBackgroundColor: colorBrandBlue,
+                            pointBackgroundColor: colorBrandOrange,
                             pointBorderColor: '#fff',
                             pointHoverRadius: 6,
-                            pointHoverBackgroundColor: colorBrandBlue,
+                            pointHoverBackgroundColor: colorBrandOrange,
                             pointHoverBorderColor: '#fff'
                         },
                         {
                             label: 'Unike besøkende',
                             data: dataSets['7'].uniques,
-                            borderColor: colorDashedOrange,
-                            backgroundColor: gradientOrange,
+                            borderColor: colorAccentRed,
+                            backgroundColor: gradientSecondary,
                             borderWidth: 2,
                             borderDash: [5, 5],
                             fill: true,
                             tension: 0.4,
-                            pointBackgroundColor: colorDashedOrange,
+                            pointBackgroundColor: colorAccentRed,
                             pointBorderColor: '#fff',
                             pointHoverRadius: 6,
-                            pointHoverBackgroundColor: colorDashedOrange,
+                            pointHoverBackgroundColor: colorAccentRed,
                             pointHoverBorderColor: '#fff'
                         }
                     ]
@@ -1431,8 +1439,8 @@
                     datasets: [{
                         data: [85, 12, 3],
                         backgroundColor: [
-                            colorAccentOrange,
-                            colorBrandBlue,
+                            colorAccentRed,
+                            colorBrandOrange,
                             '#cbd5e1'
                         ],
                         borderWidth: 0,

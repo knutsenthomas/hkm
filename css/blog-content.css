@@ -128,7 +128,7 @@ ol.block-list { list-style-type: decimal; }
     margin: 2rem 0; /* Reduced from 3rem */
     padding: 2rem 2.5rem;
     background: #f8fafc;
-    border-left: 4px solid #1B4965;
+    border-left: 4px solid #d17d39;
     border-radius: 0 12px 12px 0;
 }
 
@@ -229,7 +229,7 @@ ol.block-list { list-style-type: decimal; }
 
 /* Links */
 .block-paragraph a, .block-list a {
-    color: #1B4965;
+    color: #d17d39;
     text-decoration: underline;
     text-underline-offset: 3px;
     font-weight: 600;
@@ -237,7 +237,7 @@ ol.block-list { list-style-type: decimal; }
 }
 
 .block-paragraph a:hover, .block-list a:hover {
-    color: #d17d39;
+    color: #bd4f2a;
 }
 
 /* Responsive Adjustments */

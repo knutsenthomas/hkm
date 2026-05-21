@@ -71,16 +71,25 @@
         .btn {
             display: inline-block;
             padding: 12px 24px;
-            background: #1B4965;
+            background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
             color: white;
             text-decoration: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
-            transition: background 0.2s;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(209, 125, 57, 0.15);
         }
 
         .btn:hover {
-            background: #12344d;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(209, 125, 57, 0.3);
+            filter: brightness(1.05);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(209, 125, 57, 0.15);
+            filter: brightness(0.95);
         }
     </style>
     <script src="https://js.stripe.com/v3/"></script>

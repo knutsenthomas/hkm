@@ -28,7 +28,7 @@
 /* Header inside the checkout container */
 #stripe-checkout-container h3 {
     margin-bottom: 20px;
-    color: var(--primary-blue, #1B4965);
+    color: var(--primary-orange, #D17D39);
     text-align: center;
     font-weight: 600;
 }

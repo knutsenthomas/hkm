@@ -142,6 +142,7 @@ body.hide-critical-deletes .hkm-modal-btn-delete {
 }
 
 :root {
+  --primary-color: #d17d39 !important;
   --admin-surface: #ffffff;
   --admin-surface-muted: #f4f7fa;
   --admin-border: #e2e8f0;
@@ -2870,7 +2871,7 @@ body.builder-active .user-profile-link {
   justify-content: center !important;
   font-weight: 800 !important;
   font-size: 15px !important;
-  color: #1b4965 !important;
+  color: var(--admin-accent, #d17d39) !important;
   background: transparent !important;
   border: none !important;
   border-radius: 0 !important;
@@ -5542,7 +5543,7 @@ body.builder-active .main-header [id="admin-avatar"] {
 }
 
 .search-suggestion-item:hover .search-suggestion-label {
-  color: var(--accent-color, #1b4965);
+  color: var(--accent-color, var(--admin-accent, #d17d39));
 }
 
 /* Typography Range Grid */
@@ -5607,14 +5608,14 @@ body.builder-active .main-header [id="admin-avatar"] {
 .premium-range-val {
   font-size: 12px;
   font-weight: 700;
-  color: var(--primary-color, #1B4965);
-  background: color-mix(in srgb, var(--primary-color, #1B4965) 10%, white);
+  color: var(--primary-color, #d17d39);
+  background: color-mix(in srgb, var(--primary-color, #d17d39) 10%, white);
   padding: 2px 8px;
   border-radius: 6px;
 }
 
 .variant-card:hover {
-  border-color: var(--primary-color, #1B4965);
+  border-color: var(--primary-color, #d17d39);
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(0,0,0,0.1);
 }
@@ -5624,7 +5625,7 @@ body.builder-active .main-header [id="admin-avatar"] {
   top: 12px;
   right: 12px;
   padding: 4px 10px;
-  background: var(--primary-color, #1B4965);
+  background: var(--primary-color, #d17d39);
   color: white;
   border-radius: 6px;
   font-size: 11px;
@@ -5637,8 +5638,8 @@ body.builder-active .main-header [id="admin-avatar"] {
   font-size: 13px;
   font-weight: 600;
   margin-top: 12px;
-  color: var(--primary-color, #1B4965);
-  background: color-mix(in srgb, var(--primary-color, #1B4965) 10%, white);
+  color: var(--primary-color, #d17d39);
+  background: color-mix(in srgb, var(--primary-color, #d17d39) 10%, white);
   padding: 6px 12px;
   border-radius: 6px;
   text-align: center;

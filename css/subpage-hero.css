@@ -30,7 +30,8 @@
   background-size: cover !important;
   background-position: center center !important;
   background-repeat: no-repeat !important;
-  background-color: #1B4965 !important;
+  background-color: #d17d39 !important;
+  background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
   color: white !important;
 }
 
