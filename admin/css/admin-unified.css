@@ -3529,13 +3529,15 @@ body.builder-active .newsletter-canvas {
   body.admin-body .main-header .mobile-nav-toggle,
   body.crm-body .main-header .mobile-nav-toggle,
   body.minside-body .main-header .mobile-nav-toggle,
-  body.builder-active .main-header .mobile-nav-toggle {
+  body.builder-active .main-header .mobile-nav-toggle,
+  body.admin-body .main-header .mobile-toggle,
+  body.minside-body .main-header .mobile-toggle {
     display: flex !important;
     visibility: visible !important;
     opacity: 1 !important;
-    order: 10 !important; /* Keep on the far right of the header actions */
-    margin-left: 8px !important;
-    margin-right: 0 !important;
+    order: -1 !important; /* Keep on the far left */
+    margin-left: 0 !important;
+    margin-right: 12px !important;
   }
 
   /* Keep mobile layout aligned with desktop: title on left, actions on right */
@@ -4963,18 +4965,64 @@ body.builder-active .top-icon-btn {
 body.admin-body .mobile-nav-toggle,
 body.minside-body .mobile-nav-toggle,
 body.crm-body .mobile-nav-toggle,
-body.builder-active .mobile-nav-toggle {
+body.builder-active .mobile-nav-toggle,
+body.admin-body .mobile-toggle,
+body.minside-body .mobile-toggle {
   width: 42px !important;
   height: 42px !important;
-  display: none !important; /* Hidden on desktop */
+  display: flex !important; /* Always visible on all screen sizes */
+  visibility: visible !important;
+  opacity: 1 !important;
   align-items: center !important;
   justify-content: center !important;
   border-radius: 12px !important;
   background: #ffffff !important;
   border: 1px solid rgba(0, 0, 0, 0.05) !important;
   color: #64748b !important;
-  transition: all 0.2s ease !important;
-  margin-left: 12px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin-right: 12px !important; /* Spacing between hamburger and page icon */
+  margin-left: 0 !important;
+  order: -1 !important; /* Force to the far-left */
+  cursor: pointer !important;
+  flex-shrink: 0 !important;
+}
+
+/* Premium Interactive Micro-animations */
+body.admin-body .mobile-nav-toggle:hover,
+body.minside-body .mobile-nav-toggle:hover,
+body.admin-body .mobile-toggle:hover,
+body.minside-body .mobile-toggle:hover {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  transform: scale(1.05) !important;
+}
+
+body.admin-body .mobile-nav-toggle:active,
+body.minside-body .mobile-nav-toggle:active,
+body.admin-body .mobile-toggle:active,
+body.minside-body .mobile-toggle:active {
+  transform: scale(0.95) !important;
+}
+
+/* Sidebar Desktop Collapse Layout & Transitions */
+body.admin-body .sidebar,
+body.minside-body .sidebar {
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+body.admin-body .main-content,
+body.minside-body .main-content {
+  transition: margin-left 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+@media (min-width: 1025px) {
+  body.sidebar-collapsed .sidebar {
+    transform: translateX(-100%) !important;
+  }
+  body.sidebar-collapsed .main-content {
+    margin-left: 0 !important;
+  }
 }
 
 body.admin-body .user-profile-link,
@@ -5208,9 +5256,12 @@ body.builder-active .main-header .notification-btn {
 }
 
 body.admin-body .main-header .mobile-nav-toggle,
+body.minside-body .main-header .mobile-nav-toggle,
 body.crm-body .main-header .mobile-nav-toggle,
-body.builder-active .main-header .mobile-nav-toggle {
-  order: 3 !important;
+body.builder-active .main-header .mobile-nav-toggle,
+body.admin-body .main-header .mobile-toggle,
+body.minside-body .main-header .mobile-toggle {
+  order: -1 !important;
 }
 
 body.admin-body .main-header .user-avatar,

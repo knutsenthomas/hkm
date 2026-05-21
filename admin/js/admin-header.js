@@ -405,7 +405,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
         mobileNavToggle.addEventListener('click', (e) => {
             e.stopPropagation();
-            toggleSidebar();
+            if (window.innerWidth > 1024) {
+                document.body.classList.toggle('sidebar-collapsed');
+            } else {
+                toggleSidebar();
+            }
         });
 
         if (sidebarOverlay) {

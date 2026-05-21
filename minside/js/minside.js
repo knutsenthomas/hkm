@@ -853,7 +853,14 @@ class MinSideManager {
             });
         });
 
-        document.getElementById('mobile-toggle')?.addEventListener('click', () => this.toggleSidebar(true));
+        document.getElementById('mobile-toggle')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (window.innerWidth > 1024) {
+                document.body.classList.toggle('sidebar-collapsed');
+            } else {
+                this.toggleSidebar(true);
+            }
+        });
         document.getElementById('sidebar-overlay')?.addEventListener('click', () => this.toggleSidebar(false));
 
         document.getElementById('logout-btn')?.addEventListener('click', () => {
