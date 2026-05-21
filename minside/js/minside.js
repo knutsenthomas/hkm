@@ -2471,10 +2471,13 @@ class MinSideManager {
         ];
 
         container.innerHTML = `
-        <div class="ms-full-width">
+        <div class="ms-full-width ms-notifications-container">
             <div class="ms-section-header-row">
                 <h2 class="ms-section-title">${t('notifications.title')}</h2>
-                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">${t('notifications.markAllRead')}</button>
+                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">
+                    <span class="material-symbols-outlined" style="font-size:16px;">done_all</span>
+                    ${t('notifications.markAllRead')}
+                </button>
             </div>
 
             <!-- Filter tabs -->

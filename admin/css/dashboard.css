@@ -6814,7 +6814,7 @@ body.admin-body .notification-btn:hover {
 }
 
 body.admin-body .notification-dot {
-    background: #94a3b8 !important;
+    background: #d17d39 !important;
     border-color: #ffffff !important;
 }
 
@@ -7036,4 +7036,15 @@ body.admin-body .sidebar-nav {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
+
+/* Global overstyring for å tvinge fargen på varsel-prikken i headeren til HKM-oransje (#d17d39) */
+.notification-dot,
+#notif-badge-header,
+#notification-dot,
+.notification-btn .notification-dot {
+    background-color: #d17d39 !important;
+    background: #d17d39 !important;
+    border-color: #ffffff !important;
+}
+
 

@@ -2,7 +2,7 @@
 :root {
     --inbox-sidebar-width: 210px;
     --inbox-list-width: 340px;
-    --inbox-accent: #1B4965;
+    --inbox-accent: #d17d39;
     --inbox-orange: #d17d39;
     --brand-gradient: linear-gradient(135deg, #d17d39, #bd4f2a);
     --inbox-border: #f1f5f9;
@@ -1060,10 +1060,17 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    line-height: 0;
 }
 
 .push-icon-box .material-symbols-outlined {
     font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    line-height: 1;
 }
 
 .push-title-text h3 {

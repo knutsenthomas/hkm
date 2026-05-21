@@ -1072,159 +1072,288 @@ body {
    ACTIVITY / NOTIFICATIONS
    ══════════════════════════════════════════════════════════════════ */
 
-/* Filter tabs */
-.notif-filter-tabs {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 16px;
+/* Scoped brand container for notifications */
+.ms-notifications-container {
+    --accent-color: #d17d39;
+    --accent-light: #fff8f4;
+    --accent-glow: rgba(209, 125, 57, 0.15);
+    --accent-rgb: 209, 125, 57;
 }
 
-.notif-filter-btn {
+/* Redesigned Notification Header Row */
+.ms-notifications-container .ms-section-header-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 16px;
+}
+
+.ms-notifications-container .ms-section-title {
+    color: var(--accent-color);
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+/* Redesigned Mark All Read Button */
+#mark-all-read-btn.btn-ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: 1.5px solid var(--border-solid);
+    border-radius: 12px;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+#mark-all-read-btn.btn-ghost:hover {
+    color: var(--accent-color);
+    background: var(--accent-light);
+    border-color: rgba(209, 125, 57, 0.25);
+    transform: translateY(-1px);
+}
+
+#mark-all-read-btn.btn-ghost:active {
+    transform: scale(0.98);
+}
+
+/* Refined Filter Tabs & Pills */
+.ms-notifications-container .notif-filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.ms-notifications-container .notif-filter-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 7px 16px;
-    border: 1.5px solid var(--border-color);
+    padding: 8px 18px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border: 1.5px solid #e2e8f0;
     border-radius: 99px;
     background: transparent;
-    color: var(--text-muted);
-    font-size: 0.8rem;
-    font-weight: 600;
     cursor: pointer;
-    transition: all 0.18s ease;
+    transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     white-space: nowrap;
 }
 
-.notif-filter-btn:hover {
-    border-color: var(--accent-color);
+.ms-notifications-container .notif-filter-btn:hover {
     color: var(--accent-color);
-    background: rgba(var(--accent-rgb, 210, 125, 57), 0.06);
-}
-
-.notif-filter-btn.active {
-    background: var(--accent-color);
     border-color: var(--accent-color);
-    color: #fff;
+    background: rgba(209, 125, 57, 0.05);
 }
 
-.notif-filter-badge {
+.ms-notifications-container .notif-filter-btn:active {
+    transform: scale(0.97);
+}
+
+.ms-notifications-container .notif-filter-btn.active {
+    color: #fff;
+    border-color: transparent;
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%);
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25);
+}
+
+.ms-notifications-container .notif-filter-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
+    background: #f1f5f9;
+    color: var(--accent-color);
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
     border-radius: 99px;
-    background: rgba(255, 255, 255, 0.3);
-    font-size: 0.7rem;
     font-weight: 700;
+    font-size: 0.72rem;
+    margin-left: 6px;
+    transition: all 0.22s ease;
 }
 
-.notif-filter-btn:not(.active) .notif-filter-badge {
-    background: var(--accent-color);
+.ms-notifications-container .notif-filter-btn.active .notif-filter-badge {
+    background: rgba(255, 255, 255, 0.22);
     color: #fff;
 }
 
-.activity-list {
-
+/* Premium Card Layout for Activity Items */
+.ms-notifications-container .activity-list {
     width: 100%;
     display: block;
 }
 
-.activity-list>* {
+.ms-notifications-container .activity-list > * {
     width: 100%;
 }
 
-.activity-item {
+.ms-notifications-container .activity-item {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 16px 22px;
+    gap: 16px;
+    padding: 20px 24px;
     background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-md);
-    margin-bottom: 10px;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01), 0 2px 4px -1px rgba(0, 0, 0, 0.01);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
 }
 
-.activity-item:hover {
-    box-shadow: var(--shadow-md);
-    border-color: var(--accent-color);
-    transform: translateY(-1px);
+.ms-notifications-container .activity-item:hover {
+    box-shadow: 0 12px 25px -5px rgba(209, 125, 57, 0.08), 0 8px 10px -6px rgba(209, 125, 57, 0.08);
+    border-color: rgba(209, 125, 57, 0.25);
+    transform: translateY(-2px);
 }
 
-.activity-item.unread {
-    border-left: 3px solid var(--accent-color);
-    background: var(--accent-light);
+/* Unread Activity Card Styling */
+.ms-notifications-container .activity-item.unread {
+    border-left: 4px solid var(--accent-color);
+    background: linear-gradient(90deg, #fffcf9 0%, #ffffff 100%);
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.03);
 }
 
-.activity-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
-    background: var(--activity-icon-bg, var(--main-bg));
+/* Modern Icons Backing system */
+.ms-notifications-container .activity-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: all 0.25s ease;
+    background: var(--activity-icon-bg, var(--main-bg));
 }
 
-.activity-icon .material-symbols-outlined {
-    font-size: 20px;
+.ms-notifications-container .activity-icon .material-symbols-outlined {
+    font-size: 22px;
     color: var(--activity-icon-color, #475569);
 }
 
-.activity-icon-tone-push {
-    --activity-icon-bg: var(--accent-light);
-    --activity-icon-color: var(--accent-color);
+.ms-notifications-container .activity-icon-tone-push {
+    --activity-icon-bg: rgba(209, 125, 57, 0.08);
+    --activity-icon-color: #d17d39;
 }
 
-.activity-icon-tone-message {
-    --activity-icon-bg: #f0fdf4;
-    --activity-icon-color: #16a34a;
+.ms-notifications-container .activity-icon-tone-message {
+    --activity-icon-bg: rgba(13, 148, 136, 0.08);
+    --activity-icon-color: #0d9488;
 }
 
-.activity-icon-tone-default {
-    --activity-icon-bg: #faf5ff;
-    --activity-icon-color: #9333ea;
+.ms-notifications-container .activity-icon-tone-default {
+    --activity-icon-bg: rgba(124, 58, 237, 0.08);
+    --activity-icon-color: #7c3aed;
 }
 
-.activity-icon-tone-notif-unread {
-    --activity-icon-bg: var(--accent-light);
-    --activity-icon-color: #60a5fa;
+.ms-notifications-container .activity-icon-tone-notif-unread {
+    --activity-icon-bg: rgba(209, 125, 57, 0.08);
+    --activity-icon-color: #d17d39;
 }
 
-.activity-icon-tone-notif-read {
+.ms-notifications-container .activity-icon-tone-notif-read {
     --activity-icon-bg: var(--main-bg);
     --activity-icon-color: #475569;
 }
 
-.activity-content {
+/* Refined Text Typography inside Card */
+.ms-notifications-container .activity-content {
     flex: 1;
     min-width: 0;
 }
 
-.activity-title {
-    font-size: 0.9rem;
+.ms-notifications-container .activity-title {
+    font-size: 0.95rem;
     font-weight: 700;
-    color: var(--text-main);
-    margin-bottom: 3px;
+    color: #1e293b;
+    margin-bottom: 4px;
     letter-spacing: -0.01em;
 }
 
-.activity-body {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    line-height: 1.5;
-    margin-bottom: 5px;
+.ms-notifications-container .activity-body {
+    font-size: 0.85rem;
+    color: #475569;
+    line-height: 1.6;
+    margin-bottom: 6px;
 }
 
-.activity-time {
-    font-size: 0.73rem;
+.ms-notifications-container .activity-time {
+    font-size: 0.75rem;
     color: #94a3b8;
     font-weight: 500;
+}
+
+/* Pulsing Unread Dot Indicator */
+.ms-notifications-container .ms-unread-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.2);
+    animation: hkm-unread-pulse-orange 2s infinite;
+    flex-shrink: 0;
+    margin-left: 12px;
+    align-self: center;
+}
+
+@keyframes hkm-unread-pulse-orange {
+    0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(209, 125, 57, 0.4);
+    }
+    70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 6px rgba(209, 125, 57, 0);
+    }
+    100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(209, 125, 57, 0);
+    }
+}
+
+/* Glassmorphism overlay override for Notification Message Modal */
+#notif-modal.hkm-modal-overlay {
+    background: rgba(15, 23, 42, 0.4) !important;
+    backdrop-filter: blur(10px) !important;
+}
+
+#notif-modal .hkm-modal-container {
+    border: 1px solid rgba(209, 125, 57, 0.15) !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15) !important;
+    max-width: 460px;
+}
+
+#notif-modal .hkm-modal-title {
+    color: #d17d39;
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+#notif-modal .btn-primary {
+    background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
+    border-color: transparent !important;
+    font-weight: 600;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2);
+}
+
+#notif-modal .btn-primary:hover {
+    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3) !important;
+    transform: translateY(-1px);
 }
 
 /* ══════════════════════════════════════════════════════════════════
@@ -2461,4 +2590,15 @@ html, body {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
+
+/* Tvinger fargen på varsel-prikken i headeren til HKM-oransje (#d17d39) */
+.notification-dot,
+#notif-badge-header,
+#notification-dot,
+.notification-btn .notification-dot {
+    background-color: #d17d39 !important;
+    background: #d17d39 !important;
+    border-color: #ffffff !important;
+}
+
 
