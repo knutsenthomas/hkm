@@ -2814,8 +2814,11 @@ body.admin-body .page-title {
 }
 
 #mobile-nav-toggle,
+#mobile-toggle,
 .mobile-nav-toggle {
-  order: 3 !important;
+  order: -1 !important;
+  margin-left: 0 !important;
+  margin-right: 12px !important;
 }
 
 /* Force square 12px buttons with correct colors */
@@ -2918,11 +2921,13 @@ body.builder-active .user-profile-link {
   margin: 0 !important;
 }
 
-/* 3. Mobile Menu LAST */
+/* 3. Mobile Menu FIRST */
 #mobile-nav-toggle,
+#mobile-toggle,
 .mobile-nav-toggle {
-  order: 3 !important;
-  margin: 0 !important;
+  order: -1 !important;
+  margin-left: 0 !important;
+  margin-right: 12px !important;
 }
 
 /* Clean Search (Hidden on mobile) */
