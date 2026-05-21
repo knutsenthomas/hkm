@@ -4760,6 +4760,8 @@ body.minside-body .nav-category-header .expand-icon {
 
 body.admin-body .nav-link,
 body.minside-body .nav-link {
+  display: inline-flex !important;
+  align-items: center !important;
   padding: 10px 16px !important;
   gap: 12px !important;
   font-size: 14px !important;
@@ -5695,4 +5697,186 @@ body.minside-body .sidebar-nav {
   scrollbar-width: none !important;
   -ms-overflow-style: none !important;
 }
+
+/* ==========================================================================
+   PREMIUM RESPONSIVENESS & DEFENSIVE UI SPACING GUARDS (Lead UX/UI Designer)
+   ========================================================================== */
+
+/* 1. Standalone Button Guard: Ensure button classes behave correctly even when .btn is omitted in HTML/JS */
+.btn-primary:not(.btn),
+.btn-secondary:not(.btn),
+.btn-outline:not(.btn),
+.btn-danger:not(.btn) {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  min-height: 40px !important;
+  padding: 10px 18px !important;
+  border-radius: 10px !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease !important;
+}
+
+.btn-primary:not(.btn):hover,
+.btn-secondary:not(.btn):hover,
+.btn-outline:not(.btn):hover,
+.btn-danger:not(.btn):hover {
+  transform: translateY(-1px) !important;
+}
+
+.btn-primary:not(.btn):active,
+.btn-secondary:not(.btn):active,
+.btn-outline:not(.btn):active,
+.btn-danger:not(.btn):active {
+  transform: translateY(0) !important;
+}
+
+/* 2. Icon-to-Text Clashing Defense (8px spacing/gap grid rule) */
+.btn .material-symbols-outlined,
+.btn-primary .material-symbols-outlined,
+.btn-secondary .material-symbols-outlined,
+.btn-outline .material-symbols-outlined,
+.btn-danger .material-symbols-outlined,
+.btn-premium .material-symbols-outlined,
+.btn-premium-primary .material-symbols-outlined,
+.btn-back .material-symbols-outlined,
+.btn-text .material-symbols-outlined,
+.btn-login .material-symbols-outlined,
+.btn-ghost .material-symbols-outlined,
+.btn-link .material-symbols-outlined,
+.btn i,
+.btn-primary i,
+.btn-secondary i,
+.btn-outline i,
+.btn-danger i,
+.btn-premium i,
+.btn-premium-primary i,
+.btn-back i,
+.btn-text i,
+.btn-login i,
+.btn-ghost i,
+.btn-link i {
+  margin-right: 4px !important; /* Elegant margin nudge inside all buttons/links to prevent text clash */
+}
+
+/* Badges & Status Pills Icon Spacing */
+.badge,
+.status-pill {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.badge .material-symbols-outlined,
+.status-pill .material-symbols-outlined {
+  font-size: 14px !important;
+  display: inline-block !important;
+  line-height: 1 !important;
+}
+
+/* 3. Form Grid Responsiveness: Stack form columns on mobile (e.g. Fornavn + Etternavn, Postnr + Poststed) */
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+  
+  .crm-tool-action-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+/* 4. Intermediate Tablet Layout for Promo Cards (701px to 1100px) */
+@media (min-width: 701px) and (max-width: 1100px) {
+  body.crm-body .promo-cards > *,
+  body.minside-body .promo-cards > * {
+    grid-column: span 6 !important;
+  }
+}
+
+/* 5. Defensive Table Containers to secure overflow protection */
+.table-container {
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* Ensure no custom button overrides cancel the flex alignment */
+button.btn, a.btn, .btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+/* 6. Lead UX Landscape Guard: Reduce vertical paddings & font sizes on small landscape screens to avoid stacking */
+@media (orientation: landscape) and (max-height: 600px) {
+  body.admin-body,
+  body.crm-body,
+  body.minside-body {
+    --section-padding: 12px 16px !important;
+  }
+
+  body.admin-body .sidebar-header,
+  body.crm-body .sidebar-header {
+    padding: 12px 16px !important;
+  }
+
+  body.admin-body .sidebar-nav .nav-link,
+  body.crm-body .sidebar-nav .nav-link {
+    padding: 8px 12px !important;
+    gap: 8px !important;
+    font-size: 13px !important;
+  }
+
+  body.admin-body h1,
+  body.admin-body h2,
+  body.crm-body h1,
+  body.crm-body h2,
+  body.admin-body .section-title,
+  body.admin-body .welcome-title {
+    font-size: clamp(20px, 4.5vh, 26px) !important;
+    margin-bottom: 8px !important;
+  }
+
+  body.admin-body .stat-card,
+  body.admin-body .promo-card,
+  body.crm-body .stat-card,
+  body.crm-body .promo-card,
+  body.crm-body .stat-item {
+    padding: 14px 18px !important;
+    border-radius: 12px !important;
+  }
+
+  body.admin-body .stats-grid,
+  body.admin-body .promo-cards,
+  body.crm-body .crm-stats-bar,
+  body.crm-body .promo-cards {
+    gap: 12px !important;
+  }
+
+  body.admin-body .table-container td,
+  body.admin-body .table-container th,
+  body.crm-body .crm-table td,
+  body.crm-body .crm-table th {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+
+  body.admin-body .btn,
+  body.crm-body .btn {
+    padding: 8px 14px !important;
+    min-height: 36px !important;
+    font-size: 13px !important;
+  }
+}
+
+
 
