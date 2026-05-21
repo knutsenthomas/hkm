@@ -2206,28 +2206,48 @@ class AdminManager {
     }
 
     initMessageListener() {
-        if (!firebaseService.isInitialized || !firebaseService.db) return;
-
         const bell = document.getElementById('messages-bell');
         if (bell) {
-            bell.addEventListener('click', () => {
+            bell.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
                 window.location.href = '/admin/admin-meldinger.html';
-            });
+            };
+            console.log("[AdminManager] Bell click listener registered successfully.");
         }
 
-        try {
-            this.messagesUnsub = firebaseService.db
-                .collection('contactMessages')
-                .where('status', '==', 'ny')
-                .onSnapshot((snapshot) => {
-                    const count = snapshot.size;
-                    this.unreadMessageCount = count;
-                    this.updateMessageBell(count);
-                }, (err) => {
-                    console.error('Feil i meldings-lytter:', err);
-                });
-        } catch (err) {
-            console.error('Kunne ikke starte meldings-lytter:', err);
+        const startSubscription = () => {
+            try {
+                if (this.messagesUnsub) {
+                    this.messagesUnsub();
+                }
+                this.messagesUnsub = firebaseService.db
+                    .collection('contactMessages')
+                    .where('status', '==', 'ny')
+                    .onSnapshot((snapshot) => {
+                        const count = snapshot.size;
+                        this.unreadMessageCount = count;
+                        this.updateMessageBell(count);
+                    }, (err) => {
+                        console.error('Feil i meldings-lytter:', err);
+                    });
+                console.log("[AdminManager] Bell Firebase listener active.");
+            } catch (err) {
+                console.error('Kunne ikke starte meldings-lytter:', err);
+            }
+        };
+
+        if (firebaseService.isInitialized && firebaseService.db) {
+            startSubscription();
+        } else {
+            console.log("[AdminManager] Firebase not ready yet. Deferring message listener subscription.");
+            const interval = setInterval(() => {
+                if (firebaseService.isInitialized && firebaseService.db) {
+                    clearInterval(interval);
+                    startSubscription();
+                }
+            }, 100);
+            setTimeout(() => clearInterval(interval), 10000);
         }
     }
 
