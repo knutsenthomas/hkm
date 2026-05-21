@@ -155,6 +155,10 @@ const minsideTranslations = {
         // Notifications
         'notifications.title': 'Varslinger',
         'notifications.markAllRead': 'Merk alle lest',
+        'notifications.filterAll': 'Alle',
+        'notifications.filterUnread': 'Ulest',
+        'notifications.filterPush': 'Push',
+        'notifications.filterMessage': 'Meldinger',
         'notifications.noNotifications': 'Ingen varslinger',
         'notifications.noNotificationsSub': 'Du har ingen varslinger ennå.',
         'notifications.loadErrorNotice': 'Kunne ikke laste varslinger akkurat nå.',
@@ -397,6 +401,10 @@ const minsideTranslations = {
         // Notifications
         'notifications.title': 'Notifications',
         'notifications.markAllRead': 'Mark all as read',
+        'notifications.filterAll': 'All',
+        'notifications.filterUnread': 'Unread',
+        'notifications.filterPush': 'Push',
+        'notifications.filterMessage': 'Messages',
         'notifications.noNotifications': 'No notifications',
         'notifications.noNotificationsSub': 'You have no notifications yet.',
         'notifications.loadErrorNotice': 'Could not load notifications right now.',
@@ -639,6 +647,10 @@ const minsideTranslations = {
         // Notifications
         'notifications.title': 'Notificaciones',
         'notifications.markAllRead': 'Marcar todas como leídas',
+        'notifications.filterAll': 'Todas',
+        'notifications.filterUnread': 'No leídas',
+        'notifications.filterPush': 'Push',
+        'notifications.filterMessage': 'Mensajes',
         'notifications.noNotifications': 'Sin notificaciones',
         'notifications.noNotificationsSub': 'No tienes notificaciones todavía.',
         'notifications.loadErrorNotice': 'No se pudieron cargar las notificaciones ahora.',
