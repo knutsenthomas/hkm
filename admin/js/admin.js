@@ -2858,7 +2858,7 @@ class AdminManager {
                 </div>
             `, '')}
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(420px, 1fr)); gap: 24px; margin-bottom: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 24px; margin-bottom: 24px;">
                 <div class="card modern">
                     <div class="card-header flex-between">
                         <h3 class="card-title">Podcast-innstillinger</h3>
@@ -5530,7 +5530,7 @@ class AdminManager {
 
         section.innerHTML = `
             ${this.renderSectionHeader('hub', 'Integrasjoner', 'Administrer YouTube, Google Calendar, AI og oversettelse.', '')}
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px;">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr)); gap: 24px;">
                 <div class="card modern">
                     <div class="card-header flex-between">
                         <h3 class="card-title">YouTube</h3>
@@ -15586,7 +15586,7 @@ class AdminManager {
 
         container.innerHTML = `
             <div style="display:grid; gap:24px; grid-column:1 / -1; width:100%;">
-                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(380px, 1fr)); gap:24px; align-items:start;">
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap:24px; align-items:start;">
                     <div class="card" style="margin:0;">
                         <div class="card-body" style="display:grid; gap:18px;">
                             <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:16px;">
