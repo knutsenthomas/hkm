@@ -2301,12 +2301,46 @@ class MinSideManager {
 
     async _requestPushPermission() {
         try {
-            if (!('Notification' in window)) return;
-            if (!firebase.messaging || !firebase.messaging.isSupported()) return;
+            if (!('Notification' in window)) {
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Nettleseren din støtter ikke push-varslinger.", "error", 5000);
+                } else {
+                    alert("Nettleseren din støtter ikke push-varslinger.");
+                }
+                return;
+            }
+            if (!firebase.messaging || !firebase.messaging.isSupported()) {
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Push-varslinger er ikke støttet i denne nettleseren.", "error", 5000);
+                } else {
+                    alert("Push-varslinger er ikke støttet i denne nettleseren.");
+                }
+                return;
+            }
+
+            const currentPermission = Notification.permission;
+            if (currentPermission === 'denied') {
+                const msg = "Varsler er blokkert for dette nettstedet i nettleseren din. Vennligst tilbakestill tillatelsen i nettleserinnstillingene dine.";
+                if (typeof window.showToast === 'function') {
+                    window.showToast(msg, "warning", 7000);
+                } else {
+                    alert(msg);
+                }
+                return;
+            }
+
             const perm = await Notification.requestPermission();
-            if (perm !== 'granted') return;
+            if (perm !== 'granted') {
+                const msg = "Du må tillate varsler for å motta push-meldinger på denne enheten.";
+                if (typeof window.showToast === 'function') {
+                    window.showToast(msg, "warning", 5000);
+                } else {
+                    alert(msg);
+                }
+                return;
+            }
+
             const msg = firebase.messaging();
-            // Use the existing PWA service worker registration to avoid collisions with /firebase-messaging-sw.js
             const registration = await navigator.serviceWorker.ready;
             const token = await msg.getToken({
                 vapidKey: 'BI2k24dp-3eJWtLSPvGWQkD00A_duNRCIMY_2ozLFI0-anJDamFBALaTdtzGYQEkoFz8X0JxTcCX6tn3P_i0YrA',
@@ -2316,8 +2350,21 @@ class MinSideManager {
                 await firebase.firestore().collection('users').doc(this.currentUser.uid).update({
                     fcmTokens: firebase.firestore.FieldValue.arrayUnion(token)
                 });
+                if (typeof window.showToast === 'function') {
+                    window.showToast("Push-varslinger ble vellykket registrert på denne enheten!", "success", 5000);
+                }
+            } else {
+                throw new Error("Kunne ikke hente varslingstoken.");
             }
-        } catch (e) { console.warn('push permission:', e); }
+        } catch (e) {
+            console.warn('push permission:', e);
+            const errorMsg = `Kunne ikke registrere push-varsler: ${e.message || e}`;
+            if (typeof window.showToast === 'function') {
+                window.showToast(errorMsg, "error", 7000);
+            } else {
+                alert(errorMsg);
+            }
+        }
     }
 
 
