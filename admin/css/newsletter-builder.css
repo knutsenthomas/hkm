@@ -349,8 +349,8 @@ body.builder-active {
 
 .subject-input-modern:focus {
     background: #fff;
-    border-color: var(--accent-orange-bright);
-    box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+    border-color: #1B4965;
+    box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.1);
 }
 
 .device-toggles {
@@ -371,12 +371,16 @@ body.builder-active {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
+}
+
+.device-btn:hover {
+    color: #1B4965;
 }
 
 .device-btn.active {
     background: #fff;
-    color: var(--accent-orange-bright);
+    color: #1B4965;
     box-shadow: var(--shadow-sm);
 }
 
@@ -395,27 +399,42 @@ body.builder-active {
     align-items: center;
     gap: 8px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     border: none;
+}
+
+.toolbar-action-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+}
+
+.toolbar-action-btn:active {
+    transform: translateY(0) scale(0.98);
 }
 
 .toolbar-action-btn.secondary {
     background: #f1f5f9;
     color: var(--text-dark);
+    box-shadow: var(--shadow-sm);
 }
 
 .toolbar-action-btn.secondary:hover {
     background: #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .toolbar-action-btn.primary {
-    background: var(--accent-orange-bright);
+    background: #1B4965;
     color: #fff;
+    box-shadow: 0 4px 14px rgba(27, 73, 101, 0.2);
 }
 
 .toolbar-action-btn.primary:hover {
-    background: #ea580c;
-    transform: translateY(-1px);
+    background: #14374a;
+    box-shadow: 0 6px 20px rgba(27, 73, 101, 0.3);
+}
+
+.toolbar-action-btn.primary:active {
+    background: #0f2a39;
 }
 
 .toolbar-action-btn span {
@@ -1668,5 +1687,77 @@ input:checked+.slider:before {
 
     .canvas-container {
         padding: 12px 8px 20px;
+    }
+}
+
+/* Gold Standard Toolbar Redesign on Mobile Viewports */
+@media (max-width: 768px) {
+    body.builder-active .builder-workspace > .editor-toolbar {
+        width: 100% !important;
+        margin: 16px 0 0 0 !important;
+        padding: 0 16px !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 16px !important;
+        align-items: stretch !important;
+    }
+    
+    .editor-toolbar .toolbar-left,
+    .editor-toolbar .toolbar-center,
+    .editor-toolbar .toolbar-right {
+        width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        justify-content: center !important;
+    }
+
+    .editor-toolbar .toolbar-left .subject-field {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .editor-toolbar .toolbar-left .subject-input-modern {
+        width: 100% !important;
+    }
+
+    .editor-toolbar .toolbar-right {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    /* Make the primary button span the full width below secondary actions */
+    .editor-toolbar #continue-btn {
+        grid-column: span 2 !important;
+        justify-content: center !important;
+        width: 100% !important;
+    }
+
+    .editor-toolbar #preview-btn,
+    .editor-toolbar #save-template-btn {
+        justify-content: center !important;
+        white-space: nowrap !important;
+        font-size: 13px !important;
+        width: 100% !important;
+    }
+}
+
+/* Mobile Landscape Guard to prevent vertical stacking and scrolling issues */
+@media (max-height: 480px) and (orientation: landscape) {
+    body.builder-active .builder-workspace > .editor-toolbar {
+        margin: 8px auto 0 !important;
+        gap: 8px !important;
+        padding: 0 8px !important;
+    }
+    .toolbar-action-btn {
+        height: 32px !important;
+        font-size: 12px !important;
+        padding: 0 12px !important;
+    }
+    .subject-input-modern {
+        height: 32px !important;
+        font-size: 13px !important;
     }
 }
