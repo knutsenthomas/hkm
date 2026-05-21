@@ -774,12 +774,12 @@ class MinSideManager {
         this.views = {
             overview: this.renderOverview,
             profile: this.renderProfile,
-            activity: this.renderActivity,
             notifications: this.renderNotifications,
             giving: this.renderGiving,
             courses: this.renderCourses,
             notes: this.renderNotes,
         };
+
 
         // Run initial translation on static elements (sidebar, headers)
         translateStaticHTML();
@@ -2384,29 +2384,55 @@ class MinSideManager {
     }
 
     // ══════════════════════════════════════════════════════════
-    // VIEW: VARSLINGER (unread + mark-read)
+    // ══════════════════════════════════════════════════════════
+    // VIEW: VARSLINGER & LOGG (combined)
     // ══════════════════════════════════════════════════════════
     async renderNotifications(container) {
         const uid = this.currentUser?.uid;
+        const activeFilter = this._notifFilter || 'all';
+
+        const iconMap = {
+            push:    { icon: 'campaign',      cls: 'activity-icon-tone-push' },
+            message: { icon: 'mail',          cls: 'activity-icon-tone-message' },
+            default: { icon: 'notifications', cls: 'activity-icon-tone-default' },
+        };
+
+        const filters = [
+            { id: 'all',     label: t('notifications.filterAll')     || 'Alle' },
+            { id: 'unread',  label: t('notifications.filterUnread')  || 'Ulest' },
+            { id: 'push',    label: t('notifications.filterPush')    || 'Push' },
+            { id: 'message', label: t('notifications.filterMessage') || 'Meldinger' },
+        ];
+
         container.innerHTML = `
         <div class="ms-full-width">
             <div class="ms-section-header-row">
                 <h2 class="ms-section-title">${t('notifications.title')}</h2>
                 <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">${t('notifications.markAllRead')}</button>
             </div>
+
+            <!-- Filter tabs -->
+            <div class="notif-filter-tabs" id="notif-filter-tabs">
+                ${filters.map(f => `
+                    <button class="notif-filter-btn${f.id === activeFilter ? ' active' : ''}" data-filter="${f.id}">
+                        ${f.label}
+                        ${f.id === 'unread' ? `<span class="notif-filter-badge" id="unread-count-badge" style="display:none">0</span>` : ''}
+                    </button>
+                `).join('')}
+            </div>
+
             <div id="notifs-inner"><div class="loading-state ms-loading-min-80"><div class="spinner"></div></div></div>
         </div>`;
 
         const inner = container.querySelector('#notifs-inner');
-        try {
-            const snap = await firebase.firestore()
-                .collection('user_notifications')
-                .where('userId', '==', uid)
-                .orderBy('createdAt', 'desc')
-                .limit(30)
-                .get();
 
-            if (snap.empty) {
+        const renderList = (allItems) => {
+            let items = allItems;
+            if (activeFilter === 'unread')  items = allItems.filter(n => !n.read);
+            if (activeFilter === 'push')    items = allItems.filter(n => n.type === 'push');
+            if (activeFilter === 'message') items = allItems.filter(n => n.type === 'message');
+
+            if (items.length === 0) {
                 inner.innerHTML = `<div class="empty-state">
                     <span class="material-symbols-outlined">notifications_off</span>
                     <h3>${t('notifications.noNotifications')}</h3>
@@ -2415,12 +2441,13 @@ class MinSideManager {
                 return;
             }
 
-            const items = snap.docs.map(d => this._normalizeNotificationDoc(d));
             inner.innerHTML = items.map(n => {
                 const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
-                return `<div class="activity-item ${!n.read ? 'unread' : ''}" data-id="${n.id}" style="cursor: pointer;">
-                    <div class="activity-icon ${!n.read ? 'activity-icon-tone-notif-unread' : 'activity-icon-tone-notif-read'}">
-                        <span class="material-symbols-outlined">campaign</span>
+                const m = iconMap[n.type] || iconMap.default;
+                const iconCls = !n.read ? 'activity-icon-tone-notif-unread' : m.cls;
+                return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}" style="cursor:pointer;">
+                    <div class="activity-icon ${iconCls}">
+                        <span class="material-symbols-outlined">${m.icon}</span>
                     </div>
                     <div class="activity-content">
                         <div class="activity-title">${n.title}</div>
@@ -2436,31 +2463,71 @@ class MinSideManager {
                     const notif = items.find(n => n.id === el.dataset.id);
                     if (notif) this.showNotificationModal(notif);
                     if (notif && !notif.read) {
+                        notif.read = true;
                         el.classList.remove('unread');
                         el.querySelector('.ms-unread-dot')?.remove();
                         const icon = el.querySelector('.activity-icon');
                         if (icon) {
                             icon.classList.remove('activity-icon-tone-notif-unread');
-                            icon.classList.add('activity-icon-tone-notif-read');
+                            const m2 = iconMap[notif.type] || iconMap.default;
+                            icon.classList.add(m2.cls);
                         }
+                        firebase.firestore().collection('user_notifications').doc(notif.id)
+                            .update({ read: true }).catch(() => {});
                     }
                 });
             });
+        };
 
-            // Mark all read
-            const unread = items.filter(n => !n.read);
-            if (unread.length) {
+        try {
+            const snap = await firebase.firestore()
+                .collection('user_notifications')
+                .where('userId', '==', uid)
+                .orderBy('createdAt', 'desc')
+                .limit(50)
+                .get();
+
+            const allItems = snap.docs.map(d => this._normalizeNotificationDoc(d));
+            const unreadItems = allItems.filter(n => !n.read);
+
+            // Show unread count badge on Ulest tab
+            const unreadBadge = container.querySelector('#unread-count-badge');
+            if (unreadBadge && unreadItems.length > 0) {
+                unreadBadge.textContent = unreadItems.length;
+                unreadBadge.style.display = '';
+            }
+
+            renderList(allItems);
+
+            // Auto mark all unread as read (only when on "Alle" or "Ulest" tab)
+            if ((activeFilter === 'all' || activeFilter === 'unread') && unreadItems.length > 0) {
                 const batch = firebase.firestore().batch();
-                unread.forEach(n => batch.update(firebase.firestore().collection('user_notifications').doc(n.id), { read: true }));
+                unreadItems.forEach(n => batch.update(
+                    firebase.firestore().collection('user_notifications').doc(n.id),
+                    { read: true }
+                ));
                 await batch.commit();
                 this._setBadge(0);
             }
 
+            // Filter tab clicks
+            container.querySelectorAll('.notif-filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    this._notifFilter = btn.dataset.filter;
+                    this.renderNotifications(container);
+                });
+            });
+
+            // Mark all read button
             document.getElementById('mark-all-read-btn')?.addEventListener('click', async () => {
                 const b = firebase.firestore().batch();
-                items.forEach(n => b.update(firebase.firestore().collection('user_notifications').doc(n.id), { read: true }));
+                allItems.forEach(n => b.update(
+                    firebase.firestore().collection('user_notifications').doc(n.id),
+                    { read: true }
+                ));
                 await b.commit();
                 this._setBadge(0);
+                this._notifFilter = 'all';
                 this.renderNotifications(container);
             });
 
@@ -2470,6 +2537,8 @@ class MinSideManager {
             inner.innerHTML = `<div class="empty-state"><p>${t('notifications.loadErrorCopy')}</p></div>`;
         }
     }
+
+
 
     // ══════════════════════════════════════════════════════════
     // VIEW: GAVER

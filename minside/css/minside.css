@@ -1071,7 +1071,63 @@ body {
 /* ══════════════════════════════════════════════════════════════════
    ACTIVITY / NOTIFICATIONS
    ══════════════════════════════════════════════════════════════════ */
+
+/* Filter tabs */
+.notif-filter-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.notif-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 16px;
+    border: 1.5px solid var(--border-color);
+    border-radius: 99px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.18s ease;
+    white-space: nowrap;
+}
+
+.notif-filter-btn:hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+    background: rgba(var(--accent-rgb, 210, 125, 57), 0.06);
+}
+
+.notif-filter-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    color: #fff;
+}
+
+.notif-filter-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 99px;
+    background: rgba(255, 255, 255, 0.3);
+    font-size: 0.7rem;
+    font-weight: 700;
+}
+
+.notif-filter-btn:not(.active) .notif-filter-badge {
+    background: var(--accent-color);
+    color: #fff;
+}
+
 .activity-list {
+
     width: 100%;
     display: block;
 }
