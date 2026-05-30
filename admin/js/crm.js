@@ -156,7 +156,7 @@ class CRMManager {
         if (!tableBody) return;
 
         try {
-            const snapshot = await window.firebaseService.db.collection('users').get();
+            const snapshot = await window.firebaseService.db.collection('contacts').get();
             this.contacts = [];
             snapshot.forEach(doc => {
                 this.contacts.push({ id: doc.id, ...doc.data() });
@@ -1042,7 +1042,7 @@ class CRMManager {
             const chunk = contacts.slice(i, i + chunkSize);
             const batch = db.batch();
             chunk.forEach((contact) => {
-                const ref = db.collection('users').doc();
+                const ref = db.collection('contacts').doc();
                 batch.set(ref, {
                     ...contact,
                     createdAt: new Date().toISOString(),
@@ -1175,10 +1175,10 @@ class CRMManager {
 
         try {
             if (this.editingContactId) {
-                await window.firebaseService.db.collection('users').doc(this.editingContactId).set(contactData, { merge: true });
+                await window.firebaseService.db.collection('contacts').doc(this.editingContactId).set(contactData, { merge: true });
                 this.notify("Kontakt oppdatert!");
             } else {
-                await window.firebaseService.db.collection('users').add({
+                await window.firebaseService.db.collection('contacts').add({
                     ...contactData,
                     createdAt: new Date().toISOString(),
                     createdBy: 'admin'
@@ -1208,7 +1208,7 @@ class CRMManager {
         if (!ok) return;
 
         try {
-            await window.firebaseService.db.collection('users').doc(contactId).delete();
+            await window.firebaseService.db.collection('contacts').doc(contactId).delete();
             this.selectedContactIds.delete(contactId);
             await this.loadContacts();
             this.notify('Kontakt slettet.');
@@ -1342,7 +1342,7 @@ class CRMManager {
             const ids = Array.from(this.selectedContactIds);
             
             ids.forEach(id => {
-                batch.delete(db.collection('users').doc(id));
+                batch.delete(db.collection('contacts').doc(id));
             });
 
             await batch.commit();

@@ -348,6 +348,10 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    match /contacts/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     match /segments/{docId} {
       allow read, write: if isAdmin();
     }

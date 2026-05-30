@@ -797,7 +797,7 @@ class NewsletterBuilder {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
 
         try {
-            const usersSnap = await window.firebaseService.db.collection('users').get();
+            const usersSnap = await window.firebaseService.db.collection('contacts').get();
             const totalCount = usersSnap.size;
 
             // For now, assume a fraction are "subscribers" (simulate real data)
@@ -865,7 +865,7 @@ class NewsletterBuilder {
         container.innerHTML = '<div style="padding: 20px; text-align: center;"><span class="material-symbols-outlined rotating" style="animation: spin 1s linear infinite;">sync</span></div>';
 
         try {
-            const snap = await window.firebaseService.db.collection('users').limit(50).get();
+            const snap = await window.firebaseService.db.collection('contacts').limit(50).get();
             container.innerHTML = '';
             snap.forEach(doc => {
                 const user = doc.data();

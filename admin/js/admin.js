@@ -16136,9 +16136,15 @@ class AdminManager {
                                                                                     <div class="design-ui-top-grid">
                                                                                         <div class="design-ui-main-column">
                                                                                             <div class="design-ui-panel">
-                                                                                                <div class="design-ui-panel-header">
-                                                                                                    <h3 class="design-ui-panel-title">Aktive Brukere</h3>
-                                                                                                    <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
+                                                                                                <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+                                                                                                    <div style="display: flex; align-items: center; gap: 8px;">
+                                                                                                        <h3 class="design-ui-panel-title" style="margin: 0;">Aktive Brukere</h3>
+                                                                                                        <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
+                                                                                                    </div>
+                                                                                                    <div style="position: relative; width: 240px; margin-left: auto;">
+                                                                                                        <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 18px; pointer-events: none;">search</span>
+                                                                                                        <input type="text" id="user-search-input" class="form-control" placeholder="Søk etter brukere..." style="padding-left: 36px; height: 32px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; outline: none; transition: all 0.2s ease;">
+                                                                                                    </div>
                                                                                                 </div>
                                                                                                 <div class="design-ui-panel-body p-0" id="users-list-container" style="padding: 0;">
                                                                                                     <div class="loader" style="margin: 24px auto;"></div>
@@ -16234,6 +16240,14 @@ class AdminManager {
             };
         }
 
+        const searchInput = document.getElementById('user-search-input');
+        if (searchInput) {
+            searchInput.oninput = (e) => {
+                const query = e.target.value.trim().toLowerCase();
+                this.filterUsers(query);
+            };
+        }
+
         this._ensureUsersRealtimeSubscription();
         await this.loadUsersList();
     }
@@ -16260,11 +16274,43 @@ class AdminManager {
             });
 
             this.allUsersData = users; // Cache for filtering
-            this.renderUsersTable(users);
+
+            const searchInput = document.getElementById('user-search-input');
+            const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+            if (query) {
+                const filtered = users.filter(user => {
+                    const name = (user.displayName || user.fullName || '').toLowerCase();
+                    const email = (user.email || '').toLowerCase();
+                    const phone = (user.phone || '').toLowerCase();
+                    const role = (user.role || '').toLowerCase();
+                    return name.includes(query) || email.includes(query) || phone.includes(query) || role.includes(query);
+                });
+                this.renderUsersTable(filtered);
+            } else {
+                this.renderUsersTable(users);
+            }
         } catch (error) {
             console.error('Error fetching users:', error);
             container.innerHTML = `<p class="empty-text">Kunne ikke laste brukere: ${error.message}</p>`;
         }
+    }
+
+    filterUsers(query) {
+        if (!this.allUsersData) return;
+        if (!query) {
+            this.renderUsersTable(this.allUsersData);
+            return;
+        }
+
+        const filtered = this.allUsersData.filter(user => {
+            const name = (user.displayName || user.fullName || '').toLowerCase();
+            const email = (user.email || '').toLowerCase();
+            const phone = (user.phone || '').toLowerCase();
+            const role = (user.role || '').toLowerCase();
+            return name.includes(query) || email.includes(query) || phone.includes(query) || role.includes(query);
+        });
+
+        this.renderUsersTable(filtered);
     }
 
     renderUsersTable(users) {
