@@ -2036,9 +2036,6 @@ class NewsletterBuilder {
             const currentFilter = activeTab ? activeTab.dataset.filter : 'all';
             this.renderStudioFeedGrid(currentFilter);
         }
-
-        showToast("Sletter...", "info");
-
         try {
             if (item.type === 'blog' || item.type === 'teaching') {
                 const collectionId = `collection_${item.type}`;
