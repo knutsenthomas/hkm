@@ -1561,7 +1561,49 @@ class NewsletterBuilder {
             const draftsCountEl = document.getElementById('dashboard-drafts-count');
             
             if (!draftsContainer || !templatesContainer) return;
-            
+
+            // Default premium templates with descriptions and thumbnails (never empty)
+            const DEFAULT_TEMPLATES = [
+                {
+                    id: 'tpl-ukeshilsen',
+                    name: 'Ukeshilsen & Andakt',
+                    description: 'En ren, minimalistisk mal med andakt, bibelvers, hilsen og kontaktinfo.',
+                    thumbnail: 'https://images.unsplash.com/photo-1504052434569-70ad58565b90?auto=format&fit=crop&w=200&q=80',
+                    subject: 'Ukens oppmuntring fra His Kingdom Ministry',
+                    blocks: [
+                        { type: 'header', content: { text: 'Ukeshilsen' } },
+                        { type: 'image', content: { url: 'https://images.unsplash.com/photo-1504052434569-70ad58565b90?auto=format&fit=crop&w=800&q=80' } },
+                        { type: 'text', content: { text: '<h3>Kjære brødre og søstre,</h3><p>Vi ønsker deg en velsignet uke! I dag vil vi dele noen ord til oppmuntring om Guds trofasthet og kjærlighet i hverdagen...</p>' } },
+                        { type: 'button', content: { text: 'Les hele andakten', url: 'https://hkm.no' } }
+                    ]
+                },
+                {
+                    id: 'tpl-nyhetsbrev',
+                    name: 'Kunngjøringer & Nyheter',
+                    description: 'Vårt standardoppsett for ukentlige nyheter, oppdateringer og arrangementskunngjøringer.',
+                    thumbnail: 'https://images.unsplash.com/photo-1447069387593-a5de0862481e?auto=format&fit=crop&w=200&q=80',
+                    subject: 'Siste nytt og viktige kunngjøringer fra HKM',
+                    blocks: [
+                        { type: 'header', content: { text: 'Nyheter & Kunngjøringer' } },
+                        { type: 'text', content: { text: '<h2>Hva skjer i His Kingdom Ministry?</h2><p>Her er en oversikt over kommende møter, reiser og siste nytt fra arbeidet vårt.</p>' } },
+                        { type: 'image', content: { url: 'https://images.unsplash.com/photo-1447069387593-a5de0862481e?auto=format&fit=crop&w=800&q=80' } },
+                        { type: 'button', content: { text: 'Se arrangementskalender', url: 'https://hkm.no/kalender' } }
+                    ]
+                },
+                {
+                    id: 'tpl-undervisning',
+                    name: 'Bibelstudium & Leksjon',
+                    description: 'Tilrettelagt mal for undervisning, leksjoner og studiemateriell med spørsmål og leselister.',
+                    thumbnail: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&w=200&q=80',
+                    subject: 'Bibelstudium og ukens leksjonsplan',
+                    blocks: [
+                        { type: 'header', content: { text: 'Bibeltimer & Undervisning' } },
+                        { type: 'text', content: { text: '<h2>Ukens Bibelstudium</h2><p>Bli med oss å dykke dypere ned i Guds ord denne uken. Vi studerer skriftene sammen...</p>' } },
+                        { type: 'button', content: { text: 'Åpne leksjonsplan', url: 'https://hkm.no/undervisning' } }
+                    ]
+                }
+            ];
+
             const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
             
             let draftsHtml = '';
@@ -1576,41 +1618,78 @@ class NewsletterBuilder {
                 if (data.isDraft === true) {
                     draftsCount++;
                     draftsHtml += `
-                        <div class="template-item card" style="padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; background: white; margin-bottom: 8px; box-sizing: border-box;" 
+                        <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;" 
                             onclick="window.builder.loadDraftIntoBuilder('${id}', '${data.name.replace(/'/g, "\\'")}', \`${JSON.stringify(data.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${(data.subject || '').replace(/'/g, "\\'")}')"
-                            onmouseover="this.style.borderColor='var(--accent-color)'; this.style.transform='translateY(-2px)'" 
-                            onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <div style="font-weight:600; font-size:14.5px; color:#1e293b;">${data.name}</div>
-                                    <div style="font-size:12px; color:#64748b; margin-top:4px;">${formattedDate} · Emne: ${data.subject || 'Ingen'}</div>
-                                </div>
-                                <span class="material-symbols-outlined" style="font-size:20px; color:#ea580c;">edit</span>
+                            onmouseover="this.style.borderColor='var(--accent-color, #d17d39)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';" 
+                            onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
+                            <div style="width: 44px; height: 44px; border-radius: 10px; background: #fff7ed; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; color: #d17d39;">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">edit_document</span>
                             </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
+                                <div style="font-size: 12px; color: #64748b; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
+                                    ${formattedDate} · Emne: ${data.subject || 'Ingen'}
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39; margin-left: 12px; flex-shrink: 0;">edit</span>
                         </div>
                     `;
                 } else {
+                    // Custom templates saved in Firestore
                     templatesHtml += `
-                        <div class="template-item card" style="padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; background: white; margin-bottom: 8px; box-sizing: border-box;"
+                        <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;"
                             onclick="window.builder.loadTemplateIntoBuilder('${id}', '${data.name.replace(/'/g, "\\'")}', \`${JSON.stringify(data.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${(data.subject || '').replace(/'/g, "\\'")}')"
-                            onmouseover="this.style.borderColor='#6366f1'; this.style.transform='translateY(-2px)'"
-                            onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <div style="font-weight:600; font-size:14.5px; color:#1e293b;">${data.name}</div>
-                                    <div style="font-size:12px; color:#64748b; margin-top:4px;">Opprettet ${formattedDate}</div>
-                                </div>
-                                <span class="material-symbols-outlined" style="font-size:20px; color:#4338ca;">arrow_forward</span>
+                            onmouseover="this.style.borderColor='#1B4965'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';"
+                            onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
+                            <div style="width: 44px; height: 44px; border-radius: 10px; background: #e0f2fe; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; color: #1B4965;">
+                                <span class="material-symbols-outlined" style="font-size: 22px;">auto_awesome_motion</span>
                             </div>
+                            <div style="flex: 1; min-width: 0;">
+                                <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
+                                <div style="font-size: 12px; color: #64748b; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">Opprettet ${formattedDate}</div>
+                            </div>
+                            <span class="material-symbols-outlined" style="font-size: 20px; color: #1B4965; margin-left: 12px; flex-shrink: 0;">arrow_forward</span>
                         </div>
                     `;
                 }
             });
+
+            // Always prepopulate/merge with default templates
+            let defaultTemplatesHtml = '';
+            DEFAULT_TEMPLATES.forEach(tpl => {
+                defaultTemplatesHtml += `
+                    <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;"
+                        onclick="window.builder.loadTemplateIntoBuilder('${tpl.id}', '${tpl.name.replace(/'/g, "\\'")}', \`${JSON.stringify(tpl.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${tpl.subject.replace(/'/g, "\\'")}')"
+                        onmouseover="this.style.borderColor='#d17d39'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';"
+                        onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
+                        <img src="${tpl.thumbnail}" style="width: 72px; height: 54px; border-radius: 10px; object-fit: cover; margin-right: 16px; flex-shrink: 0; background: #f1f5f9;" alt="${tpl.name}">
+                        <div style="flex: 1; min-width: 0;">
+                            <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tpl.name}</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; font-weight: 500;">${tpl.description}</div>
+                        </div>
+                        <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39; margin-left: 12px; flex-shrink: 0;">arrow_forward</span>
+                    </div>
+                `;
+            });
+
+            templatesHtml = defaultTemplatesHtml + templatesHtml;
             
             if (draftsCountEl) draftsCountEl.textContent = `${draftsCount} kladder`;
             
-            draftsContainer.innerHTML = draftsHtml || '<p class="empty-state-text" style="color:#94a3b8; font-size:13px; text-align:center; padding:32px 0; margin:0;">Ingen kladder lagret ennå</p>';
-            templatesContainer.innerHTML = templatesHtml || '<p class="empty-state-text" style="color:#94a3b8; font-size:13px; text-align:center; padding:32px 0; margin:0;">Ingen maler lagret ennå</p>';
+            // Render Drafts
+            if (draftsHtml) {
+                draftsContainer.innerHTML = draftsHtml;
+            } else {
+                draftsContainer.innerHTML = `
+                    <div style="text-align: center; padding: 40px 16px; color: #94a3b8; border: 1px dashed #e2e8f0; border-radius: 16px; background: #fafafa; box-sizing: border-box; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                        <span class="material-symbols-outlined" style="font-size: 40px; color: #d17d39; opacity: 0.7; margin-bottom: 8px; display: block;">edit_document</span>
+                        <h5 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #475569;">Ingen kladder lagret</h5>
+                        <p style="margin: 0; font-size: 12px; line-height: 1.4; color: #64748b; font-weight: 500; max-width: 250px; margin-left: auto; margin-right: auto;">Når du lagrer et utkast underveis i byggeren, vil det dukke opp her så du kan fortsette senere.</p>
+                    </div>
+                `;
+            }
+            
+            templatesContainer.innerHTML = templatesHtml;
             
         } catch (e) {
             console.error("Load dashboard data failed:", e);
