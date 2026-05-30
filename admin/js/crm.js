@@ -1025,7 +1025,7 @@ class CRMManager {
             email,
             phone,
             role: role || 'medlem',
-            status: this.normalizeStatusFilter(rawStatus) === 'ALL' ? 'IKKE_MEDLEM' : this.normalizeStatusFilter(rawStatus),
+            status: 'IKKE_MEDLEM', // Alltid importer som kontakt (IKKE_MEDLEM) som standard
             label,
             labels: [label]
         };
