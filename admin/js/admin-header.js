@@ -321,7 +321,9 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
         ];
 
-        const favoritedItems = mainItems.filter(item => !item.header && favorites.includes(item.label));
+        const favoritedItems = mainItems
+            .filter(item => !item.header && favorites.includes(item.label))
+            .sort((a, b) => a.label.localeCompare(b.label, 'no'));
         let favHtml = '';
         if (favoritedItems.length > 0) {
             const favItemsHtml = favoritedItems.map(item => renderItem(item, true)).join('');
