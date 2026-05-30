@@ -141,9 +141,94 @@ document.addEventListener('DOMContentLoaded', () => {
     const authFallbackName = (user) => user?.displayName || user?.email || 'Administrator';
     const cachedIdentity = readCachedIdentity();
 
-    const normalizeSidebarNavigation = () => {
+    // Inject Favorites Helper styles & listener
+    const injectFavoritesUiHelper = () => {
+        const styleId = 'hkm-admin-favorites-styles';
+        if (!document.getElementById(styleId)) {
+            const style = document.createElement('style');
+            style.id = styleId;
+            style.textContent = `
+                .nav-link-wrap {
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    position: relative;
+                }
+                .nav-fav-toggle-btn {
+                    opacity: 0;
+                    transition: opacity 0.2s ease, transform 0.2s ease;
+                    background: transparent !important;
+                    border: none !important;
+                    padding: 4px !important;
+                    display: flex !important;
+                    align-items: center;
+                    justify-content: center;
+                    cursor: pointer;
+                    z-index: 10;
+                }
+                .nav-link-wrap:hover .nav-fav-toggle-btn,
+                .nav-fav-toggle-btn:focus-within {
+                    opacity: 0.5;
+                }
+                .nav-fav-toggle-btn:hover {
+                    opacity: 1 !important;
+                    transform: scale(1.2);
+                }
+                .nav-fav-toggle-btn .star-icon-element {
+                    font-size: 16px !important;
+                    color: #94a3b8;
+                    font-variation-settings: 'FILL' 0;
+                    transition: color 0.2s ease, font-variation-settings 0.2s ease;
+                }
+                .nav-fav-toggle-btn .star-icon-element.active {
+                    color: #fbbf24 !important;
+                    font-variation-settings: 'FILL' 1 !important;
+                    opacity: 1 !important;
+                }
+                .nav-fav-toggle-btn.active-fav {
+                    opacity: 1 !important;
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
         const sidebarNav = document.querySelector('.sidebar-nav');
-        if (!sidebarNav || sidebarNav.dataset.hkmNormalized === '1') return;
+        if (sidebarNav && !sidebarNav.dataset.hkmFavsBound) {
+            sidebarNav.dataset.hkmFavsBound = '1';
+            sidebarNav.addEventListener('click', (e) => {
+                const btn = e.target.closest('.nav-fav-toggle-btn');
+                if (btn) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const label = btn.getAttribute('data-label');
+                    const raw = localStorage.getItem('hkm_admin_sidebar_favorites');
+                    let favorites = raw ? JSON.parse(raw) : [];
+                    
+                    if (favorites.includes(label)) {
+                        favorites = favorites.filter(l => l !== label);
+                    } else {
+                        favorites.push(label);
+                    }
+                    
+                    localStorage.setItem('hkm_admin_sidebar_favorites', JSON.stringify(favorites));
+                    
+                    // Re-render and re-init
+                    normalizeSidebarNavigation(true);
+                    
+                    if (typeof initSidebarCategories === 'function') {
+                        initSidebarCategories();
+                    }
+                }
+            });
+        }
+    };
+
+    const normalizeSidebarNavigation = (force = false) => {
+        const sidebarNav = document.querySelector('.sidebar-nav');
+        if (!sidebarNav || (sidebarNav.dataset.hkmNormalized === '1' && !force)) return;
+
+        injectFavoritesUiHelper();
 
         const path = window.location.pathname.toLowerCase().replace(/\/$/, '');
         const hash = window.location.hash.replace('#', '');
@@ -157,25 +242,43 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         };
 
-        const renderItem = (item) => {
+        const getFavorites = () => {
+            try {
+                const raw = localStorage.getItem('hkm_admin_sidebar_favorites');
+                return raw ? JSON.parse(raw) : [];
+            } catch (e) {
+                return [];
+            }
+        };
+
+        const favorites = getFavorites();
+
+        const renderItem = (item, isFavSection = false) => {
             const active = isActive(item) ? ' active' : '';
             const visible = item.alwaysVisible ? ' visible' : '';
-            const hiddenClass = item.hidden ? ' nav-helper-hidden' : '';
-            const hiddenStyle = item.hidden ? ' style="display:none"' : '';
-            const categoryAttr = item.category ? ` data-nav-category="${item.category}"` : ' data-nav-category="all"';
+            const hiddenClass = (!isFavSection && item.hidden) ? ' nav-helper-hidden' : '';
+            const hiddenStyle = (!isFavSection && item.hidden) ? ' style="display:none"' : '';
+            const categoryAttr = isFavSection ? ' data-nav-category="favoritter"' : (item.category ? ` data-nav-category="${item.category}"` : ' data-nav-category="all"');
             const dataSection = item.section ? ` data-section="${item.section}"` : '';
-            const id = item.id ? ` id="${item.id}"` : '';
+            const id = (!isFavSection && item.id) ? ` id="${item.id}"` : '';
             const target = item.target ? ` target="${item.target}"` : '';
             const rel = item.target === '_blank' ? ' rel="noopener noreferrer"' : '';
             const href = item.href || (item.section ? itemHref(item.section) : '#');
 
+            const isFav = favorites.includes(item.label);
+
             return `
                 <li class="nav-item${visible}${hiddenClass}"${hiddenStyle}${categoryAttr}>
-                    <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel}>
-                        <span class="material-symbols-outlined">${item.icon}</span>
-                        <span>${item.label}</span>
-                        ${item.badgeId ? `<span id="${item.badgeId}" class="nav-badge" style="display: none;">0</span>` : ''}
-                    </a>
+                    <div class="nav-link-wrap">
+                        <a href="${href}" class="nav-link${active}"${dataSection}${id}${target}${rel} style="flex: 1; padding-right: 40px !important;">
+                            <span class="material-symbols-outlined">${item.icon}</span>
+                            <span>${item.label}</span>
+                            ${item.badgeId ? `<span id="${item.badgeId}" class="nav-badge" style="display: none;">0</span>` : ''}
+                        </a>
+                        <button class="nav-fav-toggle-btn${isFav ? ' active-fav' : ''}" data-label="${item.label}" title="${isFav ? 'Fjern fra favoritter' : 'Legg til i favoritter'}">
+                            <span class="material-symbols-outlined star-icon-element${isFav ? ' active' : ''}">star</span>
+                        </button>
+                    </div>
                 </li>
             `;
         };
@@ -218,13 +321,26 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
         ];
 
+        const favoritedItems = mainItems.filter(item => !item.header && favorites.includes(item.label));
+        let favHtml = '';
+        if (favoritedItems.length > 0) {
+            const favItemsHtml = favoritedItems.map(item => renderItem(item, true)).join('');
+            favHtml = `
+                <li class="nav-category-header" data-target-category="favoritter">
+                    <span>Favoritter</span>
+                    <span class="material-symbols-outlined expand-icon">expand_more</span>
+                </li>
+                ${favItemsHtml}
+            `;
+        }
+
         const footerItems = [];
 
         const mainHtml = mainItems.map((item) => (
             item.header ? renderHeader(item.header, item.label) : renderItem(item)
         )).join('');
 
-        const footerHtml = footerItems.map(renderItem).join('') + `
+        const footerHtml = footerItems.map(item => renderItem(item)).join('') + `
             <li class="nav-item visible" data-nav-category="all">
                 <button id="logout-btn" class="nav-link logout">
                     <span class="material-symbols-outlined">logout</span>
@@ -235,7 +351,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         sidebarNav.innerHTML = `
             <div class="nav-group">
-                <ul class="nav-list">${mainHtml}</ul>
+                <ul class="nav-list">
+                    ${favHtml}
+                    ${mainHtml}
+                </ul>
             </div>
             <div class="nav-group bottom">
                 <ul class="nav-list">${footerHtml}</ul>
