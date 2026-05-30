@@ -1897,9 +1897,9 @@ class NewsletterBuilder {
 
             card.innerHTML = `
                 <div class="card-media">
-                    <span class="card-type-badge">
-                        <span class="material-symbols-outlined" style="font-size: 14px;">${badgeIcon}</span>
-                        ${badgeText}
+                    <span class="card-type-badge" style="display: inline-flex !important; align-items: center !important; gap: 4px !important;">
+                        <span class="material-symbols-outlined" style="font-size: 14px; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; height: 14px; width: 14px; margin: 0 !important; padding: 0 !important;">${badgeIcon}</span>
+                        <span style="display: inline-block !important; line-height: 1 !important; margin: 0 !important; padding: 0 !important;">${badgeText}</span>
                     </span>
                     <img src="${item.coverImage}" alt="${item.title}">
                 </div>
