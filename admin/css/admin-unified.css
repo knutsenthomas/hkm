@@ -3089,23 +3089,28 @@ body.admin-body .section-content > .design-ui-header {
 .section-header-titles {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px !important;
 }
 
+body.admin-body .section-header-titles .section-title,
 body.admin-body .section-title {
   font-size: 18px !important;
-  font-weight: 700 !important;
+  font-weight: 800 !important;
   color: #0f172a !important;
   font-family: "Inter", sans-serif !important;
   margin: 0 !important;
-  line-height: 1.2;
+  margin-bottom: 0 !important;
+  line-height: 1.2 !important;
 }
 
+body.admin-body .section-header-titles .section-subtitle,
 body.admin-body .section-subtitle {
   font-size: 13px !important;
   color: #64748b !important;
   font-weight: 400 !important;
   margin: 0 !important;
+  margin-top: 0 !important;
+  line-height: 1.45 !important;
 }
 
 body.admin-body .section-content > .section-header::before,
