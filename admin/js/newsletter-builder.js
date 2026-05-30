@@ -266,6 +266,14 @@ class NewsletterBuilder {
         if (container) {
             container.addEventListener('input', () => this.syncUnifiedBlocks());
             container.addEventListener('blur', () => this.syncUnifiedBlocks());
+            container.addEventListener('click', (e) => {
+                const img = e.target.closest('img');
+                if (img) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this.showImageOptions(img);
+                }
+            });
         }
 
         // Background Color Swatches
@@ -481,10 +489,17 @@ class NewsletterBuilder {
 
     openImageInsertionFlow() {
         this.saveSelection();
-        const fileInput = document.getElementById('block-image-upload');
-        if (fileInput) {
-            const newFileInput = fileInput.cloneNode(true);
-            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+        let fileInput = document.getElementById('block-image-upload');
+        if (!fileInput) {
+            fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.id = 'block-image-upload';
+            fileInput.accept = 'image/*';
+            fileInput.style.display = 'none';
+            document.body.appendChild(fileInput);
+        }
+        const newFileInput = fileInput.cloneNode(true);
+        fileInput.parentNode.replaceChild(newFileInput, fileInput);
             
             newFileInput.addEventListener('change', async (e) => {
                 const file = e.target.files[0];
@@ -502,7 +517,6 @@ class NewsletterBuilder {
                 }
             });
             newFileInput.click();
-        }
     }
 
     addBlock(type) {
@@ -1265,6 +1279,160 @@ class NewsletterBuilder {
             finalBtn.disabled = false;
             finalBtn.innerHTML = 'Gå til utsendelse';
         }
+    }
+
+    showImageOptions(imgElement) {
+        let overlay = document.getElementById('image-options-modal');
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = 'image-options-modal';
+            overlay.className = 'profile-modal';
+            overlay.style.cssText = `
+                display: none;
+                z-index: 12000;
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.6);
+                align-items: center;
+                justify-content: center;
+                backdrop-filter: blur(8px);
+            `;
+            
+            overlay.innerHTML = `
+                <div class="profile-modal-content card modern" style="max-width: 400px; width: 90%; border-radius: 20px; background: white; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+                    <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: #d17d39;">image</span>
+                        Håndter bilde
+                    </h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <button id="img-opt-upload" class="prompt-btn primary" style="background: #1B4965 !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
+                            <span class="material-symbols-outlined">upload_file</span>
+                            Last opp fra enhet
+                        </button>
+                        <button id="img-opt-unsplash" class="prompt-btn primary" style="background: #d17d39 !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
+                            <span class="material-symbols-outlined">image_search</span>
+                            Finn på Unsplash
+                        </button>
+                        <button id="img-opt-ai" class="prompt-btn primary" style="background: linear-gradient(135deg, #bd4f2a, #d17d39) !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
+                            <span class="material-symbols-outlined">auto_awesome</span>
+                            Generer med AI
+                        </button>
+                        <button id="img-opt-delete" class="prompt-btn secondary" style="background: #ef4444 !important; border: none; color: white !important; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
+                            <span class="material-symbols-outlined">delete</span>
+                            Slett bilde
+                        </button>
+                        <button id="img-opt-cancel" class="prompt-btn secondary" style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; font-size: 14px; background: white;">
+                            Avbryt
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(overlay);
+        }
+        
+        overlay.style.display = 'flex';
+        
+        const closeOverlay = () => {
+            overlay.style.display = 'none';
+        };
+        
+        overlay.onclick = (e) => {
+            if (e.target === overlay) closeOverlay();
+        };
+        
+        document.getElementById('img-opt-cancel').onclick = closeOverlay;
+        
+        // Option 1: Upload from device
+        document.getElementById('img-opt-upload').onclick = () => {
+            closeOverlay();
+            let fileInput = document.getElementById('block-image-upload');
+            if (!fileInput) {
+                fileInput = document.createElement('input');
+                fileInput.type = 'file';
+                fileInput.id = 'block-image-upload';
+                fileInput.accept = 'image/*';
+                fileInput.style.display = 'none';
+                document.body.appendChild(fileInput);
+            }
+            
+            const newFileInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+            
+            newFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    showToast("Erstatter bilde...", "info");
+                    const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
+                    const url = await window.firebaseService.uploadImage(file, uploadPath);
+                    imgElement.src = url;
+                    this.syncUnifiedBlocks();
+                    showToast("Bilde erstattet!", "success");
+                } catch (err) {
+                    console.error("Replacement upload failed:", err);
+                    showToast("Kunne ikke erstatte bilde.", "error");
+                }
+            });
+            newFileInput.click();
+        };
+        
+        // Option 2: Search Unsplash
+        document.getElementById('img-opt-unsplash').onclick = () => {
+            closeOverlay();
+            if (window.unsplashManager) {
+                window.unsplashManager.open((selection) => {
+                    if (selection && selection.url) {
+                        imgElement.src = selection.url;
+                        this.syncUnifiedBlocks();
+                        showToast("Bilde erstattet fra Unsplash!", "success");
+                    }
+                });
+            } else {
+                showToast("Unsplash-søk er ikke tilgjengelig akkurat nå.", "warning");
+            }
+        };
+        
+        // Option 3: Generate with AI
+        document.getElementById('img-opt-ai').onclick = () => {
+            closeOverlay();
+            this.showPromptModal(
+                "Beskriv bildet du ønsker å generere med AI for å erstatte dette bildet:",
+                "F.eks: En fargerik blomstereng under en skyfri himmel...",
+                async (promptVal) => {
+                    showToast("Genererer nytt bilde med AI...", "info", 10000);
+                    try {
+                        const callable = firebase.functions().httpsCallable('aiProcess');
+                        const result = await callable({
+                            task: 'generate_image',
+                            prompt: promptVal
+                        });
+
+                        if (result.data && result.data.imageUrl) {
+                            imgElement.src = result.data.imageUrl;
+                            this.syncUnifiedBlocks();
+                            showToast("Bilde erstattet med AI-generert bilde!", "success");
+                        }
+                    } catch (err) {
+                        console.error("AI Image replacement failed:", err);
+                        showToast("Kunne ikke generere nytt bilde: " + err.message, "error");
+                    }
+                }
+            );
+        };
+        
+        // Option 4: Delete image
+        document.getElementById('img-opt-delete').onclick = () => {
+            closeOverlay();
+            if (confirm("Er du sikker på at du vil slette dette bildet?")) {
+                const parent = imgElement.parentNode;
+                imgElement.remove();
+                if (parent && parent.tagName === 'P' && parent.innerHTML.trim() === '') {
+                    parent.remove();
+                }
+                this.syncUnifiedBlocks();
+                showToast("Bilde slettet.", "info");
+            }
+        };
     }
 }
 
