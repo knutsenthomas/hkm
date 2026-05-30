@@ -2667,7 +2667,7 @@ input:checked+.slider:before {
     color: #1e293b !important;
 }
 
-.builder-unified-header .header-action-btn.secondary-flat span {
+.builder-unified-header .header-action-btn.secondary-flat span.material-symbols-outlined {
     font-size: 20px !important;
 }
 
@@ -2687,9 +2687,25 @@ input:checked+.slider:before {
     transform: translateY(0) scale(0.98) !important;
 }
 
-.builder-unified-header .header-action-btn.primary-action span {
+.builder-unified-header .header-action-btn.primary-action span.material-symbols-outlined {
     font-size: 18px !important;
     color: #ffffff !important;
+}
+
+.builder-unified-header .header-action-btn span.material-symbols-outlined {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+    line-height: 1 !important;
+}
+
+.builder-unified-header .header-action-btn span:not(.material-symbols-outlined) {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    line-height: 1 !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
 }
 
 .builder-unified-header .user-badge-modern {
