@@ -1912,25 +1912,23 @@ class NewsletterBuilder {
                 <div class="card-body">
                     <h4 class="card-title">${item.title}</h4>
                     <p class="card-excerpt">${item.excerpt}</p>
-                    <div class="card-footer" style="display: flex !important; flex-direction: column !important; align-items: stretch !important; gap: 12px !important; padding-top: 12px !important;">
-                        <div style="display: flex !important; justify-content: space-between !important; align-items: center !important; width: 100% !important; font-size: 12px !important; color: #64748b !important;">
-                            <div class="card-meta-item" style="white-space: nowrap !important; display: flex !important; align-items: center !important; gap: 4px !important;">
+                    <div class="card-footer" style="display: flex !important; align-items: center !important; justify-content: space-between !important; padding-top: 14px !important; border-top: 1px solid #f1f5f9 !important; gap: 12px !important;">
+                        <div style="display: flex !important; gap: 12px !important; align-items: center !important; color: #64748b !important; font-size: 12px !important; min-width: 0 !important; flex: 1 !important;">
+                            <div class="card-meta-item" style="white-space: nowrap !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; flex-shrink: 0 !important;">
                                 <span class="material-symbols-outlined" style="font-size: 14px !important;">calendar_today</span>
                                 <span style="line-height: 1 !important;">${dateStr}</span>
                             </div>
-                            <div class="card-meta-item" style="white-space: nowrap !important; display: flex !important; align-items: center !important; gap: 4px !important; max-width: 160px !important; overflow: hidden !important; text-overflow: ellipsis !important;">
-                                <span class="material-symbols-outlined" style="font-size: 14px !important;">person</span>
-                                <span style="line-height: 1 !important;">${item.author}</span>
+                            <div class="card-meta-item" style="white-space: nowrap !important; display: inline-flex !important; align-items: center !important; gap: 4px !important; min-width: 0 !important; max-width: 140px !important; overflow: hidden !important; text-overflow: ellipsis !important;">
+                                <span class="material-symbols-outlined" style="font-size: 14px !important; flex-shrink: 0 !important;">person</span>
+                                <span style="line-height: 1 !important; overflow: hidden !important; text-overflow: ellipsis !important;">${item.author}</span>
                             </div>
                         </div>
-                        <div style="display: flex !important; gap: 8px !important; justify-content: flex-end !important; align-items: center !important; width: 100% !important;">
-                            <button class="card-delete-btn" id="delete-btn-${item.id}" title="Slett dette elementet">
-                                <span class="material-symbols-outlined" style="font-size: 16px !important;">delete</span>
-                                Slett
+                        <div style="display: flex !important; gap: 8px !important; align-items: center !important; flex-shrink: 0 !important;">
+                            <button class="card-delete-btn" id="delete-btn-${item.id}" title="Slett dette elementet" style="width: 32px !important; height: 32px !important; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important;">
+                                <span class="material-symbols-outlined" style="font-size: 18px !important;">delete</span>
                             </button>
-                            <button class="card-edit-btn" id="edit-btn-${item.id}">
-                                <span class="material-symbols-outlined" style="font-size: 16px !important;">edit</span>
-                                Rediger
+                            <button class="card-edit-btn" id="edit-btn-${item.id}" title="Rediger dette elementet" style="width: 32px !important; height: 32px !important; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important;">
+                                <span class="material-symbols-outlined" style="font-size: 18px !important;">edit</span>
                             </button>
                         </div>
                     </div>
