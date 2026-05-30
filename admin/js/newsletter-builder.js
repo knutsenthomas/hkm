@@ -21,7 +21,7 @@ class NewsletterBuilder {
                 name: 'Light',
                 outerBg: '#ffffff',
                 innerBg: '#f8fafc',
-                font: "'Outfit', sans-serif",
+                font: "'Inter', sans-serif",
                 accent: '#0f172a'
             },
             earthy: {
@@ -1923,15 +1923,26 @@ class NewsletterBuilder {
                                 <span>${item.author}</span>
                             </div>
                         </div>
-                        <button class="card-edit-btn" id="edit-btn-${item.id}">
-                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
-                            Rediger
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button class="card-delete-btn" id="delete-btn-${item.id}" title="Slett dette elementet">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">delete</span>
+                                Slett
+                            </button>
+                            <button class="card-edit-btn" id="edit-btn-${item.id}">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                                Rediger
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
 
-            // Click listener
+            // Click listeners
+            card.querySelector(`#delete-btn-${item.id}`).onclick = (e) => {
+                e.stopPropagation();
+                this.deleteStudioItem(item);
+            };
+
             card.querySelector(`#edit-btn-${item.id}`).onclick = (e) => {
                 e.stopPropagation();
                 this.editStudioItem(item);
@@ -1954,6 +1965,48 @@ class NewsletterBuilder {
             this.loadDraftIntoBuilder(item.id, item.title, JSON.stringify(item.blocks), item.subject);
         } else if (item.type === 'newsletter') {
             this.loadTemplateIntoBuilder(item.id, item.title, JSON.stringify(item.blocks), item.subject);
+        }
+    }
+
+    async deleteStudioItem(item) {
+        const confirmed = confirm(`Er du sikker på at du vil slette "${item.title}"? Dette kan ikke angres.`);
+        if (!confirmed) return;
+
+        showToast("Sletter...", "info");
+
+        try {
+            if (item.type === 'blog' || item.type === 'teaching') {
+                const collectionId = `collection_${item.type}`;
+                const currentData = await window.firebaseService.getPageContent(collectionId);
+                const list = Array.isArray(currentData) ? currentData : (currentData && currentData.items ? currentData.items : []);
+                
+                // Finn samsvarende element basert på id, eller fallback til tittel og dato
+                const matchIdx = list.findIndex(fi => {
+                    if (item.id && fi.id === item.id) return true;
+                    return fi.title === item.title && (fi.date || fi.createdAt) === (item.date || item.createdAt);
+                });
+
+                if (matchIdx >= 0) {
+                    list.splice(matchIdx, 1);
+                    await window.firebaseService.savePageContent(collectionId, { items: list });
+                    showToast("Innholdet ble slettet!", "success");
+                } else {
+                    showToast("Kunne ikke finne elementet i samlingen.", "error");
+                }
+            } else if (item.type === 'newsletter_draft') {
+                await window.firebaseService.db.collection('newsletter_templates').doc(item.id).delete();
+                showToast("Nyhetsbrev-kladden ble slettet!", "success");
+            } else if (item.type === 'newsletter') {
+                await window.firebaseService.db.collection('newsletter_campaigns').doc(item.id).delete();
+                showToast("Nyhetsbrev-kampanjen ble slettet!", "success");
+            }
+
+            // Oppdater feeden umiddelbart
+            await this.loadStudioFeed();
+
+        } catch (error) {
+            console.error("Studio Feed - Deletion failed:", error);
+            showToast("Kunne ikke slette elementet: " + error.message, "error");
         }
     }
 
@@ -2464,7 +2517,7 @@ class NewsletterBuilder {
                 <div class="ai-pulse-loader" style="width: 48px; height: 48px; border-radius: 50%; background: #d17d39; box-shadow: 0 0 16px #d17d39; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; animation: pulseGlow 1.5s infinite ease-in-out;">
                     <span class="material-symbols-outlined" style="color: white; font-size: 24px; animation: spin 2s infinite linear;">cached</span>
                 </div>
-                <h5 style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 8px 0;">Genererer nytt forslag...</h5>
+                <h5 style="font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 8px 0;">Genererer nytt forslag...</h5>
                 <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin: 0; font-weight: 500;">
                     Vår AI analyserer samfunnsaktualiteter og podcaster for å skreddersy en ny idé til deg.
                 </p>

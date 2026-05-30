@@ -8,7 +8,7 @@
 
     <!-- Google Fonts & Icons -->
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700&family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700&family=Roboto:wght@400;500;700&display=swap"
         rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap">
@@ -143,7 +143,7 @@
             color: #047857;
         }
         .ai-suggestion-card .suggestion-title {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 19px;
             font-weight: 800;
             color: #0f172a;
@@ -363,7 +363,7 @@
             box-sizing: border-box;
         }
         .studio-feed-card .card-title {
-            font-family: 'Outfit', sans-serif;
+            font-family: 'Inter', sans-serif;
             font-size: 17px;
             font-weight: 800;
             color: #0f172a;
@@ -426,6 +426,30 @@
             transform: scale(1.03);
         }
         .studio-feed-card .card-edit-btn:active {
+            transform: scale(0.97);
+        }
+        .studio-feed-card .card-delete-btn {
+            background: #fff5f5;
+            border: 1px solid #fee2e2;
+            color: #ef4444;
+            padding: 6px 12px;
+            font-size: 12.5px;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-family: 'Inter', sans-serif;
+        }
+        .studio-feed-card .card-delete-btn:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+            transform: scale(1.03);
+        }
+        .studio-feed-card .card-delete-btn:active {
             transform: scale(0.97);
         }
     </style>
@@ -511,7 +535,7 @@
         <div id="newsletter-dashboard-layout" class="newsletter-dashboard-layout" style="display: block;">
             <div class="dashboard-header-container" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; width: 100%; box-sizing: border-box;">
                 <div class="dashboard-header-left">
-                    <h2 class="dashboard-main-title" style="font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">HKM Studio</h2>
+                    <h2 class="dashboard-main-title" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">HKM Studio</h2>
                     <p class="dashboard-main-subtitle" style="font-size: 15px; color: #64748b; margin: 0; font-weight: 500;">Ditt kreative innholdssenter for blogginnlegg, bibelundervisning og nyhetsbrev.</p>
                 </div>
                 <div class="dashboard-header-right" style="display: none;">
@@ -528,7 +552,7 @@
                     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(27, 73, 101, 0.3)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 14px rgba(27, 73, 101, 0.2)';">
                     <div style="z-index: 2;">
                         <span class="material-symbols-outlined" style="font-size: 32px; color: rgba(255,255,255,0.85); margin-bottom: 12px; display: block;">edit_note</span>
-                        <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; font-family: 'Outfit', sans-serif;">Blogginnlegg</h4>
+                        <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; font-family: 'Inter', sans-serif;">Blogginnlegg</h4>
                         <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500;">Skriv andakt eller nyhet</p>
                     </div>
                     <span class="material-symbols-outlined" style="font-size: 64px; color: rgba(255,255,255,0.06); position: absolute; right: -8px; bottom: -8px; pointer-events: none;">edit_note</span>
@@ -539,7 +563,7 @@
                     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(5, 150, 105, 0.25)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 14px rgba(5, 150, 105, 0.15)';">
                     <div style="z-index: 2;">
                         <span class="material-symbols-outlined" style="font-size: 32px; color: rgba(255,255,255,0.85); margin-bottom: 12px; display: block;">school</span>
-                        <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; font-family: 'Outfit', sans-serif;">Bibelstudium</h4>
+                        <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; font-family: 'Inter', sans-serif;">Bibelstudium</h4>
                         <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500;">Lag ny leksjonsplan</p>
                     </div>
                     <span class="material-symbols-outlined" style="font-size: 64px; color: rgba(255,255,255,0.06); position: absolute; right: -8px; bottom: -8px; pointer-events: none;">school</span>
@@ -550,7 +574,7 @@
                     onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(209, 125, 57, 0.25)';" onmouseout="this.style.transform='none'; this.style.boxShadow='0 4px 14px rgba(209, 125, 57, 0.15)';">
                     <div style="z-index: 2;">
                         <span class="material-symbols-outlined" style="font-size: 32px; color: rgba(255,255,255,0.85); margin-bottom: 12px; display: block;">campaign</span>
-                        <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; font-family: 'Outfit', sans-serif;">Nyhetsbrev</h4>
+                        <h4 style="margin: 0 0 4px 0; font-size: 18px; font-weight: 800; font-family: 'Inter', sans-serif;">Nyhetsbrev</h4>
                         <p style="margin: 0; font-size: 13px; color: rgba(255,255,255,0.7); font-weight: 500;">Bygg og send kampanje</p>
                     </div>
                     <span class="material-symbols-outlined" style="font-size: 64px; color: rgba(255,255,255,0.06); position: absolute; right: -8px; bottom: -8px; pointer-events: none;">campaign</span>
@@ -567,7 +591,7 @@
                         <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(209, 125, 57, 0.15); border: 1px solid rgba(209, 125, 57, 0.3); color: #ffffff; padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">
                             <span class="material-symbols-outlined" style="font-size: 16px;">auto_awesome</span> AI Inspirasjon & Idé-generator
                         </div>
-                        <h3 style="font-size: 28px; font-weight: 800; margin: 0 0 10px 0; color: white; font-family: 'Outfit', sans-serif; letter-spacing: -0.02em;">Klar for å engasjere menigheten og leserne?</h3>
+                        <h3 style="font-size: 28px; font-weight: 800; margin: 0 0 10px 0; color: white; font-family: 'Inter', sans-serif; letter-spacing: -0.02em;">Klar for å engasjere menigheten og leserne?</h3>
                         <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin: 0; font-weight: 500;">
                             Vår intelligente AI analyserer kristne nyheter i Norge, HKMs nyeste podcaster, sosiale medier og nettside for å skreddersy konkrete forslag to nyhetsbrev, blogginnlegg og bibelundervisning.
                         </p>
@@ -608,7 +632,7 @@
             <!-- HKM Studio Content Feed -->
             <div class="studio-feed-section" style="margin-bottom: 40px; box-sizing: border-box; width: 100%;">
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 16px; width: 100%; box-sizing: border-box;">
-                    <h3 style="font-family: 'Outfit', sans-serif; font-size: 22px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <h3 style="font-family: 'Inter', sans-serif; font-size: 22px; font-weight: 800; color: #0f172a; margin: 0; display: flex; align-items: center; gap: 10px;">
                         <span class="material-symbols-outlined" style="color: #1B4965; font-size: 26px;">dynamic_feed</span> Publisert & lagret innhold
                     </h3>
                     

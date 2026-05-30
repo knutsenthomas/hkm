@@ -2079,7 +2079,7 @@ input:checked+.slider:before {
 }
 
 .empty-canvas-card h3 {
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
     font-size: 18px !important;
     font-weight: 700 !important;
     color: #1e293b !important;
@@ -2197,7 +2197,7 @@ input:checked+.slider:before {
 }
 
 .prompt-header-title h3 {
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
     font-size: 16px !important;
     font-weight: 700 !important;
     color: #1e293b !important;
@@ -2635,7 +2635,7 @@ input:checked+.slider:before {
 }
 
 .builder-unified-header .header-title {
-    font-family: 'Outfit', sans-serif !important;
+    font-family: 'Inter', sans-serif !important;
     font-size: 18px !important;
     font-weight: 700 !important;
     color: #1e293b !important;

@@ -10555,7 +10555,7 @@ class AdminManager {
                         <html>
                         <head>
                             <meta charset="utf-8">
-                            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+                            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
                             <style>
                                 body {
                                     font-family: 'Inter', sans-serif;
@@ -10582,8 +10582,8 @@ class AdminManager {
                                     letter-spacing: 0.05em;
                                     margin-bottom: 16px;
                                 }
-                                h1 {
-                                    font-family: 'Outfit', sans-serif;
+                                .preview-container h1 {
+                                    font-family: 'Inter', sans-serif;
                                     color: #1B4965;
                                     font-size: 32px;
                                     font-weight: 800;
@@ -10629,14 +10629,14 @@ class AdminManager {
                                     margin: 0 0 20px 0;
                                 }
                                 .content-body h2 {
-                                    font-family: 'Outfit', sans-serif;
+                                    font-family: 'Inter', sans-serif;
                                     color: #1B4965;
                                     font-size: 24px;
                                     font-weight: 700;
                                     margin: 40px 0 16px 0;
                                 }
                                 .content-body h3 {
-                                    font-family: 'Outfit', sans-serif;
+                                    font-family: 'Inter', sans-serif;
                                     color: #1B4965;
                                     font-size: 20px;
                                     font-weight: 700;
