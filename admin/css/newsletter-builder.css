@@ -30,7 +30,13 @@ body.builder-active {
 .builder-app-container {
     display: flex;
     width: 100vw;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
+}
+
+body.builder-active .builder-app-container {
+    height: 100vh !important;
+    overflow: hidden !important;
 }
 
 #newsletter-builder-layout {
