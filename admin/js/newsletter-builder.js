@@ -2299,20 +2299,34 @@ class NewsletterBuilder {
     }
 
     useBlogSuggestion(bl) {
+        let title = bl.title || '';
+        let promptText = bl.promptText || bl.title || '';
+        
+        // Clean up any mangled Ă characters to Å (f.eks. Ănd -> Ånd)
+        title = title.replace(/Ă/g, 'Å').replace(/ă/g, 'å');
+        promptText = promptText.replace(/Ă/g, 'Å').replace(/ă/g, 'å');
+
         const payload = {
             type: 'blog',
-            title: bl.title,
-            prompt: bl.promptText || bl.title
+            title: title,
+            prompt: promptText
         };
         sessionStorage.setItem('pendingAiDraft', JSON.stringify(payload));
         window.location.href = '/admin/index.html#blog';
     }
     
     useTeachingSuggestion(te) {
+        let title = te.title || '';
+        let promptText = te.promptText || te.title || '';
+        
+        // Clean up any mangled Ă characters to Å
+        title = title.replace(/Ă/g, 'Å').replace(/ă/g, 'å');
+        promptText = promptText.replace(/Ă/g, 'Å').replace(/ă/g, 'å');
+
         const payload = {
             type: 'teaching',
-            title: te.title,
-            prompt: te.promptText || te.title
+            title: title,
+            prompt: promptText
         };
         sessionStorage.setItem('pendingAiDraft', JSON.stringify(payload));
         window.location.href = '/admin/index.html#teaching';

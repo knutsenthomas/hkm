@@ -2504,7 +2504,7 @@ class AdminManager {
                 // Create persistent newItem
                 const newItem = {
                     id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
-                    title: parsed.title,
+                    title: (parsed.title || '').replace(/Ă/g, 'Å').replace(/ă/g, 'å'),
                     date: new Date().toISOString().split('T')[0],
                     content: data, // EditorJS blocks
                     published: false, // Utkast
@@ -7655,8 +7655,8 @@ class AdminManager {
                                 <span class="material-symbols-outlined">print</span> Skriv ut
                              </button>
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
-                              <button class="btn-secondary" id="save-col-item-draft" style="background: linear-gradient(135deg, #1B4965, #2B6985) !important; color: white !important; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25) !important; border: none !important; margin-right: 8px;">
-                                 <span class="material-symbols-outlined">draft</span> Lagre som utkast
+                              <button class="btn-outline" id="save-col-item-draft" style="background: #ffffff !important; color: #1B4965 !important; border: 1px solid #cbd5e1 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; margin-right: 8px; display: inline-flex !important; align-items: center !important; gap: 6px !important; transition: all 0.2s ease;" onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#94a3b8';" onmouseout="this.style.background='#ffffff'; this.style.borderColor='#cbd5e1';">
+                                 <span class="material-symbols-outlined" style="color: #1B4965 !important;">draft</span> Lagre som utkast
                               </button>
                               ` : ''}
                              <button class="btn-primary" id="save-col-item">
@@ -10090,9 +10090,10 @@ class AdminManager {
 
                 const previousContent = item.content;
 
-                item.title = document.getElementById('col-item-title-v2')?.value
+                let titleVal = document.getElementById('col-item-title-v2')?.value
                     || document.getElementById('col-item-title-sidebar')?.value
                     || '';
+                item.title = titleVal.replace(/Ă/g, 'Å').replace(/ă/g, 'å');
                 let nextContent = savedData;
 
                 // Safety: never overwrite existing content with empty editor output.
