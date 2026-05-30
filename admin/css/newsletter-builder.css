@@ -2954,3 +2954,77 @@ body.builder-active.sidebar-collapsed .sidebar {
     padding: 8px 24px !important; /* Spacing matching 8px grid rules */
 }
 
+/* Premium typography rules for the single-surface editor (Matches Blog & Teaching) */
+.docs-rte-surface {
+    font-family: 'Inter', sans-serif !important;
+    font-size: 16px !important;
+    line-height: 1.75 !important;
+    color: #2d3748 !important;
+}
+
+.docs-rte-surface p {
+    margin: 0 0 1.5rem 0 !important;
+}
+
+.docs-rte-surface h1,
+.docs-rte-surface h2,
+.docs-rte-surface h3,
+.docs-rte-surface h4,
+.docs-rte-surface h5,
+.docs-rte-surface h6 {
+    margin: 1.5rem 0 1rem !important;
+    line-height: 1.3 !important;
+    color: #1a202c !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+}
+
+.docs-rte-surface h1 {
+    font-size: 32px !important;
+    font-weight: 900 !important;
+}
+
+.docs-rte-surface h2 {
+    font-size: 24px !important;
+}
+
+.docs-rte-surface h3 {
+    font-size: 20px !important;
+}
+
+.docs-rte-surface ul {
+    list-style-type: disc !important;
+    margin: 0 0 1.5rem 0 !important;
+    padding-left: 2rem !important;
+}
+
+.docs-rte-surface ol {
+    list-style-type: decimal !important;
+    margin: 0 0 1.5rem 0 !important;
+    padding-left: 2rem !important;
+}
+
+.docs-rte-surface li {
+    margin-bottom: 0.5rem !important;
+}
+
+.docs-rte-surface img {
+    max-width: 100% !important;
+    height: auto !important;
+    border-radius: 8px !important;
+    margin: 24px 0 !important;
+    display: block !important;
+}
+
+.docs-rte-surface hr {
+    border: none !important;
+    border-top: 2px solid #e2e8f0 !important;
+    margin: 32px 0 !important;
+}
+
+.docs-rte-surface:focus {
+    outline: none !important;
+}
+
+

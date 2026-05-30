@@ -53,6 +53,7 @@ class NewsletterBuilder {
         this.isRecipientsDrawerOpen = false;
         this.activeImageBlockId = null;
         this.activeColumnIndex = null;
+        this.savedRange = null;
 
         // Recipient Selection State
         this.selectedSegments = new Set();
@@ -242,6 +243,9 @@ class NewsletterBuilder {
 
         // Block Tool Clicks
         document.querySelectorAll('.element-card').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                this.saveSelection();
+            });
             btn.addEventListener('click', () => {
                 const type = btn.dataset.type;
                 if (type === 'ai_text') {
@@ -256,6 +260,13 @@ class NewsletterBuilder {
                 }
             });
         });
+
+        // Unified Editor Reactivity
+        const container = document.getElementById('blocks-container');
+        if (container) {
+            container.addEventListener('input', () => this.syncUnifiedBlocks());
+            container.addEventListener('blur', () => this.syncUnifiedBlocks());
+        }
 
         // Background Color Swatches
         document.querySelectorAll('#outer-bg-palette .color-swatch').forEach(swatch => {
@@ -324,39 +335,52 @@ class NewsletterBuilder {
         }
     }
 
+    saveSelection() {
+        const sel = window.getSelection();
+        if (sel.rangeCount > 0) {
+            const range = sel.getRangeAt(0);
+            const container = document.getElementById('blocks-container');
+            if (container && container.contains(range.commonAncestorContainer)) {
+                this.savedRange = range;
+            }
+        }
+    }
+
+    restoreSelection() {
+        if (this.savedRange) {
+            const sel = window.getSelection();
+            sel.removeAllRanges();
+            sel.addRange(this.savedRange);
+        } else {
+            const container = document.getElementById('blocks-container');
+            if (container) {
+                container.focus();
+                const sel = window.getSelection();
+                sel.selectAllChildren(container);
+                sel.collapseToEnd();
+            }
+        }
+    }
+
+    exec(command, value = null) {
+        this.restoreSelection();
+        document.execCommand(command, false, value);
+        this.syncUnifiedBlocks();
+    }
+
+    syncUnifiedBlocks() {
+        const container = document.getElementById('blocks-container');
+        if (!container) return;
+        this.blocks = [{
+            id: 'unified_content',
+            type: 'text',
+            content: { text: container.innerHTML }
+        }];
+    }
+
     setupRichTextToolbar() {
         const toolbar = document.getElementById('desktop-richtools');
         if (!toolbar) return;
-
-        // Selection range cache
-        let savedRange = null;
-
-        const saveSelection = () => {
-            const sel = window.getSelection();
-            if (sel.rangeCount > 0) {
-                savedRange = sel.getRangeAt(0);
-            }
-        };
-
-        const restoreSelection = () => {
-            if (savedRange) {
-                const sel = window.getSelection();
-                sel.removeAllRanges();
-                sel.addRange(savedRange);
-            }
-        };
-
-        const exec = (command, value = null) => {
-            restoreSelection();
-            document.execCommand(command, false, value);
-            
-            // Dispatch input event to sync model
-            const activeEl = document.activeElement;
-            if (activeEl && activeEl.getAttribute('contenteditable') === 'true') {
-                const event = new Event('input', { bubbles: true });
-                activeEl.dispatchEvent(event);
-            }
-        };
 
         // Click Handler (Event Delegation)
         toolbar.addEventListener('click', (e) => {
@@ -375,48 +399,48 @@ class NewsletterBuilder {
 
             switch (tool) {
                 case 'undo':
-                    exec('undo');
+                    this.exec('undo');
                     break;
                 case 'redo':
-                    exec('redo');
+                    this.exec('redo');
                     break;
                 case 'bold':
-                    exec('bold');
+                    this.exec('bold');
                     break;
                 case 'italic':
-                    exec('italic');
+                    this.exec('italic');
                     break;
                 case 'underline':
-                    exec('underline');
+                    this.exec('underline');
                     break;
                 case 'strike':
-                    exec('strikeThrough');
+                    this.exec('strikeThrough');
                     break;
                 case 'removeFormat':
-                    exec('removeFormat');
+                    this.exec('removeFormat');
                     break;
                 case 'justifyLeft':
-                    exec('justifyLeft');
+                    this.exec('justifyLeft');
                     break;
                 case 'justifyCenter':
-                    exec('justifyCenter');
+                    this.exec('justifyCenter');
                     break;
                 case 'justifyRight':
-                    exec('justifyRight');
+                    this.exec('justifyRight');
                     break;
                 case 'justifyFull':
-                    exec('justifyFull');
+                    this.exec('justifyFull');
                     break;
                 case 'list':
-                    exec('insertUnorderedList');
+                    this.exec('insertUnorderedList');
                     break;
                 case 'orderedList':
-                    exec('insertOrderedList');
+                    this.exec('insertOrderedList');
                     break;
                 case 'link':
                     const url = prompt('Skriv inn URL:', 'https://');
                     if (url) {
-                        exec('createLink', url);
+                        this.exec('createLink', url);
                     }
                     break;
                 case 'textColor':
@@ -433,7 +457,7 @@ class NewsletterBuilder {
         // Prevent focus loss on mousedown
         toolbar.querySelectorAll('.desktop-richtools-btn').forEach(btn => {
             btn.addEventListener('mousedown', (e) => {
-                saveSelection();
+                this.saveSelection();
                 e.preventDefault();
                 e.stopPropagation();
             });
@@ -443,72 +467,95 @@ class NewsletterBuilder {
         const textColorInput = toolbar.querySelector('[data-color-input="text"]');
         if (textColorInput) {
             textColorInput.addEventListener('input', (e) => {
-                exec('foreColor', e.target.value);
+                this.exec('foreColor', e.target.value);
             });
         }
 
         const highlightColorInput = toolbar.querySelector('[data-color-input="highlight"]');
         if (highlightColorInput) {
             highlightColorInput.addEventListener('input', (e) => {
-                exec('backColor', e.target.value);
+                this.exec('backColor', e.target.value);
             });
         }
     }
 
-    addBlock(type) {
-        const id = 'block_' + Date.now();
-        let content = '';
+    openImageInsertionFlow() {
+        this.saveSelection();
+        const fileInput = document.getElementById('block-image-upload');
+        if (fileInput) {
+            const newFileInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+            
+            newFileInput.addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                try {
+                    showToast("Laster opp bilde...", "info");
+                    const uploadPath = `newsletter/images/${Date.now()}_${file.name}`;
+                    const url = await window.firebaseService.uploadImage(file, uploadPath);
+                    const imgHtml = `<p><img src="${url}" alt="" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+                    this.exec('insertHTML', imgHtml);
+                    showToast("Bilde lastet opp!", "success");
+                } catch (err) {
+                    console.error("Upload failed:", err);
+                    showToast("Opplasting feilet.", "error");
+                }
+            });
+            newFileInput.click();
+        }
+    }
 
+    addBlock(type) {
+        let html = '';
         switch (type) {
             case 'header':
-                content = { text: 'Overskrift her' };
+                html = `<h1>Overskrift her</h1>`;
                 break;
             case 'text':
-                content = { text: 'Skriv din tekst her...' };
-                break;
-            case 'image':
-                content = { url: 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80', alt: 'Beskrivelse' };
-                break;
-            case 'button':
-                content = { text: 'Les mer', url: '#' };
-                break;
-            case 'video':
-                content = { url: '', videoId: '', provider: 'youtube' };
-                break;
-            case 'columns':
-                content = {
-                    layout: '2-col',
-                    cols: [
-                        { type: 'text', text: 'Venstre kolonne...' },
-                        { type: 'text', text: 'Høyre kolonne...' }
-                    ]
-                };
-                break;
-            case 'social':
-                content = {
-                    platforms: [
-                        { name: 'facebook', url: 'https://facebook.com/hiskingdomministry' },
-                        { name: 'instagram', url: 'https://instagram.com/hiskingdomministry' },
-                        { name: 'youtube', url: 'https://youtube.com/@HisKingdomMinistry' }
-                    ]
-                };
-                break;
-            case 'logo':
-                content = { url: '../img/logo-hkm.png', width: 100 };
+                html = `<p>Skriv din tekst her...</p>`;
                 break;
             case 'divider':
-                content = { color: '#e2e8f0', thickness: 2 };
+                html = `<hr style="border: none; border-top: 2px solid #e2e8f0; margin: 24px 0;">`;
                 break;
             case 'spacer':
-                content = { height: 32 };
+                html = `<div style="height: 24px;"></div>`;
                 break;
-            case 'ai_generated':
-                content = { text: 'AI-generert innhold...' };
+            case 'button':
+                const label = prompt("Knapptekst:", "Les mer");
+                if (!label) return;
+                const url = prompt("Knapp-URL (f.eks. nettside eller e-post):", "https://");
+                if (!url) return;
+                html = `
+                    <div style="text-align: center; margin: 24px 0;">
+                        <a href="${url}" class="block-btn" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${label}</a>
+                    </div><p><br></p>`;
                 break;
+            case 'columns':
+                html = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">
+                        <div style="min-height: 50px;">Venstre kolonne...</div>
+                        <div style="min-height: 50px;">Høyre kolonne...</div>
+                    </div><p><br></p>`;
+                break;
+            case 'image':
+            case 'logo':
+                this.openImageInsertionFlow();
+                return;
+            case 'social':
+                html = `
+                    <div style="text-align: center; margin: 24px 0; display: flex; justify-content: center; gap: 16px;">
+                        <a href="https://facebook.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Facebook</a>
+                        <a href="https://instagram.com/hiskingdomministry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">Instagram</a>
+                        <a href="https://youtube.com/@HisKingdomMinistry" style="color: #1B4965; text-decoration: none; font-family: 'Inter', sans-serif; font-weight: 600;">YouTube</a>
+                    </div><p><br></p>`;
+                break;
+            default:
+                return;
         }
 
-        this.blocks.push({ id, type: (type === 'ai_text' ? 'text' : type), content });
-        this.renderCanvas();
+        if (html) {
+            this.exec('insertHTML', html);
+        }
     }
 
     showPromptModal(label, placeholder, confirmCallback) {
@@ -981,142 +1028,65 @@ class NewsletterBuilder {
 
     renderCanvas() {
         const container = document.getElementById('blocks-container');
+        if (!container) return;
+
+        // Auto-initialize with a placeholder paragraph if empty
         if (this.blocks.length === 0) {
-            container.innerHTML = `
-                <div class="empty-canvas-msg">
-                    <div class="empty-canvas-card">
-                        <div class="empty-canvas-icon-glow">
-                            <span class="material-symbols-outlined pulsing-icon">auto_awesome</span>
-                        </div>
-                        <h3>Start ditt magiske nyhetsbrev</h3>
-                        <p>Dra eller klikk på elementene i menyen til venstre, eller la vår kunstige intelligens bygge en skreddersydd struktur for deg på sekunder.</p>
-                        <button class="empty-canvas-cta" onclick="builder.buildWithAi()">
-                            <span class="material-symbols-outlined">magic_button</span>
-                            <span>Magisk Oppsett (AI)</span>
-                        </button>
-                    </div>
-                </div>
-            `;
+            container.innerHTML = '<p>Skriv nyhetsbrevet ditt her...</p>';
+            this.syncUnifiedBlocks();
             return;
         }
 
-        container.innerHTML = '';
-        this.blocks.forEach((block) => {
-            const blockEl = document.createElement('div');
-            blockEl.className = 'newsletter-block';
-            blockEl.dataset.id = block.id;
-            blockEl.dataset.type = block.type;
+        // Backward compatibility: load discrete blocks if present and compile them to continuous HTML
+        let unifiedHtml = '';
+        const isUnified = this.blocks.length === 1 && this.blocks[0].id === 'unified_content';
+        
+        if (isUnified) {
+            unifiedHtml = this.blocks[0].content.text || '<p>Skriv nyhetsbrevet ditt her...</p>';
+        } else {
+            // Retro-compile legacy blocks
+            unifiedHtml = this.blocks.map(block => {
+                switch (block.type) {
+                    case 'header':
+                        return `<h1 class="block-h1">${block.content.text}</h1>`;
+                    case 'text':
+                        return `<p class="block-text">${block.content.text}</p>`;
+                    case 'image':
+                        return `<p><img src="${block.content.url}" alt="${block.content.alt || ''}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+                    case 'button':
+                        return `
+                            <div style="text-align: center; margin: 24px 0;">
+                                <a href="${block.content.url}" class="block-btn" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${block.content.text}</a>
+                            </div><p><br></p>`;
+                    case 'divider':
+                        return `<hr style="border: none; border-top: ${block.content.thickness || 2}px solid ${block.content.color || '#e2e8f0'}; margin: 24px 0;">`;
+                    case 'spacer':
+                        return `<div style="height: ${block.content.height || 20}px;"></div>`;
+                    case 'columns':
+                        let colsMarkup = `<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0;">`;
+                        (block.content.cols || []).forEach(col => {
+                            if (col.type === 'text') {
+                                colsMarkup += `<div style="min-height: 50px;">${col.text}</div>`;
+                            } else {
+                                colsMarkup += `<div><img src="${col.url}" style="max-width:100%; height:auto; border-radius:6px; display:block;"></div>`;
+                            }
+                        });
+                        colsMarkup += `</div><p><br></p>`;
+                        return colsMarkup;
+                    default:
+                        return '';
+                }
+            }).join('');
 
-            let innerHTML = '';
-            switch (block.type) {
-                case 'header':
-                    innerHTML = `<h1 class="block-h1" contenteditable="true">${block.content.text}</h1>`;
-                    break;
-                case 'text':
-                    innerHTML = `<div class="block-text" contenteditable="true">${block.content.text}</div>`;
-                    break;
-                case 'image':
-                    innerHTML = `
-                        <div class="block-image-wrap" onclick="builder.handleImageClick('${block.id}')">
-                            <img src="${block.content.url}" alt="${block.content.alt}" class="block-img">
-                            <div class="image-overlay">
-                                <span class="material-symbols-outlined">upload_file</span>
-                                <span>Bytt bilde</span>
-                            </div>
-                        </div>`;
-                    break;
-                case 'button':
-                    innerHTML = `<div class="block-btn-wrap"><a href="${block.content.url}" class="block-btn" contenteditable="true">${block.content.text}</a></div>`;
-                    break;
-                case 'video':
-                    if (block.content.videoId) {
-                        innerHTML = `
-                            <div class="block-video-wrap">
-                                <iframe width="100%" height="315" src="https://www.youtube.com/embed/${block.content.videoId}" frameborder="0" allowfullscreen></iframe>
-                                <input type="text" class="video-url-input" placeholder="YouTube Link" value="${block.content.url}" onblur="builder.updateVideoUrl('${block.id}', this.value)">
-                            </div>`;
-                    } else {
-                        innerHTML = `
-                            <div class="block-video-placeholder">
-                                <span class="material-symbols-outlined">smart_display</span>
-                                <input type="text" class="video-url-input" placeholder="Lim inn YouTube-link her..." onblur="builder.updateVideoUrl('${block.id}', this.value)">
-                            </div>`;
-                    }
-                    break;
-                case 'columns':
-                    innerHTML = `<div class="block-columns layout-${block.content.layout}">`;
-                    block.content.cols.forEach((col, idx) => {
-                        let colContent = '';
-                        if (col.type === 'text') {
-                            colContent = `<div class="col-text" contenteditable="true" data-col="${idx}">${col.text}</div>`;
-                        } else {
-                            colContent = `
-                                <div class="col-image-wrap" onclick="builder.handleImageClick('${block.id}', ${idx})">
-                                    <img src="${col.url}" class="col-img">
-                                    <div class="image-overlay sm">
-                                        <span class="material-symbols-outlined">upload_file</span>
-                                    </div>
-                                </div>`;
-                        }
-                        innerHTML += `
-                            <div class="column">
-                                <div class="col-type-toggle" onclick="builder.toggleColumnType('${block.id}', ${idx})">
-                                    <span class="material-symbols-outlined">${col.type === 'text' ? 'image' : 'notes'}</span>
-                                </div>
-                                ${colContent}
-                            </div>`;
-                    });
-                    innerHTML += `</div>`;
-                    break;
-                case 'social':
-                    innerHTML = `<div class="block-social">`;
-                    block.content.platforms.forEach(p => {
-                        innerHTML += `<a href="${p.url}" class="social-icon"><i class="fab fa-${p.name}"></i></a>`;
-                    });
-                    innerHTML += `</div>`;
-                    break;
-                case 'logo':
-                    innerHTML = `
-                        <div class="block-logo-wrap" style="text-align: center;">
-                            <img src="${block.content.url}" style="width: ${block.content.width}px; height: auto;">
-                        </div>`;
-                    break;
-                case 'divider':
-                    innerHTML = `<div class="block-divider" style="padding: 16px 0;"><hr style="border: none; border-top: ${block.content.thickness}px solid ${block.content.color}; margin: 0;"></div>`;
-                    break;
-                case 'spacer':
-                    innerHTML = `<div class="block-spacer" style="height: ${block.content.height}px"></div>`;
-                    break;
-            }
+            // Overwrite with unified representation for future saving
+            this.blocks = [{
+                id: 'unified_content',
+                type: 'text',
+                content: { text: unifiedHtml }
+            }];
+        }
 
-
-            blockEl.innerHTML = `
-                ${innerHTML}
-                <div class="block-controls">
-                    <button class="control-btn" onclick="builder.moveBlock('${block.id}', -1)"><span class="material-symbols-outlined">arrow_upward</span></button>
-                    <button class="control-btn" onclick="builder.moveBlock('${block.id}', 1)"><span class="material-symbols-outlined">arrow_downward</span></button>
-                    <button class="control-btn delete" onclick="builder.deleteBlock('${block.id}')"><span class="material-symbols-outlined">delete</span></button>
-                </div>
-            `;
-
-            // Sync Edits
-            blockEl.querySelectorAll('[contenteditable="true"]').forEach(editable => {
-                const sync = () => {
-                    if (block.type === 'columns') {
-                        const colIdx = editable.dataset.col;
-                        block.content.cols[colIdx].text = editable.innerHTML;
-                    } else if (block.type === 'button') {
-                        block.content.text = editable.innerText;
-                    } else {
-                        block.content.text = editable.innerHTML;
-                    }
-                };
-                editable.addEventListener('blur', sync);
-                editable.addEventListener('input', sync);
-            });
-
-            container.appendChild(blockEl);
-        });
+        container.innerHTML = unifiedHtml;
     }
 
     showPreview() {
@@ -1138,6 +1108,7 @@ class NewsletterBuilder {
         const name = prompt("Navn på malen:", "Nyhetsbrev Mal");
         if (!name) return;
         try {
+            this.syncUnifiedBlocks();
             const data = {
                 name,
                 blocks: this.blocks,
@@ -1187,7 +1158,8 @@ class NewsletterBuilder {
         if (!user) return showToast("Logg inn først", "warning");
 
         const subject = document.getElementById('newsletter-subject').value;
-        if (this.blocks.length === 0) return showToast("Legg til innhold før du sender en test.", "error");
+        this.syncUnifiedBlocks();
+        if (this.blocks.length === 0 || !this.blocks[0].content.text) return showToast("Legg til innhold før du sender en test.", "error");
 
         showToast(`Sender en test-e-post av "${subject}" til ${user.email}...`, "info");
         console.log("Test Send Triggered:", {
@@ -1214,8 +1186,9 @@ class NewsletterBuilder {
     async sendCampaign() {
         const estCount = parseInt(document.getElementById('estimated-count').innerText) || 0;
         const subject = document.getElementById('newsletter-subject').value;
+        this.syncUnifiedBlocks();
 
-        if (this.blocks.length === 0) {
+        if (this.blocks.length === 0 || !this.blocks[0].content.text) {
             return showToast("Du kan ikke sende et tomt nyhetsbrev.", "error");
         }
 
