@@ -395,6 +395,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (mobileNavToggle && sidebar) {
+        // Set initial title based on state
+        const updateToggleTitle = () => {
+            const isCollapsed = document.body.classList.contains('sidebar-collapsed');
+            mobileNavToggle.setAttribute('title', isCollapsed ? 'Vis meny' : 'Skjul meny');
+        };
+        updateToggleTitle();
+
         const toggleSidebar = (force) => {
             const isActive = force !== undefined ? force : !sidebar.classList.contains('active');
             sidebar.classList.toggle('active', isActive);
@@ -407,6 +414,7 @@ document.addEventListener('DOMContentLoaded', () => {
             e.stopPropagation();
             if (window.innerWidth > 1024) {
                 document.body.classList.toggle('sidebar-collapsed');
+                updateToggleTitle();
             } else {
                 toggleSidebar();
             }
