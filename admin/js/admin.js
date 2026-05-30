@@ -12489,8 +12489,9 @@ class AdminManager {
                 const status = this.escapeHtml(this.getDonationStatusLabel(record.status));
                 const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
                 const method = this.escapeHtml(record.method || 'Ukjent');
-                const profileStatus = record.userId ? 'Koblet' : 'Ukoblet';
-                const profileColor = record.userId ? '#166534' : '#92400e';
+                const profileStatus = record.userId
+                    ? `<span style="display:inline-flex; align-items:center; gap:6px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; box-shadow:0 1px 2px rgba(16,185,129,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; margin:0 !important; padding:0 !important; display:inline-block !important;">link</span>Koblet</span>`
+                    : `<span style="display:inline-flex; align-items:center; gap:6px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; box-shadow:0 1px 2px rgba(245,158,11,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; margin:0 !important; padding:0 !important; display:inline-block !important;">link_off</span>Ukoblet</span>`;
                 return `
                     <tr>
                         <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
@@ -12500,7 +12501,7 @@ class AdminManager {
                         </td>
                         <td><span class="method-tag">${method}</span></td>
                         <td><span class="method-tag">${status}</span></td>
-                        <td><span style="color:${profileColor};font-weight:700;">${profileStatus}</span></td>
+                        <td>${profileStatus}</td>
                         <td class="text-right"><strong>${amount}</strong></td>
                     </tr>
                 `;
@@ -12527,7 +12528,9 @@ class AdminManager {
                         <td>${donor.completedCount} / ${donor.giftCount}</td>
                         <td>${this.escapeHtml(methodText)}</td>
                         <td>${donor.latestDate ? donor.latestDate.toLocaleDateString('no-NO') : 'Ukjent'}</td>
-                        <td>${donor.userId ? '<span style="color:#166534;font-weight:700;">Koblet</span>' : '<span style="color:#92400e;font-weight:700;">Ukoblet</span>'}</td>
+                        <td>${donor.userId
+                            ? `<span style="display:inline-flex; align-items:center; gap:6px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; box-shadow:0 1px 2px rgba(16,185,129,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; margin:0 !important; padding:0 !important; display:inline-block !important;">link</span>Koblet</span>`
+                            : `<span style="display:inline-flex; align-items:center; gap:6px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; box-shadow:0 1px 2px rgba(245,158,11,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; margin:0 !important; padding:0 !important; display:inline-block !important;">link_off</span>Ukoblet</span>`}</td>
                         <td class="text-right"><strong>${this.formatDonationCurrency(donor.total)}</strong></td>
                     </tr>
                 `;
