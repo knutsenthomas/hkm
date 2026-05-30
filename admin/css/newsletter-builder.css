@@ -825,8 +825,10 @@ body.builder-active .builder-workspace > .canvas-container {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    z-index: 10000 !important;
     align-items: center;
     justify-content: center;
 }
@@ -2030,8 +2032,9 @@ input:checked+.slider:before {
     position: fixed !important;
     inset: 0 !important;
     z-index: 9999 !important;
-    background: rgba(15, 23, 42, 0.6) !important;
-    backdrop-filter: blur(8px) !important;
+    background: rgba(15, 23, 42, 0.4) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -2229,5 +2232,12 @@ input:checked+.slider:before {
         font-size: 12px !important;
     }
 }
-
-
+/* --- Global Modal & Backdrop Blur Override --- */
+.modal,
+.custom-prompt-overlay,
+.search-overlay,
+.admin-modal,
+.hkm-modal-overlay {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
