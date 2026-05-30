@@ -2256,6 +2256,11 @@ input:checked+.slider:before {
     display: flex !important;
     flex-direction: column !important;
     gap: 8px !important;
+    margin-top: 24px !important;
+}
+
+.sidebar-section-container:first-of-type {
+    margin-top: 16px !important;
 }
 
 .sidebar-section-label {
@@ -2275,9 +2280,11 @@ input:checked+.slider:before {
 
 .element-card-row {
     display: flex !important;
+    flex-direction: row !important; /* Force row layout to override column base */
     align-items: center !important;
+    justify-content: flex-start !important; /* Left-align row elements */
     width: 100% !important;
-    height: 48px !important; /* 8px grid spacing */
+    height: 48px !important; /* 8px grid height */
     padding: 0 16px !important;
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
@@ -2287,20 +2294,26 @@ input:checked+.slider:before {
     overflow: hidden !important;
     transition: all 0.2s ease !important;
     box-sizing: border-box !important;
+    gap: 0 !important; /* Disable grid gap */
 }
 
 .element-card-row .element-icon {
-    font-size: 20px !important;
+    font-size: 20px !important; /* Force premium smaller icon size, overriding .element-card span */
     color: #64748b !important;
     margin-right: 12px !important;
+    margin-bottom: 0 !important; /* Reset layout spacing */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
     transition: color 0.2s ease !important;
 }
 
 .element-card-row .element-label {
-    font-size: 14px !important;
+    font-size: 14px !important; /* Set standard text size, overriding .element-label column rule */
     font-weight: 500 !important;
     color: #334155 !important;
     text-align: left !important;
+    margin: 0 !important; /* Reset spacing */
     transition: color 0.2s ease !important;
 }
 
@@ -2626,6 +2639,7 @@ input:checked+.slider:before {
     transition: all 0.2s ease !important;
     border: none !important;
     outline: none !important;
+    white-space: nowrap !important; /* CRITICAL FIX: Prevent buttons from wrapping and stacking text */
 }
 
 .builder-unified-header .header-action-btn.secondary-flat {
