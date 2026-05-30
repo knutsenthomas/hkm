@@ -1525,11 +1525,11 @@ class NewsletterBuilder {
         if (mode === 'builder') {
             if (dashboard) dashboard.style.display = 'none';
             if (builder) builder.style.display = 'block';
-            document.body.classList.add('builder-active');
+            document.body.className = 'builder-active';
         } else {
             if (dashboard) dashboard.style.display = 'block';
             if (builder) builder.style.display = 'none';
-            document.body.classList.remove('builder-active');
+            document.body.className = 'admin-body main-dashboard';
             this.loadDashboardData();
         }
     }
