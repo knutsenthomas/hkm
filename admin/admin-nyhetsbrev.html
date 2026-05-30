@@ -530,6 +530,30 @@
         </div>
     </div>
 
+    <!-- Custom AI Prompt Modal -->
+    <div id="custom-prompt-modal" class="custom-prompt-overlay" style="display: none;">
+        <div class="custom-prompt-container">
+            <div class="custom-prompt-header">
+                <div class="prompt-header-title">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                    <h3>Magisk AI-hjelper</h3>
+                </div>
+                <button class="prompt-close-btn" id="custom-prompt-close">&times;</button>
+            </div>
+            <div class="custom-prompt-body">
+                <label id="custom-prompt-label" for="custom-prompt-input">Hva kan jeg hjelpe deg med å lage?</label>
+                <textarea id="custom-prompt-input" placeholder="Skriv din beskrivelse her..."></textarea>
+            </div>
+            <div class="custom-prompt-footer">
+                <button class="prompt-btn secondary" id="custom-prompt-cancel">Avbryt</button>
+                <button class="prompt-btn primary" id="custom-prompt-confirm">
+                    <span class="material-symbols-outlined">magic_button</span>
+                    <span>Generer med AI</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <nav class="mobile-bottom-nav">
         <a href="/admin/index.html#overview" class="mobile-nav-item" data-section="overview">
             <span class="material-symbols-outlined">grid_view</span>

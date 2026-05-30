@@ -379,86 +379,146 @@ class NewsletterBuilder {
         this.renderCanvas();
     }
 
-    async buildWithAi() {
-        const prompt = window.prompt("Beskriv hva nyhetsbrevet skal handle om, så bygger jeg strukturen for deg: (f.eks: 'En invitasjon til bønnemøte på tirsdag')");
-        if (!prompt) return;
+    showPromptModal(label, placeholder, confirmCallback) {
+        const modal = document.getElementById('custom-prompt-modal');
+        const labelEl = document.getElementById('custom-prompt-label');
+        const inputEl = document.getElementById('custom-prompt-input');
+        const cancelBtn = document.getElementById('custom-prompt-cancel');
+        const closeBtn = document.getElementById('custom-prompt-close');
+        const confirmBtn = document.getElementById('custom-prompt-confirm');
 
-        showToast("AI bygger nyhetsbrevet ditt...", "info");
-        try {
-            const callable = firebase.functions().httpsCallable('aiProcess');
-            const result = await callable({
-                task: 'generate_newsletter_structure',
-                prompt: prompt
-            });
+        if (!modal || !labelEl || !inputEl) return;
 
-            if (result.data && result.data.blocks) {
-                // Vi tømmer ikke nødvendigvis alt, men legger til de nye blokkene
-                for (const aiBlock of result.data.blocks) {
-                    const id = Date.now() + Math.random().toString(36).substr(2, 9);
-                    this.blocks.push({
-                        id,
-                        type: aiBlock.type,
-                        content: aiBlock.content
+        labelEl.innerText = label;
+        inputEl.placeholder = placeholder;
+        inputEl.value = '';
+        modal.style.display = 'flex';
+        setTimeout(() => modal.classList.add('open'), 10);
+        inputEl.focus();
+
+        const closePrompt = () => {
+            modal.classList.remove('open');
+            setTimeout(() => modal.style.display = 'none', 300);
+        };
+
+        // Reset listeners to avoid duplicates
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        const newCloseBtn = closeBtn.cloneNode(true);
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+        newCancelBtn.addEventListener('click', closePrompt);
+        newCloseBtn.addEventListener('click', closePrompt);
+        
+        newConfirmBtn.addEventListener('click', () => {
+            const val = inputEl.value.trim();
+            if (val) {
+                confirmCallback(val);
+                closePrompt();
+            } else {
+                showToast("Vennligst oppgi en beskrivelse.", "warning");
+            }
+        });
+
+        // Trigger on Cmd+Enter / Ctrl+Enter
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+                newConfirmBtn.click();
+            }
+        });
+    }
+
+    buildWithAi() {
+        this.showPromptModal(
+            "Beskriv hva nyhetsbrevet skal handle om, så bygger jeg strukturen for deg:",
+            "F.eks: En invitasjon til bønnemøte på tirsdag kveld med tema om enhet og fellesskap...",
+            async (promptVal) => {
+                showToast("AI bygger nyhetsbrevet ditt...", "info");
+                try {
+                    const callable = firebase.functions().httpsCallable('aiProcess');
+                    const result = await callable({
+                        task: 'generate_newsletter_structure',
+                        prompt: promptVal
                     });
+
+                    if (result.data && result.data.blocks) {
+                        for (const aiBlock of result.data.blocks) {
+                            const id = Date.now() + Math.random().toString(36).substr(2, 9);
+                            this.blocks.push({
+                                id,
+                                type: aiBlock.type,
+                                content: aiBlock.content
+                            });
+                        }
+                        this.renderCanvas();
+                        showToast(`AI har bygget ${result.data.blocks.length} blokker!`, "success");
+                    }
+                } catch (err) {
+                    console.error("AI Builder failed:", err);
+                    showToast("Kunne ikke bygge med AI: " + err.message, "error");
                 }
-                this.renderCanvas();
-                showToast(`AI har bygget ${result.data.blocks.length} blokker!`, "success");
             }
-        } catch (err) {
-            console.error("AI Builder failed:", err);
-            showToast("Kunne ikke bygge med AI: " + err.message, "error");
-        }
+        );
     }
 
-    async showAiTextPrompt() {
-        const prompt = window.prompt("Hva vil du at jeg skal skrive? (f.eks: 'Et velkomstbrev til nye medlemmer')");
-        if (!prompt) return;
+    showAiTextPrompt() {
+        this.showPromptModal(
+            "Hva vil du at jeg skal skrive for deg?",
+            "F.eks: Et varmt velkomstbrev til nye abonnenter, fokusert på ukentlige oppdateringer...",
+            async (promptVal) => {
+                showToast("AI tenker...", "info");
+                try {
+                    const callable = firebase.functions().httpsCallable('aiProcess');
+                    const result = await callable({
+                        task: 'generate_text',
+                        prompt: `Du er en dyktig tekstforfatter for His Kingdom Ministry. ${promptVal}. Svar med selve teksten, ingen kommentarer rundt.`,
+                        options: { model: "gpt-4o-mini" }
+                    });
 
-        showToast("AI tenker...", "info");
-        try {
-            const callable = firebase.functions().httpsCallable('aiProcess');
-            const result = await callable({
-                task: 'generate_text',
-                prompt: `Du er en dyktig tekstforfatter for His Kingdom Ministry. ${prompt}. Svar med selve teksten, ingen kommentarer rundt.`,
-                options: { model: "gpt-4o-mini" }
-            });
-
-            if (result.data && result.data.text) {
-                this.addBlock('text');
-                const lastBlock = this.blocks[this.blocks.length - 1];
-                lastBlock.content.text = result.data.text;
-                this.renderCanvas();
-                showToast("Tekst generert!", "success");
+                    if (result.data && result.data.text) {
+                        this.addBlock('text');
+                        const lastBlock = this.blocks[this.blocks.length - 1];
+                        lastBlock.content.text = result.data.text;
+                        this.renderCanvas();
+                        showToast("Tekst generert!", "success");
+                    }
+                } catch (err) {
+                    console.error("AI Text failed:", err);
+                    showToast("Kunne ikke generere tekst: " + err.message, "error");
+                }
             }
-        } catch (err) {
-            console.error("AI Text failed:", err);
-            showToast("Kunne ikke generere tekst: " + err.message, "error");
-        }
+        );
     }
 
-    async showAiImagePrompt() {
-        const prompt = window.prompt("Beskriv bildet du vil lage: (f.eks: 'En soloppgang over en rolig innsjø, fotorealistisk')");
-        if (!prompt) return;
+    showAiImagePrompt() {
+        this.showPromptModal(
+            "Beskriv bildet du ønsker å generere med AI:",
+            "F.eks: En nydelig solnedgang over fjellene med gylne toner, fotorealistisk 8k...",
+            async (promptVal) => {
+                showToast("Genererer bilde (dette kan ta 10-15 sek)...", "info", 10000);
+                try {
+                    const callable = firebase.functions().httpsCallable('aiProcess');
+                    const result = await callable({
+                        task: 'generate_image',
+                        prompt: promptVal
+                    });
 
-        showToast("Genererer bilde (dette kan ta 10-15 sek)...", "info", 10000);
-        try {
-            const callable = firebase.functions().httpsCallable('aiProcess');
-            const result = await callable({
-                task: 'generate_image',
-                prompt: prompt
-            });
-
-            if (result.data && result.data.imageUrl) {
-                this.addBlock('image');
-                const lastBlock = this.blocks[this.blocks.length - 1];
-                lastBlock.content.url = result.data.imageUrl;
-                this.renderCanvas();
-                showToast("Bilde generert!", "success");
+                    if (result.data && result.data.imageUrl) {
+                        this.addBlock('image');
+                        const lastBlock = this.blocks[this.blocks.length - 1];
+                        lastBlock.content.url = result.data.imageUrl;
+                        this.renderCanvas();
+                        showToast("Bilde generert!", "success");
+                    }
+                } catch (err) {
+                    console.error("AI Image failed:", err);
+                    showToast("Kunne ikke generere bilde: " + err.message, "error");
+                }
             }
-        } catch (err) {
-            console.error("AI Image failed:", err);
-            showToast("Kunne ikke generere bilde: " + err.message, "error");
-        }
+        );
     }
 
 
