@@ -16,7 +16,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/dashboard.css?v=20260521_dotfix">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260530_aifix5">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260530_aifix6">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260509_G46">
 
     <!-- Firebase SDK (Compat) -->
@@ -133,200 +133,184 @@
         </aside>
 
         <div class="builder-main-layout">
-            <!-- 2. Sidebar: Elements Grid -->
+            <!-- 2. Sidebar: High-fidelity elements and templates column -->
             <aside class="builder-elements-sidebar-v2">
+                <!-- Header (like mock) -->
                 <div class="sidebar-header-modern">
-                    <h2>Innhold & Design</h2>
+                    <h2>Nyhetsbrevbygger</h2>
+                    <p class="sidebar-subtitle-modern">Utkast: Ukeavis</p>
                 </div>
 
-                <!-- Kategori 1: Tekst og innhold -->
-                <div class="sidebar-category-group">
-                    <div class="sidebar-category-header">
-                        <span class="material-symbols-outlined">edit_note</span>
-                        <span>Tekst & Innhold</span>
-                    </div>
-                    <div class="elements-grid">
-                        <button class="element-card" data-type="header">
-                            <span class="material-symbols-outlined">title</span>
-                            <span class="element-label">Overskrift</span>
-                        </button>
-                        <button class="element-card" data-type="text">
-                            <span class="material-symbols-outlined">notes</span>
+                <!-- Elements Section -->
+                <div class="sidebar-section-container">
+                    <div class="sidebar-section-label">Elementer</div>
+                    <div class="elements-list-vertical">
+                        <button class="element-card-row element-card" data-type="text">
+                            <span class="material-symbols-outlined element-icon">notes</span>
                             <span class="element-label">Tekstfelt</span>
                         </button>
-                        <button class="element-card" data-type="columns">
-                            <span class="material-symbols-outlined">view_column</span>
-                            <span class="element-label">Kolonner</span>
+                        <button class="element-card-row element-card" data-type="header">
+                            <span class="material-symbols-outlined element-icon">title</span>
+                            <span class="element-label">Overskrift</span>
                         </button>
-                    </div>
-                </div>
-
-                <!-- Kategori 2: Medier & Handling -->
-                <div class="sidebar-category-group">
-                    <div class="sidebar-category-header">
-                        <span class="material-symbols-outlined">photo_library</span>
-                        <span>Medier & Handling</span>
-                    </div>
-                    <div class="elements-grid">
-                        <button class="element-card" data-type="image">
-                            <span class="material-symbols-outlined">image</span>
+                        <button class="element-card-row element-card" data-type="image">
+                            <span class="material-symbols-outlined element-icon">image</span>
                             <span class="element-label">Bilde</span>
                         </button>
-                        <button class="element-card" data-type="video">
-                            <span class="material-symbols-outlined">smart_display</span>
-                            <span class="element-label">Video</span>
-                        </button>
-                        <button class="element-card" data-type="button">
-                            <span class="material-symbols-outlined">smart_button</span>
+                        <button class="element-card-row element-card" data-type="button">
+                            <span class="material-symbols-outlined element-icon">smart_button</span>
                             <span class="element-label">Knapp</span>
                         </button>
-                    </div>
-                </div>
-
-                <!-- Kategori 3: Struktur & Profil -->
-                <div class="sidebar-category-group">
-                    <div class="sidebar-category-header">
-                        <span class="material-symbols-outlined">layers</span>
-                        <span>Struktur & Profil</span>
-                    </div>
-                    <div class="elements-grid">
-                        <button class="element-card" data-type="logo">
-                            <span class="material-symbols-outlined">featured_seasonal_and_gifts</span>
-                            <span class="element-label">Logo</span>
+                        <button class="element-card-row element-card" data-type="video">
+                            <span class="material-symbols-outlined element-icon">smart_display</span>
+                            <span class="element-label">Video</span>
                         </button>
-                        <button class="element-card" data-type="social">
-                            <span class="material-symbols-outlined">public</span>
-                            <span class="element-label">Sosiale</span>
-                        </button>
-                        <button class="element-card" data-type="divider">
-                            <span class="material-symbols-outlined">horizontal_rule</span>
+                        <button class="element-card-row element-card" data-type="divider">
+                            <span class="material-symbols-outlined element-icon">horizontal_rule</span>
                             <span class="element-label">Skillelinje</span>
                         </button>
-                        <button class="element-card" data-type="spacer">
-                            <span class="material-symbols-outlined">space_bar</span>
+                        <button class="element-card-row element-card" data-type="spacer">
+                            <span class="material-symbols-outlined element-icon">space_bar</span>
                             <span class="element-label">Avstand</span>
                         </button>
+                        <button class="element-card-row element-card" data-type="columns">
+                            <span class="material-symbols-outlined element-icon">view_column</span>
+                            <span class="element-label">Kolonner</span>
+                        </button>
+                        <button class="element-card-row element-card" data-type="logo">
+                            <span class="material-symbols-outlined element-icon">featured_seasonal_and_gifts</span>
+                            <span class="element-label">Logo</span>
+                        </button>
+                        <button class="element-card-row element-card" data-type="social">
+                            <span class="material-symbols-outlined element-icon">public</span>
+                            <span class="element-label">Sosiale lenker</span>
+                        </button>
                     </div>
                 </div>
 
-                <!-- Kategori 4: Magisk AI -->
-                <div class="sidebar-category-group last-group">
-                    <div class="sidebar-category-header">
-                        <span class="material-symbols-outlined purple-icon">auto_awesome</span>
-                        <span class="purple-text">Magisk AI Verktøy</span>
+                <!-- Magical AI Section (Premium layout addition) -->
+                <div class="sidebar-section-container" style="margin-top: 24px;">
+                    <div class="sidebar-section-label" style="display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined purple-icon" style="font-size: 14px; color: #6366f1;">auto_awesome</span>
+                        <span>Magisk AI Verktøy</span>
                     </div>
-                    <div class="elements-grid" style="margin-top: 8px;">
-                        <button class="element-card ai-tool-card purple-gradient full-width" onclick="builder.buildWithAi()" style="margin-bottom: 8px;">
-                            <span class="material-symbols-outlined">magic_button</span>
+                    <div class="elements-list-vertical">
+                        <button class="element-card-row element-card ai-tool-card purple-gradient" onclick="builder.buildWithAi()">
+                            <span class="material-symbols-outlined element-icon">magic_button</span>
                             <span class="element-label">Magisk Oppsett (AI)</span>
                         </button>
-                        <button class="element-card ai-tool-card orange-gradient half-width" data-type="ai_text">
-                            <span class="material-symbols-outlined">history_edu</span>
-                            <span class="element-label">Magisk Tekst</span>
+                        <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_text">
+                            <span class="material-symbols-outlined element-icon">history_edu</span>
+                            <span class="element-label">Magisk Tekst (AI)</span>
                         </button>
-                        <button class="element-card ai-tool-card orange-gradient half-width" data-type="ai_image">
-                            <span class="material-symbols-outlined">photo</span>
-                            <span class="element-label">AI Bilde</span>
+                        <button class="element-card-row element-card ai-tool-card orange-gradient" data-type="ai_image">
+                            <span class="material-symbols-outlined element-icon">photo</span>
+                            <span class="element-label">AI Bildegenerator</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- Leveringskvalitet (Deliverability Checklist) -->
-                <div class="templates-section-modern" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
-                    <h3 style="display: flex; align-items: center; gap: 8px; color: #1e293b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">
-                        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--accent-orange);">verified_user</span>
-                        Leveringssjekk
-                    </h3>
-                    <div class="deliverability-card">
-                        <div class="chk-item">
+                <!-- Saved Blocks Section -->
+                <div class="sidebar-section-container" style="margin-top: 24px;">
+                    <div class="sidebar-section-label">Lagrede Blokker</div>
+                    <div class="saved-blocks-empty">
+                        <span class="material-symbols-outlined empty-icon">bookmark_border</span>
+                        <span>Ingen lagrede blokker ennå...</span>
+                    </div>
+                </div>
+
+                <!-- Mine Maler Section (Fixed templates list) -->
+                <div class="sidebar-section-container" style="margin-top: 24px;">
+                    <div class="sidebar-section-label">Mine maler</div>
+                    <div id="templates-list" class="templates-list-container">
+                        <p class="empty-state-text">Ingen maler lagret ennå</p>
+                    </div>
+                </div>
+
+                <!-- Deliverability Sjekk widget -->
+                <div class="sidebar-section-container" style="margin-top: 24px;">
+                    <div class="sidebar-section-label" style="display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 14px; color: var(--accent-orange, #d17d39);">verified_user</span>
+                        <span>Leveringssjekk</span>
+                    </div>
+                    <div class="deliverability-card-modern">
+                        <div class="chk-item-modern">
                             <span class="material-symbols-outlined chk-success">check_circle</span>
-                            <span>E-postserver i Norge (GDPR-sikker)</span>
+                            <span>E-postserver i Norge (GDPR)</span>
                         </div>
-                        <div class="chk-item">
+                        <div class="chk-item-modern">
                             <span class="material-symbols-outlined chk-success">check_circle</span>
-                            <span>Avsenderdomene godkjent (SPF/DKIM)</span>
+                            <span>Avsenderdomene godkjent (DKIM)</span>
                         </div>
-                        <div class="chk-item">
-                            <span class="material-symbols-outlined chk-success">check_circle</span>
-                            <span>Responsivt mobilformat verifisert</span>
-                        </div>
-                        <div class="chk-item" id="chk-test-email">
+                        <div class="chk-item-modern" id="chk-test-email">
                             <span class="material-symbols-outlined chk-warning" id="chk-test-icon">pending</span>
-                            <span id="chk-test-text">Test-epost ikke sendt ennå</span>
+                            <span id="chk-test-text">Test-epost ikke sendt</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="templates-section-modern" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
-                    <h3>Mine maler</h3>
-                    <p class="empty-state-text">Ingen maler lagret ennå</p>
+                <!-- Bottom Add Button (like mock) -->
+                <div class="sidebar-bottom-actions" style="margin-top: auto; padding-top: 24px;">
+                    <button class="add-element-dotted-btn">
+                        <span class="material-symbols-outlined">add</span>
+                        <span>Legg til element</span>
+                    </button>
                 </div>
             </aside>
 
             <!-- 3. Main Workspace -->
             <main class="builder-workspace">
-                <!-- Page Header (Unified Standard) -->
-        <div id="dashboard-main-header" class="main-header" style="height: 72px; min-height: 72px;">
-            <div class="section-header design-ui-header in-topbar" style="height: 100%; min-height: 0; padding-top: 0; padding-bottom: 0; margin-bottom: 0;">
-                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
-                    <span class="material-symbols-outlined">menu</span>
-                </button>
-                <div class="section-header-icon">
-                    <span class="material-symbols-outlined">mail_outline</span>
-                </div>
-                <div class="section-header-content">
-                    <div class="section-header-titles">
-                        <h2 class="section-title">Nyhetsbrevbygger</h2>
-                        <p class="section-subtitle">His Kingdom Ministry</p>
-                    </div>
-                    <div class="section-header-actions">
-                        <!-- Search bar removed to match Gold Standard dashboard -->
-
-                        <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
-                            <div class="user-info-text">
-                                <span id="admin-name" class="user-name">Laster...</span>
-                                <span class="user-role">Administrator</span>
-                            </div>
-                            <div id="admin-avatar" class="user-avatar">TK</div>
-                        </a>
-
-                        <button id="messages-bell" class="notification-btn">
-                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
-                            <span id="notification-dot" class="notification-dot"></span>
+                <!-- Unified Sleek Control Header -->
+                <header class="builder-unified-header">
+                    <div class="header-left">
+                        <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                            <span class="material-symbols-outlined">menu</span>
                         </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-                <header class="editor-toolbar">
-                    <div class="toolbar-left">
-                        <div class="subject-field">
-                            <span class="subject-label">Emne:</span>
-                            <input type="text" id="newsletter-subject" placeholder="Skriv inn emne..." class="subject-input-modern">
+                        <div class="header-title-group">
+                            <h1 class="header-title">Nyhetsbrevbygger</h1>
+                            <p class="header-subtitle">His Kingdom Ministry</p>
                         </div>
                     </div>
                     
-                    <div class="toolbar-center">
-                        <div class="device-toggles">
-                            <button class="device-btn active" data-view="desktop"><span class="material-symbols-outlined">desktop_windows</span></button>
-                            <button class="device-btn" data-view="mobile"><span class="material-symbols-outlined">smartphone</span></button>
+                    <div class="header-subject-container">
+                        <span class="material-symbols-outlined subject-icon">edit_note</span>
+                        <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
+                    </div>
+                    
+                    <div class="header-center">
+                        <div class="device-toggles-modern">
+                            <button class="device-btn active" data-view="desktop" title="PC-visning">
+                                <span class="material-symbols-outlined">desktop_windows</span>
+                            </button>
+                            <button class="device-btn" data-view="mobile" title="Mobilvisning">
+                                <span class="material-symbols-outlined">smartphone</span>
+                            </button>
                         </div>
                     </div>
-
-                    <div class="toolbar-right">
-                        <button id="preview-btn" class="toolbar-action-btn secondary">
+                    
+                    <div class="header-actions">
+                        <button id="preview-btn" class="header-action-btn secondary-flat">
                             <span class="material-symbols-outlined">visibility</span>
-                            Forhåndsvis
+                            <span>Forhåndsvis</span>
                         </button>
-                        <button id="save-template-btn" class="toolbar-action-btn secondary">
+                        
+                        <button id="save-template-btn" class="header-action-btn secondary-flat">
                             <span class="material-symbols-outlined">save</span>
-                            Lagre mal
+                            <span>Lagre mal</span>
                         </button>
-                        <button id="continue-btn" class="toolbar-action-btn primary">
-                            Velg mottakere
+                        
+                        <button id="continue-btn" class="header-action-btn primary-action">
+                            <span>Velg mottakere</span>
                             <span class="material-symbols-outlined">arrow_forward</span>
                         </button>
+                        
+                        <div class="user-badge-modern" id="admin-profile-trigger">
+                            <div class="user-info-compact">
+                                <span id="admin-name" class="user-name-compact">Laster...</span>
+                                <span class="user-role-compact">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar-compact">TK</div>
+                        </div>
                     </div>
                 </header>
 
