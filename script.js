@@ -3019,7 +3019,7 @@ window.addEventListener('load', () => {
             .hkm-chat-header {
                 margin: 0 !important;
                 flex-shrink: 0 !important;
-                background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+                background: #1B4965 !important;
                 padding: 16px 24px !important;
                 display: flex !important;
                 align-items: center !important;

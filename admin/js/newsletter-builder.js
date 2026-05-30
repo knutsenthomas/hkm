@@ -1032,7 +1032,7 @@ class NewsletterBuilder {
 
         // Auto-initialize with a placeholder paragraph if empty
         if (this.blocks.length === 0) {
-            container.innerHTML = '<p>Skriv nyhetsbrevet ditt her...</p>';
+            container.innerHTML = '<p><br></p>';
             this.syncUnifiedBlocks();
             return;
         }
@@ -1042,7 +1042,12 @@ class NewsletterBuilder {
         const isUnified = this.blocks.length === 1 && this.blocks[0].id === 'unified_content';
         
         if (isUnified) {
-            unifiedHtml = this.blocks[0].content.text || '<p>Skriv nyhetsbrevet ditt her...</p>';
+            let rawText = this.blocks[0].content.text || '';
+            // If it is the old legacy hardcoded placeholder, clean it up
+            if (rawText === '<p>Skriv nyhetsbrevet ditt her...</p>') {
+                rawText = '<p><br></p>';
+            }
+            unifiedHtml = rawText || '<p><br></p>';
         } else {
             // Retro-compile legacy blocks
             unifiedHtml = this.blocks.map(block => {
@@ -1159,7 +1164,12 @@ class NewsletterBuilder {
 
         const subject = document.getElementById('newsletter-subject').value;
         this.syncUnifiedBlocks();
-        if (this.blocks.length === 0 || !this.blocks[0].content.text) return showToast("Legg til innhold før du sender en test.", "error");
+        
+        const textContent = this.blocks[0]?.content?.text || '';
+        const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+        if (this.blocks.length === 0 || !textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
+            return showToast("Legg til innhold før du sender en test.", "error");
+        }
 
         showToast(`Sender en test-e-post av "${subject}" til ${user.email}...`, "info");
         console.log("Test Send Triggered:", {
@@ -1188,7 +1198,9 @@ class NewsletterBuilder {
         const subject = document.getElementById('newsletter-subject').value;
         this.syncUnifiedBlocks();
 
-        if (this.blocks.length === 0 || !this.blocks[0].content.text) {
+        const textContent = this.blocks[0]?.content?.text || '';
+        const plainText = textContent.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, '').trim();
+        if (this.blocks.length === 0 || !textContent || plainText === '' || textContent === '<p><br></p>' || textContent === '<p>Skriv nyhetsbrevet ditt her...</p>') {
             return showToast("Du kan ikke sende et tomt nyhetsbrev.", "error");
         }
 
