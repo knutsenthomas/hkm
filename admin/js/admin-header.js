@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Segmenter', icon: 'segment', href: '/admin/admin-segmenter.html', path: 'admin-segmenter', category: 'kommunikasjon' },
             { label: 'Meldinger', icon: 'inbox', href: '/admin/admin-meldinger.html', path: 'admin-meldinger', category: 'kommunikasjon', badgeId: 'messages-badge' },
             { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
-            { label: 'Nyhetsbrev', icon: 'mail_outline', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
+            { label: 'HKM Studio', icon: 'auto_awesome', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
             { header: 'administrasjon', label: 'Administrasjon' },
             { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },
             { label: 'Brukere', icon: 'group', section: 'users', category: 'administrasjon' },

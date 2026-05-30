@@ -2284,6 +2284,15 @@ class AdminManager {
     onSectionSwitch(sectionId) {
         console.log(`[AdminManager] 🚀 Switching to section: ${sectionId}`);
         this.currentSection = sectionId;
+
+        // HKM Studio: Capture pending creation request from studio cards
+        const createSection = sessionStorage.getItem('hkm_admin_create_item_state');
+        if (createSection === sectionId) {
+            sessionStorage.removeItem('hkm_admin_create_item_state');
+            setTimeout(() => {
+                this.addNewItem(sectionId);
+            }, 600);
+        }
         
         // Update currentMediaPath based on section to ensure media library stays in sync
         const sectionMap = {

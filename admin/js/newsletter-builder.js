@@ -1555,6 +1555,10 @@ class NewsletterBuilder {
 
     async loadDashboardData() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        
+        // Trigger HKM Studio Feed in background
+        this.loadStudioFeed();
+
         try {
             const draftsContainer = document.getElementById('dashboard-drafts-list');
             const templatesContainer = document.getElementById('dashboard-templates-list');
@@ -1693,6 +1697,263 @@ class NewsletterBuilder {
             
         } catch (e) {
             console.error("Load dashboard data failed:", e);
+        }
+    }
+
+    async loadStudioFeed() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        const grid = document.getElementById('studio-content-feed-grid');
+        if (!grid) return;
+
+        // Bind tabs if not already bound
+        const tabsContainer = document.querySelector('.studio-tabs-container');
+        if (tabsContainer && !tabsContainer.dataset.bound) {
+            tabsContainer.dataset.bound = 'true';
+            tabsContainer.querySelectorAll('.studio-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabsContainer.querySelectorAll('.studio-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    const filter = tab.dataset.filter;
+                    this.renderStudioFeedGrid(filter);
+                });
+            });
+        }
+
+        try {
+            // Load Wix Blog Items
+            let blogItems = [];
+            try {
+                const blogData = await window.firebaseService.getPageContent('collection_blog');
+                const rawItems = blogData?.items ? Object.values(blogData.items) : (Array.isArray(blogData) ? blogData : []);
+                blogItems = rawItems.map((entry, idx) => ({
+                    id: entry.id || `blog-${idx}`,
+                    title: entry.title || 'Uten tittel (Blogg)',
+                    date: entry.date || entry.createdAt || entry.publishDate || '',
+                    type: 'blog',
+                    author: entry.author || 'His Kingdom Ministry',
+                    excerpt: entry.excerpt || (entry.text ? entry.text.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : 'Klikk rediger for å skrive andakt eller nyhet.'),
+                    coverImage: entry.coverImage || entry.imageUrl || 'https://images.unsplash.com/photo-1499750310107-5fef28a66643?auto=format&fit=crop&w=400&q=80',
+                    originalIndex: idx
+                }));
+            } catch (e) {
+                console.error("Studio Feed - Failed to load blog items:", e);
+            }
+
+            // Load Wix Teaching Items
+            let teachingItems = [];
+            try {
+                const teachingData = await window.firebaseService.getPageContent('collection_teaching');
+                const rawItems = teachingData?.items ? Object.values(teachingData.items) : (Array.isArray(teachingData) ? teachingData : []);
+                teachingItems = rawItems.map((entry, idx) => ({
+                    id: entry.id || `teaching-${idx}`,
+                    title: entry.title || 'Uten tittel (Undervisning)',
+                    date: entry.date || entry.createdAt || entry.publishDate || '',
+                    type: 'teaching',
+                    author: entry.author || 'His Kingdom Ministry',
+                    excerpt: entry.excerpt || (entry.text ? entry.text.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : 'Klikk rediger for å skrive bibelundervisning.'),
+                    coverImage: entry.coverImage || entry.imageUrl || 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=400&q=80',
+                    originalIndex: idx
+                }));
+            } catch (e) {
+                console.error("Studio Feed - Failed to load teaching items:", e);
+            }
+
+            // Load sent newsletter campaigns
+            let campaignItems = [];
+            try {
+                const campaignSnap = await window.firebaseService.db.collection('newsletter_campaigns').orderBy('sentAt', 'desc').limit(15).get();
+                campaignSnap.forEach(doc => {
+                    const data = doc.data();
+                    campaignItems.push({
+                        id: doc.id,
+                        title: data.subject || data.name || 'Sendt Nyhetsbrev',
+                        date: data.sentAt || data.createdAt || '',
+                        type: 'newsletter',
+                        author: data.senderName || 'HKM Studio',
+                        excerpt: `Sendt til ${data.recipientCount || 0} mottakere. Klikk for å se eller gjenbruke som mal.`,
+                        coverImage: 'https://images.unsplash.com/photo-1557200134-90327ee9fafa?auto=format&fit=crop&w=400&q=80',
+                        blocks: data.blocks || [],
+                        subject: data.subject || ''
+                    });
+                });
+            } catch (e) {
+                console.error("Studio Feed - Failed to load campaigns:", e);
+            }
+
+            // Load saved newsletter drafts
+            let draftItems = [];
+            try {
+                const draftSnap = await window.firebaseService.db.collection('newsletter_templates').where('isDraft', '==', true).get();
+                draftSnap.forEach(doc => {
+                    const data = doc.data();
+                    draftItems.push({
+                        id: doc.id,
+                        title: data.name || 'Uten navn (Kladd)',
+                        date: data.createdAt || '',
+                        type: 'newsletter_draft',
+                        author: 'HKM Studio',
+                        excerpt: data.subject ? `Kladd · Emne: ${data.subject}` : 'Kladd under arbeid. Klikk for å fortsette redigeringen.',
+                        coverImage: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=400&q=80',
+                        blocks: data.blocks || [],
+                        subject: data.subject || ''
+                    });
+                });
+            } catch (e) {
+                console.error("Studio Feed - Failed to load drafts:", e);
+            }
+
+            // Combine and sort
+            this.studioFeedItems = [
+                ...blogItems,
+                ...teachingItems,
+                ...campaignItems,
+                ...draftItems
+            ];
+
+            this.studioFeedItems.sort((a, b) => {
+                const dateA = a.date ? new Date(a.date) : new Date(0);
+                const dateB = b.date ? new Date(b.date) : new Date(0);
+                return dateB - dateA;
+            });
+
+            // Find current active filter and render
+            const activeTab = tabsContainer?.querySelector('.studio-tab.active');
+            const currentFilter = activeTab ? activeTab.dataset.filter : 'all';
+            this.renderStudioFeedGrid(currentFilter);
+
+        } catch (error) {
+            console.error("Studio Feed - Load failed:", error);
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444; font-weight: 600;">
+                    <span class="material-symbols-outlined" style="font-size: 36px; display: block; margin-bottom: 8px;">error</span>
+                    Kunne ikke laste innholdsstrømmen. Prøv å laste siden på nytt.
+                </div>
+            `;
+        }
+    }
+
+    renderStudioFeedGrid(filter = 'all') {
+        const grid = document.getElementById('studio-content-feed-grid');
+        if (!grid) return;
+
+        const items = this.studioFeedItems || [];
+        
+        // Filter items
+        const filteredItems = items.filter(item => {
+            if (filter === 'all') return true;
+            if (filter === 'blog') return item.type === 'blog';
+            if (filter === 'teaching') return item.type === 'teaching';
+            if (filter === 'newsletter') return item.type === 'newsletter' || item.type === 'newsletter_draft';
+            return true;
+        });
+
+        if (filteredItems.length === 0) {
+            grid.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 64px 24px; color: #94a3b8; border: 2px dashed #e2e8f0; border-radius: 20px; background: white; box-sizing: border-box; width: 100%;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1; margin-bottom: 12px; display: block;">post_add</span>
+                    <h4 style="margin: 0 0 6px 0; font-size: 16px; font-weight: 700; color: #475569;">Ingen innhold funnet</h4>
+                    <p style="margin: 0; font-size: 13.5px; color: #64748b; font-weight: 500;">Det er ingen publiseringer i denne kategorien ennå.</p>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = '';
+        filteredItems.forEach(item => {
+            const card = document.createElement('div');
+            card.className = `studio-feed-card ${item.type}-type`;
+            
+            // Format date beautifully
+            let dateStr = 'Udatert';
+            if (item.date) {
+                try {
+                    const date = new Date(item.date);
+                    dateStr = date.toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' });
+                } catch (e) {}
+            }
+
+            // Badges details
+            let badgeText = 'Innhold';
+            let badgeIcon = 'article';
+            if (item.type === 'blog') {
+                badgeText = 'Blogg';
+                badgeIcon = 'edit_note';
+            } else if (item.type === 'teaching') {
+                badgeText = 'Undervisning';
+                badgeIcon = 'school';
+            } else if (item.type === 'newsletter') {
+                badgeText = 'Nyhetsbrev';
+                badgeIcon = 'campaign';
+            } else if (item.type === 'newsletter_draft') {
+                badgeText = 'Kladd';
+                badgeIcon = 'edit_document';
+            }
+
+            card.innerHTML = `
+                <div class="card-media">
+                    <span class="card-type-badge">
+                        <span class="material-symbols-outlined" style="font-size: 14px;">${badgeIcon}</span>
+                        ${badgeText}
+                    </span>
+                    <img src="${item.coverImage}" alt="${item.title}">
+                </div>
+                <div class="card-body">
+                    <h4 class="card-title">${item.title}</h4>
+                    <p class="card-excerpt">${item.excerpt}</p>
+                    <div class="card-footer">
+                        <div style="display: flex; gap: 12px; align-items: center;">
+                            <div class="card-meta-item">
+                                <span class="material-symbols-outlined">calendar_today</span>
+                                <span>${dateStr}</span>
+                            </div>
+                            <div class="card-meta-item">
+                                <span class="material-symbols-outlined">person</span>
+                                <span>${item.author}</span>
+                            </div>
+                        </div>
+                        <button class="card-edit-btn" id="edit-btn-${item.id}">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
+                            Rediger
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Click listener
+            card.querySelector(`#edit-btn-${item.id}`).onclick = (e) => {
+                e.stopPropagation();
+                this.editStudioItem(item);
+            };
+
+            grid.appendChild(card);
+        });
+    }
+
+    editStudioItem(item) {
+        if (item.type === 'blog' || item.type === 'teaching') {
+            const state = {
+                collectionId: item.type,
+                itemId: item.id,
+                savedAt: Date.now()
+            };
+            sessionStorage.setItem('hkm_admin_open_editor_state', JSON.stringify(state));
+            window.location.href = `/admin/index.html#${item.type}`;
+        } else if (item.type === 'newsletter_draft') {
+            this.loadDraftIntoBuilder(item.id, item.title, JSON.stringify(item.blocks), item.subject);
+        } else if (item.type === 'newsletter') {
+            this.loadTemplateIntoBuilder(item.id, item.title, JSON.stringify(item.blocks), item.subject);
+        }
+    }
+
+    createNewStudioItem(type) {
+        if (type === 'newsletter') {
+            this.blocks = [];
+            document.getElementById('newsletter-subject').value = '';
+            this.toggleMode('builder');
+            this.renderCanvas();
+        } else if (type === 'blog' || type === 'teaching') {
+            sessionStorage.setItem('hkm_admin_create_item_state', type);
+            window.location.href = `/admin/index.html#${type}`;
         }
     }
 
