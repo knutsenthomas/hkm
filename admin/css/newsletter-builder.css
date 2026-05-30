@@ -129,8 +129,8 @@ body.builder-active {
 
 .elements-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 8px;
     margin-bottom: 40px;
 }
 
@@ -1780,7 +1780,7 @@ input:checked+.slider:before {
     grid-column: span 2 !important;
     flex-direction: row !important;
     padding: 16px 24px !important; /* Multiples of 8 spacing */
-    gap: 12px !important;
+    gap: 8px !important;
 }
 
 /* For the half width cards (Magisk Tekst, AI Bilde) */
@@ -1846,8 +1846,8 @@ input:checked+.slider:before {
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-bottom: 12px;
-    padding-left: 4px;
+    margin-bottom: 8px;
+    padding-left: 8px;
 }
 
 .sidebar-category-header span.material-symbols-outlined {
@@ -1884,8 +1884,8 @@ input:checked+.slider:before {
     padding: 16px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: 12px !important;
-    margin-top: 12px !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
 }
 
 .chk-item {
@@ -1989,7 +1989,7 @@ input:checked+.slider:before {
     color: #ffffff !important;
     border: none !important;
     border-radius: var(--radius-md, 12px) !important;
-    padding: 12px 24px !important;
+    padding: 16px 24px !important;
     font-size: 14px !important;
     font-weight: 600 !important;
     display: flex !important;
