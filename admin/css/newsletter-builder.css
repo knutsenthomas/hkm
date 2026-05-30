@@ -2082,9 +2082,7 @@ input:checked+.slider:before {
 
 .prompt-header-title span.material-symbols-outlined {
     font-size: 20px !important;
-    background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent !important;
+    color: #1B4965 !important;
 }
 
 .prompt-header-title h3 {
@@ -2093,6 +2091,7 @@ input:checked+.slider:before {
     font-weight: 700 !important;
     color: #1e293b !important;
     margin: 0 !important;
+    line-height: 1.2 !important;
 }
 
 .prompt-close-btn {
@@ -2107,7 +2106,7 @@ input:checked+.slider:before {
 }
 
 .prompt-close-btn:hover {
-    color: #64748b !important;
+    color: #1B4965 !important;
 }
 
 .custom-prompt-body {
@@ -2121,6 +2120,7 @@ input:checked+.slider:before {
     font-size: 13px !important;
     font-weight: 600 !important;
     color: #475569 !important;
+    line-height: 1.5 !important;
 }
 
 .custom-prompt-body textarea {
@@ -2141,8 +2141,8 @@ input:checked+.slider:before {
 
 .custom-prompt-body textarea:focus {
     background: #ffffff !important;
-    border-color: #d17d39 !important;
-    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.15) !important;
+    border-color: #1B4965 !important;
+    box-shadow: 0 0 0 3px rgba(27, 73, 101, 0.15) !important;
 }
 
 .custom-prompt-footer {
@@ -2157,20 +2157,20 @@ input:checked+.slider:before {
 .prompt-btn {
     height: 40px !important;
     padding: 0 16px !important;
-    border-radius: 10px !important;
+    border-radius: 8px !important;
     font-size: 14px !important;
     font-weight: 600 !important;
     display: flex !important;
     align-items: center !important;
     gap: 8px !important;
     cursor: pointer !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all 0.3s ease !important;
     border: none !important;
     box-sizing: border-box !important;
 }
 
 .prompt-btn:hover {
-    transform: translateY(-1px) scale(1.02) !important;
+    transform: translateY(-2px) scale(1.05) !important;
 }
 
 .prompt-btn:active {
@@ -2189,19 +2189,45 @@ input:checked+.slider:before {
 }
 
 .prompt-btn.primary {
-    background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+    background: #1B4965 !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25) !important;
 }
 
 .prompt-btn.primary:hover {
-    box-shadow: 0 6px 16px rgba(124, 58, 237, 0.35) !important;
-    filter: brightness(1.08) !important;
+    background: #13354c !important;
+    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.35) !important;
 }
 
 .prompt-btn.primary span.material-symbols-outlined {
     font-size: 18px !important;
     color: #ffffff !important;
+}
+
+/* --- Mobile Landscape Guard --- */
+@media (orientation: landscape) and (max-height: 480px) {
+    .custom-prompt-container {
+        max-width: 560px !important;
+        transform: scale(0.9) translateY(0) !important;
+    }
+    .custom-prompt-header {
+        padding: 8px 16px !important;
+    }
+    .custom-prompt-body {
+        padding: 16px !important;
+        gap: 8px !important;
+    }
+    .custom-prompt-body textarea {
+        min-height: 64px !important;
+        padding: 8px 16px !important;
+    }
+    .custom-prompt-footer {
+        padding: 8px 16px !important;
+    }
+    .prompt-btn {
+        height: 32px !important;
+        font-size: 12px !important;
+    }
 }
 
 
