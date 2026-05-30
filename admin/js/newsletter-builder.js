@@ -1924,11 +1924,11 @@ class NewsletterBuilder {
                             </div>
                         </div>
                         <div style="display: flex !important; gap: 8px !important; align-items: center !important; flex-shrink: 0 !important;">
-                            <button class="card-delete-btn" id="delete-btn-${item.id}" title="Slett dette elementet" style="width: 32px !important; height: 32px !important; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important;">
-                                <span class="material-symbols-outlined" style="font-size: 18px !important;">delete</span>
+                            <button class="card-delete-btn" id="delete-btn-${item.id}" title="Slett dette elementet">
+                                <span class="material-symbols-outlined">delete</span>
                             </button>
-                            <button class="card-edit-btn" id="edit-btn-${item.id}" title="Rediger dette elementet" style="width: 32px !important; height: 32px !important; padding: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border-radius: 8px !important;">
-                                <span class="material-symbols-outlined" style="font-size: 18px !important;">edit</span>
+                            <button class="card-edit-btn" id="edit-btn-${item.id}" title="Rediger dette elementet">
+                                <span class="material-symbols-outlined">edit</span>
                             </button>
                         </div>
                     </div>

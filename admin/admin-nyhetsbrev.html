@@ -421,16 +421,17 @@
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             color: #475569;
-            padding: 6px 12px;
-            font-size: 12.5px;
-            font-weight: 700;
+            width: 32px !important;
+            height: 32px !important;
+            padding: 0 !important;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             font-family: 'Inter', sans-serif;
+            box-sizing: border-box !important;
         }
         .studio-feed-card .card-edit-btn:hover {
             background: #1B4965;
@@ -445,16 +446,17 @@
             background: #fff5f5;
             border: 1px solid #fee2e2;
             color: #ef4444;
-            padding: 6px 12px;
-            font-size: 12.5px;
-            font-weight: 700;
+            width: 32px !important;
+            height: 32px !important;
+            padding: 0 !important;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 4px;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
             font-family: 'Inter', sans-serif;
+            box-sizing: border-box !important;
         }
         .studio-feed-card .card-delete-btn:hover {
             background: #ef4444;
@@ -464,6 +466,19 @@
         }
         .studio-feed-card .card-delete-btn:active {
             transform: scale(0.97);
+        }
+        .studio-feed-card .card-edit-btn span,
+        .studio-feed-card .card-delete-btn span {
+            font-size: 18px !important;
+            line-height: 1 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            height: 18px !important;
+            width: 18px !important;
+            text-align: center !important;
         }
     </style>
 </head>
