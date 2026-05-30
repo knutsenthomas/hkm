@@ -62,7 +62,9 @@ class NewsletterBuilder {
         this.totalUsers = 0;
         this.subscribersCount = 0;
 
+        this.currentMode = 'dashboard';
         this.init();
+        this.setupDashboardEvents();
     }
 
 
@@ -132,11 +134,16 @@ class NewsletterBuilder {
     async init() {
         console.log("Nyhetsbrevbygger Initializing...");
 
+        // Hide builder and show dashboard at the start
+        this.toggleMode('dashboard');
+
         // Wait for Firebase to be ready with a small retry loop
         const waitForFirebase = setInterval(() => {
             if (window.firebaseService && window.firebaseService.isInitialized) {
                 clearInterval(waitForFirebase);
                 this.startAuthListener();
+                this.loadAiSuggestions();
+                this.loadDashboardData();
             }
         }, 100);
 
@@ -1505,12 +1512,428 @@ class NewsletterBuilder {
                 container.appendChild(div);
             });
             
-            if (count === 0) {
-                container.innerHTML = '<p class="empty-state-text">Ingen kladder lagret ennå</p>';
-            }
         } catch (e) {
             console.error("Load drafts failed:", e);
         }
+    }
+
+    toggleMode(mode) {
+        this.currentMode = mode;
+        const dashboard = document.getElementById('newsletter-dashboard-layout');
+        const builder = document.getElementById('newsletter-builder-layout');
+        
+        if (mode === 'builder') {
+            if (dashboard) dashboard.style.display = 'none';
+            if (builder) builder.style.display = 'block';
+            document.body.classList.add('builder-active');
+        } else {
+            if (dashboard) dashboard.style.display = 'block';
+            if (builder) builder.style.display = 'none';
+            document.body.classList.remove('builder-active');
+            this.loadDashboardData();
+        }
+    }
+
+    setupDashboardEvents() {
+        setTimeout(() => {
+            const openEmptyBtn = document.getElementById('open-empty-builder-btn');
+            if (openEmptyBtn) {
+                openEmptyBtn.onclick = () => {
+                    this.blocks = [];
+                    document.getElementById('newsletter-subject').value = '';
+                    this.toggleMode('builder');
+                    this.renderCanvas();
+                };
+            }
+            
+            const generateBtn = document.getElementById('generate-ai-ideas-btn');
+            if (generateBtn) {
+                generateBtn.onclick = () => this.generateAiSuggestions();
+            }
+        }, 500);
+    }
+
+    async loadDashboardData() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        try {
+            const draftsContainer = document.getElementById('dashboard-drafts-list');
+            const templatesContainer = document.getElementById('dashboard-templates-list');
+            const draftsCountEl = document.getElementById('dashboard-drafts-count');
+            
+            if (!draftsContainer || !templatesContainer) return;
+            
+            const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
+            
+            let draftsHtml = '';
+            let templatesHtml = '';
+            let draftsCount = 0;
+            
+            snap.forEach(doc => {
+                const data = doc.data();
+                const id = doc.id;
+                const formattedDate = new Date(data.createdAt).toLocaleDateString();
+                
+                if (data.isDraft === true) {
+                    draftsCount++;
+                    draftsHtml += `
+                        <div class="template-item card" style="padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; background: white; margin-bottom: 8px; box-sizing: border-box;" 
+                            onclick="window.builder.loadDraftIntoBuilder('${id}', '${data.name.replace(/'/g, "\\'")}', \`${JSON.stringify(data.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${(data.subject || '').replace(/'/g, "\\'")}')"
+                            onmouseover="this.style.borderColor='var(--accent-color)'; this.style.transform='translateY(-2px)'" 
+                            onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="font-weight:600; font-size:14.5px; color:#1e293b;">${data.name}</div>
+                                    <div style="font-size:12px; color:#64748b; margin-top:4px;">${formattedDate} · Emne: ${data.subject || 'Ingen'}</div>
+                                </div>
+                                <span class="material-symbols-outlined" style="font-size:20px; color:#ea580c;">edit</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    templatesHtml += `
+                        <div class="template-item card" style="padding: 16px; border: 1px solid #e2e8f0; border-radius: 12px; cursor: pointer; transition: all 0.2s ease; background: white; margin-bottom: 8px; box-sizing: border-box;"
+                            onclick="window.builder.loadTemplateIntoBuilder('${id}', '${data.name.replace(/'/g, "\\'")}', \`${JSON.stringify(data.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${(data.subject || '').replace(/'/g, "\\'")}')"
+                            onmouseover="this.style.borderColor='#6366f1'; this.style.transform='translateY(-2px)'"
+                            onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'">
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <div>
+                                    <div style="font-weight:600; font-size:14.5px; color:#1e293b;">${data.name}</div>
+                                    <div style="font-size:12px; color:#64748b; margin-top:4px;">Opprettet ${formattedDate}</div>
+                                </div>
+                                <span class="material-symbols-outlined" style="font-size:20px; color:#4338ca;">arrow_forward</span>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (draftsCountEl) draftsCountEl.textContent = `${draftsCount} kladder`;
+            
+            draftsContainer.innerHTML = draftsHtml || '<p class="empty-state-text" style="color:#94a3b8; font-size:13px; text-align:center; padding:32px 0; margin:0;">Ingen kladder lagret ennå</p>';
+            templatesContainer.innerHTML = templatesHtml || '<p class="empty-state-text" style="color:#94a3b8; font-size:13px; text-align:center; padding:32px 0; margin:0;">Ingen maler lagret ennå</p>';
+            
+        } catch (e) {
+            console.error("Load dashboard data failed:", e);
+        }
+    }
+
+    loadDraftIntoBuilder(id, name, blocksStr, subject) {
+        if (confirm(`Last inn kladden "${name}"? Dette vil erstatte innholdet i editoren.`)) {
+            try {
+                this.blocks = JSON.parse(blocksStr);
+                document.getElementById('newsletter-subject').value = subject || '';
+                this.toggleMode('builder');
+                this.renderCanvas();
+                showToast(`Kladden "${name}" er lastet inn.`, "info");
+            } catch (e) {
+                console.error("Failed to parse blocks:", e);
+                showToast("Kunne ikke laste inn kladd pga. formatfeil.", "error");
+            }
+        }
+    }
+
+    loadTemplateIntoBuilder(id, name, blocksStr, subject) {
+        if (confirm(`Last inn malen "${name}"?`)) {
+            try {
+                this.blocks = JSON.parse(blocksStr);
+                document.getElementById('newsletter-subject').value = subject || '';
+                this.toggleMode('builder');
+                this.renderCanvas();
+                showToast(`Malen "${name}" er lastet inn.`, "info");
+            } catch (e) {
+                console.error("Failed to parse blocks:", e);
+                showToast("Kunne ikke laste inn mal pga. formatfeil.", "error");
+            }
+        }
+    }
+
+    async generateAiSuggestions() {
+        const loadingContainer = document.getElementById('ai-loading-container');
+        const loadingStatus = document.getElementById('ai-loading-status');
+        const loadingProgress = document.getElementById('ai-loading-progress');
+        const generateBtn = document.getElementById('generate-ai-ideas-btn');
+        
+        if (generateBtn) generateBtn.disabled = true;
+        if (loadingContainer) loadingContainer.style.display = 'block';
+        
+        const updateStep = (progress, statusText) => {
+            if (loadingProgress) loadingProgress.style.width = `${progress}%`;
+            if (loadingStatus) loadingStatus.textContent = statusText;
+        };
+
+        try {
+            updateStep(15, "Henter kristne nyheter og samfunnsaktualiteter...");
+            await new Promise(r => setTimeout(r, 1200));
+            
+            updateStep(40, "Analyserer HKMs nettside og sosiale medier...");
+            await new Promise(r => setTimeout(r, 1200));
+            
+            updateStep(70, "Genererer kreative vinklinger for nyhetsbrev, blogg og undervisning...");
+            
+            const prompt = `
+                Du er en inspirerende og strategisk innholdsrådgiver og teolog for His Kingdom Ministry (HKM).
+                Generer tre konkrete, dype og inspirerende ideer/utkast for den kommende uken basert på:
+                - Aktuelle kristne nyheter og happenings i Norge og globalt (f.eks. misjonsarbeid, kirkevekst, konferanser, kristent samfunnsansvar).
+                - HKMs podcast-profil, bibelstudier og ønske om å fremme Guds rike.
+                - Sesongen (Pinse/Pentecost, sommerforberedelser, kristent samfunnsliv).
+
+                Du må levere nøyaktig 3 ideer:
+                1. Ett Nyhetsbrev (newsletter) til abonnenter.
+                2. Ett Blogginnlegg (blog) til nettsiden.
+                3. Ett Undervisningstema (teaching) til bibelstudier/kurs.
+
+                Krav til Nyhetsbrev (newsletter):
+                - 'title': En fengende emnelinje.
+                - 'rationale': Hvorfor dette er svært aktuelt akkurat nå (knyttet til nyheter/sosiale medier).
+                - 'summary': En kort beskrivelse av e-postens formål.
+                - 'blocks': Array av nyhetsbrev-blokker. Hver blokk må ha:
+                  - 'type': Enten 'title', 'text', 'spacer', 'button' eller 'image'.
+                  - 'content': { 'text': '...' } for title/text, { 'text': '...', 'url': '...' } for button, { 'url': '...' } for image. For 'image' kan du bruke: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&w=800&q=80' eller tilsvarende bibelsk/kristent naturmotiv.
+
+                Krav til Blogginnlegg (blog):
+                - 'title': En engasjerende, nysgjerrigskapende tittel.
+                - 'rationale': Begrunnelse knyttet til aktuelle samfunnstrender eller kristne nyheter.
+                - 'verses': Relevante bibelvers (f.eks. "Matteus 28:19" eller "Romerne 12:2").
+                - 'outline': En array med 3-4 kulepunkter som viser seksjonene i bloggen.
+                - 'promptText': Tema-prompten vi skal sende til blogg-generatoren når brukeren klikker "Opprett".
+
+                Krav til Undervisning (teaching):
+                - 'title': En dyp, bibelsk og lærerik tittel.
+                - 'rationale': Hvorfor dette temaet trengs akkurat nå.
+                - 'verses': Viktige skriftsteder.
+                - 'outline': Array med 3-4 kulepunkter/leksjoner.
+                - 'promptText': Tema-prompten vi skal sende til undervisnings-generatoren.
+
+                Format: Returner KUN gyldig JSON på dette formatet:
+                {
+                  "newsletter": { "title": "...", "rationale": "...", "summary": "...", "blocks": [ ... ] },
+                  "blog": { "title": "...", "rationale": "...", "verses": "...", "outline": [ "..." ], "promptText": "..." },
+                  "teaching": { "title": "...", "rationale": "...", "verses": "...", "outline": [ "..." ], "promptText": "..." }
+                }
+                Svar kun med rå JSON.
+            `;
+
+            updateStep(85, "Ferdigstiller og tilpasser forslag til HKMs profil...");
+            const callable = firebase.functions().httpsCallable('aiProcess');
+            const response = await callable({ prompt: prompt });
+            
+            let data = null;
+            if (response.data && response.data.text) {
+                const jsonText = response.data.text.trim();
+                const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    data = JSON.parse(jsonMatch[0]);
+                } else {
+                    data = JSON.parse(jsonText);
+                }
+            } else {
+                throw new Error("Kunne ikke hente tekst fra AI-tjenesten.");
+            }
+
+            if (data) {
+                data.generatedAt = new Date().toISOString();
+                await window.firebaseService.db.collection('ai_suggestions').doc('latest').set(data);
+                this.renderAiSuggestions(data);
+                showToast("Nye AI-ideer generert og lagret!", "success");
+            } else {
+                throw new Error("Feil i JSON-strukturen fra AI.");
+            }
+
+        } catch (error) {
+            console.error("AI Generation failed:", error);
+            showToast(`Generering feilet: ${error.message || error}`, "error");
+        } finally {
+            if (generateBtn) generateBtn.disabled = false;
+            if (loadingContainer) loadingContainer.style.display = 'none';
+        }
+    }
+
+    async loadAiSuggestions() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        try {
+            const doc = await window.firebaseService.db.collection('ai_suggestions').doc('latest').get();
+            if (doc.exists) {
+                this.renderAiSuggestions(doc.data());
+            } else {
+                document.getElementById('ai-suggestions-view-area').style.display = 'none';
+            }
+        } catch (error) {
+            console.error("Load AI suggestions failed:", error);
+        }
+    }
+
+    renderAiSuggestions(data) {
+        const area = document.getElementById('ai-suggestions-view-area');
+        const grid = document.getElementById('ai-suggestions-grid');
+        const ts = document.getElementById('ai-suggestions-timestamp');
+        
+        if (!area || !grid) return;
+        
+        if (data.generatedAt) {
+            const date = new Date(data.generatedAt);
+            if (ts) ts.textContent = `Sist oppdatert: ${date.toLocaleDateString()} kl. ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}`;
+        }
+        
+        grid.innerHTML = '';
+        
+        // 1. Newsletter Card
+        const nl = data.newsletter;
+        if (nl) {
+            const card = document.createElement('div');
+            card.className = 'ai-suggestion-card newsletter-type';
+            const bulletItems = (nl.blocks || [])
+                .filter(b => b.type === 'title' || b.type === 'text')
+                .slice(0, 3)
+                .map(b => `<li>${b.content?.text?.replace(/<[^>]*>/g, '').substring(0, 60)}...</li>`)
+                .join('');
+
+            card.innerHTML = `
+                <div class="card-header-gradient"></div>
+                <div class="card-body-content">
+                    <span class="card-badge">Nyhetsbrev</span>
+                    <h5 class="suggestion-title">${nl.title || 'Uten tittel'}</h5>
+                    <div class="suggestion-rationale">
+                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">info</span>
+                        ${nl.rationale || 'Aktuelt tema'}
+                    </div>
+                    <p class="suggestion-summary">${nl.summary || ''}</p>
+                    <div class="section-divider"></div>
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Forslagsutkast</div>
+                    <ul class="suggestion-bullets">
+                        ${bulletItems || '<li>Innholder flere blokker</li>'}
+                    </ul>
+                    <div class="card-action-footer">
+                        <button class="btn" id="use-newsletter-suggestion-btn">
+                            <span class="material-symbols-outlined">mark_email_unread</span> Opprett og åpne kladd
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            card.querySelector('#use-newsletter-suggestion-btn').onclick = () => {
+                this.useNewsletterSuggestion(nl);
+            };
+            grid.appendChild(card);
+        }
+        
+        // 2. Blog Card
+        const bl = data.blog;
+        if (bl) {
+            const card = document.createElement('div');
+            card.className = 'ai-suggestion-card blog-type';
+            const outlineItems = (bl.outline || []).map(o => `<li>${o}</li>`).join('');
+            card.innerHTML = `
+                <div class="card-header-gradient"></div>
+                <div class="card-body-content">
+                    <span class="card-badge">Blogginnlegg</span>
+                    <h5 class="suggestion-title">${bl.title || 'Uten tittel'}</h5>
+                    <div class="suggestion-rationale">
+                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">info</span>
+                        ${bl.rationale || 'Aktuelt tema'}
+                    </div>
+                    <div style="font-size: 13px; font-weight: 600; color: #0d9488; margin-bottom: 12px; display: flex; align-items: center; gap: 4px;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">book</span> ${bl.verses || ''}
+                    </div>
+                    <div class="section-divider"></div>
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Blogg-disposisjon</div>
+                    <ul class="suggestion-bullets">
+                        ${outlineItems}
+                    </ul>
+                    <div class="card-action-footer">
+                        <button class="btn" id="use-blog-suggestion-btn">
+                            <span class="material-symbols-outlined">edit_document</span> Opprett bloggutkast
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            card.querySelector('#use-blog-suggestion-btn').onclick = () => {
+                this.useBlogSuggestion(bl);
+            };
+            grid.appendChild(card);
+        }
+        
+        // 3. Teaching Card
+        const te = data.teaching;
+        if (te) {
+            const card = document.createElement('div');
+            card.className = 'ai-suggestion-card teaching-type';
+            const outlineItems = (te.outline || []).map(o => `<li>${o}</li>`).join('');
+            card.innerHTML = `
+                <div class="card-header-gradient"></div>
+                <div class="card-body-content">
+                    <span class="card-badge">Undervisning</span>
+                    <h5 class="suggestion-title">${te.title || 'Uten tittel'}</h5>
+                    <div class="suggestion-rationale">
+                        <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">info</span>
+                        ${te.rationale || 'Aktuelt tema'}
+                    </div>
+                    <div style="font-size: 13px; font-weight: 600; color: #0369a1; margin-bottom: 12px; display: flex; align-items: center; gap: 4px;">
+                        <span class="material-symbols-outlined" style="font-size: 16px;">school</span> ${te.verses || ''}
+                    </div>
+                    <div class="section-divider"></div>
+                    <div style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; margin-bottom: 8px;">Leksjonsplan</div>
+                    <ul class="suggestion-bullets">
+                        ${outlineItems}
+                    </ul>
+                    <div class="card-action-footer">
+                        <button class="btn" id="use-teaching-suggestion-btn">
+                            <span class="material-symbols-outlined">school</span> Opprett undervisning
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            card.querySelector('#use-teaching-suggestion-btn').onclick = () => {
+                this.useTeachingSuggestion(te);
+            };
+            grid.appendChild(card);
+        }
+        
+        area.style.display = 'block';
+    }
+
+    async useNewsletterSuggestion(nl) {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        try {
+            const data = {
+                name: `AI-forslag: ${nl.title}`,
+                blocks: nl.blocks || [],
+                subject: nl.title || '',
+                createdAt: new Date().toISOString(),
+                isDraft: true
+            };
+            const docRef = await window.firebaseService.db.collection('newsletter_templates').add(data);
+            showToast("AI-kladd opprettet!", "success");
+            
+            this.blocks = data.blocks;
+            document.getElementById('newsletter-subject').value = data.subject;
+            this.toggleMode('builder');
+            this.renderCanvas();
+        } catch (e) {
+            console.error("Save AI draft failed:", e);
+            showToast("Kunne ikke opprette kladd.", "error");
+        }
+    }
+
+    useBlogSuggestion(bl) {
+        const payload = {
+            type: 'blog',
+            title: bl.title,
+            prompt: bl.promptText || bl.title
+        };
+        sessionStorage.setItem('pendingAiDraft', JSON.stringify(payload));
+        window.location.href = '/admin/index.html#blog';
+    }
+    
+    useTeachingSuggestion(te) {
+        const payload = {
+            type: 'teaching',
+            title: te.title,
+            prompt: te.promptText || te.title
+        };
+        sessionStorage.setItem('pendingAiDraft', JSON.stringify(payload));
+        window.location.href = '/admin/index.html#teaching';
     }
 }
 

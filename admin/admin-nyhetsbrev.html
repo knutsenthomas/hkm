@@ -54,7 +54,189 @@
     <link rel="apple-touch-icon" href="/img/logo-hkm.png">
     <script type="module" src="js/admin-pwa.js?v=20260520_PWA2"></script>
 
-    <link rel="icon" type="image/png" href="/img/logo-hkm.png">
+    <!-- Premium CSS for Newsletter Dashboard & AI Suggestions -->
+    <style>
+        .newsletter-dashboard-layout {
+            padding: 32px 40px;
+            background: #f8fafc;
+            min-height: calc(100vh - 100px);
+            animation: dashboardFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+            width: 100%;
+        }
+        @keyframes dashboardFadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulseGlow {
+            0% { transform: scale(0.95); opacity: 0.6; box-shadow: 0 0 4px rgba(99, 102, 241, 0.3); }
+            50% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 16px rgba(99, 102, 241, 0.7); }
+            100% { transform: scale(0.95); opacity: 0.6; box-shadow: 0 0 4px rgba(99, 102, 241, 0.3); }
+        }
+        .ai-suggestion-card {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            box-sizing: border-box;
+        }
+        .ai-suggestion-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            border-color: rgba(99, 102, 241, 0.3);
+        }
+        .ai-suggestion-card .card-header-gradient {
+            height: 8px;
+            width: 100%;
+        }
+        .ai-suggestion-card.newsletter-type .card-header-gradient {
+            background: linear-gradient(90deg, #6366f1 0%, #4f46e5 100%);
+        }
+        .ai-suggestion-card.blog-type .card-header-gradient {
+            background: linear-gradient(90deg, #0f766e 0%, #0d9488 100%);
+        }
+        .ai-suggestion-card.teaching-type .card-header-gradient {
+            background: linear-gradient(90deg, #1b4965 0%, #1e3a8a 100%);
+        }
+        .ai-suggestion-card .card-body-content {
+            padding: 24px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+        .ai-suggestion-card .card-badge {
+            align-self: flex-start;
+            padding: 5px 12px;
+            border-radius: 99px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 14px;
+        }
+        .ai-suggestion-card.newsletter-type .card-badge {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        .ai-suggestion-card.blog-type .card-badge {
+            background: #ccfbf1;
+            color: #0f766e;
+        }
+        .ai-suggestion-card.teaching-type .card-badge {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .ai-suggestion-card .suggestion-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 19px;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0 0 10px 0;
+            line-height: 1.35;
+        }
+        .ai-suggestion-card .suggestion-rationale {
+            background: #f8fafc;
+            border-left: 3px solid #6366f1;
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 12.5px;
+            color: #475569;
+            font-style: italic;
+            margin-bottom: 16px;
+            line-height: 1.45;
+        }
+        .ai-suggestion-card.blog-type .suggestion-rationale {
+            border-left-color: #0d9488;
+        }
+        .ai-suggestion-card.teaching-type .suggestion-rationale {
+            border-left-color: #1b4965;
+        }
+        .ai-suggestion-card .suggestion-summary {
+            font-size: 13.5px;
+            color: #475569;
+            line-height: 1.55;
+            margin-bottom: 16px;
+        }
+        .ai-suggestion-card .section-divider {
+            height: 1px;
+            background: #f1f5f9;
+            margin: 16px 0;
+        }
+        .ai-suggestion-card .suggestion-bullets {
+            margin: 0 0 20px 0;
+            padding-left: 20px;
+            font-size: 13px;
+            color: #475569;
+            line-height: 1.65;
+        }
+        .ai-suggestion-card .suggestion-bullets li {
+            margin-bottom: 8px;
+        }
+        .ai-suggestion-card .card-action-footer {
+            margin-top: auto;
+            width: 100%;
+        }
+        .ai-suggestion-card .card-action-footer button {
+            width: 100%;
+            padding: 12px 16px;
+            font-size: 13.5px;
+            font-weight: 700;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .ai-suggestion-card.newsletter-type .card-action-footer button {
+            background: #6366f1;
+            color: white;
+            border: none;
+        }
+        .ai-suggestion-card.newsletter-type .card-action-footer button:hover {
+            background: #4f46e5;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.35);
+        }
+        .ai-suggestion-card.blog-type .card-action-footer button {
+            background: #0d9488;
+            color: white;
+            border: none;
+        }
+        .ai-suggestion-card.blog-type .card-action-footer button:hover {
+            background: #0f766e;
+            box-shadow: 0 4px 12px rgba(13,148,136,0.35);
+        }
+        .ai-suggestion-card.teaching-type .card-action-footer button {
+            background: #1b4965;
+            color: white;
+            border: none;
+        }
+        .ai-suggestion-card.teaching-type .card-action-footer button:hover {
+            background: #123144;
+            box-shadow: 0 4px 12px rgba(27,73,101,0.35);
+        }
+
+        /* Adjustments for builder elements when builder is inactive */
+        body:not(.builder-active) .builder-tools-backdrop,
+        body:not(.builder-active) #builder-tools-fab-container,
+        body:not(.builder-active) #builder-tools-fab {
+            display: none !important;
+        }
+
+        /* Responsive spacing additions */
+        @media (max-width: 768px) {
+            .newsletter-dashboard-layout {
+                padding: 20px 24px;
+            }
+        }
+    </style>
 </head>
 
 <body class="builder-active">
@@ -133,7 +315,100 @@
             </nav>
         </aside>
 
-        <div class="builder-main-layout">
+        <!-- Modus-svitsj: Dashboard (Standard) -->
+        <div id="newsletter-dashboard-layout" class="newsletter-dashboard-layout" style="display: block;">
+            <div class="dashboard-header-container" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; width: 100%; box-sizing: border-box;">
+                <div class="dashboard-header-left">
+                    <h2 class="dashboard-main-title" style="font-family: 'Outfit', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">E-post & Kommunikasjon</h2>
+                    <p class="dashboard-main-subtitle" style="font-size: 15px; color: #64748b; margin: 0; font-weight: 500;">Administrer nyhetsbrev, utforsk AI-ideer og opprett nye kampanjer.</p>
+                </div>
+                <div class="dashboard-header-right">
+                    <button id="open-empty-builder-btn" class="btn btn-primary primary-gradient-btn" style="background: var(--accent-gradient, linear-gradient(135deg, #f97316 0%, #ff8854 100%)); border: none; padding: 14px 28px; font-weight: 700; border-radius: 12px; display: flex; align-items: center; gap: 10px; color: white; cursor: pointer; font-family: 'Inter', sans-serif; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3); transition: all 0.3s ease;">
+                        <span class="material-symbols-outlined" style="font-size: 22px;">add</span> Opprett nytt nyhetsbrev
+                    </button>
+                </div>
+            </div>
+
+            <!-- AI Inspiration Banner / Showpiece Seksjon -->
+            <div class="card ai-inspirasjon-hero" style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: white; padding: 32px; border-radius: 24px; border: 1px solid rgba(99, 102, 241, 0.2); position: relative; overflow: hidden; margin-bottom: 32px; box-shadow: 0 10px 30px rgba(99, 102, 241, 0.15); box-sizing: border-box; width: 100%;">
+                <div class="glow-orb" style="position: absolute; top: -50px; right: -50px; width: 250px; height: 250px; border-radius: 50%; background: radial-gradient(circle, rgba(99, 102, 241, 0.4) 0%, rgba(99, 102, 241, 0) 70%); filter: blur(20px); pointer-events: none;"></div>
+                <div class="glow-orb-2" style="position: absolute; bottom: -80px; left: -80px; width: 300px; height: 300px; border-radius: 50%; background: radial-gradient(circle, rgba(209, 125, 57, 0.2) 0%, rgba(209, 125, 57, 0) 70%); filter: blur(30px); pointer-events: none;"></div>
+                
+                <div style="position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 24px; box-sizing: border-box; width: 100%;">
+                    <div style="max-width: 650px; flex: 1; min-width: 280px;">
+                        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; padding: 6px 14px; border-radius: 99px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 16px;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">auto_awesome</span> AI Inspirasjon & Idé-generator
+                        </div>
+                        <h3 style="font-size: 28px; font-weight: 800; margin: 0 0 10px 0; color: white; font-family: 'Outfit', sans-serif; letter-spacing: -0.02em;">Klar for å engasjere menigheten og leserne?</h3>
+                        <p style="color: #94a3b8; font-size: 15px; line-height: 1.6; margin: 0; font-weight: 500;">
+                            Vår intelligente AI analyserer kristne nyheter i Norge, HKMs nyeste podcaster, sosiale medier og nettside for å skreddersy konkrete forslag til nyhetsbrev, blogginnlegg og bibelundervisning.
+                        </p>
+                    </div>
+                    <div style="flex-shrink: 0; min-width: 200px;">
+                        <button id="generate-ai-ideas-btn" class="btn" style="background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: white; border: none; padding: 14px 28px; font-weight: 700; border-radius: 14px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4); width: 100%; justify-content: center; box-sizing: border-box;">
+                            <span class="material-symbols-outlined">auto_awesome</span> Generer ukens ideer
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Lasting / Generering overlay -->
+                <div id="ai-loading-container" style="display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.1); width: 100%; box-sizing: border-box;">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 16px;">
+                        <div class="ai-pulse-loader" style="width: 24px; height: 24px; border-radius: 50%; background: #6366f1; box-shadow: 0 0 12px #6366f1; animation: pulseGlow 1.5s infinite ease-in-out;"></div>
+                        <div id="ai-loading-status" style="font-weight: 600; color: white; font-size: 14px;">Henter kristne nyheter og samfunnsaktualiteter...</div>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; box-sizing: border-box;">
+                        <div id="ai-loading-progress" style="width: 10%; height: 100%; background: linear-gradient(90deg, #6366f1 0%, #d17d39 100%); transition: width 0.4s ease; border-radius: 3px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI suggestions content area -->
+            <div id="ai-suggestions-view-area" style="display: none; margin-bottom: 40px; box-sizing: border-box; width: 100%;">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; width: 100%; box-sizing: border-box;">
+                    <h4 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0; display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined" style="color: #6366f1;">lightbulb</span> Aktuelle forslag tilpasset HKM
+                    </h4>
+                    <span id="ai-suggestions-timestamp" style="font-size: 12px; color: #64748b; font-weight: 600;">Sist oppdatert: --</span>
+                </div>
+                <div id="ai-suggestions-grid" class="ai-suggestions-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; box-sizing: border-box; width: 100%;">
+                    <!-- Suggested cards loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Templates and drafts grid -->
+            <div class="dashboard-grid-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 40px; box-sizing: border-box; width: 100%;">
+                <!-- Column 1: Kladder (Drafts) -->
+                <div class="card modern dashboard-card-column" style="background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); box-sizing: border-box; width: 100%; min-height: 250px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 16px; box-sizing: border-box;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined" style="color: #f97316;">edit_document</span> Mine kladder (Utsendelser)
+                        </h4>
+                        <span class="badge" style="background: #fff7ed; color: #ea580c; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600;" id="dashboard-drafts-count">0 kladder</span>
+                    </div>
+                    <div id="dashboard-drafts-list" style="display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; flex: 1;">
+                        <p class="empty-state-text" style="color: #94a3b8; font-size: 13px; text-align: center; padding: 32px 0; margin: 0;">Laster kladder...</p>
+                    </div>
+                </div>
+
+                <!-- Column 2: Standard maler & oppsett -->
+                <div class="card modern dashboard-card-column" style="background: white; border-radius: 20px; border: 1px solid #e2e8f0; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); box-sizing: border-box; width: 100%; min-height: 250px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 16px; margin-bottom: 16px; box-sizing: border-box;">
+                        <h4 style="margin: 0; font-size: 16px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
+                            <span class="material-symbols-outlined" style="color: #6366f1;">auto_awesome_motion</span> Standard maler & oppsett
+                        </h4>
+                        <span class="badge" style="background: #e0e7ff; color: #4338ca; padding: 4px 10px; border-radius: 99px; font-size: 12px; font-weight: 600;">Standard</span>
+                    </div>
+                    <div id="dashboard-templates-list" style="display: flex; flex-direction: column; gap: 12px; box-sizing: border-box; flex: 1;">
+                        <p class="empty-state-text" style="color: #94a3b8; font-size: 13px; text-align: center; padding: 32px 0; margin: 0;">Laster maler...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modus-svitsj: Builder -->
+        <div id="newsletter-builder-layout" style="display: none; width: 100%;">
+            <div class="builder-main-layout">
             <!-- 2. Sidebar: High-fidelity elements and templates column -->
             <aside class="builder-elements-sidebar-v2">
                 <!-- Header (like mock) -->
@@ -533,7 +808,8 @@
                 </div>
             </div>
         </aside>
-    </div>
+            </div> <!-- Close builder-main-layout -->
+        </div> <!-- Close newsletter-builder-layout -->
 
     <div id="builder-tools-backdrop" class="builder-tools-backdrop"></div>
     <div class="fab-menu-container" id="builder-tools-fab-container">

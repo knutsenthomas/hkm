@@ -2399,6 +2399,57 @@ class AdminManager {
                     break;
             }
         }
+        
+        // Check for pending AI Drafts
+        this._checkPendingAiDrafts(sectionId);
+    }
+
+    async _checkPendingAiDrafts(sectionId) {
+        try {
+            const raw = sessionStorage.getItem('pendingAiDraft');
+            if (!raw) return;
+            const parsed = JSON.parse(raw);
+            if (!parsed || parsed.type !== sectionId) return; // Not for this section
+            
+            // Clear immediately to prevent infinite triggers!
+            sessionStorage.removeItem('pendingAiDraft');
+            
+            this.showToast(`Oppretter AI-utkast for "${parsed.title}"...`, 'info', 4000);
+            
+            // Call the AI Process to generate the draft
+            const callable = firebase.functions().httpsCallable('aiProcess');
+            const response = await callable({
+                task: 'generate_blog_draft',
+                prompt: parsed.prompt,
+                options: { type: sectionId === 'teaching' ? 'undervisning' : 'blogginnlegg' }
+            });
+            
+            const data = response.data;
+            if (data && data.blocks && Array.isArray(data.blocks)) {
+                // Prepopulate the local list and open the editor!
+                const newItem = {
+                    id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+                    title: parsed.title,
+                    date: new Date().toISOString().split('T')[0],
+                    content: data // The editor directly accepts the object containing blocks
+                };
+                
+                if (!this._collectionItemsCache[sectionId]) this._collectionItemsCache[sectionId] = [];
+                this._collectionItemsCache[sectionId].unshift(newItem);
+                this.currentItems = this._collectionItemsCache[sectionId];
+                
+                // Immediately open the editor for this item
+                this.showToast(`Åpner AI-utkast! Klikk 'Lagre' når du er fornøyd.`, 'success', 5000);
+                setTimeout(() => {
+                    this.editCollectionItem(sectionId, 0);
+                }, 400);
+            } else {
+                throw new Error("Feil format på AI-svar.");
+            }
+        } catch (error) {
+            console.error("Failed to process pending AI draft:", error);
+            this.showToast(`Kunne ikke generere AI-utkast: ${error.message || error}`, 'error', 5000);
+        }
     }
 
     async loadAllUsers() {
