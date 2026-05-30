@@ -790,12 +790,72 @@ class CRMManager {
             });
             if (!ok) return;
 
-            await this.importContactsBatch(contacts);
+            // Åpne fremdriftsvisning i modalen
+            this.openCrmToolDialog({
+                mode: 'custom-html',
+                title: 'Importerer kontakter',
+                subtitle: `Vennligst vent mens kontaktene lagres i databasen.`,
+                confirmLabel: 'Fullfør',
+                showCancel: false,
+                html: `
+                    <div style="padding: 16px 0;">
+                        <div style="display: flex; justify-content: space-between; font-size: 14px; color: #475569; margin-bottom: 8px; font-weight: 500;">
+                            <span id="import-progress-status">Forbereder import...</span>
+                            <span id="import-progress-percent">0%</span>
+                        </div>
+                        <div style="width: 100%; height: 12px; background: #e2e8f0; border-radius: 6px; overflow: hidden; margin-bottom: 12px; position: relative;">
+                            <div id="import-progress-bar" style="width: 0%; height: 100%; background: linear-gradient(135deg, #1B4965 0%, #3b82f6 100%); transition: width 0.3s ease; border-radius: 6px;"></div>
+                        </div>
+                        <p id="import-progress-details" style="font-size: 12px; color: #64748b; margin: 0; line-height: 1.5;">
+                            Importerer 0 av ${contacts.length} kontakter...
+                        </p>
+                    </div>
+                `,
+                onConfirm: async () => true
+            });
+
+            // Deaktiver modal lukk-knapper under import for å forhindre avbrudd
+            const confirmBtn = document.getElementById('crm-tool-modal-confirm');
+            if (confirmBtn) confirmBtn.style.display = 'none';
+            const closeBtns = document.querySelectorAll('[data-crm-tool-close], .close-modal');
+            closeBtns.forEach(btn => {
+                if (btn instanceof HTMLButtonElement || btn instanceof HTMLSpanElement) {
+                    btn.style.pointerEvents = 'none';
+                    btn.style.opacity = '0.5';
+                }
+            });
+
+            // Kjør batch-import med live oppdatering
+            await this.importContactsBatch(contacts, (percentage, current, total) => {
+                const bar = document.getElementById('import-progress-bar');
+                const percent = document.getElementById('import-progress-percent');
+                const status = document.getElementById('import-progress-status');
+                const details = document.getElementById('import-progress-details');
+
+                if (bar) bar.style.width = `${percentage}%`;
+                if (percent) percent.textContent = `${percentage}%`;
+                if (status) status.textContent = percentage === 100 ? 'Fullført!' : 'Importerer...';
+                if (details) details.textContent = `Lagret ${current} av ${total} kontakter (${percentage}%).`;
+            });
+
             await this.loadContacts();
             this.notify(`Importerte ${contacts.length} kontakter.`);
+
+            // Reaktiver lukk-knapper slik at brukeren kan fullføre
+            if (confirmBtn) {
+                confirmBtn.style.display = 'inline-flex';
+                confirmBtn.textContent = 'Fullfør';
+            }
+            closeBtns.forEach(btn => {
+                if (btn instanceof HTMLButtonElement || btn instanceof HTMLSpanElement) {
+                    btn.style.pointerEvents = 'auto';
+                    btn.style.opacity = '1';
+                }
+            });
         } catch (error) {
             console.error('CSV import failed:', error);
             this.notify(`CSV-import feilet: ${error.message}`, 'error');
+            this.closeCrmToolDialog();
         } finally {
             event.target.value = '';
         }
@@ -908,12 +968,14 @@ class CRMManager {
         };
     }
 
-    async importContactsBatch(contacts) {
+    async importContactsBatch(contacts, onProgress) {
         const db = window.firebaseService?.db;
         if (!db) throw new Error('Firebase er ikke klar');
 
-        const chunkSize = 300;
-        for (let i = 0; i < contacts.length; i += chunkSize) {
+        const chunkSize = 100; // Mindre chunkSize for hyppigere progresjonsoppdatering
+        const total = contacts.length;
+
+        for (let i = 0; i < total; i += chunkSize) {
             const chunk = contacts.slice(i, i + chunkSize);
             const batch = db.batch();
             chunk.forEach((contact) => {
@@ -927,6 +989,12 @@ class CRMManager {
                 }, { merge: true });
             });
             await batch.commit();
+
+            const current = Math.min(i + chunk.length, total);
+            const percentage = Math.round((current / total) * 100);
+            if (typeof onProgress === 'function') {
+                onProgress(percentage, current, total);
+            }
         }
     }
 
@@ -1097,6 +1165,64 @@ class CRMManager {
             return;
         }
         console.log(`[CRM ${type}] ${message}`);
+
+        // Robust fallback: Oppretter en nydelig, animert toast i grensesnittet
+        let container = document.getElementById('crm-toast-container');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'crm-toast-container';
+            container.style.cssText = `
+                position: fixed;
+                bottom: 24px;
+                right: 24px;
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                pointer-events: none;
+            `;
+            document.body.appendChild(container);
+        }
+
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            padding: 12px 20px;
+            border-radius: 8px;
+            background: ${type === 'error' ? '#ef4444' : type === 'warning' ? '#f97316' : '#10b981'};
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        `;
+        
+        const icon = type === 'error' ? 'error' : type === 'warning' ? 'warning' : 'check_circle';
+        toast.innerHTML = `
+            <span class="material-symbols-outlined" style="font-size: 18px;">${icon}</span>
+            <span>${this.escapeHtml(message)}</span>
+        `;
+
+        container.appendChild(toast);
+
+        // Trigger animasjon inn
+        requestAnimationFrame(() => {
+            toast.style.transform = 'translateY(0)';
+            toast.style.opacity = '1';
+        });
+
+        // Fjern etter 4 sekunder
+        setTimeout(() => {
+            toast.style.transform = 'translateY(-20px)';
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
     }
 
     escapeHtml(value) {
