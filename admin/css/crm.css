@@ -28,8 +28,7 @@ body.crm-body {
     display: flex;
     flex-direction: column;
     min-width: 0;
-    height: 100vh;
-    overflow: hidden;
+    min-height: 100vh;
 }
 
 
@@ -235,7 +234,6 @@ body.crm-body {
 .crm-content {
     padding: var(--admin-spacing-lg) 0;
     flex: 1;
-    overflow-y: auto;
 }
 
 .content-header {
