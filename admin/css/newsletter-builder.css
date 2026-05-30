@@ -2545,7 +2545,7 @@ input:checked+.slider:before {
     border-radius: 8px !important;
     padding: 0 16px !important;
     height: 40px !important;
-    width: 200px !important; /* Optimized default width */
+    width: 280px !important; /* Restore spacious width for subject */
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
     flex-shrink: 0 !important; /* Prevent input field from collapsing to 0px width */
@@ -2581,6 +2581,9 @@ input:checked+.slider:before {
     display: flex !important;
     align-items: center !important;
     flex-shrink: 0 !important; /* Prevent toggles group from squishing */
+    position: absolute !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
 }
 
 .builder-unified-header .device-toggles-modern {
@@ -2627,6 +2630,7 @@ input:checked+.slider:before {
     align-items: center !important;
     gap: 16px !important;
     flex-shrink: 0 !important; /* Prevent buttons from being pushed off the screen */
+    margin-left: auto !important; /* Push actions to the far right */
 }
 
 .builder-unified-header .header-action-btn {
@@ -2738,7 +2742,7 @@ body.builder-active .builder-workspace > .main-header {
         display: none !important; /* Hide name/role text under 1400px window width due to double sidebar space constraint */
     }
     .builder-unified-header .header-subject-container {
-        width: 160px !important;
+        width: 200px !important;
     }
     .builder-unified-header .header-subtitle {
         display: none !important; /* Hide subtitle to conserve space */
