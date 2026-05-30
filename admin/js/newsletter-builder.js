@@ -2163,11 +2163,27 @@ class NewsletterBuilder {
     loadDraftIntoBuilder(id, name, blocksStr, subject) {
         if (confirm(`Last inn kladden "${name}"? Dette vil erstatte innholdet i editoren.`)) {
             try {
+                this.currentDraftId = id;
+                this.currentDraftName = name;
                 this.blocks = JSON.parse(blocksStr);
                 document.getElementById('newsletter-subject').value = subject || '';
                 this.toggleMode('builder');
                 this.renderCanvas();
                 showToast(`Kladden "${name}" er lastet inn.`, "info");
+                
+                // Set autosave status indicator to Saved
+                const statusEl = document.getElementById('newsletter-autosave-status');
+                const textEl = document.getElementById('newsletter-autosave-text');
+                if (statusEl && textEl) {
+                    statusEl.style.opacity = '0.7';
+                    textEl.innerHTML = 'Kladder synkronisert';
+                    const icon = statusEl.querySelector('.material-symbols-outlined');
+                    if (icon) {
+                        icon.style.color = '#10b981'; // Green
+                        icon.innerHTML = 'cloud_done';
+                        icon.style.animation = 'none';
+                    }
+                }
             } catch (e) {
                 console.error("Failed to parse blocks:", e);
                 showToast("Kunne ikke laste inn kladd pga. formatfeil.", "error");
