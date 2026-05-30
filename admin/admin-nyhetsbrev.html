@@ -57,12 +57,13 @@
     <!-- Premium CSS for Newsletter Dashboard & AI Suggestions -->
     <style>
         .newsletter-dashboard-layout {
+            margin-left: 280px;
+            width: calc(100% - 280px);
             padding: 32px 40px;
             background: #f8fafc;
             min-height: calc(100vh - 100px);
             animation: dashboardFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             box-sizing: border-box;
-            width: 100%;
         }
         @keyframes dashboardFadeIn {
             from { opacity: 0; transform: translateY(12px); }
@@ -231,8 +232,10 @@
         }
 
         /* Responsive spacing additions */
-        @media (max-width: 768px) {
+        @media (max-width: 991px) {
             .newsletter-dashboard-layout {
+                margin-left: 0 !important;
+                width: 100% !important;
                 padding: 20px 24px;
             }
         }
