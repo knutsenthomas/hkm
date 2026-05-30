@@ -4741,18 +4741,21 @@ body.minside-body .nav-category-header {
   letter-spacing: 1px !important;
   display: flex !important;
   align-items: center !important;
-  justify-content: space-between !important;
+  justify-content: flex-start !important;
+  gap: 6px !important;
   cursor: pointer !important;
   user-select: none !important;
 }
 
 body.admin-body .nav-category-header .expand-icon,
 body.minside-body .nav-category-header .expand-icon {
-  display: inline-block !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   width: 16px !important;
   height: 16px !important;
   font-size: 16px !important;
-  line-height: 16px !important;
+  line-height: 1 !important;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   transform-origin: center center !important;
   pointer-events: none !important;
