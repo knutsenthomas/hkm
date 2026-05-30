@@ -2952,6 +2952,7 @@ body.builder-active.sidebar-collapsed .sidebar {
     border-bottom: 1px solid #e2e8f0 !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     padding: 8px 24px !important; /* Spacing matching 8px grid rules */
+    justify-content: center !important; /* Centered toolbar items */
 }
 
 /* Premium typography rules for the single-surface editor (Matches Blog & Teaching) */
