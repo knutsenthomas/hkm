@@ -16143,7 +16143,7 @@ class AdminManager {
                                                                                                     </div>
                                                                                                     <div style="position: relative; width: 240px; margin-left: auto;">
                                                                                                         <span class="material-symbols-outlined" style="position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 18px; pointer-events: none;">search</span>
-                                                                                                        <input type="text" id="user-search-input" class="form-control" placeholder="Søk etter brukere..." style="padding-left: 36px; height: 32px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; outline: none; transition: all 0.2s ease;">
+                                                                                                        <input type="text" id="user-search-input" class="form-control" placeholder="Søk etter brukere..." style="padding: 8px 12px 8px 36px !important; height: 32px; font-size: 12px; border-radius: 6px; border: 1px solid #cbd5e1; width: 100%; outline: none; transition: all 0.2s ease;">
                                                                                                     </div>
                                                                                                 </div>
                                                                                                 <div class="design-ui-panel-body p-0" id="users-list-container" style="padding: 0;">
