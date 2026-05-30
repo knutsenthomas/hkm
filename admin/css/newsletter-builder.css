@@ -2889,8 +2889,9 @@ body.builder-active .builder-workspace > .main-header {
 }
 
 @media (max-width: 1100px) {
-    .builder-unified-header .header-subject-container {
-        display: none !important; /* Hide subject completely on narrow widths */
+    .builder-unified-header .header-subject-container,
+    .builder-unified-header #newsletter-autosave-status {
+        display: none !important; /* Hide subject and autosave status completely on narrow widths */
     }
 }
 

@@ -866,6 +866,12 @@
                             <span class="material-symbols-outlined subject-icon">edit_note</span>
                             <input type="text" id="newsletter-subject" placeholder="Skriv inn e-postemne..." class="subject-input-modern">
                         </div>
+
+                        <!-- Premium Autolagring statusindikator -->
+                        <div id="newsletter-autosave-status" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #64748b; margin-left: 12px; transition: opacity 0.3s ease; opacity: 0.8; flex-shrink: 0;">
+                            <span class="material-symbols-outlined" style="font-size: 18px; color: #10b981;">cloud_done</span>
+                            <span id="newsletter-autosave-text">Lagret i skyen</span>
+                        </div>
                     </div>
                     
                     <div class="header-center">
@@ -884,11 +890,6 @@
                     </div>
                     
                     <div class="header-actions">
-                        <!-- Premium Autolagring statusindikator -->
-                        <div id="newsletter-autosave-status" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #64748b; margin-right: 16px; transition: opacity 0.3s ease; opacity: 0.8;">
-                            <span class="material-symbols-outlined" style="font-size: 18px; color: #10b981;">cloud_done</span>
-                            <span id="newsletter-autosave-text">Lagret i skyen</span>
-                        </div>
 
                         <button id="save-draft-btn" class="header-action-btn secondary-flat" style="margin-right: 8px;">
                             <span class="material-symbols-outlined">edit_document</span>
