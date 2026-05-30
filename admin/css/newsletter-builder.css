@@ -2512,6 +2512,7 @@ input:checked+.slider:before {
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;
+    flex-shrink: 0 !important; /* Prevent title and menu button from squishing */
 }
 
 .builder-unified-header .header-title-group {
@@ -2547,6 +2548,7 @@ input:checked+.slider:before {
     width: 200px !important; /* Optimized default width */
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
+    flex-shrink: 0 !important; /* Prevent input field from collapsing to 0px width */
 }
 
 .builder-unified-header .header-subject-container:focus-within {
@@ -2578,6 +2580,7 @@ input:checked+.slider:before {
 .builder-unified-header .header-center {
     display: flex !important;
     align-items: center !important;
+    flex-shrink: 0 !important; /* Prevent toggles group from squishing */
 }
 
 .builder-unified-header .device-toggles-modern {
@@ -2623,6 +2626,7 @@ input:checked+.slider:before {
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;
+    flex-shrink: 0 !important; /* Prevent buttons from being pushed off the screen */
 }
 
 .builder-unified-header .header-action-btn {
