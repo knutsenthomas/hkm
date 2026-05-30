@@ -136,53 +136,85 @@
             <!-- 2. Sidebar: Elements Grid -->
             <aside class="builder-elements-sidebar-v2">
                 <div class="sidebar-header-modern">
-                    <h2>Elementer</h2>
+                    <h2>Innhold & Design</h2>
                 </div>
 
-                <div class="elements-grid">
-                    <button class="element-card" data-type="header">
-                        <span class="material-symbols-outlined">title</span>
-                        <span class="element-label">Overskrift</span>
-                    </button>
-                    <button class="element-card" data-type="text">
-                        <span class="material-symbols-outlined">notes</span>
-                        <span class="element-label">Tekst</span>
-                    </button>
-                    <button class="element-card" data-type="image">
-                        <span class="material-symbols-outlined">image</span>
-                        <span class="element-label">Bilde</span>
-                    </button>
-                    <button class="element-card" data-type="button">
-                        <span class="material-symbols-outlined">smart_button</span>
-                        <span class="element-label">Knapp</span>
-                    </button>
-                    <button class="element-card" data-type="video">
-                        <span class="material-symbols-outlined">smart_display</span>
-                        <span class="element-label">Video</span>
-                    </button>
-                    <button class="element-card" data-type="columns">
-                        <span class="material-symbols-outlined">view_column</span>
-                        <span class="element-label">Kolonner</span>
-                    </button>
-                    <button class="element-card" data-type="social">
-                        <span class="material-symbols-outlined">public</span>
-                        <span class="element-label">Sosiale medier</span>
-                    </button>
-                    <button class="element-card" data-type="divider">
-                        <span class="material-symbols-outlined">horizontal_rule</span>
-                        <span class="element-label">Skillelinje</span>
-                    </button>
-                    <button class="element-card" data-type="spacer" style="grid-column: span 1;">
-                        <span class="material-symbols-outlined">space_bar</span>
-                        <span class="element-label">Avstand</span>
-                    </button>
+                <!-- Kategori 1: Tekst og innhold -->
+                <div class="sidebar-category-group">
+                    <div class="sidebar-category-header">
+                        <span class="material-symbols-outlined">edit_note</span>
+                        <span>Tekst & Innhold</span>
+                    </div>
+                    <div class="elements-grid">
+                        <button class="element-card" data-type="header">
+                            <span class="material-symbols-outlined">title</span>
+                            <span class="element-label">Overskrift</span>
+                        </button>
+                        <button class="element-card" data-type="text">
+                            <span class="material-symbols-outlined">notes</span>
+                            <span class="element-label">Tekstfelt</span>
+                        </button>
+                        <button class="element-card" data-type="columns">
+                            <span class="material-symbols-outlined">view_column</span>
+                            <span class="element-label">Kolonner</span>
+                        </button>
+                    </div>
                 </div>
 
-                <div class="templates-section-modern" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
-                    <h3 style="display: flex; align-items: center; gap: 8px; color: #1e293b;">
-                        <span class="material-symbols-outlined" style="font-size: 20px;">auto_awesome</span>
-                        AI Verktøy
-                    </h3>
+                <!-- Kategori 2: Medier & Handling -->
+                <div class="sidebar-category-group">
+                    <div class="sidebar-category-header">
+                        <span class="material-symbols-outlined">photo_library</span>
+                        <span>Medier & Handling</span>
+                    </div>
+                    <div class="elements-grid">
+                        <button class="element-card" data-type="image">
+                            <span class="material-symbols-outlined">image</span>
+                            <span class="element-label">Bilde</span>
+                        </button>
+                        <button class="element-card" data-type="video">
+                            <span class="material-symbols-outlined">smart_display</span>
+                            <span class="element-label">Video</span>
+                        </button>
+                        <button class="element-card" data-type="button">
+                            <span class="material-symbols-outlined">smart_button</span>
+                            <span class="element-label">Knapp</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kategori 3: Struktur & Profil -->
+                <div class="sidebar-category-group">
+                    <div class="sidebar-category-header">
+                        <span class="material-symbols-outlined">layers</span>
+                        <span>Struktur & Profil</span>
+                    </div>
+                    <div class="elements-grid">
+                        <button class="element-card" data-type="logo">
+                            <span class="material-symbols-outlined">featured_seasonal_and_gifts</span>
+                            <span class="element-label">Logo</span>
+                        </button>
+                        <button class="element-card" data-type="social">
+                            <span class="material-symbols-outlined">public</span>
+                            <span class="element-label">Sosiale</span>
+                        </button>
+                        <button class="element-card" data-type="divider">
+                            <span class="material-symbols-outlined">horizontal_rule</span>
+                            <span class="element-label">Skillelinje</span>
+                        </button>
+                        <button class="element-card" data-type="spacer">
+                            <span class="material-symbols-outlined">space_bar</span>
+                            <span class="element-label">Avstand</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Kategori 4: Magisk AI -->
+                <div class="sidebar-category-group last-group">
+                    <div class="sidebar-category-header">
+                        <span class="material-symbols-outlined purple-icon">auto_awesome</span>
+                        <span class="purple-text">Magisk AI Verktøy</span>
+                    </div>
                     <div class="elements-grid" style="margin-top: 12px; grid-template-columns: 1fr 1fr;">
                         <button class="element-card ai-tool-card purple-gradient full-width" onclick="builder.buildWithAi()" style="margin-bottom: 8px;">
                             <span class="material-symbols-outlined">magic_button</span>
@@ -199,7 +231,33 @@
                     </div>
                 </div>
 
-                <div class="templates-section-modern">
+                <!-- Leveringskvalitet (Deliverability Checklist) -->
+                <div class="templates-section-modern" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
+                    <h3 style="display: flex; align-items: center; gap: 8px; color: #1e293b; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700;">
+                        <span class="material-symbols-outlined" style="font-size: 20px; color: var(--accent-orange);">verified_user</span>
+                        Leveringssjekk
+                    </h3>
+                    <div class="deliverability-card">
+                        <div class="chk-item">
+                            <span class="material-symbols-outlined chk-success">check_circle</span>
+                            <span>E-postserver i Norge (GDPR-sikker)</span>
+                        </div>
+                        <div class="chk-item">
+                            <span class="material-symbols-outlined chk-success">check_circle</span>
+                            <span>Avsenderdomene godkjent (SPF/DKIM)</span>
+                        </div>
+                        <div class="chk-item">
+                            <span class="material-symbols-outlined chk-success">check_circle</span>
+                            <span>Responsivt mobilformat verifisert</span>
+                        </div>
+                        <div class="chk-item" id="chk-test-email">
+                            <span class="material-symbols-outlined chk-warning" id="chk-test-icon">pending</span>
+                            <span id="chk-test-text">Test-epost ikke sendt ennå</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="templates-section-modern" style="margin-top: 24px; border-top: 1px solid #f1f5f9; padding-top: 24px;">
                     <h3>Mine maler</h3>
                     <p class="empty-state-text">Ingen maler lagret ennå</p>
                 </div>
@@ -511,7 +569,7 @@
     <script type="module" src="../js/notifications.js"></script>
     <script type="module" src="../js/admin-utils.js"></script>
     <script type="module" src="js/admin-header.js?v=2026.05.08.G1"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260508_G1"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260530_magicfix"></script>
 </body>
 
 </html>

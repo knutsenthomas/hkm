@@ -792,8 +792,17 @@ class NewsletterBuilder {
         if (this.blocks.length === 0) {
             container.innerHTML = `
                 <div class="empty-canvas-msg">
-                    <span class="material-symbols-outlined">add_circle</span>
-                    <p>Legg til blokker her for å starte designet ditt</p>
+                    <div class="empty-canvas-card">
+                        <div class="empty-canvas-icon-glow">
+                            <span class="material-symbols-outlined pulsing-icon">auto_awesome</span>
+                        </div>
+                        <h3>Start ditt magiske nyhetsbrev</h3>
+                        <p>Dra eller klikk på elementene i menyen til venstre, eller la vår kunstige intelligens bygge en skreddersydd struktur for deg på sekunder.</p>
+                        <button class="empty-canvas-cta" onclick="builder.buildWithAi()">
+                            <span class="material-symbols-outlined">magic_button</span>
+                            <span>Magisk Oppsett (AI)</span>
+                        </button>
+                    </div>
                 </div>
             `;
             return;
@@ -996,6 +1005,15 @@ class NewsletterBuilder {
         // Simulate success
         setTimeout(() => {
             showToast("Test-e-post er sendt!", "success");
+            
+            // Update checklist item in sidebar
+            const testIcon = document.getElementById('chk-test-icon');
+            const testText = document.getElementById('chk-test-text');
+            if (testIcon && testText) {
+                testIcon.innerText = 'check_circle';
+                testIcon.className = 'material-symbols-outlined chk-success';
+                testText.innerText = 'Test-epost bekreftet sendt';
+            }
         }, 1000);
     }
 
