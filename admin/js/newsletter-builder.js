@@ -140,6 +140,7 @@ class NewsletterBuilder {
         }, 100);
 
         this.setupEventListeners();
+        this.setupRichTextToolbar();
         this.applyBackgrounds();
         this.renderCanvas();
     }
@@ -320,6 +321,137 @@ class NewsletterBuilder {
         const imageInput = document.getElementById('block-image-upload');
         if (imageInput) {
             imageInput.addEventListener('change', (e) => this.handleImageFileSelect(e));
+        }
+    }
+
+    setupRichTextToolbar() {
+        const toolbar = document.getElementById('desktop-richtools');
+        if (!toolbar) return;
+
+        // Selection range cache
+        let savedRange = null;
+
+        const saveSelection = () => {
+            const sel = window.getSelection();
+            if (sel.rangeCount > 0) {
+                savedRange = sel.getRangeAt(0);
+            }
+        };
+
+        const restoreSelection = () => {
+            if (savedRange) {
+                const sel = window.getSelection();
+                sel.removeAllRanges();
+                sel.addRange(savedRange);
+            }
+        };
+
+        const exec = (command, value = null) => {
+            restoreSelection();
+            document.execCommand(command, false, value);
+            
+            // Dispatch input event to sync model
+            const activeEl = document.activeElement;
+            if (activeEl && activeEl.getAttribute('contenteditable') === 'true') {
+                const event = new Event('input', { bubbles: true });
+                activeEl.dispatchEvent(event);
+            }
+        };
+
+        // Click Handler (Event Delegation)
+        toolbar.addEventListener('click', (e) => {
+            const btn = e.target.closest('.desktop-richtools-btn');
+            if (!btn) return;
+
+            const tool = btn.getAttribute('data-tool');
+            if (!tool) return;
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Simple click feedback
+            btn.style.transform = 'scale(0.95)';
+            setTimeout(() => btn.style.transform = '', 100);
+
+            switch (tool) {
+                case 'undo':
+                    exec('undo');
+                    break;
+                case 'redo':
+                    exec('redo');
+                    break;
+                case 'bold':
+                    exec('bold');
+                    break;
+                case 'italic':
+                    exec('italic');
+                    break;
+                case 'underline':
+                    exec('underline');
+                    break;
+                case 'strike':
+                    exec('strikeThrough');
+                    break;
+                case 'removeFormat':
+                    exec('removeFormat');
+                    break;
+                case 'justifyLeft':
+                    exec('justifyLeft');
+                    break;
+                case 'justifyCenter':
+                    exec('justifyCenter');
+                    break;
+                case 'justifyRight':
+                    exec('justifyRight');
+                    break;
+                case 'justifyFull':
+                    exec('justifyFull');
+                    break;
+                case 'list':
+                    exec('insertUnorderedList');
+                    break;
+                case 'orderedList':
+                    exec('insertOrderedList');
+                    break;
+                case 'link':
+                    const url = prompt('Skriv inn URL:', 'https://');
+                    if (url) {
+                        exec('createLink', url);
+                    }
+                    break;
+                case 'textColor':
+                    const textInput = toolbar.querySelector('[data-color-input="text"]');
+                    if (textInput) textInput.click();
+                    break;
+                case 'highlightColor':
+                    const hlInput = toolbar.querySelector('[data-color-input="highlight"]');
+                    if (hlInput) hlInput.click();
+                    break;
+            }
+        });
+
+        // Prevent focus loss on mousedown
+        toolbar.querySelectorAll('.desktop-richtools-btn').forEach(btn => {
+            btn.addEventListener('mousedown', (e) => {
+                saveSelection();
+                e.preventDefault();
+                e.stopPropagation();
+            });
+        });
+
+        // Color input listeners
+        const textColorInput = toolbar.querySelector('[data-color-input="text"]');
+        if (textColorInput) {
+            textColorInput.addEventListener('input', (e) => {
+                exec('foreColor', e.target.value);
+            });
+        }
+
+        const highlightColorInput = toolbar.querySelector('[data-color-input="highlight"]');
+        if (highlightColorInput) {
+            highlightColorInput.addEventListener('input', (e) => {
+                exec('backColor', e.target.value);
+            });
         }
     }
 
@@ -969,7 +1101,7 @@ class NewsletterBuilder {
 
             // Sync Edits
             blockEl.querySelectorAll('[contenteditable="true"]').forEach(editable => {
-                editable.addEventListener('blur', () => {
+                const sync = () => {
                     if (block.type === 'columns') {
                         const colIdx = editable.dataset.col;
                         block.content.cols[colIdx].text = editable.innerHTML;
@@ -978,7 +1110,9 @@ class NewsletterBuilder {
                     } else {
                         block.content.text = editable.innerHTML;
                     }
-                });
+                };
+                editable.addEventListener('blur', sync);
+                editable.addEventListener('input', sync);
             });
 
             container.appendChild(blockEl);

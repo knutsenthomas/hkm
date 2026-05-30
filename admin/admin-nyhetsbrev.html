@@ -16,7 +16,7 @@
     <!-- CSS -->
     <link rel="stylesheet" href="css/dashboard.css?v=20260521_dotfix">
     <link rel="stylesheet" href="../css/notifications.css?v=1.18">
-    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260530_aifix18">
+    <link rel="stylesheet" href="css/newsletter-builder.css?v=20260530_aifix19">
     <link rel="stylesheet" href="css/admin-unified.css?v=20260509_G46">
 
     <!-- Firebase SDK (Compat) -->
@@ -311,6 +311,71 @@
                     </div>
                 </header>
 
+                <!-- Docs-style Rich Text Toolbar (Aligned with Blog & Teaching) -->
+                <div class="desktop-richtools docs-toolbar" id="desktop-richtools" style="position: sticky; top: 0; z-index: 100;">
+                    <div class="docs-toolbar-group">
+                        <button type="button" class="desktop-richtools-btn" data-tool="undo" title="Angre">
+                            <span class="material-symbols-outlined">undo</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="redo" title="Gjør om">
+                            <span class="material-symbols-outlined">redo</span>
+                        </button>
+                    </div>
+                    <div class="docs-toolbar-divider"></div>
+                    <div class="docs-toolbar-group">
+                        <button type="button" class="desktop-richtools-btn" data-tool="bold" title="Fet">
+                            <span class="material-symbols-outlined">format_bold</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="italic" title="Kursiv">
+                            <span class="material-symbols-outlined">format_italic</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="underline" title="Understreket">
+                            <span class="material-symbols-outlined">format_underlined</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="strike" title="Gjennomstreket">
+                            <span class="material-symbols-outlined">format_strikethrough</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="link" title="Lenke">
+                            <span class="material-symbols-outlined">link</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="removeFormat" title="Fjern formatering">
+                            <span class="material-symbols-outlined">format_clear</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="textColor" title="Tekstfarge">
+                            <span class="material-symbols-outlined">format_color_text</span>
+                        </button>
+                        <input type="color" class="docs-color-input" data-color-input="text" value="#1e293b" title="Velg tekstfarge" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" aria-hidden="true">
+                        <button type="button" class="desktop-richtools-btn" data-tool="highlightColor" title="Fremhevingsfarge">
+                            <span class="material-symbols-outlined">format_color_fill</span>
+                        </button>
+                        <input type="color" class="docs-color-input" data-color-input="highlight" value="#fde68a" title="Velg fremhevingsfarge" style="position:absolute; opacity:0; pointer-events:none; width:1px; height:1px;" aria-hidden="true">
+                    </div>
+                    <div class="docs-toolbar-divider"></div>
+                    <div class="docs-toolbar-group">
+                        <button type="button" class="desktop-richtools-btn" data-tool="justifyLeft" title="Venstrejuster">
+                            <span class="material-symbols-outlined">format_align_left</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="justifyCenter" title="Sentrer">
+                            <span class="material-symbols-outlined">format_align_center</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="justifyRight" title="Høyrejuster">
+                            <span class="material-symbols-outlined">format_align_right</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="justifyFull" title="Blokkjuster">
+                            <span class="material-symbols-outlined">format_align_justify</span>
+                        </button>
+                    </div>
+                    <div class="docs-toolbar-divider"></div>
+                    <div class="docs-toolbar-group">
+                        <button type="button" class="desktop-richtools-btn" data-tool="list" title="Punktliste">
+                            <span class="material-symbols-outlined">format_list_bulleted</span>
+                        </button>
+                        <button type="button" class="desktop-richtools-btn" data-tool="orderedList" title="Nummerert liste">
+                            <span class="material-symbols-outlined">format_list_numbered</span>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="canvas-container" id="canvas-container">
                 <div class="canvas-scaler" id="canvas-scaler">
                     <div class="newsletter-canvas" id="newsletter-canvas">
@@ -574,7 +639,7 @@
     <script type="module" src="../js/notifications.js"></script>
     <script type="module" src="../js/admin-utils.js"></script>
     <script type="module" src="js/admin-header.js?v=2026.05.30.G2"></script>
-    <script type="module" src="js/newsletter-builder.js?v=20260530_magicfix"></script>
+    <script type="module" src="js/newsletter-builder.js?v=20260530_aifix19"></script>
 </body>
 
 </html>

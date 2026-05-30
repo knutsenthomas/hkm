@@ -660,19 +660,19 @@ body.builder-active .builder-workspace > .canvas-container {
     max-width: 375px;
 }
 
-/* The Newsletter "Paper" */
+/* The Newsletter "Paper" - Google Docs Style */
 .newsletter-canvas {
-    background: #ffffff;
-    min-height: 1000px;
+    background: #ffffff !important;
+    min-height: 1000px !important;
     box-shadow: 
-        0 0 1px rgba(0,0,0,0.1),
-        0 10px 40px -10px rgba(0,0,0,0.1),
-        0 20px 25px -5px rgba(0,0,0,0.04);
-    border-radius: 4px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    flex-direction: column;
+        0 4px 16px rgba(0, 0, 0, 0.06), 
+        0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid #cbd5e1 !important; /* Fine-tuned premium page border */
+    border-radius: 0px !important; /* Google Docs style sharp A4 corners */
+    overflow: hidden !important;
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
 }
 
 .canvas-header {
@@ -740,6 +740,25 @@ body.builder-active .builder-workspace > .canvas-container {
     border: 2px solid transparent;
     transition: all 0.2s;
     cursor: pointer;
+}
+
+/* Google Docs Style seamless text editing overrides */
+[contenteditable="true"] {
+    outline: none !important;
+}
+
+[contenteditable="true"]:focus {
+    outline: none !important;
+}
+
+.newsletter-block:focus-within {
+    border-color: transparent !important;
+    background: transparent !important;
+    cursor: text !important;
+}
+
+.newsletter-block:focus-within .block-controls {
+    display: none !important;
 }
 
 .newsletter-block:hover {
@@ -2923,3 +2942,15 @@ body.builder-active.sidebar-collapsed .sidebar {
     pointer-events: none !important;
     transform: translateX(-100%) !important;
 }
+
+/* Premium sticky styling for Nyhetsbrev docs toolbar (Aligned with Blog & Teaching) */
+.builder-workspace > .docs-toolbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background: #ffffff !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
+    padding: 8px 24px !important; /* Spacing matching 8px grid rules */
+}
+
