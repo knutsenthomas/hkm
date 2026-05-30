@@ -2544,7 +2544,7 @@ input:checked+.slider:before {
     border-radius: 8px !important;
     padding: 0 16px !important;
     height: 40px !important;
-    width: 280px !important;
+    width: 200px !important; /* Optimized default width */
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
 }
@@ -2729,18 +2729,21 @@ body.builder-active .builder-workspace > .main-header {
 }
 
 /* Mobile Responsiveness for Unified Header */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
     .builder-unified-header .user-info-compact {
-        display: none !important;
+        display: none !important; /* Hide name/role text under 1400px window width due to double sidebar space constraint */
     }
     .builder-unified-header .header-subject-container {
-        width: 180px !important;
+        width: 160px !important;
+    }
+    .builder-unified-header .header-subtitle {
+        display: none !important; /* Hide subtitle to conserve space */
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
     .builder-unified-header .header-subject-container {
-        display: none !important; /* Hide subject in topbar to fit other actions */
+        display: none !important; /* Hide subject completely on narrow widths */
     }
 }
 
