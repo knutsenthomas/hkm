@@ -763,20 +763,50 @@ class CRMManager {
     }
 
     async handleCsvImport(event) {
-        const file = event?.target?.files?.[0];
-        if (!file) return;
-
+        console.log("CRM: handleCsvImport started");
+        
         try {
-            const text = await file.text();
+            const file = event?.target?.files?.[0];
+            if (!file) {
+                console.log("CRM: No file in event target");
+                return;
+            }
+            
+            console.log(`CRM: File selected: Name="${file.name}", Size=${file.size} bytes, Type="${file.type}"`);
+            this.notify(`Leser fil: ${file.name}...`, 'info');
+
+            let text;
+            try {
+                text = await file.text();
+                console.log(`CRM: Successfully read file text, length: ${text.length} chars`);
+            } catch (readError) {
+                console.error("CRM: Error reading file text via file.text():", readError);
+                // Prøv FileReader som fallback hvis file.text() feiler
+                text = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.onerror = (e) => reject(new Error("Kunne ikke lese filen med FileReader"));
+                    reader.readAsText(file);
+                });
+            }
+
             const rows = this.parseCsv(text);
+            console.log(`CRM: Parsed CSV rows: ${rows.length}`);
+            
             if (!rows.length) {
+                console.warn("CRM: No rows parsed from file");
                 this.notify('Fant ingen rader i CSV-filen.', 'error');
+                alert('Fant ingen rader i CSV-filen. Sjekk at filen ikke er tom.');
                 return;
             }
 
             const contacts = rows.map((row) => this.mapCsvRowToContact(row)).filter(Boolean);
+            console.log(`CRM: Mapped contacts count: ${contacts.length}`);
+            
             if (!contacts.length) {
-                this.notify('Ingen gyldige kontakter i CSV. Krever minst e-post og navn.', 'error');
+                console.warn("CRM: No contacts successfully mapped. Sample row:", rows[0]);
+                this.notify('Ingen gyldige kontakter funnet. Krever e-post.', 'error');
+                alert('Ingen gyldige kontakter funnet i CSV-filen.\n\nSjekk at filen har en kolonne for e-post (eller epost, e-postadresse, email).\n\nForste rad i filen din:\n' + JSON.stringify(rows[0]));
                 return;
             }
 
@@ -788,6 +818,7 @@ class CRMManager {
                 confirmVariant: 'primary',
                 cancelLabel: 'Avbryt'
             });
+            console.log("CRM: Confirm dialog resolved with:", ok);
             if (!ok) return;
 
             // Åpne fremdriftsvisning i modalen
@@ -854,10 +885,15 @@ class CRMManager {
             });
         } catch (error) {
             console.error('CSV import failed:', error);
+            alert(`Det oppstod en feil under CSV-importen: ${error.message}`);
             this.notify(`CSV-import feilet: ${error.message}`, 'error');
-            this.closeCrmToolDialog();
+            try {
+                this.closeCrmToolDialog();
+            } catch (_) {}
         } finally {
-            event.target.value = '';
+            if (event?.target) {
+                event.target.value = '';
+            }
         }
     }
 
