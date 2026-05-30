@@ -966,7 +966,15 @@ class CRMManager {
             const normalizedKeys = keys.map(k => String(k || '').trim().toLowerCase().replace(/[\s\-_]/g, ''));
             const entry = Object.entries(row).find(([k]) => {
                 const normalizedK = String(k || '').trim().toLowerCase().replace(/[\s\-_]/g, '');
-                return normalizedKeys.includes(normalizedK);
+                return normalizedKeys.some(nk => {
+                    if (normalizedK === nk) return true;
+                    // Håndter kolonner som slutter med tall (f.eks. "E-post 1" -> "epost1" matches av "epost")
+                    if (normalizedK.startsWith(nk)) {
+                        const remainder = normalizedK.slice(nk.length);
+                        if (/^\d+$/.test(remainder)) return true;
+                    }
+                    return false;
+                });
             });
             return entry ? String(entry[1] ?? '').trim() : '';
         };
@@ -974,8 +982,27 @@ class CRMManager {
         const firstName = get('firstname', 'fornavn', 'first');
         const lastName = get('lastname', 'etternavn', 'last');
         const displayName = get('displayname', 'name', 'navn', 'fullname', 'fulltnavn') || `${firstName} ${lastName}`.trim();
-        const email = get('email', 'epost', 'emailaddress', 'epostadresse', 'mail');
-        const phone = get('phone', 'telefon', 'mobile', 'mobil', 'mobilnummer', 'telefonnummer', 'phonenumber');
+        
+        // Nød-fallback for e-post hvis standard matching feiler (f.eks. om kolonnen heter "E-post 1" eller inneholder "mail")
+        let email = get('email', 'epost', 'emailaddress', 'epostadresse', 'mail');
+        if (!email) {
+            const fallbackEntry = Object.entries(row).find(([k]) => {
+                const normalizedK = String(k || '').trim().toLowerCase().replace(/[\s\-_]/g, '');
+                return normalizedK.includes('email') || normalizedK.includes('epost') || normalizedK.includes('mail');
+            });
+            if (fallbackEntry) email = String(fallbackEntry[1] ?? '').trim();
+        }
+
+        // Nød-fallback for telefon
+        let phone = get('phone', 'telefon', 'mobile', 'mobil', 'mobilnummer', 'telefonnummer', 'phonenumber');
+        if (!phone) {
+            const fallbackEntry = Object.entries(row).find(([k]) => {
+                const normalizedK = String(k || '').trim().toLowerCase().replace(/[\s\-_]/g, '');
+                return normalizedK.includes('phone') || normalizedK.includes('telef') || normalizedK.includes('mobil');
+            });
+            if (fallbackEntry) phone = String(fallbackEntry[1] ?? '').trim();
+        }
+
         const role = get('role', 'rolle');
         const rawStatus = get('status', 'medlemsstatus', 'membershipstatus');
         const label = get('label', 'etikett', 'tag', 'tags') || 'Ny';
