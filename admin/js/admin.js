@@ -9524,7 +9524,7 @@ class AdminManager {
             if (titleArea) {
                 const adjustTitleHeight = () => {
                     titleArea.style.height = 'auto';
-                    titleArea.style.height = (titleArea.scrollHeight) + 'px';
+                    titleArea.style.height = (titleArea.scrollHeight + 10) + 'px';
                 };
                 titleArea.addEventListener('input', adjustTitleHeight);
                 // Initial adjustment
