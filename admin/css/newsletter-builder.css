@@ -2647,7 +2647,7 @@ input:checked+.slider:before {
     height: 40px !important;
     padding: 0 16px !important;
     border-radius: 8px !important;
-    font-size: 14px !important;
+    font-size: 13px !important; /* Sleeker, more premium 13px font-size */
     font-weight: 600 !important;
     cursor: pointer !important;
     transition: all 0.2s ease !important;
