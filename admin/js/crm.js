@@ -809,7 +809,18 @@ class CRMManager {
 
         if (lines.length < 2) return [];
 
-        const delimiter = (lines[0].split(';').length > lines[0].split(',').length) ? ';' : ',';
+        // Detekter skilletegn mer robust (støtter tabulator, semikolon og komma)
+        const semicolons = lines[0].split(';').length;
+        const commas = lines[0].split(',').length;
+        const tabs = lines[0].split('\t').length;
+
+        let delimiter = ',';
+        if (semicolons > commas && semicolons > tabs) {
+            delimiter = ';';
+        } else if (tabs > commas && tabs > semicolons) {
+            delimiter = '\t';
+        }
+
         const headers = this.parseCsvLine(lines[0], delimiter).map((h) => String(h || '').trim());
         const rows = [];
 
@@ -855,22 +866,33 @@ class CRMManager {
 
     mapCsvRowToContact(row) {
         const get = (...keys) => {
-            const entry = Object.entries(row).find(([k]) => keys.includes(String(k || '').trim().toLowerCase()));
+            // Normaliser søkenøklene (lowercase, fjerner mellomrom, bindestreker og understreker)
+            const normalizedKeys = keys.map(k => String(k || '').trim().toLowerCase().replace(/[\s\-_]/g, ''));
+            const entry = Object.entries(row).find(([k]) => {
+                const normalizedK = String(k || '').trim().toLowerCase().replace(/[\s\-_]/g, '');
+                return normalizedKeys.includes(normalizedK);
+            });
             return entry ? String(entry[1] ?? '').trim() : '';
         };
 
-        const firstName = get('firstname', 'fornavn', 'first_name');
-        const lastName = get('lastname', 'etternavn', 'last_name');
-        const displayName = get('displayname', 'display_name', 'navn', 'name') || `${firstName} ${lastName}`.trim();
-        const email = get('email', 'e-post', 'epost');
-        const phone = get('phone', 'telefon', 'mobile', 'mobil');
+        const firstName = get('firstname', 'fornavn', 'first');
+        const lastName = get('lastname', 'etternavn', 'last');
+        const displayName = get('displayname', 'name', 'navn', 'fullname', 'fulltnavn') || `${firstName} ${lastName}`.trim();
+        const email = get('email', 'epost', 'emailaddress', 'epostadresse', 'mail');
+        const phone = get('phone', 'telefon', 'mobile', 'mobil', 'mobilnummer', 'telefonnummer', 'phonenumber');
         const role = get('role', 'rolle');
-        const rawStatus = get('status', 'medlemsstatus');
-        const label = get('label', 'etikett', 'tag') || 'Ny';
+        const rawStatus = get('status', 'medlemsstatus', 'membershipstatus');
+        const label = get('label', 'etikett', 'tag', 'tags') || 'Ny';
 
-        const resolvedFirstName = firstName || (displayName ? displayName.split(/\s+/)[0] : '');
+        let resolvedFirstName = firstName || (displayName ? displayName.split(/\s+/)[0] : '');
         const resolvedLastName = lastName || (displayName ? displayName.split(/\s+/).slice(1).join(' ') : '');
 
+        // Hvis e-post finnes, men fornavn mangler, bruk e-posten (local part) som en hyggelig fallback
+        if (email && !resolvedFirstName) {
+            resolvedFirstName = email.split('@')[0];
+        }
+
+        // Defensiv sjekk: e-post må være tilstede og fornavn må være løst
         if (!email || !resolvedFirstName) return null;
 
         return {

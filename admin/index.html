@@ -27,6 +27,40 @@
     
     <!-- FORCED CSS FIX FOR ENGAGEMENT OVERFLOW (INLINE TO BEAT CACHE - GLOBAL) -->
     <style>
+        /* Complete Horizontal Scroll protection */
+        html, 
+        body.admin-body {
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+            overflow-x: clip !important;
+        }
+
+        body.admin-body .main-content {
+            width: auto !important; /* Computes width as viewport minus sidebar width to prevent overflow */
+            min-width: 0 !important;
+            max-width: 100% !important;
+            overflow-x: hidden !important;
+            overflow-x: clip !important;
+        }
+
+        /* Prevent long un-wrappable paths from pushing card widths and causing grids to overflow */
+        .top-page-info, .page-info {
+            display: flex !important;
+            justify-content: space-between !important;
+            align-items: center !important;
+            width: 100% !important;
+            min-width: 0 !important;
+        }
+
+        .top-page-path, .page-url {
+            white-space: nowrap !important;
+            text-overflow: ellipsis !important;
+            overflow: hidden !important;
+            min-width: 0 !important;
+            flex: 1 !important;
+            padding-right: 12px !important;
+        }
+
         /* Modern Dashboard Overrides */
         #dashboard-stats-grid, .stats-grid {
             display: grid !important;
