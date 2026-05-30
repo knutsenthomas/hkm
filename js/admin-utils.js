@@ -240,8 +240,14 @@
             else delete item.seriesItems;
         }
 
-        if (rawItem && rawItem.content && typeof rawItem.content === 'object' && !Array.isArray(rawItem.content) && !item.content) {
-            item.content = rawItem.content;
+        if (rawItem && rawItem.content) {
+            if (typeof rawItem.content === 'object' && !Array.isArray(rawItem.content)) {
+                if (!item.content || typeof item.content !== 'object' || !Array.isArray(item.content.blocks) || item.content.blocks.length === 0) {
+                    item.content = rawItem.content;
+                }
+            } else if (typeof rawItem.content === 'string' && rawItem.content.trim().length > 0 && !item.content) {
+                item.content = rawItem.content;
+            }
         }
 
         // HKM Fix: Explicitly preserve translations and translation metadata if present in rawItem

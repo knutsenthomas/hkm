@@ -10098,7 +10098,7 @@ class AdminManager {
 
                 // Safety: never overwrite existing content with empty editor output.
                 // If the editor returns no blocks but we had content before, keep the old content.
-                if (!this._hasMeaningfulEditorContent(savedData) && this._hasMeaningfulEditorContent(previousContent)) {
+                if (!this._hasMeaningfulEditorContent(nextContent) && previousContent) {
                     nextContent = previousContent;
                 }
 

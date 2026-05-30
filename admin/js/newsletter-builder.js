@@ -2163,16 +2163,37 @@ class NewsletterBuilder {
         if (nl) {
             const card = document.createElement('div');
             card.className = 'ai-suggestion-card newsletter-type';
+            if (nl.used) {
+                card.style.opacity = '0.75';
+            }
             const bulletItems = (nl.blocks || [])
                 .filter(b => b.type === 'title' || b.type === 'text')
                 .slice(0, 3)
                 .map(b => `<li>${b.content?.text?.replace(/<[^>]*>/g, '').substring(0, 60)}...</li>`)
                 .join('');
 
+            const badgeHtml = nl.used 
+                ? `<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+                     <span class="card-badge">Nyhetsbrev</span>
+                     <span class="card-badge" style="background:#e2e8f0; color:#475569; border:1px solid #cbd5e1;">Brukt</span>
+                   </div>`
+                : `<span class="card-badge" style="margin-bottom: 12px;">Nyhetsbrev</span>`;
+
+            const buttonHtml = `
+                <div class="card-action-footer" style="display: flex; gap: 8px; width: 100%; box-sizing: border-box; margin-top: auto;">
+                    <button class="btn" id="regenerate-newsletter-suggestion-btn" style="flex: 0 0 46px; width: 46px; height: 44px; padding: 0; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: none;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';" title="Generer nytt forslag">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">cached</span>
+                    </button>
+                    <button class="btn" id="use-newsletter-suggestion-btn" style="flex: 1; height: 44px; margin: 0;">
+                        <span class="material-symbols-outlined">mark_email_unread</span> Opprett og åpne kladd
+                    </button>
+                </div>
+            `;
+
             card.innerHTML = `
                 <div class="card-header-gradient"></div>
                 <div class="card-body-content">
-                    <span class="card-badge">Nyhetsbrev</span>
+                    ${badgeHtml}
                     <h5 class="suggestion-title">${nl.title || 'Uten tittel'}</h5>
                     <div class="suggestion-rationale">
                         <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">info</span>
@@ -2184,14 +2205,13 @@ class NewsletterBuilder {
                     <ul class="suggestion-bullets">
                         ${bulletItems || '<li>Innholder flere blokker</li>'}
                     </ul>
-                    <div class="card-action-footer">
-                        <button class="btn" id="use-newsletter-suggestion-btn">
-                            <span class="material-symbols-outlined">mark_email_unread</span> Opprett og åpne kladd
-                        </button>
-                    </div>
+                    ${buttonHtml}
                 </div>
             `;
             
+            card.querySelector('#regenerate-newsletter-suggestion-btn').onclick = () => {
+                this.regenerateSingleSuggestion('newsletter');
+            };
             card.querySelector('#use-newsletter-suggestion-btn').onclick = () => {
                 this.useNewsletterSuggestion(nl);
             };
@@ -2203,11 +2223,33 @@ class NewsletterBuilder {
         if (bl) {
             const card = document.createElement('div');
             card.className = 'ai-suggestion-card blog-type';
+            if (bl.used) {
+                card.style.opacity = '0.75';
+            }
             const outlineItems = (bl.outline || []).map(o => `<li>${o}</li>`).join('');
+
+            const badgeHtml = bl.used 
+                ? `<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+                     <span class="card-badge">Blogginnlegg</span>
+                     <span class="card-badge" style="background:#e2e8f0; color:#475569; border:1px solid #cbd5e1;">Brukt</span>
+                   </div>`
+                : `<span class="card-badge" style="margin-bottom: 12px;">Blogginnlegg</span>`;
+
+            const buttonHtml = `
+                <div class="card-action-footer" style="display: flex; gap: 8px; width: 100%; box-sizing: border-box; margin-top: auto;">
+                    <button class="btn" id="regenerate-blog-suggestion-btn" style="flex: 0 0 46px; width: 46px; height: 44px; padding: 0; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: none;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';" title="Generer nytt forslag">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">cached</span>
+                    </button>
+                    <button class="btn" id="use-blog-suggestion-btn" style="flex: 1; height: 44px; margin: 0;">
+                        <span class="material-symbols-outlined">edit_document</span> Opprett bloggutkast
+                    </button>
+                </div>
+            `;
+
             card.innerHTML = `
                 <div class="card-header-gradient"></div>
                 <div class="card-body-content">
-                    <span class="card-badge">Blogginnlegg</span>
+                    ${badgeHtml}
                     <h5 class="suggestion-title">${bl.title || 'Uten tittel'}</h5>
                     <div class="suggestion-rationale">
                         <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">info</span>
@@ -2221,14 +2263,13 @@ class NewsletterBuilder {
                     <ul class="suggestion-bullets">
                         ${outlineItems}
                     </ul>
-                    <div class="card-action-footer">
-                        <button class="btn" id="use-blog-suggestion-btn">
-                            <span class="material-symbols-outlined">edit_document</span> Opprett bloggutkast
-                        </button>
-                    </div>
+                    ${buttonHtml}
                 </div>
             `;
             
+            card.querySelector('#regenerate-blog-suggestion-btn').onclick = () => {
+                this.regenerateSingleSuggestion('blog');
+            };
             card.querySelector('#use-blog-suggestion-btn').onclick = () => {
                 this.useBlogSuggestion(bl);
             };
@@ -2240,11 +2281,33 @@ class NewsletterBuilder {
         if (te) {
             const card = document.createElement('div');
             card.className = 'ai-suggestion-card teaching-type';
+            if (te.used) {
+                card.style.opacity = '0.75';
+            }
             const outlineItems = (te.outline || []).map(o => `<li>${o}</li>`).join('');
+
+            const badgeHtml = te.used 
+                ? `<div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px;">
+                     <span class="card-badge">Undervisning</span>
+                     <span class="card-badge" style="background:#e2e8f0; color:#475569; border:1px solid #cbd5e1;">Brukt</span>
+                   </div>`
+                : `<span class="card-badge" style="margin-bottom: 12px;">Undervisning</span>`;
+
+            const buttonHtml = `
+                <div class="card-action-footer" style="display: flex; gap: 8px; width: 100%; box-sizing: border-box; margin-top: auto;">
+                    <button class="btn" id="regenerate-teaching-suggestion-btn" style="flex: 0 0 46px; width: 46px; height: 44px; padding: 0; background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; box-shadow: none;" onmouseover="this.style.background='#e2e8f0';" onmouseout="this.style.background='#f1f5f9';" title="Generer nytt forslag">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">cached</span>
+                    </button>
+                    <button class="btn" id="use-teaching-suggestion-btn" style="flex: 1; height: 44px; margin: 0;">
+                        <span class="material-symbols-outlined">school</span> Opprett undervisning
+                    </button>
+                </div>
+            `;
+
             card.innerHTML = `
                 <div class="card-header-gradient"></div>
                 <div class="card-body-content">
-                    <span class="card-badge">Undervisning</span>
+                    ${badgeHtml}
                     <h5 class="suggestion-title">${te.title || 'Uten tittel'}</h5>
                     <div class="suggestion-rationale">
                         <span class="material-symbols-outlined" style="font-size: 14px; vertical-align: middle; margin-right: 4px;">info</span>
@@ -2258,14 +2321,13 @@ class NewsletterBuilder {
                     <ul class="suggestion-bullets">
                         ${outlineItems}
                     </ul>
-                    <div class="card-action-footer">
-                        <button class="btn" id="use-teaching-suggestion-btn">
-                            <span class="material-symbols-outlined">school</span> Opprett undervisning
-                        </button>
-                    </div>
+                    ${buttonHtml}
                 </div>
             `;
             
+            card.querySelector('#regenerate-teaching-suggestion-btn').onclick = () => {
+                this.regenerateSingleSuggestion('teaching');
+            };
             card.querySelector('#use-teaching-suggestion-btn').onclick = () => {
                 this.useTeachingSuggestion(te);
             };
@@ -2275,9 +2337,130 @@ class NewsletterBuilder {
         area.style.display = 'block';
     }
 
+    async regenerateSingleSuggestion(type) {
+        const cardSelectorMap = {
+            newsletter: '.newsletter-type',
+            blog: '.blog-type',
+            teaching: '.teaching-type'
+        };
+        const cardEl = document.querySelector(`.ai-suggestion-card${cardSelectorMap[type]}`);
+        if (!cardEl) return;
+
+        const originalHtml = cardEl.innerHTML;
+        cardEl.style.opacity = '1';
+        cardEl.innerHTML = `
+            <div class="card-header-gradient" style="background: linear-gradient(135deg, #1B4965 0%, #d17d39 100%) !important;"></div>
+            <div class="card-body-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 380px; text-align: center; box-sizing: border-box; padding: 32px 24px;">
+                <div class="ai-pulse-loader" style="width: 48px; height: 48px; border-radius: 50%; background: #d17d39; box-shadow: 0 0 16px #d17d39; display: flex; align-items: center; justify-content: center; margin-bottom: 24px; animation: pulseGlow 1.5s infinite ease-in-out;">
+                    <span class="material-symbols-outlined" style="color: white; font-size: 24px; animation: spin 2s infinite linear;">cached</span>
+                </div>
+                <h5 style="font-family: 'Outfit', sans-serif; font-size: 18px; font-weight: 800; color: #1e293b; margin: 0 0 8px 0;">Genererer nytt forslag...</h5>
+                <p style="font-size: 13px; color: #64748b; line-height: 1.5; margin: 0; font-weight: 500;">
+                    Vår AI analyserer samfunnsaktualiteter og podcaster for å skreddersy en ny idé til deg.
+                </p>
+            </div>
+        `;
+
+        try {
+            const promptTypeMap = {
+                newsletter: {
+                    label: 'Nyhetsbrev',
+                    reqs: `Krav til Nyhetsbrev (newsletter):
+                        - 'title': En fengende emnelinje.
+                        - 'rationale': Hvorfor dette er svært aktuelt akkurat nå.
+                        - 'summary': En kort beskrivelse av e-postens formål.
+                        - 'blocks': Array av nyhetsbrev-blokker. Hver blokk må ha:
+                          - 'type': Enten 'title', 'text', 'spacer', 'button' eller 'image'.
+                          - 'content': { 'text': '...' } for title/text, { 'text': '...', 'url': '...' } for button, { 'url': '...' } for image. For 'image' kan du bruke en kristen naturmotiv-URL fra Unsplash.`,
+                    format: `"newsletter": { "title": "...", "rationale": "...", "summary": "...", "blocks": [ ... ] }`
+                },
+                blog: {
+                    label: 'Blogginnlegg',
+                    reqs: `Krav til Blogginnlegg (blog):
+                        - 'title': En engasjerende, nysgjerrigskapende tittel.
+                        - 'rationale': Begrunnelse knyttet til aktuelle samfunnstrender.
+                        - 'verses': Relevante bibelvers (f.eks. "Matteus 28:19").
+                        - 'outline': En array med 3-4 kulepunkter som viser seksjonene.
+                        - 'promptText': Tema-prompten vi skal sende til blogg-generatoren når brukeren klikker "Opprett".`,
+                    format: `"blog": { "title": "...", "rationale": "...", "verses": "...", "outline": [ "..." ], "promptText": "..." }`
+                },
+                teaching: {
+                    label: 'Undervisningstema',
+                    reqs: `Krav til Undervisning (teaching):
+                        - 'title': En dyp, bibelsk og lærerik tittel.
+                        - 'rationale': Hvorfor dette temaet trengs akkurat nå.
+                        - 'verses': Viktige skriftsteder.
+                        - 'outline': Array med 3-4 kulepunkter/leksjoner.
+                        - 'promptText': Tema-prompten vi skal sende til undervisnings-generatoren.`,
+                    format: `"teaching": { "title": "...", "rationale": "...", "verses": "...", "outline": [ "..." ], "promptText": "..." }`
+                }
+            };
+
+            const config = promptTypeMap[type];
+            const prompt = `
+                Du er en inspirerende og strategisk innholdsrådgiver og teolog for His Kingdom Ministry (HKM).
+                Generer nøyaktig ETT nytt, unikt og inspirerende forslag til et ${config.label} for den kommende uken basert på:
+                - Aktuelle kristne nyheter og happenings i Norge og globalt.
+                - HKMs podcast-profil, bibelstudier og ønske om å fremme Guds rike.
+                - Sesongen (Pinse/Pentecost, sommerforberedelser, kristent samfunnsliv).
+
+                ${config.reqs}
+
+                Format: Returner KUN gyldig JSON på dette formatet:
+                {
+                  ${config.format}
+                }
+                Svar kun med rå JSON.
+            `;
+
+            const callable = firebase.functions().httpsCallable('aiProcess');
+            const response = await callable({ prompt: prompt });
+            
+            let generatedItem = null;
+            if (response.data && response.data.text) {
+                const jsonText = response.data.text.trim();
+                const jsonMatch = jsonText.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    generatedItem = JSON.parse(jsonMatch[0]);
+                } else {
+                    generatedItem = JSON.parse(jsonText);
+                }
+            } else {
+                throw new Error("Kunne ikke hente tekst fra AI-tjenesten.");
+            }
+
+            if (generatedItem && generatedItem[type]) {
+                const latestDoc = await window.firebaseService.db.collection('ai_suggestions').doc('latest').get();
+                if (latestDoc.exists) {
+                    const currentData = latestDoc.data();
+                    currentData[type] = generatedItem[type];
+                    currentData[type].used = false; // Fresh and not used
+                    currentData.generatedAt = new Date().toISOString();
+                    
+                    await window.firebaseService.db.collection('ai_suggestions').doc('latest').set(currentData);
+                    this.renderAiSuggestions(currentData);
+                    showToast(`Nytt forslag for ${config.label} generert!`, "success");
+                }
+            } else {
+                throw new Error("Feil i JSON-strukturen fra AI.");
+            }
+        } catch (error) {
+            console.error("AI Single Generation failed:", error);
+            showToast(`Generering feilet: ${error.message || error}`, "error");
+            cardEl.innerHTML = originalHtml;
+            cardEl.style.opacity = '0.75';
+            const btn = cardEl.querySelector(`#regenerate-${type}-suggestion-btn`);
+            if (btn) btn.onclick = () => this.regenerateSingleSuggestion(type);
+        }
+    }
+
     async useNewsletterSuggestion(nl) {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         try {
+            await window.firebaseService.db.collection('ai_suggestions').doc('latest').update({
+                'newsletter.used': true
+            });
+            
             const data = {
                 name: `AI-forslag: ${nl.title}`,
                 blocks: nl.blocks || [],
@@ -2298,7 +2481,17 @@ class NewsletterBuilder {
         }
     }
 
-    useBlogSuggestion(bl) {
+    async useBlogSuggestion(bl) {
+        if (window.firebaseService && window.firebaseService.isInitialized) {
+            try {
+                await window.firebaseService.db.collection('ai_suggestions').doc('latest').update({
+                    'blog.used': true
+                });
+            } catch (err) {
+                console.error("Failed to mark blog suggestion as used:", err);
+            }
+        }
+        
         let title = bl.title || '';
         let promptText = bl.promptText || bl.title || '';
         
@@ -2315,7 +2508,17 @@ class NewsletterBuilder {
         window.location.href = '/admin/index.html#blog';
     }
     
-    useTeachingSuggestion(te) {
+    async useTeachingSuggestion(te) {
+        if (window.firebaseService && window.firebaseService.isInitialized) {
+            try {
+                await window.firebaseService.db.collection('ai_suggestions').doc('latest').update({
+                    'teaching.used': true
+                });
+            } catch (err) {
+                console.error("Failed to mark teaching suggestion as used:", err);
+            }
+        }
+        
         let title = te.title || '';
         let promptText = te.promptText || te.title || '';
         

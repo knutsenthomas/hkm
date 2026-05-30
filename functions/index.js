@@ -4853,3 +4853,120 @@ exports.scheduledSync = onSchedule("every 15 minutes", async (event) => {
     console.error("❌ Feil under synkronisering:", error);
   }
 });
+
+/**
+ * Ukentlig automatisk AI-ideegenerering for HKM Studio
+ * Kjører hver mandag morgen kl 06:00
+ */
+exports.scheduledAiSuggestions = onSchedule({
+  schedule: "0 6 * * 1",
+  timeoutSeconds: 300,
+  memory: "512MiB",
+  secrets: [geminiApiKeyParam],
+}, async (event) => {
+  console.log("⏰ Starter ukentlig automatisk AI-ideegenerering...");
+
+  try {
+    const geminiKey = getGeminiApiKey();
+    if (!geminiKey) {
+      console.error("❌ Mangler Gemini API-nøkkel.");
+      return;
+    }
+
+    const prompt = [
+      "Du er en inspirerende og strategisk innholdsrådgiver og",
+      "teolog for His Kingdom Ministry (HKM).",
+      "Generer tre konkrete, dype og inspirerende ideer/utkast for",
+      "den kommende uken basert på:",
+      "- Aktuelle kristne nyheter og happenings i Norge og globalt",
+      "(f.eks. misjonsarbeid, kirkevekst, konferanser, kristent",
+      "samfunnsansvar).",
+      "- HKMs podcast-profil, bibelstudier og ønske om å fremme",
+      "Guds rike.",
+      "- Sesongen (Pinse/Pentecost, sommerforberedelser, kristent",
+      "samfunnsolsk).",
+      "",
+      "Du må levere nøyaktig 3 ideer:",
+      "1. Ett Nyhetsbrev (newsletter) til abonnenter.",
+      "2. Ett Blogginnlegg (blog) til nettsiden.",
+      "3. Ett Undervisningstema (teaching) til bibelstudier/kurs.",
+      "",
+      "Krav til Nyhetsbrev (newsletter):",
+      "- 'title': En fengende emnelinje.",
+      "- 'rationale': Hvorfor dette er svært aktuelt akkurat nå",
+      "(knyttet til nyheter/sosiale medier).",
+      "- 'summary': En kort beskrivelse av e-postens formål.",
+      "- 'blocks': Array av nyhetsbrev-blokker. Hver blokk må ha:",
+      "  - 'type': Enten 'title', 'text', 'spacer', 'button' eller 'image'.",
+      "  - 'content': { 'text': '...' } for title/text, { 'text': '...',",
+      "'url': '...' } for button, { 'url': '...' } for image.",
+      "For 'image' kan du bruke en kristen naturmotiv-URL fra Unsplash.",
+      "",
+      "Krav til Blogginnlegg (blog):",
+      "- 'title': En engasjerende, nysgjerrigskapende tittel.",
+      "- 'rationale': Begrunnelse knyttet til aktuelle samfunnstrender",
+      "eller kristne nyheter.",
+      "- 'verses': Relevante bibelvers (f.eks. 'Matteus 28:19').",
+      "- 'outline': En array med 3-4 kulepunkter som viser seksjonene.",
+      "- 'promptText': Tema-prompten vi skal sende til blogg-generatoren.",
+      "",
+      "Krav til Undervisning (teaching):",
+      "- 'title': En dyp, bibelsk og lærerik tittel.",
+      "- 'rationale': Hvorfor dette temaet trengs akkurat nå.",
+      "- 'verses': Viktige skriftsteder.",
+      "- 'outline': Array med 3-4 kulepunkter/leksjoner.",
+      "- 'promptText': Tema-prompten vi skal sende til undervisnings-generatoren.",
+      "",
+      "Format: Returner KUN gyldig JSON på dette formatet:",
+      "{",
+      "  \"newsletter\": {",
+      "    \"title\": \"...\", \"rationale\": \"...\", \"summary\": \"...\",",
+      "    \"blocks\": [ ... ]",
+      "  },",
+      "  \"blog\": {",
+      "    \"title\": \"...\", \"rationale\": \"...\", \"verses\": \"...\",",
+      "    \"outline\": [ \"...\" ], \"promptText\": \"...\"",
+      "  },",
+      "  \"teaching\": {",
+      "    \"title\": \"...\", \"rationale\": \"...\", \"verses\": \"...\",",
+      "    \"outline\": [ \"...\" ], \"promptText\": \"...\"",
+      "  }",
+      "}",
+      "Svar kun med rå JSON.",
+    ].join("\n");
+
+    const genAI = new GoogleGenerativeAI(geminiKey.trim());
+    const model = genAI.getGenerativeModel({model: "gemini-2.0-flash"});
+    const result = await model.generateContent(prompt);
+    const textResult = (await result.response).text().trim();
+
+    let data = null;
+    const jsonMatch = textResult.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      data = JSON.parse(jsonMatch[0]);
+    } else {
+      data = JSON.parse(textResult);
+    }
+
+    if (data) {
+      data.generatedAt = new Date().toISOString();
+      if (data.newsletter) {
+        data.newsletter.used = false;
+      }
+      if (data.blog) {
+        data.blog.used = false;
+      }
+      if (data.teaching) {
+        data.teaching.used = false;
+      }
+
+      await db.collection("ai_suggestions").doc("latest").set(data);
+      console.log("✅ Ukentlige automatiske AI-ideer generert og lagret!");
+    } else {
+      throw new Error("Feil i JSON-strukturen fra AI.");
+    }
+  } catch (error) {
+    console.error("❌ Feil under planlagt AI-ideegenerering:", error);
+  }
+});
+
