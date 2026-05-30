@@ -317,7 +317,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'SEO & Meta', icon: 'search_insights', section: 'seo', category: 'administrasjon' },
             { label: 'Innstillinger', icon: 'settings', section: 'settings', category: 'administrasjon' },
             { label: 'Integrasjoner', icon: 'hub', section: 'integrations', category: 'administrasjon' },
-            { label: 'Analyse (Analytics)', icon: 'analytics', href: '/admin/admin-analytics.html', path: 'admin-analytics', category: 'administrasjon', alwaysVisible: true },
+            { label: 'Analyse', icon: 'analytics', href: '/admin/admin-analytics.html', path: 'admin-analytics', category: 'administrasjon', alwaysVisible: true },
             { label: 'Systemlogger', icon: 'assignment', href: '/admin/admin-logger.html', path: 'admin-logger', category: 'administrasjon', alwaysVisible: true }
         ];
 
