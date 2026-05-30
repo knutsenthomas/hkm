@@ -284,6 +284,11 @@ class NewsletterBuilder {
             });
         }
 
+        const subjectInput = document.getElementById('newsletter-subject');
+        if (subjectInput) {
+            subjectInput.addEventListener('input', () => this.triggerAutosave());
+        }
+
         // Background Color Swatches
         document.querySelectorAll('#outer-bg-palette .color-swatch').forEach(swatch => {
             swatch.addEventListener('click', () => {
@@ -398,6 +403,7 @@ class NewsletterBuilder {
             type: 'text',
             content: { text: container.innerHTML }
         }];
+        this.triggerAutosave();
     }
 
     setupRichTextToolbar() {
@@ -1967,12 +1973,116 @@ class NewsletterBuilder {
         const draft = this.draftsCache && this.draftsCache[id];
         if (!draft) return;
         if (confirm(`Last inn kladden "${draft.name}"? Dette vil erstatte innholdet i editoren.`)) {
+            this.currentDraftId = id;
+            this.currentDraftName = draft.name;
             this.blocks = JSON.parse(JSON.stringify(draft.blocks || []));
             document.getElementById('newsletter-subject').value = draft.subject || '';
             this.toggleMode('builder');
             this.renderCanvas();
             showToast(`Kladden "${draft.name}" er lastet inn.`, "info");
+            
+            // Set autosave status indicator to Saved
+            const statusEl = document.getElementById('newsletter-autosave-status');
+            const textEl = document.getElementById('newsletter-autosave-text');
+            if (statusEl && textEl) {
+                statusEl.style.opacity = '0.7';
+                textEl.innerHTML = 'Lagret i skyen';
+                const icon = statusEl.querySelector('.material-symbols-outlined');
+                if (icon) {
+                    icon.style.color = '#10b981';
+                    icon.innerHTML = 'cloud_done';
+                    icon.style.animation = 'none';
+                }
+            }
         }
+    }
+
+    triggerAutosave() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        
+        // Add spin keyframe styling dynamically once
+        if (!document.getElementById('hkm-spin-style')) {
+            const style = document.createElement('style');
+            style.id = 'hkm-spin-style';
+            style.textContent = `
+                @keyframes hkm-spin {
+                    to { transform: rotate(360deg); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        const statusEl = document.getElementById('newsletter-autosave-status');
+        const textEl = document.getElementById('newsletter-autosave-text');
+        if (statusEl && textEl) {
+            statusEl.style.opacity = '1';
+            textEl.innerHTML = 'Autolagrer...';
+            const icon = statusEl.querySelector('.material-symbols-outlined');
+            if (icon) {
+                icon.style.color = '#3b82f6'; // Blue
+                icon.innerHTML = 'sync';
+                icon.style.animation = 'hkm-spin 1.5s linear infinite';
+            }
+        }
+
+        if (this.autosaveTimer) clearTimeout(this.autosaveTimer);
+        
+        this.autosaveTimer = setTimeout(async () => {
+            try {
+                // Get fresh state
+                const container = document.getElementById('blocks-container');
+                if (!container) return;
+                const freshBlocks = [{
+                    id: 'unified_content',
+                    type: 'text',
+                    content: { text: container.innerHTML }
+                }];
+                const subject = document.getElementById('newsletter-subject').value;
+                
+                const data = {
+                    name: this.currentDraftName || `Autolagret kladd (${new Date().toLocaleDateString('no')})`,
+                    blocks: freshBlocks,
+                    subject: subject,
+                    createdAt: new Date().toISOString(),
+                    isDraft: true
+                };
+
+                if (this.currentDraftId) {
+                    await window.firebaseService.db.collection('newsletter_templates').doc(this.currentDraftId).set(data, { merge: true });
+                } else {
+                    const docRef = await window.firebaseService.db.collection('newsletter_templates').add(data);
+                    this.currentDraftId = docRef.id;
+                    this.currentDraftName = data.name;
+                }
+
+                // Update UI status to Success
+                if (statusEl && textEl) {
+                    const now = new Date();
+                    const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    textEl.innerHTML = `Sist lagret kl. ${timeStr}`;
+                    const icon = statusEl.querySelector('.material-symbols-outlined');
+                    if (icon) {
+                        icon.style.color = '#10b981'; // Green
+                        icon.innerHTML = 'cloud_done';
+                        icon.style.animation = 'none';
+                    }
+                    setTimeout(() => {
+                        statusEl.style.opacity = '0.7';
+                    }, 3000);
+                }
+            } catch (e) {
+                console.error("Newsletter autosave failed:", e);
+                if (statusEl && textEl) {
+                    textEl.innerHTML = 'Lagring feilet';
+                    const icon = statusEl.querySelector('.material-symbols-outlined');
+                    if (icon) {
+                        icon.style.color = '#ef4444'; // Red
+                        icon.innerHTML = 'cloud_off';
+                        icon.style.animation = 'none';
+                    }
+                }
+            }
+        }, 2000);
     }
 
     loadCustomTemplateById(id) {

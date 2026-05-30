@@ -520,6 +520,39 @@
         });
     </script>
 
+    <!-- Wix-style Floating Bulk Actions Bar -->
+    <div id="hkm-bulk-actions-bar" class="hkm-bulk-bar" style="display: none;">
+        <div class="hkm-bulk-bar-content">
+            <div class="hkm-bulk-bar-info">
+                <span class="material-symbols-outlined" style="color: #d17d39;">check_circle</span>
+                <span id="hkm-bulk-selected-count">0 valgt</span>
+            </div>
+            <div class="hkm-bulk-bar-divider"></div>
+            <div class="hkm-bulk-bar-buttons">
+                <button type="button" class="hkm-bulk-btn" id="hkm-bulk-tag-btn">
+                    <span class="material-symbols-outlined">label</span>
+                    Endre etiketter
+                </button>
+                <button type="button" class="hkm-bulk-btn" id="hkm-bulk-status-btn">
+                    <span class="material-symbols-outlined">verified_user</span>
+                    Endre status
+                </button>
+                <button type="button" class="hkm-bulk-btn" id="hkm-bulk-export-btn">
+                    <span class="material-symbols-outlined">download</span>
+                    Eksporter
+                </button>
+                <button type="button" class="hkm-bulk-btn danger" id="hkm-bulk-delete-btn">
+                    <span class="material-symbols-outlined">delete</span>
+                    Slett kontakter
+                </button>
+            </div>
+            <div class="hkm-bulk-bar-divider"></div>
+            <button type="button" class="hkm-bulk-close" id="hkm-bulk-clear-btn" title="Fjern valg">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+    </div>
+
     <script type="module" src="../js/admin-utils.js?v=20260530_V3"></script>
     <script type="module" src="js/admin-header.js?v=20260530_V3"></script>
     <script type="module" src="js/crm.js?v=20260530_v2"></script>

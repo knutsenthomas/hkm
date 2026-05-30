@@ -8,6 +8,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const ADMIN_SW_DEV_CLEANUP_KEY = 'hkm_admin_sw_dev_cleanup_done';
     const ADMIN_SIDEBAR_SCROLL_KEY = 'hkm_admin_sidebar_scroll_top';
 
+    // Premium Progress Bar helper
+    const injectLoadingProgressBar = () => {
+        let bar = document.getElementById('admin-loading-progress');
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.id = 'admin-loading-progress';
+            document.body.appendChild(bar);
+        }
+        return bar;
+    };
+
+    window.triggerProgressAnimation = (durationMs = 450) => {
+        const bar = injectLoadingProgressBar();
+        bar.classList.remove('active');
+        bar.style.width = '0%';
+        bar.style.transition = 'none';
+        
+        // Force reflow
+        bar.offsetHeight;
+        
+        bar.classList.add('active');
+        bar.style.transition = 'width 0.4s cubic-bezier(0.1, 0.8, 0.3, 1), opacity 0.2s ease';
+        bar.style.width = '100%';
+        
+        setTimeout(() => {
+            bar.style.transition = 'opacity 0.2s ease';
+            bar.classList.remove('active');
+            setTimeout(() => {
+                bar.style.width = '0%';
+            }, 200);
+        }, durationMs);
+    };
+
+    // Auto-trigger on all navigation clicks
+    document.addEventListener('click', (e) => {
+        const link = e.target.closest('.nav-link, .mobile-nav-item, .ov-action-btn, .template-item, .studio-create-card');
+        if (link) {
+            if (typeof window.triggerProgressAnimation === 'function') {
+                window.triggerProgressAnimation();
+            }
+        }
+    });
+
+    window.addEventListener('hashchange', () => {
+        if (typeof window.triggerProgressAnimation === 'function') {
+            window.triggerProgressAnimation();
+        }
+    });
+
     const stabilizeAdminServiceWorker = async () => {
         if (!('serviceWorker' in navigator)) return;
 

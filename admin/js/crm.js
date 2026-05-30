@@ -142,6 +142,30 @@ class CRMManager {
             bulkDeleteBtn.onclick = () => this.deleteSelectedContacts();
         }
 
+        // --- Premium Wix-style Floating Bulk Actions ---
+        const hkmBulkDelete = document.getElementById('hkm-bulk-delete-btn');
+        if (hkmBulkDelete) hkmBulkDelete.onclick = () => this.deleteSelectedContacts();
+
+        const hkmBulkTag = document.getElementById('hkm-bulk-tag-btn');
+        if (hkmBulkTag) hkmBulkTag.onclick = () => this.bulkEditLabels();
+
+        const hkmBulkStatus = document.getElementById('hkm-bulk-status-btn');
+        if (hkmBulkStatus) hkmBulkStatus.onclick = () => this.bulkEditStatus();
+
+        const hkmBulkExport = document.getElementById('hkm-bulk-export-btn');
+        if (hkmBulkExport) hkmBulkExport.onclick = () => this.bulkExportCsv();
+
+        const hkmBulkClear = document.getElementById('hkm-bulk-clear-btn');
+        if (hkmBulkClear) {
+            hkmBulkClear.onclick = () => {
+                this.selectedContactIds.clear();
+                const selectAll = document.getElementById('select-all-contacts');
+                if (selectAll) selectAll.checked = false;
+                document.querySelectorAll('.contact-checkbox').forEach(cb => cb.checked = false);
+                this.updateBulkActionsVisibility();
+            };
+        }
+
         document.addEventListener('click', (e) => {
             if (!this.openContactMenuId) return;
             const target = e.target;
@@ -1310,14 +1334,34 @@ class CRMManager {
     updateBulkActionsVisibility() {
         const btn = document.getElementById('bulk-delete-btn');
         const text = document.getElementById('bulk-delete-text');
-        if (!btn || !text) return;
+        
+        const floatingBar = document.getElementById('hkm-bulk-actions-bar');
+        const countText = document.getElementById('hkm-bulk-selected-count');
 
         const count = this.selectedContactIds.size;
+        
         if (count > 0) {
-            btn.style.display = 'flex';
-            text.textContent = `Slett ${count} ${count === 1 ? 'valgt' : 'valgte'}`;
+            if (btn && text) {
+                btn.style.display = 'flex';
+                text.textContent = `Slett ${count} ${count === 1 ? 'valgt' : 'valgte'}`;
+            }
+            if (floatingBar && countText) {
+                floatingBar.style.display = 'block';
+                requestAnimationFrame(() => {
+                    floatingBar.classList.add('active');
+                });
+                countText.textContent = `${count} ${count === 1 ? 'kontakt' : 'kontakter'} valgt`;
+            }
         } else {
-            btn.style.display = 'none';
+            if (btn) btn.style.display = 'none';
+            if (floatingBar) {
+                floatingBar.classList.remove('active');
+                setTimeout(() => {
+                    if (this.selectedContactIds.size === 0) {
+                        floatingBar.style.display = 'none';
+                    }
+                }, 400);
+            }
         }
     }
 
@@ -1360,6 +1404,122 @@ class CRMManager {
             console.error("Bulk delete error:", error);
             this.notify("Kunne ikke slette kontakter: " + error.message, 'error');
         }
+    }
+
+    async bulkEditLabels() {
+        const count = this.selectedContactIds.size;
+        if (count === 0) return;
+
+        this.openCrmToolDialog({
+            mode: 'choice',
+            title: 'Endre etiketter (Massehandling)',
+            subtitle: `Velg ny etikett for de ${count} valgte kontaktene.`,
+            selectedValue: 'Medlem',
+            confirmLabel: 'Oppdater etiketter',
+            options: [
+                { value: 'Ny', label: 'Ny' },
+                { value: 'Medlem', label: 'Medlem' },
+                { value: 'Frivillig', label: 'Frivillig' },
+                { value: 'Lovsang', label: 'Lovsang' },
+                { value: 'Giver', label: 'Giver' },
+                { value: 'Abonnent', label: 'Abonnent' },
+                { value: 'Leder', label: 'Leder' }
+            ],
+            onConfirm: async (selectedValue) => {
+                const db = window.firebaseService.db;
+                const batch = db.batch();
+                const ids = Array.from(this.selectedContactIds);
+
+                ids.forEach(id => {
+                    batch.update(db.collection('contacts').doc(id), {
+                        labels: [selectedValue],
+                        updatedAt: new Date().toISOString()
+                    });
+                });
+
+                await batch.commit();
+                
+                this.selectedContactIds.clear();
+                const selectAll = document.getElementById('select-all-contacts');
+                if (selectAll) selectAll.checked = false;
+                
+                this.updateBulkActionsVisibility();
+                await this.loadContacts();
+                this.notify(`Etiketter oppdatert til "${selectedValue}" for ${count} kontakter.`);
+            }
+        });
+    }
+
+    async bulkEditStatus() {
+        const count = this.selectedContactIds.size;
+        if (count === 0) return;
+
+        this.openCrmToolDialog({
+            mode: 'choice',
+            title: 'Endre status (Massehandling)',
+            subtitle: `Velg ny medlemsstatus for de ${count} valgte kontaktene.`,
+            selectedValue: 'NETTSTEDSMEDLEM',
+            confirmLabel: 'Oppdater status',
+            options: [
+                { value: 'NETTSTEDSMEDLEM', label: 'Nettstedsmedlem', description: 'Kontakter med aktiv medlemsstatus.' },
+                { value: 'BLOKKERT', label: 'Blokkert', description: 'Markeres som blokkert (hindrer pålogging).' },
+                { value: 'IKKE_MEDLEM', label: 'Ikke medlem', description: 'Fjern medlemsstatus (blir gjest).' }
+            ],
+            onConfirm: async (selectedValue) => {
+                const db = window.firebaseService.db;
+                const batch = db.batch();
+                const ids = Array.from(this.selectedContactIds);
+
+                ids.forEach(id => {
+                    batch.update(db.collection('contacts').doc(id), {
+                        status: selectedValue,
+                        updatedAt: new Date().toISOString()
+                    });
+                });
+
+                await batch.commit();
+
+                this.selectedContactIds.clear();
+                const selectAll = document.getElementById('select-all-contacts');
+                if (selectAll) selectAll.checked = false;
+
+                this.updateBulkActionsVisibility();
+                await this.loadContacts();
+                this.notify(`Status oppdatert til "${selectedValue.replaceAll('_', ' ')}" for ${count} kontakter.`);
+            }
+        });
+    }
+
+    bulkExportCsv() {
+        const selectedIds = this.selectedContactIds;
+        if (selectedIds.size === 0) return;
+
+        const rows = this.contacts.filter(c => selectedIds.has(c.id));
+        
+        const headers = ['id', 'firstName', 'lastName', 'displayName', 'email', 'phone', 'role', 'status', 'labels'];
+        const escapeCsv = (val) => {
+            const str = String(val ?? '');
+            return /[",;\n]/.test(str) ? `"${str.replace(/"/g, '""')}"` : str;
+        };
+
+        const lines = [
+            headers.join(','),
+            ...rows.map((c) => [
+                c.id,
+                c.firstName || '',
+                c.lastName || '',
+                c.displayName || '',
+                c.email || '',
+                c.phone || '',
+                c.role || '',
+                c.status || '',
+                Array.isArray(c.labels) ? c.labels.join('|') : (c.label || '')
+            ].map(escapeCsv).join(','))
+        ];
+
+        const stamp = new Date().toISOString().slice(0, 19).replace(/[:T]/g, '-');
+        this.downloadTextFile(`hkm-kontakter-valgte-${stamp}.csv`, lines.join('\n'), 'text/csv;charset=utf-8;');
+        this.notify(`Eksporterte ${rows.length} valgte kontakter til CSV.`);
     }
 
     // --- Segment Management ---

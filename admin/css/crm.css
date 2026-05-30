@@ -1368,3 +1368,102 @@ body.crm-body {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+
+/* --- Floating Bulk Actions Bar --- */
+.hkm-bulk-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translate3d(-50%, 100px, 0) !important;
+    backface-visibility: hidden !important;
+    background: #1B4965; /* Brand Dark Blue */
+    color: white;
+    padding: 12px 24px;
+    border-radius: 100px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.3);
+    z-index: 1000;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    opacity: 0;
+    display: none;
+}
+
+.hkm-bulk-bar.active {
+    display: block;
+    opacity: 1;
+    transform: translate3d(-50%, 0, 0) !important;
+}
+
+.hkm-bulk-bar-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.hkm-bulk-bar-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.hkm-bulk-bar-divider {
+    width: 1px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.hkm-bulk-bar-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hkm-bulk-btn {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.85);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hkm-bulk-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+}
+
+.hkm-bulk-btn.danger {
+    color: #fca5a5;
+}
+
+.hkm-bulk-btn.danger:hover {
+    background: #b91c1c;
+    color: white;
+}
+
+.hkm-bulk-close {
+    background: transparent;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.hkm-bulk-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}

@@ -2297,6 +2297,9 @@ class AdminManager {
      * Called by the inline navigation script in index.html
      */
     onSectionSwitch(sectionId) {
+        if (typeof window.triggerProgressAnimation === 'function') {
+            window.triggerProgressAnimation();
+        }
         console.log(`[AdminManager] 🚀 Switching to section: ${sectionId}`);
         this.currentSection = sectionId;
 
@@ -4374,81 +4377,10 @@ class AdminManager {
                 { path: '/kontakt', pct: 5 }
             ];
 
-        // Generate a simple SVG sparkline if daily traffic is available
-        let sparklineHtml = '';
-        
-        if (!this.gaData) {
-            // Loading or Empty state
-            sparklineHtml = `
-                <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.8; text-align: center; padding: 20px;">
-                    <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 16px;">monitoring</span>
-                    <div>
-                        <h4 style="color: #1e293b; margin-bottom: 8px;">Ingen data tilgjengelig</h4>
-                        <p style="font-size: 13px; color: #64748b; max-width: 320px; margin: 0 auto 20px;">
-                            ${this._analyticsFetchFailed 
-                                ? (this._analyticsErrorMessage || 'Kunne ikke hente data fra Google Analytics. Sjekk integrasjonene dine.') 
-                                : 'Henter dine siste besøkstall eller venter på konfigurasjon...'}
-                        </p>
-                        ${this._analyticsFetchFailed ? `
-                            <button onclick="window.adminManager.onSectionSwitch('integrations')" style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease;" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">
-                                <span class="material-symbols-outlined" style="font-size: 18px;">settings_input_component</span>
-                                Åpne Integrasjoner
-                            </button>
-                        ` : ''}
-                    </div>
-                </div>
-            `;
-        } else {
-            sparklineHtml = `
-                <div style="height: 100%; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.6;">
-                    <span class="material-symbols-outlined" style="font-size: 48px; color: #d97706; margin-bottom: 16px;">monitoring</span>
-                    <div style="text-align: center;">
-                        <h4 style="color: #1e293b; margin-bottom: 8px;">Venter på trafikk</h4>
-                        <p style="font-size: 13px; color: #94a3b8;">Det er ikke registrert nok trafikk i denne perioden.</p>
-                    </div>
-                </div>
-            `;
-        }
-        
-        if (ga.dailyTraffic && Array.isArray(ga.dailyTraffic) && ga.dailyTraffic.length > 1) {
-            const trafficData = ga.dailyTraffic.map(d => parseInt(d.users) || 0);
-            const maxUsers = Math.max(...trafficData, 1);
-            const points = trafficData.map((users, i) => {
-                const x = (i / (trafficData.length - 1)) * 100;
-                const y = 95 - (users / maxUsers) * 85; // Keep 5% padding top/bottom
-                return `${x},${y}`;
-            }).join(' ');
-
-            sparklineHtml = `
-                <div style="width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative;">
-                    <div style="flex: 1; min-height: 140px; position: relative; overflow: hidden; margin: 10px 0;">
-                        <svg viewBox="0 0 100 100" preserveAspectRatio="none" style="width: 100%; height: 100%; display: block;">
-                            <defs>
-                                <linearGradient id="sparkline-grad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stop-color="#f97316" stop-opacity="0.25" />
-                                    <stop offset="100%" stop-color="#f97316" stop-opacity="0" />
-                                </linearGradient>
-                            </defs>
-                            <path d="M 0 100 L ${points} L 100 100 Z" fill="url(#sparkline-grad)" />
-                            <polyline points="${points}" fill="none" stroke="#f97316" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" />
-                        </svg>
-                    </div>
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; padding-top: 15px; border-top: 1px solid #f1f5f9; margin-top: auto;">
-                        <div>
-                            <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Aktivitet ${this._formatAnalyticsRangeLabel().toLowerCase()}</div>
-                            <div style="font-size: 24px; font-weight: 800; color: #1e293b; letter-spacing: -0.02em;">${ga.screenPageViews || '0'} <span style="font-size: 13px; font-weight: 600; color: #64748b; margin-left: 4px;">sidevisninger</span></div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 10px; color: #94a3b8; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px;">Akkurat nå</div>
-                            <div style="font-size: 24px; font-weight: 800; color: #f97316; display: flex; align-items: center; gap: 8px; justify-content: flex-end; letter-spacing: -0.02em;">
-                                <span style="width: 10px; height: 10px; background: #f97316; border-radius: 50%; display: block; animation: hkm-pulse 2s infinite;"></span>
-                                ${ga.activeUsers || '0'}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-        }
+        // Render dynamic premium interactive SVG chart
+        const sparklineHtml = `
+            <div id="analytics-svg-chart-container" style="width: 100%; height: 100%; position: relative; overflow: visible;"></div>
+        `;
 
         const analyticsFooterHtml = `
             <style>
@@ -4714,6 +4646,271 @@ class AdminManager {
 
         // Remove splash/cloak after initial render
         setTimeout(() => this.removeSplashScreen(), 300);
+
+        // Render premium interactive SVG chart
+        setTimeout(() => {
+            this.drawPremiumChart(this.gaData, this.analyticsRangeDays);
+        }, 150);
+    }
+
+    drawPremiumChart(ga, days = 30) {
+        const container = document.getElementById('analytics-svg-chart-container');
+        if (!container) return;
+
+        let trafficData = [];
+        let labels = [];
+        let isSimulated = false;
+
+        // Check if real GA data exists
+        if (ga && ga.dailyTraffic && Array.isArray(ga.dailyTraffic) && ga.dailyTraffic.length > 1) {
+            trafficData = ga.dailyTraffic.map(d => parseInt(d.users) || 0);
+            labels = ga.dailyTraffic.map((d, i) => d.date || d.label || `Punkt ${i+1}`);
+        } else {
+            // Generate mock data for premium appearance
+            isSimulated = true;
+            if (days <= 1) {
+                trafficData = [12, 18, 35, 24, 48, 62, 51, 30, 25, 45, 58, 22];
+                labels = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+            } else if (days <= 7) {
+                trafficData = [142, 210, 185, 320, 410, 280, 195];
+                labels = ['Man', 'Tir', 'Ons', 'Tor', 'Fre', 'Lør', 'Søn'];
+            } else if (days <= 30) {
+                trafficData = [340, 410, 390, 520, 680, 590, 480, 610, 750, 820, 710, 640, 580, 690, 880, 940, 810, 720, 680, 790, 920, 1050, 980, 890, 840, 910, 1120, 1250, 1100, 950];
+                labels = Array.from({length: 30}, (_, i) => `${i + 1}. mai`);
+            } else {
+                trafficData = [2400, 3100, 2900, 4200, 4800, 3900, 3400, 4100, 5500, 6200, 5100, 4400];
+                labels = ['Jan', 'Feb', 'Mar', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Des'];
+            }
+        }
+
+        const maxVal = Math.max(...trafficData, 10);
+        const minVal = Math.min(...trafficData, 0);
+        const range = maxVal - minVal;
+
+        // Build SVG dimensions
+        const width = container.clientWidth || 550;
+        const height = container.clientHeight || 250;
+        const paddingLeft = 45;
+        const paddingRight = 20;
+        const paddingTop = 30;
+        const paddingBottom = 30;
+        const chartWidth = width - paddingLeft - paddingRight;
+        const chartHeight = height - paddingTop - paddingBottom;
+
+        // Map data points to SVG coordinates
+        const points = trafficData.map((val, i) => {
+            const x = paddingLeft + (i / (trafficData.length - 1)) * chartWidth;
+            const y = paddingTop + chartHeight - ((val - minVal) / range) * chartHeight;
+            return { x, y, value: val, label: labels[i] };
+        });
+
+        // Compute Bezier Curve path
+        let pathD = `M ${points[0].x} ${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++) {
+            const p0 = points[i];
+            const p1 = points[i+1];
+            const cp1x = p0.x + (p1.x - p0.x) / 3;
+            const cp1y = p0.y;
+            const cp2x = p1.x - (p1.x - p0.x) / 3;
+            const cp2y = p1.y;
+            pathD += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p1.x} ${p1.y}`;
+        }
+
+        const areaD = `${pathD} L ${points[points.length - 1].x} ${paddingTop + chartHeight} L ${points[0].x} ${paddingTop + chartHeight} Z`;
+
+        // Render horizontal gridlines & labels
+        let gridHtml = '';
+        const gridSteps = 4;
+        for (let i = 0; i <= gridSteps; i++) {
+            const yVal = minVal + (i / gridSteps) * range;
+            const yPos = paddingTop + chartHeight - (i / gridSteps) * chartHeight;
+            gridHtml += `
+                <line x1="${paddingLeft}" y1="${yPos}" x2="${width - paddingRight}" y2="${yPos}" stroke="#f1f5f9" stroke-width="1" stroke-dasharray="4,4" />
+                <text x="${paddingLeft - 8}" y="${yPos + 4}" fill="#94a3b8" font-size="10" font-weight="600" text-anchor="end">${Math.round(yVal)}</text>
+            `;
+        }
+
+        // Render vertical labels
+        let labelHtml = '';
+        const labelInterval = Math.max(1, Math.floor(points.length / 6));
+        points.forEach((p, i) => {
+            if (i % labelInterval === 0 || i === points.length - 1) {
+                labelHtml += `
+                    <text x="${p.x}" y="${height - 8}" fill="#94a3b8" font-size="10" font-weight="600" text-anchor="middle">${p.label}</text>
+                `;
+            }
+        });
+
+        // Combine into complete SVG
+        container.innerHTML = `
+            <style>
+                .chart-line {
+                    stroke-dasharray: 1200;
+                    stroke-dashoffset: 1200;
+                    animation: chart-draw 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
+                .chart-area {
+                    animation: chart-fade 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                }
+                @keyframes chart-draw {
+                    to { stroke-dashoffset: 0; }
+                }
+                @keyframes chart-fade {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                .chart-dot-glow {
+                    animation: dot-pulse 2s infinite;
+                }
+                @keyframes dot-pulse {
+                    0% { r: 6; opacity: 1; }
+                    50% { r: 12; opacity: 0.4; }
+                    100% { r: 6; opacity: 1; }
+                }
+                .chart-interactive-tooltip {
+                    position: absolute;
+                    background: rgba(15, 23, 42, 0.95);
+                    color: white;
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    font-size: 12px;
+                    font-weight: 700;
+                    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+                    pointer-events: none;
+                    display: none;
+                    z-index: 100;
+                    transform: translate(-50%, -100%) translateY(-12px);
+                    transition: left 0.15s cubic-bezier(0.16, 1, 0.3, 1), top 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    white-space: nowrap;
+                }
+                .chart-interactive-tooltip::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -6px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    border-width: 6px 6px 0;
+                    border-style: solid;
+                    border-color: rgba(15, 23, 42, 0.95) transparent transparent;
+                }
+            </style>
+            
+            ${isSimulated ? `
+                <div style="position: absolute; top: -15px; right: 0; background: rgba(249, 115, 22, 0.1); color: #f97316; font-size: 10px; font-weight: 800; padding: 4px 8px; border-radius: 20px; border: 1px solid rgba(249, 115, 22, 0.2); letter-spacing: 0.05em; text-transform: uppercase; z-index: 10; display: flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 12px;">info</span>
+                    Demovisning (Google Analytics ikke tilkoblet)
+                </div>
+            ` : ''}
+
+            <svg width="100%" height="100%" style="overflow: visible; display: block;" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none">
+                <defs>
+                    <linearGradient id="chart-area-grad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#d17d39" stop-opacity="0.3" />
+                        <stop offset="100%" stop-color="#d17d39" stop-opacity="0" />
+                    </linearGradient>
+                    <linearGradient id="chart-line-grad" x1="0" y1="0" x2="1" y2="0">
+                        <stop offset="0%" stop-color="#d17d39" />
+                        <stop offset="50%" stop-color="#f97316" />
+                        <stop offset="100%" stop-color="#bd4f2a" />
+                    </linearGradient>
+                </defs>
+
+                <!-- Grid -->
+                <g class="chart-grid">${gridHtml}</g>
+
+                <!-- Curves -->
+                <path class="chart-area" d="${areaD}" fill="url(#chart-area-grad)" opacity="0" />
+                <path class="chart-line" d="${pathD}" fill="none" stroke="url(#chart-line-grad)" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round" />
+
+                <!-- Vertical reticle line -->
+                <line id="chart-reticle-line" x1="0" y1="${paddingTop}" x2="0" y2="${paddingTop + chartHeight}" stroke="#d17d39" stroke-width="1.5" stroke-dasharray="3,3" style="display:none;" />
+
+                <!-- Glow Dot Tracker -->
+                <g id="chart-tracker-group" style="display:none;">
+                    <circle id="chart-tracker-glow" class="chart-dot-glow" cx="0" cy="0" r="10" fill="#f97316" opacity="0.3" />
+                    <circle id="chart-tracker-point" cx="0" cy="0" r="6" fill="#ffffff" stroke="#f97316" stroke-width="3" />
+                </g>
+                
+                <!-- X Labels -->
+                <g class="chart-labels">${labelHtml}</g>
+            </svg>
+
+            <!-- Floating Tooltip -->
+            <div id="chart-tooltip" class="chart-interactive-tooltip"></div>
+        `;
+
+        // Interactivity handling
+        const svg = container.querySelector('svg');
+        const reticle = container.querySelector('#chart-reticle-line');
+        const tracker = container.querySelector('#chart-tracker-group');
+        const tooltip = container.querySelector('#chart-tooltip');
+
+        const handleHover = (clientX) => {
+            const rect = svg.getBoundingClientRect();
+            const mouseX = clientX - rect.left;
+            
+            // Map mouse position to SVG coordinates
+            const svgX = (mouseX / rect.width) * width;
+            
+            // Find closest data point
+            let closestPoint = points[0];
+            let minDist = Math.abs(points[0].x - svgX);
+            
+            points.forEach(p => {
+                const dist = Math.abs(p.x - svgX);
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestPoint = p;
+                }
+            });
+
+            // Update reticle & tracker positions
+            reticle.setAttribute('x1', closestPoint.x);
+            reticle.setAttribute('x2', closestPoint.x);
+            reticle.style.display = 'block';
+
+            const glow = tracker.querySelector('#chart-tracker-glow');
+            const pt = tracker.querySelector('#chart-tracker-point');
+            glow.setAttribute('cx', closestPoint.x);
+            glow.setAttribute('cy', closestPoint.y);
+            pt.setAttribute('cx', closestPoint.x);
+            pt.setAttribute('cy', closestPoint.y);
+            tracker.style.display = 'block';
+
+            // Update Tooltip
+            tooltip.innerHTML = `
+                <div style="font-size:10px; text-transform:uppercase; opacity:0.7; font-weight:800; margin-bottom:2px;">${closestPoint.label}</div>
+                <div style="font-size:14px; font-weight:800; display:flex; align-items:center; gap:4px;">
+                    <span style="width:6px; height:6px; background:#f97316; border-radius:50%;"></span>
+                    ${closestPoint.value.toLocaleString()} besøkende
+                </div>
+            `;
+            
+            // Calculate absolute position inside container
+            const tipLeft = (closestPoint.x / width) * 100;
+            const tipTop = (closestPoint.y / height) * 100;
+            
+            tooltip.style.left = `${tipLeft}%`;
+            tooltip.style.top = `${tipTop}%`;
+            tooltip.style.display = 'block';
+        };
+
+        container.addEventListener('mousemove', (e) => {
+            handleHover(e.clientX);
+        });
+
+        container.addEventListener('touchstart', (e) => {
+            if (e.touches && e.touches[0]) {
+                handleHover(e.touches[0].clientX);
+            }
+        }, { passive: true });
+
+        container.addEventListener('mouseleave', () => {
+            reticle.style.display = 'none';
+            tracker.style.display = 'none';
+            tooltip.style.display = 'none';
+        });
     }
 
     initSortableWidgets() {
@@ -7582,6 +7779,8 @@ class AdminManager {
     }
 
     async editCollectionItem(collectionId, index) {
+        let triggerAutosave = null;
+        let updateLivePreview = null;
         try {
             // Hard cleanup: ensure only one editor modal exists.
             document.querySelectorAll('.dashboard-modal').forEach((existingModal) => {
@@ -7643,6 +7842,13 @@ class AdminManager {
                              </span>
                         </div>
                         <div class="editor-header-right">
+                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
+                              <!-- Premium Autolagring statusindikator -->
+                              <div id="editor-autosave-status" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #64748b; margin-right: 16px; transition: opacity 0.3s ease; opacity: 0.8;">
+                                  <span class="material-symbols-outlined" style="font-size: 18px; color: #10b981;">cloud_done</span>
+                                  <span id="editor-autosave-text">Lagret i skyen</span>
+                              </div>
+                              ` : ''}
                                       ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `
                                       <span id="blog-translation-status" title="Status for oversettelser" style="display:none;"></span>
                                       ` : ''}
@@ -7654,6 +7860,11 @@ class AdminManager {
                              <button class="btn-ghost" id="print-col-item" title="Skriv ut" style="display:flex; align-items:center; gap:6px;">
                                 <span class="material-symbols-outlined">print</span> Skriv ut
                              </button>
+                             ${(collectionId === 'blog' || collectionId === 'teaching') ? `
+                              <button class="btn-ghost" id="toggle-split-preview" title="Forhåndsvis" style="display:flex; align-items:center; gap:6px; margin-right: 8px;">
+                                 <span class="material-symbols-outlined">visibility</span> Forhåndsvis
+                              </button>
+                              ` : ''}
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
                               <button class="btn-outline" id="save-col-item-draft" style="background: #ffffff !important; color: #1B4965 !important; border: 1px solid #cbd5e1 !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important; margin-right: 8px; display: inline-flex !important; align-items: center !important; gap: 6px !important; transition: all 0.2s ease;" onmouseover="this.style.background='#f8fafc'; this.style.borderColor='#94a3b8';" onmouseout="this.style.background='#ffffff'; this.style.borderColor='#cbd5e1';">
                                  <span class="material-symbols-outlined" style="color: #1B4965 !important;">draft</span> Lagre som utkast
@@ -7821,6 +8032,30 @@ class AdminManager {
                             </div>
                             </div>
                         </div>
+                        
+                        <!-- Split-Screen Live Preview Panel -->
+                        <div class="editor-preview-canvas" id="editor-live-preview-panel" style="display: none; flex: 1; border-left: 1px solid #e2e8f0; background: #f8fafc; flex-direction: column; overflow: hidden; position: relative;">
+                            <!-- Preview toolbar -->
+                            <div style="padding: 8px 16px; background: white; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+                                <div style="display: flex; gap: 8px; align-items: center;">
+                                    <span class="material-symbols-outlined" style="color: #d17d39;">devices</span>
+                                    <span style="font-weight: 700; font-size: 13px; color: #475569;">Sanntidsvisning</span>
+                                </div>
+                                <div class="device-toggles-modern" style="margin: 0;">
+                                    <button type="button" class="device-btn active" id="preview-device-desktop" title="PC-visning" style="width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:8px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">desktop_windows</span>
+                                    </button>
+                                    <button type="button" class="device-btn" id="preview-device-mobile" title="Mobilvisning" style="width:32px; height:32px; padding:0; display:flex; align-items:center; justify-content:center; border-radius:8px;">
+                                        <span class="material-symbols-outlined" style="font-size: 18px;">smartphone</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Preview Container -->
+                            <div id="preview-iframe-container" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px; overflow: auto; box-sizing: border-box; transition: all 0.3s ease;">
+                                <iframe id="editor-live-preview-iframe" style="width: 100%; height: 100%; border: none; background: white; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);" src="about:blank"></iframe>
+                            </div>
+                        </div>
+
                         <aside class="editor-sidebar-v2">
                              <h4 class="sidebar-section-title">DETALJER</h4>
                              <div class="sidebar-group">
@@ -8540,6 +8775,10 @@ class AdminManager {
 
                     // Initialize image behaviors for single surface
                     this._initImageReplaceBehavior(editor, editorHolderId, collectionId);
+
+                    holder.addEventListener('input', () => {
+                        if (typeof triggerAutosave === 'function') triggerAutosave();
+                    });
                 }
             } else {
                 // Standard Block-based EditorJS
@@ -8549,6 +8788,9 @@ class AdminManager {
                     placeholder: 'Trykk "/" for å velge blokker...',
                     tools: toolsConfig,
                     logLevel: 'ERROR',
+                    onChange: () => {
+                        if (typeof triggerAutosave === 'function') triggerAutosave();
+                    },
                     onReady: () => {
                         this._activeEditorInstance = editor;
                         assertEditorContact('onReady');
@@ -10208,6 +10450,290 @@ class AdminManager {
                     list.unshift(nextItem);
                 }
             };
+
+            let autosaveTimer = null;
+            triggerAutosave = () => {
+                if (collectionId !== 'blog' && collectionId !== 'teaching') return;
+
+                if (typeof updateLivePreview === 'function') updateLivePreview();
+
+                const statusEl = document.getElementById('editor-autosave-status');
+                const textEl = document.getElementById('editor-autosave-text');
+                if (statusEl && textEl) {
+                    statusEl.style.opacity = '1';
+                    textEl.innerHTML = 'Autolagrer...';
+                    const icon = statusEl.querySelector('.material-symbols-outlined');
+                    if (icon) {
+                        icon.style.color = '#3b82f6';
+                        icon.innerHTML = 'sync';
+                        icon.style.animation = 'hkm-spin 1.5s linear infinite';
+                    }
+                }
+
+                if (autosaveTimer) clearTimeout(autosaveTimer);
+
+                autosaveTimer = setTimeout(async () => {
+                    try {
+                        let safeItem = await buildSafeItemFromForm();
+                        
+                        // Perform the save
+                        firebaseService.invalidatePageContentCache(`collection_${collectionId}`);
+                        const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                        const list = this._getCollectionItems(currentData);
+
+                        // Mark as edited
+                        safeItem.dashboardEdited = true;
+                        safeItem.dashboardEditedAt = new Date().toISOString();
+                        
+                        upsertItemInList(list, safeItem);
+                        await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+
+                        // Update status to saved
+                        if (statusEl && textEl) {
+                            const now = new Date();
+                            const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                            textEl.innerHTML = `Sist lagret kl. ${timeStr}`;
+                            const icon = statusEl.querySelector('.material-symbols-outlined');
+                            if (icon) {
+                                icon.style.color = '#10b981';
+                                icon.innerHTML = 'cloud_done';
+                                icon.style.animation = 'none';
+                            }
+                            setTimeout(() => {
+                                statusEl.style.opacity = '0.7';
+                            }, 3000);
+                        }
+                    } catch (e) {
+                        console.error("Editor autosave failed:", e);
+                        if (statusEl && textEl) {
+                            textEl.innerHTML = 'Lagring feilet';
+                            const icon = statusEl.querySelector('.material-symbols-outlined');
+                            if (icon) {
+                                icon.style.color = '#ef4444';
+                                icon.innerHTML = 'cloud_off';
+                                icon.style.animation = 'none';
+                            }
+                        }
+                    }
+                }, 2000);
+            };
+
+            // Global modal input changes trigger autosave
+            modal.addEventListener('input', (e) => {
+                if (e.target.matches('.sidebar-control, #col-item-title-v2, #col-item-title-sidebar')) {
+                    if (typeof triggerAutosave === 'function') triggerAutosave();
+                }
+            });
+
+            // --- Live Preview Setup ---
+            const togglePreviewBtn = modal.querySelector('#toggle-split-preview');
+            const previewPanel = modal.querySelector('#editor-live-preview-panel');
+            const editorSidebar = modal.querySelector('.editor-sidebar-v2');
+            const previewIframe = modal.querySelector('#editor-live-preview-iframe');
+            
+            updateLivePreview = async () => {
+                if (!previewPanel || previewPanel.style.display === 'none') return;
+                
+                try {
+                    let safeItem = await buildSafeItemFromForm({ preserveExistingContentIfEmpty: true });
+                    
+                    let contentHtml = '';
+                    if (safeItem.content && Array.isArray(safeItem.content.blocks)) {
+                        contentHtml = this.editorJsBlocksToHtml(safeItem.content.blocks);
+                    } else if (typeof safeItem.content === 'string') {
+                        contentHtml = safeItem.content;
+                    }
+
+                    const titleText = safeItem.title || 'Uten tittel';
+                    const author = safeItem.author || 'Mandal Regnskapskontor';
+                    const dateStr = safeItem.date ? new Date(safeItem.date).toLocaleDateString('no') : '';
+                    const category = safeItem.category || '';
+                    const coverImage = safeItem.imageUrl || '';
+
+                    const docTemplate = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="utf-8">
+                            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+                            <style>
+                                body {
+                                    font-family: 'Inter', sans-serif;
+                                    color: #1e293b;
+                                    background: white;
+                                    margin: 0;
+                                    padding: 40px 24px;
+                                    line-height: 1.6;
+                                    -webkit-font-smoothing: antialiased;
+                                }
+                                .preview-container {
+                                    max-width: 720px;
+                                    margin: 0 auto;
+                                }
+                                .category-badge {
+                                    display: inline-block;
+                                    background: #fff7ed;
+                                    color: #d17d39;
+                                    font-size: 11px;
+                                    font-weight: 800;
+                                    padding: 4px 10px;
+                                    border-radius: 20px;
+                                    text-transform: uppercase;
+                                    letter-spacing: 0.05em;
+                                    margin-bottom: 16px;
+                                }
+                                h1 {
+                                    font-family: 'Outfit', sans-serif;
+                                    color: #1B4965;
+                                    font-size: 32px;
+                                    font-weight: 800;
+                                    line-height: 1.2;
+                                    margin: 0 0 16px 0;
+                                }
+                                .meta-area {
+                                    display: flex;
+                                    align-items: center;
+                                    gap: 12px;
+                                    font-size: 13px;
+                                    color: #64748b;
+                                    font-weight: 500;
+                                    margin-bottom: 32px;
+                                    border-bottom: 1px solid #f1f5f9;
+                                    padding-bottom: 16px;
+                                }
+                                .meta-avatar {
+                                    width: 32px;
+                                    height: 32px;
+                                    border-radius: 50%;
+                                    background: #e2e8f0;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-weight: 700;
+                                    color: #475569;
+                                    font-size: 12px;
+                                }
+                                .cover-image {
+                                    width: 100%;
+                                    aspect-ratio: 16/9;
+                                    object-fit: cover;
+                                    border-radius: 16px;
+                                    margin-bottom: 32px;
+                                    background: #f8fafc;
+                                }
+                                .content-body {
+                                    font-size: 16px;
+                                    color: #334155;
+                                }
+                                .content-body p {
+                                    margin: 0 0 20px 0;
+                                }
+                                .content-body h2 {
+                                    font-family: 'Outfit', sans-serif;
+                                    color: #1B4965;
+                                    font-size: 24px;
+                                    font-weight: 700;
+                                    margin: 40px 0 16px 0;
+                                }
+                                .content-body h3 {
+                                    font-family: 'Outfit', sans-serif;
+                                    color: #1B4965;
+                                    font-size: 20px;
+                                    font-weight: 700;
+                                    margin: 32px 0 16px 0;
+                                }
+                                .content-body img {
+                                    width: 100%;
+                                    border-radius: 12px;
+                                    margin: 24px 0;
+                                }
+                                .content-body blockquote {
+                                    border-left: 4px solid #d17d39;
+                                    margin: 24px 0;
+                                    padding: 8px 0 8px 20px;
+                                    font-style: italic;
+                                    color: #475569;
+                                    background: #fff7ed;
+                                    border-radius: 0 8px 8px 0;
+                                }
+                                .content-body ul, .content-body ol {
+                                    margin: 0 0 20px 0;
+                                    padding-left: 24px;
+                                }
+                                .content-body li {
+                                    margin-bottom: 8px;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="preview-container">
+                                \${category ? \`<span class="category-badge">\${category}</span>\` : ''}
+                                <h1>\${titleText}</h1>
+                                
+                                <div class="meta-area">
+                                    <div class="meta-avatar">\${author.substring(0,2).toUpperCase()}</div>
+                                    <div>
+                                        <div style="font-weight: 700; color: #1e293b;">\${author}</div>
+                                        <div style="font-size: 11px;">\${dateStr}</div>
+                                    </div>
+                                </div>
+
+                                \${coverImage ? \`<img src="\${coverImage}" class="cover-image">\` : ''}
+
+                                <div class="content-body">
+                                    \${contentHtml || '<p style="color:#94a3b8; font-style:italic;">Skriv innhold for å se forhåndsvisning...</p>'}
+                                </div>
+                            </div>
+                        </body>
+                        </html>
+                    `;
+
+                    const doc = previewIframe.contentDocument || previewIframe.contentWindow.document;
+                    doc.open();
+                    doc.write(docTemplate);
+                    doc.close();
+                } catch (err) {
+                    console.error("Preview update failed:", err);
+                }
+            };
+
+            if (togglePreviewBtn) {
+                togglePreviewBtn.onclick = () => {
+                    const isActive = togglePreviewBtn.classList.toggle('active');
+                    if (isActive) {
+                        togglePreviewBtn.style.background = '#fff7ed';
+                        togglePreviewBtn.style.color = '#d17d39';
+                        previewPanel.style.display = 'flex';
+                        editorSidebar.style.display = 'none';
+                        updateLivePreview();
+                    } else {
+                        togglePreviewBtn.style.background = 'transparent';
+                        togglePreviewBtn.style.color = 'inherit';
+                        previewPanel.style.display = 'none';
+                        editorSidebar.style.display = 'block';
+                    }
+                };
+            }
+
+            // Device toggles
+            const btnDesktop = modal.querySelector('#preview-device-desktop');
+            const btnMobile = modal.querySelector('#preview-device-mobile');
+            if (btnDesktop && btnMobile && previewIframe) {
+                btnDesktop.onclick = () => {
+                    btnDesktop.classList.add('active');
+                    btnMobile.classList.remove('active');
+                    previewIframe.style.width = '100%';
+                    previewIframe.style.borderRadius = '12px';
+                    previewIframe.style.height = '100%';
+                };
+                btnMobile.onclick = () => {
+                    btnMobile.classList.add('active');
+                    btnDesktop.classList.remove('active');
+                    previewIframe.style.width = '375px';
+                    previewIframe.style.borderRadius = '24px';
+                    previewIframe.style.height = '812px';
+                };
+            }
 
             const translateBtn = modal.querySelector('#translate-col-item');
             if (translateBtn && (collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts')) {
