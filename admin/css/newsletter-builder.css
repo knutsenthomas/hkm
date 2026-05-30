@@ -33,6 +33,20 @@ body.builder-active {
     height: 100vh;
 }
 
+#newsletter-builder-layout {
+    flex: 1 !important;
+    display: none;
+    height: 100vh !important;
+    height: 100dvh !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+body.builder-active #newsletter-builder-layout {
+    display: flex !important;
+    flex-direction: column !important;
+}
+
 /* 1. Nav Rail */
 .builder-nav-rail {
     width: var(--nav-rail-width);
