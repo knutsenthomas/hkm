@@ -220,6 +220,17 @@
                     </div>
                 </div>
 
+                <!-- Mine Kladder (Drafts) Section -->
+                <div class="sidebar-section-container" style="margin-top: 24px;">
+                    <div class="sidebar-section-label" style="display: flex; align-items: center; justify-content: space-between;">
+                        <span>Mine kladder</span>
+                        <span class="material-symbols-outlined" style="font-size: 16px; color: #64748b;">edit_note</span>
+                    </div>
+                    <div id="drafts-list" class="templates-list-container">
+                        <p class="empty-state-text">Ingen kladder lagret ennå</p>
+                    </div>
+                </div>
+
                 <!-- Mine Maler Section (Fixed templates list) -->
                 <div class="sidebar-section-container" style="margin-top: 24px;">
                     <div class="sidebar-section-label">Mine maler</div>
@@ -292,7 +303,12 @@
                     </div>
                     
                     <div class="header-actions">
-                        <button id="save-template-btn" class="header-action-btn secondary-flat">
+                        <button id="save-draft-btn" class="header-action-btn secondary-flat" style="margin-right: 8px;">
+                            <span class="material-symbols-outlined">edit_document</span>
+                            <span>Lagre kladd</span>
+                        </button>
+                        
+                        <button id="save-template-btn" class="header-action-btn secondary-flat" style="margin-right: 8px;">
                             <span class="material-symbols-outlined">save</span>
                             <span>Lagre mal</span>
                         </button>

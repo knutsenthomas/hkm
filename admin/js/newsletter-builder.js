@@ -212,6 +212,7 @@ class NewsletterBuilder {
                 window.location.href = '/admin/login.html';
             } else {
                 this.loadTemplates();
+                this.loadDrafts();
             }
         });
     }
@@ -319,6 +320,12 @@ class NewsletterBuilder {
 
         // Actions
         document.getElementById('preview-btn').addEventListener('click', () => this.showPreview());
+        
+        const saveDraftBtn = document.getElementById('save-draft-btn');
+        if (saveDraftBtn) {
+            saveDraftBtn.addEventListener('click', () => this.saveDraft());
+        }
+        
         document.getElementById('save-template-btn').addEventListener('click', () => this.saveTemplate());
         document.getElementById('continue-btn').addEventListener('click', () => this.toggleRecipientsDrawer());
         document.getElementById('send-test-btn').addEventListener('click', () => this.sendTestEmail());
@@ -1148,7 +1155,8 @@ class NewsletterBuilder {
                 name,
                 blocks: this.blocks,
                 subject: document.getElementById('newsletter-subject').value,
-                createdAt: new Date().toISOString()
+                createdAt: new Date().toISOString(),
+                isDraft: false
             };
             await window.firebaseService.db.collection('newsletter_templates').add(data);
             showToast("Mal lagret!", "success");
@@ -1163,13 +1171,14 @@ class NewsletterBuilder {
         try {
             const container = document.getElementById('templates-list');
             const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
-            if (snap.empty) {
-                container.innerHTML = '<p class="empty-msg">Ingen maler lagret ennå</p>';
-                return;
-            }
+            
+            let count = 0;
             container.innerHTML = '';
             snap.forEach(doc => {
                 const data = doc.data();
+                if (data.isDraft === true) return; // Skip drafts!
+                count++;
+                
                 const div = document.createElement('div');
                 div.className = 'template-item card';
                 div.style.padding = '12px'; div.style.marginBottom = '8px'; div.style.cursor = 'pointer';
@@ -1184,6 +1193,10 @@ class NewsletterBuilder {
                 };
                 container.appendChild(div);
             });
+            
+            if (count === 0) {
+                container.innerHTML = '<p class="empty-msg">Ingen maler lagret ennå</p>';
+            }
         } catch (e) { }
     }
 
@@ -1433,6 +1446,71 @@ class NewsletterBuilder {
                 showToast("Bilde slettet.", "info");
             }
         };
+    }
+
+    async saveDraft() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        const name = prompt("Navn på kladden (f.eks: Ukeavis, Invitasjon...):", "Min Kladd");
+        if (!name) return;
+        try {
+            this.syncUnifiedBlocks();
+            const data = {
+                name,
+                blocks: this.blocks,
+                subject: document.getElementById('newsletter-subject').value,
+                createdAt: new Date().toISOString(),
+                isDraft: true // Marked as draft!
+            };
+            await window.firebaseService.db.collection('newsletter_templates').add(data);
+            showToast("Kladd lagret!", "success");
+            this.loadDrafts();
+        } catch (e) {
+            console.error("Save draft failed:", e);
+            showToast("Kunne ikke lagre kladd.");
+        }
+    }
+
+    async loadDrafts() {
+        if (!window.firebaseService || !window.firebaseService.isInitialized) return;
+        try {
+            const container = document.getElementById('drafts-list');
+            if (!container) return;
+            const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
+            
+            let count = 0;
+            container.innerHTML = '';
+            snap.forEach(doc => {
+                const data = doc.data();
+                if (data.isDraft !== true) return; // Only load drafts!
+                count++;
+                
+                const div = document.createElement('div');
+                div.className = 'template-item card';
+                div.style.padding = '12px'; div.style.marginBottom = '8px'; div.style.cursor = 'pointer';
+                div.innerHTML = `<div style="display:flex; justify-content:space-between; align-items:center;">
+                                     <div>
+                                         <div style="font-weight:600; font-size:14px; color:#1e293b;">${data.name}</div>
+                                         <div style="font-size:11px; color:#64748b;">${new Date(data.createdAt).toLocaleDateString()}</div>
+                                     </div>
+                                     <span class="material-symbols-outlined" style="font-size:18px; color:#94a3b8;">edit</span>
+                                 </div>`;
+                div.onclick = () => {
+                    if (confirm(`Last inn kladden "${data.name}"? Dette vil overskrive gjeldende innhold.`)) {
+                        this.blocks = data.blocks;
+                        document.getElementById('newsletter-subject').value = data.subject || '';
+                        this.renderCanvas();
+                        showToast(`Kladden "${data.name}" er lastet inn.`, "info");
+                    }
+                };
+                container.appendChild(div);
+            });
+            
+            if (count === 0) {
+                container.innerHTML = '<p class="empty-state-text">Ingen kladder lagret ennå</p>';
+            }
+        } catch (e) {
+            console.error("Load drafts failed:", e);
+        }
     }
 }
 
