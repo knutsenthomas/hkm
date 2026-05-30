@@ -624,16 +624,35 @@ class NewsletterBuilder {
                     });
 
                     if (result.data && result.data.blocks) {
-                        for (const aiBlock of result.data.blocks) {
-                            const id = Date.now() + Math.random().toString(36).substr(2, 9);
-                            this.blocks.push({
-                                id,
-                                type: aiBlock.type,
-                                content: aiBlock.content
-                            });
+                        const aiHtml = result.data.blocks.map(block => {
+                            switch (block.type) {
+                                case 'header':
+                                    return `<h1 class="block-h1">${block.content.text}</h1>`;
+                                case 'text':
+                                    return `<p class="block-text">${block.content.text}</p>`;
+                                case 'image':
+                                    return `<p><img src="${block.content.url || 'https://images.unsplash.com/photo-1490730141103-6cac27aaab94?auto=format&fit=crop&w=800&q=80'}" alt="${block.content.alt || ''}" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+                                case 'button':
+                                    return `
+                                        <div style="text-align: center; margin: 24px 0;">
+                                            <a href="${block.content.url || '#'}" class="block-btn" style="display: inline-block; background-color: #d17d39; color: white; padding: 12px 30px; border-radius: 999px; text-decoration: none; font-weight: 700; font-family: 'Inter', sans-serif;">${block.content.text || 'Les mer'}</a>
+                                        </div><p><br></p>`;
+                                case 'divider':
+                                    return `<hr style="border: none; border-top: ${block.content.thickness || 2}px solid ${block.content.color || '#e2e8f0'}; margin: 24px 0;">`;
+                                case 'spacer':
+                                    return `<div style="height: ${block.content.height || 24}px;"></div>`;
+                                default:
+                                    return '';
+                            }
+                        }).join('');
+
+                        // Set the container content directly to the compiled AI HTML
+                        const container = document.getElementById('blocks-container');
+                        if (container) {
+                            container.innerHTML = aiHtml;
+                            this.syncUnifiedBlocks();
                         }
-                        this.renderCanvas();
-                        showToast(`AI har bygget ${result.data.blocks.length} blokker!`, "success");
+                        showToast(`AI har bygget nyhetsbrevet ditt!`, "success");
                     }
                 } catch (err) {
                     console.error("AI Builder failed:", err);
@@ -658,10 +677,9 @@ class NewsletterBuilder {
                     });
 
                     if (result.data && result.data.text) {
-                        this.addBlock('text');
-                        const lastBlock = this.blocks[this.blocks.length - 1];
-                        lastBlock.content.text = result.data.text;
-                        this.renderCanvas();
+                        // Insert the generated text as paragraphs at the cursor position
+                        const paragraphs = result.data.text.split('\n\n').map(p => `<p class="block-text">${p.replace(/\n/g, '<br>')}</p>`).join('');
+                        this.exec('insertHTML', paragraphs);
                         showToast("Tekst generert!", "success");
                     }
                 } catch (err) {
@@ -686,10 +704,8 @@ class NewsletterBuilder {
                     });
 
                     if (result.data && result.data.imageUrl) {
-                        this.addBlock('image');
-                        const lastBlock = this.blocks[this.blocks.length - 1];
-                        lastBlock.content.url = result.data.imageUrl;
-                        this.renderCanvas();
+                        const imgHtml = `<p><img src="${result.data.imageUrl}" alt="AI Generert bilde" class="block-img" style="max-width:100%; height:auto; border-radius:8px; margin: 16px 0; display: block;"></p>`;
+                        this.exec('insertHTML', imgHtml);
                         showToast("Bilde generert!", "success");
                     }
                 } catch (err) {
