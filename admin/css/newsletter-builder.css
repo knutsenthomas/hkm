@@ -2542,6 +2542,15 @@ input:checked+.slider:before {
     font-weight: 500 !important;
 }
 
+.builder-unified-header .header-left-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    flex: 1 !important;
+    justify-content: flex-start !important;
+    min-width: 0 !important; /* Allow shrinking without breakage */
+}
+
 .builder-unified-header .header-subject-container {
     display: flex !important;
     align-items: center !important;
@@ -2586,10 +2595,9 @@ input:checked+.slider:before {
 .builder-unified-header .header-center {
     display: flex !important;
     align-items: center !important;
+    justify-content: center !important;
     flex-shrink: 0 !important; /* Prevent toggles group from squishing */
-    position: absolute !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    margin: 0 16px !important; /* Safe zone spacing to prevent overlapping */
 }
 
 .builder-unified-header .device-toggles-modern {
@@ -2635,8 +2643,9 @@ input:checked+.slider:before {
     display: flex !important;
     align-items: center !important;
     gap: 16px !important;
+    flex: 1 !important;
+    justify-content: flex-end !important;
     flex-shrink: 0 !important; /* Prevent buttons from being pushed off the screen */
-    margin-left: auto !important; /* Push actions to the far right */
 }
 
 .builder-unified-header .header-action-btn {
