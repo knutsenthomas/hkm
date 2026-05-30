@@ -2031,7 +2031,7 @@ input:checked+.slider:before {
 .custom-prompt-overlay {
     position: fixed !important;
     inset: 0 !important;
-    z-index: 9999 !important;
+    z-index: 999999 !important;
     background: rgba(15, 23, 42, 0.4) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -2240,6 +2240,7 @@ input:checked+.slider:before {
 .hkm-modal-overlay {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
+    z-index: 999999 !important; /* Force overlays to sit unconditionally on top of all page elements */
 }
 
 /* --- High-Fidelity Unified Top Header & Modern Vertical Sidebar Styles --- */
