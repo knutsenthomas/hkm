@@ -592,6 +592,53 @@ class NewsletterBuilder {
         }
     }
 
+    showConfirm(title, message, confirmText = 'Bekreft', cancelText = 'Avbryt') {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('hkm-confirm-modal');
+            if (!modal) {
+                resolve(confirm(message));
+                return;
+            }
+
+            const titleEl = document.getElementById('confirm-modal-title');
+            const messageEl = document.getElementById('confirm-modal-message');
+            const confirmBtn = document.getElementById('confirm-modal-confirm');
+            const cancelBtn = document.getElementById('confirm-modal-cancel');
+            const headerEl = modal.querySelector('.modal-header');
+
+            if (titleEl) titleEl.textContent = title;
+            if (messageEl) messageEl.textContent = message;
+            if (cancelBtn) cancelBtn.textContent = cancelText;
+            
+            if (confirmBtn) {
+                confirmBtn.textContent = confirmText;
+                const orangeGradient = 'linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%)';
+                confirmBtn.style.background = orangeGradient;
+                if (headerEl) headerEl.style.background = orangeGradient;
+            }
+
+            const cleanup = () => {
+                modal.style.display = 'none';
+                confirmBtn.onclick = null;
+                cancelBtn.onclick = null;
+            };
+
+            confirmBtn.onclick = (e) => {
+                e.preventDefault();
+                cleanup();
+                resolve(true);
+            };
+
+            cancelBtn.onclick = (e) => {
+                e.preventDefault();
+                cleanup();
+                resolve(false);
+            };
+
+            modal.style.display = 'flex';
+        });
+    }
+
     showPromptModal(label, placeholder, confirmCallback) {
         const modal = document.getElementById('custom-prompt-modal');
         const labelEl = document.getElementById('custom-prompt-label');
@@ -1197,8 +1244,9 @@ class NewsletterBuilder {
                 div.style.padding = '12px'; div.style.marginBottom = '8px'; div.style.cursor = 'pointer';
                 div.innerHTML = `<div style="font-weight:600; font-size:14px;">${data.name}</div>
                                  <div style="font-size:11px; color:#64748b;">${new Date(data.createdAt).toLocaleDateString()}</div>`;
-                div.onclick = () => {
-                    if (confirm(`Last inn "${data.name}"?`)) {
+                div.onclick = async () => {
+                    const confirmed = await this.showConfirm('Last inn mal', `Last inn "${data.name}"?`, 'Last inn');
+                    if (confirmed) {
                         this.blocks = data.blocks;
                         document.getElementById('newsletter-subject').value = data.subject || '';
                         this.renderCanvas();
@@ -1264,7 +1312,7 @@ class NewsletterBuilder {
             return showToast("Du må velge minst én mottaker eller målgruppe.", "warning");
         }
 
-        const confirmSend = confirm(`Er du sikker på at du vil sende "${subject}" til ca. ${estCount} mottakere?`);
+        const confirmSend = await this.showConfirm('Send kampanje', `Er du sikker på at du vil sende "${subject}" til ca. ${estCount} mottakere?`, 'Send');
         if (!confirmSend) return;
 
         try {
@@ -1287,13 +1335,14 @@ class NewsletterBuilder {
             await window.firebaseService.db.collection('newsletter_campaigns').add(campaignData);
 
             // Success feedback
-            setTimeout(() => {
+            setTimeout(async () => {
                 showToast(`Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse til ${estCount} mottakere.`);
                 finalBtn.disabled = false;
                 finalBtn.innerHTML = originalText;
 
                 // Optionally redirect back to dashboard
-                if (confirm("Vil du gå tilbake til dashbordet?")) {
+                const confirmedBack = await this.showConfirm('Tilbake til dashbord', "Vil du gå tilbake til dashbordet?", 'Ja, gå tilbake', 'Bli her');
+                if (confirmedBack) {
                     window.location.href = '/admin/index.html';
                 }
             }, 1500);
@@ -1447,9 +1496,10 @@ class NewsletterBuilder {
         };
         
         // Option 4: Delete image
-        document.getElementById('img-opt-delete').onclick = () => {
+        document.getElementById('img-opt-delete').onclick = async () => {
             closeOverlay();
-            if (confirm("Er du sikker på at du vil slette dette bildet?")) {
+            const confirmed = await this.showConfirm('Slett bilde', "Er du sikker på at du vil slette dette bildet?", 'Slett');
+            if (confirmed) {
                 const parent = imgElement.parentNode;
                 imgElement.remove();
                 if (parent && parent.tagName === 'P' && parent.innerHTML.trim() === '') {
@@ -1507,8 +1557,9 @@ class NewsletterBuilder {
                                      </div>
                                      <span class="material-symbols-outlined" style="font-size:18px; color:#94a3b8;">edit</span>
                                  </div>`;
-                div.onclick = () => {
-                    if (confirm(`Last inn kladden "${data.name}"? Dette vil overskrive gjeldende innhold.`)) {
+                div.onclick = async () => {
+                    const confirmed = await this.showConfirm('Last inn kladd', `Last inn kladden "${data.name}"? Dette vil overskrive gjeldende innhold.`, 'Last inn');
+                    if (confirmed) {
                         this.blocks = data.blocks;
                         document.getElementById('newsletter-subject').value = data.subject || '';
                         this.renderCanvas();
@@ -1936,12 +1987,12 @@ class NewsletterBuilder {
             `;
 
             // Click listeners
-            card.querySelector(`#delete-btn-${item.id}`).onclick = (e) => {
+            card.querySelector('.card-delete-btn').onclick = (e) => {
                 e.stopPropagation();
                 this.deleteStudioItem(item);
             };
 
-            card.querySelector(`#edit-btn-${item.id}`).onclick = (e) => {
+            card.querySelector('.card-edit-btn').onclick = (e) => {
                 e.stopPropagation();
                 this.editStudioItem(item);
             };
@@ -1967,7 +2018,11 @@ class NewsletterBuilder {
     }
 
     async deleteStudioItem(item) {
-        const confirmed = confirm(`Er du sikker på at du vil slette "${item.title}"? Dette kan ikke angres.`);
+        const confirmed = await this.showConfirm(
+            'Bekreft sletting',
+            `Er du sikker på at du vil slette "${item.title}"? Dette kan ikke angres.`,
+            'Slett'
+        );
         if (!confirmed) return;
 
         showToast("Sletter...", "info");
@@ -1981,7 +2036,10 @@ class NewsletterBuilder {
                 // Finn samsvarende element basert på id, eller fallback til tittel og dato
                 const matchIdx = list.findIndex(fi => {
                     if (item.id && fi.id === item.id) return true;
-                    return fi.title === item.title && (fi.date || fi.createdAt) === (item.date || item.createdAt);
+                    const cleanTitleMatch = fi.title === item.title;
+                    const dateA = (fi.date || fi.createdAt || '').toString().substring(0, 10);
+                    const dateB = (item.date || item.createdAt || '').toString().substring(0, 10);
+                    return cleanTitleMatch && (dateA === dateB || !dateA || !dateB);
                 });
 
                 if (matchIdx >= 0) {
@@ -2020,10 +2078,15 @@ class NewsletterBuilder {
         }
     }
 
-    loadDraftById(id) {
+    async loadDraftById(id) {
         const draft = this.draftsCache && this.draftsCache[id];
         if (!draft) return;
-        if (confirm(`Last inn kladden "${draft.name}"? Dette vil erstatte innholdet i editoren.`)) {
+        const confirmed = await this.showConfirm(
+            'Last inn kladd',
+            `Last inn kladden "${draft.name}"? Dette vil erstatte innholdet i editoren.`,
+            'Last inn'
+        );
+        if (confirmed) {
             this.currentDraftId = id;
             this.currentDraftName = draft.name;
             this.blocks = JSON.parse(JSON.stringify(draft.blocks || []));
@@ -2136,10 +2199,15 @@ class NewsletterBuilder {
         }, 2000);
     }
 
-    loadCustomTemplateById(id) {
+    async loadCustomTemplateById(id) {
         const tpl = this.templatesCache && this.templatesCache[id];
         if (!tpl) return;
-        if (confirm(`Last inn malen "${tpl.name}"? Dette vil erstatte innholdet i editoren.`)) {
+        const confirmed = await this.showConfirm(
+            'Last inn mal',
+            `Last inn malen "${tpl.name}"? Dette vil erstatte innholdet i editoren.`,
+            'Last inn'
+        );
+        if (confirmed) {
             this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
             document.getElementById('newsletter-subject').value = tpl.subject || '';
             this.toggleMode('builder');
@@ -2148,10 +2216,15 @@ class NewsletterBuilder {
         }
     }
 
-    loadTemplateById(id) {
+    async loadTemplateById(id) {
         const tpl = this.defaultTemplates && this.defaultTemplates.find(t => t.id === id);
         if (!tpl) return;
-        if (confirm(`Last inn malen "${tpl.name}"? Dette vil erstatte innholdet i editoren.`)) {
+        const confirmed = await this.showConfirm(
+            'Last inn mal',
+            `Last inn malen "${tpl.name}"? Dette vil erstatte innholdet i editoren.`,
+            'Last inn'
+        );
+        if (confirmed) {
             this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
             document.getElementById('newsletter-subject').value = tpl.subject || '';
             this.toggleMode('builder');
@@ -2160,8 +2233,13 @@ class NewsletterBuilder {
         }
     }
 
-    loadDraftIntoBuilder(id, name, blocksStr, subject) {
-        if (confirm(`Last inn kladden "${name}"? Dette vil erstatte innholdet i editoren.`)) {
+    async loadDraftIntoBuilder(id, name, blocksStr, subject) {
+        const confirmed = await this.showConfirm(
+            'Last inn kladd',
+            `Last inn kladden "${name}"? Dette vil erstatte innholdet i editoren.`,
+            'Last inn'
+        );
+        if (confirmed) {
             try {
                 this.currentDraftId = id;
                 this.currentDraftName = name;
@@ -2191,8 +2269,13 @@ class NewsletterBuilder {
         }
     }
 
-    loadTemplateIntoBuilder(id, name, blocksStr, subject) {
-        if (confirm(`Last inn malen "${name}"?`)) {
+    async loadTemplateIntoBuilder(id, name, blocksStr, subject) {
+        const confirmed = await this.showConfirm(
+            'Last inn mal',
+            `Last inn malen "${name}"?`,
+            'Last inn'
+        );
+        if (confirmed) {
             try {
                 this.blocks = JSON.parse(blocksStr);
                 document.getElementById('newsletter-subject').value = subject || '';
