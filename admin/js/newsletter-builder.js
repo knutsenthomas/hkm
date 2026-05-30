@@ -1572,11 +1572,11 @@ class NewsletterBuilder {
                     id: 'tpl-ukeshilsen',
                     name: 'Ukeshilsen & Andakt',
                     description: 'En ren, minimalistisk mal med andakt, bibelvers, hilsen og kontaktinfo.',
-                    thumbnail: 'https://images.unsplash.com/photo-1504052434569-70ad58565b90?auto=format&fit=crop&w=200&q=80',
+                    thumbnail: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=200&q=80',
                     subject: 'Ukens oppmuntring fra His Kingdom Ministry',
                     blocks: [
                         { type: 'header', content: { text: 'Ukeshilsen' } },
-                        { type: 'image', content: { url: 'https://images.unsplash.com/photo-1504052434569-70ad58565b90?auto=format&fit=crop&w=800&q=80' } },
+                        { type: 'image', content: { url: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80' } },
                         { type: 'text', content: { text: '<h3>Kjære brødre og søstre,</h3><p>Vi ønsker deg en velsignet uke! I dag vil vi dele noen ord til oppmuntring om Guds trofasthet og kjærlighet i hverdagen...</p>' } },
                         { type: 'button', content: { text: 'Les hele andakten', url: 'https://hkm.no' } }
                     ]
@@ -1627,16 +1627,16 @@ class NewsletterBuilder {
                     draftsCount++;
                     this.draftsCache[id] = data;
                     draftsHtml += `
-                        <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;" 
+                        <div class="template-item card" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; text-align: left !important; height: auto !important; min-height: unset !important; padding: 12px 16px !important; border: 1px solid #e2e8f0 !important; border-radius: 16px !important; cursor: pointer !important; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important; background: white !important; margin-bottom: 12px !important; box-sizing: border-box !important; box-shadow: none !important;" 
                             onclick="window.builder.loadDraftById('${id}')"
                             onmouseover="this.style.borderColor='var(--accent-color, #d17d39)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';" 
                             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
                             <div style="width: 44px; height: 44px; border-radius: 10px; background: #fff7ed; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; color: #d17d39;">
                                 <span class="material-symbols-outlined" style="font-size: 22px;">edit_document</span>
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
-                                <div style="font-size: 12px; color: #64748b; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">
+                            <div style="flex: 1; min-width: 0; text-align: left !important;">
+                                <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important;">${data.name}</div>
+                                <div style="font-size: 12px; color: #64748b; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; text-align: left !important;">
                                     ${formattedDate} · Emne: ${data.subject || 'Ingen'}
                                 </div>
                             </div>
@@ -1647,16 +1647,16 @@ class NewsletterBuilder {
                     // Custom templates saved in Firestore
                     this.templatesCache[id] = data;
                     templatesHtml += `
-                        <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;"
+                        <div class="template-item card" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; text-align: left !important; height: auto !important; min-height: unset !important; padding: 12px 16px !important; border: 1px solid #e2e8f0 !important; border-radius: 16px !important; cursor: pointer !important; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important; background: white !important; margin-bottom: 12px !important; box-sizing: border-box !important; box-shadow: none !important;"
                             onclick="window.builder.loadCustomTemplateById('${id}')"
                             onmouseover="this.style.borderColor='#1B4965'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';"
                             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
                             <div style="width: 44px; height: 44px; border-radius: 10px; background: #e0f2fe; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; color: #1B4965;">
                                 <span class="material-symbols-outlined" style="font-size: 22px;">auto_awesome_motion</span>
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${data.name}</div>
-                                <div style="font-size: 12px; color: #64748b; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500;">Opprettet ${formattedDate}</div>
+                            <div style="flex: 1; min-width: 0; text-align: left !important;">
+                                <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important;">${data.name}</div>
+                                <div style="font-size: 12px; color: #64748b; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; text-align: left !important;">Opprettet ${formattedDate}</div>
                             </div>
                             <span class="material-symbols-outlined" style="font-size: 20px; color: #1B4965; margin-left: 12px; flex-shrink: 0;">arrow_forward</span>
                         </div>
@@ -1668,14 +1668,14 @@ class NewsletterBuilder {
             let defaultTemplatesHtml = '';
             DEFAULT_TEMPLATES.forEach(tpl => {
                 defaultTemplatesHtml += `
-                    <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;"
+                    <div class="template-item card" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; text-align: left !important; height: auto !important; min-height: unset !important; padding: 12px 16px !important; border: 1px solid #e2e8f0 !important; border-radius: 16px !important; cursor: pointer !important; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important; background: white !important; margin-bottom: 12px !important; box-sizing: border-box !important; box-shadow: none !important;"
                         onclick="window.builder.loadTemplateById('${tpl.id}')"
                         onmouseover="this.style.borderColor='#d17d39'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';"
                         onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
                         <img src="${tpl.thumbnail}" style="width: 72px; height: 54px; border-radius: 10px; object-fit: cover; margin-right: 16px; flex-shrink: 0; background: #f1f5f9;" alt="${tpl.name}">
-                        <div style="flex: 1; min-width: 0;">
-                            <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${tpl.name}</div>
-                            <div style="font-size: 12px; color: #64748b; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; font-weight: 500;">${tpl.description}</div>
+                        <div style="flex: 1; min-width: 0; text-align: left !important;">
+                            <div style="font-weight: 700; font-size: 14.5px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left !important;">${tpl.name}</div>
+                            <div style="font-size: 12px; color: #64748b; margin-top: 4px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; font-weight: 500; text-align: left !important;">${tpl.description}</div>
                         </div>
                         <span class="material-symbols-outlined" style="font-size: 20px; color: #d17d39; margin-left: 12px; flex-shrink: 0;">arrow_forward</span>
                     </div>
