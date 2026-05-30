@@ -1761,3 +1761,71 @@ input:checked+.slider:before {
         font-size: 13px !important;
     }
 }
+
+/* --- AI Tool Cards (High Fidelity & Premium Finish) --- */
+.ai-tool-card {
+    border: none !important;
+    border-radius: var(--radius-md, 12px) !important;
+    color: #ffffff !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* For the full width card (Magisk Oppsett AI) */
+.ai-tool-card.full-width {
+    grid-column: span 2 !important;
+    flex-direction: row !important;
+    padding: 16px 24px !important; /* Multiples of 8 spacing */
+    gap: 12px !important;
+}
+
+/* For the half width cards (Magisk Tekst, AI Bilde) */
+.ai-tool-card.half-width {
+    grid-column: span 1 !important;
+    flex-direction: column !important;
+    padding: 24px 16px !important; /* Multiples of 8 spacing */
+    gap: 8px !important;
+}
+
+.ai-tool-card:hover {
+    transform: translateY(-2px) scale(1.02) !important;
+    filter: brightness(1.08) !important;
+}
+
+.ai-tool-card.purple-gradient {
+    background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+}
+
+.ai-tool-card.purple-gradient:hover {
+    box-shadow: 0 8px 24px rgba(124, 58, 237, 0.3) !important;
+}
+
+.ai-tool-card.orange-gradient {
+    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+}
+
+.ai-tool-card.orange-gradient:hover {
+    box-shadow: 0 8px 24px rgba(209, 125, 57, 0.3) !important;
+}
+
+.ai-tool-card:active {
+    transform: translateY(0) scale(0.98) !important;
+}
+
+/* Override child icon colors inside AI cards to ensure white color */
+.ai-tool-card span.material-symbols-outlined {
+    font-size: 24px !important;
+    color: #ffffff !important;
+}
+
+/* Override child label colors inside AI cards to ensure white color */
+.ai-tool-card .element-label {
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+}
+
