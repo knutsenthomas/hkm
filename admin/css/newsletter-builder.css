@@ -748,39 +748,48 @@ body.builder-active .builder-workspace > .canvas-container {
 }
 
 .block-controls {
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-    display: none;
-    flex-direction: column;
-    gap: 4px;
-    z-index: 10;
+    position: absolute !important;
+    right: -36px !important; /* Float completely outside the right active border */
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: none !important;
+    flex-direction: column !important;
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    padding: 4px !important;
+    gap: 4px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08) !important;
+    z-index: 100 !important;
 }
 
 .newsletter-block:hover .block-controls {
-    display: flex;
+    display: flex !important;
 }
 
 .control-btn {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-    background: white;
-    border: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    color: #64748b !important;
+    transition: all 0.2s ease !important;
+    box-shadow: none !important;
 }
 
 .control-btn:hover {
-    color: var(--accent-orange);
+    color: #1B4965 !important; /* Brand Mørkeblå */
+    background: #f1f5f9 !important;
 }
 
 .control-btn.delete:hover {
-    color: #ef4444;
+    color: #ef4444 !important;
+    background: #fee2e2 !important;
 }
 
 /* Recipient Drawer Styles */
@@ -1518,15 +1527,27 @@ input:checked+.slider:before {
     }
 
     .block-controls {
-        position: static;
-        transform: none;
-        display: flex;
-        flex-direction: row;
-        margin-top: 10px;
+        position: static !important;
+        transform: none !important;
+        display: flex !important;
+        flex-direction: row !important;
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        gap: 8px !important;
+        margin-top: 12px !important;
+        z-index: 10 !important;
     }
 
     .newsletter-block:hover .block-controls {
-        display: flex;
+        display: flex !important;
+    }
+
+    .block-controls .control-btn {
+        border: 1px solid #e2e8f0 !important;
+        background: #ffffff !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     }
 
     .builder-layout {
