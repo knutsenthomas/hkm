@@ -5989,9 +5989,14 @@ body.admin-body .template-item:active {
 }
 
 /* Premium visual separation for gave-tabellene (Donations tables) */
+.data-table {
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  width: 100% !important;
+}
+
 #donation-transactions-body tr,
 #donation-donors-body tr {
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
   background-color: #ffffff !important;
   transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
@@ -6005,7 +6010,12 @@ body.admin-body .template-item:active {
 #donation-donors-body td {
   padding: 16px 20px !important;
   vertical-align: middle !important;
-  border-bottom: none !important; /* Overstyre eldre td-rammer for å bruke tr-rammen */
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important; /* Premium visual divider */
+}
+
+#donation-transactions-body tr:last-child td,
+#donation-donors-body tr:last-child td {
+  border-bottom: none !important; /* Rent design uten linje under siste rad */
 }
 
 #donation-transactions-body td:first-child,
