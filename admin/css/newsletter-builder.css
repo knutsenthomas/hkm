@@ -2192,14 +2192,20 @@ input:checked+.slider:before {
 }
 
 .prompt-btn.primary {
-    background: #1B4965 !important;
+    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
     color: #ffffff !important;
-    box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25) !important;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2) !important;
+    border: none !important;
 }
 
 .prompt-btn.primary:hover {
-    background: #13354c !important;
-    box-shadow: 0 6px 16px rgba(27, 73, 101, 0.35) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 16px rgba(209, 125, 57, 0.3) !important;
+    filter: brightness(1.05) !important;
+}
+
+.prompt-btn.primary:active {
+    transform: translateY(0) scale(0.98) !important;
 }
 
 .prompt-btn.primary span.material-symbols-outlined {
