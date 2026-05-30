@@ -776,10 +776,18 @@ body.admin-body .btn-sm,
 .btn-sm {
     min-height: 32px !important;
     height: 32px !important;
+    width: auto !important;
     padding: 0 16px !important;
     font-size: 0.78rem !important;
     line-height: 1 !important;
     border-radius: 8px !important;
+}
+
+body.admin-body .ms-btn-full,
+.ms-btn-full,
+body.admin-body .btn-full,
+.btn-full {
+    width: 100% !important;
 }
 
 .btn .material-symbols-outlined {
