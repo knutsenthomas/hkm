@@ -5995,6 +5995,17 @@ body.admin-body .template-item:active {
   width: 100% !important;
 }
 
+.data-table th {
+  padding: 12px 20px !important;
+  text-align: left !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  color: #64748b !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.05em !important;
+  border-bottom: 2px solid rgba(15, 23, 42, 0.08) !important;
+}
+
 #donation-transactions-body tr,
 #donation-donors-body tr {
   background-color: #ffffff !important;
@@ -6008,9 +6019,25 @@ body.admin-body .template-item:active {
 
 #donation-transactions-body td,
 #donation-donors-body td {
-  padding: 16px 20px !important;
+  padding: 12px 20px !important; /* Mer kompakt premium padding */
   vertical-align: middle !important;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important; /* Premium visual divider */
+  font-size: 13px !important; /* Elegant og profesjonell tekststørrelse */
+  color: #334155 !important;
+}
+
+#donation-transactions-body td strong,
+#donation-donors-body td strong {
+  font-size: 13.5px !important; /* Mer balansert størrelse for navn og beløp */
+  font-weight: 600 !important; /* Mindre aggressiv skrifttykkelse */
+  color: #0f172a !important;
+}
+
+#donation-transactions-body td div,
+#donation-donors-body td div {
+  font-size: 11px !important; /* Mindre tekst for e-post og sekundærinfo */
+  color: #64748b !important;
+  margin-top: 2px !important;
 }
 
 #donation-transactions-body tr:last-child td,
