@@ -139,6 +139,21 @@ class AdminManager {
         window.adminManager = this;
         console.log("AdminManager initialized successfully.");
 
+        // Robust initial section switch on startup to prevent race conditions
+        const hash = window.location.hash.substring(1);
+        const rememberedSection = sessionStorage.getItem('hkm_admin_last_dashboard_section');
+        const initialSection = hash || rememberedSection || 'overview';
+        if (initialSection && initialSection !== 'overview') {
+            console.log(`[AdminManager] 🚀 Auto-triggering initial section switch on startup: ${initialSection}`);
+            setTimeout(() => {
+                if (typeof window.handleSectionSwitch === 'function') {
+                    window.handleSectionSwitch(initialSection);
+                } else {
+                    this.onSectionSwitch(initialSection);
+                }
+            }, 100);
+        }
+
         // Auto-cleanup trigger if hash is present
         if (window.location.hash === '#force-wix-cleanup') {
             console.log('[Auto-Cleanup] Triggered via hash!');
