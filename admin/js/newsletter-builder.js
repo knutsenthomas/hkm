@@ -1608,6 +1608,10 @@ class NewsletterBuilder {
                 }
             ];
 
+            this.defaultTemplates = DEFAULT_TEMPLATES;
+            this.draftsCache = {};
+            this.templatesCache = {};
+
             const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
             
             let draftsHtml = '';
@@ -1621,9 +1625,10 @@ class NewsletterBuilder {
                 
                 if (data.isDraft === true) {
                     draftsCount++;
+                    this.draftsCache[id] = data;
                     draftsHtml += `
                         <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;" 
-                            onclick="window.builder.loadDraftIntoBuilder('${id}', '${data.name.replace(/'/g, "\\'")}', \`${JSON.stringify(data.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${(data.subject || '').replace(/'/g, "\\'")}')"
+                            onclick="window.builder.loadDraftById('${id}')"
                             onmouseover="this.style.borderColor='var(--accent-color, #d17d39)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';" 
                             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
                             <div style="width: 44px; height: 44px; border-radius: 10px; background: #fff7ed; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; color: #d17d39;">
@@ -1640,9 +1645,10 @@ class NewsletterBuilder {
                     `;
                 } else {
                     // Custom templates saved in Firestore
+                    this.templatesCache[id] = data;
                     templatesHtml += `
                         <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;"
-                            onclick="window.builder.loadTemplateIntoBuilder('${id}', '${data.name.replace(/'/g, "\\'")}', \`${JSON.stringify(data.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${(data.subject || '').replace(/'/g, "\\'")}')"
+                            onclick="window.builder.loadCustomTemplateById('${id}')"
                             onmouseover="this.style.borderColor='#1B4965'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';"
                             onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
                             <div style="width: 44px; height: 44px; border-radius: 10px; background: #e0f2fe; display: flex; align-items: center; justify-content: center; margin-right: 16px; flex-shrink: 0; color: #1B4965;">
@@ -1663,7 +1669,7 @@ class NewsletterBuilder {
             DEFAULT_TEMPLATES.forEach(tpl => {
                 defaultTemplatesHtml += `
                     <div class="template-item card" style="display: flex; align-items: center; padding: 12px 16px; border: 1px solid #e2e8f0; border-radius: 16px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); background: white; margin-bottom: 12px; box-sizing: border-box; box-shadow: none;"
-                        onclick="window.builder.loadTemplateIntoBuilder('${tpl.id}', '${tpl.name.replace(/'/g, "\\'")}', \`${JSON.stringify(tpl.blocks).replace(/`/g, '\\`').replace(/\\/g, '\\\\')}\`, '${tpl.subject.replace(/'/g, "\\'")}')"
+                        onclick="window.builder.loadTemplateById('${tpl.id}')"
                         onmouseover="this.style.borderColor='#d17d39'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 16px rgba(0,0,0,0.04)';"
                         onmouseout="this.style.borderColor='#e2e8f0'; this.style.transform='none'; this.style.boxShadow='none';">
                         <img src="${tpl.thumbnail}" style="width: 72px; height: 54px; border-radius: 10px; object-fit: cover; margin-right: 16px; flex-shrink: 0; background: #f1f5f9;" alt="${tpl.name}">
@@ -1954,6 +1960,42 @@ class NewsletterBuilder {
         } else if (type === 'blog' || type === 'teaching') {
             sessionStorage.setItem('hkm_admin_create_item_state', type);
             window.location.href = `/admin/index.html#${type}`;
+        }
+    }
+
+    loadDraftById(id) {
+        const draft = this.draftsCache && this.draftsCache[id];
+        if (!draft) return;
+        if (confirm(`Last inn kladden "${draft.name}"? Dette vil erstatte innholdet i editoren.`)) {
+            this.blocks = JSON.parse(JSON.stringify(draft.blocks || []));
+            document.getElementById('newsletter-subject').value = draft.subject || '';
+            this.toggleMode('builder');
+            this.renderCanvas();
+            showToast(`Kladden "${draft.name}" er lastet inn.`, "info");
+        }
+    }
+
+    loadCustomTemplateById(id) {
+        const tpl = this.templatesCache && this.templatesCache[id];
+        if (!tpl) return;
+        if (confirm(`Last inn malen "${tpl.name}"? Dette vil erstatte innholdet i editoren.`)) {
+            this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
+            document.getElementById('newsletter-subject').value = tpl.subject || '';
+            this.toggleMode('builder');
+            this.renderCanvas();
+            showToast(`Malen "${tpl.name}" er lastet inn.`, "info");
+        }
+    }
+
+    loadTemplateById(id) {
+        const tpl = this.defaultTemplates && this.defaultTemplates.find(t => t.id === id);
+        if (!tpl) return;
+        if (confirm(`Last inn malen "${tpl.name}"? Dette vil erstatte innholdet i editoren.`)) {
+            this.blocks = JSON.parse(JSON.stringify(tpl.blocks || []));
+            document.getElementById('newsletter-subject').value = tpl.subject || '';
+            this.toggleMode('builder');
+            this.renderCanvas();
+            showToast(`Malen "${tpl.name}" er lastet inn.`, "info");
         }
     }
 
