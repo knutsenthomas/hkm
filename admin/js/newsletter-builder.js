@@ -2025,6 +2025,18 @@ class NewsletterBuilder {
         );
         if (!confirmed) return;
 
+        // Ta en kopi av den nåværende listen i tilfelle sletting feiler
+        const originalItems = [...(this.studioFeedItems || [])];
+
+        // 1. OPTIMISTISK OPPDATERING: Fjern elementet fra minnet og oppdater grensesnittet umiddelbart!
+        if (this.studioFeedItems) {
+            this.studioFeedItems = this.studioFeedItems.filter(fi => fi.id !== item.id);
+            const tabsContainer = document.querySelector('.studio-tabs-container');
+            const activeTab = tabsContainer?.querySelector('.studio-tab.active');
+            const currentFilter = activeTab ? activeTab.dataset.filter : 'all';
+            this.renderStudioFeedGrid(currentFilter);
+        }
+
         showToast("Sletter...", "info");
 
         try {
@@ -2047,7 +2059,7 @@ class NewsletterBuilder {
                     await window.firebaseService.savePageContent(collectionId, { items: list });
                     showToast("Innholdet ble slettet!", "success");
                 } else {
-                    showToast("Kunne ikke finne elementet i samlingen.", "error");
+                    throw new Error("Kunne ikke finne elementet i samlingen.");
                 }
             } else if (item.type === 'newsletter_draft') {
                 await window.firebaseService.db.collection('newsletter_templates').doc(item.id).delete();
@@ -2057,12 +2069,19 @@ class NewsletterBuilder {
                 showToast("Nyhetsbrev-kampanjen ble slettet!", "success");
             }
 
-            // Oppdater feeden umiddelbart
-            await this.loadStudioFeed();
+            // Synkroniser stille i bakgrunnen for å sikre perfekt DB-samsvar
+            this.loadStudioFeed().catch(err => console.error(err));
 
         } catch (error) {
             console.error("Studio Feed - Deletion failed:", error);
             showToast("Kunne ikke slette elementet: " + error.message, "error");
+            
+            // Rull tilbake hvis det feilet
+            this.studioFeedItems = originalItems;
+            const tabsContainer = document.querySelector('.studio-tabs-container');
+            const activeTab = tabsContainer?.querySelector('.studio-tab.active');
+            const currentFilter = activeTab ? activeTab.dataset.filter : 'all';
+            this.renderStudioFeedGrid(currentFilter);
         }
     }
 
