@@ -384,9 +384,9 @@
                         <span class="material-symbols-outlined">${icon}</span>
                     </div>
                     <div class="section-header-content">
-                        <div class="section-header-titles">
-                            <h2 class="section-title">${title}</h2>
-                            <p class="section-subtitle" ${subtitleId ? `id="${subtitleId}"` : ''}>${subtitle}</p>
+                        <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
+                            <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">${title}</h2>
+                            <p class="section-subtitle" ${subtitleId ? `id="${subtitleId}"` : ''} style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important;">${subtitle}</p>
                         </div>
                         ${actionsHtml ? `<div class="section-header-actions">${actionsHtml}</div>` : ''}
                     </div>

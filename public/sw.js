@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hkm-admin-v5';
+const CACHE_NAME = 'hkm-admin-v6';
 const STATIC_ASSETS = [
     '/admin/css/dashboard.css',
     '/admin/css/admin-unified.css',

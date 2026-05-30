@@ -363,12 +363,16 @@ body.builder-active {
   margin-bottom: 18px;
 }
 
-.section-header .section-title {
-  margin: 0 0 var(--admin-spacing-sm) 0;
+.section-header .section-title,
+.design-ui-header .section-title {
+  margin: 0 !important;
+  margin-bottom: 4px !important;
 }
 
-.section-header .section-subtitle {
-  margin: 0 0 var(--admin-spacing-md) 0;
+.section-header .section-subtitle,
+.design-ui-header .section-subtitle {
+  margin: 0 !important;
+  margin-top: 0 !important;
 }
 
 /* Global Typography - Spacing Rule (Strict Audit) */
@@ -5902,6 +5906,46 @@ button.btn, a.btn, .btn {
   direction: ltr !important;
   -webkit-font-feature-settings: 'liga' !important;
   -webkit-font-smoothing: antialiased !important;
+}
+
+/* ==========================================================================
+   Lead UI/UX Global Spacing & Typography Overrides (Zero Margin & 4px Gap)
+   ========================================================================== */
+body.admin-body .section-header-titles,
+.section-header-titles {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+body.admin-body .section-header-titles .section-title,
+body.admin-body .section-title,
+.section-header-titles .section-title,
+.section-title {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: #0f172a !important;
+  font-family: "Inter", sans-serif !important;
+  margin: 0 !important;
+  margin-bottom: 0 !important;
+  padding: 0 !important;
+  line-height: 1.2 !important;
+}
+
+body.admin-body .section-header-titles .section-subtitle,
+body.admin-body .section-subtitle,
+.section-header-titles .section-subtitle,
+.section-subtitle {
+  font-size: 13px !important;
+  color: #64748b !important;
+  font-weight: 400 !important;
+  font-family: "Inter", sans-serif !important;
+  margin: 0 !important;
+  margin-top: 0 !important;
+  padding: 0 !important;
+  line-height: 1.45 !important;
 }
 
 
