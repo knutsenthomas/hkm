@@ -22,6 +22,7 @@ async function loadTeachingCategory(categoryName, gridContainerId = 'teaching-gr
 
         // Filter items by category (flexible match for singular/plural)
         const filteredItems = teachingData.items.filter(item => {
+            if (item && item.published === false) return false;
             const itemCat = String(item.category || item.teachingType || '').trim().toLowerCase();
             const targetCat = categoryName.trim().toLowerCase();
 

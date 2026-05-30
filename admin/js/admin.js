@@ -2438,8 +2438,50 @@ class AdminManager {
             // Clear immediately to prevent infinite triggers!
             sessionStorage.removeItem('pendingAiDraft');
             
-            this.showToast(`Oppretter AI-utkast for "${parsed.title}"...`, 'info', 4000);
-            
+            // Create and append the premium brand loading overlay
+            const loaderOverlay = document.createElement('div');
+            loaderOverlay.id = 'ai-generation-overlay';
+            loaderOverlay.style.cssText = `
+                position: fixed;
+                inset: 0;
+                background: rgba(15, 23, 42, 0.7);
+                backdrop-filter: blur(8px);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 99999;
+                opacity: 0;
+                transition: opacity 0.3s ease;
+            `;
+            loaderOverlay.innerHTML = `
+                <div class="card" style="padding: 40px !important; text-align: center !important; max-width: 480px !important; width: 90% !important; border-radius: 24px !important; background: white !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box !important;">
+                    <div style="width: 80px; height: 80px; margin: 0 auto 24px; background: linear-gradient(135deg, #d17d39, #bd4f2a); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(209, 125, 57, 0.25);">
+                        <span class="material-symbols-outlined" style="font-size: 36px; color: white; animation: spin 2s linear infinite;">auto_awesome</span>
+                    </div>
+                    <h3 style="font-size: 20px; font-weight: 800; color: #1e293b; margin: 0 0 12px; font-family: 'Inter', sans-serif !important;">Oppretter AI-utkast</h3>
+                    <p style="font-size: 14px; color: #64748b; font-weight: 500; margin: 0 0 24px; line-height: 1.6; font-family: 'Inter', sans-serif !important;">Vennligst vent mens vår AI-assistent skriver et engasjerende blogginnlegg for <strong>"${this.escapeHtml(parsed.title)}"</strong>. Dette tar normalt 5-10 sekunder.</p>
+                    <div style="width: 100%; height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; position: relative;">
+                        <div style="position: absolute; top: 0; bottom: 0; left: 0; width: 40%; background: linear-gradient(90deg, #d17d39, #bd4f2a); border-radius: 3px; animation: loading-bar 1.5s infinite ease-in-out;"></div>
+                    </div>
+                </div>
+                <style>
+                    @keyframes spin {
+                        0% { transform: rotate(0deg); }
+                        100% { transform: rotate(360deg); }
+                    }
+                    @keyframes loading-bar {
+                        0% { left: -40%; width: 40%; }
+                        50% { width: 60%; }
+                        100% { left: 100%; width: 40%; }
+                    }
+                </style>
+            `;
+            document.body.appendChild(loaderOverlay);
+            setTimeout(() => {
+                loaderOverlay.style.opacity = '1';
+                loaderOverlay.querySelector('.card').style.transform = 'scale(1)';
+            }, 50);
+
             // Call the AI Process to generate the draft
             const callable = firebase.functions().httpsCallable('aiProcess');
             const response = await callable({
@@ -2450,20 +2492,53 @@ class AdminManager {
             
             const data = response.data;
             if (data && data.blocks && Array.isArray(data.blocks)) {
-                // Prepopulate the local list and open the editor!
+                // Determine user profile author details if logged in
+                let currentAuthor = 'AI-Assistent';
+                let currentAuthorPhoto = '';
+                const currentUser = firebase.auth().currentUser;
+                if (currentUser) {
+                    currentAuthor = this._lastKnownDisplayName || currentUser.displayName || currentUser.email;
+                    currentAuthorPhoto = this._lastKnownPhotoURL || currentUser.photoURL || '';
+                }
+
+                // Create persistent newItem
                 const newItem = {
                     id: `item-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
                     title: parsed.title,
                     date: new Date().toISOString().split('T')[0],
-                    content: data // The editor directly accepts the object containing blocks
+                    content: data, // EditorJS blocks
+                    published: false, // Utkast
+                    author: currentAuthor,
+                    authorPhoto: currentAuthorPhoto,
+                    category: sectionId === 'teaching' ? 'Undervisning' : 'Blogg',
+                    imageUrl: '',
+                    tags: [],
+                    dashboardEdited: true,
+                    dashboardEditedAt: new Date().toISOString()
                 };
                 
-                if (!this._collectionItemsCache[sectionId]) this._collectionItemsCache[sectionId] = [];
-                this._collectionItemsCache[sectionId].unshift(newItem);
-                this.currentItems = this._collectionItemsCache[sectionId];
+                // Get the current list from Firestore, unshift, and save back immediately
+                firebaseService.invalidatePageContentCache(`collection_${sectionId}`);
+                const currentData = await firebaseService.getPageContent(`collection_${sectionId}`);
+                const list = this._getCollectionItems(currentData);
+                list.unshift(newItem);
+                
+                await firebaseService.savePageContent(`collection_${sectionId}`, { items: list });
+                
+                // Sync the local memory cache and trigger list refresh
+                this._collectionItemsCache[sectionId] = list;
+                this.currentItems = list;
+                this.renderItems(sectionId, list);
+                
+                // Fade out and remove the loader
+                loaderOverlay.style.opacity = '0';
+                loaderOverlay.querySelector('.card').style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    loaderOverlay.remove();
+                }, 300);
                 
                 // Immediately open the editor for this item
-                this.showToast(`Åpner AI-utkast! Klikk 'Lagre' når du er fornøyd.`, 'success', 5000);
+                this.showToast(`✅ AI-utkast opprettet og lagret!`, 'success', 5000);
                 setTimeout(() => {
                     this.editCollectionItem(sectionId, 0);
                 }, 400);
@@ -2472,6 +2547,8 @@ class AdminManager {
             }
         } catch (error) {
             console.error("Failed to process pending AI draft:", error);
+            const overlay = document.getElementById('ai-generation-overlay');
+            if (overlay) overlay.remove();
             this.showToast(`Kunne ikke generere AI-utkast: ${error.message || error}`, 'error', 5000);
         }
     }
@@ -7577,6 +7654,11 @@ class AdminManager {
                              <button class="btn-ghost" id="print-col-item" title="Skriv ut" style="display:flex; align-items:center; gap:6px;">
                                 <span class="material-symbols-outlined">print</span> Skriv ut
                              </button>
+                             ${(collectionId === 'blog' || collectionId === 'teaching') ? `
+                              <button class="btn-secondary" id="save-col-item-draft" style="background: linear-gradient(135deg, #1B4965, #2B6985) !important; color: white !important; box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25) !important; border: none !important; margin-right: 8px;">
+                                 <span class="material-symbols-outlined">draft</span> Lagre som utkast
+                              </button>
+                              ` : ''}
                              <button class="btn-primary" id="save-col-item">
                                 <span class="material-symbols-outlined">publish</span> Lagre og publiser
                              </button>
@@ -10509,6 +10591,11 @@ class AdminManager {
                                     // Mark as edited in dashboard so the public site prioritizes this version
                                     safeItem.dashboardEdited = true;
                                     safeItem.dashboardEditedAt = new Date().toISOString();
+                                    
+                                    // Explicitly publish this post
+                                    if (collectionId === 'blog' || collectionId === 'teaching') {
+                                        safeItem.published = true;
+                                    }
 
                                     // HKM Fix: Dynamically attach author info from logged in profile
                                     if (collectionId === 'blog' || collectionId === 'teaching') {
@@ -10544,7 +10631,7 @@ class AdminManager {
                                 }
 
                                 // Stay in the editor after saving — just show confirmation
-                                this.showToast('✅ Lagret!', 'success');
+                                this.showToast('✅ Lagret og publisert!', 'success');
                                 
                                 // Clear restore state on successful save so a subsequent page refresh
                                 // doesn't try to "restore" potentially stale content from session storage.
@@ -10558,6 +10645,67 @@ class AdminManager {
                             }
                         }, {
                             loadingText: '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Lagrer...'
+                        });
+                    });
+                };
+            }
+
+            const saveBtnDraft = modal.querySelector('#save-col-item-draft');
+            if (saveBtnDraft) {
+                saveBtnDraft.onclick = async () => {
+                    const btn = modal.querySelector('#save-col-item-draft');
+                    if (!btn) return;
+
+                    // Clear immediately before Firestore write
+                    this._clearOpenEditorState(collectionId);
+
+                    await this._runWriteLocked(`collection-save:${collectionId}`, async () => {
+                        await this._withButtonLoading(btn, async () => {
+                            try {
+                                let safeItem = await buildSafeItemFromForm();
+
+                                firebaseService.invalidatePageContentCache(`collection_${collectionId}`);
+                                
+                                const currentData = await firebaseService.getPageContent(`collection_${collectionId}`);
+                                const list = this._getCollectionItems(currentData);
+
+                                // Mark as edited in dashboard
+                                safeItem.dashboardEdited = true;
+                                safeItem.dashboardEditedAt = new Date().toISOString();
+                                
+                                // Explicitly save as draft
+                                safeItem.published = false;
+
+                                // HKM Fix: Dynamically attach author info
+                                if (collectionId === 'blog' || collectionId === 'teaching') {
+                                    const currentUser = firebase.auth().currentUser;
+                                    if (currentUser) {
+                                        const displayName = this._lastKnownDisplayName || currentUser.displayName || currentUser.email;
+                                        const photoURL = this._lastKnownPhotoURL || currentUser.photoURL;
+                                        
+                                        if (!safeItem.author || safeItem.author === 'Ukjent forfatter' || safeItem.author === 'Navn') {
+                                            safeItem.author = displayName;
+                                        }
+                                        if (!safeItem.authorPhoto || safeItem.authorPhoto.includes('author-placeholder')) {
+                                            if (photoURL) safeItem.authorPhoto = photoURL;
+                                        }
+                                    }
+                                }
+
+                                upsertItemInList(list, safeItem);
+
+                                await firebaseService.savePageContent(`collection_${collectionId}`, { items: list });
+
+                                this.showToast('✅ Lagret som utkast!', 'success');
+                                
+                                this._clearOpenEditorState(collectionId);
+                                this.loadCollection(collectionId);
+                            } catch (err) {
+                                console.error('Error saving item as draft:', err);
+                                this.showToast(err?.message || 'Kunne ikke lagre utkast.', 'error', 5000);
+                            }
+                        }, {
+                            loadingText: '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Lagrer utkast...'
                         });
                     });
                 };

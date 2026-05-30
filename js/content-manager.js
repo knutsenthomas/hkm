@@ -114,11 +114,14 @@ class ContentManager {
     }
 
     getCollectionItems(data) {
-        if (Array.isArray(data)) return data;
-        if (!data || typeof data !== 'object') return [];
-        if (Array.isArray(data.items)) return data.items;
-        if (data.items && typeof data.items === 'object') return Object.values(data.items);
-        return [];
+        let list = [];
+        if (Array.isArray(data)) list = data;
+        else if (!data || typeof data !== 'object') list = [];
+        else if (Array.isArray(data.items)) list = data.items;
+        else if (data.items && typeof data.items === 'object') list = Object.values(data.items);
+        
+        // Filter out drafts on the public website
+        return list.filter(item => item && item.published !== false);
     }
 
     getContentItemStableId(item) {
