@@ -518,6 +518,7 @@
             .newsletter-dashboard-layout {
                 padding: 16px !important;
                 padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+                overflow-y: visible !important;
             }
         }
     </style>
@@ -600,7 +601,7 @@
         </aside>
 
         <!-- Modus-svitsj: Dashboard (Standard) -->
-        <div id="newsletter-dashboard-wrapper" class="newsletter-dashboard-wrapper">
+        <main id="newsletter-dashboard-wrapper" class="newsletter-dashboard-wrapper">
             <!-- Header for Dashboard Mode -->
             <div id="dashboard-main-header" class="main-header">
                 <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
@@ -784,7 +785,7 @@
                 </div>
             </div>
         </div> <!-- Close newsletter-dashboard-layout -->
-    </div> <!-- Close newsletter-dashboard-wrapper -->
+    </main> <!-- Close newsletter-dashboard-wrapper -->
 
     <!-- Modus-svitsj: Builder -->
         <div id="newsletter-builder-layout" style="display: none; width: 100%;">
