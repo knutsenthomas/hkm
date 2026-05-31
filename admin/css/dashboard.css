@@ -5535,7 +5535,7 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     }
 
     /* Hide the separator and "Blogginnlegg" label on mobile to save space */
-    .editor-header-left span {
+    .editor-header-left > span {
         display: none !important;
     }
 
