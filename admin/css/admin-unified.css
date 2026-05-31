@@ -6415,3 +6415,127 @@ body.builder-active .btn-primary:active,
   transform: translateY(0) !important;
   box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2) !important;
 }
+
+/* ==========================================================================
+   Premium Desktop Header Spacing & Layout Optimization (PC/Desktop)
+   Utilizes the screen space better, standardizes spacing, and adds hover effects
+   ========================================================================== */
+@media (min-width: 1025px) {
+  /* 1. Direct Faux Search Input Bar instead of simple icon button on PC */
+  body.admin-body .main-header #global-search-opener,
+  body.crm-body .main-header #global-search-opener,
+  body.builder-active .main-header #global-search-opener {
+    width: 240px !important;
+    height: 44px !important;
+    padding: 0 16px !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    color: #64748b !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    cursor: pointer !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    box-shadow: none !important;
+  }
+
+  body.admin-body .main-header #global-search-opener::after,
+  body.crm-body .main-header #global-search-opener::after,
+  body.builder-active .main-header #global-search-opener::after {
+    content: "Søk i systemet..." !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    color: #94a3b8 !important;
+    font-family: var(--admin-font), sans-serif !important;
+  }
+
+  body.admin-body .main-header #global-search-opener:hover,
+  body.crm-body .main-header #global-search-opener:hover,
+  body.builder-active .main-header #global-search-opener:hover {
+    border-color: rgba(249, 115, 22, 0.3) !important;
+    background: #fafafa !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+  }
+
+  body.admin-body .main-header #global-search-opener:active,
+  body.crm-body .main-header #global-search-opener:active,
+  body.builder-active .main-header #global-search-opener:active {
+    transform: translateY(0) !important;
+  }
+
+  /* 2. Premium User Profile Capsule & Fluid Float Avatar on PC */
+  body.admin-body .main-header .user-profile-link,
+  body.crm-body .main-header .user-profile-link,
+  body.builder-active .main-header .user-profile-link {
+    height: 44px !important;
+    padding: 0 4px 0 16px !important;
+    gap: 12px !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    box-shadow: none !important;
+  }
+
+  body.admin-body .main-header .user-profile-link:hover,
+  body.crm-body .main-header .user-profile-link:hover,
+  body.builder-active .main-header .user-profile-link:hover {
+    border-color: rgba(249, 115, 22, 0.3) !important;
+    background: #fafafa !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+  }
+
+  body.admin-body .main-header .user-profile-link:active,
+  body.crm-body .main-header .user-profile-link:active,
+  body.builder-active .main-header .user-profile-link:active {
+    transform: translateY(0) !important;
+  }
+
+  /* 3. Fluid Nested Avatar sizing & style in Header */
+  body.admin-body .main-header [id="admin-avatar"],
+  body.minside-body .main-header [id="ph-avatar"],
+  body.crm-body .main-header [id="admin-avatar"],
+  body.builder-active .main-header [id="admin-avatar"] {
+    width: 36px !important;
+    height: 36px !important;
+    min-width: 36px !important;
+    min-height: 36px !important;
+    line-height: 36px !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(15, 23, 42, 0.08) !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+  }
+
+  /* 4. Notification Bell button consistent height & hover */
+  body.admin-body .main-header .notification-btn,
+  body.crm-body .main-header .notification-btn,
+  body.builder-active .main-header .notification-btn {
+    height: 44px !important;
+    width: 44px !important;
+    border-radius: 12px !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  }
+
+  body.admin-body .main-header .notification-btn:hover,
+  body.crm-body .main-header .notification-btn:hover,
+  body.builder-active .main-header .notification-btn:hover {
+    border-color: rgba(249, 115, 22, 0.2) !important;
+    background: #fafafa !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
+    color: var(--accent-color, #f97316) !important;
+  }
+
+  body.admin-body .main-header .notification-btn:active,
+  body.crm-body .main-header .notification-btn:active,
+  body.builder-active .main-header .notification-btn:active {
+    transform: translateY(0) !important;
+  }
+}
