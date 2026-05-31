@@ -4664,7 +4664,17 @@ class AdminManager {
         // Check if real GA data exists
         if (ga && ga.dailyTraffic && Array.isArray(ga.dailyTraffic) && ga.dailyTraffic.length > 1) {
             trafficData = ga.dailyTraffic.map(d => parseInt(d.users) || 0);
-            labels = ga.dailyTraffic.map((d, i) => d.date || d.label || `Punkt ${i+1}`);
+            labels = ga.dailyTraffic.map((d, i) => {
+                const rawDate = d.date || d.label || '';
+                if (typeof rawDate === 'string' && /^\d{8}$/.test(rawDate)) {
+                    const day = parseInt(rawDate.substring(6, 8), 10);
+                    const monthNum = parseInt(rawDate.substring(4, 6), 10);
+                    const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+                    const monthLabel = months[monthNum - 1] || '';
+                    return `${day}. ${monthLabel}`;
+                }
+                return rawDate || `Punkt ${i+1}`;
+            });
         } else {
             // Generate mock data for premium appearance
             isSimulated = true;
@@ -4732,9 +4742,16 @@ class AdminManager {
 
         // Render vertical labels
         let labelHtml = '';
-        const labelInterval = Math.max(1, Math.floor(points.length / 6));
+        // If we have many points, make sure we have at most 6-7 labels on x-axis to prevent crowding
+        const labelInterval = Math.max(1, Math.ceil(points.length / 6));
         points.forEach((p, i) => {
-            if (i % labelInterval === 0 || i === points.length - 1) {
+            const isLast = i === points.length - 1;
+            const isInterval = i % labelInterval === 0;
+            const lastIntervalIndex = Math.floor((points.length - 1) / labelInterval) * labelInterval;
+            const distanceToLastInterval = (points.length - 1) - lastIntervalIndex;
+            const tooCloseToLastInterval = isLast && (distanceToLastInterval < Math.max(2, labelInterval * 0.7));
+
+            if (isInterval || (isLast && !tooCloseToLastInterval)) {
                 labelHtml += `
                     <text x="${p.x}" y="${height - 8}" fill="#94a3b8" font-size="10" font-weight="600" text-anchor="middle">${p.label}</text>
                 `;
