@@ -3155,18 +3155,27 @@ input[type="range"] {
     margin-right: 8px !important;
 }
 
-/* Align Material Symbols inside editor header buttons */
-.editor-header-v2 .material-symbols-outlined {
+/* Align Material Symbols inside editor header buttons with higher specificity to defeat global overrides */
+.editor-header-v2 .btn-primary .material-symbols-outlined,
+.editor-header-v2 .btn-outline .material-symbols-outlined,
+.editor-header-v2 .btn-ghost .material-symbols-outlined,
+.editor-header-v2 button .material-symbols-outlined {
     font-size: 18px !important;
     width: 18px !important;
     height: 18px !important;
-    min-width: 0 !important;
-    min-height: 0 !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
     margin: 0 !important;
     margin-right: 0 !important;
+    margin-left: 0 !important;
+    padding: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
+    line-height: 1 !important;
+    vertical-align: middle !important;
 }
 
 /* Editor Header Mobile Responsiveness */
@@ -3235,6 +3244,10 @@ input[type="range"] {
         padding: 0 !important;
         border-radius: 6px !important;
         gap: 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
     }
     
     .editor-header-v2 #toggle-split-preview {
