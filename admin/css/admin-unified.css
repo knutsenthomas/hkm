@@ -6282,7 +6282,35 @@ body.admin-body #podcast-section .section-header-actions .btn {
   align-self: flex-start !important;
 }
 
+/* Perfect vertical centering and alignment for section headers across all viewports */
+body.admin-body .section-content > .section-header,
+body.admin-body .section-content > .design-ui-header {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  box-sizing: border-box !important;
+}
 
-
-
-
+@media (max-width: 1024px) {
+  body.admin-body .section-content > .section-header,
+  body.admin-body .section-content > .design-ui-header {
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    padding: 16px 24px !important; /* Symmetric, premium 8px grid padding (16px vertical, 24px horizontal) */
+    margin-bottom: 24px !important;
+    gap: 12px !important;
+  }
+  
+  body.admin-body .section-content > .section-header > .section-header-content,
+  body.admin-body .section-content > .design-ui-header > .section-header-content {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    width: 100% !important;
+  }
+}
