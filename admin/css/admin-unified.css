@@ -6153,6 +6153,14 @@ body.admin-body .template-item:active {
   .sidebar-overlay {
     z-index: 9998 !important;
   }
+
+  /* Flytt toast-varsler opp slik at de ikke skjules av bunnmenyen */
+  .toast-container {
+    bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
+    right: 16px !important;
+    left: 16px !important;
+    z-index: 15000 !important;
+  }
 }
 
 /* 3. Small Mobile Screen Adjustments (< 768px) */
