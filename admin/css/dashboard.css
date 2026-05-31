@@ -3273,6 +3273,7 @@ input[type="range"] {
     align-items: flex-start;
     gap: 0;
     scroll-behavior: smooth;
+    scroll-padding-top: 72px !important; /* Perfect offset matching the sticky toolbar height + breathing room */
 }
 
 .docs-workspace-shell {
