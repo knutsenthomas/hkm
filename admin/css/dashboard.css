@@ -3192,8 +3192,8 @@ input[type="range"] {
         display: none !important;
     }
     
-    .editor-header-left span[style*="color: #94a3b8"],
-    .editor-header-left span[style*="letter-spacing: 0.05em"] {
+    .editor-header-left .editor-header-divider,
+    .editor-header-left .editor-header-type {
         display: none !important;
     }
     

@@ -7834,8 +7834,8 @@ class AdminManager {
                     <header class="editor-header-v2">
                         <div class="editor-header-left">
                              <button class="btn-ghost" id="close-col-modal"><span class="material-symbols-outlined">arrow_back</span><span>Tilbake</span></button>
-                             <span style="color: #94a3b8; margin: 0 8px; flex-shrink: 0;">|</span>
-                             <span style="font-weight: 600; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; flex-shrink: 0;">
+                             <span class="editor-header-divider" style="color: #94a3b8; margin: 0 8px; flex-shrink: 0;">|</span>
+                             <span class="editor-header-type" style="font-weight: 600; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; flex-shrink: 0;">
                                 ${collectionId === 'blog' ? 'Blogginnlegg' : (collectionId === 'events' ? 'Arrangement' : (collectionId === 'teaching' ? 'Undervisning' : (collectionId === 'podcast_transcripts' ? 'Podcast Transkripsjon' : 'Rediger innhold')))}
                              </span>
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
