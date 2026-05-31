@@ -481,23 +481,31 @@
             text-align: center !important;
         }
 
+        /* --- Standardized Top Header Styles for HKM Studio --- */
+        #dashboard-main-header {
+            display: flex !important;
+            margin-left: -40px !important;
+            margin-right: -40px !important;
+            margin-top: -32px !important;
+            margin-bottom: 32px !important;
+            width: calc(100% + 80px) !important;
+            box-sizing: border-box !important;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
+            background: #ffffff !important;
+        }
+
+        .dashboard-header-container {
+            display: none !important;
+        }
+
         /* --- Responsive Main Header Overrides --- */
         @media (max-width: 1024px) {
             #dashboard-main-header {
-                display: flex !important;
                 margin-left: -16px !important;
                 margin-right: -16px !important;
                 margin-top: -16px !important;
+                margin-bottom: 24px !important;
                 width: calc(100% + 32px) !important;
-                box-sizing: border-box !important;
-            }
-            .dashboard-header-container {
-                display: none !important;
-            }
-        }
-        @media (min-width: 1025px) {
-            #dashboard-main-header {
-                display: none !important;
             }
         }
     </style>
