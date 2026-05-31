@@ -3179,21 +3179,23 @@ input[type="range"] {
 }
 
 /* Editor Header Mobile Responsiveness */
-@media (max-width: 1200px) {
-    #translate-col-item span:not(.material-symbols-outlined) {
+@media (max-width: 1300px) {
+    #translate-col-item span:not(.material-symbols-outlined),
+    #print-col-item span:not(.material-symbols-outlined),
+    #toggle-split-preview span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1100px) {
+    .editor-header-left .editor-header-divider,
+    .editor-header-left .editor-header-type {
         display: none !important;
     }
 }
 
 @media (max-width: 1024px) {
-    #print-col-item span:not(.material-symbols-outlined),
-    #toggle-split-preview span:not(.material-symbols-outlined),
     #close-col-modal span:not(.material-symbols-outlined) {
-        display: none !important;
-    }
-    
-    .editor-header-left .editor-header-divider,
-    .editor-header-left .editor-header-type {
         display: none !important;
     }
     

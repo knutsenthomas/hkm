@@ -7851,7 +7851,7 @@ class AdminManager {
                         </div>
                         <div class="editor-header-right">
                                       ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `
-                                      <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk"><span class="material-symbols-outlined">g_translate</span><span>Oversett til tilgjengelige språk</span></button>
+                                      <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk"><span class="material-symbols-outlined">g_translate</span><span>Oversett</span></button>
                                       ` : ''}
                              <button class="btn-ghost" id="print-col-item" title="Skriv ut"><span class="material-symbols-outlined">print</span><span>Skriv ut</span></button>
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
