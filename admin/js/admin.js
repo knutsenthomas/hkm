@@ -3002,7 +3002,7 @@ class AdminManager {
                         <span class="material-symbols-outlined">refresh</span>
                         Synkroniser
                     </button>
-                    <button class="btn btn-primary" id="save-podcast-overrides-btn" style="display:none;">
+                    <button class="btn btn-primary" id="save-podcast-overrides" style="display:none;">
                         Lagre endringer
                     </button>
                 </div>
