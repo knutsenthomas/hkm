@@ -7865,7 +7865,7 @@ class AdminManager {
 </header>
                     <div class="editor-content-wrapper">
                         <div class="editor-main-canvas">
-                            <div class="docs-workspace-shell">
+                            <div class="editor-toolbar-container">
                             <div class="desktop-richtools docs-toolbar" id="desktop-richtools">
                                 <div class="docs-toolbar-group">
                                     <button type="button" class="desktop-richtools-btn" data-tool="undo" title="Angre">
@@ -8013,11 +8013,15 @@ class AdminManager {
                                     </button>
                                 </div>
                             </div>
-                            <div class="editor-paper docs-page-paper">
-                                <textarea id="col-item-title-v2" placeholder="Skriv din tittel her..." rows="1">${item.title || ''}</textarea>
-                                <div id="${editorHolderId}"></div>
-                                <input type="file" id="docs-image-upload-input" style="display:none;" accept="image/*">
                             </div>
+                            <div class="editor-scroll-area">
+                                <div class="docs-workspace-shell">
+                                    <div class="editor-paper docs-page-paper">
+                                        <textarea id="col-item-title-v2" placeholder="Skriv din tittel her..." rows="1">${item.title || ''}</textarea>
+                                        <div id="${editorHolderId}"></div>
+                                        <input type="file" id="docs-image-upload-input" style="display:none;" accept="image/*">
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
