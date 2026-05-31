@@ -6539,3 +6539,71 @@ body.builder-active .btn-primary:active,
     transform: translateY(0) !important;
   }
 }
+
+/* ==========================================================================
+   Narrow Desktop Screen Optimization (1025px - 1200px)
+   Prevents header crowding/overlap by dynamically adjusting sizes and padding
+   ========================================================================== */
+@media (min-width: 1025px) and (max-width: 1200px) {
+  body.admin-body .main-header,
+  body.crm-body #dashboard-main-header,
+  body.builder-active #dashboard-main-header {
+    padding: 0 20px !important; /* Premium tighter padding to free up horizontal space */
+  }
+
+  /* Make search faux-bar narrower and use shorter placeholder text */
+  body.admin-body .main-header #global-search-opener,
+  body.crm-body .main-header #global-search-opener,
+  body.builder-active .main-header #global-search-opener {
+    width: 160px !important;
+  }
+
+  body.admin-body .main-header #global-search-opener::after,
+  body.crm-body .main-header #global-search-opener::after,
+  body.builder-active .main-header #global-search-opener::after {
+    content: "Søk..." !important;
+  }
+
+  /* Hide the administrator subtext to save horizontal space and keep it extremely clean */
+  body.admin-body .main-header .user-profile-link .user-role,
+  body.minside-body .main-header .user-profile-link .user-role,
+  body.crm-body .main-header .user-profile-link .user-role,
+  body.builder-active .main-header .user-profile-link .user-role {
+    display: none !important;
+  }
+
+  /* Reduce profile card gap and padding for narrow screens */
+  body.admin-body .main-header .user-profile-link,
+  body.crm-body .main-header .user-profile-link,
+  body.builder-active .main-header .user-profile-link {
+    padding: 0 4px 0 12px !important;
+    gap: 8px !important;
+  }
+}
+
+/* ==========================================================================
+   Premium Desktop Search Bar Centering & Crowding Fix
+   Centering search bar in the middle of the header on desktop to prevent crowding
+   ========================================================================== */
+@media (min-width: 1025px) {
+  /* Set positioning context on header to enable absolute centering of the search bar */
+  body.admin-body .main-header,
+  body.crm-body .main-header,
+  body.minside-body .main-header,
+  body.builder-active .main-header {
+    position: sticky !important;
+  }
+
+  /* Center the search bar perfectly in the middle of the header container */
+  body.admin-body .main-header #global-search-opener,
+  body.crm-body .main-header #global-search-opener,
+  body.builder-active .main-header #global-search-opener {
+    position: absolute !important;
+    left: 50% !important;
+    top: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    z-index: 100 !important;
+  }
+}
+
