@@ -7833,8 +7833,9 @@ class AdminManager {
                 <div class="editor-layout-v2">
                     <header class="editor-header-v2">
                         <div class="editor-header-left">
-                             <button class="btn-ghost" id="close-col-modal" style="flex-shrink: 0; white-space: nowrap;">
-                                <span class="material-symbols-outlined">arrow_back</span> Tilbake
+                             <button class="btn-ghost" id="close-col-modal">
+                                <span class="material-symbols-outlined">arrow_back</span>
+                                <span>Tilbake</span>
                              </button>
                              <span style="color: #94a3b8; margin: 0 8px; flex-shrink: 0;">|</span>
                              <span style="font-weight: 600; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; flex-shrink: 0;">
@@ -7855,28 +7856,28 @@ class AdminManager {
                                       ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `
                                       <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk">
                                           <span class="material-symbols-outlined">g_translate</span>
-                                          <span class="hidden xl:inline">Oversett til tilgjengelige språk</span>
+                                          <span>Oversett til tilgjengelige språk</span>
                                       </button>
                                       ` : ''}
                              <button class="btn-ghost" id="print-col-item" title="Skriv ut">
                                 <span class="material-symbols-outlined">print</span>
-                                <span class="hidden lg:inline">Skriv ut</span>
+                                <span>Skriv ut</span>
                              </button>
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
                               <button class="btn-ghost" id="toggle-split-preview" title="Forhåndsvis">
                                  <span class="material-symbols-outlined">visibility</span>
-                                 <span class="hidden lg:inline">Forhåndsvis</span>
+                                 <span>Forhåndsvis</span>
                               </button>
                               ` : ''}
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
                               <button class="btn-outline" id="save-col-item-draft">
                                  <span class="material-symbols-outlined">draft</span>
-                                 <span class="hidden md:inline">Lagre som utkast</span>
+                                 <span>Lagre som utkast</span>
                               </button>
                               ` : ''}
                              <button class="btn-primary" id="save-col-item">
                                 <span class="material-symbols-outlined">publish</span>
-                                <span class="hidden sm:inline">Lagre og publiser</span>
+                                <span>Lagre og publiser</span>
                              </button>
                         </div>
 </header>

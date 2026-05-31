@@ -3165,6 +3165,78 @@ input[type="range"] {
     justify-content: center !important;
 }
 
+/* Editor Header Mobile Responsiveness */
+@media (max-width: 1200px) {
+    #translate-col-item span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    #print-col-item span:not(.material-symbols-outlined),
+    #toggle-split-preview span:not(.material-symbols-outlined),
+    #close-col-modal span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+    
+    .editor-header-left span[style*="color: #94a3b8"],
+    .editor-header-left span[style*="letter-spacing: 0.05em"] {
+        display: none !important;
+    }
+    
+    .editor-header-v2 {
+        padding: 0 12px !important;
+        gap: 8px !important;
+    }
+
+    .editor-header-left {
+        gap: 8px !important;
+    }
+
+    .editor-header-right {
+        gap: 6px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #save-col-item-draft span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+    
+    #editor-autosave-text {
+        display: none !important;
+    }
+    
+    #editor-autosave-status {
+        margin-left: 4px !important;
+        margin-right: 4px !important;
+    }
+}
+
+@media (max-width: 640px) {
+    #save-col-item span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
+    
+    #blog-translation-status {
+        display: none !important;
+    }
+    
+    /* Make the buttons square icon buttons on small screens */
+    .editor-header-v2 .btn-primary,
+    .editor-header-v2 .btn-outline,
+    .editor-header-v2 .btn-ghost {
+        width: 32px !important;
+        height: 32px !important;
+        padding: 0 !important;
+        border-radius: 6px !important;
+    }
+    
+    .editor-header-v2 #toggle-split-preview {
+        margin-right: 0 !important;
+    }
+}
+
 .editor-content-wrapper {
     flex: 1;
     display: flex;
