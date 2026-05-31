@@ -2133,6 +2133,7 @@ class NewsletterBuilder {
     }
 
     triggerAutosave() {
+        if (this.currentMode !== 'builder') return;
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         
         // Add spin keyframe styling dynamically once
