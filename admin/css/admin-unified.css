@@ -6339,8 +6339,9 @@ body.admin-body .template-item:active {
   }
 }
 
-
-
-
-
-
+/* Center section headers vertically in between content boxes with premium symmetric margins */
+body.admin-body .section-content > .section-header,
+body.admin-body .section-content > .design-ui-header {
+  margin-top: 32px !important;
+  margin-bottom: 32px !important;
+}
