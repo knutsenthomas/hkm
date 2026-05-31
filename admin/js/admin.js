@@ -7833,10 +7833,7 @@ class AdminManager {
                 <div class="editor-layout-v2">
                     <header class="editor-header-v2">
                         <div class="editor-header-left">
-                             <button class="btn-ghost" id="close-col-modal">
-                                <span class="material-symbols-outlined">arrow_back</span>
-                                <span>Tilbake</span>
-                             </button>
+                             <button class="btn-ghost" id="close-col-modal"><span class="material-symbols-outlined">arrow_back</span><span>Tilbake</span></button>
                              <span style="color: #94a3b8; margin: 0 8px; flex-shrink: 0;">|</span>
                              <span style="font-weight: 600; font-size: 14px; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; flex-shrink: 0;">
                                 ${collectionId === 'blog' ? 'Blogginnlegg' : (collectionId === 'events' ? 'Arrangement' : (collectionId === 'teaching' ? 'Undervisning' : (collectionId === 'podcast_transcripts' ? 'Podcast Transkripsjon' : 'Rediger innhold')))}
@@ -7854,31 +7851,16 @@ class AdminManager {
                         </div>
                         <div class="editor-header-right">
                                       ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `
-                                      <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk">
-                                          <span class="material-symbols-outlined">g_translate</span>
-                                          <span>Oversett til tilgjengelige språk</span>
-                                      </button>
+                                      <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk"><span class="material-symbols-outlined">g_translate</span><span>Oversett til tilgjengelige språk</span></button>
                                       ` : ''}
-                             <button class="btn-ghost" id="print-col-item" title="Skriv ut">
-                                <span class="material-symbols-outlined">print</span>
-                                <span>Skriv ut</span>
-                             </button>
+                             <button class="btn-ghost" id="print-col-item" title="Skriv ut"><span class="material-symbols-outlined">print</span><span>Skriv ut</span></button>
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
-                              <button class="btn-ghost" id="toggle-split-preview" title="Forhåndsvis">
-                                 <span class="material-symbols-outlined">visibility</span>
-                                 <span>Forhåndsvis</span>
-                              </button>
+                              <button class="btn-ghost" id="toggle-split-preview" title="Forhåndsvis"><span class="material-symbols-outlined">visibility</span><span>Forhåndsvis</span></button>
                               ` : ''}
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
-                              <button class="btn-outline" id="save-col-item-draft">
-                                 <span class="material-symbols-outlined">draft</span>
-                                 <span>Lagre som utkast</span>
-                              </button>
+                              <button class="btn-outline" id="save-col-item-draft"><span class="material-symbols-outlined">draft</span><span>Lagre som utkast</span></button>
                               ` : ''}
-                             <button class="btn-primary" id="save-col-item">
-                                <span class="material-symbols-outlined">publish</span>
-                                <span>Lagre og publiser</span>
-                             </button>
+                             <button class="btn-primary" id="save-col-item"><span class="material-symbols-outlined">publish</span><span>Lagre og publiser</span></button>
                         </div>
 </header>
                     <div class="editor-content-wrapper">

@@ -3230,6 +3230,7 @@ input[type="range"] {
         height: 32px !important;
         padding: 0 !important;
         border-radius: 6px !important;
+        gap: 0 !important;
     }
     
     .editor-header-v2 #toggle-split-preview {
