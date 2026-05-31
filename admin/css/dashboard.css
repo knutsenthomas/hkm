@@ -3162,6 +3162,8 @@ input[type="range"] {
     height: 18px !important;
     min-width: 0 !important;
     min-height: 0 !important;
+    margin: 0 !important;
+    margin-right: 0 !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
