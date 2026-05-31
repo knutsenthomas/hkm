@@ -6345,3 +6345,68 @@ body.admin-body .section-content > .design-ui-header {
   margin-top: 32px !important;
   margin-bottom: 32px !important;
 }
+
+/* ==========================================================================
+   Primary Action Buttons & Save Buttons Style Standardization
+   Fixes conflicting gray gradients to ensure premium uniform brand orange
+   ========================================================================== */
+body.admin-body .btn-primary,
+body.crm-body .btn-primary,
+body.builder-active .btn-primary,
+.btn-primary,
+.btn-save-content,
+#save-content,
+#save-profile-btn,
+#save-global-seo,
+#save-design-settings,
+#save-stats-btn,
+#save-user-detail-btn,
+#save-cause-btn,
+#save-course-btn,
+#save-manual-donation-btn {
+  background: var(--admin-orange-gradient) !important;
+  background-image: var(--admin-orange-gradient) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 6px 18px rgba(209, 125, 57, 0.25) !important;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease !important;
+}
+
+body.admin-body .btn-primary:hover,
+body.crm-body .btn-primary:hover,
+body.builder-active .btn-primary:hover,
+.btn-primary:hover,
+.btn-save-content:hover,
+#save-content:hover,
+#save-profile-btn:hover,
+#save-global-seo:hover,
+#save-design-settings:hover,
+#save-stats-btn:hover,
+#save-user-detail-btn:hover,
+#save-cause-btn:hover,
+#save-course-btn:hover,
+#save-manual-donation-btn:hover {
+  background: linear-gradient(135deg, #bd4f2a 0%, #d17d39 100%) !important;
+  background-image: linear-gradient(135deg, #bd4f2a 0%, #d17d39 100%) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(209, 125, 57, 0.35) !important;
+}
+
+body.admin-body .btn-primary:active,
+body.crm-body .btn-primary:active,
+body.builder-active .btn-primary:active,
+.btn-primary:active,
+.btn-save-content:active,
+#save-content:active,
+#save-profile-btn:active,
+#save-global-seo:active,
+#save-design-settings:active,
+#save-stats-btn:active,
+#save-user-detail-btn:active,
+#save-cause-btn:active,
+#save-course-btn:active,
+#save-manual-donation-btn:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 4px 12px rgba(209, 125, 57, 0.2) !important;
+}
