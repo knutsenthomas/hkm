@@ -6282,15 +6282,15 @@ body.admin-body #podcast-section .section-header-actions .btn {
   align-self: flex-start !important;
 }
 
-/* Complete Horizontal and Vertical Centering for Section Headers across all screen sizes */
+/* Perfect horizontal and vertical centering with icon and text side-by-side across all viewports */
 body.admin-body .section-content > .section-header,
 body.admin-body .section-content > .design-ui-header {
   display: flex !important;
-  flex-direction: column !important;
+  flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
-  text-align: center !important;
-  padding: 24px 24px !important; /* Equal symmetric padding on all sides for perfect mathematical vertical/horizontal centering */
+  gap: 16px !important;
+  padding: 24px 24px !important; /* Premium symmetric padding on all sides for perfect mathematical vertical/horizontal centering */
   box-sizing: border-box !important;
   width: 100% !important;
   min-height: auto !important;
@@ -6298,19 +6298,22 @@ body.admin-body .section-content > .design-ui-header {
 
 body.admin-body .section-content > .section-header .section-header-icon,
 body.admin-body .section-content > .design-ui-header .section-header-icon {
-  margin: 0 auto 12px !important;
+  margin: 0 !important;
   align-self: center !important;
   display: inline-flex !important;
+  flex-shrink: 0 !important;
 }
 
 body.admin-body .section-content > .section-header > .section-header-content,
 body.admin-body .section-content > .design-ui-header > .section-header-content {
   display: flex !important;
-  flex-direction: column !important;
+  flex-direction: row !important;
+  flex-wrap: wrap !important;
   align-items: center !important;
   justify-content: center !important;
-  text-align: center !important;
-  width: 100% !important;
+  gap: 20px !important; /* Gap between titles and actions */
+  flex: none !important;
+  width: auto !important;
   margin: 0 !important;
   padding: 0 !important;
 }
@@ -6319,28 +6322,29 @@ body.admin-body .section-content > .section-header .section-header-titles,
 body.admin-body .section-content > .design-ui-header .section-header-titles {
   display: flex !important;
   flex-direction: column !important;
-  align-items: center !important;
+  align-items: flex-start !important;
   justify-content: center !important;
-  text-align: center !important;
-  width: 100% !important;
+  text-align: left !important;
+  flex: none !important;
+  width: auto !important;
   margin: 0 !important;
   padding: 0 !important;
 }
 
 body.admin-body .section-content > .section-header .section-title,
 body.admin-body .section-content > .design-ui-header .section-title {
-  text-align: center !important;
-  margin: 0 auto !important;
-  align-self: center !important;
-  width: 100% !important;
+  text-align: left !important;
+  margin: 0 !important;
+  align-self: flex-start !important;
+  width: auto !important;
 }
 
 body.admin-body .section-content > .section-header .section-subtitle,
 body.admin-body .section-content > .design-ui-header .section-subtitle {
-  text-align: center !important;
-  margin: 6px auto 0 !important;
-  align-self: center !important;
-  width: 100% !important;
+  text-align: left !important;
+  margin: 4px 0 0 !important;
+  align-self: flex-start !important;
+  width: auto !important;
 }
 
 body.admin-body .section-content > .section-header .section-header-actions,
@@ -6349,8 +6353,8 @@ body.admin-body .section-content > .design-ui-header .section-header-actions {
   flex-direction: row !important;
   align-items: center !important;
   justify-content: center !important;
-  margin: 16px auto 0 !important; /* Premium spacing below title */
-  width: 100% !important;
+  margin: 0 !important;
+  width: auto !important;
   flex-wrap: wrap !important;
   gap: 12px !important;
 }
@@ -6366,12 +6370,13 @@ body.admin-body .section-content > .design-ui-header .section-header-actions .bt
   margin: 0 !important;
 }
 
-/* Mobile-specific adjustments to keep spacing tight and premium */
+/* Mobile-specific adjustments to keep padding tight and premium */
 @media (max-width: 1024px) {
   body.admin-body .section-content > .section-header,
   body.admin-body .section-content > .design-ui-header {
-    padding: 20px 20px !important; /* Symmetric tighter 8px grid padding on mobile/tablet */
-    margin-bottom: 24px !important;
+    padding: 16px 20px !important; /* Premium tighter 8px grid padding on mobile/tablet */
+    gap: 12px !important;
   }
 }
+
 
