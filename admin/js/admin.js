@@ -4666,9 +4666,10 @@ class AdminManager {
             trafficData = ga.dailyTraffic.map(d => parseInt(d.users) || 0);
             labels = ga.dailyTraffic.map((d, i) => {
                 const rawDate = d.date || d.label || '';
-                if (typeof rawDate === 'string' && /^\d{8}$/.test(rawDate)) {
-                    const day = parseInt(rawDate.substring(6, 8), 10);
-                    const monthNum = parseInt(rawDate.substring(4, 6), 10);
+                const rawDateStr = String(rawDate).trim();
+                if (/^\d{8}$/.test(rawDateStr)) {
+                    const day = parseInt(rawDateStr.substring(6, 8), 10);
+                    const monthNum = parseInt(rawDateStr.substring(4, 6), 10);
                     const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
                     const monthLabel = months[monthNum - 1] || '';
                     return `${day}. ${monthLabel}`;
