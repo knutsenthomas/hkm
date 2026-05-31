@@ -1576,7 +1576,7 @@ class NewsletterBuilder {
 
     toggleMode(mode) {
         this.currentMode = mode;
-        const dashboard = document.getElementById('newsletter-dashboard-layout');
+        const dashboard = document.getElementById('newsletter-dashboard-wrapper') || document.getElementById('newsletter-dashboard-layout');
         const builder = document.getElementById('newsletter-builder-layout');
         const mainHeader = document.getElementById('dashboard-main-header');
         

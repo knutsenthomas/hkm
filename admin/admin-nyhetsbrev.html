@@ -481,31 +481,43 @@
             text-align: center !important;
         }
 
-        /* --- Standardized Top Header Styles for HKM Studio --- */
-        body.admin-body .newsletter-dashboard-layout #dashboard-main-header {
-            display: flex !important;
-            margin-left: -40px !important;
-            margin-right: -40px !important;
-            margin-top: -32px !important;
-            margin-bottom: 32px !important;
-            width: calc(100% + 80px) !important;
-            box-sizing: border-box !important;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
-            background: #ffffff !important;
-        }
-
         .dashboard-header-container {
             display: none !important;
         }
 
-        /* --- Responsive Main Header Overrides --- */
+        /* --- Standardized Topp-Header og Layout for HKM Studio --- */
+        .newsletter-dashboard-wrapper {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-width: 0;
+            width: calc(100% - 280px);
+            margin-left: 280px;
+            min-height: 100vh;
+            background: #f8fafc;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-dashboard-layout {
+            width: 100% !important;
+            margin-left: 0 !important;
+            padding: 32px 40px 80px 40px !important;
+            background: #f8fafc !important;
+            min-height: calc(100vh - 72px) !important;
+            animation: dashboardFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            box-sizing: border-box !important;
+        }
+
+        /* --- Mobil og nettbrett tilpasning (< 1024px) --- */
         @media (max-width: 1024px) {
-            body.admin-body .newsletter-dashboard-layout #dashboard-main-header {
-                margin-left: -16px !important;
-                margin-right: -16px !important;
-                margin-top: -16px !important;
-                margin-bottom: 24px !important;
-                width: calc(100% + 32px) !important;
+            .newsletter-dashboard-wrapper {
+                width: 100% !important;
+                margin-left: 0 !important;
+            }
+            .newsletter-dashboard-layout {
+                padding: 16px !important;
+                padding-bottom: calc(100px + env(safe-area-inset-bottom, 0px)) !important;
             }
         }
     </style>
@@ -588,9 +600,9 @@
         </aside>
 
         <!-- Modus-svitsj: Dashboard (Standard) -->
-        <div id="newsletter-dashboard-layout" class="newsletter-dashboard-layout" style="display: block;">
+        <div id="newsletter-dashboard-wrapper" class="newsletter-dashboard-wrapper">
             <!-- Header for Dashboard Mode -->
-            <div id="dashboard-main-header" class="main-header" style="margin-bottom: 24px;">
+            <div id="dashboard-main-header" class="main-header">
                 <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
                     <button id="mobile-nav-toggle" class="mobile-nav-toggle">
                         <span class="material-symbols-outlined">menu</span>
@@ -620,6 +632,8 @@
                     </div>
                 </div>
             </div>
+
+            <div id="newsletter-dashboard-layout" class="newsletter-dashboard-layout" style="display: block;">
             <div class="dashboard-header-container" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; flex-wrap: wrap; gap: 16px; width: 100%; box-sizing: border-box;">
                 <div class="dashboard-header-left">
                     <h2 class="dashboard-main-title" style="font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 800; color: #0f172a; margin: 0 0 4px 0; letter-spacing: -0.02em;">HKM Studio</h2>
@@ -769,9 +783,10 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> <!-- Close newsletter-dashboard-layout -->
+    </div> <!-- Close newsletter-dashboard-wrapper -->
 
-        <!-- Modus-svitsj: Builder -->
+    <!-- Modus-svitsj: Builder -->
         <div id="newsletter-builder-layout" style="display: none; width: 100%;">
             <div class="builder-main-layout">
             <!-- 2. Sidebar: High-fidelity elements and templates column -->
