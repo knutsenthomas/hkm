@@ -1851,7 +1851,7 @@ body.admin-body .welcome-subtitle {
 
 .design-ui-brand-profile {
   position: relative;
-  min-height: 190px;
+  min-height: 192px;
   color: #fff;
   border-color: rgba(15, 23, 42, 0.18);
   background:
@@ -1887,11 +1887,11 @@ body.admin-body .welcome-subtitle {
 .design-ui-brand-profile-content {
   position: relative;
   z-index: 1;
-  padding: 18px;
+  padding: 24px;
 }
 
 .design-ui-brand-profile-kicker {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1900,8 +1900,9 @@ body.admin-body .welcome-subtitle {
 
 .design-ui-brand-profile h3 {
   margin: 8px 0 0;
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 800;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
@@ -1961,21 +1962,21 @@ body.admin-body .welcome-subtitle {
 .design-ui-brand-profile h2 {
   margin: 8px 0 8px;
   font-size: 24px;
-  line-height: 1.05;
+  line-height: 1.2;
   letter-spacing: -0.03em;
   color: #fff;
 }
 
 .design-ui-brand-profile p {
-  margin: 0;
-  color: rgba(255, 255, 255, 0.82);
-  font-size: 13px;
+  margin: 8px 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 14px;
   line-height: 1.5;
-  max-width: 28ch;
+  max-width: 100%;
 }
 
 .design-ui-brand-profile-chips {
-  margin-top: 12px;
+  margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -1983,8 +1984,8 @@ body.admin-body .welcome-subtitle {
 
 .design-ui-brand-profile-chips span {
   border-radius: 999px;
-  padding: 6px 10px;
-  font-size: 11px;
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 700;
   color: rgba(255, 255, 255, 0.95);
   background: rgba(255, 255, 255, 0.12);
