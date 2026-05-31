@@ -1199,61 +1199,61 @@ body.admin-body .welcome-subtitle {
 
 .design-ui-shell {
   display: grid;
-  gap: 18px;
+  gap: 24px;
 }
 
 .design-ui-workspace {
   display: grid;
-  gap: 18px;
+  gap: 24px;
   align-items: start;
 }
 
 .design-ui-top-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.7fr);
-  gap: 18px;
+  gap: 24px;
   align-items: start;
 }
 
 .design-ui-full-stack {
   display: grid;
-  gap: 18px;
+  gap: 24px;
 }
 
 .design-ui-main-column,
 .design-ui-side-column {
   display: grid;
-  gap: 18px;
+  gap: 24px;
 }
 
 .design-ui-panel {
   background: #fff;
   border: 1px solid #dbe4ef;
-  border-radius: 18px;
+  border-radius: 16px;
   box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
   overflow: hidden;
 }
 
 .design-ui-topbar {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 18px;
-  padding: 18px 20px;
+  gap: 24px;
+  padding: 24px;
   background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
 }
 
 .design-ui-topbar-main {
   display: flex;
-  align-items: center;
-  gap: 14px;
+  align-items: flex-start;
+  gap: 16px;
   min-width: 0;
 }
 
 .design-ui-topbar-icon {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1261,6 +1261,7 @@ body.admin-body .welcome-subtitle {
   color: var(--accent-color, #f97316);
   border: 1px solid #fed7aa;
   flex-shrink: 0;
+  margin-top: 2px; /* Precision vertical alignment with the first line of the title */
 }
 
 .design-ui-topbar-icon .material-symbols-outlined {
@@ -1269,31 +1270,32 @@ body.admin-body .welcome-subtitle {
 
 .design-ui-title {
   margin: 0;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 800;
   color: #0f172a;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
 .design-ui-muted {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
   color: #64748b;
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .design-ui-actions {
   display: flex;
-  gap: 10px;
+  gap: 16px;
   align-items: center;
   flex-wrap: wrap;
   justify-content: flex-end;
 }
 
 .design-ui-actions .btn {
-  min-height: 42px;
+  min-height: 40px;
   padding: 0 16px;
-  border-radius: 12px;
+  border-radius: 8px;
   font-size: 14px;
 }
 
@@ -1322,11 +1324,11 @@ body.admin-body .welcome-subtitle {
 }
 
 .design-ui-panel-header {
-  padding: 16px 18px;
+  padding: 16px 24px;
   border-bottom: 1px solid #eef2f7;
   background: #fcfdff;
   display: flex;
-  gap: 12px;
+  gap: 16px;
   align-items: flex-start;
 }
 
@@ -1335,9 +1337,9 @@ body.admin-body .welcome-subtitle {
 }
 
 .design-ui-panel-header-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1345,6 +1347,7 @@ body.admin-body .welcome-subtitle {
   color: var(--accent-color, #f97316);
   border: 1px solid #fed7aa;
   flex-shrink: 0;
+  margin-top: 2px; /* Precision alignment with panel title */
 }
 
 .design-ui-panel-header-icon .material-symbols-outlined {
@@ -1356,14 +1359,15 @@ body.admin-body .welcome-subtitle {
   font-size: 16px;
   font-weight: 800;
   color: #0f172a;
+  line-height: 1.2;
   letter-spacing: -0.02em;
 }
 
 .design-ui-panel-subtitle {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
   color: #64748b;
-  font-size: 13px;
-  line-height: 1.45;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .design-ui-panel-body {
