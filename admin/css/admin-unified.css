@@ -6069,6 +6069,170 @@ body.admin-body .template-item:active {
   border-bottom-right-radius: 8px;
 }
 
+/* ==========================================================================
+   Kinetic & Mandal Regnskapskontor - 100% Mobile Responsive Overrides
+   Defensive overrides target only tablet and phone sized screens (< 1024px / < 768px).
+   Leaves desktop layout completely intact.
+   ========================================================================== */
+
+/* 1. Global Table Scroll Protection */
+.table-container,
+.logs-table-wrap,
+.table-responsive,
+.full-bleed,
+.podcast-table-wrap {
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch !important;
+}
+
+/* 2. Tablet & Mobile Layout Shifts (< 1024px) */
+@media (max-width: 1024px) {
+  /* Enforce grid collapse to single column (8px Grid Rule: multiples of 8) */
+  .stats-grid,
+  .promo-cards,
+  .dashboard-grid-layout,
+  .push-dashboard-grid,
+  .ai-suggestions-grid,
+  .studio-creation-grid,
+  .studio-feed-section #studio-content-feed-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important; /* 8px Grid Rule parity */
+  }
+
+  /* Reset faste bredder på dashboard-containere */
+  .newsletter-dashboard-layout {
+    margin-left: 0 !important;
+    width: 100% !important;
+    padding: 16px !important;
+  }
+
+  body.admin-body .main-content {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Skuddsikker breddesikring for analysesiden og Google GeoChart/Chart.js */
+  .analytics-main-grid,
+  .analytics-main-grid > div,
+  .chart-card-premium,
+  .chart-container-inner,
+  #regions_div {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  #regions_div svg,
+  #regions_div iframe,
+  #regions_div div {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .chart-container-inner canvas {
+    max-width: 100% !important;
+    width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Sidebar Drawer Isolation */
+  body.admin-body .sidebar,
+  body.minside-body .sidebar,
+  body.crm-body .sidebar {
+    z-index: 9999 !important; /* Keep above overlay and page content */
+  }
+
+  .sidebar-overlay {
+    z-index: 9998 !important;
+  }
+}
+
+/* 3. Small Mobile Screen Adjustments (< 768px) */
+@media (max-width: 768px) {
+  /* Content wrappers breathing room (8px grid spacing) */
+  .content-wrapper,
+  .section-container,
+  .inbox-container,
+  .crm-content {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  /* Full width forms and touch safety */
+  form .form-group input,
+  form .form-group select,
+  form .form-group textarea,
+  form button[type="submit"],
+  .modal-content input,
+  .modal-content select,
+  .modal-content textarea,
+  .modal-content button,
+  #admin-modal-profile-form input,
+  #admin-modal-profile-form textarea,
+  #admin-modal-profile-form button,
+  .quill-editor-container,
+  .form-control {
+    width: 100% !important;
+    min-height: 48px !important; /* Touch-friendly size */
+    box-sizing: border-box !important;
+    font-size: 16px !important; /* Stops iOS automatic zoom on focus */
+  }
+
+  /* Form row elements stacking */
+  .form-row {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Interactive modal actions stack vertically for thumb safety */
+  .modal-footer {
+    flex-direction: column-reverse !important;
+    gap: 12px !important;
+    width: 100% !important;
+    padding: 16px 20px !important;
+  }
+
+  .modal-footer button,
+  .modal-footer .btn {
+    width: 100% !important;
+    margin: 0 !important;
+    min-height: 48px !important;
+    justify-content: center !important;
+  }
+
+  /* Actions and filters wrap nicely */
+  .table-header,
+  .header-left-actions,
+  .header-right-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 12px !important;
+  }
+
+  .header-right-actions .search-box,
+  .header-right-actions .threads-search {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .header-right-actions button,
+  .header-right-actions .btn,
+  .header-left-actions button,
+  .header-left-actions .btn,
+  .header-left-actions select,
+  .view-selector {
+    width: 100% !important;
+    justify-content: center !important;
+    min-height: 48px !important;
+  }
+}
+
+
 
 
 

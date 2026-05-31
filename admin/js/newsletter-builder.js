@@ -1578,14 +1578,19 @@ class NewsletterBuilder {
         this.currentMode = mode;
         const dashboard = document.getElementById('newsletter-dashboard-layout');
         const builder = document.getElementById('newsletter-builder-layout');
+        const mainHeader = document.getElementById('dashboard-main-header');
         
         if (mode === 'builder') {
             if (dashboard) dashboard.style.display = 'none';
             if (builder) builder.style.display = 'block';
+            if (mainHeader) mainHeader.style.setProperty('display', 'none', 'important');
             document.body.className = 'builder-active';
         } else {
             if (dashboard) dashboard.style.display = 'block';
             if (builder) builder.style.display = 'none';
+            if (mainHeader) {
+                mainHeader.style.removeProperty('display');
+            }
             document.body.className = 'admin-body main-dashboard';
             this.loadDashboardData();
         }

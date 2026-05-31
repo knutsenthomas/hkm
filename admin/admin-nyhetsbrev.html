@@ -480,6 +480,21 @@
             width: 18px !important;
             text-align: center !important;
         }
+
+        /* --- Responsive Main Header Overrides --- */
+        @media (max-width: 1024px) {
+            #dashboard-main-header {
+                display: flex !important;
+            }
+            .dashboard-header-container {
+                display: none !important;
+            }
+        }
+        @media (min-width: 1025px) {
+            #dashboard-main-header {
+                display: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -558,6 +573,38 @@
                 </div>
             </nav>
         </aside>
+
+        <!-- Header for Dashboard Mode -->
+        <div id="dashboard-main-header" class="main-header">
+            <div class="section-header design-ui-header in-topbar" style="margin-bottom: 0;">
+                <button id="mobile-nav-toggle" class="mobile-nav-toggle">
+                    <span class="material-symbols-outlined">menu</span>
+                </button>
+                <div class="section-header-icon">
+                    <span class="material-symbols-outlined">auto_awesome</span>
+                </div>
+                <div class="section-header-content">
+                    <div class="section-header-titles" style="display: flex !important; flex-direction: column !important; gap: 4px !important; margin: 0 !important; padding: 0 !important;">
+                        <h2 class="section-title" style="margin: 0 !important; padding: 0 !important; line-height: 1.2 !important;">HKM Studio</h2>
+                        <p class="section-subtitle" style="margin: 0 !important; margin-top: 0 !important; padding: 0 !important; line-height: 1.45 !important;">Ditt kreative innholdssenter for blogginnlegg, bibelundervisning og nyhetsbrev.</p>
+                    </div>
+                    <div class="section-header-actions">
+                        <a href="javascript:void(0)" class="user-profile-link" id="admin-profile-trigger">
+                            <div class="user-info-text">
+                                <span id="admin-name" class="user-name">Laster...</span>
+                                <span class="user-role">Administrator</span>
+                            </div>
+                            <div id="admin-avatar" class="user-avatar">TK</div>
+                        </a>
+
+                        <button id="messages-bell" class="notification-btn">
+                            <span id="notification-icon" class="material-symbols-outlined">notifications</span>
+                            <span id="notification-dot" class="notification-dot"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Modus-svitsj: Dashboard (Standard) -->
         <div id="newsletter-dashboard-layout" class="newsletter-dashboard-layout" style="display: block;">
