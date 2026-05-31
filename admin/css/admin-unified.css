@@ -6249,6 +6249,39 @@ body.admin-body .template-item:active {
   }
 }
 
+/* Prevent section header action buttons from stretching unprofessionally on responsive viewports */
+body.admin-body .section-content > .section-header .section-header-actions,
+body.admin-body .section-content > .design-ui-header .section-header-actions,
+body.admin-body #hero-section .section-header-actions,
+body.admin-body #podcast-section .section-header-actions {
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  width: auto !important;
+  max-width: max-content !important;
+  flex: none !important;
+  align-self: flex-start !important;
+  margin-left: 0 !important;
+}
+
+body.admin-body .section-content > .section-header .section-header-actions button,
+body.admin-body .section-content > .section-header .section-header-actions .btn,
+body.admin-body .section-content > .design-ui-header .section-header-actions button,
+body.admin-body .section-content > .design-ui-header .section-header-actions .btn,
+body.admin-body #hero-section .section-header-actions button,
+body.admin-body #hero-section .section-header-actions .btn,
+body.admin-body #podcast-section .section-header-actions button,
+body.admin-body #podcast-section .section-header-actions .btn {
+  width: auto !important;
+  max-width: max-content !important;
+  flex: none !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  align-self: flex-start !important;
+}
+
 
 
 
