@@ -3276,7 +3276,7 @@ input[type="range"] {
 
 .editor-toolbar-container {
     width: 100% !important;
-    max-width: 816px !important;
+    max-width: 864px !important; /* Matches paper max-width (816px) + horizontal padding (48px) for perfect alignment */
     margin: 0 auto !important;
     padding: 16px 24px 8px !important;
     box-sizing: border-box !important;
@@ -3328,6 +3328,10 @@ input[type="range"] {
     align-items: flex-start !important;
     box-sizing: border-box !important;
     scroll-behavior: smooth !important;
+    
+    /* Premium smooth gradient mask for scroll fading transition */
+    mask-image: linear-gradient(to bottom, transparent 0px, black 24px) !important;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 24px) !important;
 }
 
 .docs-toolbar {
