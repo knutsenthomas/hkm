@@ -845,7 +845,7 @@ class MinSideManager {
     // NAVIGATION
     // ──────────────────────────────────────────────────────────
     setupNavigation() {
-        document.querySelectorAll('.nav-link[data-view]').forEach(link => {
+        document.querySelectorAll('.nav-link[data-view], .mobile-nav-item[data-view]').forEach(link => {
             link.addEventListener('click', e => {
                 e.preventDefault();
                 this.loadView(link.dataset.view);
@@ -922,8 +922,9 @@ class MinSideManager {
         if (titleEl) titleEl.textContent = info.title;
         if (iconEl) iconEl.textContent = info.icon;
 
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        document.querySelectorAll('.nav-link, .mobile-nav-item').forEach(l => l.classList.remove('active'));
         document.querySelector(`.nav-link[data-view="${viewId}"]`)?.classList.add('active');
+        document.querySelector(`.mobile-nav-item[data-view="${viewId}"]`)?.classList.add('active');
 
         const container = document.getElementById('view-container') || document.getElementById('content-area');
         container.innerHTML = `<div class="loading-state"><div class="spinner"></div><p>${t('common.loading')}...</p></div>`;
