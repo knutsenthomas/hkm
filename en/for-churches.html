@@ -50,7 +50,7 @@
         })();
     </script>
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
-    <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
+        <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
     <style>
         .sidebar-nav *, 
         .mobile-bottom-nav .mobile-nav-item, 
@@ -78,6 +78,36 @@
             box-shadow: none !important;
             outline: none !important;
             border-image: none !important;
+        }
+
+        /* Force remove pseudo-elements used as underlines in styles.css */
+        .sidebar-nav .nav-link::after,
+        .sidebar-nav .nav-link::before,
+        .sidebar-nav .nav-link-wrap::after,
+        .sidebar-nav .nav-link-wrap::before,
+        .sidebar-nav .nav-item::after,
+        .sidebar-nav .nav-item::before,
+        .mobile-bottom-nav .mobile-nav-item::after,
+        .mobile-bottom-nav .mobile-nav-item::before,
+        body.admin-body .nav-link::after,
+        body.admin-body .nav-link::before,
+        body.admin-body .nav-link-wrap::after,
+        body.admin-body .nav-link-wrap::before,
+        body.admin-body .nav-item::after,
+        body.admin-body .nav-item::before,
+        body.minside-body .nav-link::after,
+        body.minside-body .nav-link::before,
+        body.minside-body .nav-link-wrap::after,
+        body.minside-body .nav-link-wrap::before,
+        body.minside-body .nav-item::after,
+        body.minside-body .nav-item::before,
+        .mobile-nav-item::after,
+        .mobile-nav-item::before {
+            content: none !important;
+            display: none !important;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
         }
     </style>
 </head>

@@ -56,7 +56,7 @@
         })();
     </script>
     <link rel="icon" type="image/png" href="/assets/logo-hkm-B4n9sAJj.png">
-    <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
+        <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
     <style>
         .sidebar-nav *, 
         .mobile-bottom-nav .mobile-nav-item, 
@@ -85,19 +85,48 @@
             outline: none !important;
             border-image: none !important;
         }
+
+        /* Force remove pseudo-elements used as underlines in styles.css */
+        .sidebar-nav .nav-link::after,
+        .sidebar-nav .nav-link::before,
+        .sidebar-nav .nav-link-wrap::after,
+        .sidebar-nav .nav-link-wrap::before,
+        .sidebar-nav .nav-item::after,
+        .sidebar-nav .nav-item::before,
+        .mobile-bottom-nav .mobile-nav-item::after,
+        .mobile-bottom-nav .mobile-nav-item::before,
+        body.admin-body .nav-link::after,
+        body.admin-body .nav-link::before,
+        body.admin-body .nav-link-wrap::after,
+        body.admin-body .nav-link-wrap::before,
+        body.admin-body .nav-item::after,
+        body.admin-body .nav-item::before,
+        body.minside-body .nav-link::after,
+        body.minside-body .nav-link::before,
+        body.minside-body .nav-link-wrap::after,
+        body.minside-body .nav-link-wrap::before,
+        body.minside-body .nav-item::after,
+        body.minside-body .nav-item::before,
+        .mobile-nav-item::after,
+        .mobile-nav-item::before {
+            content: none !important;
+            display: none !important;
+            width: 0px !important;
+            height: 0px !important;
+            background: transparent !important;
+        }
     </style>
   <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
   <script type="module" crossorigin src="/assets/firebase-config-BEqgZ5NB.js"></script>
-  <script type="module" crossorigin src="/assets/firebase-service.js_v_2026.05.10-Bee5LJ79.js"></script>
   <script type="module" crossorigin src="/assets/firebase-service-BGQiBNkc.js"></script>
-  <script type="module" crossorigin src="/assets/interactions-BfBBz7UR.js"></script>
-  <script type="module" crossorigin src="/assets/content-manager.js_v_2026.05.10-8DoKVdSI.js"></script>
+  <script type="module" crossorigin src="/assets/interactions-C5M6pUFc.js"></script>
+  <script type="module" crossorigin src="/assets/content-manager.js_v_2026.05.10-ax_Y4jGO.js"></script>
   <script type="module" crossorigin src="/assets/teaching-loader-xOaW7zvi.js"></script>
   <script type="module" crossorigin src="/assets/i18n-D7FYo70T.js"></script>
   <script type="module" crossorigin src="/assets/script.js_v_2026.04.26.12-DCbpVCbx.js"></script>
   <script type="module" crossorigin src="/assets/media-CySnUJbC.js"></script>
   <script type="module" crossorigin src="/assets/cookie-consent-DZCUu30K.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/styles-CHpt1YD4.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles.css_v_2026.04.22-CHpt1YD4.css">
   <link rel="stylesheet" crossorigin href="/assets/cookie-consent-_nwlpFTp.css">
 </head>
 
