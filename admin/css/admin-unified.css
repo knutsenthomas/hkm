@@ -2277,9 +2277,13 @@ body.crm-body .crm-table {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 90px;
+  min-width: 72px !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 14px !important;
   vertical-align: middle;
-  font-size: 13px;
+  font-size: 12px !important;
+  border-radius: 6px !important;
 }
 
 .crm-table td.col-actions .btn-secondary {
@@ -2287,9 +2291,13 @@ body.crm-body .crm-table {
   align-items: center;
   justify-content: center;
   width: auto !important;
-  min-height: 32px;
+  height: 32px !important;
+  min-height: 32px !important;
+  padding: 0 14px !important;
   vertical-align: middle;
   white-space: nowrap;
+  font-size: 12px !important;
+  border-radius: 6px !important;
 }
 
 .crm-table td.col-actions .icon-btn,
@@ -3985,16 +3993,21 @@ body.admin-body .grid-2-cols.editor-layout {
 
 /* Symmetrical spans for common 2-column layouts */
 body.admin-body .grid-2-cols > :first-child,
-body.admin-body .grid-2-cols.equal > :first-child,
 body.admin-body .grid-2-cols.editor-layout > :first-child {
   grid-column: span 8;
   min-width: 0;
 }
 
 body.admin-body .grid-2-cols > :last-child,
-body.admin-body .grid-2-cols.equal > :last-child,
 body.admin-body .grid-2-cols.editor-layout > :last-child {
   grid-column: span 4;
+  min-width: 0;
+}
+
+/* Symmetrical 50/50 split for equal 2-column layouts */
+body.admin-body .grid-2-cols.equal > :first-child,
+body.admin-body .grid-2-cols.equal > :last-child {
+  grid-column: span 6;
   min-width: 0;
 }
 
@@ -4873,10 +4886,10 @@ body.builder-active #dashboard-main-header {
 }
 
 /* 2. Unified Content Structure Alignment */
-body.admin-body .section-header,
-body.minside-body .section-header,
-body.crm-body .section-header,
-body.builder-active .section-header,
+body.admin-body .main-header .section-header,
+body.minside-body .main-header .section-header,
+body.crm-body .main-header .section-header,
+body.builder-active .main-header .section-header,
 body.builder-active .breadcrumb-nav {
   width: 100% !important;
   height: 100% !important;
@@ -4889,10 +4902,10 @@ body.builder-active .breadcrumb-nav {
   border: none !important;
 }
 
-body.admin-body .section-header-content,
-body.minside-body .section-header-content,
-body.crm-body .section-header-content,
-body.builder-active .section-header-content,
+body.admin-body .main-header .section-header-content,
+body.minside-body .main-header .section-header-content,
+body.crm-body .main-header .section-header-content,
+body.builder-active .main-header .section-header-content,
 body.builder-active .top-bar-actions {
   display: flex !important;
   align-items: center !important;
@@ -6278,8 +6291,8 @@ body.admin-body .template-item:active {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 12px !important;
+    justify-content: flex-start !important;
+    gap: 16px !important;
     padding: 16px 20px !important; /* Premium tighter padding on mobile/tablet */
     box-sizing: border-box !important;
     width: 100% !important;
@@ -6300,9 +6313,9 @@ body.admin-body .template-item:active {
     flex-direction: row !important;
     flex-wrap: wrap !important;
     align-items: center !important;
-    justify-content: center !important;
-    gap: 12px !important;
-    flex: none !important;
+    justify-content: flex-start !important;
+    gap: 16px !important;
+    flex: 1 !important;
     width: auto !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -6564,68 +6577,75 @@ body.builder-active .btn-primary:active,
 @media (max-width: 768px) {
     body.admin-body .section-content > .section-header,
     body.admin-body .section-content > .design-ui-header {
-        flex-direction: column !important;
+        display: flex !important;
+        flex-direction: row !important;
         align-items: center !important;
-        justify-content: center !important;
-        text-align: center !important;
-        padding: 24px 16px !important;
-        gap: 16px !important;
-        margin-top: 24px !important;
-        margin-bottom: 24px !important;
+        justify-content: flex-start !important;
+        text-align: left !important;
+        padding: 16px 16px !important;
+        gap: 12px !important;
+        margin-top: 16px !important;
+        margin-bottom: 16px !important;
         width: 100% !important;
         box-sizing: border-box !important;
     }
     
     body.admin-body .section-content > .section-header .section-header-icon,
     body.admin-body .section-content > .design-ui-header .section-header-icon {
-        margin: 0 auto !important;
+        margin: 0 !important;
         align-self: center !important;
+        display: inline-flex !important;
+        flex-shrink: 0 !important;
     }
     
     body.admin-body .section-content > .section-header > .section-header-content,
     body.admin-body .section-content > .design-ui-header > .section-header-content {
-        flex-direction: column !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
         align-items: center !important;
-        justify-content: center !important;
-        gap: 16px !important;
-        width: 100% !important;
+        justify-content: flex-start !important;
+        gap: 12px !important;
+        flex: 1 !important;
+        width: auto !important;
         margin: 0 !important;
         padding: 0 !important;
     }
     
     body.admin-body .section-content > .section-header .section-header-titles,
     body.admin-body .section-content > .design-ui-header .section-header-titles {
-        align-items: center !important;
+        align-items: flex-start !important;
         justify-content: center !important;
-        text-align: center !important;
-        width: 100% !important;
+        text-align: left !important;
+        width: auto !important;
+        flex: 1 !important;
     }
     
     body.admin-body .section-content > .section-header .section-title,
     body.admin-body .section-content > .design-ui-header .section-title {
-        text-align: center !important;
-        align-self: center !important;
-        font-size: 22px !important;
-        width: 100% !important;
+        text-align: left !important;
+        align-self: flex-start !important;
+        font-size: 16px !important;
+        width: auto !important;
     }
     
     body.admin-body .section-content > .section-header .section-subtitle,
     body.admin-body .section-content > .design-ui-header .section-subtitle {
-        text-align: center !important;
-        align-self: center !important;
-        font-size: 13.5px !important;
-        margin: 6px 0 0 !important;
-        width: 100% !important;
+        text-align: left !important;
+        align-self: flex-start !important;
+        font-size: 12px !important;
+        margin: 2px 0 0 !important;
+        width: auto !important;
     }
     
     body.admin-body .section-content > .section-header .section-header-actions,
     body.admin-body .section-content > .design-ui-header .section-header-actions {
-        flex-direction: column !important;
-        align-items: stretch !important;
-        justify-content: center !important;
-        width: 100% !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        width: auto !important;
         margin: 0 !important;
-        gap: 12px !important;
+        gap: 8px !important;
     }
     
     body.admin-body .section-content > .section-header .section-header-actions button,
