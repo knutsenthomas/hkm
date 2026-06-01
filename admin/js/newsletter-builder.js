@@ -1310,7 +1310,7 @@ class NewsletterBuilder {
                         const src = img.getAttribute('src') || '';
                         if (src && !src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('data:')) {
                             const cleanSrc = src.replace(/^\.\.\//, '').replace(/^\//, '');
-                            img.src = `https://www.hiskingdomministry.no/${cleanSrc}`;
+                            img.src = `https://hkm-dusky.vercel.app/${cleanSrc}`;
                         }
                     });
                     
