@@ -202,6 +202,26 @@ const initAdminHeader = () => {
             const style = document.createElement('style');
             style.id = styleId;
             style.textContent = `
+                body.admin-body .nav-list,
+                body.minside-body .nav-list {
+                    display: flex !important;
+                    flex-direction: column !important;
+                    align-items: stretch !important;
+                    width: 100% !important;
+                    padding: 0 !important;
+                    margin: 0 !important;
+                }
+                body.admin-body .nav-item,
+                body.minside-body .nav-item {
+                    width: 100% !important;
+                    display: block !important;
+                }
+                body.admin-body .nav-link,
+                body.minside-body .nav-link {
+                    display: flex !important;
+                    align-items: center !important;
+                    width: 100% !important;
+                }
                 .nav-link-wrap {
                     width: 100%;
                     display: flex;
