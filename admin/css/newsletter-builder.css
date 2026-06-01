@@ -2613,9 +2613,9 @@ input:checked+.slider:before {
     min-height: 72px !important;
     background: #ffffff !important;
     border-bottom: 1px solid #e2e8f0 !important;
-    display: flex !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
     align-items: center !important;
-    justify-content: space-between !important;
     padding: 0 24px !important;
     position: relative !important;
     width: 100% !important;
@@ -2879,13 +2879,7 @@ body.builder-active .builder-workspace > .main-header {
 }
 
 /* Mobile Responsiveness for Unified Header */
-@media (max-width: 1400px) {
-    .builder-unified-header .user-info-compact {
-        display: none !important; /* Hide name/role text under 1400px window width due to double sidebar space constraint */
-    }
-    .builder-unified-header .header-subtitle {
-        display: none !important; /* Hide subtitle to conserve space */
-    }
+@media (max-width: 1650px) {
     #newsletter-autosave-status span:not(.material-symbols-outlined) {
         display: none !important; /* Hide autosave text, keep icon */
     }
@@ -2894,7 +2888,7 @@ body.builder-active .builder-workspace > .main-header {
     }
 }
 
-@media (max-width: 1350px) {
+@media (max-width: 1500px) {
     #save-draft-btn span:not(.material-symbols-outlined),
     #save-template-btn span:not(.material-symbols-outlined) {
         display: none !important; /* Hide secondary button text */
@@ -2909,13 +2903,13 @@ body.builder-active .builder-workspace > .main-header {
     }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1350px) {
     .builder-unified-header .user-badge-modern {
         display: none !important; /* Hide user badge in builder header to save huge space */
     }
 }
 
-@media (max-width: 1100px) {
+@media (max-width: 1200px) {
     #continue-btn span:not(.material-symbols-outlined) {
         display: none !important; /* Hide main action button text on narrow widths */
     }
@@ -2923,8 +2917,13 @@ body.builder-active .builder-workspace > .main-header {
         padding: 0 12px !important;
         min-width: 40px !important;
     }
-    .builder-unified-header .header-subject-container {
-        min-width: 120px !important;
+}
+
+@media (max-width: 1024px) {
+    /* Hide subject and autosave status completely on mobile/tablet to prevent overlapping */
+    .builder-unified-header .header-subject-container,
+    .builder-unified-header #newsletter-autosave-status {
+        display: none !important;
     }
 }
 
