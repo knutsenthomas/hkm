@@ -531,10 +531,10 @@ export default function TodoApp() {
 
                 {/* Header view title and Search Bar */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
-                    <div>
-                        <div className="flex items-center gap-3">
-                            <h3 className="m-0 font-bold text-2xl text-[#1B4965] tracking-tight">{activeViewTitle}</h3>
-                            <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#1B4965]/10 text-[#1B4965] shadow-sm">
+                    <div className="flex-shrink-0">
+                        <div className="flex items-center gap-3 flex-nowrap">
+                            <h3 className="m-0 font-bold text-2xl text-[#1B4965] tracking-tight whitespace-nowrap">{activeViewTitle}</h3>
+                            <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#1B4965]/10 text-[#1B4965] shadow-sm whitespace-nowrap flex-shrink-0">
                                 {activeTasks.length} {activeTasks.length === 1 ? 'oppgave' : 'oppgaver'}
                             </span>
                         </div>
