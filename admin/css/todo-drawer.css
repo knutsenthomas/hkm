@@ -1,10 +1,11 @@
-/* Todo Drawer Material 3 & Brand Unified Styling */
-/* Aligned with the 8px Grid Rule, Modern Glassmorphism, and Chrome Jitter Fix */
+/* HKM Studio Premium - Material 3 sliding Task Drawer Stylesheet */
+/* Complies strictly with the 8px Grid Rule, Brand Aesthetics, and Chrome Jitter Safeguards */
 
+/* 1. Backdrop Overlay */
 .todo-drawer-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 23, 42, 0.3);
+    background: rgba(15, 23, 42, 0.25);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     z-index: 10000;
@@ -12,6 +13,7 @@
     visibility: hidden;
     transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s;
     transform: translateZ(0);
+    backface-visibility: hidden;
 }
 
 .todo-drawer-overlay.active {
@@ -19,17 +21,18 @@
     visibility: visible;
 }
 
+/* 2. Slide-out Side Sheet (Material 3 side sheet) */
 .hkm-todo-drawer {
     position: fixed;
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 440px; /* Highly optimal width for material drawers */
+    max-width: 440px; /* Golden standard sidebar width */
     height: 100vh;
-    background: rgba(252, 253, 255, 0.9); /* Material 3 Surface Tint */
-    backdrop-filter: blur(28px) saturate(190%);
-    -webkit-backdrop-filter: blur(28px) saturate(190%);
-    box-shadow: -12px 0 64px -16px rgba(15, 23, 42, 0.25);
+    background: rgba(248, 250, 252, 0.95); /* Soft surface color */
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    box-shadow: -16px 0 64px -16px rgba(27, 73, 101, 0.16);
     z-index: 10001;
     transform: translateX(100%) translateZ(0) !important;
     backface-visibility: hidden !important;
@@ -38,23 +41,24 @@
     display: flex;
     flex-direction: column;
     border-left: 1px solid rgba(27, 73, 101, 0.08);
+    border-radius: 24px 0 0 24px; /* Soft left-hand rounding */
 }
 
 .hkm-todo-drawer.active {
     transform: translateX(0) translateZ(0) !important;
 }
 
-/* Header - Premium Material 3 styling */
+/* 3. Header - Bold Premium Brand Identity */
 .todo-drawer-header {
-    background: #1B4965; /* Brand Dark Blue */
+    background: #1B4965; /* Deep brand blue */
     color: white;
-    padding: 24px 32px; /* 8px multiples */
+    padding: 24px 32px; /* Strict 8px grid */
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-shrink: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 4px 20px -8px rgba(15, 23, 42, 0.15);
+    box-shadow: 0 8px 32px -16px rgba(15, 23, 42, 0.2);
 }
 
 .todo-drawer-header h3 {
@@ -64,12 +68,13 @@
     letter-spacing: -0.02em;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 16px; /* 8px multiple */
+    line-height: 1.2;
 }
 
 .todo-drawer-header h3 span {
-    font-size: 24px;
-    color: #fb923c; /* brand soft orange icon glint */
+    font-size: 28px;
+    color: #fb923c; /* Spark of brand orange */
 }
 
 .todo-drawer-close {
@@ -77,39 +82,39 @@
     border: none;
     color: white;
     cursor: pointer;
-    width: 36px;
-    height: 36px;
+    width: 40px; /* 8px multiple */
+    height: 40px; /* 8px multiple */
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .todo-drawer-close:hover {
     background: rgba(255, 255, 255, 0.2);
-    transform: scale(1.08);
+    transform: scale(1.1);
 }
 
 .todo-drawer-close:active {
-    transform: scale(0.95);
+    transform: scale(0.9);
 }
 
-/* Body & Layout Isolation */
+/* 4. Body Content - Scrollable Isolation */
 .todo-drawer-body {
     position: relative !important; /* Offset-kontekst */
     flex: 1;
     overflow-y: auto;
-    padding: 32px; /* 8px grid */
+    padding: 32px; /* Strict 8px grid */
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 32px; /* 8px grid */
     transform: translateZ(0);
 }
 
-/* Custom minimal scrollbar */
+/* Custom scrollbar */
 .todo-drawer-body::-webkit-scrollbar {
-    width: 6px;
+    width: 8px;
 }
 
 .todo-drawer-body::-webkit-scrollbar-track {
@@ -117,114 +122,107 @@
 }
 
 .todo-drawer-body::-webkit-scrollbar-thumb {
-    background: rgba(27, 73, 101, 0.12);
+    background: rgba(27, 73, 101, 0.15);
     border-radius: 99px;
 }
 
 .todo-drawer-body::-webkit-scrollbar-thumb:hover {
-    background: rgba(27, 73, 101, 0.25);
+    background: rgba(27, 73, 101, 0.3);
 }
 
-/* Add Task Form - Premium Material 3 Container */
+/* 5. Quick Add Form - Material 3 Outlined Card */
 .todo-drawer-quick-add {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    background: rgba(255, 255, 255, 0.8);
+    gap: 16px; /* 8px multiple */
+    background: #FFFFFF;
     border: 1px solid rgba(27, 73, 101, 0.12);
-    border-radius: 20px; /* Rounded corners */
-    padding: 20px;
-    box-shadow: 0 8px 30px -10px rgba(27, 73, 101, 0.08);
+    border-radius: 24px; /* Highly rounded M3 container */
+    padding: 24px; /* Strict 8px grid */
+    box-shadow: 0 8px 32px -8px rgba(27, 73, 101, 0.06);
 }
 
-.todo-drawer-quick-add input[type="text"] {
+/* Outlined form fields with complete jitter fix */
+.todo-drawer-quick-add input[type="text"],
+.todo-drawer-quick-add select,
+.todo-drawer-quick-add input[type="date"] {
     display: block !important;
     width: 100% !important;
-    padding: 14px 18px !important;
-    border-radius: 14px !important;
-    border: 1.5px solid rgba(27, 73, 101, 0.15) !important;
-    background: white !important;
+    padding: 16px 24px !important; /* Strict 8px grid */
+    border-radius: 16px !important; /* Golden ratio rounded corner */
+    border: 2px solid rgba(27, 73, 101, 0.12) !important;
+    background: #FFFFFF !important;
     font-size: 14px !important;
     font-weight: 500 !important;
     color: #0f172a !important;
     outline: none !important;
-    transition: all 0.25s ease !important;
     box-sizing: border-box !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
 }
 
-.todo-drawer-quick-add input[type="text"]:focus {
-    border-color: #d17d39 !important;
-    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.15) !important;
-}
-
-.todo-quick-add-row {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;
-    gap: 12px;
-}
-
-.todo-quick-add-row select,
-.todo-quick-add-row input[type="date"] {
-    display: block !important;
-    padding: 12px 16px !important;
-    border-radius: 14px !important;
-    border: 1.5px solid rgba(27, 73, 101, 0.15) !important;
-    background: white !important;
-    font-size: 13.5px !important;
-    font-weight: 500 !important;
-    color: #475569 !important;
-    outline: none !important;
-    cursor: pointer;
-    box-sizing: border-box !important;
-    transition: all 0.25s ease !important;
-}
-
-.todo-quick-add-row select:focus,
-.todo-quick-add-row input[type="date"]:focus {
-    border-color: #d17d39 !important;
-    box-shadow: 0 0 0 3px rgba(209, 125, 57, 0.12) !important;
-}
-
-/* LEGGER TIL OPPGAVE BUTTON - Pill Shaped M3 design */
-.todo-drawer-quick-add button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    background: linear-gradient(135deg, #d17d39, #bd4f2a);
-    color: white;
-    border: none;
-    border-radius: 9999px; /* Pill shaped */
-    padding: 14px 20px;
+/* Field labels */
+.todo-quick-label {
+    display: block;
+    font-size: 12px;
     font-weight: 700;
-    font-size: 14px;
-    cursor: pointer;
-    box-shadow: 0 4px 14px rgba(209, 125, 57, 0.25);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #475569;
+    margin-bottom: 6px;
+    padding-left: 4px;
+}
+
+.todo-drawer-quick-add input[type="text"]:focus,
+.todo-drawer-quick-add select:focus,
+.todo-drawer-quick-add input[type="date"]:focus {
+    border-color: #d17d39 !important;
+    box-shadow: 0 0 0 4px rgba(209, 125, 57, 0.12) !important;
+}
+
+/* Legg til oppgave Button - Pill Shaped */
+.todo-drawer-quick-add button {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important; /* Strict 8px spacing */
+    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important;
+    color: #FFFFFF !important;
+    border: none !important;
+    border-radius: 9999px !important; /* Fully pill-shaped */
+    padding: 16px 24px !important; /* Multiples of 8px */
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    box-shadow: 0 8px 24px -4px rgba(209, 125, 57, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transform: translateZ(0) !important;
+    backface-visibility: hidden !important;
 }
 
 .todo-drawer-quick-add button:hover {
-    transform: translateY(-1.5px);
-    box-shadow: 0 6px 20px rgba(209, 125, 57, 0.35);
+    transform: translateY(-2px) scale(1.02) translateZ(0) !important;
+    box-shadow: 0 12px 32px -4px rgba(209, 125, 57, 0.4) !important;
     filter: brightness(1.05);
 }
 
 .todo-drawer-quick-add button:active {
-    transform: translateY(0.5px);
-    box-shadow: 0 2px 8px rgba(209, 125, 57, 0.2);
+    transform: translateY(1px) scale(0.98) translateZ(0) !important;
+    box-shadow: 0 4px 12px -2px rgba(209, 125, 57, 0.2) !important;
 }
 
-/* Task lists section titles */
+/* 6. List Titles */
 .todo-drawer-list-title {
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: #1B4965; /* Brand Dark Blue */
+    color: #1B4965;
     font-weight: 800;
     margin: 0 0 16px 0;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     opacity: 0.85;
 }
 
@@ -232,39 +230,43 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(27, 73, 101, 0.1);
+    background: rgba(27, 73, 101, 0.12);
 }
 
 .todo-drawer-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px; /* Strict 8px spacing */
 }
 
-/* Task Cards - Premium M3 look */
+/* 7. Task Items - Sleek Outlined Cards */
 .todo-drawer-item {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    background: white;
+    gap: 16px; /* 8px multiple */
+    background: #FFFFFF;
     border: 1px solid rgba(27, 73, 101, 0.08);
-    border-radius: 16px; /* Highly rounded */
-    padding: 16px;
-    box-shadow: 0 4px 16px -6px rgba(15, 23, 42, 0.04);
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-radius: 20px; /* M3 elegant corners */
+    padding: 20px; /* Strict 8px multiple */
+    box-shadow: 0 4px 16px -4px rgba(27, 73, 101, 0.02);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     transform: translateZ(0);
     backface-visibility: hidden;
 }
 
 .todo-drawer-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px -10px rgba(27, 73, 101, 0.12);
-    border-color: rgba(27, 73, 101, 0.18);
+    transform: translateY(-2px) translateZ(0);
+    box-shadow: 0 12px 32px -12px rgba(27, 73, 101, 0.12);
+    border-color: rgba(27, 73, 101, 0.16);
+}
+
+.todo-drawer-item:active {
+    transform: scale(0.99) translateZ(0);
 }
 
 .todo-drawer-item.completed {
-    opacity: 0.65;
-    background: rgba(248, 250, 252, 0.8);
+    opacity: 0.6;
+    background: rgba(248, 250, 252, 0.7);
     border-color: rgba(27, 73, 101, 0.04);
     box-shadow: none;
 }
@@ -274,20 +276,21 @@
     color: #94a3b8;
 }
 
-/* Material 3 Styled Checkboxes */
+/* 8. Circular Material 3 Checkboxes */
 .todo-drawer-checkbox {
-    width: 22px;
-    height: 22px;
-    border-radius: 8px; /* Rounded M3 checkbox */
+    width: 24px; /* Golden standard M3 sizing */
+    height: 24px;
+    border-radius: 50%; /* Fully circular */
     border: 2px solid rgba(27, 73, 101, 0.25);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    background: white;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    background: #FFFFFF;
     flex-shrink: 0;
-    margin-top: 1px;
+    margin-top: 2px;
+    box-sizing: border-box;
 }
 
 .todo-drawer-checkbox:hover {
@@ -302,10 +305,11 @@
 
 .todo-drawer-checkbox.checked span {
     font-size: 16px;
-    color: white;
+    color: #FFFFFF;
     font-weight: 700;
 }
 
+/* 9. Card Content & Metadata */
 .todo-drawer-item-content {
     flex: 1;
     min-width: 0;
@@ -313,18 +317,18 @@
 
 .todo-drawer-item-title {
     font-weight: 600;
-    font-size: 14.5px;
+    font-size: 15px;
     color: #0f172a;
-    margin: 0 0 4px 0;
+    margin: 0 0 6px 0;
     line-height: 1.4;
     word-break: break-word;
 }
 
 .todo-drawer-item-desc {
-    font-size: 12.5px;
+    font-size: 13px;
     color: #64748b;
     line-height: 1.5;
-    margin: 0 0 8px 0;
+    margin: 0 0 12px 0;
     word-break: break-word;
 }
 
@@ -332,15 +336,19 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 8px; /* Multi-badge spacing */
 }
 
-/* Tonal Badges (Material 3 style) */
+/* 10. Tonal M3 Badges */
 .todo-drawer-badge {
     font-size: 11px;
     font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 8px;
+    padding: 6px 12px;
+    border-radius: 12px; /* Golden ratio badge rounding */
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1.2;
 }
 
 .todo-drawer-badge.priority-high {
@@ -359,47 +367,66 @@
 }
 
 .todo-drawer-badge.due-date {
+    background: #eff6ff; /* Blue tonal date badge */
+    color: #2563eb;
+}
+
+.todo-drawer-badge.assignee {
     background: #f1f5f9;
     color: #475569;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
 }
 
-.todo-drawer-badge.due-date span {
-    font-size: 13px;
-}
-
-/* Empty States - Delicately designed */
+/* 11. Premium Empty States */
 .todo-drawer-empty {
     text-align: center;
-    padding: 36px 16px;
+    padding: 48px 24px; /* Strict 8px grid */
     background: rgba(255, 255, 255, 0.4);
-    border: 1px dashed rgba(27, 73, 101, 0.12);
-    border-radius: 16px;
+    border: 1px dashed rgba(27, 73, 101, 0.16);
+    border-radius: 24px; /* Rounded corners */
     color: #94a3b8;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 2px 8px rgba(27, 73, 101, 0.01);
 }
 
 .todo-drawer-empty span.icon {
-    font-size: 40px;
+    font-size: 48px;
     display: block;
-    margin-bottom: 8px;
-    color: #cbd5e1;
+    margin-bottom: 12px;
+    color: rgba(27, 73, 101, 0.25);
+    transition: transform 0.4s ease;
+}
+
+.todo-drawer-empty:hover span.icon {
+    transform: scale(1.1) rotate(5deg);
 }
 
 .todo-drawer-empty p {
     margin: 0;
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 600;
-    color: #94a3b8;
+    color: #64748b;
 }
 
-/* Mobile optimizations */
+/* 12. Landscape & Mobile Viewport Protection */
 @media (max-width: 480px) {
     .hkm-todo-drawer {
         max-width: 100%;
+        border-radius: 0; /* Fullscreen on extra small mobile */
     }
     .todo-drawer-body {
         padding: 24px;
+    }
+}
+
+@media (orientation: landscape) and (max-height: 520px) {
+    .todo-drawer-body {
+        padding: 16px;
+        gap: 16px;
+    }
+    .todo-drawer-quick-add {
+        padding: 16px;
+    }
+    .todo-drawer-header {
+        padding: 16px 24px;
     }
 }

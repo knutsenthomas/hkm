@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
 
 /**
- * TodoApp Component - HKM Studio Premium Task Manager
+ * TodoApp Component - HKM Studio Premium Task Manager Dashboard
  * Implemented inside Vite hybrid React environment.
  * Complies strictly with the 8px Grid Rule, Brand Aesthetics, and Chrome Jitter Fix.
+ * Overhauled to a premium Material 3 design utilizing Tailwind CSS.
  */
 export default function TodoApp() {
     const [tasks, setTasks] = useState([]);
@@ -98,7 +99,6 @@ export default function TodoApp() {
         if (!currentUser) return;
         
         // Redirect to cloud function trigger for OAuth2 flow
-        // In local environments redirect to firebase emulator, in production to the Vercel hosted function
         const hostname = window.location.hostname;
         const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1';
         const functionsBase = isLocalDev 
@@ -269,57 +269,58 @@ export default function TodoApp() {
     // Helpers
     const getAssigneeName = (uid) => {
         const u = users.find(user => user.uid === uid);
-        return u ? u.displayName : 'Ukjent';
+        return u ? u.displayName : 'Ukjent bruker';
     };
 
     if (loading) {
         return (
-            <div style={{ display: 'flex', justifyContent: 'center', padding: '64px' }}>
-                <div className="loader"></div>
+            <div className="flex justify-center items-center py-16">
+                <div className="loader w-10 h-10 border-4 border-[#1B4965] border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     if (!currentUser) {
         return (
-            <div style={{ padding: '32px', textAlign: 'center', color: '#64748b' }}>
-                Vennligst logg inn for å få tilgang til huskelisten.
+            <div className="bg-slate-50 border border-slate-100 rounded-3xl p-12 text-center text-slate-500 max-w-md mx-auto my-8">
+                <span className="material-symbols-outlined text-4xl mb-3 text-slate-400">lock</span>
+                <p className="font-semibold">Vennligst logg inn for å få tilgang til huskelisten.</p>
             </div>
         );
     }
 
     return (
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '32px', transform: 'translateZ(0)', backfaceVisibility: 'hidden' }}>
+        <div className="grid grid-cols-1 gap-8 w-full transform translate-z-0 backface-hidden">
             
             {/* Upper control board with Google sync & statistics */}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', background: 'white', borderRadius: '16px', padding: '24px', border: '1px solid rgba(27, 73, 101, 0.08)' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ background: googleConnected ? '#e6f4ea' : '#f1f5f9', color: googleConnected ? '#137333' : '#5f6368', padding: '12px', borderRadius: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <span className="material-symbols-outlined" style={{ fontSize: '28px' }}>sync_alt</span>
+            <div className="flex justify-between items-center flex-wrap gap-6 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm shadow-slate-100/50">
+                <div className="flex items-center gap-5">
+                    <div className={`p-4 rounded-2xl flex items-center justify-center transition-colors duration-300 ${googleConnected ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>
+                        <span className="material-symbols-outlined text-3xl">sync_alt</span>
                     </div>
                     <div>
-                        <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '700', color: '#1B4965' }}>Google Tasks Synkronisering</h4>
-                        <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#64748b' }}>
+                        <h4 className="margin-0 text-base font-bold text-[#1B4965]">Google Tasks Synkronisering</h4>
+                        <p className="margin-0 text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                             {googleConnected 
-                                ? 'Status: Koblet til Google-kontoen din og synkroniserer.' 
-                                : 'Status: Ikke tilkoblet. Klikk for å synkronisere oppgavene dine.'}
+                                ? 'Status: Koblet til Google-kontoen din og synkroniserer automatisk.' 
+                                : 'Status: Ikke tilkoblet. Koble til for å synkronisere oppgavene dine med Google.'}
                         </p>
                     </div>
                 </div>
-                <div style={{ display: 'flex', gap: '12px' }}>
+                <div className="flex gap-3 items-center">
                     {googleConnected ? (
                         <>
-                            <button onClick={handleManualSync} disabled={syncing} className="btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', fontWeight: '600', cursor: 'pointer', border: '1.5px solid #cbd5e1', background: 'white', fontSize: '14px' }}>
-                                <span className={`material-symbols-outlined ${syncing ? 'animate-spin' : ''}`} style={{ fontSize: '20px' }}>sync</span>
+                            <button onClick={handleManualSync} disabled={syncing} className="flex items-center gap-2 px-5 py-3 rounded-full font-semibold border-2 border-slate-200 hover:border-[#1B4965] hover:text-[#1B4965] bg-white text-slate-600 text-sm transition-all duration-300 cursor-pointer disabled:opacity-50">
+                                <span className={`material-symbols-outlined text-lg ${syncing ? 'animate-spin' : ''}`}>sync</span>
                                 {syncing ? 'Synkroniserer...' : 'Synkroniser nå'}
                             </button>
-                            <button onClick={handleGoogleTasksAuth} className="btn-text" style={{ fontSize: '13px', color: '#94a3b8', border: 'none', background: 'none', cursor: 'pointer' }}>
+                            <button onClick={handleGoogleTasksAuth} className="text-xs font-bold text-slate-400 hover:text-red-500 transition-colors duration-200 border-none bg-none cursor-pointer px-2 py-1">
                                 Koble fra
                             </button>
                         </>
                     ) : (
-                        <button onClick={handleGoogleTasksAuth} className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '12px 20px', borderRadius: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', background: 'linear-gradient(135deg, #d17d39, #bd4f2a)', color: 'white', fontSize: '14px', boxShadow: '0 4px 10px rgba(209, 125, 57, 0.2)' }}>
-                            <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>link</span>
+                        <button onClick={handleGoogleTasksAuth} className="flex items-center gap-2 px-6 py-3 rounded-full font-bold bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] text-white text-sm hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-orange-500/15 transition-all duration-300 cursor-pointer">
+                            <span className="material-symbols-outlined text-lg">link</span>
                             Koble til Google Tasks
                         </button>
                     )}
@@ -327,47 +328,48 @@ export default function TodoApp() {
             </div>
 
             {/* Split layout: Form (Left/Top) & Tasks Board (Right/Bottom) */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '32px' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                 
-                {/* Form to create new task */}
-                <div className="card modern" style={{ height: 'fit-content', background: 'white', borderRadius: '20px', padding: '32px', border: '1px solid rgba(27, 73, 101, 0.08)', boxShadow: '0 10px 30px -10px rgba(15, 23, 42, 0.04)' }}>
-                    <h3 style={{ margin: '0 0 24px 0', fontSize: '18px', fontWeight: '700', color: '#1B4965', borderBottom: '2px solid #f1f5f9', paddingBottom: '16px' }}>Ny oppgave</h3>
+                {/* Form to create new task (Span 5 on large screens) */}
+                <div className="lg:col-span-5 bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm shadow-slate-100/50">
+                    <h3 className="text-lg font-bold text-[#1B4965] border-b border-slate-100 pb-4 mb-6">Ny oppgave</h3>
                     
                     {formError && (
-                        <div style={{ background: '#fef2f2', color: '#ef4444', padding: '12px 16px', borderRadius: '10px', fontSize: '13px', fontWeight: '500', marginBottom: '20px' }}>
+                        <div className="bg-red-50 text-red-500 px-4 py-3 rounded-2xl text-xs font-semibold mb-6 flex items-center gap-2">
+                            <span className="material-symbols-outlined text-lg">error</span>
                             {formError}
                         </div>
                     )}
 
-                    <form onSubmit={handleAddTask} style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Tittel *</label>
-                            <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Hva må gjøres?" required style={{ display: 'block', width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
+                    <form onSubmit={handleAddTask} className="flex flex-col gap-5">
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Tittel *</label>
+                            <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Hva må gjøres?" required className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" />
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Beskrivelse</label>
-                            <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Detaljer om oppgaven..." rows={3} style={{ display: 'block', width: '100%', padding: '12px 16px', borderRadius: '12px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box', resize: 'none' }} />
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Beskrivelse</label>
+                            <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Detaljer om oppgaven..." rows={3} className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm resize-none fontFamily-inherit box-sizing-border-box" />
                         </div>
 
-                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Prioritet</label>
-                                <select value={newPriority} onChange={e => setNewPriority(e.target.value)} style={{ padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', fontSize: '14px', background: 'white' }}>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Prioritet</label>
+                                <select value={newPriority} onChange={e => setNewPriority(e.target.value)} className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250">
                                     <option value="low">Lav</option>
                                     <option value="medium">Medium</option>
                                     <option value="high">Høy</option>
                                 </select>
                             </div>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                                <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Forfallsdato</label>
-                                <input type="date" value={newDueDate} onChange={e => setNewDueDate(e.target.value)} style={{ padding: '11px 14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', fontSize: '14px' }} />
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Forfallsdato</label>
+                                <input type="date" value={newDueDate} onChange={e => setNewDueDate(e.target.value)} className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 text-sm transition-colors duration-250" />
                             </div>
                         </div>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                            <label style={{ fontSize: '13px', fontWeight: '600', color: '#475569' }}>Tildel til (Valgfritt)</label>
-                            <select value={newAssignee} onChange={e => setNewAssignee(e.target.value)} style={{ padding: '12px 14px', borderRadius: '12px', border: '1.5px solid #e2e8f0', fontSize: '14px', background: 'white' }}>
+                        <div className="flex flex-col gap-2">
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Tildel til (Valgfritt)</label>
+                            <select value={newAssignee} onChange={e => setNewAssignee(e.target.value)} className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250">
                                 <option value="">Alle administratorer (Global)</option>
                                 {users.map(u => (
                                     <option key={u.uid} value={u.uid}>{u.displayName}</option>
@@ -375,36 +377,37 @@ export default function TodoApp() {
                             </select>
                         </div>
 
-                        <button type="submit" className="btn-primary" style={{ marginTop: '8px', padding: '14px', borderRadius: '12px', border: 'none', background: 'linear-gradient(135deg, #1B4965, #14354b)', color: 'white', fontWeight: '700', fontSize: '15px', cursor: 'pointer', transition: 'all 0.25s ease' }}>
+                        <button type="submit" className="w-full flex items-center justify-center gap-2 mt-4 px-6 py-4 rounded-full font-bold text-white bg-gradient-to-r from-[#1B4965] to-[#14354b] hover:from-[#25668d] hover:to-[#1b4965] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-[#1B4965]/10 hover:shadow-lg hover:shadow-[#1B4965]/20 transition-all duration-300 cursor-pointer border-none text-base">
+                            <span className="material-symbols-outlined text-lg">save</span>
                             Lagre oppgave
                         </button>
                     </form>
                 </div>
 
-                {/* Tasks board with interactive lists */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                {/* Tasks board with interactive lists (Span 7 on large screens) */}
+                <div className="lg:col-span-7 flex flex-col gap-6">
                     
                     {/* Controls & Filter panel */}
-                    <div style={{ background: 'white', borderRadius: '20px', padding: '24px', border: '1px solid rgba(27, 73, 101, 0.08)', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                    <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm shadow-slate-100/50 flex flex-col gap-5">
                         
                         {/* Search Bar */}
-                        <div style={{ position: 'relative' }}>
-                            <span className="material-symbols-outlined" style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8', fontSize: '20px' }}>search</span>
-                            <input type="text" value={filterSearch} onChange={e => setFilterSearch(e.target.value)} placeholder="Søk i oppgaver..." style={{ width: '100%', padding: '12px 16px 12px 48px', borderRadius: '12px', border: '1.5px solid #e2e8f0', fontSize: '14px', outline: 'none', boxSizing: 'border-box' }} />
+                        <div className="relative">
+                            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
+                            <input type="text" value={filterSearch} onChange={e => setFilterSearch(e.target.value)} placeholder="Søk i oppgaver..." className="w-full pl-12 pr-6 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" />
                         </div>
 
                         {/* Filters Row */}
-                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
+                        <div className="flex flex-wrap gap-4 items-center">
                             
                             {/* Status Filter buttons */}
-                            <div style={{ display: 'flex', background: '#f1f5f9', borderRadius: '10px', padding: '4px', gap: '4px' }}>
-                                <button onClick={() => setFilterStatus('gjeldende')} style={{ border: 'none', background: filterStatus === 'gjeldende' ? 'white' : 'transparent', color: filterStatus === 'gjeldende' ? '#1B4965' : '#64748b', fontWeight: '600', fontSize: '13px', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }}>Gjeldende</button>
-                                <button onClick={() => setFilterStatus('fullført')} style={{ border: 'none', background: filterStatus === 'fullført' ? 'white' : 'transparent', color: filterStatus === 'fullført' ? '#1B4965' : '#64748b', fontWeight: '600', fontSize: '13px', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }}>Fullførte</button>
-                                <button onClick={() => setFilterStatus('all')} style={{ border: 'none', background: filterStatus === 'all' ? 'white' : 'transparent', color: filterStatus === 'all' ? '#1B4965' : '#64748b', fontWeight: '600', fontSize: '13px', padding: '8px 14px', borderRadius: '8px', cursor: 'pointer', transition: 'all 0.2s' }}>Alle</button>
+                            <div className="flex bg-slate-100 rounded-2xl p-1 gap-1 border border-slate-200/20">
+                                <button onClick={() => setFilterStatus('gjeldende')} className={`border-none px-4 py-2 rounded-xl font-bold text-xs cursor-pointer transition-all duration-300 ${filterStatus === 'gjeldende' ? 'bg-white text-[#1B4965] shadow-sm' : 'bg-transparent text-slate-500 hover:text-slate-800'}`}>Gjeldende</button>
+                                <button onClick={() => setFilterStatus('fullført')} className={`border-none px-4 py-2 rounded-xl font-bold text-xs cursor-pointer transition-all duration-300 ${filterStatus === 'fullført' ? 'bg-white text-[#1B4965] shadow-sm' : 'bg-transparent text-slate-500 hover:text-slate-800'}`}>Fullførte</button>
+                                <button onClick={() => setFilterStatus('all')} className={`border-none px-4 py-2 rounded-xl font-bold text-xs cursor-pointer transition-all duration-300 ${filterStatus === 'all' ? 'bg-white text-[#1B4965] shadow-sm' : 'bg-transparent text-slate-500 hover:text-slate-800'}`}>Alle</button>
                             </div>
 
                             {/* Priority select filter */}
-                            <select value={filterPriority} onChange={e => setFilterPriority(e.target.value)} style={{ padding: '8px 12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', fontSize: '13px', fontWeight: '600', color: '#475569', background: 'white' }}>
+                            <select value={filterPriority} onChange={e => setFilterPriority(e.target.value)} className="px-4 py-2.5 rounded-2xl border-2 border-slate-200 bg-white font-bold text-xs text-slate-600 outline-none focus:border-[#d17d39] cursor-pointer transition-colors duration-200">
                                 <option value="all">Alle prioriteter</option>
                                 <option value="high">Høy prioritet</option>
                                 <option value="medium">Medium prioritet</option>
@@ -412,7 +415,7 @@ export default function TodoApp() {
                             </select>
 
                             {/* Assignee select filter */}
-                            <select value={filterAssignee} onChange={e => setFilterAssignee(e.target.value)} style={{ padding: '8px 12px', borderRadius: '10px', border: '1.5px solid #e2e8f0', fontSize: '13px', fontWeight: '600', color: '#475569', background: 'white' }}>
+                            <select value={filterAssignee} onChange={e => setFilterAssignee(e.target.value)} className="px-4 py-2.5 rounded-2xl border-2 border-slate-200 bg-white font-bold text-xs text-slate-600 outline-none focus:border-[#d17d39] cursor-pointer transition-colors duration-200">
                                 <option value="all">Alle tildelinger</option>
                                 <option value="me">Tildelt meg</option>
                                 <option value="global">Globale oppgaver</option>
@@ -425,59 +428,68 @@ export default function TodoApp() {
                     </div>
 
                     {/* Task Grid items */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div className="flex flex-col gap-4">
                         {filteredTasks.length === 0 ? (
-                            <div style={{ background: 'white', borderRadius: '20px', padding: '64px 32px', textAlign: 'center', border: '1px solid rgba(27, 73, 101, 0.08)', color: '#94a3b8' }}>
-                                <span className="material-symbols-outlined" style={{ fontSize: '48px', opacity: 0.5, marginBottom: '12px', display: 'block' }}>playlist_add_check</span>
-                                <p style={{ margin: 0, fontWeight: '500', fontSize: '15px' }}>Ingen oppgaver matcher valgte filtre.</p>
+                            <div className="bg-white rounded-3xl py-16 px-8 text-center border border-dashed border-slate-200/80 shadow-sm flex flex-col items-center justify-center">
+                                <span className="material-symbols-outlined text-5xl text-slate-300 mb-4">playlist_add_check</span>
+                                <p className="font-bold text-base text-slate-500">Ingen oppgaver matcher valgte filtre.</p>
+                                <span className="text-xs text-slate-400 mt-2 font-medium">Opprett en ny oppgave til venstre eller juster filterinnstillingene.</span>
                             </div>
                         ) : (
                             filteredTasks.map(t => {
                                 const isCompleted = t.status === 'fullført';
-                                const prioLabel = { low: 'Lav', medium: 'Med', high: 'Høy' }[t.priority] || 'Medium';
-                                const prioClass = `todo-drawer-badge priority-${t.priority || 'medium'}`;
+                                const prioLabel = { low: 'Lav prioritet', medium: 'Medium', high: 'Høy prioritet' }[t.priority] || 'Medium';
+                                
+                                // Priority styling configuration
+                                const prioStyles = {
+                                    high: 'bg-red-50 text-red-500',
+                                    medium: 'bg-orange-50 text-orange-500',
+                                    low: 'bg-green-50 text-green-500'
+                                }[t.priority || 'medium'];
 
                                 return (
-                                    <div key={t.id} className="todo-drawer-item" style={{ background: 'white', border: '1px solid rgba(27, 73, 101, 0.06)', borderRadius: '16px', padding: '24px', display: 'flex', gap: '16px', alignItems: 'flex-start', boxShadow: '0 4px 15px -4px rgba(15, 23, 42, 0.03)', opacity: isCompleted ? 0.65 : 1 }}>
-                                        {/* Checked checkbox */}
-                                        <div onClick={() => handleToggleTask(t)} className={`todo-drawer-checkbox ${isCompleted ? 'checked' : ''}`} style={{ marginTop: '2px', border: '2px solid rgba(27, 73, 101, 0.3)', width: '22px', height: '22px', borderRadius: '6px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'white' }}>
-                                            {isCompleted && <span className="material-symbols-outlined" style={{ fontSize: '16px', color: 'white', fontWeight: 'bold' }}>check</span>}
+                                    <div key={t.id} className={`flex gap-5 items-start bg-white border border-slate-200/60 rounded-3xl p-6 shadow-sm shadow-slate-100/30 hover:-translate-y-0.5 hover:shadow-md hover:shadow-slate-100/80 hover:border-slate-200 active:scale-[0.99] transition-all duration-300 ${isCompleted ? 'opacity-60 bg-slate-50/50 shadow-none border-slate-100' : ''}`}>
+                                        
+                                        {/* Circular M3 Checkbox */}
+                                        <div onClick={() => handleToggleTask(t)} className={`w-6 h-6 rounded-full border-2 border-slate-300 flex items-center justify-center cursor-pointer transition-all duration-300 select-none flex-shrink-0 mt-0.5 hover:border-[#d17d39] hover:bg-[#d17d39]/5 ${isCompleted ? 'bg-[#d17d39] border-[#d17d39]' : 'bg-white'}`}>
+                                            {isCompleted && <span className="material-symbols-outlined text-[15px] text-white font-bold">check</span>}
                                         </div>
 
                                         {/* Card content */}
-                                        <div style={{ flex: 1, minWidth: 0 }}>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
-                                                <h4 style={{ margin: 0, fontSize: '16px', fontWeight: '600', color: '#1e293b', textDecoration: isCompleted ? 'line-through' : 'none', wordBreak: 'break-word', lineHeight: 1.4 }}>{t.title}</h4>
-                                                <button onClick={() => handleDeleteTask(t.id)} style={{ border: 'none', background: 'none', padding: '4px', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'color 0.2s' }} title="Slett oppgave">
-                                                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>delete</span>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex justify-between items-start gap-4">
+                                                <h4 className={`margin-0 font-bold text-base text-slate-800 leading-snug break-words ${isCompleted ? 'line-through text-slate-400' : ''}`}>{t.title}</h4>
+                                                <button onClick={() => handleDeleteTask(t.id)} className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-250 flex items-center justify-center" title="Slett oppgave">
+                                                    <span className="material-symbols-outlined text-lg">delete</span>
                                                 </button>
                                             </div>
 
                                             {t.description && (
-                                                <p style={{ margin: '8px 0 0 0', fontSize: '13px', color: '#64748b', lineHeight: 1.5, wordBreak: 'break-word' }}>{t.description}</p>
+                                                <p className="margin-0 text-sm text-slate-500 mt-2 leading-relaxed break-words font-medium">{t.description}</p>
                                             )}
 
                                             {/* Metadata tags */}
-                                            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px', marginTop: '16px' }}>
-                                                <span className={prioClass} style={{ fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px' }}>
+                                            <div className="flex flex-wrap items-center gap-2 mt-4">
+                                                <span className={`text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 ${prioStyles}`}>
+                                                    <span className="w-1.5 h-1.5 rounded-full bg-current"></span>
                                                     {prioLabel}
                                                 </span>
 
                                                 {t.dueDate && (
-                                                    <span className="todo-drawer-badge due-date" style={{ fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>calendar_today</span>
+                                                    <span className="bg-blue-50 text-blue-600 text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                                                        <span className="material-symbols-outlined text-[14px]">calendar_today</span>
                                                         Forfaller: {new Date(t.dueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short', year: 'numeric' })}
                                                     </span>
                                                 )}
 
                                                 {t.tildelt_til && t.tildelt_til.length > 0 ? (
-                                                    <span className="todo-drawer-badge" style={{ background: '#eff6ff', color: '#1d4ed8', fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>account_circle</span>
+                                                    <span className="bg-indigo-50 text-indigo-600 text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                                                        <span className="material-symbols-outlined text-[14px]">account_circle</span>
                                                         Tildelt: {getAssigneeName(t.tildelt_til[0])}
                                                     </span>
                                                 ) : (
-                                                    <span className="todo-drawer-badge" style={{ background: '#f8fafc', color: '#64748b', fontSize: '11px', fontWeight: '600', padding: '3px 8px', borderRadius: '6px', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
-                                                        <span className="material-symbols-outlined" style={{ fontSize: '13px' }}>group</span>
+                                                    <span className="bg-slate-50 text-slate-500 text-[11px] font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5">
+                                                        <span className="material-symbols-outlined text-[14px]">group</span>
                                                         Global oppgave
                                                     </span>
                                                 )}

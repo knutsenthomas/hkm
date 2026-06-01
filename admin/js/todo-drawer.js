@@ -11,7 +11,11 @@ import '../css/todo-drawer.css';
     if (window.__HKMTodoDrawerInitialized) return;
     window.__HKMTodoDrawerInitialized = true;
 
-    console.log("[todo-drawer] Initializing Todo Drawer...");
+    console.log("[todo-drawer] Initializing Todo Drawer with Material 3 & Delegation...");
+
+    // Module-scoped state for users and current tasks
+    let systemAdmins = [];
+    let currentTasksList = [];
 
     // Inject drawer HTML structure into body
     const injectDrawerHtml = () => {
@@ -25,6 +29,9 @@ import '../css/todo-drawer.css';
         const drawer = document.createElement('div');
         drawer.id = 'hkm-todo-drawer';
         drawer.className = 'hkm-todo-drawer';
+        drawer.style.transform = 'translateX(100%) translateZ(0)';
+        drawer.style.backfaceVisibility = 'hidden';
+        
         drawer.innerHTML = `
             <div class="todo-drawer-header">
                 <h3>
@@ -36,19 +43,37 @@ import '../css/todo-drawer.css';
                 </button>
             </div>
             <div class="todo-drawer-body">
-                <!-- Quick Add Form -->
-                <div class="todo-drawer-quick-add">
-                    <input type="text" id="todo-quick-title" placeholder="Hva må gjøres?..." required autocomplete="off">
-                    <div class="todo-quick-add-row">
+                <!-- Quick Add Form - Vertically Stacked to Prevent Chrome Jitter -->
+                <div class="todo-drawer-quick-add" style="transform: translateZ(0); backface-visibility: hidden;">
+                    <div style="display: block !important; width: 100% !important;">
+                        <label class="todo-quick-label" for="todo-quick-title">Ny oppgave *</label>
+                        <input type="text" id="todo-quick-title" placeholder="Hva må gjøres?..." required autocomplete="off">
+                    </div>
+                    
+                    <div style="display: block !important; width: 100% !important;">
+                        <label class="todo-quick-label" for="todo-quick-priority">Prioritet</label>
                         <select id="todo-quick-priority">
                             <option value="low">Lav prioritet</option>
                             <option value="medium" selected>Medium prioritet</option>
                             <option value="high">Høy prioritet</option>
                         </select>
+                    </div>
+
+                    <div style="display: block !important; width: 100% !important;">
+                        <label class="todo-quick-label" for="todo-quick-duedate">Forfallsdato</label>
                         <input type="date" id="todo-quick-duedate" title="Forfallsdato">
                     </div>
+
+                    <div style="display: block !important; width: 100% !important;">
+                        <label class="todo-quick-label" for="todo-quick-assignee">Tildel til</label>
+                        <select id="todo-quick-assignee">
+                            <option value="">Alle (Global oppgave)</option>
+                            <!-- Populated dynamically with administrators -->
+                        </select>
+                    </div>
+
                     <button id="todo-quick-add-btn">
-                        <span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+                        <span class="material-symbols-outlined">add</span>
                         Legg til oppgave
                     </button>
                 </div>
@@ -68,8 +93,8 @@ import '../css/todo-drawer.css';
                 <div>
                     <h4 class="todo-drawer-list-title">Fullførte oppgaver</h4>
                     <div id="todo-completed-list" class="todo-drawer-list">
-                        <div class="todo-drawer-empty" style="padding: 24px 12px; border: none; background: transparent;">
-                            <p style="font-size: 12px; opacity: 0.6;">Ingen fullførte oppgaver</p>
+                        <div class="todo-drawer-empty" style="background: transparent; border: 1px dashed rgba(27, 73, 101, 0.08); box-shadow: none;">
+                            <p style="font-size: 13px; color: #94a3b8;">Ingen fullførte oppgaver</p>
                         </div>
                     </div>
                 </div>
@@ -113,6 +138,39 @@ import '../css/todo-drawer.css';
 
             console.log("[todo-drawer] User authenticated. Listening to tasks...");
             const db = firebase.firestore();
+
+            // Fetch user directory for task delegation in real-time
+            db.collection('users').get().then(snapshot => {
+                systemAdmins = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if (data.role === 'admin' || data.role === 'superadmin' || data.isAdmin) {
+                        systemAdmins.push({
+                            uid: doc.id,
+                            displayName: data.displayName || data.email || 'Admin User'
+                        });
+                    }
+                });
+
+                // Populate the Assignee select element
+                const assigneeSelect = document.getElementById('todo-quick-assignee');
+                if (assigneeSelect) {
+                    assigneeSelect.innerHTML = '<option value="">Alle (Global oppgave)</option>';
+                    systemAdmins.forEach(admin => {
+                        const option = document.createElement('option');
+                        option.value = admin.uid;
+                        option.textContent = admin.displayName;
+                        assigneeSelect.appendChild(option);
+                    });
+                }
+
+                // If tasks are already loaded, trigger re-render to map assignee names
+                if (currentTasksList && currentTasksList.length > 0) {
+                    renderTasks(currentTasksList, user.uid);
+                }
+            }).catch(err => {
+                console.warn("[todo-drawer] Could not load users for delegation:", err);
+            });
             
             // Listen to tasks collection in real-time
             db.collection('tasks').onSnapshot(snapshot => {
@@ -121,6 +179,7 @@ import '../css/todo-drawer.css';
                     tasks.push({ id: doc.id, ...doc.data() });
                 });
 
+                currentTasksList = tasks;
                 renderTasks(tasks, user.uid);
             }, error => {
                 console.error("[todo-drawer] Firestore fetch error:", error);
@@ -206,6 +265,7 @@ import '../css/todo-drawer.css';
                 <div class="todo-drawer-empty">
                     <span class="material-symbols-outlined icon">verified</span>
                     <p>Ingen gjeldende oppgaver</p>
+                    <span style="font-size: 12px; color: #94a3b8; display: block; margin-top: 4px;">Alt er unnagjort! Godt jobbet.</span>
                 </div>
             `;
         } else {
@@ -215,8 +275,9 @@ import '../css/todo-drawer.css';
         // Render Completed List
         if (completedTasks.length === 0) {
             completedList.innerHTML = `
-                <div class="todo-drawer-empty" style="padding: 24px 12px; border: none; background: transparent;">
-                    <p style="font-size: 13px;">Ingen fullførte oppgaver</p>
+                <div class="todo-drawer-empty" style="background: transparent; border: 1px dashed rgba(27, 73, 101, 0.08); box-shadow: none; padding: 24px 16px;">
+                    <span class="material-symbols-outlined icon" style="font-size: 32px; color: rgba(27, 73, 101, 0.15);">playlist_add_check</span>
+                    <p style="font-size: 13px; color: #94a3b8;">Ingen fullførte oppgaver</p>
                 </div>
             `;
         } else {
@@ -236,9 +297,30 @@ import '../css/todo-drawer.css';
 
     // Generate HTML string for single task card
     const createTaskHtml = (t, isCompleted) => {
-        const priorityLabels = { low: 'Lav prioritet', medium: 'Medium prioritet', high: 'Høy prioritet' };
+        const priorityLabels = { low: 'Lav prioritet', medium: 'Medium', high: 'Høy prioritet' };
         const priorityClass = `priority-${t.priority || 'medium'}`;
         const formattedDate = t.dueDate ? formatDate(t.dueDate) : '';
+
+        // Assignee element mapping
+        let assigneeHtml = '';
+        if (t.tildelt_til && t.tildelt_til.length > 0) {
+            const assigneeId = t.tildelt_til[0];
+            const admin = systemAdmins.find(a => a.uid === assigneeId);
+            const displayName = admin ? admin.displayName : 'Laster...';
+            assigneeHtml = `
+                <span class="todo-drawer-badge assignee" title="Tildelt: ${escapeHtml(displayName)}">
+                    <span class="material-symbols-outlined" style="font-size: 13px;">account_circle</span>
+                    ${escapeHtml(displayName)}
+                </span>
+            `;
+        } else {
+            assigneeHtml = `
+                <span class="todo-drawer-badge assignee" style="background: #f1f5f9; color: #475569;" title="Global oppgave">
+                    <span class="material-symbols-outlined" style="font-size: 13px;">group</span>
+                    Alle (Global)
+                </span>
+            `;
+        }
 
         return `
             <div class="todo-drawer-item ${isCompleted ? 'completed' : ''}" id="drawer-task-${t.id}">
@@ -258,6 +340,7 @@ import '../css/todo-drawer.css';
                                 ${formattedDate}
                             </span>
                         ` : ''}
+                        ${assigneeHtml}
                     </div>
                 </div>
             </div>
@@ -292,6 +375,7 @@ import '../css/todo-drawer.css';
         const titleInput = document.getElementById('todo-quick-title');
         const prioritySelect = document.getElementById('todo-quick-priority');
         const duedateInput = document.getElementById('todo-quick-duedate');
+        const assigneeSelect = document.getElementById('todo-quick-assignee');
         const addBtn = document.getElementById('todo-quick-add-btn');
 
         if (!titleInput || !titleInput.value.trim()) return;
@@ -299,6 +383,7 @@ import '../css/todo-drawer.css';
         const title = titleInput.value.trim();
         const priority = prioritySelect ? prioritySelect.value : 'medium';
         const dueDate = duedateInput ? duedateInput.value : '';
+        const assignee = assigneeSelect ? assigneeSelect.value : '';
 
         // Disable button during execution
         if (addBtn) {
@@ -318,7 +403,7 @@ import '../css/todo-drawer.css';
                 status: 'gjeldende',
                 dueDate,
                 opprettet_av: currentUser.uid,
-                tildelt_til: [], // Global to all admins
+                tildelt_til: assignee ? [assignee] : [], // Array storage for sync consistency
                 created_at: firebase.firestore.FieldValue.serverTimestamp(),
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -328,6 +413,7 @@ import '../css/todo-drawer.css';
             // Reset input values
             titleInput.value = '';
             if (duedateInput) duedateInput.value = '';
+            if (assigneeSelect) assigneeSelect.value = '';
             
             console.log("[todo-drawer] Task added successfully");
         } catch (error) {
@@ -336,7 +422,7 @@ import '../css/todo-drawer.css';
         } finally {
             if (addBtn) {
                 addBtn.disabled = false;
-                addBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px;">add</span> Legg til oppgave';
+                addBtn.innerHTML = '<span class="material-symbols-outlined">add</span> Legg til oppgave';
             }
         }
     };
