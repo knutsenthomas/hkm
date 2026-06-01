@@ -561,7 +561,7 @@ export default function TodoApp() {
                     className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col shadow-sm ${
                         isQuickAddExpanded 
                             ? 'p-6 ring-2 ring-[#d17d39]/15 border-[#d17d39]/40 gap-4' 
-                            : 'p-4 hover:border-slate-300/80 hover:shadow-md cursor-pointer'
+                            : 'py-3 px-4 hover:border-slate-300/80 hover:shadow-md cursor-pointer'
                     }`}
                     onClick={() => {
                         if (!isQuickAddExpanded) setIsQuickAddExpanded(true);
