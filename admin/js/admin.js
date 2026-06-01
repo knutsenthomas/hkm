@@ -1899,22 +1899,7 @@ class AdminManager {
             profileTrigger.dataset.boundProfileNav = '1';
             profileTrigger.addEventListener('click', (e) => {
                 e.preventDefault();
-                if (window.adminManager && typeof window.adminManager.onSectionSwitch === 'function') {
-                    window.adminManager.onSectionSwitch('profile');
-
-                    const navLinks = document.querySelectorAll('.nav-link[data-section]');
-                    navLinks.forEach(l => {
-                        l.classList.toggle('active', l.getAttribute('data-section') === 'profile');
-                    });
-
-                    const sections = document.querySelectorAll('.section-content');
-                    sections.forEach(section => {
-                        section.classList.remove('active');
-                        if (section.id === 'profile-section') {
-                            section.classList.add('active');
-                        }
-                    });
-                }
+                window.location.hash = 'profile';
             });
         }
 
