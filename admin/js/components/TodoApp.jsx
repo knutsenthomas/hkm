@@ -685,7 +685,7 @@ export default function TodoApp() {
                                         type="submit" 
                                         disabled={!inlineTitle.trim()}
                                         onClick={(e) => e.stopPropagation()}
-                                        className="px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:shadow-md hover:shadow-orange-500/10 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                                        className="px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:shadow-md hover:shadow-orange-500/10 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs disabled:opacity-80 disabled:cursor-not-allowed"
                                     >
                                         Lagre
                                     </button>
