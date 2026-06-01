@@ -17615,7 +17615,7 @@ class AdminManager {
         }
 
         try {
-            const response = await fetch('https://sendmanualemail-7fskzic55a-uc.a.run.app', {
+            const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

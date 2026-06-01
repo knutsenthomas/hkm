@@ -3115,26 +3115,31 @@ exports.sendManualEmail = onRequest({ cors: true, secrets: [emailUserParam, emai
     }
 
     try {
-      const { to, subject, message, fromName } = req.body;
+      const { to, subject, message, fromName, html: rawHtml } = req.body;
 
-      if (!to || !subject || !message) {
+      if (!to || !subject || (!message && !rawHtml)) {
         res.status(400).send({ error: "Mangler mottaker, emne eller melding." });
         return;
       }
 
-      const html = `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-          <div style="margin-bottom: 20px;">
-            ${message.replace(/\n/g, '<br>')}
+      let html = "";
+      if (rawHtml) {
+        html = rawHtml;
+      } else {
+        html = `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+            <div style="margin-bottom: 20px;">
+              ${message.replace(/\n/g, '<br>')}
+            </div>
+            <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+              Vennlig hilsen,<br>
+              His Kingdom Ministry
+            </div>
           </div>
-          <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-            Vennlig hilsen,<br>
-            His Kingdom Ministry
-          </div>
-        </div>
-      `;
+        `;
+      }
 
-      const success = await sendEmail({ to, subject, html, text: message, fromName });
+      const success = await sendEmail({ to, subject, html, text: message || "", fromName });
 
       if (success) {
         res.status(200).send({ success: true });

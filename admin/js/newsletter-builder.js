@@ -1262,11 +1262,11 @@ class NewsletterBuilder {
     }
 
 
-    sendTestEmail() {
-        const user = window.firebaseService.auth.currentUser;
+    async sendTestEmail() {
+        const user = window.firebaseService?.auth?.currentUser;
         if (!user) return showToast("Logg inn først", "warning");
 
-        const subject = document.getElementById('newsletter-subject').value;
+        const subject = document.getElementById('newsletter-subject').value || 'Test-e-post';
         this.syncUnifiedBlocks();
         
         const textContent = this.blocks[0]?.content?.text || '';
@@ -1275,26 +1275,118 @@ class NewsletterBuilder {
             return showToast("Legg til innhold før du sender en test.", "error");
         }
 
-        showToast(`Sender en test-e-post av "${subject}" til ${user.email}...`, "info");
-        console.log("Test Send Triggered:", {
-            to: user.email,
-            subject: subject,
-            blocks: this.blocks
-        });
+        const testBtn = document.getElementById('send-test-btn');
+        const originalHtml = testBtn ? testBtn.innerHTML : '';
+        if (testBtn) {
+            testBtn.disabled = true;
+            testBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Sender...';
+        }
 
-        // Simulate success
-        setTimeout(() => {
-            showToast("Test-e-post er sendt!", "success");
+        showToast(`Sender test-e-post til ${user.email}...`, "info");
+
+        try {
+            // Get user ID Token for verification
+            const idToken = await user.getIdToken();
+
+            // Clone and clean the canvas
+            const canvasClone = document.getElementById('newsletter-canvas').cloneNode(true);
+            canvasClone.querySelectorAll('.block-controls, input, .col-type-toggle, .image-overlay, .add-block-btn-canvas, .block-actions-overlay').forEach(c => c.remove());
+            canvasClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
             
-            // Update checklist item in sidebar
-            const testIcon = document.getElementById('chk-test-icon');
-            const testText = document.getElementById('chk-test-text');
-            if (testIcon && testText) {
-                testIcon.innerText = 'check_circle';
-                testIcon.className = 'material-symbols-outlined chk-success';
-                testText.innerText = 'Test-epost bekreftet sendt';
+            // Build style block for structural elements inside the email
+            const styleBlock = `
+<style>
+  .newsletter-canvas {
+    max-width: 600px;
+    margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    overflow: hidden;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+  .canvas-header {
+    padding: 48px 32px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+  }
+  .newsletter-logo {
+    height: 56px;
+    margin-bottom: 16px;
+    display: inline-block;
+  }
+  .canvas-brand-name {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+    font-family: sans-serif;
+  }
+  .blocks-container {
+    padding: 32px 40px;
+    color: #1e293b;
+    line-height: 1.6;
+  }
+  .canvas-footer {
+    padding: 48px 32px;
+    text-align: center;
+    border-top: 1px solid #f1f5f9;
+    background: #f8fafc;
+    font-size: 13px;
+    color: #64748b;
+  }
+  .canvas-footer p {
+    margin: 0 0 8px 0;
+  }
+  .canvas-footer a {
+    color: #d17d39;
+    text-decoration: none;
+    font-weight: 600;
+  }
+</style>
+            `;
+
+            const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8">${styleBlock}</head><body>${canvasClone.outerHTML}</body></html>`;
+
+            const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
+                body: JSON.stringify({
+                    to: user.email,
+                    subject: `[TEST] ${subject}`,
+                    html: fullHtml,
+                    message: plainText.substring(0, 500),
+                    fromName: 'His Kingdom Ministry'
+                })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                showToast("Test-e-post er sendt!", "success");
+                
+                // Update checklist item in sidebar
+                const testIcon = document.getElementById('chk-test-icon');
+                const testText = document.getElementById('chk-test-text');
+                if (testIcon && testText) {
+                    testIcon.innerText = 'check_circle';
+                    testIcon.className = 'material-symbols-outlined chk-success';
+                    testText.innerText = 'Test-epost bekreftet sendt';
+                }
+            } else {
+                throw new Error(result.error || 'Serveren returnerte en feil.');
             }
-        }, 1000);
+        } catch (error) {
+            console.error('Feil ved sending av test-e-post:', error);
+            showToast('Kunne ikke sende: ' + error.message, 'error');
+        } finally {
+            if (testBtn) {
+                testBtn.disabled = false;
+                testBtn.innerHTML = originalHtml;
+            }
+        }
     }
 
     async sendCampaign() {
