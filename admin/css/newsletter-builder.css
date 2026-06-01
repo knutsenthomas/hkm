@@ -2614,7 +2614,7 @@ input:checked+.slider:before {
     background: #ffffff !important;
     border-bottom: 1px solid #e2e8f0 !important;
     display: grid !important;
-    grid-template-columns: 1fr auto 1fr !important;
+    grid-template-columns: 1fr auto !important;
     align-items: center !important;
     padding: 0 24px !important;
     position: relative !important;
@@ -2703,51 +2703,64 @@ input:checked+.slider:before {
     color: #94a3b8 !important;
 }
 
-.builder-unified-header .header-center {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex-shrink: 0 !important; /* Prevent toggles group from squishing */
-    margin: 0 16px !important; /* Safe zone spacing to prevent overlapping */
-}
+
 
 .builder-unified-header .device-toggles-modern {
     display: flex !important;
     align-items: center !important;
-    background: #f1f5f9 !important;
-    border-radius: 8px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 10px !important;
     padding: 4px !important;
-    gap: 4px !important;
+    gap: 6px !important;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
 }
 
 .builder-unified-header .device-btn {
     background: transparent !important;
-    border: none !important;
-    border-radius: 6px !important;
-    width: 32px !important;
-    height: 32px !important;
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+    width: 34px !important;
+    height: 34px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
     color: #64748b !important;
-    transition: all 0.2s ease !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     padding: 0 !important;
+    outline: none !important;
 }
 
 .builder-unified-header .device-btn span {
     font-size: 18px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
 }
 
 .builder-unified-header .device-btn:hover {
-    color: #1e293b !important;
-    background: rgba(255, 255, 255, 0.4) !important;
+    color: #1B4965 !important;
+    background: rgba(27, 73, 101, 0.05) !important;
+    transform: translateY(-0.5px) !important;
+}
+
+/* Spesial hover for forhåndsvisning-øye (oransje HKM-farge) */
+.builder-unified-header #preview-btn:hover {
+    color: #d17d39 !important;
+    background: rgba(209, 125, 57, 0.05) !important;
+}
+
+.builder-unified-header .device-btn:active {
+    transform: scale(0.97) !important;
 }
 
 .builder-unified-header .device-btn.active {
     background: #ffffff !important;
     color: #1B4965 !important;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06) !important;
+    border-color: rgba(27, 73, 101, 0.08) !important;
+    box-shadow: 0 4px 10px rgba(27, 73, 101, 0.08) !important;
+    transform: scale(1.03) !important;
 }
 
 .builder-unified-header .header-actions {
