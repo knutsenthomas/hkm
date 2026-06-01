@@ -201,7 +201,6 @@ import '../css/todo-drawer.css';
         if (!badge) return;
 
         if (uncompletedCount > 0) {
-            badge.style.display = 'block';
             badge.textContent = uncompletedCount;
             badge.style.cssText = `
                 display: flex !important;
@@ -211,13 +210,18 @@ import '../css/todo-drawer.css';
                 color: white !important;
                 font-size: 10px !important;
                 font-weight: 700 !important;
-                width: 16px !important;
-                height: 16px !important;
+                width: 18px !important;
+                height: 18px !important;
                 border-radius: 50% !important;
                 position: absolute !important;
-                top: -4px !important;
-                right: -4px !important;
+                top: -6px !important;
+                right: -6px !important;
                 border: 2px solid white !important;
+                box-shadow: 0 2px 6px rgba(209, 125, 57, 0.3) !important;
+                box-sizing: border-box !important;
+                line-height: 1 !important;
+                padding: 0 !important;
+                text-align: center !important;
             `;
         } else {
             badge.style.display = 'none';

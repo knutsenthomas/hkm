@@ -19,6 +19,7 @@ export default function TodoApp() {
     const [configClientId, setConfigClientId] = useState('');
     const [configClientSecret, setConfigClientSecret] = useState('');
     const [savingConfig, setSavingConfig] = useState(false);
+    const [showAddTaskModal, setShowAddTaskModal] = useState(false);
 
     // Form fields
     const [newTitle, setNewTitle] = useState('');
@@ -217,6 +218,7 @@ export default function TodoApp() {
             setNewPriority('medium');
             setNewDueDate('');
             setNewAssignee('');
+            setShowAddTaskModal(false);
         } catch (err) {
             console.error('[TodoApp] Error adding task:', err);
             setFormError('Kunne ikke legge til oppgave: ' + err.message);
@@ -482,73 +484,34 @@ export default function TodoApp() {
                 </div>
             )}
 
-            {/* Split layout: Form (Left/Top) & Tasks Board (Right/Bottom) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            {/* Main content: Tasks Board spans full-width for maximum focus */}
+            <div className="w-full">
                 
-                {/* Form to create new task (Span 5 on large screens) */}
-                <div className="lg:col-span-5 bg-white rounded-3xl p-8 border border-slate-200/80 shadow-sm shadow-slate-100/50">
-                    <h3 className="text-lg font-bold text-[#1B4965] border-b border-slate-100 pb-4 mb-6">Ny oppgave</h3>
-                    
-                    {formError && (
-                        <div className="bg-red-50 text-red-500 px-4 py-3 rounded-2xl text-xs font-semibold mb-6 flex items-center gap-2">
-                            <span className="material-symbols-outlined text-lg">error</span>
-                            {formError}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleAddTask} className="flex flex-col gap-5">
-                        <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Tittel *</label>
-                            <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Hva må gjøres?" required className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" />
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Beskrivelse</label>
-                            <textarea value={newDesc} onChange={e => setNewDesc(e.target.value)} placeholder="Detaljer om oppgaven..." rows={3} className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm resize-none fontFamily-inherit box-sizing-border-box" />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                            <div className="flex flex-col gap-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Prioritet</label>
-                                <select value={newPriority} onChange={e => setNewPriority(e.target.value)} className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250">
-                                    <option value="low">Lav</option>
-                                    <option value="medium">Medium</option>
-                                    <option value="high">Høy</option>
-                                </select>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Forfallsdato</label>
-                                <input type="date" value={newDueDate} onChange={e => setNewDueDate(e.target.value)} className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 text-sm transition-colors duration-250" />
-                            </div>
-                        </div>
-
-                        <div className="flex flex-col gap-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Tildel til (Valgfritt)</label>
-                            <select value={newAssignee} onChange={e => setNewAssignee(e.target.value)} className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250">
-                                <option value="">Alle administratorer (Global)</option>
-                                {users.map(u => (
-                                    <option key={u.uid} value={u.uid}>{u.displayName}</option>
-                                ))}
-                            </select>
-                        </div>
-
-                        <button type="submit" className="w-full flex items-center justify-center gap-2 mt-4 px-6 py-4 rounded-full font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-orange-500/15 hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 cursor-pointer border-none text-base">
-                            <span className="material-symbols-outlined text-lg">save</span>
-                            Lagre oppgave
-                        </button>
-                    </form>
-                </div>
-
-                {/* Tasks board with interactive lists (Span 7 on large screens) */}
-                <div className="lg:col-span-7 flex flex-col gap-6">
+                {/* Tasks board with interactive lists */}
+                <div className="flex flex-col gap-6 w-full">
                     
                     {/* Controls & Filter panel */}
                     <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm shadow-slate-100/50 flex flex-col gap-5">
                         
-                        {/* Search Bar */}
-                        <div className="relative todo-search-wrapper">
-                            <span className="material-symbols-outlined">search</span>
-                            <input type="text" value={filterSearch} onChange={e => setFilterSearch(e.target.value)} placeholder="Søk i oppgaver..." className="todo-search-input w-full pr-6 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" />
+                        {/* Search Bar & Ny Oppgave Button */}
+                        <div className="flex flex-col sm:flex-row gap-4 items-center w-full">
+                            <div className="relative todo-search-wrapper flex-1 w-full">
+                                <span className="material-symbols-outlined">search</span>
+                                <input 
+                                    type="text" 
+                                    value={filterSearch} 
+                                    onChange={e => setFilterSearch(e.target.value)} 
+                                    placeholder="Søk i oppgaver..." 
+                                    className="todo-search-input w-full pr-6 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" 
+                                />
+                            </div>
+                            <button 
+                                onClick={() => setShowAddTaskModal(true)} 
+                                className="w-full sm:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-bold text-white bg-[#1B4965] hover:bg-[#25638c] active:scale-[0.98] transition-all duration-300 cursor-pointer border-none text-sm whitespace-nowrap"
+                            >
+                                <span className="material-symbols-outlined text-lg">add</span>
+                                Ny oppgave
+                            </button>
                         </div>
 
                         {/* Filters Row */}
@@ -588,7 +551,7 @@ export default function TodoApp() {
                             <div className="bg-white rounded-3xl py-16 px-8 text-center border border-dashed border-slate-200/80 shadow-sm flex flex-col items-center justify-center">
                                 <span className="material-symbols-outlined text-5xl text-slate-300 mb-4">playlist_add_check</span>
                                 <p className="font-bold text-base text-slate-500">Ingen oppgaver matcher valgte filtre.</p>
-                                <span className="text-xs text-slate-400 mt-2 font-medium">Opprett en ny oppgave til venstre eller juster filterinnstillingene.</span>
+                                <span className="text-xs text-slate-400 mt-2 font-medium">Opprett en ny oppgave over eller juster filterinnstillingene.</span>
                             </div>
                         ) : (
                             filteredTasks.map(t => {
@@ -659,6 +622,138 @@ export default function TodoApp() {
 
             </div>
 
+            {/* Popup Modal for adding a new task */}
+            {showAddTaskModal && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+                    {/* Backdrop with elegant blur */}
+                    <div 
+                        className="absolute inset-0 bg-slate-900/60 backdrop-blur-md transition-opacity duration-300"
+                        onClick={() => {
+                            setFormError('');
+                            setShowAddTaskModal(false);
+                        }}
+                    />
+                    
+                    {/* Modal Content container */}
+                    <div className="relative w-full max-w-lg bg-white rounded-[32px] shadow-2xl border border-slate-100 overflow-hidden transform transition-all duration-300 max-h-[90vh] flex flex-col animate-in fade-in zoom-in-95">
+                        
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-8 py-6 border-b border-slate-100 bg-slate-50/50">
+                            <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-xl bg-orange-50 text-[#d17d39] flex items-center justify-center">
+                                    <span className="material-symbols-outlined">playlist_add</span>
+                                </div>
+                                <div>
+                                    <h3 className="text-lg font-bold text-[#1B4965]">Ny oppgave</h3>
+                                    <p className="text-xs text-slate-400 font-medium">Opprett en ny oppgave i listen din</p>
+                                </div>
+                            </div>
+                            <button 
+                                onClick={() => {
+                                    setFormError('');
+                                    setShowAddTaskModal(false);
+                                }} 
+                                className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition-all duration-200 border-none cursor-pointer"
+                            >
+                                <span className="material-symbols-outlined text-xl">close</span>
+                            </button>
+                        </div>
+
+                        {/* Form Body with scrollable content */}
+                        <div className="p-8 overflow-y-auto flex-1">
+                            {formError && (
+                                <div className="bg-red-50 text-red-500 px-4 py-3 rounded-2xl text-xs font-semibold mb-6 flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-lg">error</span>
+                                    {formError}
+                                </div>
+                            )}
+
+                            <form onSubmit={handleAddTask} className="flex flex-col gap-6">
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Tittel *</label>
+                                    <input 
+                                        type="text" 
+                                        value={newTitle} 
+                                        onChange={e => setNewTitle(e.target.value)} 
+                                        placeholder="Hva må gjøres?" 
+                                        required 
+                                        className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" 
+                                    />
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Beskrivelse</label>
+                                    <textarea 
+                                        value={newDesc} 
+                                        onChange={e => setNewDesc(e.target.value)} 
+                                        placeholder="Detaljer om oppgaven..." 
+                                        rows={3} 
+                                        className="w-full px-5 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm resize-none fontFamily-inherit box-sizing-border-box" 
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Prioritet</label>
+                                        <select 
+                                            value={newPriority} 
+                                            onChange={e => setNewPriority(e.target.value)} 
+                                            className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250"
+                                        >
+                                            <option value="low">Lav</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="high">Høy</option>
+                                        </select>
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Forfallsdato</label>
+                                        <input 
+                                            type="date" 
+                                            value={newDueDate} 
+                                            onChange={e => setNewDueDate(e.target.value)} 
+                                            className="w-full px-4 py-3 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 text-sm transition-colors duration-250" 
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Tildel til (Valgfritt)</label>
+                                    <select 
+                                        value={newAssignee} 
+                                        onChange={e => setNewAssignee(e.target.value)} 
+                                        className="w-full px-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] outline-none font-semibold text-slate-700 bg-white text-sm cursor-pointer transition-colors duration-250"
+                                    >
+                                        <option value="">Alle administratorer (Global)</option>
+                                        {users.map(u => (
+                                            <option key={u.uid} value={u.uid}>{u.displayName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="flex gap-4 mt-4">
+                                    <button 
+                                        type="button" 
+                                        onClick={() => {
+                                            setFormError('');
+                                            setShowAddTaskModal(false);
+                                        }}
+                                        className="flex-1 px-6 py-4 rounded-full font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 active:scale-95 transition-all duration-300 cursor-pointer border-none text-base"
+                                    >
+                                        Avbryt
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        className="flex-1 flex items-center justify-center gap-2 px-6 py-4 rounded-full font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-orange-500/15 hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 cursor-pointer border-none text-base"
+                                    >
+                                        <span className="material-symbols-outlined text-lg">save</span>
+                                        Lagre oppgave
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

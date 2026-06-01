@@ -5989,12 +5989,17 @@ class AdminManager {
                         </div>
                     </div>
                 </div>
+                <div id="google-tasks-integration-card" style="grid-column: 1 / -1; width: 100%;"></div>
             </div>
         `;
 
         section.setAttribute('data-rendered', 'true');
         this.loadMediaSettings();
         this._loadIntegrationsSettings();
+
+        if (typeof window.mountGoogleTasksIntegration === 'function') {
+            window.mountGoogleTasksIntegration();
+        }
 
         section.addEventListener('click', (event) => {
             if (event.target.id === 'save-youtube-settings') this.saveMediaSettings('save-youtube-settings');
