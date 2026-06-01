@@ -1298,7 +1298,8 @@ body.admin-body {
     display: none;
     align-items: flex-start;
     justify-content: center;
-    padding-top: 10vh;
+    padding: 10vh 16px 16px 16px;
+    box-sizing: border-box !important;
     animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
