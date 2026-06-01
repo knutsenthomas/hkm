@@ -7398,33 +7398,37 @@ class AdminManager {
 
         const actionsHtml = collectionId === 'podcast_transcripts'
             ? `
-                <div style="display:flex !important; align-items:center !important; gap:12px !important; flex-shrink:0 !important; margin-left:20px !important;">
-                    <button class="btn btn-secondary" id="bulk-fill-${collectionId}" style="background:#fff !important; border:1px solid #e2e8f0 !important; padding:14px 20px !important; font-weight:700 !important; border-radius:10px !important; display:flex !important; align-items:center !important; gap:10px !important; color:#1e293b !important; cursor:pointer !important; white-space:nowrap !important;">
-                        <span class="material-symbols-outlined" style="font-size:22px !important;">auto_awesome</span> Fyll manglende tekst og oppsummering
+                <div class="kinetic-actions-wrapper">
+                    <button class="btn btn-secondary" id="bulk-fill-${collectionId}">
+                        <span class="material-symbols-outlined">auto_awesome</span> Fyll manglende tekst og oppsummering
                     </button>
-                    <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316 !important; border: none !important; padding: 14px 28px !important; font-weight: 700 !important; border-radius: 10px !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3) !important; color: white !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; white-space: nowrap !important; flex-shrink: 0 !important;">
-                        <span class="material-symbols-outlined" style="font-size: 22px !important;">add</span> Legg til ny
+                    <button class="btn btn-primary" id="add-new-${collectionId}">
+                        <span class="material-symbols-outlined">add</span> Legg til ny
                     </button>
                 </div>
             `
             : `
-                <button class="btn btn-primary" id="add-new-${collectionId}" style="background: #f97316 !important; border: none !important; padding: 14px 28px !important; font-weight: 700 !important; border-radius: 10px !important; display: flex !important; align-items: center !important; gap: 10px !important; box-shadow: 0 4px 14px rgba(249, 115, 22, 0.3) !important; color: white !important; cursor: pointer !important; font-family: 'Inter', sans-serif !important; white-space: nowrap !important; flex-shrink: 0 !important; margin-left: 20px !important;">
-                    <span class="material-symbols-outlined" style="font-size: 22px !important;">add</span> Legg til ny
-                </button>
+                <div class="kinetic-actions-wrapper">
+                    <button class="btn btn-primary" id="add-new-${collectionId}">
+                        <span class="material-symbols-outlined">add</span> Legg til ny
+                    </button>
+                </div>
             `;
 
         section.innerHTML = `
-            <div class="card kinetic-header-card" style="margin-bottom: 24px !important; display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; padding: 32px 40px !important; background: white !important; border-radius: 20px !important; border: 1px solid #f1f5f9 !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; flex-wrap: nowrap !important;">
-                <div style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 28px !important; min-width: 0 !important; flex: 1 !important;">
-                    <div style="width: 64px !important; height: 64px !important; border-radius: 50% !important; background: #fdfdfd !important; border: 1px solid #f1f5f9 !important; display: flex !important; align-items: center !important; justify-content: center !important; color: #64748b !important; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02) !important; flex-shrink: 0 !important;">
-                        <span class="material-symbols-outlined" style="font-size: 28px !important; opacity: 0.7 !important;">edit_square</span>
+            <div class="card kinetic-header-card">
+                <div class="kinetic-header-left">
+                    <div class="kinetic-header-icon-circle">
+                        <span class="material-symbols-outlined">edit_square</span>
                     </div>
-                    <div style="min-width: 0 !important;">
-                        <h2 style="margin: 0 !important; font-size: 26px !important; font-weight: 800 !important; color: #1e293b !important; letter-spacing: -0.02em !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">${title}</h2>
-                        <p style="margin: 6px 0 0 !important; font-size: 15px !important; color: #94a3b8 !important; font-weight: 500 !important; white-space: nowrap !important; overflow: hidden !important; text-overflow: ellipsis !important;">Administrer dine ${title.toLowerCase()}.</p>
+                    <div class="kinetic-header-info">
+                        <h2>${title}</h2>
+                        <p>Administrer dine ${title.toLowerCase()}.</p>
                     </div>
                 </div>
-                ${actionsHtml}
+                <div class="kinetic-header-actions">
+                    ${actionsHtml}
+                </div>
             </div>
             <div class="card" style="padding: 0 !important; overflow: hidden !important; border-radius: 20px !important; border: 1px solid #f1f5f9 !important; background: white !important; box-shadow: 0 2px 15px rgba(0,0,0,0.03) !important; width: 100% !important; box-sizing: border-box !important;">
                 <div id="${collectionId}-list" class="table-container full-bleed">
