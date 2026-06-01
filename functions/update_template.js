@@ -29,7 +29,7 @@ const newHtml = `
 
   <!-- Premium CTA Button -->
   <div style="text-align: center; margin-bottom: 48px;">
-    <a href="https://hiskingdomministry.no/admin/index.html#newsletter" style="display: inline-block; background-color: #1B4965; color: #ffffff; text-decoration: none; font-size: 14.5px; font-weight: 700; padding: 16px 36px; border-radius: 9999px; box-shadow: 0 10px 20px rgba(27, 73, 101, 0.22); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.05em;">
+    <a href="https://hkm-dusky.vercel.app/admin/index.html#newsletter" style="display: inline-block; background-color: #1B4965; color: #ffffff; text-decoration: none; font-size: 14.5px; font-weight: 700; padding: 16px 36px; border-radius: 9999px; box-shadow: 0 10px 20px rgba(27, 73, 101, 0.22); transition: all 0.3s ease; text-transform: uppercase; letter-spacing: 0.05em;">
       Vurder og godkjenn i HKM Studio
     </a>
   </div>
@@ -56,9 +56,17 @@ const newHtml = `
       
       <!-- Card CTA Link -->
       <div>
-        <a href="https://hiskingdomministry.no/admin/index.html#newsletter" style="display: inline-flex; align-items: center; text-decoration: none; font-size: 14px; font-weight: 700; color: #d17d39; transition: color 0.2s ease;">
-          <span>Åpne i HKM Studio</span>
-          <span style="margin-left: 6px; font-size: 16px; line-height: 1;">→</span>
+        <a href="https://hkm-dusky.vercel.app/admin/index.html#newsletter" style="text-decoration: none; display: inline-block; vertical-align: middle;">
+          <table border="0" cellpadding="0" cellspacing="0" style="border-collapse: collapse; display: inline-table; vertical-align: middle;">
+            <tr>
+              <td style="font-family: 'Inter', sans-serif; font-size: 14px; font-weight: 700; color: #d17d39; line-height: 1.2; vertical-align: middle; padding: 0 6px 0 0; margin: 0; border: none;">
+                Åpne i HKM Studio
+              </td>
+              <td style="font-family: 'Inter', sans-serif; font-size: 16px; font-weight: 700; color: #d17d39; line-height: 1; vertical-align: middle; padding: 0; margin: 0; border: none;">
+                &rarr;
+              </td>
+            </tr>
+          </table>
         </a>
       </div>
     </div>
