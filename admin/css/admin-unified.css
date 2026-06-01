@@ -2926,9 +2926,10 @@ body.builder-active .user-profile-link {
   margin: 0 !important;
 }
 
-/* Hide checklist shortcut button in header as user requested 'just the search box next to the bell' */
+/* 2.5. Checklist shortcut button in header */
 #todo-shortcut-btn {
-  display: none !important;
+  display: flex !important;
+  order: 2 !important;
 }
 
 /* 3. Search Box FIRST */
