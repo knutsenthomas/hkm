@@ -3045,7 +3045,6 @@ body.builder-active.sidebar-collapsed .sidebar {
     transform: translateX(-100%) !important;
 }
 
-/* Premium sticky styling for Nyhetsbrev docs toolbar (Aligned with Blog & Teaching) */
 .builder-workspace > .docs-toolbar {
     position: sticky !important;
     top: 0 !important;
@@ -3054,7 +3053,14 @@ body.builder-active.sidebar-collapsed .sidebar {
     border-bottom: 1px solid #e2e8f0 !important;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
     padding: 8px 24px !important; /* Spacing matching 8px grid rules */
-    justify-content: center !important; /* Centered toolbar items */
+    display: flex !important;
+    flex-wrap: nowrap !important; /* Garanterer én enkelt linje uten linjebrudd */
+    overflow-x: auto !important; /* Tillater rulling sidelengs */
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+    scrollbar-width: none !important;
+    justify-content: flex-start !important; /* Start rullingen fra venstre for å unngå data loss ved sentrering */
+    -webkit-overflow-scrolling: touch !important;
 }
 
 /* Premium typography rules for the single-surface editor (Matches Blog & Teaching) */
@@ -3137,10 +3143,17 @@ body.builder-active.sidebar-collapsed .sidebar {
         position: sticky !important;
         top: 72px !important; /* Stacked right below the 72px header */
         z-index: 999 !important;
-        flex-wrap: wrap !important;
+        flex-wrap: nowrap !important; /* Garanterer én enkelt linje uten linjebrudd */
+        overflow-x: auto !important; /* Tillater rulling sidelengs */
+        overflow-y: hidden !important;
+        justify-content: flex-start !important; /* Start rullingen fra venstre */
+        scrollbar-width: none !important; /* Skjul rullefeltet i Firefox */
         height: auto !important;
         padding: 8px 16px !important;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    }
+    body.builder-active .builder-workspace > .docs-toolbar::-webkit-scrollbar {
+        display: none !important; /* Skjul rullefeltet i Chrome/Safari */
     }
 }
 

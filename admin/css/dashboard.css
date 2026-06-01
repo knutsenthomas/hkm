@@ -3333,29 +3333,32 @@ input[type="range"] {
     position: relative !important;
     top: auto !important;
     z-index: 10 !important;
-    width: 100%;
+    width: 100% !important;
     background: #ffffff !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02);
-    padding: 6px 10px;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+    padding: 6px 10px !important;
     margin-bottom: 0 !important;
-    display: flex;
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 4px;
-    overflow-x: auto;
-    white-space: nowrap;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    transition: all 0.3s ease;
-    box-sizing: border-box;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 4px !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    white-space: nowrap !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    transition: all 0.3s ease !important;
+    box-sizing: border-box !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
 .desktop-richtools::-webkit-scrollbar {
-    display: none;
+    display: none !important;
 }
 
 .editor-scroll-area {
@@ -3378,6 +3381,7 @@ input[type="range"] {
     display: flex !important;
     align-items: center !important;
     flex-wrap: nowrap !important;
+    justify-content: flex-start !important;
     gap: 2px !important;
     padding: 6px 12px !important;
     background: #ffffff !important;
@@ -3385,7 +3389,9 @@ input[type="range"] {
     min-height: 48px !important;
     overflow-x: auto !important;
     overflow-y: hidden !important;
+    white-space: nowrap !important;
     scrollbar-width: none !important;
+    -webkit-overflow-scrolling: touch !important;
 }
 
 .docs-toolbar::-webkit-scrollbar {
