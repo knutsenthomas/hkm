@@ -4,23 +4,15 @@
  * Adheres strictly to the 8px grid, Jitter Guard, and Defensiveness rules.
  */
 
+import '../css/todo-drawer.css';
+
 (function () {
     if (window.__HKMTodoDrawerInitialized) return;
     window.__HKMTodoDrawerInitialized = true;
 
     console.log("[todo-drawer] Initializing Todo Drawer...");
 
-    // Helper to dynamically load CSS to avoid manual head editing where possible
-    const injectStylesheet = () => {
-        const id = 'hkm-todo-drawer-css';
-        if (!document.getElementById(id)) {
-            const link = document.createElement('link');
-            link.id = id;
-            link.rel = 'stylesheet';
-            link.href = 'css/todo-drawer.css?v=' + Date.now();
-            document.head.appendChild(link);
-        }
-    };
+    // Inject drawer HTML structure into body
 
     // Inject drawer HTML structure into body
     const injectDrawerHtml = () => {
@@ -416,7 +408,6 @@
 
     // Initialize module
     const init = () => {
-        injectStylesheet();
         injectDrawerHtml();
         bindUiEvents();
         setupFirestoreSync().catch(err => {
