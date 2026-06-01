@@ -2606,10 +2606,10 @@ body.crm-body .crm-table .btn-delete-message:hover {
   --admin-page-gutter: 24px;
   --admin-page-max: 1280px;
   /* UI Audit: Capped at 1200px for better focus */
-  --admin-page-primary: #f97316;
-  --admin-page-primary-hover: #ea580c;
-  --admin-page-icon-bg: #fff7ed;
-  --admin-page-icon-border: rgba(249, 115, 22, 0.1);
+  --admin-page-primary: #1B4965;
+  --admin-page-primary-hover: #123043;
+  --admin-page-icon-bg: #f0f7ff;
+  --admin-page-icon-border: rgba(27, 73, 101, 0.1);
 
   /* UI Audit - Structural Constants */
   --admin-spacing-xs: 8px;
@@ -3277,50 +3277,97 @@ body.builder-active a.btn {
 body.admin-body .btn-primary,
 body.crm-body .btn-primary,
 body.builder-active .btn-primary {
-  background: var(--admin-page-primary);
-  color: #fff;
-  border-color: transparent;
-  box-shadow: none;
+  background: var(--admin-page-primary) !important;
+  color: #fff !important;
+  border: 1px solid var(--admin-page-primary) !important;
+  box-shadow: 0 2px 4px rgba(27, 73, 101, 0.15) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
 }
 
 body.admin-body .btn-primary:hover,
 body.crm-body .btn-primary:hover,
 body.builder-active .btn-primary:hover {
-  background: var(--admin-page-primary-hover);
-  box-shadow: none;
-  transform: translateY(-1px);
+  background: var(--admin-page-primary-hover) !important;
+  border-color: var(--admin-page-primary-hover) !important;
+  color: #fff !important;
+  box-shadow: 0 4px 8px rgba(27, 73, 101, 0.25) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.admin-body .btn-primary:active,
+body.crm-body .btn-primary:active,
+body.builder-active .btn-primary:active {
+  transform: scale(0.97) !important;
 }
 
 body.admin-body .btn-secondary,
 body.crm-body .btn-secondary,
 body.builder-active .btn-secondary {
-  background: #fff;
-  color: #334155;
-  border: 1px solid var(--admin-page-panel-border);
-  box-shadow: none;
+  background: #fff !important;
+  color: #334155 !important;
+  border: 1px solid var(--admin-page-panel-border) !important;
+  box-shadow: none !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
 }
 
 body.admin-body .btn-secondary:hover,
 body.crm-body .btn-secondary:hover,
 body.builder-active .btn-secondary:hover {
-  background: #f8fafc;
-  border-color: #dbe3ec;
-  box-shadow: none;
+  background: #f8fafc !important;
+  border-color: var(--admin-page-primary) !important;
+  color: var(--admin-page-primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.admin-body .btn-secondary:active,
+body.crm-body .btn-secondary:active,
+body.builder-active .btn-secondary:active {
+  transform: scale(0.97) !important;
 }
 
 body.admin-body .btn-outline,
 body.crm-body .btn-outline,
 body.builder-active .btn-outline {
-  background: #fff;
-  color: #334155;
-  border: 1px solid var(--admin-page-panel-border);
+  background: #fff !important;
+  color: #334155 !important;
+  border: 1px solid var(--admin-page-panel-border) !important;
+  border-radius: 10px !important;
+  font-weight: 700 !important;
+  font-size: 14px !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
 }
 
 body.admin-body .btn-outline:hover,
 body.crm-body .btn-outline:hover,
 body.builder-active .btn-outline:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+  background: #f9fafb !important;
+  border-color: var(--admin-page-primary) !important;
+  color: var(--admin-page-primary) !important;
+  transform: translateY(-1px) !important;
+}
+
+body.admin-body .btn-outline:active,
+body.crm-body .btn-outline:active,
+body.builder-active .btn-outline:active {
+  transform: scale(0.97) !important;
 }
 
 /* Shared panel style */
