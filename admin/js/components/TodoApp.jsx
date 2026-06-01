@@ -860,10 +860,11 @@ export default function TodoApp() {
                                         {/* Checked status checkbox */}
                                         <div 
                                             onClick={() => handleToggleTask(t)} 
-                                            className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
+                                            className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105 group/checkbox"
                                             title="Marker som ugjort"
                                         >
-                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none">check</span>
+                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none group-hover/checkbox:hidden">check</span>
+                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hidden group-hover/checkbox:block">close</span>
                                         </div>
 
                                         {/* Content */}
