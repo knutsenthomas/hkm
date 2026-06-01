@@ -6866,5 +6866,45 @@ body.admin-body .section-content > .design-ui-header .section-subtitle {
     width: auto !important;
 }
 
+body.admin-body .profile-header-card-body {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 32px !important;
+  padding: 32px !important;
+}
+
+@media (max-width: 768px) {
+  body.admin-body .profile-header-card-body {
+    flex-direction: column !important;
+    text-align: center !important;
+    align-items: center !important;
+    gap: 20px !important;
+    padding: 24px !important;
+  }
+  
+  body.admin-body .profile-header-card-body .profile-header-info {
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  body.admin-body .profile-header-card-body .profile-header-meta-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 16px !important;
+    text-align: center !important;
+  }
+  
+  body.admin-body .profile-header-card-body .profile-header-meta-row > div {
+    text-align: center !important;
+  }
+  
+  body.admin-body .profile-header-card-body .profile-header-badge-row {
+    justify-content: center !important;
+  }
+}
+
+
 
 

@@ -17252,7 +17252,7 @@ class AdminManager {
         container.innerHTML = `
                                                                             <div style="width: 100%;">
                                                                                 <div class="card" style="margin-bottom: 24px;">
-                                                                                    <div class="card-body" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 32px !important; padding: 32px !important;">
+                                                                                    <div class="card-body profile-header-card-body">
                                                                                         <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover; background-position: center;` : 'background-color: var(--accent-color);'}">
                                                                                             ${!userData.photoURL ? initials : ''}
                                                                                             ${this.userEditMode ? `
@@ -17262,13 +17262,13 @@ class AdminManager {
                                 <input type="file" id="user-photo-input" style="display: none;" accept="image/*">
                             ` : ''}
                                                                                         </div>
-                                                                                        <div style="flex:1;">
-                                                                                            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                                                                                        <div class="profile-header-info" style="flex:1;">
+                                                                                            <div class="profile-header-meta-row" style="display:flex; justify-content:space-between; align-items:flex-start;">
                                                                                                 <div>
                                                                                                     <h3 style="font-size: 24px; font-weight: 700; margin-bottom: 4px;">${this.escapeHtml(name)}</h3>
                                                                                                     <p style="color: var(--text-muted); font-size: 15px;">${this.escapeHtml(userData.email || 'Ingen e-post')}</p>
                                                                                                 </div>
-                                                                                                <div style="display:flex; gap:12px;">
+                                                                                                <div style="display:flex; gap:12px; flex-shrink: 0;">
                                                                                                     ${!this.userEditMode ? `
                                         <button id="activate-edit-btn" class="btn-secondary">
                                             <span class="material-symbols-outlined">edit</span>
@@ -17284,7 +17284,7 @@ class AdminManager {
                                     `}
                                                                                                 </div>
                                                                                             </div>
-                                                                                            <div style="margin-top:16px; display:flex; gap:16px;">
+                                                                                            <div class="profile-header-badge-row" style="margin-top:16px; display:flex; gap:16px;">
                                                                                                 <span class="role-badge role-badge-${userData.role || 'medlem'}">${(userData.role || 'medlem').toUpperCase()}</span>
                                                                                                 <span style="font-size:13px; color:var(--text-muted);">Opprettet: ${userData.createdAt ? (userData.createdAt.toDate ? userData.createdAt.toDate().toLocaleDateString('no-NO') : new Date(userData.createdAt).toLocaleDateString('no-NO')) : 'Ukjent'}</span>
                                                                                             </div>
