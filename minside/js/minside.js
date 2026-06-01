@@ -1427,15 +1427,15 @@ class MinSideManager {
         
         if (el) {
             el.textContent = count > 9 ? '9+' : count;
-            el.style.display = count > 0 ? 'inline-block' : 'none';
+            el.style.setProperty('display', count > 0 ? 'inline-block' : 'none', 'important');
         }
         
         if (headerDot) {
-            headerDot.style.display = count > 0 ? 'block' : 'none';
+            headerDot.style.setProperty('display', count > 0 ? 'block' : 'none', 'important');
         }
 
         if (bottomDot) {
-            bottomDot.style.display = count > 0 ? 'block' : 'none';
+            bottomDot.style.setProperty('display', count > 0 ? 'block' : 'none', 'important');
         }
     }
 
@@ -2480,9 +2480,9 @@ class MinSideManager {
         <div class="ms-full-width ms-notifications-container">
             <div class="ms-section-header-row">
                 <h2 class="ms-section-title">${t('notifications.title')}</h2>
-                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn">
-                    <span class="material-symbols-outlined" style="font-size:16px;">done_all</span>
-                    ${t('notifications.markAllRead')}
+                <button class="btn btn-ghost btn-sm" id="mark-all-read-btn" style="display: inline-flex !important; align-items: center !important; justify-content: center !important; gap: 4px !important; padding: 0 12px !important; height: 32px !important; min-height: 32px !important; border-radius: 12px !important;">
+                    <span class="material-symbols-outlined" style="font-size: 16px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important; margin: 0 !important;">done_all</span>
+                    <span style="display: inline-flex !important; align-items: center !important; justify-content: center !important; line-height: 1 !important;">${t('notifications.markAllRead')}</span>
                 </button>
             </div>
 
@@ -2576,13 +2576,24 @@ class MinSideManager {
 
             // Auto mark all unread as read (only when on "Alle" or "Ulest" tab)
             if ((activeFilter === 'all' || activeFilter === 'unread') && unreadItems.length > 0) {
-                const batch = firebase.firestore().batch();
-                unreadItems.forEach(n => batch.update(
-                    firebase.firestore().collection('user_notifications').doc(n.id),
-                    { read: true }
-                ));
-                await batch.commit();
-                this._setBadge(0);
+                try {
+                    const unreadSnap = await firebase.firestore()
+                        .collection('user_notifications')
+                        .where('userId', '==', uid)
+                        .where('read', '==', false)
+                        .get();
+                    
+                    if (!unreadSnap.empty) {
+                        const batch = firebase.firestore().batch();
+                        unreadSnap.docs.forEach(doc => {
+                            batch.update(doc.ref, { read: true });
+                        });
+                        await batch.commit();
+                    }
+                    this._setBadge(0);
+                } catch (err) {
+                    console.error('Error auto-marking all read:', err);
+                }
             }
 
             // Filter tab clicks
@@ -2595,15 +2606,26 @@ class MinSideManager {
 
             // Mark all read button
             document.getElementById('mark-all-read-btn')?.addEventListener('click', async () => {
-                const b = firebase.firestore().batch();
-                allItems.forEach(n => b.update(
-                    firebase.firestore().collection('user_notifications').doc(n.id),
-                    { read: true }
-                ));
-                await b.commit();
-                this._setBadge(0);
-                this._notifFilter = 'all';
-                this.renderNotifications(container);
+                try {
+                    const unreadSnap = await firebase.firestore()
+                        .collection('user_notifications')
+                        .where('userId', '==', uid)
+                        .where('read', '==', false)
+                        .get();
+                    
+                    if (!unreadSnap.empty) {
+                        const b = firebase.firestore().batch();
+                        unreadSnap.docs.forEach(doc => {
+                            b.update(doc.ref, { read: true });
+                        });
+                        await b.commit();
+                    }
+                    this._setBadge(0);
+                    this._notifFilter = 'all';
+                    this.renderNotifications(container);
+                } catch (err) {
+                    console.error('Error marking all as read:', err);
+                }
             });
 
         } catch (err) {
