@@ -14,6 +14,12 @@ export default function TodoApp() {
     const [syncing, setSyncing] = useState(false);
     const [loading, setLoading] = useState(true);
 
+    // Google Tasks config states
+    const [showConfig, setShowConfig] = useState(false);
+    const [configClientId, setConfigClientId] = useState('');
+    const [configClientSecret, setConfigClientSecret] = useState('');
+    const [savingConfig, setSavingConfig] = useState(false);
+
     // Form fields
     const [newTitle, setNewTitle] = useState('');
     const [newDesc, setNewDesc] = useState('');
@@ -84,8 +90,20 @@ export default function TodoApp() {
                         console.warn("[TodoApp] Google Credentials fetch ignored:", err);
                     });
 
+                    // Listen to Google Tasks Config document
+                    const unsubscribeConfig = db.collection('settings').doc('google_tasks_config').onSnapshot(doc => {
+                        if (doc.exists) {
+                            const data = doc.data();
+                            setConfigClientId(data.clientId || '');
+                            setConfigClientSecret(data.clientSecret || '');
+                        }
+                    }, err => {
+                        console.warn("[TodoApp] Settings fetch ignored:", err);
+                    });
+
                     return () => {
                         unsubscribeTasks();
+                        unsubscribeConfig();
                     };
                 } else {
                     setCurrentUser(null);
@@ -96,6 +114,29 @@ export default function TodoApp() {
 
         checkAuth();
     }, []);
+
+    // Save Google Tasks Configuration in Firestore settings/google_tasks_config
+    const handleSaveConfig = async (e) => {
+        e.preventDefault();
+        if (!currentUser) return;
+        setSavingConfig(true);
+        try {
+            const db = firebase.firestore();
+            await db.collection('settings').doc('google_tasks_config').set({
+                clientId: configClientId.trim(),
+                clientSecret: configClientSecret.trim(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedBy: currentUser.uid
+            }, { merge: true });
+            alert('Google Tasks-konfigurasjon lagret!');
+            setShowConfig(false);
+        } catch (err) {
+            console.error('[TodoApp] Error saving config:', err);
+            alert('Kunne ikke lagre konfigurasjon: ' + err.message);
+        } finally {
+            setSavingConfig(false);
+        }
+    };
 
     // Sync to Google Tasks handler
     const handleGoogleTasksAuth = () => {
@@ -311,6 +352,13 @@ export default function TodoApp() {
                     </div>
                 </div>
                 <div className="flex gap-3 items-center">
+                    <button 
+                        onClick={() => setShowConfig(!showConfig)} 
+                        className={`flex items-center justify-center p-3 rounded-full border-2 transition-all duration-300 cursor-pointer ${showConfig ? 'border-[#d17d39] text-[#d17d39] bg-orange-50' : 'border-slate-200 text-slate-500 hover:border-[#1B4965] hover:text-[#1B4965]'}`} 
+                        title="Google Tasks Innstillinger"
+                    >
+                        <span className="material-symbols-outlined text-lg">settings</span>
+                    </button>
                     {googleConnected ? (
                         <>
                             <button onClick={handleManualSync} disabled={syncing} className="flex items-center gap-2 px-5 py-3 rounded-full font-semibold border-2 border-slate-200 hover:border-[#1B4965] hover:text-[#1B4965] bg-white text-slate-600 text-sm transition-all duration-300 cursor-pointer disabled:opacity-50">
@@ -329,6 +377,110 @@ export default function TodoApp() {
                     )}
                 </div>
             </div>
+
+            {showConfig && (
+                <div className="bg-slate-50 rounded-3xl p-8 border-2 border-slate-200/80 shadow-inner flex flex-col gap-6 transform translate-z-0 backface-hidden">
+                    <div className="flex justify-between items-start border-b border-slate-200/60 pb-4">
+                        <div>
+                            <h3 className="m-0 text-base font-bold text-[#1B4965] flex items-center gap-2">
+                                <span className="material-symbols-outlined text-orange-500">settings</span>
+                                Google Tasks API Innstillinger
+                            </h3>
+                            <p className="m-0 text-xs text-slate-500 mt-1 font-medium">Konfigurer Google Cloud credentials for synkronisering av huskelisten.</p>
+                        </div>
+                        <button onClick={() => setShowConfig(false)} className="border-none bg-transparent p-1 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors duration-250 flex items-center justify-center">
+                            <span className="material-symbols-outlined text-lg">close</span>
+                        </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                        {/* Guidance panel */}
+                        <div className="bg-white rounded-2xl p-6 border border-slate-200/60 text-xs text-slate-600 leading-relaxed flex flex-col gap-3">
+                            <h4 className="m-0 text-xs font-bold uppercase tracking-wider text-slate-500">Instruksjoner for oppsett</h4>
+                            <ol className="m-0 pl-4 flex flex-col gap-2 font-medium">
+                                <li>Gå til <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer" className="text-[#d17d39] font-semibold underline">Google Cloud Console</a>.</li>
+                                <li>Velg eller opprett prosjektet <strong>his-kingdom-ministry</strong>.</li>
+                                <li>Søk etter og aktiver <strong>Google Tasks API</strong> i API-biblioteket.</li>
+                                <li>Gå til <strong>OAuth consent screen</strong> og konfigurer den (velg f.eks. <em>Ekstern</em>, oppgi e-post, og legg til din Gmail-adresse som <em>Test User</em>).</li>
+                                <li>Gå til <strong>Credentials</strong> &rarr; <strong>Create Credentials</strong> &rarr; <strong>OAuth client ID</strong>.</li>
+                                <li>Velg <strong>Web application</strong> som type.</li>
+                                <li>Under <strong>Authorized redirect URIs</strong>, legg inn nøyaktig disse to adressene:</li>
+                            </ol>
+                            
+                            <div className="flex flex-col gap-2 mt-2">
+                                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/50 flex flex-col gap-1">
+                                    <span className="font-bold text-[10px] uppercase text-slate-400">Live Redirect URI:</span>
+                                    <div className="flex justify-between items-center gap-2">
+                                        <code className="text-[10px] text-slate-700 font-mono select-all break-all">https://us-central1-his-kingdom-ministry.cloudfunctions.net/googleTasksCallback</code>
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText("https://us-central1-his-kingdom-ministry.cloudfunctions.net/googleTasksCallback");
+                                                alert("Kopiert!");
+                                            }} 
+                                            className="px-2 py-1 rounded bg-[#1B4965] hover:bg-[#25638c] text-white text-[10px] font-bold cursor-pointer border-none transition-colors"
+                                        >
+                                            Kopier
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/50 flex flex-col gap-1">
+                                    <span className="font-bold text-[10px] uppercase text-slate-400">Lokal Redirect URI (for utvikling):</span>
+                                    <div className="flex justify-between items-center gap-2">
+                                        <code className="text-[10px] text-slate-700 font-mono select-all break-all">http://127.0.0.1:5001/his-kingdom-ministry/us-central1/googleTasksCallback</code>
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                navigator.clipboard.writeText("http://127.0.0.1:5001/his-kingdom-ministry/us-central1/googleTasksCallback");
+                                                alert("Kopiert!");
+                                            }} 
+                                            className="px-2 py-1 rounded bg-[#1B4965] hover:bg-[#25638c] text-white text-[10px] font-bold cursor-pointer border-none transition-colors"
+                                        >
+                                            Kopier
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Settings Form */}
+                        <form onSubmit={handleSaveConfig} className="flex flex-col gap-5 bg-white rounded-2xl p-6 border border-slate-200/60">
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Client ID (Klient-ID) *</label>
+                                <input 
+                                    type="text" 
+                                    value={configClientId} 
+                                    onChange={e => setConfigClientId(e.target.value)} 
+                                    placeholder="Skriv inn Google Client ID..." 
+                                    required 
+                                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box"
+                                />
+                            </div>
+
+                            <div className="flex flex-col gap-2">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-wider pl-1">Client Secret (Klient-hemmelighet) *</label>
+                                <input 
+                                    type="password" 
+                                    value={configClientSecret} 
+                                    onChange={e => setConfigClientSecret(e.target.value)} 
+                                    placeholder="Skriv inn Google Client Secret..." 
+                                    required 
+                                    className="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box"
+                                />
+                            </div>
+
+                            <button 
+                                type="submit" 
+                                disabled={savingConfig} 
+                                className="w-full flex items-center justify-center gap-2 mt-2 px-5 py-3 rounded-full font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] shadow-sm hover:shadow active:scale-95 active:translate-y-0.5 transition-all duration-300 cursor-pointer border-none text-sm disabled:opacity-50"
+                            >
+                                <span className="material-symbols-outlined text-base">save</span>
+                                {savingConfig ? 'Lagrer...' : 'Lagre konfigurasjon'}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             {/* Split layout: Form (Left/Top) & Tasks Board (Right/Bottom) */}
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">

@@ -381,6 +381,10 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    match /settings/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     // Interactions (Likes & Comments)
     match /interactions/{postId} {
       allow read: if true;
