@@ -257,6 +257,15 @@
             display: flex;
             gap: 4px;
             border: 1px solid #e2e8f0;
+            overflow-x: auto;
+            white-space: nowrap;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+            max-width: 100%;
+            box-sizing: border-box;
+        }
+        .studio-tabs-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari og Opera */
         }
         .studio-tab {
             background: transparent;
@@ -269,6 +278,8 @@
             cursor: pointer;
             transition: all 0.3s ease;
             font-family: 'Inter', sans-serif;
+            flex-shrink: 0; /* Hindrer at tabene krymper på mobil */
+            white-space: nowrap;
         }
         .studio-tab:hover {
             color: #0f172a;
@@ -278,6 +289,16 @@
             background: white !important;
             color: #1B4965 !important;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        @media (max-width: 640px) {
+            .studio-tabs-container {
+                width: 100% !important;
+            }
+            .studio-tab {
+                padding: 8px 12px; /* Litt mer kompakt padding på små mobilskjermer */
+                font-size: 13px;
+            }
         }
         .studio-feed-card {
             background: white;
