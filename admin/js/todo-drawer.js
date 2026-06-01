@@ -2,6 +2,7 @@
  * HKM Studio - Universal Todo Drawer Module
  * Premium real-time sliding drawer for quick task management.
  * Adheres strictly to the 8px grid, Jitter Guard, and Defensiveness rules.
+ * Material 3 and brand-aligned design.
  */
 
 import '../css/todo-drawer.css';
@@ -11,8 +12,6 @@ import '../css/todo-drawer.css';
     window.__HKMTodoDrawerInitialized = true;
 
     console.log("[todo-drawer] Initializing Todo Drawer...");
-
-    // Inject drawer HTML structure into body
 
     // Inject drawer HTML structure into body
     const injectDrawerHtml = () => {
@@ -57,16 +56,21 @@ import '../css/todo-drawer.css';
                 <!-- Active Tasks -->
                 <div>
                     <h4 class="todo-drawer-list-title">Gjeldende oppgaver</h4>
-                    <div id="todo-active-list" class="todo-drawer-list" style="margin-top: 12px;">
-                        <!-- Injected dynamically -->
+                    <div id="todo-active-list" class="todo-drawer-list">
+                        <div class="todo-drawer-empty">
+                            <span class="material-symbols-outlined icon">sync</span>
+                            <p>Henter oppgaver...</p>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Completed Tasks -->
                 <div>
                     <h4 class="todo-drawer-list-title">Fullførte oppgaver</h4>
-                    <div id="todo-completed-list" class="todo-drawer-list" style="margin-top: 12px;">
-                        <!-- Injected dynamically -->
+                    <div id="todo-completed-list" class="todo-drawer-list">
+                        <div class="todo-drawer-empty" style="padding: 24px 12px; border: none; background: transparent;">
+                            <p style="font-size: 12px; opacity: 0.6;">Ingen fullførte oppgaver</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,37 +97,24 @@ import '../css/todo-drawer.css';
         }
     };
 
-    // Firebase Wait helper
-    const waitForFirebase = async (timeoutMs = 10000) => {
-        const start = Date.now();
-        while (Date.now() - start < timeoutMs) {
-            if (window.firebaseService && window.firebaseService.isInitialized) {
-                return window.firebaseService;
-            }
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-        return window.firebaseService || null;
-    };
-
-    // Setup Firestore listeners
-    const setupFirestoreSync = async () => {
-        const service = await waitForFirebase();
-        if (!service) {
-            console.warn("[todo-drawer] Firebase was not loaded. Realtime tasks disabled.");
+    // Setup Firestore listeners directly using global firebase
+    const setupFirestoreSync = () => {
+        if (typeof firebase === 'undefined') {
+            console.warn("[todo-drawer] Firebase was not loaded.");
             return;
         }
 
-        service.onAuthChange(user => {
+        firebase.auth().onAuthStateChanged(user => {
             if (!user) {
                 // Not authenticated, hide dot
                 updateBadgeDot(0);
                 return;
             }
 
+            console.log("[todo-drawer] User authenticated. Listening to tasks...");
             const db = firebase.firestore();
             
             // Listen to tasks collection in real-time
-            // Filtering in-memory to prevent missing Firestore index warnings
             db.collection('tasks').onSnapshot(snapshot => {
                 const tasks = [];
                 snapshot.forEach(doc => {
@@ -188,7 +179,6 @@ import '../css/todo-drawer.css';
         const activeTasks = visibleTasks
             .filter(t => t.status === 'gjeldende')
             .sort((a, b) => {
-                // Sort by priority (high > medium > low), then by duedate
                 const prioWeight = { high: 3, medium: 2, low: 1 };
                 const aPrio = prioWeight[a.priority] || 2;
                 const bPrio = prioWeight[b.priority] || 2;
@@ -225,8 +215,8 @@ import '../css/todo-drawer.css';
         // Render Completed List
         if (completedTasks.length === 0) {
             completedList.innerHTML = `
-                <div class="todo-drawer-empty" style="padding: 24px 12px;">
-                    <p style="font-size: 13px;">Ingen fullførte oppgaver ennå</p>
+                <div class="todo-drawer-empty" style="padding: 24px 12px; border: none; background: transparent;">
+                    <p style="font-size: 13px;">Ingen fullførte oppgaver</p>
                 </div>
             `;
         } else {
@@ -246,7 +236,7 @@ import '../css/todo-drawer.css';
 
     // Generate HTML string for single task card
     const createTaskHtml = (t, isCompleted) => {
-        const priorityLabels = { low: 'Lav', medium: 'Med', high: 'Høy' };
+        const priorityLabels = { low: 'Lav prioritet', medium: 'Medium prioritet', high: 'Høy prioritet' };
         const priorityClass = `priority-${t.priority || 'medium'}`;
         const formattedDate = t.dueDate ? formatDate(t.dueDate) : '';
 
@@ -264,7 +254,7 @@ import '../css/todo-drawer.css';
                         </span>
                         ${formattedDate ? `
                             <span class="todo-drawer-badge due-date">
-                                <span class="material-symbols-outlined" style="font-size: 14px;">calendar_today</span>
+                                <span class="material-symbols-outlined" style="font-size: 13px;">calendar_today</span>
                                 ${formattedDate}
                             </span>
                         ` : ''}
@@ -317,8 +307,7 @@ import '../css/todo-drawer.css';
         }
 
         try {
-            const service = window.firebaseService;
-            const currentUser = service?.auth?.currentUser;
+            const currentUser = firebase.auth().currentUser;
             if (!currentUser) throw new Error("Du må være innlogget");
 
             const db = firebase.firestore();
@@ -395,7 +384,7 @@ import '../css/todo-drawer.css';
             };
         }
 
-        // Bind global shortcut toggle listeners (delegate to document to handle dynamically loaded triggers)
+        // Bind global shortcut toggle listeners
         document.addEventListener('click', (e) => {
             const shortcutBtn = e.target.closest('#todo-shortcut-btn');
             if (shortcutBtn) {
@@ -410,9 +399,7 @@ import '../css/todo-drawer.css';
     const init = () => {
         injectDrawerHtml();
         bindUiEvents();
-        setupFirestoreSync().catch(err => {
-            console.error("[todo-drawer] Firestore init failed:", err);
-        });
+        setupFirestoreSync();
     };
 
     if (document.readyState === 'loading') {
