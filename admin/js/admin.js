@@ -7859,8 +7859,8 @@ class AdminManager {
                              ${(collectionId === 'blog' || collectionId === 'teaching') ? `
                              <!-- Premium Autolagring statusindikator -->
                              <div id="editor-autosave-status" style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #64748b; margin-left: 8px; transition: opacity 0.3s ease; opacity: 0.8; white-space: nowrap; flex-shrink: 0;">
-                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #10b981;">cloud_done</span>
-                                 <span id="editor-autosave-text">Lagret i skyen</span>
+                                 <span class="material-symbols-outlined" style="font-size: 18px; color: #10b981; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; line-height: 1; vertical-align: middle;">cloud_done</span>
+                                 <span id="editor-autosave-text" style="display: inline-flex; align-items: center; line-height: 1;">Lagret i skyen</span>
                              </div>
                              ` : ''}
                              ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `

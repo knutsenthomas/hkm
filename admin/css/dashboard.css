@@ -3159,7 +3159,8 @@ input[type="range"] {
 .editor-header-v2 .btn-primary .material-symbols-outlined,
 .editor-header-v2 .btn-outline .material-symbols-outlined,
 .editor-header-v2 .btn-ghost .material-symbols-outlined,
-.editor-header-v2 button .material-symbols-outlined {
+.editor-header-v2 button .material-symbols-outlined,
+.editor-header-left #editor-autosave-status .material-symbols-outlined {
     font-size: 18px !important;
     width: 18px !important;
     height: 18px !important;
