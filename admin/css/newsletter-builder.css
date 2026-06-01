@@ -3150,4 +3150,13 @@ body.builder-active.sidebar-collapsed .sidebar {
     top: 32px;  /* Samstemt med vår toppmarg på 32px */
 }
 
+/* --- State protection: ensure dashboard wrapper and builder layout never render side-by-side --- */
+body.builder-active #newsletter-dashboard-wrapper {
+    display: none !important;
+}
+
+body:not(.builder-active) #newsletter-builder-layout {
+    display: none !important;
+}
+
 
