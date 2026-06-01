@@ -17,6 +17,9 @@ export default function TodoApp() {
     // Accordion state for completed tasks
     const [showCompleted, setShowCompleted] = useState(true);
 
+    // Sidebar view mode: 'active' or 'completed'
+    const [viewMode, setViewMode] = useState('active');
+
     // Inline quick-add states
     const [inlineTitle, setInlineTitle] = useState('');
     const [inlineDesc, setInlineDesc] = useState('');
@@ -348,12 +351,17 @@ export default function TodoApp() {
             me: 0,
             global: 0,
             starred: 0,
+            completed: 0,
             userLists: {}
         };
 
         if (!currentUser) return result;
 
         tasks.forEach(t => {
+            if (t.status === 'fullført') {
+                result.completed++;
+                return;
+            }
             if (t.status !== 'gjeldende') return;
 
             result.all++;
@@ -390,6 +398,7 @@ export default function TodoApp() {
     };
 
     const activeViewTitle = useMemo(() => {
+        if (viewMode === 'completed') return 'Fullførte oppgaver';
         if (filterAssignee === 'me') return 'Tildelt meg';
         if (filterAssignee === 'global') return 'Globale oppgaver';
         if (filterPriority === 'high') return 'Viktige oppgaver';
@@ -398,7 +407,7 @@ export default function TodoApp() {
             return user ? `${user.displayName} sin liste` : 'Oppgaveliste';
         }
         return 'Alle gjøremål';
-    }, [filterAssignee, filterPriority, users]);
+    }, [filterAssignee, filterPriority, users, viewMode]);
 
     if (loading) {
         return (
@@ -418,10 +427,11 @@ export default function TodoApp() {
     }
 
     // Set Active State Highlights in Sidebar
-    const isAllActive = filterAssignee === 'all' && filterPriority !== 'high';
-    const isMeActive = filterAssignee === 'me';
-    const isGlobalActive = filterAssignee === 'global';
-    const isStarredActive = filterPriority === 'high' && filterAssignee === 'all';
+    const isAllActive = filterAssignee === 'all' && filterPriority !== 'high' && viewMode === 'active';
+    const isMeActive = filterAssignee === 'me' && viewMode === 'active';
+    const isGlobalActive = filterAssignee === 'global' && viewMode === 'active';
+    const isStarredActive = filterPriority === 'high' && filterAssignee === 'all' && viewMode === 'active';
+    const isCompletedViewActive = viewMode === 'completed';
 
     return (
         <div className="flex flex-col lg:flex-row gap-8 w-full items-start transform translate-z-0 backface-hidden">
@@ -444,6 +454,7 @@ export default function TodoApp() {
                     
                     <button 
                         onClick={() => {
+                            setViewMode('active');
                             setFilterAssignee('all');
                             setFilterPriority('all');
                         }}
@@ -456,6 +467,7 @@ export default function TodoApp() {
 
                     <button 
                         onClick={() => {
+                            setViewMode('active');
                             setFilterAssignee('me');
                             setFilterPriority('all');
                         }}
@@ -468,6 +480,7 @@ export default function TodoApp() {
 
                     <button 
                         onClick={() => {
+                            setViewMode('active');
                             setFilterAssignee('global');
                             setFilterPriority('all');
                         }}
@@ -480,6 +493,7 @@ export default function TodoApp() {
 
                     <button 
                         onClick={() => {
+                            setViewMode('active');
                             setFilterAssignee('all');
                             setFilterPriority('high');
                         }}
@@ -490,17 +504,31 @@ export default function TodoApp() {
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isStarredActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.starred}</span>
                     </button>
 
+                    <button 
+                        onClick={() => {
+                            setViewMode('completed');
+                            setFilterAssignee('all');
+                            setFilterPriority('all');
+                        }}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isCompletedViewActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
+                    >
+                        <span className={`material-symbols-outlined text-base ${isCompletedViewActive ? 'text-[#1B4965]' : 'text-slate-400'}`}>task_alt</span>
+                        <span className="flex-1 truncate">Fullførte oppgaver</span>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isCompletedViewActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.completed}</span>
+                    </button>
+
                     {/* Lists sub-header */}
                     <span className="px-3 py-2 mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-wider select-none">Lister</span>
 
                     {users.map(u => {
-                        const isUserActive = filterAssignee === u.uid;
+                        const isUserActive = filterAssignee === u.uid && viewMode === 'active';
                         const userActiveCount = counts.userLists[u.uid] || 0;
 
                         return (
                             <button 
                                 key={u.uid}
                                 onClick={() => {
+                                    setViewMode('active');
                                     setFilterAssignee(u.uid);
                                     setFilterPriority('all');
                                 }}
@@ -535,7 +563,10 @@ export default function TodoApp() {
                         <div className="flex items-center gap-3 flex-nowrap">
                             <h3 className="m-0 font-bold text-2xl text-[#1B4965] tracking-tight whitespace-nowrap">{activeViewTitle}</h3>
                             <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#1B4965]/10 text-[#1B4965] shadow-sm whitespace-nowrap flex-shrink-0">
-                                {activeTasks.length} {activeTasks.length === 1 ? 'oppgave' : 'oppgaver'}
+                                {viewMode === 'completed' 
+                                    ? `${completedTasks.length} ${completedTasks.length === 1 ? 'fullført' : 'fullførte'}` 
+                                    : `${activeTasks.length} ${activeTasks.length === 1 ? 'oppgave' : 'oppgaver'}`
+                                }
                             </span>
                         </div>
                         <p className="m-0 text-xs text-slate-400 font-medium mt-2">Administrer og deleger oppgavene dine effektivt.</p>
@@ -555,307 +586,52 @@ export default function TodoApp() {
                     </div>
                 </div>
 
-                {/* Premium Standalone Inline Quick-Add Card */}
-                <form 
-                    onSubmit={handleInlineQuickAdd} 
-                    className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col shadow-sm ${
-                        isQuickAddExpanded 
-                            ? 'p-6 ring-2 ring-[#d17d39]/15 border-[#d17d39]/40 gap-4' 
-                            : 'py-3 px-4 hover:border-slate-300/80 hover:shadow-md cursor-pointer'
-                    }`}
-                    onClick={() => {
-                        if (!isQuickAddExpanded) setIsQuickAddExpanded(true);
-                    }}
-                >
-                    <div className="flex items-center gap-3.5">
-                        <span className="material-symbols-outlined text-slate-400 select-none text-xl">playlist_add</span>
-                        <input 
-                            type="text" 
-                            value={inlineTitle} 
-                            onChange={e => setInlineTitle(e.target.value)} 
-                            placeholder="Legg til et nytt gjøremål her..." 
-                            className="w-full border-none outline-none bg-transparent font-bold text-slate-700 text-xs placeholder-slate-400" 
-                        />
-                        {!isQuickAddExpanded && inlineTitle.trim() && (
-                            <button 
-                                type="submit" 
-                                className="flex items-center justify-center w-7 h-7 rounded-full bg-[#1B4965] hover:bg-[#25638c] text-white cursor-pointer border-none scale-100 hover:scale-105 active:scale-95 transition-all duration-200 flex-shrink-0"
-                                title="Lagre oppgave"
-                            >
-                                <span className="material-symbols-outlined text-sm font-bold">check</span>
-                            </button>
-                        )}
-                    </div>
-
-                    {isQuickAddExpanded && (
-                        <div className="flex flex-col gap-4 mt-2 border-t border-slate-100 pt-4 animate-in fade-in duration-200">
-                            {/* Optional Description Input */}
-                            <textarea 
-                                value={inlineDesc}
-                                onChange={e => setInlineDesc(e.target.value)}
-                                placeholder="Legg til en beskrivelse (valgfritt)..."
-                                rows={2}
-                                className="w-full border-none outline-none text-xs text-slate-600 placeholder-slate-400 bg-transparent resize-none leading-relaxed"
-                            />
-
-                            {/* Metadata Selectors & Action Buttons */}
-                            <div className="flex flex-wrap items-center gap-2 mt-2 w-full">
-                                {/* Priority dropdown */}
-                                <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
-                                    <span className={`w-2 h-2 rounded-full ${
-                                        inlinePriority === 'high' ? 'bg-red-500' : inlinePriority === 'medium' ? 'bg-orange-500' : 'bg-green-500'
-                                    }`}></span>
-                                    <span>{inlinePriority === 'high' ? 'Høy prioritet' : inlinePriority === 'medium' ? 'Medium prioritet' : 'Lav prioritet'}</span>
-                                    <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
-                                    <select 
-                                        value={inlinePriority} 
-                                        onChange={e => setInlinePriority(e.target.value)}
-                                        onClick={e => e.stopPropagation()}
-                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                    >
-                                        <option value="low">Lav prioritet</option>
-                                        <option value="medium">Medium prioritet</option>
-                                        <option value="high">Høy prioritet</option>
-                                    </select>
+                {viewMode === 'completed' ? (
+                    /* Completed Tasks View (Primary display) */
+                    <div className="flex flex-col gap-4">
+                        {completedTasks.length === 0 ? (
+                            /* Premium completed empty state vector illustration */
+                            <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center max-w-lg mx-auto w-full shadow-sm flex flex-col items-center justify-center">
+                                <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
+                                    <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <circle cx="60" cy="60" r="50" fill="url(#completedEmptyGrad)" fillOpacity="0.06" />
+                                        <circle cx="60" cy="60" r="50" stroke="url(#completedEmptyGrad)" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.4" />
+                                        <path d="M40 60L53 73L80 46" stroke="#d17d39" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" opacity="0.3" />
+                                        <path d="M48 68 L60 56 L72 68 M60 56 L60 80" stroke="#1B4965" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                                        <circle cx="95" cy="38" r="4" fill="#d17d39" fillOpacity="0.6" />
+                                        <circle cx="25" cy="80" r="3" fill="#1B4965" fillOpacity="0.4" />
+                                        <defs>
+                                            <linearGradient id="completedEmptyGrad" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+                                                <stop stopColor="#d17d39" />
+                                                <stop offset="1" stopColor="#1B4965" />
+                                            </linearGradient>
+                                        </defs>
+                                    </svg>
                                 </div>
-
-                                {/* Due Date selector */}
-                                <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
-                                    <span className="material-symbols-outlined text-[15px] text-slate-400">calendar_today</span>
-                                    <span>
-                                        {inlineDueDate 
-                                            ? new Date(inlineDueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) 
-                                            : 'Sett forfallsdato'}
-                                    </span>
-                                    <input 
-                                        type="date" 
-                                        value={inlineDueDate} 
-                                        onChange={e => setInlineDueDate(e.target.value)}
-                                        onClick={e => e.stopPropagation()}
-                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
-                                    />
-                                    {inlineDueDate && (
-                                        <button 
-                                            type="button"
-                                            onClick={(e) => { e.stopPropagation(); setInlineDueDate(''); }}
-                                            className="p-0 border-none bg-transparent hover:text-red-500 text-slate-400 flex items-center justify-center cursor-pointer ml-1"
-                                            title="Fjern dato"
-                                        >
-                                            <span className="material-symbols-outlined text-[13px]">close</span>
-                                        </button>
-                                    )}
-                                </div>
-
-                                {/* Assignee selector */}
-                                <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
-                                    <span className="material-symbols-outlined text-[15px] text-slate-400">account_circle</span>
-                                    <span className="max-w-[120px] truncate">
-                                        {inlineAssignee ? getAssigneeName(inlineAssignee) : 'Deleger (Felles)'}
-                                    </span>
-                                    <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
-                                    <select 
-                                        value={inlineAssignee} 
-                                        onChange={e => setInlineAssignee(e.target.value)}
-                                        onClick={e => e.stopPropagation()}
-                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                    >
-                                        <option value="">Felles (Ingen)</option>
-                                        {users.map(u => (
-                                            <option key={u.uid} value={u.uid}>{u.displayName}</option>
-                                        ))}
-                                    </select>
-                                </div>
-
-                                {/* Action Buttons */}
-                                <div className="ml-auto flex items-center gap-2">
-                                    <button 
-                                        type="button" 
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setInlineTitle('');
-                                            setInlineDesc('');
-                                            setInlineDueDate('');
-                                            setIsQuickAddExpanded(false);
-                                        }}
-                                        className="px-4 py-2 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs"
-                                    >
-                                        Avbryt
-                                    </button>
-                                    <button 
-                                        type="submit" 
-                                        disabled={!inlineTitle.trim()}
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:shadow-md hover:shadow-orange-500/10 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs disabled:opacity-80 disabled:cursor-not-allowed"
-                                    >
-                                        Lagre
-                                    </button>
-                                </div>
+                                <h4 className="font-bold text-base text-slate-800 tracking-tight">Ingen fullførte gjøremål</h4>
+                                <p className="text-xs text-slate-400 mt-2 font-medium max-w-[280px] leading-relaxed">Du har ikke fullført noen oppgaver i denne listen ennå. Start med å fullføre en oppgave!</p>
                             </div>
-                        </div>
-                    )}
-                </form>
+                        ) : (
+                            /* Completed Task Row Cards (Primary Style) */
+                            completedTasks.map(t => {
+                                const assigneeName = t.tildelt_til && t.tildelt_til.length > 0 ? getAssigneeName(t.tildelt_til[0]) : '';
+                                const getInitials = (name) => {
+                                    if (!name) return '';
+                                    const parts = name.split(' ');
+                                    if (parts.length >= 2) {
+                                        return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+                                    }
+                                    return name.substring(0, 2).toUpperCase();
+                                };
+                                const initials = getInitials(assigneeName);
+                                const completedDateStr = t.completed_at 
+                                    ? new Date(t.completed_at.seconds ? t.completed_at.seconds * 1000 : t.completed_at).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) 
+                                    : null;
 
-                {/* Active Tasks List Area */}
-                <div className="flex flex-col gap-4">
-                    {activeTasks.length === 0 ? (
-                        
-                        /* Premium empty state vector drawing illustration */
-                        <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center max-w-lg mx-auto w-full shadow-sm flex flex-col items-center justify-center">
-                            <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
-                                <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <circle cx="60" cy="60" r="50" fill="url(#circleGrad)" fillOpacity="0.06" />
-                                    <circle cx="60" cy="60" r="50" stroke="url(#circleGrad)" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.4" />
-                                    <path d="M40 60L53 73L80 46" stroke="#d17d39" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                                    <path d="M28 35C28 35 30 40 33 40C36 40 38 35 38 35C38 35 36 30 33 30C30 30 28 35 28 35Z" fill="#1B4965" fillOpacity="0.3" />
-                                    <path d="M82 85C82 85 84 90 87 90C90 90 92 85 92 85C92 85 90 80 87 80C84 80 82 85 82 85Z" fill="#1B4965" fillOpacity="0.3" />
-                                    <circle cx="95" cy="38" r="4" fill="#d17d39" fillOpacity="0.6" />
-                                    <circle cx="25" cy="80" r="3" fill="#1B4965" fillOpacity="0.4" />
-                                    <defs>
-                                        <linearGradient id="circleGrad" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
-                                            <stop stopColor="#d17d39" />
-                                            <stop offset="1" stopColor="#1B4965" />
-                                        </linearGradient>
-                                    </defs>
-                                </svg>
-                                <div className="absolute top-2 right-4 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
-                                    <span className="material-symbols-outlined text-[9px] text-white font-bold">check</span>
-                                </div>
-                                <div className="absolute bottom-4 left-4 w-4.5 h-4.5 bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
-                                    <span className="material-symbols-outlined text-[10px] text-white font-bold">star</span>
-                                </div>
-                            </div>
-                            <h4 className="font-bold text-base text-slate-800 tracking-tight">Alle gjøremålene er fullført</h4>
-                            <p className="text-xs text-slate-400 mt-2 font-medium max-w-[280px] leading-relaxed">Fantastisk jobb! Det er ingenting utestående på denne oppgavelisten.</p>
-                        </div>
-                    ) : (
-                        
-                        /* Task Row Cards */
-                        activeTasks.map(t => {
-                            const prioLabel = { low: 'Lav', medium: 'Medium', high: 'Høy' }[t.priority] || 'Medium';
-                            const prioDotColor = {
-                                high: 'bg-red-500',
-                                medium: 'bg-orange-500',
-                                low: 'bg-green-500'
-                            }[t.priority || 'medium'];
-
-                            // Check if task is overdue
-                            const isOverdue = t.dueDate ? new Date(t.dueDate).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) : false;
-
-                            // Calculate initials for tildelt user avatar
-                            const assigneeName = t.tildelt_til && t.tildelt_til.length > 0 ? getAssigneeName(t.tildelt_til[0]) : '';
-                            const getInitials = (name) => {
-                                if (!name) return '';
-                                const parts = name.split(' ');
-                                if (parts.length >= 2) {
-                                    return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
-                                }
-                                return name.substring(0, 2).toUpperCase();
-                            };
-                            const initials = getInitials(assigneeName);
-
-                            return (
-                                <div 
-                                    key={t.id} 
-                                    className="flex gap-4 items-start bg-white border border-slate-100 hover:border-slate-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear"
-                                >
-                                    {/* Styled circular Checkbox */}
-                                    <div 
-                                        onClick={() => handleToggleTask(t)} 
-                                        className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105 group/checkbox"
-                                        title="Fullfør oppgave"
-                                    >
-                                        <span className="material-symbols-outlined text-[10px] text-transparent group-hover/checkbox:text-slate-400 select-none">check</span>
-                                    </div>
-
-                                    {/* Content body */}
-                                    <div className="flex-grow min-w-0">
-                                        <div className="flex justify-between items-start gap-3">
-                                            <h4 className="m-0 font-bold text-xs text-slate-800 leading-snug break-words">{t.title}</h4>
-                                            
-                                            {/* Slett oppgave icon */}
-                                            <button 
-                                                onClick={() => handleDeleteTask(t.id)} 
-                                                className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
-                                                title="Slett oppgave"
-                                            >
-                                                <span className="material-symbols-outlined text-base">delete</span>
-                                            </button>
-                                        </div>
-
-                                        {t.description && (
-                                            <p className="m-0 text-[11px] text-slate-500 mt-2 leading-relaxed break-words font-medium">{t.description}</p>
-                                        )}
-
-                                        {/* Minimal SaaS Tags line */}
-                                        <div className="flex flex-wrap items-center gap-2.5 mt-3.5 text-[10px] font-bold text-slate-500">
-                                            
-                                            {/* Priority badge with translucent pastel styling */}
-                                            <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
-                                                t.priority === 'high' 
-                                                    ? 'bg-red-500/[0.06] text-red-700 border-red-500/10' 
-                                                    : t.priority === 'medium'
-                                                    ? 'bg-amber-500/[0.06] text-amber-700 border-amber-500/10'
-                                                    : 'bg-emerald-500/[0.06] text-emerald-700 border-emerald-500/10'
-                                            }`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full ${prioDotColor}`}></span>
-                                                {prioLabel} prioritet
-                                            </span>
-
-                                            {/* Due date badge */}
-                                            {t.dueDate && (
-                                                <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
-                                                    isOverdue 
-                                                        ? 'bg-rose-500/[0.06] text-rose-700 border-rose-500/10 font-bold animate-pulse' 
-                                                        : 'bg-[#1B4965]/[0.06] text-[#1B4965] border-[#1B4965]/10'
-                                                }`}>
-                                                    <span className="material-symbols-outlined text-[13px]">{isOverdue ? 'error' : 'calendar_today'}</span>
-                                                    <span>{isOverdue ? 'Forfalt: ' : 'Forfaller: '}</span>
-                                                    <span>{new Date(t.dueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })}</span>
-                                                </span>
-                                            )}
-
-                                            {/* Assignee badge with actual circular initials avatar */}
-                                            {t.tildelt_til && t.tildelt_til.length > 0 ? (
-                                                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-indigo-500/[0.06] text-indigo-700 border-indigo-500/10" title={`Tildelt: ${assigneeName}`}>
-                                                    <span className="w-4.5 h-4.5 rounded-full bg-[#1B4965] text-white font-bold text-[8px] flex items-center justify-center select-none shadow-sm shadow-indigo-600/10">
-                                                        {initials}
-                                                    </span>
-                                                    <span>{assigneeName}</span>
-                                                </span>
-                                            ) : (
-                                                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-500/[0.06] text-slate-600 border-slate-500/10">
-                                                    <span className="material-symbols-outlined text-[13px]">group</span>
-                                                    <span>Felles</span>
-                                                </span>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-                            );
-                        })
-                    )}
-                </div>
-
-                {/* Collapsible Completed Tasks List Accordion */}
-                {completedTasks.length > 0 && (
-                    <div className="mt-4">
-                        <button 
-                            type="button"
-                            onClick={() => setShowCompleted(!showCompleted)} 
-                            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-xs bg-white hover:bg-slate-50 border border-slate-200/60 hover:border-slate-300 cursor-pointer px-4 py-2.5 rounded-xl transition-all duration-300 select-none outline-none transform active:scale-95 shadow-sm"
-                        >
-                            <span className="material-symbols-outlined text-base transform transition-transform duration-300" style={{ transform: showCompleted ? 'rotate(180deg)' : 'rotate(0deg)' }}>
-                                expand_more
-                            </span>
-                            <span>Fullførte gjøremål ({completedTasks.length})</span>
-                        </button>
-                        
-                        {showCompleted && (
-                            <div className="flex flex-col gap-3 mt-4 animate-in fade-in slide-in-from-top-4 duration-300">
-                                {completedTasks.map(t => (
+                                return (
                                     <div 
                                         key={t.id} 
-                                        className="flex gap-4 items-start bg-slate-50/40 border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 opacity-60 hover:opacity-85 transition-all duration-200 group w-full relative"
+                                        className="flex gap-4 items-start bg-white border border-slate-100 hover:border-emerald-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.03)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.06)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear"
                                     >
                                         {/* Checked status checkbox */}
                                         <div 
@@ -867,10 +643,12 @@ export default function TodoApp() {
                                             <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hidden group-hover/checkbox:block">close</span>
                                         </div>
 
-                                        {/* Content */}
+                                        {/* Content body */}
                                         <div className="flex-grow min-w-0">
                                             <div className="flex justify-between items-start gap-3">
                                                 <h4 className="m-0 font-bold text-xs text-slate-400 line-through leading-snug break-words">{t.title}</h4>
+                                                
+                                                {/* Slett oppgave icon */}
                                                 <button 
                                                     onClick={() => handleDeleteTask(t.id)} 
                                                     className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
@@ -881,14 +659,386 @@ export default function TodoApp() {
                                             </div>
 
                                             {t.description && (
-                                                <p className="m-0 text-[11px] text-slate-400 line-through mt-1.5 leading-relaxed break-words font-medium">{t.description}</p>
+                                                <p className="m-0 text-[11px] text-slate-400 line-through mt-2 leading-relaxed break-words font-medium">{t.description}</p>
                                             )}
+
+                                            {/* Minimal SaaS Tags line */}
+                                            <div className="flex flex-wrap items-center gap-2.5 mt-3.5 text-[10px] font-bold text-slate-400">
+                                                
+                                                {/* Priority badge */}
+                                                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-50 text-slate-500 border-slate-200/60">
+                                                    <span className={`w-1.5 h-1.5 rounded-full ${
+                                                        t.priority === 'high' ? 'bg-red-400/60' : t.priority === 'medium' ? 'bg-orange-400/60' : 'bg-green-400/60'
+                                                    }`}></span>
+                                                    {{ low: 'Lav', medium: 'Medium', high: 'Høy' }[t.priority || 'medium']} prioritet
+                                                </span>
+
+                                                {/* Completed date badge */}
+                                                {completedDateStr && (
+                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-emerald-500/[0.04] text-emerald-700 border-emerald-500/10">
+                                                        <span className="material-symbols-outlined text-[13px]">done_all</span>
+                                                        <span>Fullført: {completedDateStr}</span>
+                                                    </span>
+                                                )}
+
+                                                {/* Assignee badge */}
+                                                {t.tildelt_til && t.tildelt_til.length > 0 ? (
+                                                    <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-slate-50 text-slate-500 border-slate-200/60" title={`Tildelt: ${assigneeName}`}>
+                                                        <span className="w-4.5 h-4.5 rounded-full bg-slate-400 text-white font-bold text-[8px] flex items-center justify-center select-none shadow-sm">
+                                                            {initials}
+                                                        </span>
+                                                        <span>{assigneeName}</span>
+                                                    </span>
+                                                ) : (
+                                                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-50 text-slate-500 border-slate-200/60">
+                                                        <span className="material-symbols-outlined text-[13px]">group</span>
+                                                        <span>Felles</span>
+                                                    </span>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
+                                );
+                            })
                         )}
                     </div>
+                ) : (
+                    /* Active Tasks View */
+                    <>
+                        {/* Premium Standalone Inline Quick-Add Card */}
+                        <form 
+                            onSubmit={handleInlineQuickAdd} 
+                            className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col shadow-sm ${
+                                isQuickAddExpanded 
+                                    ? 'p-6 ring-2 ring-[#d17d39]/15 border-[#d17d39]/40 gap-4' 
+                                    : 'py-3 px-4 hover:border-slate-300/80 hover:shadow-md cursor-pointer'
+                            }`}
+                            onClick={() => {
+                                if (!isQuickAddExpanded) setIsQuickAddExpanded(true);
+                            }}
+                        >
+                            <div className="flex items-center gap-3.5">
+                                <span className="material-symbols-outlined text-slate-400 select-none text-xl">playlist_add</span>
+                                <input 
+                                    type="text" 
+                                    value={inlineTitle} 
+                                    onChange={e => setInlineTitle(e.target.value)} 
+                                    placeholder="Legg til et nytt gjøremål her..." 
+                                    className="w-full border-none outline-none bg-transparent font-bold text-slate-700 text-xs placeholder-slate-400" 
+                                />
+                                {!isQuickAddExpanded && inlineTitle.trim() && (
+                                    <button 
+                                        type="submit" 
+                                        className="flex items-center justify-center w-7 h-7 rounded-full bg-[#1B4965] hover:bg-[#25638c] text-white cursor-pointer border-none scale-100 hover:scale-105 active:scale-95 transition-all duration-200 flex-shrink-0"
+                                        title="Lagre oppgave"
+                                    >
+                                        <span className="material-symbols-outlined text-sm font-bold">check</span>
+                                    </button>
+                                )}
+                            </div>
+
+                            {isQuickAddExpanded && (
+                                <div className="flex flex-col gap-4 mt-2 border-t border-slate-100 pt-4 animate-in fade-in duration-200">
+                                    {/* Optional Description Input */}
+                                    <textarea 
+                                        value={inlineDesc}
+                                        onChange={e => setInlineDesc(e.target.value)}
+                                        placeholder="Legg til en beskrivelse (valgfritt)..."
+                                        rows={2}
+                                        className="w-full border-none outline-none text-xs text-slate-600 placeholder-slate-400 bg-transparent resize-none leading-relaxed"
+                                    />
+
+                                    {/* Metadata Selectors & Action Buttons */}
+                                    <div className="flex flex-wrap items-center gap-2 mt-2 w-full">
+                                        {/* Priority dropdown */}
+                                        <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
+                                            <span className={`w-2 h-2 rounded-full ${
+                                                inlinePriority === 'high' ? 'bg-red-500' : inlinePriority === 'medium' ? 'bg-orange-500' : 'bg-green-500'
+                                            }`}></span>
+                                            <span>{inlinePriority === 'high' ? 'Høy prioritet' : inlinePriority === 'medium' ? 'Medium prioritet' : 'Lav prioritet'}</span>
+                                            <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
+                                            <select 
+                                                value={inlinePriority} 
+                                                onChange={e => setInlinePriority(e.target.value)}
+                                                onClick={e => e.stopPropagation()}
+                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                            >
+                                                <option value="low">Lav prioritet</option>
+                                                <option value="medium">Medium prioritet</option>
+                                                <option value="high">Høy prioritet</option>
+                                            </select>
+                                        </div>
+
+                                        {/* Due Date selector */}
+                                        <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
+                                            <span className="material-symbols-outlined text-[15px] text-slate-400">calendar_today</span>
+                                            <span>
+                                                {inlineDueDate 
+                                                    ? new Date(inlineDueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) 
+                                                    : 'Sett forfallsdato'}
+                                            </span>
+                                            <input 
+                                                type="date" 
+                                                value={inlineDueDate} 
+                                                onChange={e => setInlineDueDate(e.target.value)}
+                                                onClick={e => e.stopPropagation()}
+                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
+                                            />
+                                            {inlineDueDate && (
+                                                <button 
+                                                    type="button"
+                                                    onClick={(e) => { e.stopPropagation(); setInlineDueDate(''); }}
+                                                    className="p-0 border-none bg-transparent hover:text-red-500 text-slate-400 flex items-center justify-center cursor-pointer ml-1"
+                                                    title="Fjern dato"
+                                                >
+                                                    <span className="material-symbols-outlined text-[13px]">close</span>
+                                                </button>
+                                            )}
+                                        </div>
+
+                                        {/* Assignee selector */}
+                                        <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
+                                            <span className="material-symbols-outlined text-[15px] text-slate-400">account_circle</span>
+                                            <span className="max-w-[120px] truncate">
+                                                {inlineAssignee ? getAssigneeName(inlineAssignee) : 'Deleger (Felles)'}
+                                            </span>
+                                            <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
+                                            <select 
+                                                value={inlineAssignee} 
+                                                onChange={e => setInlineAssignee(e.target.value)}
+                                                onClick={e => e.stopPropagation()}
+                                                className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                            >
+                                                <option value="">Felles (Ingen)</option>
+                                                {users.map(u => (
+                                                    <option key={u.uid} value={u.uid}>{u.displayName}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+
+                                        {/* Action Buttons */}
+                                        <div className="ml-auto flex items-center gap-2">
+                                            <button 
+                                                type="button" 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setInlineTitle('');
+                                                    setInlineDesc('');
+                                                    setInlineDueDate('');
+                                                    setIsQuickAddExpanded(false);
+                                                }}
+                                                className="px-4 py-2 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs"
+                                            >
+                                                Avbryt
+                                            </button>
+                                            <button 
+                                                type="submit" 
+                                                disabled={!inlineTitle.trim()}
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:shadow-md hover:shadow-orange-500/10 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs disabled:opacity-80 disabled:cursor-not-allowed"
+                                            >
+                                                Lagre
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </form>
+
+                        {/* Active Tasks List Area */}
+                        <div className="flex flex-col gap-4">
+                            {activeTasks.length === 0 ? (
+                                /* Premium empty state vector drawing illustration */
+                                <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center max-w-lg mx-auto w-full shadow-sm flex flex-col items-center justify-center">
+                                    <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
+                                        <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="60" cy="60" r="50" fill="url(#circleGrad)" fillOpacity="0.06" />
+                                            <circle cx="60" cy="60" r="50" stroke="url(#circleGrad)" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.4" />
+                                            <path d="M40 60L53 73L80 46" stroke="#d17d39" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                                            <path d="M28 35C28 35 30 40 33 40C36 40 38 35 38 35C38 35 36 30 33 30C30 30 28 35 28 35Z" fill="#1B4965" fillOpacity="0.3" />
+                                            <path d="M82 85C82 85 84 90 87 90C90 90 92 85 92 85C92 85 90 80 87 80C84 80 82 85 82 85Z" fill="#1B4965" fillOpacity="0.3" />
+                                            <circle cx="95" cy="38" r="4" fill="#d17d39" fillOpacity="0.6" />
+                                            <circle cx="25" cy="80" r="3" fill="#1B4965" fillOpacity="0.4" />
+                                            <defs>
+                                                <linearGradient id="circleGrad" x1="10" y1="10" x2="110" y2="110" gradientUnits="userSpaceOnUse">
+                                                    <stop stopColor="#d17d39" />
+                                                    <stop offset="1" stopColor="#1B4965" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <div className="absolute top-2 right-4 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                                            <span className="material-symbols-outlined text-[9px] text-white font-bold">check</span>
+                                        </div>
+                                        <div className="absolute bottom-4 left-4 w-4.5 h-4.5 bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
+                                            <span className="material-symbols-outlined text-[10px] text-white font-bold">star</span>
+                                        </div>
+                                    </div>
+                                    <h4 className="font-bold text-base text-slate-800 tracking-tight">Alle gjøremålene er fullført</h4>
+                                    <p className="text-xs text-slate-400 mt-2 font-medium max-w-[280px] leading-relaxed">Fantastisk jobb! Det er ingenting utestående på denne oppgavelisten.</p>
+                                </div>
+                            ) : (
+                                /* Task Row Cards */
+                                activeTasks.map(t => {
+                                    const prioLabel = { low: 'Lav', medium: 'Medium', high: 'Høy' }[t.priority] || 'Medium';
+                                    const prioDotColor = {
+                                        high: 'bg-red-500',
+                                        medium: 'bg-orange-500',
+                                        low: 'bg-green-500'
+                                    }[t.priority || 'medium'];
+
+                                    // Check if task is overdue
+                                    const isOverdue = t.dueDate ? new Date(t.dueDate).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) : false;
+
+                                    // Calculate initials for tildelt user avatar
+                                    const assigneeName = t.tildelt_til && t.tildelt_til.length > 0 ? getAssigneeName(t.tildelt_til[0]) : '';
+                                    const getInitials = (name) => {
+                                        if (!name) return '';
+                                        const parts = name.split(' ');
+                                        if (parts.length >= 2) {
+                                            return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+                                        }
+                                        return name.substring(0, 2).toUpperCase();
+                                    };
+                                    const initials = getInitials(assigneeName);
+
+                                    return (
+                                        <div 
+                                            key={t.id} 
+                                            className="flex gap-4 items-start bg-white border border-slate-100 hover:border-slate-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear"
+                                        >
+                                            {/* Styled circular Checkbox */}
+                                            <div 
+                                                onClick={() => handleToggleTask(t)} 
+                                                className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105 group/checkbox"
+                                                title="Fullfør oppgave"
+                                            >
+                                                <span className="material-symbols-outlined text-[10px] text-transparent group-hover/checkbox:text-slate-400 select-none">check</span>
+                                            </div>
+
+                                            {/* Content body */}
+                                            <div className="flex-grow min-w-0">
+                                                <div className="flex justify-between items-start gap-3">
+                                                    <h4 className="m-0 font-bold text-xs text-slate-800 leading-snug break-words">{t.title}</h4>
+                                                    
+                                                    {/* Slett oppgave icon */}
+                                                    <button 
+                                                        onClick={() => handleDeleteTask(t.id)} 
+                                                        className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
+                                                        title="Slett oppgave"
+                                                    >
+                                                        <span className="material-symbols-outlined text-base">delete</span>
+                                                    </button>
+                                                </div>
+
+                                                {t.description && (
+                                                    <p className="m-0 text-[11px] text-slate-500 mt-2 leading-relaxed break-words font-medium">{t.description}</p>
+                                                )}
+
+                                                {/* Minimal SaaS Tags line */}
+                                                <div className="flex flex-wrap items-center gap-2.5 mt-3.5 text-[10px] font-bold text-slate-500">
+                                                    
+                                                    {/* Priority badge with translucent pastel styling */}
+                                                    <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
+                                                        t.priority === 'high' 
+                                                            ? 'bg-red-500/[0.06] text-red-700 border-red-500/10' 
+                                                            : t.priority === 'medium'
+                                                            ? 'bg-amber-500/[0.06] text-amber-700 border-amber-500/10'
+                                                            : 'bg-emerald-500/[0.06] text-emerald-700 border-emerald-500/10'
+                                                    }`}>
+                                                        <span className={`w-1.5 h-1.5 rounded-full ${prioDotColor}`}></span>
+                                                        {prioLabel} prioritet
+                                                    </span>
+
+                                                    {/* Due date badge */}
+                                                    {t.dueDate && (
+                                                        <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
+                                                            isOverdue 
+                                                                ? 'bg-rose-500/[0.06] text-rose-700 border-rose-500/10 font-bold animate-pulse' 
+                                                                : 'bg-[#1B4965]/[0.06] text-[#1B4965] border-[#1B4965]/10'
+                                                        }`}>
+                                                            <span className="material-symbols-outlined text-[13px]">{isOverdue ? 'error' : 'calendar_today'}</span>
+                                                            <span>{isOverdue ? 'Forfalt: ' : 'Forfaller: '}</span>
+                                                            <span>{new Date(t.dueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })}</span>
+                                                        </span>
+                                                    )}
+
+                                                    {/* Assignee badge with actual circular initials avatar */}
+                                                    {t.tildelt_til && t.tildelt_til.length > 0 ? (
+                                                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-indigo-500/[0.06] text-indigo-700 border-indigo-500/10" title={`Tildelt: ${assigneeName}`}>
+                                                            <span className="w-4.5 h-4.5 rounded-full bg-[#1B4965] text-white font-bold text-[8px] flex items-center justify-center select-none shadow-sm shadow-indigo-600/10">
+                                                                {initials}
+                                                            </span>
+                                                            <span>{assigneeName}</span>
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-500/[0.06] text-slate-600 border-slate-500/10">
+                                                            <span className="material-symbols-outlined text-[13px]">group</span>
+                                                            <span>Felles</span>
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </div>
+
+                        {/* Collapsible Completed Tasks List Accordion */}
+                        {completedTasks.length > 0 && (
+                            <div className="mt-4">
+                                <button 
+                                    type="button"
+                                    onClick={() => setShowCompleted(!showCompleted)} 
+                                    className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-xs bg-white hover:bg-slate-50 border border-slate-200/60 hover:border-slate-300 cursor-pointer px-4 py-2.5 rounded-xl transition-all duration-300 select-none outline-none transform active:scale-95 shadow-sm"
+                                >
+                                    <span className="material-symbols-outlined text-base transform transition-transform duration-300" style={{ transform: showCompleted ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                                        expand_more
+                                    </span>
+                                    <span>Fullførte gjøremål ({completedTasks.length})</span>
+                                </button>
+                                
+                                {showCompleted && (
+                                    <div className="flex flex-col gap-3 mt-4 animate-in fade-in slide-in-from-top-4 duration-300">
+                                        {completedTasks.map(t => (
+                                            <div 
+                                                key={t.id} 
+                                                className="flex gap-4 items-start bg-slate-50/40 border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 opacity-60 hover:opacity-85 transition-all duration-200 group w-full relative"
+                                            >
+                                                {/* Checked status checkbox */}
+                                                <div 
+                                                    onClick={() => handleToggleTask(t)} 
+                                                    className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105 group/checkbox"
+                                                    title="Marker som ugjort"
+                                                >
+                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none group-hover/checkbox:hidden">check</span>
+                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hidden group-hover/checkbox:block">close</span>
+                                                </div>
+
+                                                {/* Content */}
+                                                <div className="flex-grow min-w-0">
+                                                    <div className="flex justify-between items-start gap-3">
+                                                        <h4 className="m-0 font-bold text-xs text-slate-400 line-through leading-snug break-words">{t.title}</h4>
+                                                        <button 
+                                                            onClick={() => handleDeleteTask(t.id)} 
+                                                            className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
+                                                            title="Slett oppgave"
+                                                        >
+                                                            <span className="material-symbols-outlined text-base">delete</span>
+                                                        </button>
+                                                    </div>
+
+                                                    {t.description && (
+                                                        <p className="m-0 text-[11px] text-slate-400 line-through mt-1.5 leading-relaxed break-words font-medium">{t.description}</p>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </>
                 )}
             </div>
 
