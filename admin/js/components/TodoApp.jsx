@@ -17,8 +17,13 @@ export default function TodoApp() {
     // Accordion state for completed tasks
     const [showCompleted, setShowCompleted] = useState(false);
 
-    // Inline quick-add state
+    // Inline quick-add states
     const [inlineTitle, setInlineTitle] = useState('');
+    const [inlineDesc, setInlineDesc] = useState('');
+    const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(false);
+    const [inlinePriority, setInlinePriority] = useState('medium');
+    const [inlineDueDate, setInlineDueDate] = useState('');
+    const [inlineAssignee, setInlineAssignee] = useState('');
 
     // Google Tasks config and modal states
     const [showAddTaskModal, setShowAddTaskModal] = useState(false);
@@ -102,6 +107,17 @@ export default function TodoApp() {
         checkAuth();
     }, []);
 
+    // Sync inline quick-add default fields with active filters
+    useEffect(() => {
+        if (!currentUser) return;
+        setInlinePriority(filterPriority === 'high' ? 'high' : 'medium');
+        setInlineAssignee(
+            filterAssignee === 'me' 
+                ? currentUser.uid 
+                : (filterAssignee !== 'all' && filterAssignee !== 'global' ? filterAssignee : '')
+        );
+    }, [filterPriority, filterAssignee, currentUser]);
+
     // Trigger silent sync in background on mutation
     const triggerSilentSync = () => {
         if (!currentUser || !googleConnected) return;
@@ -173,20 +189,23 @@ export default function TodoApp() {
             const db = firebase.firestore();
             const payload = {
                 title: inlineTitle.trim(),
-                description: '',
-                priority: filterPriority === 'high' ? 'high' : 'medium',
+                description: inlineDesc.trim(),
+                priority: inlinePriority,
                 status: 'gjeldende',
-                dueDate: '',
+                dueDate: inlineDueDate,
                 opprettet_av: currentUser.uid,
-                tildelt_til: filterAssignee === 'me' 
-                    ? [currentUser.uid] 
-                    : (filterAssignee !== 'all' && filterAssignee !== 'global' ? [filterAssignee] : []),
+                tildelt_til: inlineAssignee ? [inlineAssignee] : [],
                 created_at: firebase.firestore.FieldValue.serverTimestamp(),
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             };
 
             await db.collection('tasks').add(payload);
+            
+            // Reset and collapse
             setInlineTitle('');
+            setInlineDesc('');
+            setInlineDueDate('');
+            setIsQuickAddExpanded(false);
 
             // Trigger silent background sync
             triggerSilentSync();
@@ -497,60 +516,193 @@ export default function TodoApp() {
             </div>
 
             {/* Right Main Content Panel */}
-            <div className="flex-grow bg-white rounded-3xl p-6 lg:p-8 border border-slate-200/80 shadow-sm flex flex-col gap-6 w-full">
+            <div className="flex-grow bg-[#f8fafc]/50 rounded-3xl p-6 lg:p-8 border border-slate-200/80 shadow-sm flex flex-col gap-6 w-full">
                 
+                {/* Style tag for butter-smooth CSS animations */}
+                <style dangerouslySetInnerHTML={{ __html: `
+                    @keyframes taskAppear {
+                        from { opacity: 0; transform: translateY(12px) scale(0.98); }
+                        to { opacity: 1; transform: translateY(0) scale(1); }
+                    }
+                    .animate-task-appear {
+                        animation: taskAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+                    }
+                `}} />
+
                 {/* Header view title and Search Bar */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
                     <div>
-                        <h3 className="m-0 font-bold text-xl text-[#1B4965] tracking-tight">{activeViewTitle}</h3>
-                        <p className="m-0 text-xs text-slate-400 font-semibold mt-1">
-                            {activeTasks.length} {activeTasks.length === 1 ? 'gjøremål' : 'gjøremål'} gjenværende
-                        </p>
+                        <div className="flex items-center gap-3">
+                            <h3 className="m-0 font-bold text-2xl text-[#1B4965] tracking-tight">{activeViewTitle}</h3>
+                            <span className="text-[10px] font-bold px-3 py-1 rounded-full bg-[#1B4965]/10 text-[#1B4965] shadow-sm">
+                                {activeTasks.length} {activeTasks.length === 1 ? 'oppgave' : 'oppgaver'}
+                            </span>
+                        </div>
+                        <p className="m-0 text-xs text-slate-400 font-medium mt-2">Administrer og deleger oppgavene dine effektivt.</p>
                     </div>
 
                     {/* Integrated Search Box */}
-                    <div className="relative w-full sm:w-64 todo-search-wrapper">
-                        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg select-none" style={{ zIndex: 2 }}>search</span>
+                    <div className="relative w-full sm:w-72 todo-search-wrapper">
+                        <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-lg select-none" style={{ zIndex: 2 }}>search</span>
                         <input 
                             type="text" 
                             value={filterSearch} 
                             onChange={e => setFilterSearch(e.target.value)} 
                             placeholder="Søk i oppgaver..." 
-                            className="w-full pr-4 py-2 rounded-xl border border-slate-200 focus:border-[#d17d39] outline-none font-medium text-slate-700 text-xs box-sizing-border-box transition-colors duration-250 bg-slate-50/50 todo-search-input" 
-                            style={{ paddingLeft: '40px' }}
+                            className="w-full pr-4 py-2.5 rounded-2xl border border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 outline-none font-semibold text-slate-700 text-xs box-sizing-border-box transition-all duration-250 bg-white shadow-sm todo-search-input" 
+                            style={{ paddingLeft: '48px' }}
                         />
                     </div>
                 </div>
 
-                {/* Inline Quick-Add Task Box */}
-                <form onSubmit={handleInlineQuickAdd} className="relative border border-slate-200/80 hover:border-slate-300 focus-within:border-[#d17d39] rounded-2xl px-5 py-3.5 transition-all duration-300 flex items-center gap-3 bg-slate-50/30">
-                    <span className="material-symbols-outlined text-slate-400 select-none text-xl">playlist_add</span>
-                    <input 
-                        type="text" 
-                        value={inlineTitle} 
-                        onChange={e => setInlineTitle(e.target.value)} 
-                        placeholder="Legg til et gjøremål..." 
-                        className="w-full border-none outline-none bg-transparent font-semibold text-slate-700 text-sm placeholder-slate-400" 
-                    />
-                    {inlineTitle.trim() && (
-                        <button 
-                            type="submit" 
-                            className="flex items-center justify-center w-7 h-7 rounded-full bg-[#1B4965] hover:bg-[#25638c] text-white cursor-pointer border-none scale-100 hover:scale-105 active:scale-95 transition-all duration-200 flex-shrink-0"
-                            title="Lagre oppgave"
-                        >
-                            <span className="material-symbols-outlined text-sm font-bold">check</span>
-                        </button>
+                {/* Premium Standalone Inline Quick-Add Card */}
+                <form 
+                    onSubmit={handleInlineQuickAdd} 
+                    className={`bg-white rounded-2xl border transition-all duration-300 flex flex-col shadow-sm ${
+                        isQuickAddExpanded 
+                            ? 'p-6 ring-2 ring-[#d17d39]/15 border-[#d17d39]/40 gap-4' 
+                            : 'p-4 hover:border-slate-300/80 hover:shadow-md cursor-pointer'
+                    }`}
+                    onClick={() => {
+                        if (!isQuickAddExpanded) setIsQuickAddExpanded(true);
+                    }}
+                >
+                    <div className="flex items-center gap-3.5">
+                        <span className="material-symbols-outlined text-slate-400 select-none text-xl">playlist_add</span>
+                        <input 
+                            type="text" 
+                            value={inlineTitle} 
+                            onChange={e => setInlineTitle(e.target.value)} 
+                            placeholder="Legg til et nytt gjøremål her..." 
+                            className="w-full border-none outline-none bg-transparent font-bold text-slate-700 text-xs placeholder-slate-400" 
+                        />
+                        {!isQuickAddExpanded && inlineTitle.trim() && (
+                            <button 
+                                type="submit" 
+                                className="flex items-center justify-center w-7 h-7 rounded-full bg-[#1B4965] hover:bg-[#25638c] text-white cursor-pointer border-none scale-100 hover:scale-105 active:scale-95 transition-all duration-200 flex-shrink-0"
+                                title="Lagre oppgave"
+                            >
+                                <span className="material-symbols-outlined text-sm font-bold">check</span>
+                            </button>
+                        )}
+                    </div>
+
+                    {isQuickAddExpanded && (
+                        <div className="flex flex-col gap-4 mt-2 border-t border-slate-100 pt-4 animate-in fade-in duration-200">
+                            {/* Optional Description Input */}
+                            <textarea 
+                                value={inlineDesc}
+                                onChange={e => setInlineDesc(e.target.value)}
+                                placeholder="Legg til en beskrivelse (valgfritt)..."
+                                rows={2}
+                                className="w-full border-none outline-none text-xs text-slate-600 placeholder-slate-400 bg-transparent resize-none leading-relaxed"
+                            />
+
+                            {/* Metadata Selectors & Action Buttons */}
+                            <div className="flex flex-wrap items-center gap-2 mt-2 w-full">
+                                {/* Priority dropdown */}
+                                <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
+                                    <span className={`w-2 h-2 rounded-full ${
+                                        inlinePriority === 'high' ? 'bg-red-500' : inlinePriority === 'medium' ? 'bg-orange-500' : 'bg-green-500'
+                                    }`}></span>
+                                    <span>{inlinePriority === 'high' ? 'Høy prioritet' : inlinePriority === 'medium' ? 'Medium prioritet' : 'Lav prioritet'}</span>
+                                    <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
+                                    <select 
+                                        value={inlinePriority} 
+                                        onChange={e => setInlinePriority(e.target.value)}
+                                        onClick={e => e.stopPropagation()}
+                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                    >
+                                        <option value="low">Lav prioritet</option>
+                                        <option value="medium">Medium prioritet</option>
+                                        <option value="high">Høy prioritet</option>
+                                    </select>
+                                </div>
+
+                                {/* Due Date selector */}
+                                <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
+                                    <span className="material-symbols-outlined text-[15px] text-slate-400">calendar_today</span>
+                                    <span>
+                                        {inlineDueDate 
+                                            ? new Date(inlineDueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' }) 
+                                            : 'Sett forfallsdato'}
+                                    </span>
+                                    <input 
+                                        type="date" 
+                                        value={inlineDueDate} 
+                                        onChange={e => setInlineDueDate(e.target.value)}
+                                        onClick={e => e.stopPropagation()}
+                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full" 
+                                    />
+                                    {inlineDueDate && (
+                                        <button 
+                                            type="button"
+                                            onClick={(e) => { e.stopPropagation(); setInlineDueDate(''); }}
+                                            className="p-0 border-none bg-transparent hover:text-red-500 text-slate-400 flex items-center justify-center cursor-pointer ml-1"
+                                            title="Fjern dato"
+                                        >
+                                            <span className="material-symbols-outlined text-[13px]">close</span>
+                                        </button>
+                                    )}
+                                </div>
+
+                                {/* Assignee selector */}
+                                <div className="relative flex items-center gap-2 bg-slate-50 hover:bg-slate-100 border border-slate-200/80 rounded-xl px-3 py-2 text-[11px] font-bold text-slate-600 transition-colors cursor-pointer select-none">
+                                    <span className="material-symbols-outlined text-[15px] text-slate-400">account_circle</span>
+                                    <span className="max-w-[120px] truncate">
+                                        {inlineAssignee ? getAssigneeName(inlineAssignee) : 'Deleger (Felles)'}
+                                    </span>
+                                    <span className="material-symbols-outlined text-[14px] text-slate-400">expand_more</span>
+                                    <select 
+                                        value={inlineAssignee} 
+                                        onChange={e => setInlineAssignee(e.target.value)}
+                                        onClick={e => e.stopPropagation()}
+                                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                                    >
+                                        <option value="">Felles (Ingen)</option>
+                                        {users.map(u => (
+                                            <option key={u.uid} value={u.uid}>{u.displayName}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="ml-auto flex items-center gap-2">
+                                    <button 
+                                        type="button" 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setInlineTitle('');
+                                            setInlineDesc('');
+                                            setInlineDueDate('');
+                                            setIsQuickAddExpanded(false);
+                                        }}
+                                        className="px-4 py-2 rounded-xl font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs"
+                                    >
+                                        Avbryt
+                                    </button>
+                                    <button 
+                                        type="submit" 
+                                        disabled={!inlineTitle.trim()}
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="px-4 py-2 rounded-xl font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:shadow-md hover:shadow-orange-500/10 active:scale-[0.97] transition-all duration-200 border-none cursor-pointer text-xs disabled:opacity-40 disabled:cursor-not-allowed"
+                                    >
+                                        Lagre
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     )}
                 </form>
 
                 {/* Active Tasks List Area */}
-                <div className="flex flex-col gap-3 min-h-[120px]">
+                <div className="flex flex-col gap-4">
                     {activeTasks.length === 0 ? (
                         
                         /* Premium empty state vector drawing illustration */
-                        <div className="flex flex-col items-center justify-center py-16 px-8 text-center max-w-sm mx-auto">
-                            <div className="w-36 h-36 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
-                                <svg viewBox="0 0 120 120" className="w-24 h-24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center max-w-lg mx-auto w-full shadow-sm flex flex-col items-center justify-center">
+                            <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
+                                <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <circle cx="60" cy="60" r="50" fill="url(#circleGrad)" fillOpacity="0.06" />
                                     <circle cx="60" cy="60" r="50" stroke="url(#circleGrad)" strokeWidth="1.5" strokeDasharray="4 4" strokeOpacity="0.4" />
                                     <path d="M40 60L53 73L80 46" stroke="#d17d39" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
@@ -565,50 +717,65 @@ export default function TodoApp() {
                                         </linearGradient>
                                     </defs>
                                 </svg>
-                                <div className="absolute top-4 right-6 w-3 h-3 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
-                                    <span className="material-symbols-outlined text-[8px] text-white font-bold">check</span>
+                                <div className="absolute top-2 right-4 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                                    <span className="material-symbols-outlined text-[9px] text-white font-bold">check</span>
                                 </div>
-                                <div className="absolute bottom-6 left-6 w-4 h-4 bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
-                                    <span className="material-symbols-outlined text-[9px] text-white font-bold">star</span>
+                                <div className="absolute bottom-4 left-4 w-4.5 h-4.5 bg-orange-500 rounded-full flex items-center justify-center shadow-sm">
+                                    <span className="material-symbols-outlined text-[10px] text-white font-bold">star</span>
                                 </div>
                             </div>
                             <h4 className="font-bold text-base text-slate-800 tracking-tight">Alle gjøremålene er fullført</h4>
-                            <p className="text-xs text-slate-400 mt-2 font-medium">Bra jobbet! Alt på denne listen er unnagjort.</p>
+                            <p className="text-xs text-slate-400 mt-2 font-medium max-w-[280px] leading-relaxed">Fantastisk jobb! Det er ingenting utestående på denne oppgavelisten.</p>
                         </div>
                     ) : (
                         
-                        /* Task cards list */
+                        /* Task Row Cards */
                         activeTasks.map(t => {
-                            const prioLabel = { low: 'Lav prioritet', medium: 'Medium', high: 'Høy' }[t.priority] || 'Medium';
-                            const prioStyles = {
-                                high: 'bg-red-50 text-red-600',
-                                medium: 'bg-orange-50 text-orange-600',
-                                low: 'bg-green-50 text-green-600'
+                            const prioLabel = { low: 'Lav', medium: 'Medium', high: 'Høy' }[t.priority] || 'Medium';
+                            const prioDotColor = {
+                                high: 'bg-red-500',
+                                medium: 'bg-orange-500',
+                                low: 'bg-green-500'
                             }[t.priority || 'medium'];
+
+                            // Check if task is overdue
+                            const isOverdue = t.dueDate ? new Date(t.dueDate).setHours(0,0,0,0) < new Date().setHours(0,0,0,0) : false;
+
+                            // Calculate initials for tildelt user avatar
+                            const assigneeName = t.tildelt_til && t.tildelt_til.length > 0 ? getAssigneeName(t.tildelt_til[0]) : '';
+                            const getInitials = (name) => {
+                                if (!name) return '';
+                                const parts = name.split(' ');
+                                if (parts.length >= 2) {
+                                    return (parts[0].charAt(0) + parts[1].charAt(0)).toUpperCase();
+                                }
+                                return name.substring(0, 2).toUpperCase();
+                            };
+                            const initials = getInitials(assigneeName);
 
                             return (
                                 <div 
                                     key={t.id} 
-                                    className="flex gap-4 items-start bg-white border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 shadow-sm shadow-slate-100/10 hover:shadow-md hover:shadow-slate-100/40 transform hover:-translate-y-0.5 transition-all duration-300 group"
+                                    className="flex gap-4 items-start bg-white border border-slate-100 hover:border-slate-200/80 rounded-2xl p-5 shadow-[0_2px_8px_-3px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:-translate-y-0.5 transition-all duration-300 group w-full relative animate-task-appear"
                                 >
-                                    {/* M3 styled circular Checkbox */}
+                                    {/* Styled circular Checkbox */}
                                     <div 
                                         onClick={() => handleToggleTask(t)} 
-                                        className="w-5.5 h-5.5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-[#d17d39]/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none bg-white"
+                                        className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105"
                                         title="Fullfør oppgave"
                                     >
-                                        <span className="material-symbols-outlined text-[12px] text-transparent group-hover:text-slate-300">check</span>
+                                        <span className="material-symbols-outlined text-[10px] text-transparent group-hover:text-slate-400 select-none">check</span>
                                     </div>
 
-                                    {/* Content columns */}
+                                    {/* Content body */}
                                     <div className="flex-grow min-w-0">
                                         <div className="flex justify-between items-start gap-3">
-                                            <h4 className="m-0 font-bold text-sm text-slate-800 leading-snug break-words">{t.title}</h4>
+                                            <h4 className="m-0 font-bold text-xs text-slate-800 leading-snug break-words">{t.title}</h4>
                                             
                                             {/* Slett oppgave icon */}
                                             <button 
                                                 onClick={() => handleDeleteTask(t.id)} 
-                                                className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100" 
+                                                className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
                                                 title="Slett oppgave"
                                             >
                                                 <span className="material-symbols-outlined text-base">delete</span>
@@ -616,32 +783,49 @@ export default function TodoApp() {
                                         </div>
 
                                         {t.description && (
-                                            <p className="m-0 text-xs text-slate-500 mt-1 leading-relaxed break-words font-medium">{t.description}</p>
+                                            <p className="m-0 text-[11px] text-slate-500 mt-2 leading-relaxed break-words font-medium">{t.description}</p>
                                         )}
 
-                                        {/* Tags line */}
-                                        <div className="flex flex-wrap items-center gap-2 mt-3">
-                                            <span className={`text-[10px] font-bold px-2 py-1 rounded-xl flex items-center gap-1 ${prioStyles}`}>
-                                                <span className="w-1 h-1 rounded-full bg-current"></span>
-                                                {prioLabel}
+                                        {/* Minimal SaaS Tags line */}
+                                        <div className="flex flex-wrap items-center gap-2.5 mt-3.5 text-[10px] font-bold text-slate-500">
+                                            
+                                            {/* Priority badge with translucent pastel styling */}
+                                            <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
+                                                t.priority === 'high' 
+                                                    ? 'bg-red-500/[0.06] text-red-700 border-red-500/10' 
+                                                    : t.priority === 'medium'
+                                                    ? 'bg-amber-500/[0.06] text-amber-700 border-amber-500/10'
+                                                    : 'bg-emerald-500/[0.06] text-emerald-700 border-emerald-500/10'
+                                            }`}>
+                                                <span className={`w-1.5 h-1.5 rounded-full ${prioDotColor}`}></span>
+                                                {prioLabel} prioritet
                                             </span>
 
+                                            {/* Due date badge */}
                                             {t.dueDate && (
-                                                <span className="bg-blue-50 text-blue-600 text-[10px] font-bold px-2 py-1 rounded-xl flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-[12px]">calendar_today</span>
-                                                    Forfaller: {new Date(t.dueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })}
+                                                <span className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border ${
+                                                    isOverdue 
+                                                        ? 'bg-rose-500/[0.06] text-rose-700 border-rose-500/10 font-bold animate-pulse' 
+                                                        : 'bg-[#1B4965]/[0.06] text-[#1B4965] border-[#1B4965]/10'
+                                                }`}>
+                                                    <span className="material-symbols-outlined text-[13px]">{isOverdue ? 'error' : 'calendar_today'}</span>
+                                                    <span>{isOverdue ? 'Forfalt: ' : 'Forfaller: '}</span>
+                                                    <span>{new Date(t.dueDate).toLocaleDateString('no-NO', { day: 'numeric', month: 'short' })}</span>
                                                 </span>
                                             )}
 
+                                            {/* Assignee badge with actual circular initials avatar */}
                                             {t.tildelt_til && t.tildelt_til.length > 0 ? (
-                                                <span className="bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-xl flex items-center gap-1" title={`Tildelt: ${getAssigneeName(t.tildelt_til[0])}`}>
-                                                    <span className="material-symbols-outlined text-[12px]">account_circle</span>
-                                                    {getAssigneeName(t.tildelt_til[0])}
+                                                <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border bg-indigo-500/[0.06] text-indigo-700 border-indigo-500/10" title={`Tildelt: ${assigneeName}`}>
+                                                    <span className="w-4.5 h-4.5 rounded-full bg-[#1B4965] text-white font-bold text-[8px] flex items-center justify-center select-none shadow-sm shadow-indigo-600/10">
+                                                        {initials}
+                                                    </span>
+                                                    <span>{assigneeName}</span>
                                                 </span>
                                             ) : (
-                                                <span className="bg-slate-50 text-slate-500 text-[10px] font-bold px-2 py-1 rounded-xl flex items-center gap-1">
-                                                    <span className="material-symbols-outlined text-[12px]">group</span>
-                                                    Global
+                                                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full border bg-slate-500/[0.06] text-slate-600 border-slate-500/10">
+                                                    <span className="material-symbols-outlined text-[13px]">group</span>
+                                                    <span>Felles</span>
                                                 </span>
                                             )}
                                         </div>
@@ -652,18 +836,18 @@ export default function TodoApp() {
                     )}
                 </div>
 
-                {/* Collapsible Completed Tasks List */}
+                {/* Collapsible Completed Tasks List Accordion */}
                 {completedTasks.length > 0 && (
-                    <div className="mt-4 border-t border-slate-100 pt-6">
+                    <div className="mt-4">
                         <button 
                             type="button"
                             onClick={() => setShowCompleted(!showCompleted)} 
-                            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-xs bg-slate-50 hover:bg-slate-100 border-none cursor-pointer px-4 py-2.5 rounded-xl transition-all duration-300 select-none outline-none transform active:scale-95"
+                            className="flex items-center gap-2 text-slate-500 hover:text-slate-800 font-bold text-xs bg-white hover:bg-slate-50 border border-slate-200/60 hover:border-slate-300 cursor-pointer px-4 py-2.5 rounded-xl transition-all duration-300 select-none outline-none transform active:scale-95 shadow-sm"
                         >
-                            <span className="material-symbols-outlined text-lg transform transition-transform duration-300" style={{ transform: showCompleted ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                            <span className="material-symbols-outlined text-base transform transition-transform duration-300" style={{ transform: showCompleted ? 'rotate(180deg)' : 'rotate(0deg)' }}>
                                 expand_more
                             </span>
-                            Fullført ({completedTasks.length})
+                            <span>Fullførte gjøremål ({completedTasks.length})</span>
                         </button>
                         
                         {showCompleted && (
@@ -671,24 +855,24 @@ export default function TodoApp() {
                                 {completedTasks.map(t => (
                                     <div 
                                         key={t.id} 
-                                        className="flex gap-4 items-start bg-slate-50/50 border border-slate-100 rounded-2xl p-4 opacity-60 group"
+                                        className="flex gap-4 items-start bg-slate-50/40 border border-slate-100 hover:border-slate-200/80 rounded-2xl p-4 opacity-60 hover:opacity-85 transition-all duration-200 group w-full relative"
                                     >
-                                        {/* checked status checkbox */}
+                                        {/* Checked status checkbox */}
                                         <div 
                                             onClick={() => handleToggleTask(t)} 
-                                            className="w-5.5 h-5.5 rounded-full bg-[#1B4965] border-2 border-[#1B4965] flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-[#1B4965]/10"
+                                            className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
                                             title="Marker som ugjort"
                                         >
-                                            <span className="material-symbols-outlined text-[11px] text-white font-bold">check</span>
+                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none">check</span>
                                         </div>
 
-                                        {/* content */}
+                                        {/* Content */}
                                         <div className="flex-grow min-w-0">
                                             <div className="flex justify-between items-start gap-3">
-                                                <h4 className="m-0 font-bold text-sm text-slate-400 line-through leading-snug break-words">{t.title}</h4>
+                                                <h4 className="m-0 font-bold text-xs text-slate-400 line-through leading-snug break-words">{t.title}</h4>
                                                 <button 
                                                     onClick={() => handleDeleteTask(t.id)} 
-                                                    className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center group-hover:opacity-100" 
+                                                    className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100 flex-shrink-0" 
                                                     title="Slett oppgave"
                                                 >
                                                     <span className="material-symbols-outlined text-base">delete</span>
@@ -696,7 +880,7 @@ export default function TodoApp() {
                                             </div>
 
                                             {t.description && (
-                                                <p className="m-0 text-xs text-slate-400 line-through mt-1 leading-relaxed break-words font-medium">{t.description}</p>
+                                                <p className="m-0 text-[11px] text-slate-400 line-through mt-1.5 leading-relaxed break-words font-medium">{t.description}</p>
                                             )}
                                         </div>
                                     </div>
