@@ -4060,6 +4060,13 @@ body.admin-body .grid-2-cols.editor-layout > :last-child {
   min-width: 0;
 }
 
+/* Symmetrical 50/50 split for equal 2-column layouts */
+body.admin-body .grid-2-cols.equal > :first-child,
+body.admin-body .grid-2-cols.equal > :last-child {
+  grid-column: span 6 !important;
+  min-width: 0;
+}
+
 
 /* Overview widget grid spans */
 body.admin-body .stats-grid > * {

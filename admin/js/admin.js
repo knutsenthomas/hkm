@@ -17304,7 +17304,7 @@ class AdminManager {
                                                                                 <form id="user-detail-form" class="${!this.userEditMode ? 'readonly-form' : ''}">
                                                                                     <input type="hidden" name="id" value="${userData.id}">
 
-                                                                                        <div class="grid-2-cols" style="margin-bottom: 24px; gap: 24px;">
+                                                                                        <div class="grid-2-cols equal" style="margin-bottom: 24px; gap: 24px;">
                                                                                             <div class="card">
                                                                                                 <div class="card-header"><h4 class="card-title">Personalia</h4></div>
                                                                                                 <div class="card-body">
@@ -17369,7 +17369,7 @@ class AdminManager {
                                                                                             </div>
                                                                                         </div>
 
-                                                                                        <div class="grid-2-cols" style="gap: 24px;">
+                                                                                        <div class="grid-2-cols equal" style="gap: 24px;">
                                                                                             <div class="card">
                                                                                                 <div class="card-header"><h4 class="card-title">Medlemskap & Tilgang</h4></div>
                                                                                                 <div class="card-body">
