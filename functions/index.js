@@ -27,6 +27,7 @@ const os = require('os');
 const { parseStringPromise } = require('xml2js');
 const OpenAI = require('openai');
 const crypto = require('crypto');
+const nodemailer = require('nodemailer');
 
 if (admin.apps.length === 0) {
   admin.initializeApp();
