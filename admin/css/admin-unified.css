@@ -2761,10 +2761,6 @@ body.admin-body .page-title {
     display: none !important;
   }
 
-  #global-search-opener {
-    display: none !important;
-  }
-
   .user-profile-link {
     width: auto !important;
     min-width: 42px !important;
@@ -2892,8 +2888,7 @@ body.builder-active .user-profile-link {
 
 /* Mobile cleanup */
 @media (max-width: 768px) {
-  .user-info-text,
-  #global-search-opener {
+  .user-info-text {
     display: none !important;
   }
 }
