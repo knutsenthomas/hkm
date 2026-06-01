@@ -15,7 +15,7 @@ export default function TodoApp() {
     const [loading, setLoading] = useState(true);
 
     // Accordion state for completed tasks
-    const [showCompleted, setShowCompleted] = useState(false);
+    const [showCompleted, setShowCompleted] = useState(true);
 
     // Inline quick-add states
     const [inlineTitle, setInlineTitle] = useState('');
