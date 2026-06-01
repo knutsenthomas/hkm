@@ -2918,32 +2918,37 @@ body.builder-active .user-profile-link {
   justify-content: flex-end !important;
 }
 
-/* 1. Profile/Avatar FIRST */
+/* 1. Profile/Avatar LAST (Far Right) */
 .user-profile-link {
+  order: 4 !important;
+  margin: 0 !important;
+}
+
+/* 2. Notifications and other shortcut buttons */
+#messages-bell,
+.notification-btn:not(#global-search-opener):not(.mobile-nav-toggle) {
+  order: 3 !important;
+  margin: 0 !important;
+}
+
+/* Hide checklist shortcut button in header as user requested 'just the search box next to the bell' */
+#todo-shortcut-btn {
+  display: none !important;
+}
+
+/* 3. Search Box FIRST */
+#global-search-opener {
   order: 1 !important;
   margin: 0 !important;
 }
 
-/* 2. Notifications SECOND */
-#messages-bell,
-.notification-btn:not(#global-search-opener):not(.mobile-nav-toggle) {
-  order: 2 !important;
-  margin: 0 !important;
-}
-
-/* 3. Mobile Menu FIRST */
+/* 4. Mobile Menu FIRST */
 #mobile-nav-toggle,
 #mobile-toggle,
 .mobile-nav-toggle {
   order: -1 !important;
   margin-left: 0 !important;
   margin-right: 12px !important;
-}
-
-/* Clean Search (Hidden on mobile) */
-#global-search-opener {
-  order: 0 !important;
-  margin: 0 !important;
 }
 
 /* Main content surfaces */
@@ -6456,14 +6461,14 @@ body.builder-active .btn-primary:active,
   body.builder-active .main-header #global-search-opener:hover {
     border-color: rgba(249, 115, 22, 0.3) !important;
     background: #fafafa !important;
-    transform: translate(-50%, calc(-50% - 1px)) !important;
+    transform: translateY(-1px) !important;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
   }
 
   body.admin-body .main-header #global-search-opener:active,
   body.crm-body .main-header #global-search-opener:active,
   body.builder-active .main-header #global-search-opener:active {
-    transform: translate(-50%, -50%) !important;
+    transform: translateY(0) !important;
   }
 
   /* 2. Premium User Profile Capsule & Fluid Float Avatar on PC */
@@ -6594,17 +6599,7 @@ body.builder-active .btn-primary:active,
     position: sticky !important;
   }
 
-  /* Center the search bar perfectly in the middle of the header container */
-  body.admin-body .main-header #global-search-opener,
-  body.crm-body .main-header #global-search-opener,
-  body.builder-active .main-header #global-search-opener {
-    position: absolute !important;
-    left: 50% !important;
-    top: 50% !important;
-    transform: translate(-50%, -50%) !important;
-    margin: 0 !important;
-    z-index: 100 !important;
-  }
+
 }
 
 /* --- Universal Mobile Responsiveness for Section Headers (Kurs, Podcast, Kommentarer, etc.) --- */
