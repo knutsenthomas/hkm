@@ -5747,19 +5747,34 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
     .editor-content-wrapper {
         overflow: auto !important;
         max-height: calc(100vh - 120px) !important;
+        background-color: #ffffff !important; /* Ta vekk det grå feltet */
         /* Ensure scrollable but not clipped */
     }
 
     .editor-main-canvas {
-        padding: 15px 10px !important;
+        padding: 0 !important; /* Gjør skriveområdet bredt */
         overflow: visible !important;
+        background-color: #ffffff !important; /* Ta vekk det grå feltet */
+    }
+
+    .editor-scroll-area {
+        background-color: #ffffff !important; /* Ta vekk det grå feltet */
+    }
+
+    .docs-workspace-shell {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
     }
 
     .editor-paper {
-        padding: 40px 20px !important;
+        padding: 24px 16px !important; /* Premium luftig padding basert på 8px-regelen */
+        width: 100% !important;
+        max-width: 100% !important;
         min-height: auto !important;
-        margin-bottom: 60px !important;
+        margin-bottom: 32px !important;
         box-shadow: none !important;
+        border: none !important; /* Fjern rammen/boksen rundt skriveområdet */
         border-radius: 0 !important;
     }
 
