@@ -7471,4 +7471,86 @@ body.admin-body .sidebar-nav {
     }
 }
 
+/* --- Universal Mobile Responsiveness for Section Headers (Kurs, Podcast, Kommentarer, etc.) --- */
+@media (max-width: 768px) {
+    body.admin-body .section-content > .section-header,
+    body.admin-body .section-content > .design-ui-header {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        padding: 24px 16px !important;
+        gap: 16px !important;
+        margin-top: 24px !important;
+        margin-bottom: 24px !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+    
+    body.admin-body .section-content > .section-header .section-header-icon,
+    body.admin-body .section-content > .design-ui-header .section-header-icon {
+        margin: 0 auto !important;
+        align-self: center !important;
+    }
+    
+    body.admin-body .section-content > .section-header > .section-header-content,
+    body.admin-body .section-content > .design-ui-header > .section-header-content {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 16px !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    
+    body.admin-body .section-content > .section-header .section-header-titles,
+    body.admin-body .section-content > .design-ui-header .section-header-titles {
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        width: 100% !important;
+    }
+    
+    body.admin-body .section-content > .section-header .section-title,
+    body.admin-body .section-content > .design-ui-header .section-title {
+        text-align: center !important;
+        align-self: center !important;
+        font-size: 22px !important;
+        width: 100% !important;
+    }
+    
+    body.admin-body .section-content > .section-header .section-subtitle,
+    body.admin-body .section-content > .design-ui-header .section-subtitle {
+        text-align: center !important;
+        align-self: center !important;
+        font-size: 13.5px !important;
+        margin: 6px 0 0 !important;
+        width: 100% !important;
+    }
+    
+    body.admin-body .section-content > .section-header .section-header-actions,
+    body.admin-body .section-content > .design-ui-header .section-header-actions {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        justify-content: center !important;
+        width: 100% !important;
+        margin: 0 !important;
+        gap: 12px !important;
+    }
+    
+    body.admin-body .section-content > .section-header .section-header-actions button,
+    body.admin-body .section-content > .section-header .section-header-actions .btn,
+    body.admin-body .section-content > .design-ui-header .section-header-actions button,
+    body.admin-body .section-content > .design-ui-header .section-header-actions .btn {
+        width: 100% !important;
+        max-width: 100% !important;
+        justify-content: center !important;
+        align-self: center !important;
+        margin: 0 !important;
+        height: 48px !important;
+        box-sizing: border-box !important;
+    }
+}
+
 
