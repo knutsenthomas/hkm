@@ -207,6 +207,7 @@ const initAdminHeader = () => {
                     display: flex !important;
                     flex-direction: column !important;
                     align-items: stretch !important;
+                    gap: 4px !important;
                     width: 100% !important;
                     padding: 0 !important;
                     margin: 0 !important;
@@ -215,6 +216,8 @@ const initAdminHeader = () => {
                 body.minside-body .nav-item {
                     width: 100% !important;
                     display: block !important;
+                    margin-bottom: 4px !important;
+                    margin-top: 0 !important;
                 }
                 body.admin-body .nav-link,
                 body.minside-body .nav-link {
