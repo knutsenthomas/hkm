@@ -509,14 +509,15 @@ export default function TodoApp() {
                     </div>
 
                     {/* Integrated Search Box */}
-                    <div className="relative w-full sm:w-64">
-                        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg select-none">search</span>
+                    <div className="relative w-full sm:w-64 todo-search-wrapper">
+                        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg select-none" style={{ zIndex: 2 }}>search</span>
                         <input 
                             type="text" 
                             value={filterSearch} 
                             onChange={e => setFilterSearch(e.target.value)} 
                             placeholder="Søk i oppgaver..." 
-                            className="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-200 focus:border-[#d17d39] outline-none font-medium text-slate-700 text-xs box-sizing-border-box transition-colors duration-250 bg-slate-50/50" 
+                            className="w-full pr-4 py-2 rounded-xl border border-slate-200 focus:border-[#d17d39] outline-none font-medium text-slate-700 text-xs box-sizing-border-box transition-colors duration-250 bg-slate-50/50 todo-search-input" 
+                            style={{ paddingLeft: '40px' }}
                         />
                     </div>
                 </div>
