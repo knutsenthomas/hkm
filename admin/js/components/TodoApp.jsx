@@ -33,7 +33,10 @@ export default function TodoApp() {
     useEffect(() => {
         // Wait for Firebase auth state
         const checkAuth = async () => {
-            if (typeof firebase === 'undefined') return;
+            if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function' || firebase.apps.length === 0) {
+                setTimeout(checkAuth, 100);
+                return;
+            }
             
             firebase.auth().onAuthStateChanged(async (user) => {
                 if (user) {

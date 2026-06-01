@@ -124,8 +124,16 @@ import '../css/todo-drawer.css';
 
     // Setup Firestore listeners directly using global firebase
     const setupFirestoreSync = () => {
-        if (typeof firebase === 'undefined') {
-            console.warn("[todo-drawer] Firebase was not loaded.");
+        if (typeof firebase === 'undefined' || typeof firebase.auth !== 'function' || typeof firebase.firestore !== 'function') {
+            console.warn("[todo-drawer] Firebase, Auth or Firestore was not loaded yet. Retrying in 100ms...");
+            setTimeout(setupFirestoreSync, 100);
+            return;
+        }
+
+        // Defensive: Check if Firebase default app has been initialized
+        if (firebase.apps.length === 0) {
+            console.warn("[todo-drawer] Firebase default app is not initialized yet. Retrying in 100ms...");
+            setTimeout(setupFirestoreSync, 100);
             return;
         }
 
