@@ -7614,15 +7614,71 @@ body.admin-body .sidebar-nav {
     }
 }
 
-/* Global overstyring for å forhindre understreker på aktive elementer i sidemenyen */
+/* Global overstyring for å forhindre understreker på elementer i sidemenyen på alle sider */
 body.admin-body .nav-link,
+body.admin-body .nav-link:hover,
 body.admin-body .nav-link.active,
 body.admin-body .nav-link-wrap,
+body.admin-body .nav-link-wrap:hover,
 body.admin-body .nav-item,
 body.admin-body .sidebar-nav .nav-link,
-body.admin-body .sidebar-nav .nav-link.active {
+body.admin-body .sidebar-nav .nav-link:hover,
+body.admin-body .sidebar-nav .nav-link.active,
+body.crm-body .nav-link,
+body.crm-body .nav-link:hover,
+body.crm-body .nav-link.active,
+body.crm-body .nav-link-wrap,
+body.crm-body .nav-link-wrap:hover,
+body.crm-body .nav-item,
+body.crm-body .sidebar-nav .nav-link,
+body.crm-body .sidebar-nav .nav-link:hover,
+body.crm-body .sidebar-nav .nav-link.active,
+body.builder-active .nav-link,
+body.builder-active .nav-link:hover,
+body.builder-active .nav-link.active,
+body.builder-active .nav-link-wrap,
+body.builder-active .nav-link-wrap:hover,
+body.builder-active .nav-item,
+body.builder-active .sidebar-nav .nav-link,
+body.builder-active .sidebar-nav .nav-link:hover,
+body.builder-active .sidebar-nav .nav-link.active,
+body.minside-body .nav-link,
+body.minside-body .nav-link:hover,
+body.minside-body .nav-link.active,
+body.minside-body .nav-link-wrap,
+body.minside-body .nav-link-wrap:hover,
+body.minside-body .nav-item,
+body.minside-body .sidebar-nav .nav-link,
+body.minside-body .sidebar-nav .nav-link:hover,
+body.minside-body .sidebar-nav .nav-link.active,
+.sidebar-nav .nav-link,
+.sidebar-nav .nav-link:hover,
+.sidebar-nav .nav-link:active,
+.sidebar-nav .nav-link:focus,
+.sidebar-nav .nav-link.active,
+.sidebar-nav .nav-link-wrap,
+.sidebar-nav .nav-link-wrap:hover,
+.sidebar-nav .nav-item,
+.sidebar-nav a,
+.sidebar-nav a:hover,
+.sidebar-nav a:active,
+.sidebar-nav a:focus,
+.sidebar .nav-link,
+.sidebar .nav-link:hover,
+.sidebar .nav-link:active,
+.sidebar .nav-link:focus,
+.sidebar .nav-link.active,
+.sidebar .nav-link-wrap,
+.sidebar .nav-link-wrap:hover,
+.sidebar .nav-item,
+.sidebar a,
+.sidebar a:hover,
+.sidebar a:active,
+.sidebar a:focus {
     border-bottom: none !important;
+    border-bottom-width: 0px !important;
     text-decoration: none !important;
+    text-decoration-line: none !important;
     box-shadow: none !important;
 }
 
