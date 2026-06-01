@@ -17250,7 +17250,7 @@ class AdminManager {
         }).join('');
 
         container.innerHTML = `
-                                                                            <div style="max-width: 900px;">
+                                                                            <div style="width: 100%;">
                                                                                 <div class="card" style="margin-bottom: 24px;">
                                                                                     <div class="card-body" style="display: flex !important; flex-direction: row !important; align-items: center !important; gap: 32px !important; padding: 32px !important;">
                                                                                         <div class="user-avatar-lg" style="width: 100px; height: 100px; font-size: 36px; position: relative; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; ${userData.photoURL ? `background-image: url('${userData.photoURL}'); background-size: cover; background-position: center;` : 'background-color: var(--accent-color);'}">
@@ -17399,9 +17399,9 @@ class AdminManager {
 
                                                                                         <div class="card" style="margin-top: 24px;">
                                                                                             <div class="card-header">
-                                                                                                <div style="display:flex; align-items:center; gap:8px;">
-                                                                                                    <span class="material-symbols-outlined" style="color: var(--accent-color);">mail</span>
-                                                                                                    <h4 class="card-title">Kommunikasjon</h4>
+                                                                                                <div style="display: flex; align-items: center; gap: 8px;">
+                                                                                                     <span class="material-symbols-outlined" style="color: var(--accent-color); margin: 0 !important; display: flex; align-items: center;">mail</span>
+                                                                                                     <h4 class="card-title" style="margin: 0 !important; line-height: 1 !important;">Kommunikasjon</h4>
                                                                                                 </div>
                                                                                             </div>
                                                                                             <div class="card-body">
