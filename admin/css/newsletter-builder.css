@@ -2706,14 +2706,17 @@ input:checked+.slider:before {
 
 
 .builder-unified-header .device-toggles-modern {
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
+    justify-content: center !important;
+    width: fit-content !important;
     background: #f8fafc !important;
     border: 1px solid #e2e8f0 !important;
     border-radius: 10px !important;
     padding: 4px !important;
     gap: 6px !important;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02) !important;
+    box-sizing: border-box !important;
 }
 
 .builder-unified-header .device-btn {
@@ -2730,6 +2733,7 @@ input:checked+.slider:before {
     transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
     padding: 0 !important;
     outline: none !important;
+    margin: 0 !important; /* SKUDDSIKKER SYMMETRI: Fjern alle marginer */
 }
 
 .builder-unified-header .device-btn span {
