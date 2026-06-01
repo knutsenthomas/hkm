@@ -1423,6 +1423,7 @@ class MinSideManager {
     _setBadge(count) {
         const el = document.getElementById('notif-badge');
         const headerDot = document.getElementById('notif-badge-header');
+        const bottomDot = document.getElementById('notif-badge-bottom');
         
         if (el) {
             el.textContent = count > 9 ? '9+' : count;
@@ -1431,6 +1432,10 @@ class MinSideManager {
         
         if (headerDot) {
             headerDot.style.display = count > 0 ? 'block' : 'none';
+        }
+
+        if (bottomDot) {
+            bottomDot.style.display = count > 0 ? 'block' : 'none';
         }
     }
 

@@ -151,10 +151,7 @@
                                     </div>
                                 </div>
 
-                                <button class="notification-btn" onclick="window.minSideManager.loadView('notifications')">
-                                    <span class="material-symbols-outlined">notifications</span>
-                                    <span id="notif-badge-header" class="notification-dot" style="display:none"></span>
-                                </button>
+
 
                             </div>
                         </div>
@@ -189,9 +186,10 @@
                 <span class="material-symbols-outlined">volunteer_activism</span>
                 <span data-i18n="overview.btnGivingLabel">Gaver</span>
             </a>
-            <a href="#notifications" class="mobile-nav-item" data-view="notifications">
+            <a href="#notifications" class="mobile-nav-item" data-view="notifications" style="position: relative;">
                 <span class="material-symbols-outlined">notifications</span>
                 <span data-i18n="sidebar.varslinger">Varslinger</span>
+                <span id="notif-badge-bottom" class="notification-dot" style="display:none; position: absolute; top: 6px; right: calc(50% - 14px); width: 8px; height: 8px; border-radius: 50%; background: #d17d39; border: 1px solid #ffffff; box-sizing: border-box;"></span>
             </a>
         </nav>
     </main>
