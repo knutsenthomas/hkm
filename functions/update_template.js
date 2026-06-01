@@ -36,7 +36,7 @@ const newHtml = `
 
   <!-- Devotional Preview Card -->
   <div style="background-color: #f8fafc; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.03);">
-    <img src="https://images.unsplash.com/photo-1504052442567-82d4b7e9ab71?auto=format&fit=crop&w=800&q=80" alt="Åpen bibel" style="width: 100%; height: 210px; object-fit: cover; display: block; border-bottom: 1px solid #e2e8f0;">
+    <img src="https://images.unsplash.com/photo-1504052442567-82d4b7e9ab71?w=800" alt="Åpen bibel" style="width: 100%; height: 210px; object-fit: cover; display: block; border-bottom: 1px solid #e2e8f0;">
     
     <div style="padding: 32px;">
       <!-- Date Badge -->
@@ -63,13 +63,6 @@ const newHtml = `
         </a>
       </div>
     </div>
-  </div>
-
-  <!-- Footer -->
-  <div style="text-align: center; margin-top: 40px; border-top: 1px solid #e2e8f0; padding-top: 24px;">
-    <p style="margin: 0; font-size: 11.5px; color: #94a3b8; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">
-      Sendt automatisk av HKM Studio Assistent
-    </p>
   </div>
 </div>
 `;
