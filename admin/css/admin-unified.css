@@ -4087,7 +4087,9 @@ body.admin-body #overview-section .stat-card.modern .stat-content {
 
 body.admin-body #overview-section .analytics-range-select {
   min-height: 28px;
-  padding: 4px 28px 4px 10px;
+  min-width: 140px;
+  width: auto;
+  padding: 4px 30px 4px 12px;
   border: 0;
   border-radius: 999px;
   background: #ffedd5;
@@ -4103,12 +4105,13 @@ body.admin-body #overview-section .analytics-range-select {
     linear-gradient(45deg, transparent 50%, #9a3412 50%),
     linear-gradient(135deg, #9a3412 50%, transparent 50%);
   background-position:
-    calc(100% - 14px) 11px,
-    calc(100% - 9px) 11px;
+    calc(100% - 14px) center,
+    calc(100% - 9px) center;
   background-size:
     5px 5px,
     5px 5px;
   background-repeat: no-repeat;
+  box-sizing: border-box;
 }
 
 body.admin-body #overview-section .analytics-range-select:focus-visible {

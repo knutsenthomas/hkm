@@ -4391,7 +4391,7 @@ class AdminManager {
                             <label for="analytics-range-days" class="sr-only">Velg periode</label>
                             <select id="analytics-range-days" class="analytics-range-select" aria-label="Velg periode for Google Analytics">
                                 ${[1, 7, 14, 30, 60, 90, 180, 365].map(days => `
-                                    <option value="${days}" ${days === this.analyticsRangeDays ? 'selected' : ''}>${this._formatAnalyticsRangeLabel(days)}</option>
+                                    <option value="${days}" ${days === this.analyticsRangeDays ? 'selected' : ''}>${this._formatAnalyticsRangeLabel(days).toUpperCase()}</option>
                                 `).join('')}
                             </select>
                             <span class="material-symbols-outlined" style="cursor:pointer; color: #64748b;">more_vert</span>
