@@ -380,7 +380,7 @@ export default function TodoApp() {
                             </select>
                         </div>
 
-                        <button type="submit" className="w-full flex items-center justify-center gap-2 mt-4 px-6 py-4 rounded-full font-bold text-white bg-[#1B4965] hover:bg-[#2a6f97] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-[#1B4965]/15 hover:shadow-lg hover:shadow-[#1B4965]/25 transition-all duration-300 cursor-pointer border-none text-base">
+                        <button type="submit" className="w-full flex items-center justify-center gap-2 mt-4 px-6 py-4 rounded-full font-bold text-white bg-gradient-to-r from-[#d17d39] to-[#bd4f2a] hover:from-[#e28e4a] hover:to-[#ce5d37] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-orange-500/15 hover:shadow-lg hover:shadow-orange-500/25 transition-all duration-300 cursor-pointer border-none text-base">
                             <span className="material-symbols-outlined text-lg">save</span>
                             Lagre oppgave
                         </button>
