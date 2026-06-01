@@ -2891,6 +2891,9 @@ body.builder-active .user-profile-link {
   .user-info-text {
     display: none !important;
   }
+  #todo-shortcut-btn {
+    display: none !important;
+  }
 }
 
 /* Cleaned up legacy overrides */

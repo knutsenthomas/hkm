@@ -485,9 +485,19 @@ import '../css/todo-drawer.css';
         // Bind global shortcut toggle listeners
         document.addEventListener('click', (e) => {
             const shortcutBtn = e.target.closest('#todo-shortcut-btn');
-            if (shortcutBtn) {
+            const fabItem = e.target.closest('#todo-fab-item');
+            if (shortcutBtn || fabItem) {
                 e.preventDefault();
                 e.stopPropagation();
+                
+                // If it is the FAB item click, close the FAB menu overlay
+                if (fabItem) {
+                    const mainFab = document.getElementById('main-fab');
+                    const fabMenu = document.getElementById('fab-menu');
+                    if (mainFab) mainFab.classList.remove('active');
+                    if (fabMenu) fabMenu.classList.remove('active');
+                }
+                
                 toggleDrawer();
             }
         });
