@@ -6426,50 +6426,7 @@ body.builder-active .btn-primary:active,
    Utilizes the screen space better, standardizes spacing, and adds hover effects
    ========================================================================== */
 @media (min-width: 1025px) {
-  /* 1. Direct Faux Search Input Bar instead of simple icon button on PC */
-  body.admin-body .main-header #global-search-opener,
-  body.crm-body .main-header #global-search-opener,
-  body.builder-active .main-header #global-search-opener {
-    width: 240px !important;
-    height: 44px !important;
-    padding: 0 16px !important;
-    border-radius: 12px !important;
-    background: #ffffff !important;
-    border: 1px solid rgba(15, 23, 42, 0.08) !important;
-    color: #64748b !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 8px !important;
-    cursor: pointer !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-    box-shadow: none !important;
-  }
 
-  body.admin-body .main-header #global-search-opener::after,
-  body.crm-body .main-header #global-search-opener::after,
-  body.builder-active .main-header #global-search-opener::after {
-    content: "Søk i systemet..." !important;
-    font-size: 14px !important;
-    font-weight: 500 !important;
-    color: #94a3b8 !important;
-    font-family: var(--admin-font), sans-serif !important;
-  }
-
-  body.admin-body .main-header #global-search-opener:hover,
-  body.crm-body .main-header #global-search-opener:hover,
-  body.builder-active .main-header #global-search-opener:hover {
-    border-color: rgba(249, 115, 22, 0.3) !important;
-    background: #fafafa !important;
-    transform: translateY(-1px) !important;
-    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
-  }
-
-  body.admin-body .main-header #global-search-opener:active,
-  body.crm-body .main-header #global-search-opener:active,
-  body.builder-active .main-header #global-search-opener:active {
-    transform: translateY(0) !important;
-  }
 
   /* 2. Premium User Profile Capsule & Fluid Float Avatar on PC */
   body.admin-body .main-header .user-profile-link,
@@ -6556,18 +6513,7 @@ body.builder-active .btn-primary:active,
     padding: 0 20px !important; /* Premium tighter padding to free up horizontal space */
   }
 
-  /* Make search faux-bar narrower and use shorter placeholder text */
-  body.admin-body .main-header #global-search-opener,
-  body.crm-body .main-header #global-search-opener,
-  body.builder-active .main-header #global-search-opener {
-    width: 160px !important;
-  }
 
-  body.admin-body .main-header #global-search-opener::after,
-  body.crm-body .main-header #global-search-opener::after,
-  body.builder-active .main-header #global-search-opener::after {
-    content: "Søk..." !important;
-  }
 
   /* Hide the administrator subtext to save horizontal space and keep it extremely clean */
   body.admin-body .main-header .user-profile-link .user-role,
