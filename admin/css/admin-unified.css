@@ -4086,18 +4086,19 @@ body.admin-body #overview-section .stat-card.modern .stat-content {
 }
 
 body.admin-body #overview-section .analytics-range-select {
-  min-height: 28px;
-  min-width: 140px;
+  min-height: 24px;
+  min-width: 115px;
   width: auto;
-  padding: 4px 30px 4px 12px;
+  padding: 3px 22px 3px 10px;
   border: 0;
   border-radius: 999px;
   background: #ffedd5;
   color: #9a3412;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 9px !important;
+  font-weight: 700 !important;
   line-height: 1;
   text-transform: uppercase;
+  letter-spacing: 0.05em !important;
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
@@ -4105,11 +4106,11 @@ body.admin-body #overview-section .analytics-range-select {
     linear-gradient(45deg, transparent 50%, #9a3412 50%),
     linear-gradient(135deg, #9a3412 50%, transparent 50%);
   background-position:
-    calc(100% - 14px) center,
-    calc(100% - 9px) center;
+    calc(100% - 12px) center,
+    calc(100% - 7px) center;
   background-size:
-    5px 5px,
-    5px 5px;
+    4px 4px,
+    4px 4px;
   background-repeat: no-repeat;
   box-sizing: border-box;
 }
