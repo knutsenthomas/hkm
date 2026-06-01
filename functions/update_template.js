@@ -36,7 +36,7 @@ const newHtml = `
 
   <!-- Devotional Preview Card -->
   <div style="background-color: #f8fafc; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.03);">
-    <img src="https://images.unsplash.com/photo-1507434965515-61970f2bd7c6?w=800" height="210" alt="Åpen bibel" style="width: 100%; height: 210px; object-fit: cover; display: block; border-bottom: 1px solid #e2e8f0;">
+    <img src="https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=800&h=450&q=80" width="600" height="338" alt="Åpen bibel" style="width: 100%; height: auto; max-height: 338px; object-fit: cover; display: block; border-top-left-radius: 22px; border-top-right-radius: 22px; border-bottom: 1px solid #e2e8f0;">
     
     <div style="padding: 32px;">
       <!-- Date Badge -->
