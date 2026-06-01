@@ -5223,7 +5223,7 @@ exports.syncGoogleTasks = onRequest({ cors: true }, async (req, res) => {
       accessToken = await refreshAccessToken(tokens.refresh_token);
     }
 
-    const listsRes = await fetch("https://tasks.googleapis.com/tasks/v1/users/@default/lists", {
+    const listsRes = await fetch("https://tasks.googleapis.com/tasks/v1/users/@me/lists", {
       headers: { "Authorization": `Bearer ${accessToken}` }
     });
 
