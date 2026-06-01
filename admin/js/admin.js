@@ -7871,6 +7871,13 @@ class AdminManager {
                              <span id="blog-translation-status" title="Status for oversettelser" style="display:none; white-space: nowrap; flex-shrink: 0; margin-left: 8px;"></span>
                              ` : ''}
                         </div>
+                        
+                        <div class="editor-header-center">
+                            <span class="editor-header-title" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;" title="${item.title || 'Uten tittel'}">
+                                ${item.title || 'Uten tittel'}
+                            </span>
+                        </div>
+                        
                         <div class="editor-header-right">
                                       ${(collectionId === 'blog' || collectionId === 'teaching' || collectionId === 'podcast_transcripts') ? `
                                       <button class="btn-ghost" id="translate-col-item" title="Oversett til tilgjengelige språk"><span class="material-symbols-outlined">g_translate</span><span>Oversett</span></button>
@@ -8205,6 +8212,17 @@ class AdminManager {
                 `;
 
             document.body.appendChild(modal);
+
+            // Live synkronisering av tittel i header-center
+            const titleMainEl = document.getElementById('col-item-title-v2');
+            const headerTitleEl = modal.querySelector('.editor-header-title');
+            if (titleMainEl && headerTitleEl) {
+                titleMainEl.addEventListener('input', () => {
+                    const cleanTitle = titleMainEl.value.trim();
+                    headerTitleEl.textContent = cleanTitle || 'Uten tittel';
+                    headerTitleEl.setAttribute('title', cleanTitle || 'Uten tittel');
+                });
+            }
 
             if (collectionId === 'podcast_transcripts') {
                 const titleMain = document.getElementById('col-item-title-v2');

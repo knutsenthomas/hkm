@@ -3074,80 +3074,110 @@ input[type="range"] {
 }
 
 .editor-header-v2 {
-    height: 64px;
-    background: white;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    z-index: 10;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    height: 72px !important;
+    background: white !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    align-items: center !important;
+    padding: 0 24px !important;
+    z-index: 10 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+    box-sizing: border-box !important;
 }
 
 .editor-header-left {
-    display: flex;
-    align-items: center;
-    gap: 16px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+.editor-header-center {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-width: 0 !important;
 }
 
 .editor-header-right {
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    justify-content: flex-end !important;
+    min-width: 0 !important;
 }
 
 /* Premium Compact Editor Buttons */
 .editor-header-v2 .btn-primary,
 .editor-header-v2 .btn-outline,
 .editor-header-v2 .btn-ghost {
-    height: 34px !important;
-    padding: 0 12px !important;
+    height: 40px !important;
+    padding: 0 16px !important;
     font-size: 13px !important;
     font-weight: 600 !important;
-    border-radius: 8px !important;
-    gap: 6px !important;
+    border-radius: 10px !important;
+    gap: 8px !important;
     display: inline-flex !important;
     align-items: center !important;
     justify-content: center !important;
     white-space: nowrap !important;
     flex-shrink: 0 !important;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    cursor: pointer !important;
+    border: none !important;
 }
 
 .editor-header-v2 .btn-ghost {
     background: transparent !important;
-    color: #64748b !important;
-    border: none !important;
+    color: #475569 !important;
 }
 
 .editor-header-v2 .btn-ghost:hover {
     background: #f1f5f9 !important;
-    color: #1e293b !important;
+    color: #0f172a !important;
+    transform: translateY(-1px) !important;
+}
+
+.editor-header-v2 .btn-ghost:active {
+    transform: translateY(0) scale(0.98) !important;
 }
 
 .editor-header-v2 .btn-outline {
     background: #ffffff !important;
     color: #1B4965 !important;
-    border: 1px solid #cbd5e1 !important;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
 }
 
 .editor-header-v2 .btn-outline:hover {
     background: #f8fafc !important;
-    border-color: #94a3b8 !important;
+    border-color: #cbd5e1 !important;
+    color: #1B4965 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(27, 73, 101, 0.05) !important;
+}
+
+.editor-header-v2 .btn-outline:active {
+    transform: translateY(0) scale(0.98) !important;
 }
 
 .editor-header-v2 .btn-primary {
     background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
     color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    box-shadow: 0 2px 4px rgba(209, 125, 57, 0.1) !important;
+    box-shadow: 0 2px 4px rgba(209, 125, 57, 0.2) !important;
 }
 
 .editor-header-v2 .btn-primary:hover {
     background: linear-gradient(135deg, #bd4f2a 0%, #d17d39 100%) !important;
-    box-shadow: 0 4px 8px rgba(209, 125, 57, 0.2) !important;
+    box-shadow: 0 4px 12px rgba(209, 125, 57, 0.3) !important;
+    transform: translateY(-1px) !important;
+    filter: brightness(1.05) !important;
+}
+
+.editor-header-v2 .btn-primary:active {
+    transform: translateY(0) scale(0.98) !important;
 }
 
 /* Add custom margin for preview toggle to separate it from the save buttons */
@@ -3179,82 +3209,91 @@ input[type="range"] {
     vertical-align: middle !important;
 }
 
-/* Editor Header Mobile Responsiveness */
-@media (max-width: 1300px) {
-    #translate-col-item span:not(.material-symbols-outlined),
-    #print-col-item span:not(.material-symbols-outlined),
-    #toggle-split-preview span:not(.material-symbols-outlined) {
-        display: none !important;
-    }
-}
-
-@media (max-width: 1100px) {
-    .editor-header-left .editor-header-divider,
-    .editor-header-left .editor-header-type {
-        display: none !important;
-    }
-}
-
-@media (max-width: 1024px) {
-    #close-col-modal span:not(.material-symbols-outlined) {
-        display: none !important;
-    }
-    
-    .editor-header-v2 {
-        padding: 0 12px !important;
-        gap: 8px !important;
-    }
-
-    .editor-header-left {
-        gap: 8px !important;
-    }
-
-    .editor-header-right {
-        gap: 6px !important;
-    }
-}
-
-@media (max-width: 768px) {
-    #save-col-item-draft span:not(.material-symbols-outlined) {
-        display: none !important;
-    }
-    
+/* Editor Header Mobile & Fluid Responsiveness */
+@media (max-width: 1700px) {
     #editor-autosave-text {
-        display: none !important;
+        display: none !important; /* Hide autosave text, keep icon */
     }
-    
-    #editor-autosave-status {
-        margin-left: 4px !important;
+}
+
+@media (max-width: 1550px) {
+    #translate-col-item span:not(.material-symbols-outlined),
+    #print-col-item span:not(.material-symbols-outlined) {
+        display: none !important; /* Hide secondary flat action texts */
+    }
+    .editor-header-v2 #translate-col-item,
+    .editor-header-v2 #print-col-item {
+        padding: 0 10px !important;
+        min-width: 40px !important;
+    }
+}
+
+@media (max-width: 1400px) {
+    #toggle-split-preview span:not(.material-symbols-outlined) {
+        display: none !important; /* Hide preview text, keep icon */
+    }
+    .editor-header-v2 #toggle-split-preview {
+        padding: 0 10px !important;
+        min-width: 40px !important;
         margin-right: 4px !important;
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1250px) {
+    #save-col-item-draft span:not(.material-symbols-outlined) {
+        display: none !important; /* Hide draft text, keep icon */
+    }
+    .editor-header-v2 #save-col-item-draft {
+        padding: 0 10px !important;
+        min-width: 40px !important;
+    }
+    .editor-header-center {
+        max-width: 200px !important;
+    }
+}
+
+@media (max-width: 1100px) {
+    /* Hide types and titles completely on narrow viewports to secure layout */
+    .editor-header-left .editor-header-divider,
+    .editor-header-left .editor-header-type,
+    .editor-header-center {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .editor-header-v2 {
+        padding: 0 16px !important;
+    }
     #save-col-item span:not(.material-symbols-outlined) {
-        display: none !important;
+        display: none !important; /* Hide publish text, keep icon */
+    }
+    .editor-header-v2 #save-col-item {
+        padding: 0 10px !important;
+        min-width: 40px !important;
     }
     
-    #blog-translation-status {
-        display: none !important;
-    }
-    
-    /* Make the buttons square icon buttons on small screens */
+    /* Elegant rounded icon buttons on mobile */
     .editor-header-v2 .btn-primary,
     .editor-header-v2 .btn-outline,
     .editor-header-v2 .btn-ghost {
-        width: 32px !important;
-        height: 32px !important;
+        width: 36px !important;
+        height: 36px !important;
         padding: 0 !important;
-        border-radius: 6px !important;
+        border-radius: 50% !important; /* Purely round circular icon buttons on mobile! Extremely modern */
         gap: 0 !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        box-sizing: border-box !important;
     }
     
-    .editor-header-v2 #toggle-split-preview {
-        margin-right: 0 !important;
+    .editor-header-v2 #close-col-modal {
+        width: 36px !important;
+        height: 36px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        background: #f1f5f9 !important; /* Modern circular back button with light background */
+    }
+    
+    #editor-autosave-status {
+        margin-left: 4px !important;
     }
 }
 
@@ -5744,22 +5783,13 @@ input[type="range"].premium-slider::-webkit-slider-thumb:hover {
 
 @media (max-width: 768px) {
     .editor-header-v2 {
-        padding: 0 12px !important;
-        height: 60px !important;
-    }
-
-    .editor-header-left .btn-ghost {
-        padding: 6px 8px !important;
+        padding: 0 16px !important;
+        height: 64px !important; /* Premium unified mobile height */
     }
 
     /* Hide the separator and "Blogginnlegg" label on mobile to save space */
     .editor-header-left > span {
         display: none !important;
-    }
-
-    .editor-header-right .btn-primary {
-        padding: 8px 12px !important;
-        font-size: 13px !important;
     }
 
     .editor-layout-v2 {
