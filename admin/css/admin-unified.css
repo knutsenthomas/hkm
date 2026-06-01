@@ -2891,12 +2891,6 @@ body.builder-active .user-profile-link {
   .user-info-text {
     display: none !important;
   }
-  #todo-shortcut-btn {
-    display: none !important;
-  }
-  #global-search-opener {
-    display: none !important;
-  }
 }
 
 /* Cleaned up legacy overrides */
@@ -2951,6 +2945,16 @@ body.builder-active .user-profile-link {
   order: -1 !important;
   margin-left: 0 !important;
   margin-right: 12px !important;
+}
+
+/* Hide checklist and search buttons on mobile headers (preventing cascade overrides) */
+@media (max-width: 768px) {
+  #todo-shortcut-btn {
+    display: none !important;
+  }
+  #global-search-opener {
+    display: none !important;
+  }
 }
 
 /* Main content surfaces */
