@@ -255,6 +255,35 @@
         .admin-toggle-sm { width: 34px; height: 19px; }
         .admin-toggle-sm .admin-toggle-slider::before { width: 13px; height: 13px; }
         .admin-toggle-sm input:checked + .admin-toggle-slider::before { transform: translateX(15px); }
+
+        /* Search Box Overrides for Todo App */
+        .todo-search-wrapper {
+            position: relative !important;
+            width: 100% !important;
+        }
+        .todo-search-wrapper .material-symbols-outlined {
+            position: absolute !important;
+            left: 16px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            color: #64748b !important;
+            pointer-events: none !important;
+            font-size: 20px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            z-index: 10 !important;
+        }
+        #todo-app-root .todo-search-input {
+            padding-left: 48px !important;
+        }
+        #todo-app-root h4 {
+            margin: 0 !important;
+        }
+        #todo-app-root p {
+            margin: 0 !important;
+            margin-top: 4px !important;
+        }
     </style>
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->

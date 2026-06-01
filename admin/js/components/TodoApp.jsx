@@ -302,8 +302,8 @@ export default function TodoApp() {
                         <span className="material-symbols-outlined text-3xl">sync_alt</span>
                     </div>
                     <div>
-                        <h4 className="margin-0 text-base font-bold text-[#1B4965]">Google Tasks Synkronisering</h4>
-                        <p className="margin-0 text-xs text-slate-500 mt-1 font-medium leading-relaxed">
+                        <h4 className="m-0 text-base font-bold text-[#1B4965]">Google Tasks Synkronisering</h4>
+                        <p className="m-0 text-xs text-slate-500 mt-1 font-medium leading-relaxed">
                             {googleConnected 
                                 ? 'Status: Koblet til Google-kontoen din og synkroniserer automatisk.' 
                                 : 'Status: Ikke tilkoblet. Koble til for å synkronisere oppgavene dine med Google.'}
@@ -380,7 +380,7 @@ export default function TodoApp() {
                             </select>
                         </div>
 
-                        <button type="submit" className="w-full flex items-center justify-center gap-2 mt-4 px-6 py-4 rounded-full font-bold text-white bg-gradient-to-r from-[#1B4965] to-[#14354b] hover:from-[#25668d] hover:to-[#1b4965] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-[#1B4965]/10 hover:shadow-lg hover:shadow-[#1B4965]/20 transition-all duration-300 cursor-pointer border-none text-base">
+                        <button type="submit" className="w-full flex items-center justify-center gap-2 mt-4 px-6 py-4 rounded-full font-bold text-white bg-[#1B4965] hover:bg-[#2a6f97] hover:-translate-y-0.5 active:translate-y-0.5 active:scale-95 shadow-md shadow-[#1B4965]/15 hover:shadow-lg hover:shadow-[#1B4965]/25 transition-all duration-300 cursor-pointer border-none text-base">
                             <span className="material-symbols-outlined text-lg">save</span>
                             Lagre oppgave
                         </button>
@@ -394,9 +394,9 @@ export default function TodoApp() {
                     <div className="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm shadow-slate-100/50 flex flex-col gap-5">
                         
                         {/* Search Bar */}
-                        <div className="relative">
-                            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl">search</span>
-                            <input type="text" value={filterSearch} onChange={e => setFilterSearch(e.target.value)} placeholder="Søk i oppgaver..." className="w-full pl-12 pr-6 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" />
+                        <div className="relative todo-search-wrapper">
+                            <span className="material-symbols-outlined">search</span>
+                            <input type="text" value={filterSearch} onChange={e => setFilterSearch(e.target.value)} placeholder="Søk i oppgaver..." className="todo-search-input w-full pr-6 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-[#d17d39] focus:ring-4 focus:ring-[#d17d39]/10 transition-all duration-300 outline-none font-medium text-slate-800 text-sm box-sizing-border-box" />
                         </div>
 
                         {/* Filters Row */}
@@ -461,14 +461,14 @@ export default function TodoApp() {
                                         {/* Card content */}
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-start gap-4">
-                                                <h4 className={`margin-0 font-bold text-base text-slate-800 leading-snug break-words ${isCompleted ? 'line-through text-slate-400' : ''}`}>{t.title}</h4>
+                                                <h4 className={`m-0 font-bold text-base text-slate-800 leading-snug break-words ${isCompleted ? 'line-through text-slate-400' : ''}`}>{t.title}</h4>
                                                 <button onClick={() => handleDeleteTask(t.id)} className="border-none bg-transparent p-1 cursor-pointer text-slate-300 hover:text-red-500 transition-colors duration-250 flex items-center justify-center" title="Slett oppgave">
                                                     <span className="material-symbols-outlined text-lg">delete</span>
                                                 </button>
                                             </div>
 
                                             {t.description && (
-                                                <p className="margin-0 text-sm text-slate-500 mt-2 leading-relaxed break-words font-medium">{t.description}</p>
+                                                <p className="m-0 text-sm text-slate-500 mt-2 leading-relaxed break-words font-medium">{t.description}</p>
                                             )}
 
                                             {/* Metadata tags */}
