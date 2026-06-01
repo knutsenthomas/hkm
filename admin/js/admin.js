@@ -12362,6 +12362,21 @@ class AdminManager {
         return labels[normalized] || (status || 'Ukjent');
     }
 
+    getDonationMethodLabel(method) {
+        const normalized = String(method || '').toLowerCase();
+        const labels = {
+            stripe: 'Stripe',
+            vipps: 'Vipps',
+            vipps_manual: 'Vipps manuelt',
+            card: 'Kort',
+            bank: 'Bank',
+            cash: 'Kontant',
+            manual: 'Manuell',
+            other: 'Annen tjeneste'
+        };
+        return labels[normalized] || (method ? (method.charAt(0).toUpperCase() + method.slice(1)) : 'Ukjent');
+    }
+
     getDonationDonorName(donation, userMap = new Map()) {
         const user = donation.userId ? userMap.get(donation.userId) : null;
         return donation.donorName
@@ -12518,7 +12533,7 @@ class AdminManager {
                 const email = this.escapeHtml(this.getDonationDonorEmail(record, userMap) || 'Ingen e-post');
                 const status = this.escapeHtml(this.getDonationStatusLabel(record.status));
                 const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
-                const method = this.escapeHtml(record.method || 'Ukjent');
+                const method = this.escapeHtml(this.getDonationMethodLabel(record.method));
                 const profileStatus = record.userId
                     ? `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>Koblet</span>`
                     : `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>Ukoblet</span>`;
@@ -12548,7 +12563,7 @@ class AdminManager {
                 .slice(0, 100);
 
             donorsBody.innerHTML = visibleDonors.length ? visibleDonors.map((donor) => {
-                const methodText = Array.from(donor.methods).join(', ') || 'Ukjent';
+                const methodText = Array.from(donor.methods).map(m => this.getDonationMethodLabel(m)).join(', ') || 'Ukjent';
                 return `
                     <tr>
                         <td>
