@@ -50,7 +50,7 @@
 
 /* 3. Header - Bold Premium Brand Identity */
 .todo-drawer-header {
-    background: #1B4965; /* Deep brand blue */
+    background: linear-gradient(135deg, #d17d39, #bd4f2a) !important; /* Premium brand orange gradient */
     color: white;
     padding: 24px 32px; /* Strict 8px grid */
     display: flex;
@@ -74,7 +74,7 @@
 
 .todo-drawer-header h3 span {
     font-size: 28px;
-    color: #fb923c; /* Spark of brand orange */
+    color: #ffffff !important; /* White icon for pristine contrast on orange background */
 }
 
 .todo-drawer-close {
