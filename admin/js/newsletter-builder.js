@@ -1305,6 +1305,15 @@ class NewsletterBuilder {
                     canvasClone.querySelectorAll('.block-controls, input, .col-type-toggle, .image-overlay, .add-block-btn-canvas, .block-actions-overlay').forEach(c => c.remove());
                     canvasClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
                     
+                    // Convert all relative image src paths to absolute production URLs for email client compatibility
+                    canvasClone.querySelectorAll('img').forEach(img => {
+                        const src = img.getAttribute('src') || '';
+                        if (src && !src.startsWith('http://') && !src.startsWith('https://') && !src.startsWith('data:')) {
+                            const cleanSrc = src.replace(/^\.\.\//, '').replace(/^\//, '');
+                            img.src = `https://www.hiskingdomministry.no/${cleanSrc}`;
+                        }
+                    });
+                    
                     // Build style block for structural elements inside the email
                     const styleBlock = `
 <style>

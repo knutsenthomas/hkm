@@ -40,9 +40,8 @@ const newHtml = `
     
     <div style="padding: 32px;">
       <!-- Date Badge -->
-      <div style="font-size: 11px; font-weight: 700; color: #d17d39; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px;">
-        <span style="display: inline-block; width: 6px; height: 6px; border-radius: 50%; background-color: #d17d39;"></span>
-        Planlagt til torsdag 4. juni
+      <div style="font-size: 11px; font-weight: 700; color: #d17d39; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.2;">
+        <span style="color: #d17d39; font-size: 12px; vertical-align: middle; margin-right: 6px; line-height: 1;">&#9679;</span>Planlagt til torsdag 4. juni
       </div>
       
       <!-- Card Title -->
