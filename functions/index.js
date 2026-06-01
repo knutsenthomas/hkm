@@ -5292,20 +5292,46 @@ exports.syncGoogleTasks = onRequest({ cors: true }, async (req, res) => {
         const fCompleted = fTask.status === "fullført";
 
         if (gCompleted !== fCompleted) {
-          if (gCompleted) {
-            await db.collection("tasks").doc(fTask.id).update({
-              status: "fullført",
-              completed_at: FieldValue.serverTimestamp(),
-              updated_at: FieldValue.serverTimestamp()
+          const fUpdated = fTask.updated_at 
+            ? (typeof fTask.updated_at.toDate === 'function' ? fTask.updated_at.toDate().getTime() : new Date(fTask.updated_at).getTime()) 
+            : 0;
+          const gUpdated = gTask.updated ? Date.parse(gTask.updated) : 0;
+
+          if (fUpdated >= gUpdated) {
+            // Firestore is newer: update Google Tasks to match Firestore
+            const patchRes = await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${listId}/tasks/${gTask.id}`, {
+              method: "PATCH",
+              headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                status: fCompleted ? "completed" : "needsAction"
+              })
             });
-            console.log(`[GoogleTasks] Completed Firestore task "${fTask.title}" based on Google.`);
+
+            if (patchRes.ok) {
+              console.log(`[GoogleTasks] Synced Firestore status "${fTask.status}" to Google Task "${fTask.title}".`);
+            } else {
+              console.warn(`[GoogleTasks] Failed to sync status to Google Task: ${await patchRes.text()}`);
+            }
           } else {
-            await db.collection("tasks").doc(fTask.id).update({
-              status: "gjeldende",
-              completed_at: null,
-              updated_at: FieldValue.serverTimestamp()
-            });
-            console.log(`[GoogleTasks] Uncompleted Firestore task "${fTask.title}" based on Google.`);
+            // Google Tasks is newer: update Firestore to match Google Tasks
+            if (gCompleted) {
+              await db.collection("tasks").doc(fTask.id).update({
+                status: "fullført",
+                completed_at: FieldValue.serverTimestamp(),
+                updated_at: FieldValue.serverTimestamp()
+              });
+              console.log(`[GoogleTasks] Completed Firestore task "${fTask.title}" based on Google.`);
+            } else {
+              await db.collection("tasks").doc(fTask.id).update({
+                status: "gjeldende",
+                completed_at: null,
+                updated_at: FieldValue.serverTimestamp()
+              });
+              console.log(`[GoogleTasks] Uncompleted Firestore task "${fTask.title}" based on Google.`);
+            }
           }
         }
       }
