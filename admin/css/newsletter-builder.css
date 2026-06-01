@@ -2668,10 +2668,13 @@ input:checked+.slider:before {
     border-radius: 8px !important;
     padding: 0 16px !important;
     height: 40px !important;
-    width: 280px !important; /* Restore spacious width for subject */
+    flex: 1 !important;
+    min-width: 140px !important;
+    max-width: 280px !important;
+    width: auto !important; /* Allow dynamic scaling */
     box-sizing: border-box !important;
     transition: all 0.2s ease !important;
-    flex-shrink: 0 !important; /* Prevent input field from collapsing to 0px width */
+    flex-shrink: 1 !important; /* Allow shrinking if needed */
 }
 
 .builder-unified-header .header-subject-container:focus-within {
@@ -2880,18 +2883,71 @@ body.builder-active .builder-workspace > .main-header {
     .builder-unified-header .user-info-compact {
         display: none !important; /* Hide name/role text under 1400px window width due to double sidebar space constraint */
     }
-    .builder-unified-header .header-subject-container {
-        width: 200px !important;
-    }
     .builder-unified-header .header-subtitle {
         display: none !important; /* Hide subtitle to conserve space */
+    }
+    #newsletter-autosave-status span:not(.material-symbols-outlined) {
+        display: none !important; /* Hide autosave text, keep icon */
+    }
+    #newsletter-autosave-status {
+        margin-left: 4px !important;
+    }
+}
+
+@media (max-width: 1350px) {
+    #save-draft-btn span:not(.material-symbols-outlined),
+    #save-template-btn span:not(.material-symbols-outlined) {
+        display: none !important; /* Hide secondary button text */
+    }
+    .builder-unified-header .header-action-btn {
+        padding: 0 10px !important;
+        min-width: 40px !important;
+        justify-content: center !important;
+    }
+    #save-draft-btn, #save-template-btn {
+        margin-right: 4px !important;
+    }
+}
+
+@media (max-width: 1200px) {
+    .builder-unified-header .user-badge-modern {
+        display: none !important; /* Hide user badge in builder header to save huge space */
     }
 }
 
 @media (max-width: 1100px) {
-    .builder-unified-header .header-subject-container,
-    .builder-unified-header #newsletter-autosave-status {
-        display: none !important; /* Hide subject and autosave status completely on narrow widths */
+    #continue-btn span:not(.material-symbols-outlined) {
+        display: none !important; /* Hide main action button text on narrow widths */
+    }
+    #continue-btn {
+        padding: 0 12px !important;
+        min-width: 40px !important;
+    }
+    .builder-unified-header .header-subject-container {
+        min-width: 120px !important;
+    }
+}
+
+@media (max-width: 1024px) {
+    /* Hide the main admin sidebar completely on mobile/tablet in builder mode */
+    body.builder-active .sidebar {
+        transform: translateX(-100%) !important;
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        height: 100vh !important;
+        z-index: 9999 !important;
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    
+    body.builder-active .sidebar.active {
+        transform: translateX(0) !important;
+    }
+    
+    /* Make builder workspace expand to full screen */
+    body.builder-active #newsletter-builder-layout {
+        width: 100% !important;
+        margin-left: 0 !important;
     }
 }
 
@@ -2904,10 +2960,6 @@ body.builder-active .builder-workspace > .main-header {
     }
     .builder-unified-header .header-action-btn {
         padding: 0 10px !important;
-    }
-    .builder-unified-header .user-badge-modern {
-        padding-left: 8px !important;
-        border-left: none !important;
     }
 }
 

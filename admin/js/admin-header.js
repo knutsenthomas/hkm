@@ -552,8 +552,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // Keep profile links as normal navigation (e.g. to ../minside/index.html).
 
 
-    // Mobile Nav Toggle
-    const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+    // Mobile Nav Toggle (Supports both dashboard and builder instances)
+    const mobileNavToggles = document.querySelectorAll('.mobile-nav-toggle');
     const sidebar = document.querySelector('.sidebar');
 
     // Create overlay if missing (for better mobile UX)
@@ -564,11 +564,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(sidebarOverlay);
     }
 
-    if (mobileNavToggle && sidebar) {
+    if (mobileNavToggles.length > 0 && sidebar) {
         // Set initial title based on state
         const updateToggleTitle = () => {
             const isCollapsed = document.body.classList.contains('sidebar-collapsed');
-            mobileNavToggle.setAttribute('title', isCollapsed ? 'Vis meny' : 'Skjul meny');
+            mobileNavToggles.forEach(toggle => {
+                toggle.setAttribute('title', isCollapsed ? 'Vis meny' : 'Skjul meny');
+            });
         };
         updateToggleTitle();
 
@@ -580,14 +582,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        mobileNavToggle.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if (window.innerWidth > 1024) {
-                document.body.classList.toggle('sidebar-collapsed');
-                updateToggleTitle();
-            } else {
-                toggleSidebar();
-            }
+        mobileNavToggles.forEach(toggle => {
+            toggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (window.innerWidth > 1024) {
+                    document.body.classList.toggle('sidebar-collapsed');
+                    updateToggleTitle();
+                } else {
+                    toggleSidebar();
+                }
+            });
         });
 
         if (sidebarOverlay) {
