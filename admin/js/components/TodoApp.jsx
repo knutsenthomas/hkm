@@ -761,10 +761,10 @@ export default function TodoApp() {
                                     {/* Styled circular Checkbox */}
                                     <div 
                                         onClick={() => handleToggleTask(t)} 
-                                        className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105"
+                                        className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105 group/checkbox"
                                         title="Fullfør oppgave"
                                     >
-                                        <span className="material-symbols-outlined text-[10px] text-transparent group-hover:text-slate-400 select-none">check</span>
+                                        <span className="material-symbols-outlined text-[10px] text-transparent group-hover/checkbox:text-slate-400 select-none">check</span>
                                     </div>
 
                                     {/* Content body */}
