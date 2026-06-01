@@ -555,6 +555,17 @@ export default function TodoApp() {
                     .animate-task-appear {
                         animation: taskAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                     }
+                    .hkm-checkbox-round {
+                        width: 20px !important;
+                        height: 20px !important;
+                        min-width: 20px !important;
+                        min-height: 20px !important;
+                        max-width: 20px !important;
+                        max-height: 20px !important;
+                        border-radius: 9999px !important;
+                        aspect-ratio: 1 / 1 !important;
+                        overflow: hidden !important;
+                    }
                     .hkm-checkbox-completed .hkm-close-icon {
                         display: none !important;
                     }
@@ -648,7 +659,7 @@ export default function TodoApp() {
                                         {/* Checked status checkbox */}
                                         <div 
                                             onClick={() => handleToggleTask(t)} 
-                                            className="hkm-checkbox-completed w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
+                                            className="hkm-checkbox-completed hkm-checkbox-round w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
                                             title="Marker som ugjort"
                                         >
                                             <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-check-icon">check</span>
@@ -921,7 +932,7 @@ export default function TodoApp() {
                                             {/* Styled circular Checkbox */}
                                             <div 
                                                 onClick={() => handleToggleTask(t)} 
-                                                className="w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105 group/checkbox"
+                                                className="hkm-checkbox-round w-5 h-5 rounded-full border-2 border-slate-300 hover:border-[#d17d39] hover:bg-orange-500/5 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 bg-white shadow-sm hover:scale-105 group/checkbox"
                                                 title="Fullfør oppgave"
                                             >
                                                 <span className="material-symbols-outlined text-[10px] text-transparent group-hover/checkbox:text-slate-400 select-none">check</span>
@@ -1020,7 +1031,7 @@ export default function TodoApp() {
                                                 {/* Checked status checkbox */}
                                                 <div 
                                                     onClick={() => handleToggleTask(t)} 
-                                                    className="hkm-checkbox-completed w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
+                                                    className="hkm-checkbox-completed hkm-checkbox-round w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
                                                     title="Marker som ugjort"
                                                 >
                                                     <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-check-icon">check</span>
