@@ -42,6 +42,7 @@
     flex-direction: column;
     border-left: 1px solid rgba(27, 73, 101, 0.08);
     border-radius: 24px 0 0 24px; /* Soft left-hand rounding */
+    overflow: hidden; /* Prevent child content from leaking outside rounded corners */
 }
 
 .hkm-todo-drawer.active {
@@ -59,6 +60,7 @@
     flex-shrink: 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 8px 32px -16px rgba(15, 23, 42, 0.2);
+    border-top-left-radius: 24px; /* Align perfectly with drawer rounding */
 }
 
 .todo-drawer-header h3 {
