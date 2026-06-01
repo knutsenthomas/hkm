@@ -7076,6 +7076,8 @@ body.admin-body .nav-link.active {
     background: #f1f5f9 !important;
     color: #0f172a !important;
     border-color: #e2e8f0 !important;
+    border-bottom: none !important;
+    text-decoration: none !important;
 }
 
 body.admin-body .nav-link.active span:first-child {
@@ -7611,5 +7613,18 @@ body.admin-body .sidebar-nav {
         box-sizing: border-box !important;
     }
 }
+
+/* Global overstyring for å forhindre understreker på aktive elementer i sidemenyen */
+body.admin-body .nav-link,
+body.admin-body .nav-link.active,
+body.admin-body .nav-link-wrap,
+body.admin-body .nav-item,
+body.admin-body .sidebar-nav .nav-link,
+body.admin-body .sidebar-nav .nav-link.active {
+    border-bottom: none !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
 
 
