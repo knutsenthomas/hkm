@@ -460,7 +460,26 @@ export default function TodoApp() {
                         }}
                         className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isAllActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                        <span className={`material-symbols-outlined text-base ${isAllActive ? 'text-[#1B4965]' : 'text-slate-400'}`}>playlist_add_check</span>
+                        <span 
+                            className={`material-symbols-outlined text-base ${isAllActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '16px',
+                                height: '16px',
+                                minWidth: '16px',
+                                minHeight: '16px',
+                                maxWidth: '16px',
+                                maxHeight: '16px',
+                                aspectRatio: '1/1',
+                                flexShrink: 0,
+                                fontSize: '16px',
+                                lineHeight: 1
+                            }}
+                        >
+                            playlist_add_check
+                        </span>
                         <span className="flex-1 truncate">Alle gjøremål</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isAllActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.all}</span>
                     </button>
@@ -473,7 +492,26 @@ export default function TodoApp() {
                         }}
                         className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isMeActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                        <span className={`material-symbols-outlined text-base ${isMeActive ? 'text-[#1B4965]' : 'text-slate-400'}`}>account_circle</span>
+                        <span 
+                            className={`material-symbols-outlined text-base ${isMeActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '16px',
+                                height: '16px',
+                                minWidth: '16px',
+                                minHeight: '16px',
+                                maxWidth: '16px',
+                                maxHeight: '16px',
+                                aspectRatio: '1/1',
+                                flexShrink: 0,
+                                fontSize: '16px',
+                                lineHeight: 1
+                            }}
+                        >
+                            account_circle
+                        </span>
                         <span className="flex-1 truncate">Tildelt meg</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isMeActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.me}</span>
                     </button>
@@ -486,7 +524,26 @@ export default function TodoApp() {
                         }}
                         className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isGlobalActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                        <span className={`material-symbols-outlined text-base ${isGlobalActive ? 'text-[#1B4965]' : 'text-slate-400'}`}>group</span>
+                        <span 
+                            className={`material-symbols-outlined text-base ${isGlobalActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '16px',
+                                height: '16px',
+                                minWidth: '16px',
+                                minHeight: '16px',
+                                maxWidth: '16px',
+                                maxHeight: '16px',
+                                aspectRatio: '1/1',
+                                flexShrink: 0,
+                                fontSize: '16px',
+                                lineHeight: 1
+                            }}
+                        >
+                            group
+                        </span>
                         <span className="flex-1 truncate">Globale oppgaver</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isGlobalActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.global}</span>
                     </button>
@@ -499,7 +556,26 @@ export default function TodoApp() {
                         }}
                         className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isStarredActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                        <span className={`material-symbols-outlined text-base ${isStarredActive ? 'text-[#1B4965]' : 'text-slate-400'}`}>star</span>
+                        <span 
+                            className={`material-symbols-outlined text-base ${isStarredActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '16px',
+                                height: '16px',
+                                minWidth: '16px',
+                                minHeight: '16px',
+                                maxWidth: '16px',
+                                maxHeight: '16px',
+                                aspectRatio: '1/1',
+                                flexShrink: 0,
+                                fontSize: '16px',
+                                lineHeight: 1
+                            }}
+                        >
+                            star
+                        </span>
                         <span className="flex-1 truncate">Viktige oppgaver</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isStarredActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.starred}</span>
                     </button>
@@ -512,7 +588,26 @@ export default function TodoApp() {
                         }}
                         className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isCompletedViewActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                     >
-                        <span className={`material-symbols-outlined text-base ${isCompletedViewActive ? 'text-[#1B4965]' : 'text-slate-400'}`}>task_alt</span>
+                        <span 
+                            className={`material-symbols-outlined text-base ${isCompletedViewActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
+                            style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                width: '16px',
+                                height: '16px',
+                                minWidth: '16px',
+                                minHeight: '16px',
+                                maxWidth: '16px',
+                                maxHeight: '16px',
+                                aspectRatio: '1/1',
+                                flexShrink: 0,
+                                fontSize: '16px',
+                                lineHeight: 1
+                            }}
+                        >
+                            check_circle
+                        </span>
                         <span className="flex-1 truncate">Fullførte oppgaver</span>
                         <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isCompletedViewActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{counts.completed}</span>
                     </button>
@@ -534,7 +629,26 @@ export default function TodoApp() {
                                 }}
                                 className={`flex items-center gap-3 w-full px-4 py-3 rounded-2xl font-semibold text-xs border-none cursor-pointer transition-all duration-300 text-left ${isUserActive ? 'bg-[#1B4965]/5 text-[#1B4965]' : 'bg-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'}`}
                             >
-                                <span className={`material-symbols-outlined text-base ${isUserActive ? 'text-[#1B4965]' : 'text-slate-400'}`}>assignment</span>
+                                <span 
+                                    className={`material-symbols-outlined text-base ${isUserActive ? 'text-[#1B4965]' : 'text-slate-400'}`}
+                                    style={{
+                                        display: 'inline-flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        width: '16px',
+                                        height: '16px',
+                                        minWidth: '16px',
+                                        minHeight: '16px',
+                                        maxWidth: '16px',
+                                        maxHeight: '16px',
+                                        aspectRatio: '1/1',
+                                        flexShrink: 0,
+                                        fontSize: '16px',
+                                        lineHeight: 1
+                                    }}
+                                >
+                                    assignment
+                                </span>
                                 <span className="flex-1 truncate">{u.displayName}'s liste</span>
                                 <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isUserActive ? 'bg-[#1B4965]/10 text-[#1B4965]' : 'bg-slate-100 text-slate-500'}`}>{userActiveCount}</span>
                             </button>
