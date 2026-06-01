@@ -591,7 +591,7 @@ export default function TodoApp() {
                     <div className="flex flex-col gap-4">
                         {completedTasks.length === 0 ? (
                             /* Premium completed empty state vector illustration */
-                            <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center max-w-lg mx-auto w-full shadow-sm flex flex-col items-center justify-center">
+                            <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center">
                                 <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
                                     <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <circle cx="60" cy="60" r="50" fill="url(#completedEmptyGrad)" fillOpacity="0.06" />
@@ -849,7 +849,7 @@ export default function TodoApp() {
                         <div className="flex flex-col gap-4">
                             {activeTasks.length === 0 ? (
                                 /* Premium empty state vector drawing illustration */
-                                <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center max-w-lg mx-auto w-full shadow-sm flex flex-col items-center justify-center">
+                                <div className="bg-white rounded-3xl border border-slate-200/60 p-16 text-center w-full shadow-sm flex flex-col items-center justify-center">
                                     <div className="w-28 h-28 mb-6 relative flex items-center justify-center bg-slate-50 rounded-full border border-slate-100">
                                         <svg viewBox="0 0 120 120" className="w-16 h-16" fill="none" xmlns="http://www.w3.org/2000/svg">
                                             <circle cx="60" cy="60" r="50" fill="url(#circleGrad)" fillOpacity="0.06" />
