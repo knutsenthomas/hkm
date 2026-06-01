@@ -10,9 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
-    <link rel="stylesheet" href="../admin/css/dashboard.css?v=20260601_V3">
-    <link rel="stylesheet" href="../admin/css/admin-unified.css?v=20260601_V3">
-    <link rel="stylesheet" href="css/minside.css?v=20260601_V3">
+    <link rel="stylesheet" href="../admin/css/dashboard.css?v=20260601_V6">
+    <link rel="stylesheet" href="../admin/css/admin-unified.css?v=20260601_V6">
+    <link rel="stylesheet" href="css/minside.css?v=20260601_V6">
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->
     <script type="module" src="../js/firebase-config.js"></script>
@@ -52,6 +52,36 @@
             });
         })();
     </script>
+    <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
+    <style>
+        .sidebar-nav *, 
+        .mobile-bottom-nav .mobile-nav-item, 
+        .mobile-bottom-nav .mobile-nav-item *, 
+        .nav-link, 
+        .nav-link-wrap, 
+        .nav-item, 
+        .mobile-nav-item, 
+        .mobile-nav-item *,
+        .mega-menu *,
+        .mega-nav-list *,
+        .mega-nav-list a,
+        .menu-footer-links a,
+        #mega-menu a,
+        .header a,
+        #header a {
+            border-bottom: none !important;
+            border-bottom-width: 0px !important;
+            border-bottom-color: transparent !important;
+            border-top: none !important;
+            border-top-width: 0px !important;
+            border-top-color: transparent !important;
+            text-decoration: none !important;
+            text-decoration-line: none !important;
+            box-shadow: none !important;
+            outline: none !important;
+            border-image: none !important;
+        }
+    </style>
 </head>
 
 <body class="admin-body minside-body cms-loading">
