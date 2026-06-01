@@ -2284,6 +2284,15 @@ body.crm-body .crm-table {
   vertical-align: middle;
   font-size: 12px !important;
   border-radius: 6px !important;
+  border: 1px solid var(--admin-page-panel-border, #e2e8f0) !important;
+  color: #334155 !important;
+  background-color: #ffffff !important;
+}
+
+.crm-table td.col-actions .btn.btn-outline:hover {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
 .crm-table td.col-actions .btn-secondary {
