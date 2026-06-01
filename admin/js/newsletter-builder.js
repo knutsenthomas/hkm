@@ -639,7 +639,7 @@ class NewsletterBuilder {
         });
     }
 
-    showPromptModal(label, placeholder, confirmCallback) {
+    showPromptModal(label, placeholder, confirmCallback, defaultValue = '', warningMsg = "Vennligst oppgi en beskrivelse.") {
         const modal = document.getElementById('custom-prompt-modal');
         const labelEl = document.getElementById('custom-prompt-label');
         const inputEl = document.getElementById('custom-prompt-input');
@@ -651,10 +651,13 @@ class NewsletterBuilder {
 
         labelEl.innerText = label;
         inputEl.placeholder = placeholder;
-        inputEl.value = '';
+        inputEl.value = defaultValue;
         modal.style.display = 'flex';
         setTimeout(() => modal.classList.add('open'), 10);
         inputEl.focus();
+        if (defaultValue) {
+            inputEl.select();
+        }
 
         const closePrompt = () => {
             modal.classList.remove('open');
@@ -679,7 +682,7 @@ class NewsletterBuilder {
                 confirmCallback(val);
                 closePrompt();
             } else {
-                showToast("Vennligst oppgi en beskrivelse.", "warning");
+                showToast(warningMsg, "warning");
             }
         });
 
@@ -1275,26 +1278,35 @@ class NewsletterBuilder {
             return showToast("Legg til innhold før du sender en test.", "error");
         }
 
-        const testBtn = document.getElementById('send-test-btn');
-        const originalHtml = testBtn ? testBtn.innerHTML : '';
-        if (testBtn) {
-            testBtn.disabled = true;
-            testBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Sender...';
-        }
+        this.showPromptModal(
+            "Hvem vil du sende test-e-posten til?",
+            "Skriv inn e-postadresse...",
+            async (recipientEmail) => {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(recipientEmail)) {
+                    return showToast("Vennligst oppgi en gyldig e-postadresse.", "error");
+                }
 
-        showToast(`Sender test-e-post til ${user.email}...`, "info");
+                const testBtn = document.getElementById('send-test-btn');
+                const originalHtml = testBtn ? testBtn.innerHTML : '';
+                if (testBtn) {
+                    testBtn.disabled = true;
+                    testBtn.innerHTML = '<span class="material-symbols-outlined rotating" style="font-size: 20px;">sync</span> Sender...';
+                }
 
-        try {
-            // Get user ID Token for verification
-            const idToken = await user.getIdToken();
+                showToast(`Sender test-e-post til ${recipientEmail}...`, "info");
 
-            // Clone and clean the canvas
-            const canvasClone = document.getElementById('newsletter-canvas').cloneNode(true);
-            canvasClone.querySelectorAll('.block-controls, input, .col-type-toggle, .image-overlay, .add-block-btn-canvas, .block-actions-overlay').forEach(c => c.remove());
-            canvasClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
-            
-            // Build style block for structural elements inside the email
-            const styleBlock = `
+                try {
+                    // Get user ID Token for verification
+                    const idToken = await user.getIdToken();
+
+                    // Clone and clean the canvas
+                    const canvasClone = document.getElementById('newsletter-canvas').cloneNode(true);
+                    canvasClone.querySelectorAll('.block-controls, input, .col-type-toggle, .image-overlay, .add-block-btn-canvas, .block-actions-overlay').forEach(c => c.remove());
+                    canvasClone.querySelectorAll('[contenteditable]').forEach(e => e.removeAttribute('contenteditable'));
+                    
+                    // Build style block for structural elements inside the email
+                    const styleBlock = `
 <style>
   .newsletter-canvas {
     max-width: 600px;
@@ -1344,49 +1356,53 @@ class NewsletterBuilder {
     font-weight: 600;
   }
 </style>
-            `;
+                    `;
 
-            const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8">${styleBlock}</head><body>${canvasClone.outerHTML}</body></html>`;
+                    const fullHtml = `<!DOCTYPE html><html><head><meta charset="utf-8">${styleBlock}</head><body>${canvasClone.outerHTML}</body></html>`;
 
-            const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${idToken}`
-                },
-                body: JSON.stringify({
-                    to: user.email,
-                    subject: `[TEST] ${subject}`,
-                    html: fullHtml,
-                    message: plainText.substring(0, 500),
-                    fromName: 'His Kingdom Ministry'
-                })
-            });
+                    const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${idToken}`
+                        },
+                        body: JSON.stringify({
+                            to: recipientEmail,
+                            subject: `[TEST] ${subject}`,
+                            html: fullHtml,
+                            message: plainText.substring(0, 500),
+                            fromName: 'His Kingdom Ministry'
+                        })
+                    });
 
-            const result = await response.json();
-            if (result.success) {
-                showToast("Test-e-post er sendt!", "success");
-                
-                // Update checklist item in sidebar
-                const testIcon = document.getElementById('chk-test-icon');
-                const testText = document.getElementById('chk-test-text');
-                if (testIcon && testText) {
-                    testIcon.innerText = 'check_circle';
-                    testIcon.className = 'material-symbols-outlined chk-success';
-                    testText.innerText = 'Test-epost bekreftet sendt';
+                    const result = await response.json();
+                    if (result.success) {
+                        showToast("Test-e-post er sendt!", "success");
+                        
+                        // Update checklist item in sidebar
+                        const testIcon = document.getElementById('chk-test-icon');
+                        const testText = document.getElementById('chk-test-text');
+                        if (testIcon && testText) {
+                            testIcon.innerText = 'check_circle';
+                            testIcon.className = 'material-symbols-outlined chk-success';
+                            testText.innerText = 'Test-epost bekreftet sendt';
+                        }
+                    } else {
+                        throw new Error(result.error || 'Serveren returnerte en feil.');
+                    }
+                } catch (error) {
+                    console.error('Feil ved sending av test-e-post:', error);
+                    showToast('Kunne ikke sende: ' + error.message, 'error');
+                } finally {
+                    if (testBtn) {
+                        testBtn.disabled = false;
+                        testBtn.innerHTML = originalHtml;
+                    }
                 }
-            } else {
-                throw new Error(result.error || 'Serveren returnerte en feil.');
-            }
-        } catch (error) {
-            console.error('Feil ved sending av test-e-post:', error);
-            showToast('Kunne ikke sende: ' + error.message, 'error');
-        } finally {
-            if (testBtn) {
-                testBtn.disabled = false;
-                testBtn.innerHTML = originalHtml;
-            }
-        }
+            },
+            user.email,
+            "Vennligst oppgi en e-postadresse."
+        );
     }
 
     async sendCampaign() {
