@@ -185,6 +185,26 @@ export default function TodoApp() {
             setSyncing(false);
         }
     };
+ 
+    // Trigger silent sync in background on mutation (add/toggle/delete)
+    const triggerSilentSync = () => {
+        if (!currentUser || !googleConnected) return;
+        const hostname = window.location.hostname;
+        const isLocalDev = hostname === 'localhost' || hostname === '127.0.0.1';
+        const functionsBase = isLocalDev 
+            ? 'http://127.0.0.1:5001/his-kingdom-ministry/us-central1'
+            : 'https://us-central1-his-kingdom-ministry.cloudfunctions.net';
+
+        fetch(`${functionsBase}/syncGoogleTasks`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ uid: currentUser.uid })
+        }).catch(err => {
+            console.warn("[TodoApp] Silent sync warning:", err);
+        });
+    };
 
     // Form submission
     const handleAddTask = async (e) => {
@@ -219,6 +239,9 @@ export default function TodoApp() {
             setNewDueDate('');
             setNewAssignee('');
             setShowAddTaskModal(false);
+
+            // Trigger silent background sync
+            triggerSilentSync();
         } catch (err) {
             console.error('[TodoApp] Error adding task:', err);
             setFormError('Kunne ikke legge til oppgave: ' + err.message);
@@ -244,6 +267,9 @@ export default function TodoApp() {
             }
 
             await db.collection('tasks').doc(task.id).update(updatePayload);
+
+            // Trigger silent background sync
+            triggerSilentSync();
         } catch (err) {
             console.error('[TodoApp] Toggle status error:', err);
         }
@@ -258,6 +284,9 @@ export default function TodoApp() {
                 status: 'arkivert',
                 updated_at: firebase.firestore.FieldValue.serverTimestamp()
             });
+
+            // Trigger silent background sync
+            triggerSilentSync();
         } catch (err) {
             console.error('[TodoApp] Delete task error:', err);
         }
