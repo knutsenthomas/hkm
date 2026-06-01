@@ -6456,14 +6456,14 @@ body.builder-active .btn-primary:active,
   body.builder-active .main-header #global-search-opener:hover {
     border-color: rgba(249, 115, 22, 0.3) !important;
     background: #fafafa !important;
-    transform: translateY(-1px) !important;
+    transform: translate(-50%, calc(-50% - 1px)) !important;
     box-shadow: 0 4px 12px rgba(15, 23, 42, 0.03) !important;
   }
 
   body.admin-body .main-header #global-search-opener:active,
   body.crm-body .main-header #global-search-opener:active,
   body.builder-active .main-header #global-search-opener:active {
-    transform: translateY(0) !important;
+    transform: translate(-50%, -50%) !important;
   }
 
   /* 2. Premium User Profile Capsule & Fluid Float Avatar on PC */
