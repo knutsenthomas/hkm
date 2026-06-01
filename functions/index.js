@@ -4868,7 +4868,7 @@ exports.scheduledAiSuggestions = onSchedule({
   schedule: "0 6 * * 1",
   timeoutSeconds: 300,
   memory: "512MiB",
-  secrets: [geminiApiKeyParam],
+  secrets: [geminiApiKeyParam, emailUserParam, emailPassParam],
 }, async (event) => {
   console.log("⏰ Starter ukentlig automatisk AI-ideegenerering...");
 
@@ -4968,6 +4968,97 @@ exports.scheduledAiSuggestions = onSchedule({
 
       await db.collection("ai_suggestions").doc("latest").set(data);
       console.log("✅ Ukentlige automatiske AI-ideer generert og lagret!");
+
+      // Send automatisk påminnelse og forslag til admin-brukerne på e-post
+      try {
+        const emailTitle = data.newsletter?.title || "Ukens Andakt: Lær å vokse i tro og modenhet";
+        const blogTitle = data.blog?.title || "Nye blogginnlegg for uken";
+        const teachingTitle = data.teaching?.title || "Nytt undervisningstema";
+
+        const htmlContent = `
+<div style="font-family: 'Inter', system-ui, -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px 16px; background-color: #ffffff; color: #1e293b; line-height: 1.6;">
+  <!-- Studio Badge -->
+  <div style="text-align: center; margin-bottom: 24px;">
+    <span style="background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%); color: #ffffff; font-size: 11px; font-weight: 800; padding: 6px 16px; border-radius: 9999px; letter-spacing: 0.08em; text-transform: uppercase; display: inline-block; box-shadow: 0 4px 6px rgba(209, 125, 57, 0.15);">
+      HKM Studio Assistent
+    </span>
+  </div>
+
+  <!-- Headline & Subtitle -->
+  <h1 style="font-size: 28px; font-weight: 850; color: #1B4965; text-align: center; margin: 0 0 16px 0; line-height: 1.2; letter-spacing: -0.03em;">
+    Nye ukentlige innholdskampanjer er klare til vurdering
+  </h1>
+  
+  <p style="font-size: 15px; line-height: 1.6; color: #475569; text-align: center; margin: 0 0 32px 0; font-weight: 500; padding: 0 16px;">
+    Hei! AI-assistenten har gjort klart ukens forslag til nyhetsbrev, blogg og undervisning for deg. Gå til HKM Studio for å vurdere og godkjenne dem for sending.
+  </p>
+
+  <!-- Premium CTA Button -->
+  <div style="text-align: center; margin-bottom: 40px;">
+    <a href="https://hkm-dusky.vercel.app/admin/index.html#newsletter" style="display: inline-block; background-color: #1B4965; color: #ffffff; text-decoration: none; font-size: 14px; font-weight: 700; padding: 16px 36px; border-radius: 9999px; box-shadow: 0 10px 20px rgba(27, 73, 101, 0.22); text-transform: uppercase; letter-spacing: 0.05em;">
+      Vurder og godkjenn i HKM Studio
+    </a>
+  </div>
+
+  <!-- Devotional Preview Card -->
+  <div style="background-color: #f8fafc; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.03); margin-bottom: 32px;">
+    <img src="https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=800&h=450&q=80" width="600" alt="Åpen bibel" style="width: 100%; height: auto; max-height: 250px; object-fit: cover; display: block; border-bottom: 1px solid #e2e8f0;">
+    
+    <div style="padding: 24px;">
+      <!-- Date Badge -->
+      <div style="font-size: 11px; font-weight: 700; color: #d17d39; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.2;">
+        <span style="color: #d17d39; font-size: 12px; vertical-align: middle; margin-right: 6px; line-height: 1;">&#9679;</span>Planlagt forslag til utsendelse
+      </div>
+      
+      <!-- Card Title -->
+      <h3 style="font-size: 18px; font-weight: 800; color: #1B4965; margin: 0 0 12px 0; line-height: 1.3; letter-spacing: -0.01em;">
+        ${emailTitle}
+      </h3>
+      
+      <!-- Suggestions Summary List -->
+      <div style="margin-bottom: 20px; font-size: 13.5px; line-height: 1.6; color: #475569;">
+        <p style="margin: 0 0 8px 0;"><strong>Ukens innholdsforslag:</strong></p>
+        <ul style="margin: 0; padding-left: 20px;">
+          <li style="margin-bottom: 6px;"><strong>Nyhetsbrev:</strong> ${emailTitle}</li>
+          <li style="margin-bottom: 6px;"><strong>Blogginnlegg:</strong> ${blogTitle}</li>
+          <li style="margin-bottom: 6px;"><strong>Undervisning:</strong> ${teachingTitle}</li>
+        </ul>
+      </div>
+
+      <p style="font-size: 13.5px; line-height: 1.5; color: #64748b; margin: 0 0 20px 0; font-weight: 500;">
+        Du kan åpne disse forslagene direkte i HKM Studio for å redigere innholdet og sende det ut til dine abonnenter.
+      </p>
+      
+      <!-- Card CTA Link -->
+      <div>
+        <a href="https://hkm-dusky.vercel.app/admin/index.html#newsletter" style="text-decoration: none; display: inline-block; font-size: 13.5px; font-weight: 700; color: #d17d39;">
+          Åpne i HKM Studio &rarr;
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="text-align: center; border-top: 1px solid #e2e8f0; padding-top: 24px; margin-top: 24px;">
+    <p style="margin: 0; font-size: 11px; color: #94a3b8; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase;">
+      Sendt automatisk av HKM Studio Assistent
+    </p>
+  </div>
+</div>
+        `;
+
+        await sendEmail({
+          to: "post@hiskingdomministry.no, thomas@hiskingdomministry.no",
+          subject: `[HKM Studio Assistent] 💡 Ukens innholdsforslag er klare: ${emailTitle}`,
+          html: htmlContent,
+          text: `Hei! AI-assistenten har gjort klart ukens forslag til nyhetsbrev: "${emailTitle}". Gå til HKM Studio for å vurdere og godkjenne dem.`,
+          fromName: "HKM Studio Assistent",
+          type: "automated"
+        });
+        console.log("✅ Automatisk e-postpåminnelse sendt til admin-brukere!");
+      } catch (emailErr) {
+        console.error("❌ Feil ved sending av automatisk admin-påminnelse på e-post:", emailErr);
+      }
     } else {
       throw new Error("Feil i JSON-strukturen fra AI.");
     }
@@ -4976,3 +5067,295 @@ exports.scheduledAiSuggestions = onSchedule({
   }
 });
 
+
+// =========================================================================
+// GOOGLE TASKS OAUTH & SYNC CLOUD FUNCTIONS (V2 ONREQUEST WITH CORS)
+// =========================================================================
+
+exports.googleTasksAuth = onRequest({ cors: true }, async (req, res) => {
+  const uid = req.query.uid;
+  if (!uid) {
+    return res.status(400).send("Manglende uid parameter");
+  }
+
+  try {
+    const configSnap = await db.collection('settings').doc('google_tasks_config').get();
+    const config = configSnap.exists ? configSnap.data() : {};
+    
+    const clientId = config.clientId || "842416397346-6p9b4o15t5c65f9o76191c9447e1n21g.apps.googleusercontent.com";
+    
+    const host = req.get('host') || "";
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1') || host.includes('5001');
+    const redirectUri = isLocal 
+      ? "http://127.0.0.1:5001/his-kingdom-ministry/us-central1/googleTasksCallback"
+      : "https://us-central1-his-kingdom-ministry.cloudfunctions.net/googleTasksCallback";
+
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?` +
+      `client_id=${encodeURIComponent(clientId)}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=${encodeURIComponent("https://www.googleapis.com/auth/tasks")}` +
+      `&state=${encodeURIComponent(uid)}` +
+      `&access_type=offline` +
+      `&prompt=consent`;
+
+    return res.redirect(authUrl);
+  } catch (error) {
+    console.error("Error in googleTasksAuth:", error);
+    return res.status(500).send("Kunne ikke starte Google Tasks autorisering: " + error.message);
+  }
+});
+
+exports.googleTasksCallback = onRequest({ cors: true }, async (req, res) => {
+  const { code, state: uid } = req.query;
+  if (!code || !uid) {
+    return res.status(400).send("Manglende code eller state parameter");
+  }
+
+  try {
+    const configSnap = await db.collection('settings').doc('google_tasks_config').get();
+    const config = configSnap.exists ? configSnap.data() : {};
+    
+    const clientId = config.clientId || "842416397346-6p9b4o15t5c65f9o76191c9447e1n21g.apps.googleusercontent.com";
+    const clientSecret = config.clientSecret || "GOCSPX-dummysecret";
+    
+    const host = req.get('host') || "";
+    const isLocal = host.includes('localhost') || host.includes('127.0.0.1') || host.includes('5001');
+    const redirectUri = isLocal 
+      ? "http://127.0.0.1:5001/his-kingdom-ministry/us-central1/googleTasksCallback"
+      : "https://us-central1-his-kingdom-ministry.cloudfunctions.net/googleTasksCallback";
+
+    const tokenResponse = await fetch("https://oauth2.googleapis.com/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({
+        code,
+        client_id: clientId,
+        client_secret: clientSecret,
+        redirect_uri: redirectUri,
+        grant_type: "authorization_code"
+      })
+    });
+
+    if (!tokenResponse.ok) {
+      const errText = await tokenResponse.text();
+      throw new Error(`Token exchange failed: ${errText}`);
+    }
+
+    const tokens = await tokenResponse.json();
+
+    await db.collection("user_google_credentials").doc(uid).set({
+      tokens,
+      updatedAt: FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    return res.redirect("https://hkm-dusky.vercel.app/admin/index.html#todo");
+  } catch (error) {
+    console.error("Error in googleTasksCallback:", error);
+    return res.status(500).send("Kunne ikke fullføre Google Tasks tilkobling: " + error.message);
+  }
+});
+
+exports.syncGoogleTasks = onRequest({ cors: true }, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.set("Access-Control-Max-Age", "3600");
+    return res.status(204).send("");
+  }
+
+  const { uid } = req.body || req.query || {};
+  if (!uid) {
+    return res.status(400).send("Manglende uid parameter i forespørsel");
+  }
+
+  try {
+    const credSnap = await db.collection("user_google_credentials").doc(uid).get();
+    if (!credSnap.exists) {
+      return res.status(401).send("Brukeren er ikke koblet til Google Tasks");
+    }
+
+    const credentials = credSnap.data();
+    let tokens = credentials.tokens;
+
+    const configSnap = await db.collection('settings').doc('google_tasks_config').get();
+    const config = configSnap.exists ? configSnap.data() : {};
+    
+    const clientId = config.clientId || "842416397346-6p9b4o15t5c65f9o76191c9447e1n21g.apps.googleusercontent.com";
+    const clientSecret = config.clientSecret || "GOCSPX-dummysecret";
+
+    const refreshAccessToken = async (refreshToken) => {
+      const refreshResponse = await fetch("https://oauth2.googleapis.com/token", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams({
+          client_id: clientId,
+          client_secret: clientSecret,
+          refresh_token: refreshToken,
+          grant_type: "refresh_token"
+        })
+      });
+
+      if (!refreshResponse.ok) {
+        throw new Error("Kunne ikke fornye tilgangstoken med Google");
+      }
+
+      const refreshed = await refreshResponse.json();
+      const updatedTokens = {
+        ...tokens,
+        access_token: refreshed.access_token,
+        expiry_date: Date.now() + (refreshed.expires_in * 1000)
+      };
+
+      await db.collection("user_google_credentials").doc(uid).update({
+        tokens: updatedTokens,
+        updatedAt: FieldValue.serverTimestamp()
+      });
+
+      return refreshed.access_token;
+    };
+
+    let accessToken = tokens.access_token;
+    const isExpired = tokens.expiry_date ? Date.now() >= tokens.expiry_date - 60000 : true;
+
+    if (isExpired && tokens.refresh_token) {
+      console.log("[GoogleTasks] Access token expired, refreshing...");
+      accessToken = await refreshAccessToken(tokens.refresh_token);
+    }
+
+    const listsRes = await fetch("https://tasks.googleapis.com/tasks/v1/users/@default/lists", {
+      headers: { "Authorization": `Bearer ${accessToken}` }
+    });
+
+    if (!listsRes.ok) {
+      throw new Error(`Klarte ikke å hente oppgavelister: ${await listsRes.text()}`);
+    }
+
+    const listsData = await listsRes.json();
+    const defaultList = listsData.items && listsData.items[0];
+    if (!defaultList) {
+      throw new Error("Fant ingen standard oppgaveliste i Google Tasks");
+    }
+
+    const listId = defaultList.id;
+
+    const googleTasksRes = await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${listId}/tasks?showCompleted=true&showHidden=true`, {
+      headers: { "Authorization": `Bearer ${accessToken}` }
+    });
+
+    if (!googleTasksRes.ok) {
+      throw new Error(`Klarte ikke å hente oppgaver fra Google: ${await googleTasksRes.text()}`);
+    }
+
+    const googleTasksData = await googleTasksRes.json();
+    const googleTasks = googleTasksData.items || [];
+
+    const firestoreTasksSnap = await db.collection("tasks").where("status", "!=", "arkivert").get();
+    const firestoreTasks = [];
+    firestoreTasksSnap.forEach(doc => {
+      firestoreTasks.push({ id: doc.id, ...doc.data() });
+    });
+
+    const googleTaskMap = new Map(googleTasks.map(t => [t.id, t]));
+    const firestoreTaskMap = new Map(firestoreTasks.map(t => [t.googleTaskId || t.id, t]));
+
+    for (const fTask of firestoreTasks) {
+      const gTask = fTask.googleTaskId ? googleTaskMap.get(fTask.googleTaskId) : null;
+
+      if (!gTask) {
+        const priorityTag = `[${fTask.priority.toUpperCase()}] `;
+        const newGTaskRes = await fetch(`https://tasks.googleapis.com/tasks/v1/lists/${listId}/tasks`, {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            title: fTask.title,
+            notes: priorityTag + (fTask.description || ""),
+            status: fTask.status === "fullført" ? "completed" : "needsAction",
+            due: fTask.dueDate ? new Date(fTask.dueDate).toISOString() : undefined
+          })
+        });
+
+        if (newGTaskRes.ok) {
+          const newGTask = await newGTaskRes.json();
+          await db.collection("tasks").doc(fTask.id).update({
+            googleTaskId: newGTask.id,
+            googleListId: listId,
+            updated_at: FieldValue.serverTimestamp()
+          });
+          console.log(`[GoogleTasks] Created task "${fTask.title}" in Google Tasks.`);
+        }
+      } else {
+        const gCompleted = gTask.status === "completed";
+        const fCompleted = fTask.status === "fullført";
+
+        if (gCompleted !== fCompleted) {
+          if (gCompleted) {
+            await db.collection("tasks").doc(fTask.id).update({
+              status: "fullført",
+              completed_at: FieldValue.serverTimestamp(),
+              updated_at: FieldValue.serverTimestamp()
+            });
+            console.log(`[GoogleTasks] Completed Firestore task "${fTask.title}" based on Google.`);
+          } else {
+            await db.collection("tasks").doc(fTask.id).update({
+              status: "gjeldende",
+              completed_at: null,
+              updated_at: FieldValue.serverTimestamp()
+            });
+            console.log(`[GoogleTasks] Uncompleted Firestore task "${fTask.title}" based on Google.`);
+          }
+        }
+      }
+    }
+
+    for (const gTask of googleTasks) {
+      if (gTask.deleted || gTask.hidden) continue;
+
+      const fTask = firestoreTaskMap.get(gTask.id);
+      if (!fTask) {
+        let priority = "medium";
+        let title = gTask.title || "Uten tittel";
+        let description = gTask.notes || "";
+
+        if (description.startsWith("[HIGH]")) {
+          priority = "high";
+          description = description.replace("[HIGH]", "").trim();
+        } else if (description.startsWith("[MEDIUM]")) {
+          priority = "medium";
+          description = description.replace("[MEDIUM]", "").trim();
+        } else if (description.startsWith("[LOW]")) {
+          priority = "low";
+          description = description.replace("[LOW]", "").trim();
+        }
+
+        const dueDate = gTask.due ? gTask.due.split("T")[0] : "";
+        const status = gTask.status === "completed" ? "fullført" : "gjeldende";
+
+        await db.collection("tasks").add({
+          title,
+          description,
+          priority,
+          status,
+          dueDate,
+          opprettet_av: uid,
+          tildelt_til: [],
+          googleTaskId: gTask.id,
+          googleListId: listId,
+          created_at: FieldValue.serverTimestamp(),
+          updated_at: FieldValue.serverTimestamp(),
+          completed_at: status === "fullført" ? FieldValue.serverTimestamp() : null
+        });
+
+        console.log(`[GoogleTasks] Created Firestore task "${title}" based on Google Tasks.`);
+      }
+    }
+
+    return res.status(200).json({ success: true, message: "Synkronisering fullført" });
+  } catch (error) {
+    console.error("Error in syncGoogleTasks:", error);
+    return res.status(500).send("Kunne ikke synkronisere oppgaver: " + error.message);
+  }
+});

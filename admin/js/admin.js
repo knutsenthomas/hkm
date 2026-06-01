@@ -345,7 +345,15 @@ class AdminManager {
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
-            if (cancelBtn) cancelBtn.textContent = cancelText;
+            
+            if (cancelBtn) {
+                if (cancelText) {
+                    cancelBtn.style.display = 'block';
+                    cancelBtn.textContent = cancelText;
+                } else {
+                    cancelBtn.style.display = 'none';
+                }
+            }
             
             if (confirmBtn) {
                 confirmBtn.textContent = confirmText;

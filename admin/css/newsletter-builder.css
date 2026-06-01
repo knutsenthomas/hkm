@@ -2316,8 +2316,16 @@ input:checked+.slider:before {
     transform: translateY(0) scale(0.98) !important;
 }
 
-.prompt-btn.primary span.material-symbols-outlined {
+.prompt-btn span.material-symbols-outlined {
     font-size: 18px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    vertical-align: middle !important;
+}
+
+.prompt-btn.primary span.material-symbols-outlined {
     color: #ffffff !important;
 }
 

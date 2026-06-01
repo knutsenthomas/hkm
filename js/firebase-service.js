@@ -1054,20 +1054,15 @@ class FirebaseService {
             this.tryAutoInit();
         }
         if (!this.isInitialized) return false;
-        const subscribe = () => {
-            this.auth.onAuthStateChanged(callback);
-        };
+        
+        // Subscribe to auth changes immediately to avoid hangs
+        this.auth.onAuthStateChanged(callback);
 
-        // Let persistence settle first to reduce transient null auth events on slower browsers.
+        // Ensure persistence settles in the background asynchronously
         if (typeof this.ensureAuthPersistence === 'function') {
-            const persistencePromise = this.ensureAuthPersistence().catch(() => false);
-            if (persistencePromise && typeof persistencePromise.finally === 'function') {
-                persistencePromise.finally(subscribe);
-                return true;
-            }
+            this.ensureAuthPersistence().catch(() => false);
         }
 
-        subscribe();
         return true;
     }
 

@@ -1,7 +1,8 @@
 if (!window.__HKMAdminHeaderInitialized) {
 window.__HKMAdminHeaderInitialized = true;
 
-document.addEventListener('DOMContentLoaded', () => {
+const initAdminHeader = () => {
+    console.log("[admin-header] Initializing admin header...");
     const adminUtils = window.HKMAdminUtils || {};
     let pendingAuthRedirect = null;
     const ADMIN_IDENTITY_CACHE_KEY = 'hkm_admin_identity_cache';
@@ -109,8 +110,8 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const getIdentityEls = () => ({
-        adminName: document.getElementById('admin-name'),
-        adminAvatar: document.getElementById('admin-avatar')
+        adminNames: Array.from(document.querySelectorAll('#admin-name, .user-name, .user-name-compact')),
+        adminAvatars: Array.from(document.querySelectorAll('#admin-avatar, .user-avatar, .user-avatar-compact'))
     });
 
     const readCachedIdentity = () => {
@@ -153,38 +154,42 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderIdentity = (displayName, photoURL) => {
-        const { adminName, adminAvatar } = getIdentityEls();
+        const { adminNames, adminAvatars } = getIdentityEls();
         const safeName = (displayName || '').trim() || 'Administrator';
 
-        if (adminName) {
-            adminName.textContent = safeName;
-        }
+        adminNames.forEach(adminName => {
+            if (adminName) {
+                adminName.textContent = safeName;
+            }
+        });
 
-        if (!adminAvatar) return;
+        adminAvatars.forEach(adminAvatar => {
+            if (!adminAvatar) return;
 
-        // Clear any previous state
-        adminAvatar.textContent = '';
-        adminAvatar.innerHTML = '';
-        adminAvatar.title = safeName;
-        if (photoURL) adminAvatar.dataset.photoUrl = photoURL;
+            // Clear any previous state
+            adminAvatar.textContent = '';
+            adminAvatar.innerHTML = '';
+            adminAvatar.title = safeName;
+            if (photoURL) adminAvatar.dataset.photoUrl = photoURL;
 
-        if (photoURL && photoURL.trim().length > 5) {
-            // Show actual photo
-            const img = document.createElement('img');
-            img.src = photoURL;
-            img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
-            
-            // Fallback if image fails to load
-            img.onerror = () => {
-                adminAvatar.innerHTML = '';
+            if (photoURL && photoURL.trim().length > 5) {
+                // Show actual photo
+                const img = document.createElement('img');
+                img.src = photoURL;
+                img.style.cssText = "width:100%; height:100%; object-fit:cover; border-radius:inherit;";
+                
+                // Fallback if image fails to load
+                img.onerror = () => {
+                    adminAvatar.innerHTML = '';
+                    adminAvatar.textContent = getInitials(safeName);
+                };
+                
+                adminAvatar.appendChild(img);
+            } else {
+                // Fallback: Use initials
                 adminAvatar.textContent = getInitials(safeName);
-            };
-            
-            adminAvatar.appendChild(img);
-        } else {
-            // Fallback: Use initials
-            adminAvatar.textContent = getInitials(safeName);
-        }
+            }
+        });
     };
 
     const authFallbackName = (user) => user?.displayName || user?.email || 'Administrator';
@@ -294,7 +299,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const getFavorites = () => {
             try {
                 const raw = localStorage.getItem('hkm_admin_sidebar_favorites');
-                return raw ? JSON.parse(raw) : [];
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
             } catch (e) {
                 return [];
             }
@@ -360,6 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
             { label: 'Kommentarer', icon: 'forum', section: 'comments', category: 'kommunikasjon' },
             { label: 'HKM Studio', icon: 'auto_awesome', href: '/admin/admin-nyhetsbrev.html', path: 'admin-nyhetsbrev', category: 'kommunikasjon' },
             { header: 'administrasjon', label: 'Administrasjon' },
+            { label: 'Huskeliste', icon: 'playlist_add_check', section: 'todo', category: 'administrasjon', alwaysVisible: true },
             { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },
             { label: 'Brukere', icon: 'group', section: 'users', category: 'administrasjon' },
             { label: 'Automatisering', icon: 'auto_awesome', section: 'automation', category: 'administrasjon' },
@@ -414,20 +421,25 @@ document.addEventListener('DOMContentLoaded', () => {
         sidebarNav.dataset.hkmNormalized = '1';
     };
 
+    console.log("[admin-header] Normalizing sidebar...");
     normalizeSidebarNavigation();
 
     // Hydrate cached identity immediately to avoid visible "Laster..." hangs.
     if (cachedIdentity?.displayName) {
+        console.log("[admin-header] Hydrating cached identity:", cachedIdentity.displayName);
         renderIdentity(cachedIdentity.displayName, cachedIdentity.photoURL || '');
     }
 
     // Final guardrail: never leave the loading placeholder indefinitely.
+    console.log("[admin-header] Scheduling final guardrail timeout...");
     setTimeout(() => {
-        const { adminName } = getIdentityEls();
-        if (adminName && adminName.textContent.trim() === 'Laster...') {
+        const { adminNames } = getIdentityEls();
+        const hasLaster = adminNames.some(el => el && el.textContent.trim() === 'Laster...');
+        if (hasLaster) {
+            console.log("[admin-header] Guardrail timeout fired: Name is still loading. Rendering cached or default identity.");
             renderIdentity(cachedIdentity?.displayName || 'Administrator', cachedIdentity?.photoURL || '');
         }
-    }, 2500);
+    }, 1500);
 
     const waitForFirebaseService = async (timeoutMs = 8000) => {
         const start = Date.now();
@@ -662,7 +674,8 @@ document.addEventListener('DOMContentLoaded', () => {
     if (sidebar) {
         // Close when clicking outside
         document.addEventListener('click', (e) => {
-            if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && e.target !== mobileNavToggle) {
+            const isClickingToggle = Array.from(mobileNavToggles).some(toggle => toggle.contains(e.target) || toggle === e.target);
+            if (sidebar.classList.contains('active') && !sidebar.contains(e.target) && !isClickingToggle) {
                 const toggleSidebar = (force) => {
                     const isActive = force !== undefined ? force : !sidebar.classList.contains('active');
                     sidebar.classList.toggle('active', isActive);
@@ -749,5 +762,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Sidebar Category logic is now handled in the main dashboard script in index.html
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initAdminHeader);
+} else {
+    initAdminHeader();
+}
 }

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 import fs from 'fs';
+import react from '@vitejs/plugin-react';
 
 function getHtmlEntries(dir, entries = {}) {
     const files = fs.readdirSync(dir);
@@ -21,6 +22,12 @@ function getHtmlEntries(dir, entries = {}) {
 }
 
 export default defineConfig({
+    plugins: [react()],
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, 'admin/js')
+        }
+    },
     server: {
         proxy: {
             '/api/facebook-feed': {

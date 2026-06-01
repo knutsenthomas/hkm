@@ -67,6 +67,24 @@ class NewsletterBuilder {
         this.setupDashboardEvents();
     }
 
+    async safeGet(query, timeoutMs = 8000) {
+        let timerId;
+        const timeoutToken = Symbol('timeout');
+        try {
+            const result = await Promise.race([
+                query.get(),
+                new Promise((resolve) => {
+                    timerId = setTimeout(() => resolve(timeoutToken), timeoutMs);
+                })
+            ]);
+            if (result === timeoutToken) {
+                throw new Error("Firestore-forespørsel tidsavbrutt etter " + timeoutMs + "ms");
+            }
+            return result;
+        } finally {
+            if (timerId) clearTimeout(timerId);
+        }
+    }
 
     switchTab(tab) {
         this.activeTab = tab;
@@ -142,8 +160,6 @@ class NewsletterBuilder {
             if (window.firebaseService && window.firebaseService.isInitialized) {
                 clearInterval(waitForFirebase);
                 this.startAuthListener();
-                this.loadAiSuggestions();
-                this.loadDashboardData();
             }
         }, 100);
 
@@ -218,8 +234,11 @@ class NewsletterBuilder {
             if (!user) {
                 window.location.href = '/admin/login.html';
             } else {
+                console.log("[newsletter-builder] User is authenticated. Loading data...");
                 this.loadTemplates();
                 this.loadDrafts();
+                this.loadAiSuggestions();
+                this.loadDashboardData();
             }
         });
     }
@@ -608,7 +627,15 @@ class NewsletterBuilder {
 
             if (titleEl) titleEl.textContent = title;
             if (messageEl) messageEl.textContent = message;
-            if (cancelBtn) cancelBtn.textContent = cancelText;
+            
+            if (cancelBtn) {
+                if (cancelText) {
+                    cancelBtn.style.display = 'block';
+                    cancelBtn.textContent = cancelText;
+                } else {
+                    cancelBtn.style.display = 'none';
+                }
+            }
             
             if (confirmBtn) {
                 confirmBtn.textContent = confirmText;
@@ -853,7 +880,7 @@ class NewsletterBuilder {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
 
         try {
-            const usersSnap = await window.firebaseService.db.collection('contacts').get();
+            const usersSnap = await this.safeGet(window.firebaseService.db.collection('contacts'), 8000);
             const totalCount = usersSnap.size;
 
             // For now, assume a fraction are "subscribers" (simulate real data)
@@ -921,7 +948,7 @@ class NewsletterBuilder {
         container.innerHTML = '<div style="padding: 20px; text-align: center;"><span class="material-symbols-outlined rotating" style="animation: spin 1s linear infinite;">sync</span></div>';
 
         try {
-            const snap = await window.firebaseService.db.collection('contacts').limit(50).get();
+            const snap = await this.safeGet(window.firebaseService.db.collection('contacts').limit(50), 8000);
             container.innerHTML = '';
             snap.forEach(doc => {
                 const user = doc.data();
@@ -1233,7 +1260,7 @@ class NewsletterBuilder {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         try {
             const container = document.getElementById('templates-list');
-            const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
             
             let count = 0;
             container.innerHTML = '';
@@ -1364,6 +1391,33 @@ class NewsletterBuilder {
     text-decoration: none;
     font-weight: 600;
   }
+  
+  /* --- Premium Mobile Email Client Responsive Guard --- */
+  @media only screen and (max-width: 600px) {
+    .newsletter-canvas {
+      border: none !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+    .canvas-header {
+      padding: 32px 16px !important;
+    }
+    .blocks-container {
+      padding: 24px 16px !important; /* Reduces large horizontal padding from 40px to 16px */
+    }
+    .canvas-footer {
+      padding: 32px 16px !important;
+    }
+    .email-preview-card {
+      border-radius: 16px !important;
+    }
+    .email-preview-card-body {
+      padding: 20px !important; /* Reduces large horizontal padding from 32px to 20px */
+    }
+    .email-headline {
+      font-size: 24px !important; /* Fits much better on small screens */
+    }
+  }
 </style>
                     `;
 
@@ -1396,6 +1450,14 @@ class NewsletterBuilder {
                             testIcon.className = 'material-symbols-outlined chk-success';
                             testText.innerText = 'Test-epost bekreftet sendt';
                         }
+
+                        // Vis en tydelig og lekker bekreftelsesmelding til brukeren i systemet
+                        await this.showConfirm(
+                            "E-post sendt!",
+                            `Test-e-posten ble sendt til ${recipientEmail}. Sjekk innboksen din (og søppelpost hvis den ikke dukker opp).`,
+                            "OK",
+                            ""
+                        );
                     } else {
                         throw new Error(result.error || 'Serveren returnerte en feil.');
                     }
@@ -1453,12 +1515,17 @@ class NewsletterBuilder {
 
             // Success feedback
             setTimeout(async () => {
-                showToast(`Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse til ${estCount} mottakere.`);
+                showToast(`Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse til ${estCount} mottakere.`, "success");
                 finalBtn.disabled = false;
                 finalBtn.innerHTML = originalText;
 
-                // Optionally redirect back to dashboard
-                const confirmedBack = await this.showConfirm('Tilbake til dashbord', "Vil du gå tilbake til dashbordet?", 'Ja, gå tilbake', 'Bli her');
+                // Vis en lekker bekreftelse og spør om de vil gå tilbake til dashbordet
+                const confirmedBack = await this.showConfirm(
+                    'Nyhetsbrev sendt!',
+                    `Suksess! Nyhetsbrevet er nå lagt i kø for utsendelse til ca. ${estCount} mottakere.\n\nVil du gå tilbake til dashbordet?`,
+                    'Ja, gå til dashbordet',
+                    'Nei, bli her'
+                );
                 if (confirmedBack) {
                     window.location.href = '/admin/index.html';
                 }
@@ -1493,28 +1560,28 @@ class NewsletterBuilder {
             overlay.innerHTML = `
                 <div class="profile-modal-content card modern" style="max-width: 400px; width: 90%; border-radius: 20px; background: white; padding: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
                     <h3 style="margin: 0 0 16px 0; font-size: 18px; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined" style="color: #d17d39;">image</span>
-                        Håndter bilde
+                        <span class="material-symbols-outlined" style="color: #d17d39; font-size: 20px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">image</span>
+                        <span>Håndter bilde</span>
                     </h3>
                     <div style="display: flex; flex-direction: column; gap: 10px;">
                         <button id="img-opt-upload" class="prompt-btn primary" style="background: #1B4965 !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined">upload_file</span>
-                            Last opp fra enhet
+                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">upload_file</span>
+                            <span>Last opp fra enhet</span>
                         </button>
                         <button id="img-opt-unsplash" class="prompt-btn primary" style="background: #d17d39 !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined">image_search</span>
-                            Finn på Unsplash
+                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">image_search</span>
+                            <span>Finn på Unsplash</span>
                         </button>
                         <button id="img-opt-ai" class="prompt-btn primary" style="background: linear-gradient(135deg, #bd4f2a, #d17d39) !important; border: none; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; color: white; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined">auto_awesome</span>
-                            Generer med AI
+                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">auto_awesome</span>
+                            <span>Generer med AI</span>
                         </button>
                         <button id="img-opt-delete" class="prompt-btn secondary" style="background: #ef4444 !important; border: none; color: white !important; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; font-weight: 600; font-size: 14px;">
-                            <span class="material-symbols-outlined">delete</span>
-                            Slett bilde
+                            <span class="material-symbols-outlined" style="font-size: 18px; line-height: 1; display: inline-flex; align-items: center; justify-content: center;">delete</span>
+                            <span>Slett bilde</span>
                         </button>
                         <button id="img-opt-cancel" class="prompt-btn secondary" style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 600; font-size: 14px; background: white;">
-                            Avbryt
+                            <span>Avbryt</span>
                         </button>
                     </div>
                 </div>
@@ -1655,7 +1722,7 @@ class NewsletterBuilder {
         try {
             const container = document.getElementById('drafts-list');
             if (!container) return;
-            const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
             
             let count = 0;
             container.innerHTML = '';
@@ -1791,7 +1858,7 @@ class NewsletterBuilder {
             this.draftsCache = {};
             this.templatesCache = {};
 
-            const snap = await window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc').get();
+            const snap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').orderBy('createdAt', 'desc'), 8000);
             
             let draftsHtml = '';
             let templatesHtml = '';
@@ -1882,6 +1949,14 @@ class NewsletterBuilder {
             
         } catch (e) {
             console.error("Load dashboard data failed:", e);
+            const draftsContainer = document.getElementById('dashboard-drafts-list');
+            const templatesContainer = document.getElementById('dashboard-templates-list');
+            if (draftsContainer && draftsContainer.innerHTML.includes('Laster kladder...')) {
+                draftsContainer.innerHTML = '<p class="empty-state-text" style="color: #94a3b8; font-size: 13px; text-align: center; padding: 32px 0; margin: 0;">Kunne ikke laste kladder.</p>';
+            }
+            if (templatesContainer && templatesContainer.innerHTML.includes('Laster maler...')) {
+                templatesContainer.innerHTML = '<p class="empty-state-text" style="color: #94a3b8; font-size: 13px; text-align: center; padding: 32px 0; margin: 0;">Kunne ikke laste maler.</p>';
+            }
         }
     }
 
@@ -1946,7 +2021,7 @@ class NewsletterBuilder {
             // Load sent newsletter campaigns
             let campaignItems = [];
             try {
-                const campaignSnap = await window.firebaseService.db.collection('newsletter_campaigns').orderBy('sentAt', 'desc').limit(15).get();
+                const campaignSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_campaigns').orderBy('sentAt', 'desc').limit(15), 8000);
                 campaignSnap.forEach(doc => {
                     const data = doc.data();
                     campaignItems.push({
@@ -1968,7 +2043,7 @@ class NewsletterBuilder {
             // Load saved newsletter drafts
             let draftItems = [];
             try {
-                const draftSnap = await window.firebaseService.db.collection('newsletter_templates').where('isDraft', '==', true).get();
+                const draftSnap = await this.safeGet(window.firebaseService.db.collection('newsletter_templates').where('isDraft', '==', true), 8000);
                 draftSnap.forEach(doc => {
                     const data = doc.data();
                     draftItems.push({
@@ -2532,7 +2607,7 @@ class NewsletterBuilder {
     async loadAiSuggestions() {
         if (!window.firebaseService || !window.firebaseService.isInitialized) return;
         try {
-            const doc = await window.firebaseService.db.collection('ai_suggestions').doc('latest').get();
+            const doc = await this.safeGet(window.firebaseService.db.collection('ai_suggestions').doc('latest'), 8000);
             if (doc.exists) {
                 this.renderAiSuggestions(doc.data());
             } else {
@@ -2829,7 +2904,7 @@ class NewsletterBuilder {
             }
 
             if (generatedItem && generatedItem[type]) {
-                const latestDoc = await window.firebaseService.db.collection('ai_suggestions').doc('latest').get();
+                const latestDoc = await this.safeGet(window.firebaseService.db.collection('ai_suggestions').doc('latest'), 10000);
                 if (latestDoc.exists) {
                     const currentData = latestDoc.data();
                     currentData[type] = generatedItem[type];
@@ -2940,7 +3015,7 @@ if (!window.builder) {
 }
 
 // Recipient flow listeners
-document.addEventListener('DOMContentLoaded', () => {
+const initRecipientCalculations = () => {
     // Radio buttons calculation
     document.querySelectorAll('input[name="send-to"]').forEach(radio => {
         radio.addEventListener('change', () => {
@@ -2979,4 +3054,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.builder) window.builder.toggleLabelsList();
         });
     }
-});
+};
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initRecipientCalculations);
+} else {
+    initRecipientCalculations();
+}

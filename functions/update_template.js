@@ -19,7 +19,7 @@ const newHtml = `
   </div>
 
   <!-- Headline & Subtitle -->
-  <h1 style="font-size: 32px; font-weight: 850; color: #1B4965; text-align: center; margin: 0 0 16px 0; line-height: 1.2; letter-spacing: -0.03em;">
+  <h1 class="email-headline" style="font-size: 32px; font-weight: 850; color: #1B4965; text-align: center; margin: 0 0 16px 0; line-height: 1.2; letter-spacing: -0.03em;">
     Nye ukentlige innholdskampanjer er klare til vurdering
   </h1>
   
@@ -35,10 +35,10 @@ const newHtml = `
   </div>
 
   <!-- Devotional Preview Card -->
-  <div style="background-color: #f8fafc; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.03);">
+  <div class="email-preview-card" style="background-color: #f8fafc; border-radius: 24px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 12px 24px rgba(15, 23, 42, 0.03);">
     <img src="https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?auto=format&fit=crop&w=800&h=450&q=80" width="600" height="338" alt="Åpen bibel" style="width: 100%; height: auto; max-height: 338px; object-fit: cover; display: block; border-top-left-radius: 22px; border-top-right-radius: 22px; border-bottom: 1px solid #e2e8f0;">
     
-    <div style="padding: 32px;">
+    <div class="email-preview-card-body" style="padding: 32px;">
       <!-- Date Badge -->
       <div style="font-size: 11px; font-weight: 700; color: #d17d39; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.08em; line-height: 1.2;">
         <span style="color: #d17d39; font-size: 12px; vertical-align: middle; margin-right: 6px; line-height: 1;">&#9679;</span>Planlagt til torsdag 4. juni

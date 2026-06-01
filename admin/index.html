@@ -530,6 +530,10 @@
                             <span class="material-symbols-outlined">search</span>
                         </button>
 
+                        <button id="todo-shortcut-btn" class="notification-btn" title="Huskeliste" style="position: relative;">
+                                                        <span class="material-symbols-outlined">playlist_add_check</span>
+                                                        <span id="todo-badge-dot" class="notification-dot" style="display: none; background: var(--color-accent, #d17d39);"></span>
+                                                    </button>
                         <button id="messages-bell" class="notification-btn">
                             <span id="notification-icon" class="material-symbols-outlined">notifications</span>
                             <span id="notification-dot" class="notification-dot"></span>
@@ -1081,6 +1085,19 @@
                 </div>
             </div>
 
+            <div id="todo-section" class="section-content">
+                <div class="section-header design-ui-header in-topbar" style="margin-bottom: 24px;">
+                    <div class="section-header-icon" style="background: #eff6ff; color: #1B4965; width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; margin-right: 16px;">
+                        <span class="material-symbols-outlined" style="font-size: 28px;">playlist_add_check</span>
+                    </div>
+                    <div class="section-header-content">
+                        <h2 class="section-title" style="margin: 0; font-size: 24px; font-weight: 700; color: #1B4965;">Huskeliste & Oppgaver</h2>
+                        <p class="section-subtitle" style="margin: 4px 0 0 0; font-size: 14px; color: #64748b;">Administrer oppgaver, tildelinger og synkroniser med Google Tasks i sanntid.</p>
+                    </div>
+                </div>
+                <div id="todo-app-root"></div>
+            </div>
+
             <div id="users-section" class="section-content">
                 <div class="section-header">
                     <h2 class="section-title">Brukerhåndtering</h2>
@@ -1218,7 +1235,8 @@
             const ADMIN_LAST_DASHBOARD_SECTION_KEY = 'hkm_admin_last_dashboard_section';
 
             const topbarSectionOverrides = {
-                overview: { icon: 'grid_view', title: 'Oversikt' }
+                overview: { icon: 'grid_view', title: 'Oversikt' },
+                todo: { icon: 'playlist_add_check', title: 'Huskeliste' }
             };
 
             function getNavLabelFromLink(link) {
@@ -1462,6 +1480,8 @@
     <script type="module" src="../js/user-roles.js"></script>
     <script type="module" src="../js/notifications.js"></script>
     <script type="module" src="js/admin-header.js?v=20260601_V3"></script>
+    <script type="module" src="js/todo-drawer.js?v=20260601_V3"></script>
+    <script type="module" src="js/todo-init.jsx"></script>
     <script type="module" src="js/unsplash.js?v=20260511_G1"></script>
     <script type="module" src="js/admin.js?v=20260601_V3"></script>
     <script type="module">

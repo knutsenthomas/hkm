@@ -372,6 +372,15 @@ service cloud.firestore {
       allow read, write: if isAdmin();
     }
 
+    // Admin tasks / Todo list
+    match /tasks/{docId} {
+      allow read, write: if isAdmin();
+    }
+
+    match /user_google_credentials/{docId} {
+      allow read, write: if isAdmin();
+    }
+
     // Interactions (Likes & Comments)
     match /interactions/{postId} {
       allow read: if true;

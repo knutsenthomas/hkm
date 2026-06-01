@@ -24,3 +24,5 @@ test-reply*.txt
 build_*.txt
 
 dist/
+.vercel
+scratch/
