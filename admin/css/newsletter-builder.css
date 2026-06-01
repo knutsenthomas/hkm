@@ -2898,8 +2898,8 @@ body.builder-active .builder-workspace > .main-header {
         min-width: 40px !important;
         justify-content: center !important;
     }
-    #save-draft-btn, #save-template-btn {
-        margin-right: 4px !important;
+    .builder-unified-header .header-actions {
+        gap: 8px !important; /* Tighten gap to 8px for elegant unified spacing */
     }
 }
 
