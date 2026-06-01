@@ -555,6 +555,18 @@ export default function TodoApp() {
                     .animate-task-appear {
                         animation: taskAppear 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
                     }
+                    .hkm-checkbox-completed .hkm-close-icon {
+                        display: none !important;
+                    }
+                    .hkm-checkbox-completed .hkm-check-icon {
+                        display: block !important;
+                    }
+                    .hkm-checkbox-completed:hover .hkm-close-icon {
+                        display: block !important;
+                    }
+                    .hkm-checkbox-completed:hover .hkm-check-icon {
+                        display: none !important;
+                    }
                 `}} />
 
                 {/* Header view title and Search Bar */}
@@ -636,11 +648,11 @@ export default function TodoApp() {
                                         {/* Checked status checkbox */}
                                         <div 
                                             onClick={() => handleToggleTask(t)} 
-                                            className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105 group/checkbox"
+                                            className="hkm-checkbox-completed w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
                                             title="Marker som ugjort"
                                         >
-                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none group-hover/checkbox:hidden">check</span>
-                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hidden group-hover/checkbox:block">close</span>
+                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-check-icon">check</span>
+                                            <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-close-icon">close</span>
                                         </div>
 
                                         {/* Content body */}
@@ -1008,11 +1020,11 @@ export default function TodoApp() {
                                                 {/* Checked status checkbox */}
                                                 <div 
                                                     onClick={() => handleToggleTask(t)} 
-                                                    className="w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105 group/checkbox"
+                                                    className="hkm-checkbox-completed w-5 h-5 rounded-full bg-emerald-500 border-2 border-emerald-500 flex items-center justify-center cursor-pointer flex-shrink-0 mt-0.5 transition-all duration-300 select-none shadow-sm shadow-emerald-500/10 hover:scale-105"
                                                     title="Marker som ugjort"
                                                 >
-                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none group-hover/checkbox:hidden">check</span>
-                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hidden group-hover/checkbox:block">close</span>
+                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-check-icon">check</span>
+                                                    <span className="material-symbols-outlined text-[10px] text-white font-bold select-none hkm-close-icon">close</span>
                                                 </div>
 
                                                 {/* Content */}
