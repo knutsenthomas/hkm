@@ -7871,7 +7871,7 @@ class AdminManager {
                         </div>
                         
                         <div class="editor-header-center">
-                            <span class="editor-header-title" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 320px;" title="${item.title || 'Uten tittel'}">
+                            <span class="editor-header-title" style="font-family: 'Inter', sans-serif; font-weight: 700; font-size: 15px; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%;" title="${item.title || 'Uten tittel'}">
                                 ${item.title || 'Uten tittel'}
                             </span>
                         </div>
