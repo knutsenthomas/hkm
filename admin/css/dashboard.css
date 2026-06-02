@@ -3281,23 +3281,12 @@ input[type="range"] {
     /* Elegant rounded icon buttons on mobile */
     .editor-header-v2 .btn-primary,
     .editor-header-v2 .btn-outline,
-    .editor-header-v2 .btn-ghost {
+    .editor-header-v2 .btn-ghost:not(#close-col-modal) {
         width: 36px !important;
         height: 36px !important;
         padding: 0 !important;
         border-radius: 50% !important; /* Purely round circular icon buttons on mobile! Extremely modern */
         gap: 0 !important;
-    }
-    
-    .editor-header-v2 #close-col-modal {
-        width: 36px !important;
-        height: 36px !important;
-        padding: 0 !important;
-        border-radius: 50% !important;
-        background: #f1f5f9 !important; /* Modern circular back button with light background */
-    }
-    .editor-header-v2 #close-col-modal span:not(.material-symbols-outlined) {
-        display: none !important;
     }
     
     #editor-autosave-status {
