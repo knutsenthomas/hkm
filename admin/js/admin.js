@@ -7738,13 +7738,13 @@ class AdminManager {
                     <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600;">${author || '<span style="color: #cbd5e1;">—</span>'}</td>
                     <td style="padding: 24px;">${statusPill}</td>
                     <td style="padding: 24px; text-align: right;">
-                        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px;">
+                        <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; white-space: nowrap;">
                             <button type="button" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})" 
-                                style="background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02);">
+                                style="background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02); white-space: nowrap; flex-shrink: 0;">
                                 Rediger
                             </button>
                             <button type="button" class="icon-btn delete" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
-                                style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s; display: inline-flex; align-items: center; justify-content: center;" 
+                                style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;" 
                                 onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                             </button>
@@ -7779,8 +7779,8 @@ class AdminManager {
 
         container.innerHTML = `
             ${overviewHtml}
-            <div style="width: 100%; overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+            <div style="width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch;">
+                <table style="width: 100%; min-width: 800px; border-collapse: collapse; text-align: left; table-layout: auto;">
                     <thead style="background: #fafbfc; border-bottom: 1px solid #f1f5f9;">
                         <tr>
                             <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Innhold</th>

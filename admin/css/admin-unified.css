@@ -2287,6 +2287,8 @@ body.crm-body .crm-table {
   border: 1px solid var(--admin-page-panel-border, #e2e8f0) !important;
   color: #334155 !important;
   background-color: #ffffff !important;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
 }
 
 .crm-table td.col-actions .btn.btn-outline:hover {
@@ -2304,7 +2306,8 @@ body.crm-body .crm-table {
   min-height: 32px !important;
   padding: 0 14px !important;
   vertical-align: middle;
-  white-space: nowrap;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
   font-size: 12px !important;
   border-radius: 6px !important;
 }
