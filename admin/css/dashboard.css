@@ -7380,9 +7380,8 @@ body.admin-body .sidebar-nav {
     font-weight: 800 !important;
     color: #1e293b !important;
     letter-spacing: -0.02em !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    word-break: break-word !important;
 }
 
 .kinetic-header-info p {
@@ -7390,9 +7389,8 @@ body.admin-body .sidebar-nav {
     font-size: 15px !important;
     color: #94a3b8 !important;
     font-weight: 500 !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
+    white-space: normal !important;
+    word-break: break-word !important;
 }
 
 .kinetic-header-actions {
@@ -7471,37 +7469,32 @@ body.admin-body .sidebar-nav {
     
     .kinetic-header-left {
         flex-direction: column !important;
-        align-items: center !important;
-        text-align: center !important;
-        gap: 16px !important;
+        align-items: flex-start !important;
+        text-align: left !important;
+        gap: 12px !important;
         width: 100% !important;
     }
     
     .kinetic-header-icon-circle {
-        width: 56px !important;
-        height: 56px !important;
-    }
-    
-    .kinetic-header-icon-circle span {
-        font-size: 24px !important;
+        display: none !important;
     }
     
     .kinetic-header-info {
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important;
+        align-items: flex-start !important;
         width: 100% !important;
     }
     
     .kinetic-header-info h2 {
         font-size: 22px !important;
-        text-align: center !important;
+        text-align: left !important;
         white-space: normal !important;
     }
     
     .kinetic-header-info p {
         font-size: 13.5px !important;
-        text-align: center !important;
+        text-align: left !important;
         margin-top: 4px !important;
         white-space: normal !important;
     }
@@ -7510,26 +7503,36 @@ body.admin-body .sidebar-nav {
         width: 100% !important;
         margin-left: 0 !important;
         display: flex !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+        gap: 12px !important;
     }
     
     .kinetic-actions-wrapper {
         width: 100% !important;
         margin-left: 0 !important;
         display: flex !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
         gap: 12px !important;
     }
     
     .kinetic-header-actions button,
-    .kinetic-header-actions .btn {
-        width: 100% !important;
+    .kinetic-header-actions .btn,
+    .kinetic-actions-wrapper button,
+    .kinetic-actions-wrapper .btn {
+        flex: 1 1 auto !important;
+        width: auto !important;
+        max-width: none !important;
         margin-left: 0 !important;
         justify-content: center !important;
         height: 48px !important;
         padding: 12px 20px !important;
+        white-space: nowrap !important;
     }
 }
 
