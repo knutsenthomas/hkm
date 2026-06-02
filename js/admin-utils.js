@@ -385,6 +385,82 @@
         },
         renderSectionHeader(icon, title, subtitle, actionsHtml = '', subtitleId = '') {
             return `
+                <style>
+                    @media (max-width: 1024px) {
+                        body.admin-body .section-content > .section-header.design-ui-header {
+                            display: block !important;
+                            padding: 16px 24px !important;
+                            box-sizing: border-box !important;
+                            width: 100% !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-icon {
+                            display: none !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header > .section-header-content {
+                            display: flex !important;
+                            flex-direction: column !important;
+                            align-items: stretch !important;
+                            justify-content: flex-start !important;
+                            gap: 16px !important;
+                            width: 100% !important;
+                            min-width: 0 !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-titles {
+                            width: 100% !important;
+                            min-width: 0 !important;
+                            flex: none !important;
+                            display: flex !important;
+                            flex-direction: column !important;
+                            gap: 8px !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-titles .section-title {
+                            font-size: 20px !important;
+                            font-weight: 800 !important;
+                            color: #111827 !important;
+                            line-height: 1.2 !important;
+                            white-space: normal !important;
+                            word-break: break-word !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-titles .section-subtitle {
+                            font-size: 14px !important;
+                            color: #64748b !important;
+                            line-height: 1.5 !important;
+                            white-space: normal !important;
+                            word-break: break-word !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions {
+                            display: flex !important;
+                            flex-direction: row !important;
+                            align-items: center !important;
+                            justify-content: flex-start !important;
+                            width: 100% !important;
+                            flex-wrap: wrap !important;
+                            gap: 16px !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions > div {
+                            display: flex !important;
+                            flex-direction: row !important;
+                            flex-wrap: wrap !important;
+                            width: 100% !important;
+                            gap: 16px !important;
+                        }
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions button,
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions .btn,
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions > div button,
+                        body.admin-body .section-content > .section-header.design-ui-header .section-header-actions > div .btn {
+                            flex: 1 1 auto !important;
+                            width: auto !important;
+                            max-width: none !important;
+                            margin: 0 !important;
+                            justify-content: center !important;
+                            white-space: nowrap !important;
+                        }
+                    }
+                </style>
                 <div class="section-header design-ui-header">
                     <div class="section-header-icon">
                         <span class="material-symbols-outlined">${icon}</span>

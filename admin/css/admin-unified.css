@@ -6348,12 +6348,8 @@ body.admin-body .template-item:active {
 @media (max-width: 1024px) {
   body.admin-body .section-content > .section-header,
   body.admin-body .section-content > .design-ui-header {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: flex-start !important;
-    gap: 16px !important;
-    padding: 16px 20px !important; /* Premium tighter padding on mobile/tablet */
+    display: block !important;
+    padding: 16px 24px !important;
     box-sizing: border-box !important;
     width: 100% !important;
     min-height: auto !important;
@@ -6361,20 +6357,16 @@ body.admin-body .template-item:active {
 
   body.admin-body .section-content > .section-header .section-header-icon,
   body.admin-body .section-content > .design-ui-header .section-header-icon {
-    margin: 0 !important;
-    align-self: center !important;
-    display: inline-flex !important;
-    flex-shrink: 0 !important;
+    display: none !important;
   }
 
   body.admin-body .section-content > .section-header > .section-header-content,
   body.admin-body .section-content > .design-ui-header > .section-header-content {
     display: flex !important;
     flex-direction: column !important;
-    flex-wrap: wrap !important;
-    align-items: flex-start !important;
+    align-items: stretch !important;
     justify-content: flex-start !important;
-    gap: 12px !important;
+    gap: 16px !important;
     flex: 1 !important;
     width: 100% !important;
     margin: 0 !important;
@@ -6388,7 +6380,6 @@ body.admin-body .template-item:active {
     align-items: flex-start !important;
     justify-content: center !important;
     text-align: left !important;
-    flex: 1 1 100% !important;
     width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
@@ -6396,6 +6387,12 @@ body.admin-body .template-item:active {
 
   body.admin-body .section-content > .section-header .section-title,
   body.admin-body .section-content > .design-ui-header .section-title {
+    font-size: 20px !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
     text-align: left !important;
     margin: 0 !important;
     align-self: flex-start !important;
@@ -6404,6 +6401,11 @@ body.admin-body .template-item:active {
 
   body.admin-body .section-content > .section-header .section-subtitle,
   body.admin-body .section-content > .design-ui-header .section-subtitle {
+    font-size: 14px !important;
+    color: #64748b !important;
+    line-height: 1.5 !important;
+    white-space: normal !important;
+    word-break: break-word !important;
     text-align: left !important;
     margin: 4px 0 0 !important;
     align-self: flex-start !important;
@@ -6419,18 +6421,33 @@ body.admin-body .template-item:active {
     margin: 0 !important;
     width: 100% !important;
     flex-wrap: wrap !important;
-    gap: 10px !important;
+    gap: 16px !important;
+    padding: 0 !important;
+  }
+
+  body.admin-body .section-content > .section-header .section-header-actions > div,
+  body.admin-body .section-content > .design-ui-header .section-header-actions > div {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    width: 100% !important;
+    gap: 16px !important;
   }
 
   body.admin-body .section-content > .section-header .section-header-actions button,
   body.admin-body .section-content > .section-header .section-header-actions .btn,
   body.admin-body .section-content > .design-ui-header .section-header-actions button,
-  body.admin-body .section-content > .design-ui-header .section-header-actions .btn {
+  body.admin-body .section-content > .design-ui-header .section-header-actions .btn,
+  body.admin-body .section-content > .section-header .section-header-actions > div button,
+  body.admin-body .section-content > .section-header .section-header-actions > div .btn,
+  body.admin-body .section-content > .design-ui-header .section-header-actions > div button,
+  body.admin-body .section-content > .design-ui-header .section-header-actions > div .btn {
+    flex: 1 1 auto !important;
     width: auto !important;
-    max-width: max-content !important;
-    justify-content: center !important;
-    align-self: center !important;
+    max-width: none !important;
     margin: 0 !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
   }
 }
 
