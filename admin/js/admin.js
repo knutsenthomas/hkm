@@ -3509,7 +3509,7 @@ class AdminManager {
                         <td style="font-size: 11px; color: #94a3b8; font-family: monospace;">${this.escapeHtml(c.postId)}</td>
                         <td class="col-actions" style="text-align:right; padding-right:20px;">
                             <button class="btn btn-icon danger delete-comment-btn" data-comment-id="${c.id}" data-post-id="${c.postId}" title="Slett kommentar" 
-                                style="color: #ef4444; background: #fee2e2; border-radius: 8px; width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; padding: 0;">
+                                style="color: #ef4444 !important; background: #fee2e2 !important; border-radius: 8px !important; width: 34px !important; height: 34px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; padding: 0 !important; box-shadow: none !important; outline: none !important;">
                                 <span class="material-symbols-outlined" style="font-size:20px; line-height: 1; display: block;">delete</span>
                             </button>
                         </td>
@@ -7744,7 +7744,7 @@ class AdminManager {
                                 Rediger
                             </button>
                             <button type="button" class="icon-btn delete" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
-                                style="background: transparent; border: none; color: #cbd5e1; cursor: pointer; padding: 4px; transition: color 0.2s; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;" 
+                                style="background: transparent !important; border: none !important; color: #cbd5e1 !important; cursor: pointer !important; padding: 4px !important; transition: color 0.2s !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; box-shadow: none !important; outline: none !important;" 
                                 onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'">
                                 <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
                             </button>
