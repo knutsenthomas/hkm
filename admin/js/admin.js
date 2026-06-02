@@ -7725,7 +7725,7 @@ class AdminManager {
 
             return `
                 <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.2s;">
-                    <td style="padding: 24px;">
+                    <td style="padding: 24px; min-width: 280px;">
                         <div style="display: flex; align-items: center; gap: 20px;">
                             ${imageCell}
                             <div>
@@ -7735,9 +7735,9 @@ class AdminManager {
                         </div>
                     </td>
                     <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600; white-space: nowrap; min-width: 120px;">${dateText}</td>
-                    <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600;">${author || '<span style="color: #cbd5e1;">—</span>'}</td>
-                    <td style="padding: 24px;">${statusPill}</td>
-                    <td style="padding: 24px; text-align: right;">
+                    <td style="padding: 24px; color: #64748b; font-size: 13px; font-weight: 600; white-space: nowrap;">${author || '<span style="color: #cbd5e1;">—</span>'}</td>
+                    <td style="padding: 24px; white-space: nowrap;">${statusPill}</td>
+                    <td style="padding: 24px; text-align: right; white-space: nowrap;">
                         <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; white-space: nowrap;">
                             <button type="button" onclick="window.adminManager.editCollectionItem('${collectionId}', ${index})" 
                                 style="background: white; border: 1px solid #e2e8f0; color: #1e293b; padding: 8px 20px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.02); white-space: nowrap; flex-shrink: 0;">
@@ -7783,11 +7783,11 @@ class AdminManager {
                 <table style="width: 100%; min-width: 800px; border-collapse: collapse; text-align: left; table-layout: auto;">
                     <thead style="background: #fafbfc; border-bottom: 1px solid #f1f5f9;">
                         <tr>
-                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Innhold</th>
-                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Dato</th>
-                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Forfatter</th>
-                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em;">Status</th>
-                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; text-align: right;">Handlinger</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; min-width: 280px;">Innhold</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; min-width: 120px; white-space: nowrap;">Dato</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; white-space: nowrap;">Forfatter</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; white-space: nowrap;">Status</th>
+                            <th style="padding: 20px 24px; font-size: 11px; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.15em; text-align: right; white-space: nowrap;">Handlinger</th>
                         </tr>
                     </thead>
                     <tbody>
