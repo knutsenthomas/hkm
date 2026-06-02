@@ -3510,7 +3510,7 @@ class AdminManager {
                         <td class="col-actions" style="text-align:right; padding-right:20px;">
                             <button class="btn btn-icon danger delete-comment-btn" data-comment-id="${c.id}" data-post-id="${c.postId}" title="Slett kommentar" 
                                 style="color: #ef4444 !important; background: #fee2e2 !important; border-radius: 8px !important; width: 34px !important; height: 34px !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; border: none !important; cursor: pointer !important; padding: 0 !important; box-shadow: none !important; outline: none !important;">
-                                <span class="material-symbols-outlined" style="font-size:20px; line-height: 1; display: block;">delete</span>
+                                <span class="material-symbols-outlined" style="font-size: 20px !important; line-height: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; padding: 0 !important; width: 20px !important; height: 20px !important;">delete</span>
                             </button>
                         </td>
                     </tr>
@@ -7744,9 +7744,9 @@ class AdminManager {
                                 Rediger
                             </button>
                             <button type="button" class="icon-btn delete" onclick="window.adminManager.deleteItem('${collectionId}', ${index})" 
-                                style="background: transparent !important; border: none !important; color: #cbd5e1 !important; cursor: pointer !important; padding: 4px !important; transition: color 0.2s !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; box-shadow: none !important; outline: none !important;" 
+                                style="background: transparent !important; border: none !important; color: #cbd5e1 !important; cursor: pointer !important; padding: 0 !important; transition: color 0.2s !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; box-shadow: none !important; outline: none !important; width: 34px !important; height: 34px !important;" 
                                 onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#cbd5e1'">
-                                <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                <span class="material-symbols-outlined" style="font-size: 20px !important; line-height: 0 !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; margin: 0 !important; padding: 0 !important; width: 20px !important; height: 20px !important;">delete</span>
                             </button>
                         </div>
                     </td>
