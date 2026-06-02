@@ -6370,13 +6370,13 @@ body.admin-body .template-item:active {
   body.admin-body .section-content > .section-header > .section-header-content,
   body.admin-body .section-content > .design-ui-header > .section-header-content {
     display: flex !important;
-    flex-direction: row !important;
+    flex-direction: column !important;
     flex-wrap: wrap !important;
-    align-items: center !important;
+    align-items: flex-start !important;
     justify-content: flex-start !important;
-    gap: 16px !important;
+    gap: 12px !important;
     flex: 1 !important;
-    width: auto !important;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -6388,8 +6388,8 @@ body.admin-body .template-item:active {
     align-items: flex-start !important;
     justify-content: center !important;
     text-align: left !important;
-    flex: none !important;
-    width: auto !important;
+    flex: 1 1 100% !important;
+    width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
   }
@@ -6415,9 +6415,9 @@ body.admin-body .template-item:active {
     display: flex !important;
     flex-direction: row !important;
     align-items: center !important;
-    justify-content: center !important;
+    justify-content: flex-start !important;
     margin: 0 !important;
-    width: auto !important;
+    width: 100% !important;
     flex-wrap: wrap !important;
     gap: 10px !important;
   }
