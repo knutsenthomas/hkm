@@ -3296,6 +3296,9 @@ input[type="range"] {
         border-radius: 50% !important;
         background: #f1f5f9 !important; /* Modern circular back button with light background */
     }
+    .editor-header-v2 #close-col-modal span:not(.material-symbols-outlined) {
+        display: none !important;
+    }
     
     #editor-autosave-status {
         margin-left: 4px !important;
