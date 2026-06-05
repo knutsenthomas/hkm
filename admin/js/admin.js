@@ -13192,7 +13192,7 @@ class AdminManager {
 
         container.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; padding-top:8px;">
-                <h3 style="margin:0; font-size:24px; font-weight:700; color:#0f172a;">${inKindCount} In-Kind Donations</h3>
+                <h3 style="margin:0; font-size:24px; font-weight:700; color:#0f172a;">${inKindCount} tingsgaver</h3>
                 <button type="button" class="btn-primary" id="add-manual-inkind-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
                     <span class="material-symbols-outlined" style="font-size:20px;">volunteer_activism</span>
                     Registrer tingsgave
@@ -13204,12 +13204,12 @@ class AdminManager {
                     <table class="data-table" style="width:100%;">
                         <thead>
                             <tr>
-                                <th>Date Received</th>
-                                <th>Description</th>
-                                <th>Donor</th>
-                                <th>Fund</th>
-                                <th style="text-align:center;">Acknowledgment Sent</th>
-                                <th style="text-align:right;">Fair Market Value</th>
+                                <th>Mottatt dato</th>
+                                <th>Beskrivelse</th>
+                                <th>Giver</th>
+                                <th>Formål</th>
+                                <th style="text-align:center;">Mottaksbekreftelse sendt</th>
+                                <th style="text-align:right;">Antatt verdi (USD)</th>
                                 <th></th>
                             </tr>
                         </thead>
@@ -13877,9 +13877,9 @@ class AdminManager {
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
-                    <button class="automation-tab" data-tab="donations">By Donation</button>
-                    <button class="automation-tab" data-tab="donors">By Donor</button>
-                    <button class="automation-tab" data-tab="inkind">In-Kind</button>
+                    <button class="automation-tab" data-tab="donations">Per gave</button>
+                    <button class="automation-tab" data-tab="donors">Per giver</button>
+                    <button class="automation-tab" data-tab="inkind">Tingsgaver</button>
                 </div>
             </div>
 
