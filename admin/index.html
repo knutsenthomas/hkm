@@ -1296,8 +1296,10 @@
 
             function getNavLabelFromLink(link) {
                 if (!link) return '';
-                const textSpan = Array.from(link.querySelectorAll('span'))
-                    .find(span => !span.classList.contains('material-symbols-outlined') && !span.classList.contains('nav-badge'));
+                const spans = link.querySelectorAll('span');
+                if (!spans || spans.length === 0) return '';
+                const textSpan = Array.from(spans)
+                    .find(span => span && span.classList && !span.classList.contains('material-symbols-outlined') && !span.classList.contains('nav-badge'));
                 return (textSpan?.textContent || '').trim();
             }
 

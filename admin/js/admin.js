@@ -5104,7 +5104,7 @@ class AdminManager {
         }
     }
 
-    async renderContentEditor() {
+    async renderLegacyContentDashboard() {
         const section = document.getElementById('content-editor-section');
         if (!section) return;
 
