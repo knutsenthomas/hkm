@@ -81,6 +81,12 @@ class ContentManager {
         if (p('podcast')) return 'podcast';
         if (p('undervisning')) return 'undervisning';
         if (p('seminarer')) return 'seminarer';
+        if (p('reisevirksomhet')) return 'reisevirksomhet';
+        if (p('bibelstudier')) return 'bibelstudier';
+        if (p('bli-fast-giver') || p('regular-donors') || p('donantes-regulares')) return 'bli-fast-giver';
+        if (p('personvern') || p('privacy') || p('privacidad')) return 'personvern';
+        if (p('tilgjengelighet') || p('accessibility') || p('accesibilidad')) return 'tilgjengelighet';
+        if (p('betingelser')) return 'betingelser';
         return '';
     }
 
@@ -2682,12 +2688,7 @@ class ContentManager {
             }));
         } catch (_) { }
 
-        // Skip updateDOM for translated pages (EN/ES) to preserve HTML translations
         const lang = document.documentElement.lang || 'no';
-        if (lang !== 'no') {
-            console.log('[ContentManager] Skipping updateDOM for translated page:', lang);
-            return;
-        }
 
         // Find all elements with data-content-key
         const elements = document.querySelectorAll("[data-content-key]");
@@ -2697,10 +2698,34 @@ class ContentManager {
             if (targetDoc && targetDoc !== docId) return;
 
             const key = el.getAttribute("data-content-key");
-            const value = this.getValueByPath(data, key);
+            const contentAttr = el.getAttribute('data-content-attr');
+            const isBgKey = key === "hero.backgroundImage" || key === "hero.bg" || key.endsWith(".backgroundImage") || key.endsWith(".bg");
+            const isMedia = el.tagName === 'IMG' ||
+                            isBgKey ||
+                            (contentAttr && 
+                             (contentAttr.includes('src') || 
+                              contentAttr.includes('href')));
+
+            let value;
+            if (lang !== 'no') {
+                const translationPath = `translations.${lang}.${key}`;
+                value = this.getValueByPath(data, translationPath);
+                
+                if (value === undefined) {
+                    if (isMedia) {
+                        // Fall back to root value for images, URLs, etc.
+                        value = this.getValueByPath(data, key);
+                    } else {
+                        // Return early to preserve static HTML translation for text/content elements
+                        return;
+                    }
+                }
+            } else {
+                value = this.getValueByPath(data, key);
+            }
+
             if (value === undefined) return;
 
-            const contentAttr = el.getAttribute('data-content-attr');
             if (contentAttr) {
                 const visibilityTargetSelector = el.getAttribute('data-visibility-target');
                 const visibilityTarget = visibilityTargetSelector ? el.closest(visibilityTargetSelector) : null;
@@ -2760,7 +2785,6 @@ class ContentManager {
 
             // HERO IMAGE & TEXT SYNC (unified, strict separation)
             const isHeroSection = el.classList.contains('page-hero') || el.classList.contains('hero-section');
-            const isBgKey = key === "hero.backgroundImage" || key === "hero.bg" || key.endsWith(".backgroundImage") || key.endsWith(".bg");
             const isHeroTitle = el.classList.contains('page-hero-title') || el.classList.contains('hero-title') || el.classList.contains('page-title');
             const isHeroSubtitle = el.classList.contains('page-hero-subtitle') || el.classList.contains('hero-subtitle');
 
@@ -2840,6 +2864,62 @@ class ContentManager {
             if (currentText !== newText) {
                 el.textContent = value;
             }
+        });
+
+        // Update list elements with data-content-list
+        const listElements = document.querySelectorAll("[data-content-list]");
+        listElements.forEach(listEl => {
+            const targetDoc = listEl.getAttribute('data-content-doc');
+            if (targetDoc && targetDoc !== docId) return;
+
+            const key = listEl.getAttribute("data-content-list");
+            
+            let value;
+            if (lang !== 'no') {
+                const translationPath = `translations.${lang}.${key}`;
+                value = this.getValueByPath(data, translationPath);
+                if (value === undefined) {
+                    // Skip and preserve static HTML list items if no translation exists
+                    return;
+                }
+            } else {
+                value = this.getValueByPath(data, key);
+            }
+
+            // Fallback migration for list fields that might still be stored as objects in Firestore
+            if (value && !Array.isArray(value) && typeof value === 'object') {
+                const list = [value.f1, value.f2, value.f3, value.f4].map(v => typeof v === 'string' ? v.trim() : (v && typeof v === 'object' && v.title ? v.title.trim() : '')).filter(Boolean);
+                if (list.length > 0) {
+                    value = list;
+                } else {
+                    value = Object.values(value).map(v => typeof v === 'string' ? v.trim() : (v && typeof v === 'object' && v.title ? v.title.trim() : '')).filter(Boolean);
+                }
+            }
+
+            if (!Array.isArray(value)) return;
+
+            const template = listEl.querySelector('template');
+            if (!template) {
+                console.warn('[ContentManager] No <template> found inside data-content-list:', key);
+                return;
+            }
+
+            // Clear all child nodes except the template
+            Array.from(listEl.childNodes).forEach(child => {
+                if (child !== template) {
+                    listEl.removeChild(child);
+                }
+            });
+
+            // Render array items
+            value.forEach(itemText => {
+                const clone = template.content.cloneNode(true);
+                const textEl = clone.querySelector('[data-item-text]') || clone.querySelector('span') || clone.firstElementChild;
+                if (textEl) {
+                    textEl.textContent = String(itemText);
+                }
+                listEl.appendChild(clone);
+            });
         });
     }
 

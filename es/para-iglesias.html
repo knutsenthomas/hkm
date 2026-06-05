@@ -210,7 +210,7 @@
         <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
             style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
             <div class="container">
-                <h1 class="page-title">Para Iglesias</h1>
+                <h1 class="page-title" data-content-key="hero.title">Para Iglesias</h1>
                 <div class="breadcrumbs">
                     <a href="/">Inicio</a>
                     <i class="fas fa-chevron-right"></i>
@@ -225,13 +225,16 @@
                 <div class="about-grid"
                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
                     <div class="about-content">
-                        <span class="section-label">Colaboración</span>
-                        <h2 class="section-title">Una Misión Compartida</h2>
-                        <p class="section-text">His Kingdom Ministry siente pasión por ver florecer a la iglesia local.
+                        <span class="section-label" data-content-key="intro.label">Colaboración</span>
+                        <h2 class="section-title" data-content-key="intro.title">Una Misión Compartida</h2>
+                        <p class="section-text" data-content-key="intro.text">His Kingdom Ministry siente pasión por ver florecer a la iglesia local.
                             Ofrecemos recursos, seminarios y enseñanzas que pueden complementar su trabajo existente e
                             inspirar un seguimiento más profundo de Jesús.</p>
 
-                        <ul style="margin: 30px 0; display: grid; gap: 15px;">
+                        <ul data-content-list="features" style="margin: 30px 0; display: grid; gap: 15px;">
+                            <template>
+                                <li><i class="fas fa-check-circle" style="color: var(--primary-orange); margin-right: 10px;"></i> <span data-item-text></span></li>
+                            </template>
                             <li><i class="fas fa-check-circle"
                                     style="color: var(--primary-orange); margin-right: 10px;"></i> Seminarios sobre
                                 oración y discipulado</li>
@@ -249,7 +252,7 @@
                         <a href="/es/contacto" class="btn btn-primary">Contáctenos para colaborar</a>
                     </div>
                     <div class="about-image">
-                        <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                        <img data-content-key="intro.image" data-content-attr="src" src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                             alt="Colaboración con Iglesias" style="border-radius: 20px; box-shadow: var(--shadow);">
                     </div>
                 </div>
@@ -260,10 +263,10 @@
         <section class="cta-section"
             style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
             <div class="container text-center">
-                <h2 style="color: white; margin-bottom: 20px;">¿Quiere saber más?</h2>
-                <p style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">Nos encantaría enviarle más información
+                <h2 data-content-key="cta.title" style="color: white; margin-bottom: 20px;">¿Quiere saber más?</h2>
+                <p data-content-key="cta.text" style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">Nos encantaría enviarle más información
                     sobre cómo podemos apoyar a su iglesia.</p>
-                <a href="/es/contacto" class="btn btn-outline" style="border-color: white; color: white;">Contáctenos
+                <a data-content-key="cta.btnText" href="/es/contacto" class="btn btn-outline" style="border-color: white; color: white;">Contáctenos
                     hoy</a>
             </div>
         </section>

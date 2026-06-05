@@ -213,7 +213,7 @@
             <section class="page-hero subpage-hero" data-content-key="hero.backgroundImage"
                 style="background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat !important;">
                 <div class="container">
-                    <h1 class="page-title">For Churches</h1>
+                    <h1 class="page-title" data-content-key="hero.title">For Churches</h1>
                     <div class="breadcrumbs">
                         <a href="/">Home</a>
                         <i class="fas fa-chevron-right"></i>
@@ -228,14 +228,17 @@
                     <div class="about-grid"
                         style="display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;">
                         <div class="about-content">
-                            <span class="section-label">Collaboration</span>
-                            <h2 class="section-title">A Shared Mission</h2>
-                            <p class="section-text">His Kingdom Ministry is passionate about seeing the local church
+                            <span class="section-label" data-content-key="intro.label">Collaboration</span>
+                            <h2 class="section-title" data-content-key="intro.title">A Shared Mission</h2>
+                            <p class="section-text" data-content-key="intro.text">His Kingdom Ministry is passionate about seeing the local church
                                 flourish. We offer resources, seminars, and teaching that can complement your existing
                                 work
                                 and inspire deeper discipleship of Jesus.</p>
 
-                            <ul style="margin: 30px 0; display: grid; gap: 15px;">
+                            <ul data-content-list="features" style="margin: 30px 0; display: grid; gap: 15px;">
+                                <template>
+                                    <li><i class="fas fa-check-circle" style="color: var(--primary-orange); margin-right: 10px;"></i> <span data-item-text></span></li>
+                                </template>
                                 <li><i class="fas fa-check-circle"
                                         style="color: var(--primary-orange); margin-right: 10px;"></i> Seminars on
                                     prayer
@@ -255,7 +258,7 @@
                             <a href="/en/contact" class="btn btn-primary">Contact us for collaboration</a>
                         </div>
                         <div class="about-image">
-                            <img src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                            <img data-content-key="intro.image" data-content-attr="src" src="https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                                 alt="Church Collaboration" style="border-radius: 20px; box-shadow: var(--shadow);">
                         </div>
                     </div>
@@ -266,10 +269,10 @@
             <section class="cta-section"
                 style="background: linear-gradient(135deg, var(--primary-orange), var(--primary-red)); color: white;">
                 <div class="container text-center">
-                    <h2 style="color: white; margin-bottom: 20px;">Want to hear more?</h2>
-                    <p style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">We would love to send you more
+                    <h2 data-content-key="cta.title" style="color: white; margin-bottom: 20px;">Want to hear more?</h2>
+                    <p data-content-key="cta.text" style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;">We would love to send you more
                         information about how we can support your church.</p>
-                    <a href="/en/contact" class="btn btn-outline" style="border-color: white; color: white;">Contact us
+                    <a data-content-key="cta.btnText" href="/en/contact" class="btn btn-outline" style="border-color: white; color: white;">Contact us
                         today</a>
                 </div>
             </section>

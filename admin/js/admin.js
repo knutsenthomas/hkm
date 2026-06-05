@@ -1138,6 +1138,67 @@ class AdminManager {
         return translation;
     }
 
+    _isTranslatableKey(key) {
+        const k = String(key || '').toLowerCase();
+        return !k.includes('image') &&
+               !k.includes('url') &&
+               !k.includes('link') &&
+               !k.includes('bg') &&
+               !k.includes('icon') &&
+               !k.includes('email') &&
+               !k.includes('phone') &&
+               !k.includes('vipps') &&
+               !k.includes('account') &&
+               !k.includes('instagram') &&
+               !k.includes('facebook') &&
+               !k.includes('youtube') &&
+               !k.includes('tiktok');
+    }
+
+    async _buildPageContentTranslation(obj, targetLang, sourceLang = 'no') {
+        if (Array.isArray(obj)) {
+            const result = [];
+            for (const item of obj) {
+                if (typeof item === 'string') {
+                    if (this._isLikelyNonTranslatableToken(item)) {
+                        result.push(item);
+                    } else {
+                        result.push(await this._translateRichText(item, targetLang, sourceLang));
+                    }
+                } else if (typeof item === 'object' && item !== null) {
+                    result.push(await this._buildPageContentTranslation(item, targetLang, sourceLang));
+                } else {
+                    result.push(item);
+                }
+            }
+            return result;
+        }
+
+        if (typeof obj === 'object' && obj !== null) {
+            const result = {};
+            for (const key of Object.keys(obj)) {
+                const value = obj[key];
+                if (key === 'translations') {
+                    continue;
+                }
+                if (typeof value === 'string') {
+                    if (this._isTranslatableKey(key) && !this._isLikelyNonTranslatableToken(value)) {
+                        result[key] = await this._translateRichText(value, targetLang, sourceLang);
+                    } else {
+                        result[key] = value;
+                    }
+                } else if (typeof value === 'object' && value !== null) {
+                    result[key] = await this._buildPageContentTranslation(value, targetLang, sourceLang);
+                } else {
+                    result[key] = value;
+                }
+            }
+            return result;
+        }
+
+        return obj;
+    }
+
     _normalizeTranslationCompareText(value) {
         let rawText = '';
         if (typeof value === 'string') {
@@ -7338,11 +7399,13 @@ class AdminManager {
                         <li class="page-item" data-page="om-oss">Om oss</li>
                         <li class="page-item" data-page="media">Media</li>
                         <li class="page-item" data-page="arrangementer">Arrangementer</li>
+                        <li class="page-item" data-page="kalender">Kalender</li>
                         <li class="page-item" data-page="blogg">Blogg</li>
                         <li class="page-item" data-page="butikk">Butikk</li>
                         <li class="page-item" data-page="for-menigheter">For menigheter</li>
                         <li class="page-item" data-page="kontakt">Kontakt</li>
                         <li class="page-item" data-page="donasjoner">Donasjoner</li>
+                        <li class="page-item" data-page="bli-fast-giver">Bli fast giver</li>
                         <li class="page-item" data-page="undervisning">Undervisning</li>
                         <li class="page-item" data-page="reisevirksomhet">Reisevirksomhet</li>
                         <li class="page-item" data-page="bibelstudier">Bibelstudier</li>
@@ -7351,6 +7414,9 @@ class AdminManager {
                         <li class="page-item" data-page="youtube">YouTube</li>
                         <li class="page-item" data-page="for-bedrifter">For bedrifter</li>
                         <li class="page-item" data-page="bnn">Business Network</li>
+                        <li class="page-item" data-page="personvern">Personvern</li>
+                        <li class="page-item" data-page="tilgjengelighet">Tilgjengelighet</li>
+                        <li class="page-item" data-page="betingelser">Betingelser</li>
                     </ul>
                 </aside>
                 <div class="content-main">
@@ -16689,6 +16755,68 @@ class AdminManager {
                     allOptionLabel: 'Alle'
                 }
             },
+            'om-oss': {
+                hero: {
+                    title: 'Om Oss',
+                    subtitle: 'Lær mer om vår visjon, oppdrag og historie',
+                    backgroundImage: 'https://images.unsplash.com/photo-1529070538774-1843cb3265df?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80'
+                },
+                intro: {
+                    label: 'Velkommen til fellesskapet',
+                    title: 'Vi er en Non-profit organisasjon',
+                    text: 'His Kingdom Ministry driver med åndelig samlinger som bønnemøter, undervisningseminarer, og forkynnende reisevirksomhet. Vi ønsker å være et felleskap der mennesker kan vokse i sin tro og relasjon til Jesus.',
+                    btnText: 'Kontakt oss',
+                    image: 'https://static.wixstatic.com/media/db4f96_2b25900fd882417e8fc88a62002ba11a~mv2.jpg/v1/fill/w_865,h_675,al_c,q_85,enc_avif,quality_auto/FullSizeRender_edited_edited_edited_edited%20(1).jpg',
+                    videoUrl: 'https://www.youtube.com/watch?v=Z3jXbw0yC5E'
+                },
+                about: {
+                    features: {
+                        mission: {
+                            title: 'Vårt oppdrag',
+                            text: 'Å utruste og inspirere mennesker til et dypere liv med Gud gjennom undervisning, fellesskap og bønn.'
+                        },
+                        story: {
+                            title: 'Vår historie',
+                            text: 'Startet med en visjon om å samle mennesker in åndelig vekst, har vi vokst til et levende felleskap som driver med bønnemøter, undervisning og reisevirksomhet.'
+                        }
+                    }
+                },
+                values: {
+                    label: 'Om oss',
+                    title: 'Hva Vi Står For',
+                    bible: {
+                        text: 'Vi forankrer alt vi gjør i Guds ord og søker å leve etter Bibelens prinsipper.'
+                    }
+                },
+                team: {
+                    label: 'Vårt team',
+                    title: 'Møt hjertene bak His Kingdom Ministry',
+                    hilde: {
+                        name: 'Hilde Karin Knutsen',
+                        role: 'Profetisk forbeder og underviser',
+                        bio: 'Velkommen til siden min. Jeg heter Hilde Karin. Jeg er gift med Thomas. Vi bor i Norge. Jeg har reist som misjonær og profetisk forbeder mer enn halve livet mitt. Ved Guds nåde, gjennom Bibelens prinsipper og ved Den Hellige Ånds ledelse er jeg en profetisk stemme klar til å hjelpe deg å vokse i ditt personlige forhold to Jesus Kristus og utruste deg til å bli alt det han har gjort deg til å være.',
+                        image: 'img/Hilde%20Karin%20Knutsen.jpg',
+                        instagram: 'https://www.instagram.com/freedomisathand/',
+                        facebook: 'https://www.facebook.com/hiskingdomministry777?locale=nb_NO',
+                        youtube: 'https://www.youtube.com/@HisKingdomMinistry',
+                        tiktok: 'https://www.tiktok.com/@hilde707'
+                    },
+                    thomas: {
+                        name: 'Thomas Knutsen',
+                        role: 'Daglig leder og Lovsang',
+                        bio: 'Hei og velkommen til siden vår. Vi er så glade for at du kom inn på vår tjeneteside. Jeg har ikke reist rundt i verden. Jeg har jobbet og bodd stort sett i samme by hele livet. Jeg jobbet i samme kirke i 15 år før jeg møtte Hilde. Vi koblet sammen med en gang og er så velsignet at Gud forente livene våre sammen.',
+                        image: 'img/Thomas.jpeg',
+                        instagram: 'https://www.instagram.com/tkdesignandmusic/',
+                        facebook: 'https://www.facebook.com/thomas.knutsen.75/?locale=nb_NO'
+                    }
+                },
+                cta: {
+                    title: 'Bli Med i Fellesskapet',
+                    text: 'Vi ønsker å være et sted der du kan vokse i din tro og oppleve Guds nærvær.',
+                    btn1: 'Se arrangementer',
+                    btn2: 'Kontakt oss'
+                }
+            },
             'for-menigheter': {
                 hero: {
                     title: 'For Menigheter',
@@ -16701,12 +16829,12 @@ class AdminManager {
                     text: 'His Kingdom Ministry brenner for å se den lokale kirken blomstre. Vi tilbyr ressurser, seminarer og undervisning som kan komplementere deres eksisterende arbeid og inspirere til dypere etterfølgelse av Jesus.',
                     image: 'https://images.unsplash.com/photo-1438232992991-995b7058bbb3?ixlib=rb-4.0.3\u0026auto=format\u0026fit=crop\u0026w=800\u0026q=80'
                 },
-                features: {
-                    f1: 'Seminarer om bønn og disippelskap',
-                    f2: 'Ressurser for smågrupper',
-                    f3: 'Besøk av våre undervisere',
-                    f4: 'Felles bønneinitiativ'
-                },
+                features: [
+                    'Seminarer om bønn og disippelskap',
+                    'Ressurser for smågrupper',
+                    'Besøk av våre undervisere',
+                    'Felles bønneinitiativ'
+                ],
                 cta: {
                     title: 'Vil dere høre mer?',
                     text: 'Vi sender gjerne mer informasjon om hvordan vi kan støtte deres menighet.',
@@ -16754,6 +16882,424 @@ class AdminManager {
                 cta: {
                     btnText: 'Bli en del av nettverket'
                 }
+            },
+            'kontakt': {
+                hero: {
+                    title: "Kontakt Oss",
+                    subtitle: "Vi vil gjerne høre fra deg. Send oss en melding eller besøk oss.",
+                    backgroundImage: "https://images.unsplash.com/photo-1423666639041-f56000c27a9a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                contact: {
+                    info: {
+                        title: "Ta Kontakt",
+                        text: "Har du spørsmål, bønnebehov eller ønsker du å vite mer om vår tjeneste? Ikke nøl med å ta kontakt med oss.",
+                        email_label: "E-post",
+                        email: "post@hiskingdomministry.no",
+                        phone_label: "Telefon",
+                        phone: "+47 930 94 615",
+                        address_label: "Besøksadresse",
+                        address: "Oslo, Norge"
+                    }
+                }
+            },
+            'donasjoner': {
+                hero: {
+                    title: "Donasjoner",
+                    subtitle: "Bli med og støtt vårt arbeid",
+                    bg: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                intro: {
+                    title: "Våre aktive innsamlingsaksjoner",
+                    description: "Din gave utgjør en forskjell. Velg et prosjekt du ønsker å støtte og bli med på å forandre liv."
+                },
+                regular_donor: {
+                    title: "Vær med på å skape varig endring",
+                    description: "Som fast giver er du med på å sikre forutsigbarhet i vårt arbeid, slik at vi kan planlegge og gjennomføre flere prosjekter for Guds rike.",
+                    vipps: {
+                        title: "Fast gave via Vipps",
+                        text: "Den enkleste måten å bli fast giver på. Du oppretter en fast avtale direkte i Vipps-appen.",
+                        cta: "Opprett i Vipps"
+                    },
+                    bank: {
+                        title: "Bankoverføring",
+                        text: "Opprett et fast trekk i nettbanken din til vår konto. Dette gir oss de laveste gebyrene.",
+                        account: "Konto: 3000.66.08759"
+                    },
+                    tax: {
+                        title: "Visste du at du får skattefradrag?",
+                        description: "Gaver til His Kingdom Ministry gir rett til skattefradrag dersom de samlede gavene i løpet av et kalenderår er på minst 500 kroner. For å få fradrag må vi ha ditt fødselsnummer (11 siffer)."
+                    }
+                },
+                form: {
+                    title: "Støtt vårt arbeid",
+                    description: "Din gave gjør en reell forskjell. Velg beløp og betalingsmetode nedenfor."
+                }
+            },
+            'undervisning': {
+                hero: {
+                    title: "Undervisning",
+                    subtitle: "Dyptgående bibelundervisning",
+                    bg: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                intro: {
+                    label: "Ressurser",
+                    title: "Utforsk vår undervisning",
+                    description: "Velg en kategori for å utforske våre ulike undervisningsressurser."
+                },
+                card_bible: {
+                    title: "Bibelstudier",
+                    text: "Systematiske studier gjennom Bibelens bøker med dyptgående forklaringer."
+                },
+                card_seminar: {
+                    title: "Seminarer",
+                    text: "Opptak fra våre seminarer og konferanser om ulike temaer."
+                },
+                card_series: {
+                    title: "Undervisningsserier",
+                    text: "Tematiske undervisningsserier om viktige kristne emner."
+                }
+            },
+            'arrangementer': {
+                hero: {
+                    title: "Arrangementer",
+                    subtitle: "Bli med på våre kommende hendelser",
+                    bg: "https://images.unsplash.com/photo-1523580494863-6f3031224c94?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                }
+            },
+            'kalender': {
+                hero: {
+                    title: "Månedskalender",
+                    subtitle: "Her finner du en oversikt over alle våre kommende aktiviteter og samlinger.",
+                    backgroundImage: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                helligdager: {
+                    label: "Helligdager & høytider",
+                    title: "Hvorfor markerer vi disse dagene?",
+                    description: "Her finner du en kort forklaring på noen av de viktigste kristne høytidsdagene og norske helligdagene som ofte påvirker kalenderen vår."
+                },
+                holidays: {
+                    nyttarsdag: {
+                        title: "1. nyttårsdag",
+                        text: "Første dag i det nye året. En dag for ettertanke, takk for året som ligger bak, og bønn for året som kommer."
+                    },
+                    palmesondag: {
+                        title: "Palmesøndag",
+                        text: "Markerer Jesu inntog i Jerusalem, der folket hilste ham med palmegrener og ropte «Hosianna». Innleder påskeuken."
+                    },
+                    skjertorsdag: {
+                        title: "Skjærtorsdag",
+                        text: "Til minne om Jesu siste måltid med disiplene, der han innstiftet nattverden og viste veien til tjenende lederskap ved å vaske disiplenes føtter."
+                    },
+                    langfredag: {
+                        title: "Langfredag",
+                        text: "Vi minnes Jesu lidelse og død på korset. En stille og alvorlig dag som peker på den store kjærligheten Gud har vist oss."
+                    },
+                    paskedag1: {
+                        title: "1. påskedag",
+                        text: "Feiringen av Jesu oppstandelse. Denne dagen står i sentrum av den kristne tro og minner oss om seier over synd, død og mørke."
+                    },
+                    paskedag2: {
+                        title: "2. påskedag",
+                        text: "Fortsetter gleden over oppstandelsen, og peker på møtene den oppstandne Jesus hadde med disiplene."
+                    },
+                    himmelfart: {
+                        title: "Kristi himmelfartsdag",
+                        text: "Feirer at Jesus for opp til himmelen før Faderen, og at han fortsatt ber for oss og regjerer som Herre."
+                    },
+                    pinsedag1: {
+                        title: "1. pinsedag",
+                        text: "Til minne om at Den hellige ånd ble utøst over de første troende i Jerusalem. Pinsen blir ofte kalt «kirkens fødselsdag»."
+                    },
+                    pinsedag2: {
+                        title: "2. pinsedag",
+                        text: "En forlengelse av pinsefeiringen, der fokuset fortsatt er på Den hellige ånds nærvær og gaver i våre liv."
+                    },
+                    mai1: {
+                        title: "Arbeidernes dag (1. mai)",
+                        text: "Norsk offentlig fridag som hedrer arbeideres rettigheter. For mange også en dag for å be for rettferdighet og gode arbeidsforhold."
+                    },
+                    mai17: {
+                        title: "Grunnlovsdagen (17. mai)",
+                        text: "Feiring av Norges grunnlov fra 1814. En festdag for frihet, fellesskap og takknemlighet for landet vårt."
+                    },
+                    juledag1: {
+                        title: "1. juledag",
+                        text: "Markerer selve juledagen og feirer at Guds Sønn ble født i verden. Fokus er på inkarnasjonen – at Gud ble menneske."
+                    },
+                    juledag2: {
+                        title: "2. juledag",
+                        text: "En roligere oppfølgingsdag i julen som gir rom for ettertanke, familie og hvile etter selve høytidsdagen."
+                    }
+                }
+            },
+            'media': {
+                hero: {
+                    title: "Media",
+                    subtitle: "Utforsk våre videoer, podcaster og annet innhold",
+                    backgroundImage: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                youtube: {
+                    title: "Siste Videoer",
+                    description: "Se våre nyeste videoer og undervisninger"
+                },
+                teaching: {
+                    title: "Undervisningsressurser",
+                    description: "Dyptgående bibelstudier og undervisningsserier"
+                }
+            },
+            'seminarer': {
+                hero: {
+                    title: "Seminarer",
+                    subtitle: "Temabaserte undervisningsdager",
+                    backgroundImage: "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                intro: {
+                    label: "Tilgjengelige Seminarer",
+                    title: "Laster innhold...",
+                    description: "Lær fra våre dyptgående seminarer og konferanser"
+                },
+                cta: {
+                    title: "Lær og Voks Sammen Med Oss",
+                    text: "Alle våre seminarer er tilgjengelige gratis. Bli med på våre kommende arrangementer!"
+                }
+            },
+            'reisevirksomhet': {
+                hero: {
+                    title: "Reisevirksomhet",
+                    subtitle: "Vi tar oppdrag i hele Norge for tale, undervisning og lovsang.",
+                    backgroundImage: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                intro: {
+                    label: "Vi kommer dit du er",
+                    title: "Forkynnelse og lovsang over hele landet",
+                    text: "His Kingdom Ministry reiser til menigheter, konferanser og samlinger i hele Norge. Vi tjener gjennom forkynnelse, profetisk tjeneste, forbønn og lovsang, og ønsker å styrke det Gud allerede gjør lokalt.",
+                    features: {
+                        preaching: {
+                            title: "Tale og undervisning",
+                            text: "Vi tar oppdrag for møter, helgesamlinger og konferanser med fokus på Guds nærvær, frihet og disippelskap."
+                        },
+                        worship: {
+                            title: "Lovsang og tilbedelse",
+                            text: "Thomas leder lovsang og bygger team i en kultur av frihet, glede og overgivelse til Jesus."
+                        }
+                    }
+                },
+                booking: {
+                    label: "Praktisk informasjon",
+                    title: "Hvordan booke His Kingdom Ministry",
+                    text: "Vi tilpasser oppdrag etter behovene i din menighet eller samling. Ta kontakt for å avtale helger, enkeltmøter, konferanser eller lovsangskvelder. Sammen finner vi en løsning som fungerer både praktisk og økonomisk."
+                },
+                cta: {
+                    title: "Inviter oss til din menighet eller konferanse",
+                    text: "Vi elsker å tjene sammen med lokale ledere og menigheter. Send oss en forespørsel, så tar vi en prat om hvordan vi kan stå sammen."
+                }
+            },
+            'bibelstudier': {
+                hero: {
+                    title: "Bibelstudier",
+                    subtitle: "Utforsk Guds ord sammen med oss",
+                    backgroundImage: "https://images.unsplash.com/photo-1491841550275-ad7854e35ca6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                intro: {
+                    label: "Tilgjengelige Serier",
+                    title: "Laster innhold...",
+                    description: "Dykk dypere inn i Guds ord gjennom våre strukturerte bibelstudier"
+                },
+                cta: {
+                    title: "Begynn Din Bibelstudiereise",
+                    text: "Bli med oss og dykk dypere inn i Guds ord. Alle studier er gratis og tilgjengelige når som helst."
+                }
+            },
+            'podcast': {
+                hero: {
+                    title: "Podcast",
+                    subtitle: "Lytt til våre samtaler",
+                    backgroundImage: "https://images.unsplash.com/photo-1478737270239-2f02b77ac6d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                intro: {
+                    label: "Episodearkiv",
+                    title: "Alle episoder",
+                    description: "Her kan du høre på alle våre podcast-episoder direkte i nettleseren."
+                }
+            },
+            'youtube': {
+                hero: {
+                    title: "YouTube",
+                    subtitle: "Se videoundervisning, prekener og mer på vår YouTube-kanal.",
+                    backgroundImage: "https://images.unsplash.com/photo-1516280440614-37939bbacd81?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                intro: {
+                    label: "Videoarkiv",
+                    title: "Alle videoer",
+                    description: "Her finner du en oversikt over alt vårt videoinnhold direkte fra YouTube."
+                }
+            },
+            'bli-fast-giver': {
+                hero: {
+                    title: "Bli fast giver",
+                    bg: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                regular_donor: {
+                    title: "Vær med på å skape varig endring",
+                    description: "Som fast giver er du med på å sikre forutsigbarhet i vårt arbeid, slik at vi kan planlegge og gjennomføre flere prosjekter for Guds rike.",
+                    vipps: {
+                        title: "Fast gave via Vipps",
+                        text: "Den enkleste måten å bli fast giver på. Du oppretter en fast avtale direkte i Vipps-appen.",
+                        cta: "Opprett i Vipps",
+                        subtext: "Ingen bindingstid. Avtalen kan enkelt avsluttes i Vipps eller via e-post. Se våre vilkår for faste betalinger."
+                    },
+                    bank: {
+                        title: "Bankoverføring",
+                        text: "Opprett et fast trekk i nettbanken din til vår konto. Dette gir oss de laveste gebyrene.",
+                        account: "Konto: 3000.66.08759"
+                    },
+                    tax: {
+                        title: "Visste du at du får skattefradrag?",
+                        description: "Gaver til His Kingdom Ministry gir rett til skattefradrag dersom de samlede gavene i løpet av et kalenderår er på minst 500 kroner. For å få fradrag må vi ha ditt fødselsnummer (11 siffer)."
+                    }
+                },
+                newsletter: {
+                    title: "Hold deg oppdatert",
+                    text: "Meld deg på vårt nyhetsbrev for å få siste nytt direkte i din innboks.",
+                    placeholder: "Din e-postadresse",
+                    btnText: "Abonner"
+                }
+            },
+            'personvern': {
+                hero: {
+                    title: "Personvernerklæring",
+                    subtitle: "Sist oppdatert: 13. februar 2026",
+                    backgroundImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                content: {
+                    intro: "I His Kingdom Ministry (\"vi\", \"oss\") er vi opptatt av at du skal føle deg trygg når du besøker våre nettsider og bruker våre tjenester. Denne personvernerklæringen forklarer på en enkel og tydelig måte hvilke opplysninger vi samler inn om deg, hvorfor vi gjør det, og hvilke rettigheter du har.",
+                    intro2: "Som en kristen organisasjon basert på tillit og fellesskap, behandler vi dine data med største respekt og fortrolighet.",
+                    sec1_title: "1. Hvilken informasjon samler vi inn?",
+                    sec1_text: "Vi samler kun inn informasjon som er nødvendig for å gi deg tilgang til våre kurs, undervisning og fellesskap.",
+                    sec1_item1: "Ved registrering på \"Min Side\": Navn, e-postadresse og passord (kryptert).",
+                    sec1_item2: "Ved bruk av kursportalen: Informasjon om hvilke kurs du deltar på, og din progresjon (f.eks. hvilke videoer du har sett ferdig). Dette gjør vi for at du enkelt skal kunne fortsette der du slapp.",
+                    sec1_item3: "Ved påmelding til arrangementer: Kontaktinformasjon og evt. diettbehov (hvis du oppgir dette frivillig).",
+                    sec2_title: "2. Hvordan bruker vi informasjonen?",
+                    sec2_text: "Vi bruker opplysningene dine til følgende formål:",
+                    sec2_item1: "Å gi deg tilgang til din personlige profil og kursmateriell.",
+                    sec2_item2: "Å sende deg relevant informasjon om kurs du deltar på.",
+                    sec2_item3: "Å forbedre våre tjenester og nettsider basert på generell bruksstatistikk (anonymisert).",
+                    sec2_item4: "Å opprettholde sikkerheten på din brukerkonto.",
+                    sec3_title: "3. Informasjonskapsler (Cookies)",
+                    sec3_text1: "Vi bruker informasjonskapsler for at nettsiden skal fungere optimalt.",
+                    sec3_text2: "Nødvendige cookies: Disse er strengt nødvendige for at du skal kunne logge inn og navigere trygt på \"Min Side\". Disse kan ikke velges bort.",
+                    sec3_text3: "Statistikk og analyse: Vi kan bruke verktøy for å forstå hvordan nettsiden brukes, slik at vi kan gjøre den bedre. Du kan velge å takke nei til disse.",
+                    sec3_text4: "Du kan når som helst endre dine cookie-innstillinger via lenken nederst på nettsiden.",
+                    sec4_title: "4. Lagring og sletting",
+                    sec4_text1: "Dine personopplysninger lagres trygt i vår database (levert av Google Firebase). Vi beholder informasjonen din så lenge du har en aktiv brukerkonto hos oss.",
+                    sec4_text2: "Du kan når som helst be om å få slettet din konto og alle tilhørende data ved å kontakte oss, eller ved å bruke \"Slett konto\"-funksjonen inne på profilen din.",
+                    sec5_title: "5. Deling av informasjon",
+                    sec5_text1: "Vi selger aldri dine personopplysninger til tredjeparter.",
+                    sec5_text2: "Dersom du gjennomfører en donasjon eller kjøper et kurs, vil betalingsinformasjonen din behandles direkte av vår betalingsleverandør (f.eks. Vipps eller Stripe). Vi lagrer ikke kortnummer eller bankinformasjon selv.",
+                    sec6_title: "6. Dine rettigheter",
+                    sec6_text1: "I henhold til GDPR (personvernforordningen) har du rett til:",
+                    sec6_item1: "Innsyn i hvilke opplysninger vi har lagret om deg.",
+                    sec6_item2: "Korrigering av feilaktige opplysninger.",
+                    sec6_item3: "Sletting av dine opplysninger (\"retten til å bli glemt\").",
+                    sec6_item4: "Å trekke tilbake samtykket ditt når som helst.",
+                    sec7_title: "7. Kontakt oss",
+                    sec7_text1: "Hvis du har spørsmål om personvern eller ønsker å utøve dine rettigheter, er du hjertelig velkommen til å kontakte oss:",
+                    sec7_email: "E-post: post@hiskingdomministry.no",
+                    sec7_address: "Adresse: Norge"
+                }
+            },
+            'tilgjengelighet': {
+                hero: {
+                    title: "Tilgjengelighetserklæring",
+                    subtitle: "Vårt engasjement for universell utforming",
+                    backgroundImage: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                content: {
+                    intro: "His Kingdom Ministry ønsker at våre nettsider og vårt innhold skal være tilgjengelig for alle mennesker, uavhengig av funksjonsevne.",
+                    goal_title: "Vårt mål",
+                    goal_text: "Vi arbeider kontinuerlig for å oppfylle kravene til universell utforming av IKT (WCAG 2.1). Vi tror at Guds ord og vårt fellesskap skal være åpent for alle, og digitale barrierer skal ikke stå i veien for dette.",
+                    status_title: "Status for samsvar",
+                    status_text: "Delvis samsvar: Vi er klar over at enkelte deler av nettstedet vårt kanskje ikke fullt ut tilfredsstiller alle krav i WCAG 2.1 nivå AA ennå, men vi jobber aktivt med forbedringer.",
+                    measures_title: "Hva vi gjør for tilgjengelighet",
+                    measures_text: "Vi har fokusert på følgende tiltak for å sikre god tilgjengelighet:",
+                    measures_item1: "Kontrast og lesbarhet: Vi bruker klare farger med god kontrast mellom tekst og bakgrunn for å sikre at teksten er lett å lese.",
+                    measures_item2: "Tastaturnavigasjon: Nettstedet er bygget slik at det skal være mulig å navigere i menyene og innholdet ved hjelp av tastatur (Tab-tasten).",
+                    measures_item3: "Bilder og media: Vi jobber med å inkludere tekstalternativer (alt-tekst) for bilder som bærer informasjon.",
+                    measures_item4: "Video og undervisning: Vi har som mål å tekste våre undervisningsvideoer, slik at de er tilgjengelige for hørselshemmede og de som ser video uten lyd.",
+                    gaps_title: "Kjente mangler",
+                    gaps_text: "Vi er oppmerksomme på følgende områder som vi jobber med å forbedre:",
+                    gaps_item1: "Eldre videoinnhold kan mangle teksting.",
+                    gaps_item2: "Enkelte dokumenter (PDF) er kanskje ikke optimalisert for skjermlesere.",
+                    feedback_title: "Gi oss tilbakemelding",
+                    feedback_text1: "Opplever du problemer med å bruke nettsiden vår, eller har du forslag til forbedringer? Vi setter stor pris på din tilbakemelding.",
+                    feedback_text2: "Vennligst kontakt oss på:",
+                    feedback_email: "E-post: post@hiskingdomministry.no",
+                    feedback_phone: "Telefon: +47 930 94 615",
+                    footer_text: "Denne erklæringen ble sist oppdatert 13. februar 2026."
+                }
+            },
+            'betingelser': {
+                hero: {
+                    title: "Vilkår og betingelser",
+                    subtitle: "Sist oppdatert: 5. mai 2026",
+                    backgroundImage: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                content: {
+                    intro: "Vilkår og betingelser for His Kingdom Ministry. Disse vilkårene og betingelsene gjelder for alle tjenester og produkter levert av His Kingdom Ministry, herunder nettbutikk, kurs, digitale produkter og donasjoner. Ved å gjennomføre en transaksjon, påmelding eller donasjon aksepterer du disse vilkårene og betingelsene i sin helhet.",
+                    sec1_title: "1. Selgerinformasjon",
+                    sec1_item1: "Navn på virksomheten: His Kingdom Ministry",
+                    sec1_item2: "Organisasjonsnummer: 933728927",
+                    sec1_item3: "E-postadresse: post@hiskingdomministry.no",
+                    sec2_title: "2. Bestilling og avtaleinngåelse",
+                    sec2_text: "Bestilling av varer via nettbutikken er bindende når du har fullført bestillingsprosessen og mottatt en ordrebekreftelse fra oss per e-post. Vi forbeholder oss retten til å kansellere en bestilling dersom varen er utsolgt, det er skrivefeil i produktinformasjonen eller prisen, eller ved mistanke om svindel. Du vil i så fall bli informert så raskt som mulig.",
+                    sec3_title: "3. Priser",
+                    sec3_text: "Alle priser er oppgitt i [Norsk krone - NOK] og inkluderer merverdiavgift (mva.) med mindre annet er spesifikt angitt. Eventuelle fraktkostnader kommer i tillegg og vil tydelig fremgå før du fullfører kjøpet i nettbutikken. Vi forbeholder oss retten til å endre priser uten varsel. Prisen som gjaldt på tidspunktet for bestillingen vil være den gjeldende prisen.",
+                    sec4_title: "4. Betaling og faste betalinger",
+                    sec4_text: "Vi tilbyr kortbetaling via Stripe og faste betalinger via Vipps.",
+                    sec4_sub1_title: "4.1 Kortbetaling (Nettbutikk)",
+                    sec4_sub1_text: "Ved betaling med kort vil beløpet reserveres på din konto ved bestilling og trekkes når varene sendes eller hentes.",
+                    sec4_sub2_title: "4.2 Faste betalinger (Vipps)",
+                    sec4_sub2_text: "Ved inngåelse av avtale om faste betalinger (f.eks. fast givertjeneste eller abonnement) via Vipps, gjelder følgende:",
+                    sec4_sub2_item1: "Oppsigelse: Du kan når som helst avslutte avtalen om faste betalinger. Dette gjøres enten direkte i Vipps-appen under \"Faste betalinger\", eller ved å kontakte oss på post@hiskingdomministry.no. Oppsigelsen gjelder fra neste betalingstermin.",
+                    sec4_sub2_item2: "Bindingstid: Det er ingen bindingstid på faste betalinger hos His Kingdom Ministry, med mindre dette er spesifisert i det enkelte produkt eller tjeneste ved avtaleinngåelse.",
+                    sec4_sub2_item3: "Endring av avtale: Eventuelle endringer i beløp eller frekvens vil bli varslet i henhold til gjeldende regler fra betalingstjenesteleverandøren.",
+                    sec5_title: "5. Levering",
+                    sec5_text: "Vi tilbyr levering til adresser i Norge mot betaling. Leveringstiden er normalt 3-7 virkedager fra den dagen bestillingen er bekreftet, med forbehold om forsinkelser som skyldes forhold utenfor vår kontroll. Fraktkostnadene varierer avhengig av faktorer som påvirker fraktkostnaden, f.eks. vekt, størrelse, leveringsmetode og vil spesifiseres i bestillingsprosessen. Du er ansvarlig for å oppgi korrekt leveringsadresse.",
+                    sec6_title: "6. Henting i butikk",
+                    sec6_text: "Du kan velge å hente bestilte varer. Send en melding hvis du ønsker dette. Du vil motta en melding når varene er klare for henting. Ved henting må du fremvise gyldig legitimasjon og eventuelt ordrebekreftelsen.",
+                    sec7_title: "7. Angrerett",
+                    sec7_text: "I henhold til angrerettloven har du som forbruker rett til å angre kjøpet innen 14 dager fra den dagen du mottok varen(e) (eller fra avtaleinngåelsen ved kjøp av digitale tjenester). For å benytte deg av angreretten må du gi oss tydelig beskjed om at du ønsker å angre kjøpet, for eksempel ved å sende oss et angrerettskjema (som du finner https://om.no/2ZOA), via e-post eller per post. Varen(e) må returneres i samme stand som du mottok dem, og i originalemballasjen dersom dette er mulig. Du er ansvarlig for returkostnadene med mindre annet er avtalt. Vi vil refundere kjøpesummen innen 14 dager fra den dagen vi mottok melding om din beslutning om å angre kjøpet, forutsatt at vi har mottatt varen(e) i retur eller du har fremlagt bevis for at varen(e) er sendt.",
+                    sec8_title: "8. Reklamasjon",
+                    sec8_text: "Dersom det er mangler ved varen du har kjøpt, har du rett til å reklamere i henhold til forbrukerkjøpsloven. Reklamasjonsfristen er normalt to år fra kjøpsdatoen, eller fem år for varer som er ment å vare vesentlig lenger. Ta kontakt med oss så snart som mulig etter at du har oppdaget mangelen. Beskriv mangelen så detaljert som mulig. Ved godkjent reklamasjon vil vi i første omgang forsøke å reparere varen eller levere en ny tilsvarende vare. Dersom dette ikke er mulig eller uforholdsmessig kostbart, kan du ha rett til prisavslag eller heving av kjøpet.",
+                    sec9_title: "9. Personvern",
+                    sec9_text: "Vi behandler dine personopplysninger i henhold to vår personvernerklæring, som du finner her: https://www.hiskingdomministry.no/personvernerklæring",
+                    sec10_title: "10. Kurs og digitale produkter",
+                    sec10_text: "Ved påmelding til kurs eller kjøp av digitale produkter gjelder følgende:",
+                    sec10_item1: "Betaling: Kursavgiften må være betalt i sin helhet før tilgang til kurset gis, med mindre annet er avtalt eller kurset er gratis.",
+                    sec10_item2: "Tilgang: Tilgangen til kurset er personal og kan ikke deles med andre. Varigheten av tilgangen vil fremgå av kursbeskrivelsen ved påmelding.",
+                    sec10_item3: "Angrerett: Ved kjøp av digitale kurs der levering starter umiddelbart etter betaling, samtykker du til at leveringen påbegynnes og at angreretten bortfaller når du har logget inn og startet kurset, i henhold til angrerettlovens § 22 n.",
+                    sec10_item4: "Opphavsrett: Alt kursmateriell (videoer, tekster, filer) er beskyttet av opphavsrett og er kun til personlig bruk. Kommersiell bruk eller videresalg er strengt forbudt.",
+                    sec11_title: "11. Immaterielle rettigheter",
+                    sec11_text: "Alt innhold på vår Nettbutikk, inkludert bilder, tekster, logoer og design, er beskyttet av opphavsrett og andre immaterielle rettigheter og tilhører His Kingdom Ministry nettbutikk eller våre samarbeidspartnere. Enhver kopiering eller bruk av dette innholdet uten vår skriftlige tillatelse er forbudt.",
+                    sec12_title: "12. Ansvarsbegrensning",
+                    sec12_text: "Vi er ikke ansvarlig for indirekte tap, følgeskader eller tap som skyldes force majeure. Vårt ansvar er begrenset til kjøpesummen for de aktuelle varene.",
+                    sec13_title: "13. Tvister",
+                    sec13_text: "Eventuelle tvister som oppstår i forbindelse med disse vilkårene og betingelsene skal søkes løst i minnelighet. Dersom enighet ikke oppnås, kan saken bringes inn for de ordinære domstoler i Norge i henhold til norsk lov.",
+                    sec14_title: "14. Endringer i vilkårene",
+                    sec14_text: "Vi forbeholder oss retten til å endre disse vilkårene og betingelsene når som helst. De til enhver tid gjeldende vilkårene vil være tilgjengelige på vår Nettbutikk og i vår fysiske butikk."
+                }
+            },
+            'blogg': {
+                hero: {
+                    title: "Nyheter / Blogg",
+                    subtitle: "Les våre siste artikler og oppdateringer",
+                    bg: "https://images.unsplash.com/photo-1499750310159-5b600aaf0320?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+                },
+                section: {
+                    label: "Nyheter & Blogg",
+                    title: "Siste Nytt",
+                    description: "Les våre siste artikler og oppdateringer."
+                }
             }
         };
 
@@ -16795,6 +17341,18 @@ class AdminManager {
 
         try {
             const fetchedData = await firebaseService.getPageContent(pageId) || {};
+            
+            // Migrate 'for-menigheter' features from old object format to array format
+            if (pageId === 'for-menigheter' && fetchedData && fetchedData.features && !Array.isArray(fetchedData.features) && typeof fetchedData.features === 'object') {
+                const f = fetchedData.features;
+                const list = [f.f1, f.f2, f.f3, f.f4].map(v => typeof v === 'string' ? v.trim() : (v && typeof v === 'object' && v.title ? v.title.trim() : '')).filter(Boolean);
+                if (list.length > 0) {
+                    fetchedData.features = list;
+                } else {
+                    fetchedData.features = Object.values(f).map(v => typeof v === 'string' ? v.trim() : (v && typeof v === 'object' && v.title ? v.title.trim() : '')).filter(Boolean);
+                }
+            }
+
             const defaults = this.getPageContentEditorDefaults(pageId);
             const data = this.mergePageContentDefaults(defaults, fetchedData);
 
@@ -16848,6 +17406,73 @@ class AdminManager {
 
             const label = document.createElement('label');
             label.textContent = key.replace(/\./g, ' > ').toUpperCase();
+
+            // Support editing arrays as dynamic lists
+            if (Array.isArray(value)) {
+                formGroup.classList.add('is-list-field');
+                
+                const listContainer = document.createElement('div');
+                listContainer.className = 'list-field-container';
+                listContainer.style.display = 'flex';
+                listContainer.style.flexDirection = 'column';
+                listContainer.style.gap = '8px';
+                listContainer.style.marginTop = '8px';
+                listContainer.setAttribute('data-list-key', key);
+
+                const renderListItems = () => {
+                    listContainer.innerHTML = '';
+                    value.forEach((itemVal, idx) => {
+                        const itemRow = document.createElement('div');
+                        itemRow.style.display = 'flex';
+                        itemRow.style.gap = '8px';
+                        itemRow.style.alignItems = 'center';
+
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'form-control list-item-input';
+                        input.value = itemVal || '';
+                        input.style.flex = '1';
+                        input.setAttribute('data-index', idx);
+                        
+                        input.addEventListener('input', (e) => {
+                            value[idx] = e.target.value;
+                        });
+
+                        const delBtn = document.createElement('button');
+                        delBtn.type = 'button';
+                        delBtn.className = 'btn btn-danger btn-sm';
+                        delBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                        delBtn.style.padding = '8px 12px';
+                        delBtn.addEventListener('click', () => {
+                            value.splice(idx, 1);
+                            renderListItems();
+                        });
+
+                        itemRow.appendChild(input);
+                        itemRow.appendChild(delBtn);
+                        listContainer.appendChild(itemRow);
+                    });
+                };
+
+                renderListItems();
+
+                const addBtn = document.createElement('button');
+                addBtn.type = 'button';
+                addBtn.className = 'btn btn-secondary btn-sm';
+                addBtn.style.marginTop = '8px';
+                addBtn.style.width = 'fit-content';
+                addBtn.innerHTML = '<i class="fas fa-plus"></i> Legg til punkt';
+                addBtn.addEventListener('click', () => {
+                    value.push('');
+                    renderListItems();
+                });
+
+                formGroup.appendChild(label);
+                formGroup.appendChild(listContainer);
+                formGroup.appendChild(addBtn);
+                container.appendChild(formGroup);
+                return;
+            }
 
             let inputElement;
             if (typeof value === 'string' && (value.length > 100 || key.includes('description') || key.includes('content'))) {
@@ -17482,8 +18107,12 @@ class AdminManager {
         const dataToSave = {};
         if (!root) return dataToSave;
 
+        // 1. Collect standard form fields (inputs/textareas with data-key)
         const inputs = root.querySelectorAll('.form-control[data-key]');
         inputs.forEach((input) => {
+            // Skip inputs that are inside a dynamic list container to prevent double collection
+            if (input.closest('[data-list-key]')) return;
+
             const keys = input.dataset.key.split('.');
             let value = input.value;
 
@@ -17498,6 +18127,29 @@ class AdminManager {
             keys.forEach((k, i) => {
                 if (i === keys.length - 1) {
                     curr[k] = value;
+                } else {
+                    curr[k] = curr[k] || {};
+                    curr = curr[k];
+                }
+            });
+        });
+
+        // 2. Collect list fields (containers with data-list-key)
+        const listContainers = root.querySelectorAll('[data-list-key]');
+        listContainers.forEach((container) => {
+            const listKey = container.getAttribute('data-list-key');
+            const keys = listKey.split('.');
+            
+            const itemInputs = container.querySelectorAll('.list-item-input');
+            const arrayValue = [];
+            itemInputs.forEach((itemInput) => {
+                arrayValue.push(itemInput.value);
+            });
+
+            let curr = dataToSave;
+            keys.forEach((k, i) => {
+                if (i === keys.length - 1) {
+                    curr[k] = arrayValue;
                 } else {
                     curr[k] = curr[k] || {};
                     curr = curr[k];
@@ -17520,10 +18172,22 @@ class AdminManager {
         await this._runWriteLocked(`page-content:${pageId}`, async () => {
             await this._withButtonLoading(saveBtn, async () => {
                 try {
+                    // Automatically build page content translations for static pages
+                    if (pageId && !pageId.startsWith('settings_')) {
+                        sanitized.translations = sanitized.translations || {};
+                        try {
+                            this.showToast('Oversetter innhold til engelsk og spansk...', 'info', 3000);
+                            sanitized.translations.en = await this._buildPageContentTranslation(sanitized, 'en', 'no');
+                            sanitized.translations.es = await this._buildPageContentTranslation(sanitized, 'es', 'no');
+                        } catch (transErr) {
+                            console.error('Kunne ikke fullføre automatisk oversettelse:', transErr);
+                            this.showToast('⚠️ Lagret, men oversettelse feilet: ' + transErr.message, 'warning', 8000);
+                        }
+                    }
                     await firebaseService.savePageContent(pageId, sanitized);
                     this.showToast('✅ Innholdet er lagret!', 'success', 5000);
                 } catch (err) {
-                    this.showToast('❌ Feil ved lagring', 'error', 5000);
+                    this.showToast('❌ Feil ved lagring: ' + err.message, 'error', 5000);
                 }
             }, {
                 loadingText: 'Lagrer...'
