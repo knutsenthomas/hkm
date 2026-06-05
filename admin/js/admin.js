@@ -13235,8 +13235,6 @@ class AdminManager {
 
 
         section.innerHTML = `
-            ${this.renderSectionHeader('volunteer_activism', 'Gaver & Donasjoner', 'Følg dagens gaver, filtrer historikk og se giveroversikt.')}
-            
             <div class="stats-grid" style="margin-bottom: 32px;">
                 <div class="stat-card modern">
                     <div class="stat-icon-wrap green">
