@@ -903,6 +903,7 @@ class ContentManager {
         if (this.pageId === 'donasjoner') {
             const causes = await this.loadCauses();
             this.renderCauses(causes);
+            this.populatePurposeDropdown(causes);
         }
     }
 
@@ -942,7 +943,8 @@ class ContentManager {
             const raised = Number(cause.raised ?? cause.collected ?? 0) || 0;
             const goal = Number(cause.goal ?? 0) || 0;
             const progress = goal > 0 ? Math.min((raised / goal) * 100, 100) : 0;
-            const link = cause.link || this.getLocalizedLink('donasjoner');
+            const causeId = cause.id || this.getContentItemStableId(cause) || this.generateSlug(title);
+            const link = cause.link || `${this.getLocalizedLink('donasjoner')}?fund=${encodeURIComponent(causeId)}`;
 
             return `
             <div class="cause-card">
@@ -971,6 +973,49 @@ class ContentManager {
             </div>
         `;
         }).join('');
+    }
+
+    generateSlug(text) {
+        return String(text || '')
+            .toLowerCase()
+            .trim()
+            .replace(/æ/g, 'ae')
+            .replace(/ø/g, 'o')
+            .replace(/å/g, 'a')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    populatePurposeDropdown(causes) {
+        const selectEl = document.getElementById('donation-purpose');
+        if (!selectEl) return;
+
+        const lang = this.getCurrentLanguage();
+        let defaultLabel = 'Generell gave (der det trengs mest)';
+        if (lang === 'en') {
+            defaultLabel = 'General donation (where it is needed most)';
+        } else if (lang === 'es') {
+            defaultLabel = 'Donación general (donde más se necesite)';
+        }
+
+        selectEl.innerHTML = `<option value="general">${defaultLabel}</option>`;
+
+        if (causes && Array.isArray(causes)) {
+            causes.forEach(cause => {
+                const causeId = cause.id || this.getContentItemStableId(cause) || this.generateSlug(cause.title || '');
+                const option = document.createElement('option');
+                option.value = causeId;
+                option.textContent = cause.title || 'Innsamlingsaksjon';
+                selectEl.appendChild(option);
+            });
+        }
+
+        // Check for URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const fundParam = urlParams.get('fund');
+        if (fundParam) {
+            selectEl.value = fundParam;
+        }
     }
 
     async renderSingleBlogPost() {

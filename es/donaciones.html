@@ -350,6 +350,14 @@
                                 style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
                         </div>
 
+                        <!-- Purpose Selection -->
+                        <div style="margin-bottom: 30px;">
+                            <label style="display: block; font-weight: 600; margin-bottom: 15px; color: var(--text-dark);">¿Qué desea apoyar?</label>
+                            <select id="donation-purpose" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; background: white; outline: none; cursor: pointer; transition: border-color 0.3s ease;">
+                                <option value="general">Donación general (donde más se necesite)</option>
+                            </select>
+                        </div>
+
                         <!-- Payment Method -->
                         <div style="margin-bottom: 30px;">
                             <label
@@ -593,6 +601,7 @@
                                 const el = document.getElementById(id);
                                 return el ? el.value : '';
                             };
+                            const fundSelect = document.getElementById('donation-purpose');
 
                             const customerDetails = {
                                 name: getValue('donor-name'),
@@ -602,7 +611,8 @@
                                 zip: getValue('donor-zip'),
                                 city: getValue('donor-city'),
                                 message: getValue('donor-message'),
-                                userId: (window.firebase && firebase.auth && firebase.auth().currentUser) ? firebase.auth().currentUser.uid : null
+                                userId: (window.firebase && firebase.auth && firebase.auth().currentUser) ? firebase.auth().currentUser.uid : null,
+                                fund: fundSelect ? fundSelect.value : 'general'
                             };
 
                             initializeStripe(amount, customerDetails);

@@ -14424,14 +14424,26 @@ class AdminManager {
                 const checkedGoal = cause.goal || 100000;
                 const progress = checkedGoal > 0 ? Math.round((checkedCollected / checkedGoal) * 100) : 0;
 
+                // Beregn faktiske betalinger registrert på denne aksjonen
+                const causeId = cause.id || this.generateSlug(cause.title || '');
+                const matchingDonations = (this.allDonationRecords || []).filter(r => {
+                    const isCompleted = ['completed', 'succeeded', 'captured'].includes(String(r.status).toLowerCase());
+                    if (!isCompleted) return false;
+                    const f = String(r.fund || '').toLowerCase().trim();
+                    return f === causeId.toLowerCase().trim() || f === String(cause.title || '').toLowerCase().trim();
+                });
+                const actualSum = matchingDonations.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+                const hasDifference = actualSum !== checkedCollected;
+
                 return `
-                    <div class="cause-item">
-                        <div class="cause-header-row">
+                    <div class="cause-item" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 16px; background: white;">
+                        <div class="cause-header-row" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
                             <div class="cause-title-wrap">
-                                <h4 class="cause-title-text">${cause.title || 'Uten tittel'}</h4>
-                                <p class="cause-desc-text">${cause.description || ''}</p>
+                                <h4 class="cause-title-text" style="margin:0 0 4px 0; font-size:16px; font-weight:700; color:#1e293b;">${cause.title || 'Uten tittel'}</h4>
+                                <p class="cause-desc-text" style="margin:0; font-size:13px; color:#64748b;">${cause.description || ''}</p>
+                                <span style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:lowercase; display:inline-block; margin-top:6px;">ID: ${causeId}</span>
                             </div>
-                            <div class="cause-actions-wrap">
+                            <div class="cause-actions-wrap" style="display:flex; gap:8px;">
                                 <button class="action-btn edit-cause-btn" data-index="${index}" title="Rediger">
                                     <span class="material-symbols-outlined" style="pointer-events: none;">edit</span>
                                 </button>
@@ -14440,22 +14452,40 @@ class AdminManager {
                                 </button>
                             </div>
                         </div>
-                        <div class="cause-stats-row">
+                        <div class="cause-stats-row" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-top:16px; padding-top:16px; border-top:1px solid #f1f5f9;">
                             <div class="cause-stat-unit">
-                                <span class="cause-stat-label">Samlet inn</span>
-                                <span class="cause-stat-number success">${parseInt(checkedCollected).toLocaleString('no-NO')} kr</span>
+                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Visningsbeløp</span>
+                                <span class="cause-stat-number success" style="font-size:15px; font-weight:700; color:#10b981;">${parseInt(checkedCollected).toLocaleString('no-NO')} kr</span>
                             </div>
                             <div class="cause-stat-unit">
-                                <span class="cause-stat-label">Mål</span>
-                                <span class="cause-stat-number">${parseInt(checkedGoal).toLocaleString('no-NO')} kr</span>
+                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Betalinger i DB</span>
+                                <span class="cause-stat-number" style="font-size:15px; font-weight:700; color:#1B4965;">${parseInt(actualSum).toLocaleString('no-NO')} kr</span>
                             </div>
                             <div class="cause-stat-unit">
-                                <span class="cause-stat-label">Progresjon</span>
-                                <span class="cause-stat-number highlight">${progress}%</span>
+                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Mål</span>
+                                <span class="cause-stat-number" style="font-size:15px; font-weight:700; color:#475569;">${parseInt(checkedGoal).toLocaleString('no-NO')} kr</span>
+                            </div>
+                            <div class="cause-stat-unit">
+                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Progresjon</span>
+                                <span class="cause-stat-number highlight" style="font-size:15px; font-weight:700; color:#d97706;">${progress}%</span>
                             </div>
                         </div>
-                        <div class="progress-bar-wrap" style="margin-top: 16px;">
-                            <div class="progress-bar" style="width: ${Math.min(progress, 100)}%;"></div>
+                        
+                        ${hasDifference ? `
+                        <div style="margin-top:16px; padding:12px; background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <span class="material-symbols-outlined" style="color:#d97706; font-size:20px;">warning</span>
+                                <span style="font-size:13px; color:#b45309; font-weight:500;">Avvik: Det er registrert ${actualSum.toLocaleString('no-NO')} kr i betalinger.</span>
+                            </div>
+                            <button type="button" class="btn btn-secondary sync-cause-btn" data-index="${index}" data-sum="${actualSum}" style="padding:6px 12px; font-size:12px; background:#fff; border:1px solid #d97706; color:#d97706; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                                <span class="material-symbols-outlined" style="font-size:16px;">sync</span>
+                                Synkroniser
+                            </button>
+                        </div>
+                        ` : ''}
+
+                        <div class="progress-bar-wrap" style="margin-top: 16px; height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                            <div class="progress-bar" style="width: ${Math.min(progress, 100)}%; height:100%; background:#10b981; border-radius:3px;"></div>
                         </div>
                     </div>
                     `;
@@ -14470,6 +14500,14 @@ class AdminManager {
 
             document.querySelectorAll('.delete-cause-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => this.deleteCause(parseInt(e.target.dataset.index)));
+            });
+
+            document.querySelectorAll('.sync-cause-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const idx = parseInt(e.currentTarget.dataset.index);
+                    const sum = parseInt(e.currentTarget.dataset.sum);
+                    this.syncCauseCollected(idx, sum);
+                });
             });
         } catch (error) {
             console.error('Error loading causes:', error);
@@ -14494,7 +14532,15 @@ class AdminManager {
             let causesData = await firebaseService.getPageContent('collection_causes');
             let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
 
-            const newCause = { title, description, collected, goal, image };
+            // Opprett en stabil slug-ID
+            let causeId = '';
+            if (editId !== '' && causes[parseInt(editId)]) {
+                causeId = causes[parseInt(editId)].id || this.generateSlug(title);
+            } else {
+                causeId = this.generateSlug(title) || `cause-${Date.now()}`;
+            }
+
+            const newCause = { id: causeId, title, description, collected, goal, image };
 
             if (editId !== '') {
                 causes[parseInt(editId)] = newCause;
@@ -14544,6 +14590,33 @@ class AdminManager {
         } catch (error) {
             console.error('Error deleting cause:', error);
             this.showToast('Feil ved sletting av innsamlingsaksjon', 'error', 5000);
+        }
+    }
+
+    generateSlug(text) {
+        return String(text || '')
+            .toLowerCase()
+            .trim()
+            .replace(/æ/g, 'ae')
+            .replace(/ø/g, 'o')
+            .replace(/å/g, 'a')
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    async syncCauseCollected(index, actualSum) {
+        try {
+            let causesData = await firebaseService.getPageContent('collection_causes');
+            let causes = causesData && Array.isArray(causesData.items) ? causesData.items : [];
+            if (causes[index]) {
+                causes[index].collected = actualSum;
+                await firebaseService.savePageContent('collection_causes', { items: causes });
+                this.showToast('✅ Fremgang synkronisert!', 'success');
+                await this.loadCauses();
+            }
+        } catch (error) {
+            console.error('Error syncing cause collected:', error);
+            this.showToast('Feil under synkronisering', 'error', 5000);
         }
     }
 

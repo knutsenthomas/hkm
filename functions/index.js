@@ -2520,6 +2520,7 @@ exports.createPaymentIntent = onRequest({
         customer_city: customerDetails.city,
         message: customerDetails.message,
         user_id: resolvedUserId || "",
+        fund: customerDetails.fund || "general",
       },
       shipping: customerDetails.name && customerDetails.address ? {
         name: customerDetails.name,
@@ -2558,7 +2559,8 @@ exports.createPaymentIntent = onRequest({
       donorName: customerDetails.name || "Ukjent",
       donorEmail: customerDetails.email || "Ukjent",
       message: customerDetails.message || "",
-      type: "Gave"
+      type: "Gave",
+      fund: customerDetails.fund || "general"
     });
 
     // Returner clientSecret til frontend
@@ -2679,7 +2681,8 @@ exports.createVippsPayment = onRequest({
       donorName: customerDetails.name || "Ukjent",
       donorEmail: customerDetails.email || "Ukjent",
       message: customerDetails.message || "",
-      type: "Gave"
+      type: "Gave",
+      fund: customerDetails.fund || "general"
     });
 
     const paymentResponse = await fetch(`${baseUrl}/ecomm/v2/payments`, {
