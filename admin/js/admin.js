@@ -12422,6 +12422,7 @@ class AdminManager {
         const method = String(filters.method || 'all').toLowerCase();
 
         return records.filter((record) => {
+            if (record.isInKind) return false;
             const date = this.getDonationDate(record);
             if (start && (!date || date < start)) return false;
             if (end && (!date || date > end)) return false;
@@ -12488,11 +12489,12 @@ class AdminManager {
         const userMap = this.adminUserMap || new Map();
         const todayRange = this.buildDonationDateRange('today');
         const todayRecords = (this.allDonationRecords || []).filter((record) => {
+            if (record.isInKind) return false;
             const date = this.getDonationDate(record);
             return date && date >= todayRange.start && date <= todayRange.end;
         });
         const isCompleted = (record) => ['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase());
-        const allRecords = this.allDonationRecords || [];
+        const allRecords = (this.allDonationRecords || []).filter(r => !r.isInKind);
         const allCompletedRecords = allRecords.filter(isCompleted);
         const allCompletedTotal = allCompletedRecords.reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
         const allAverage = allCompletedRecords.length ? allCompletedTotal / allCompletedRecords.length : 0;
@@ -12734,6 +12736,621 @@ class AdminManager {
         } catch (e) {
             console.error('Kunne ikke slette gave:', e);
             this.showToast('Kunne ikke slette gaven: ' + e.message, 'error', 5000);
+        }
+    }
+
+    bindCausesTabs() {
+        const tabs = document.querySelectorAll('#causes-section .automation-tab');
+        const panes = document.querySelectorAll('#causes-section .cause-tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                tabs.forEach(t => {
+                    t.classList.toggle('active', t === tab);
+                    if (t === tab) {
+                        t.style.color = '#1B4965';
+                        t.style.borderBottomColor = '#1B4965';
+                    } else {
+                        t.style.color = '#64748b';
+                        t.style.borderBottomColor = 'transparent';
+                    }
+                });
+                panes.forEach(p => {
+                    p.style.display = p.id === `cause-tab-content-${target}` ? 'block' : 'none';
+                });
+                
+                if (target === 'dashboard') {
+                    this.renderGiftsDashboard();
+                } else if (target === 'inkind') {
+                    this.renderInKindDonations();
+                }
+            });
+        });
+        
+        this.renderGiftsDashboard();
+    }
+
+    renderGiftsDashboard() {
+        const container = document.getElementById('causes-dashboard-container');
+        if (!container) return;
+
+        const allRecords = Array.isArray(this.allDonationRecords) ? this.allDonationRecords : [];
+        const monetaryRecords = allRecords.filter(r => !r.isInKind);
+        
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const last30DaysRecords = monetaryRecords.filter(r => {
+            const d = this.getDonationDate(r);
+            return d && d >= thirtyDaysAgo && d <= now;
+        });
+        
+        const isCompleted = (r) => ['completed', 'succeeded', 'captured'].includes(String(r.status || '').toLowerCase());
+        const last30DaysCompleted = last30DaysRecords.filter(isCompleted);
+        const last30DaysTotal = last30DaysCompleted.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+        
+        const pad = (n) => String(n).padStart(2, '0');
+        const rangeText = `${pad(thirtyDaysAgo.getDate())}/${pad(thirtyDaysAgo.getMonth()+1)}/${thirtyDaysAgo.getFullYear()} - ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} - ${this.formatDonationCurrency(last30DaysTotal)}`;
+
+        const numIntervals = 15;
+        const intervalMs = (30 * 24 * 60 * 60 * 1000) / numIntervals;
+        const dailyData = Array.from({ length: numIntervals }).map((_, idx) => {
+            const start = new Date(thirtyDaysAgo.getTime() + idx * intervalMs);
+            const end = new Date(start.getTime() + intervalMs);
+            const intervalRecords = last30DaysCompleted.filter(r => {
+                const d = this.getDonationDate(r);
+                return d && d >= start && d < end;
+            });
+            const amount = intervalRecords.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+            return { start, end, amount };
+        });
+
+        const maxAmount = Math.max(...dailyData.map(d => d.amount), 1000);
+        const chartBarsHtml = dailyData.map(d => {
+            const pct = Math.round((d.amount / maxAmount) * 100);
+            const dateLabel = `${d.start.getDate()}/${d.start.getMonth()+1}`;
+            const tooltip = `${dateLabel}: ${d.amount.toLocaleString('no-NO')} kr`;
+            return `
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; position:relative;" title="${tooltip}">
+                    <div style="width:12px; height:80%; background:#f1f5f9; border-radius:999px; display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden;">
+                        <div style="height:${pct}%; background:#1B4965; border-radius:999px; transition: height 0.5s ease-out;"></div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        const uniqueDonors = new Set(last30DaysRecords.map(r => r.userId || r.donorEmail || r.donorName));
+        const donorCount = uniqueDonors.size;
+        
+        const donorFirstDonation = new Map();
+        monetaryRecords.forEach(r => {
+            const donorKey = r.userId || r.donorEmail || r.donorName;
+            const date = this.getDonationDate(r);
+            if (date) {
+                if (!donorFirstDonation.has(donorKey) || date < donorFirstDonation.get(donorKey)) {
+                    donorFirstDonation.set(donorKey, date);
+                }
+            }
+        });
+        
+        let newDonors = 0;
+        uniqueDonors.forEach(k => {
+            const firstDate = donorFirstDonation.get(k);
+            if (firstDate && firstDate >= thirtyDaysAgo) {
+                newDonors++;
+            }
+        });
+
+        const donorCompletedCounts = new Map();
+        monetaryRecords.forEach(r => {
+            if (isCompleted(r)) {
+                const donorKey = r.userId || r.donorEmail || r.donorName;
+                donorCompletedCounts.set(donorKey, (donorCompletedCounts.get(donorKey) || 0) + 1);
+            }
+        });
+        
+        let recurringDonors = 0;
+        uniqueDonors.forEach(k => {
+            if ((donorCompletedCounts.get(k) || 0) >= 2) {
+                recurringDonors++;
+            }
+        });
+
+        const textDonors = last30DaysCompleted.filter(r => String(r.method || '').toLowerCase() === 'vipps' || String(r.method || '').toLowerCase() === 'vipps_manual').length;
+
+        const donationCount30Days = last30DaysCompleted.length;
+        const methodsMap = new Map();
+        last30DaysCompleted.forEach(r => {
+            const m = String(r.method || 'other').toLowerCase();
+            methodsMap.set(m, (methodsMap.get(m) || 0) + 1);
+        });
+
+        const stripeCount = methodsMap.get('stripe') || 0;
+        const vippsCount = (methodsMap.get('vipps') || 0) + (methodsMap.get('vipps_manual') || 0);
+        const bankCount = methodsMap.get('bank') || 0;
+        const otherCount = donationCount30Days - stripeCount - vippsCount - bankCount;
+
+        const stripePct = donationCount30Days ? Math.round((stripeCount / donationCount30Days) * 100) : 0;
+        const vippsPct = donationCount30Days ? Math.round((vippsCount / donationCount30Days) * 100) : 0;
+        const bankPct = donationCount30Days ? Math.round((bankCount / donationCount30Days) * 100) : 0;
+        const otherPct = donationCount30Days ? Math.round((otherCount / donationCount30Days) * 100) : 0;
+
+        let accumulatedPct = 0;
+        const donutSlices = [
+            { pct: vippsPct, color: '#3b82f6' },
+            { pct: stripePct, color: '#f59e0b' },
+            { pct: bankPct, color: '#a855f7' },
+            { pct: otherPct, color: '#10b981' }
+        ].filter(s => s.pct > 0).map(s => {
+            const strokeDash = `${s.pct} ${100 - s.pct}`;
+            const strokeOffset = 100 - accumulatedPct;
+            accumulatedPct += s.pct;
+            return `<circle class="donut-segment" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="${s.color}" stroke-width="4" stroke-dasharray="${strokeDash}" stroke-dashoffset="${strokeOffset}"></circle>`;
+        }).join('');
+
+        const fundDonationsMap = new Map();
+        allRecords.forEach(r => {
+            if (isCompleted(r)) {
+                const f = r.fund || 'general';
+                fundDonationsMap.set(f, (fundDonationsMap.get(f) || 0) + this.normalizeDonationAmountNok(r));
+            }
+        });
+        const fundLabelsHtml = Array.from(fundDonationsMap.entries()).map(([fund, sum]) => {
+            return `
+                <div style="margin-bottom: 12px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span class="cms-pill" style="background:#f1f5f9; color:#475569; border-radius:4px; font-weight:600; text-transform:lowercase; font-size:12px;">${fund}</span>
+                        <strong style="color:#0f172a; font-size:13px;">${sum.toLocaleString('no-NO')} kr</strong>
+                    </div>
+                </div>
+            `;
+        }).join('') || '<p style="color:#64748b; font-size:13px; text-align:center;">Ingen merkelapper brukt ennå</p>';
+
+        container.innerHTML = `
+            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr) !important; gap: 24px; margin-bottom: 24px;">
+                <div class="card" style="grid-column: span 3; padding: 24px;">
+                    <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonshistorikk</span>
+                            <h4 style="margin: 4px 0 0; font-size: 18px; font-weight: 700; color: #0f172a;">Siste 30 dager</h4>
+                        </div>
+                        <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
+                    </div>
+                    <div style="height: 180px; display:flex; gap: 16px; align-items: flex-end; padding: 10px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
+                        ${chartBarsHtml}
+                    </div>
+                    <div style="display:flex; justify-content:space-between; color: #94a3b8; font-size: 11px; font-weight: 600;">
+                        <span>30 dager siden</span>
+                        <span>I dag</span>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; min-height: 240px;">
+                    <div style="margin-bottom: 20px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Givere i perioden</span>
+                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donorCount} givere</h4>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div style="width:28px; height:28px; border-radius:50%; background:#eff6ff; color:#3b82f6; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${newDonors}</div>
+                                <span style="font-size:13px; font-weight:600; color:#475569;">Nye givere</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div style="width:28px; height:28px; border-radius:50%; background:#f0fdf4; color:#16a34a; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${recurringDonors}</div>
+                                <span style="font-size:13px; font-weight:600; color:#475569;">Faste givere</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid #f1f5f9;">
+                            <div style="display:flex; align-items:center; gap:12px;">
+                                <div style="width:28px; height:28px; border-radius:50%; background:#fdf2f8; color:#db2777; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:12px;">${textDonors}</div>
+                                <span style="font-size:13px; font-weight:600; color:#475569;">Vipps-givere</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 24px; min-height: 240px;">
+                    <div style="margin-bottom: 16px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Gaver registrert</span>
+                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donationCount30Days} gaver</h4>
+                    </div>
+                    <div style="display: flex; gap: 20px; align-items: center;">
+                        <div style="flex: 1; display:flex; flex-direction:column; gap:8px;">
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#475569; margin-bottom:2px;">
+                                    <span>Vipps</span>
+                                    <span>${vippsPct}%</span>
+                                </div>
+                                <div style="height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden;">
+                                    <div style="width:${vippsPct}%; height:100%; background:#3b82f6;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#475569; margin-bottom:2px;">
+                                    <span>Kort (Stripe)</span>
+                                    <span>${stripePct}%</span>
+                                </div>
+                                <div style="height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden;">
+                                    <div style="width:${stripePct}%; height:100%; background:#f59e0b;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#475569; margin-bottom:2px;">
+                                    <span>Bank</span>
+                                    <span>${bankPct}%</span>
+                                </div>
+                                <div style="height:6px; background:#f1f5f9; border-radius:99px; overflow:hidden;">
+                                    <div style="width:${bankPct}%; height:100%; background:#a855f7;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="position:relative; width:90px; height:90px; flex-shrink:0;">
+                            <svg width="100%" height="100%" viewBox="0 0 42 42" class="donut">
+                                <circle class="donut-hole" cx="21" cy="21" r="15.91549430918954" fill="#fff"></circle>
+                                <circle class="donut-ring" cx="21" cy="21" r="15.91549430918954" fill="transparent" stroke="#f1f5f9" stroke-width="4"></circle>
+                                ${donutSlices}
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 24px; min-height: 240px; display: flex; flex-direction: column;">
+                    <div style="margin-bottom: 16px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Fordelt på formål</span>
+                        <h4 style="margin: 4px 0 0; font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Aktive formål</h4>
+                    </div>
+                    <div style="flex:1; overflow-y:auto; max-height:140px;">
+                        ${fundLabelsHtml}
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 24px; min-height: 240px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="width:100%; text-align:left; margin-bottom:12px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonsfordeling</span>
+                    </div>
+                    <div style="position:relative; width:100px; height:100px;">
+                        <div style="position:absolute; inset:0; border-radius:50%; background:#eff6ff; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(59,130,246,0.1);">
+                            <div style="width:68px; height:68px; border-radius:50%; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center;">
+                                <span class="material-symbols-outlined" style="color:#fff; font-size:28px;">volunteer_activism</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px; font-size:12px; font-weight:600; color:#64748b; text-align:center;">
+                        Alle fullførte donasjoner
+                    </div>
+                </div>
+
+                <div class="card" style="padding: 24px; min-height: 240px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Aksjonsprogresjon</span>
+                        <h4 style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
+                        <div style="background:#f8fafc; border-radius:8px; padding:10px 14px; border:1px solid #f1f5f9;">
+                            <div style="height:10px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:6px;">
+                                <div style="width:80%; height:100%; background:#1B4965; border-radius:99px;"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b;">
+                                <span>Aktiv aksjon</span>
+                                <span>80% oppnådd</span>
+                            </div>
+                        </div>
+                        <div style="background:#f8fafc; border-radius:8px; padding:10px 14px; border:1px solid #f1f5f9;">
+                            <div style="height:10px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:6px;">
+                                <div style="width:45%; height:100%; background:#d17d39; border-radius:99px;"></div>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b;">
+                                <span>Nytt bygg</span>
+                                <span>45% oppnådd</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    async seedInKindDonationsIfEmpty() {
+        if (!firebaseService.db) return;
+        try {
+            const inKindSnapshot = await firebaseService.db.collection('donations').where('isInKind', '==', true).get();
+            if (inKindSnapshot.empty) {
+                console.log("Seeding mock in-kind donations...");
+                const batch = firebaseService.db.batch();
+                const inKindData = [
+                    { date: '2024-04-10', desc: 'Refrigerator', donor: 'Gene Perry', email: 'gene@perry.com', fund: 'new-building', ack: false, value: 300, userId: null },
+                    { date: '2024-04-09', desc: '25 Gallons of Interior Paint', donor: 'Marshall Johnson', email: 'marshall@johnson.com', fund: 'new-building', ack: true, value: 625, userId: 'marshall_johnson_placeholder' },
+                    { date: '2024-04-07', desc: 'Oven - Used', donor: 'Bruce Cook', email: 'bruce@cook.com', fund: 'new-building', ack: false, value: 250, userId: null },
+                    { date: '2024-03-29', desc: 'Artwork - A Small Monet Painting', donor: 'Suchi Gupta', email: 'suchi@gupta.com', fund: 'general', ack: true, value: 15000, userId: null },
+                    { date: '2024-03-17', desc: '2019 Toyota Corolla (Used)', donor: 'Alma Lopez', email: 'alma@lopez.com', fund: 'domestic-missions-sandnes', ack: false, value: 14500, userId: null },
+                    { date: '2024-02-15', desc: 'Maytag Refrigerator (Used)', donor: 'Ashley Johnson', email: 'ashley@johnson.com', fund: 'new-building', ack: true, value: null, userId: 'ashley_johnson_placeholder' },
+                    { date: '2024-02-05', desc: 'Drywall Install for 5 Rooms', donor: 'Jesse Cohen', email: 'jesse@cohen.com', fund: 'new-building', ack: false, value: null, userId: null },
+                    { date: '2024-01-09', desc: '30 Shares of Stock (GFI)', donor: 'Ashley Johnson', email: 'ashley@johnson.com', fund: 'general', ack: false, value: 530, userId: 'ashley_johnson_placeholder' },
+                    { date: '2024-01-07', desc: '75 Shares of Stock', donor: 'Joe Smith', email: 'joe@smith.com', fund: 'general', ack: true, value: 6750, userId: 'joe_smith_placeholder' }
+                ];
+
+                inKindData.forEach(item => {
+                    const docRef = firebaseService.db.collection('donations').doc();
+                    const docId = docRef.id;
+                    const timestamp = firebase.firestore.Timestamp.fromDate(new Date(item.date));
+                    const payload = {
+                        transactionId: docId,
+                        paymentIntentId: docId,
+                        manualDonationId: docId,
+                        amount: item.value || 0,
+                        amountNok: item.value || 0,
+                        amountOre: (item.value || 0) * 100,
+                        currency: 'USD',
+                        method: 'in_kind',
+                        status: 'completed',
+                        timestamp,
+                        completedAt: timestamp,
+                        userId: item.userId,
+                        donorName: item.donor,
+                        donorEmail: item.email,
+                        description: item.desc,
+                        fund: item.fund,
+                        acknowledgmentSent: item.ack,
+                        isInKind: true,
+                        type: 'Gave',
+                        source: 'manual_admin',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    batch.set(docRef, payload);
+                });
+                await batch.commit();
+                console.log("Seeding in-kind donations completed successfully!");
+            }
+        } catch (e) {
+            console.warn("Failed to seed in-kind donations:", e);
+        }
+    }
+
+    async renderInKindDonations() {
+        const container = document.getElementById('inkind-donations-container');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div style="display:flex; justify-content:center; padding:32px;">
+                <div class="loader">Laster tingsgaver...</div>
+            </div>
+        `;
+
+        await this.seedInKindDonationsIfEmpty();
+
+        let inKindDonations = [];
+        try {
+            if (firebaseService.db) {
+                const snapshot = await firebaseService.db.collection('donations').where('isInKind', '==', true).get();
+                inKindDonations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            }
+        } catch (e) {
+            console.error("Failed to load in-kind donations:", e);
+        }
+
+        inKindDonations.sort((a, b) => {
+            const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+            const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+            return bDate - aDate;
+        });
+
+        const inKindCount = inKindDonations.length;
+        const userMap = this.adminUserMap || new Map();
+
+        const tableRows = inKindDonations.map(record => {
+            const date = this.getDonationDate(record);
+            const dateStr = date ? `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}` : 'Ukjent';
+            const name = this.escapeHtml(record.donorName || 'Ukjent');
+            
+            const isLinked = !!record.userId;
+            const donorCell = isLinked 
+                ? `<span style="display:inline-flex; align-items:center; gap:6px;">${name} <span class="material-symbols-outlined" style="font-size:16px; color:#1B4965; vertical-align:middle; cursor:pointer;" title="Koblet til profil">link</span></span>`
+                : name;
+
+            const fund = String(record.fund || 'general').toLowerCase();
+            let fundBadge = '';
+            if (fund === 'new-building') {
+                fundBadge = `<span style="background: #ffedd5; color: #d97706; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 13px; text-transform: lowercase;">new-building</span>`;
+            } else if (fund === 'domestic-missions-sandnes' || fund.includes('domestic')) {
+                fundBadge = `<span style="background: #d1fae5; color: #059669; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 13px; text-transform: lowercase;">domestic-missions-san...</span>`;
+            } else {
+                fundBadge = `<span style="background: #e2e8f0; color: #475569; padding: 4px 8px; border-radius: 4px; font-weight: 600; font-size: 13px; text-transform: lowercase;">general</span>`;
+            }
+
+            const ackSent = record.acknowledgmentSent 
+                ? `<span class="material-symbols-outlined" style="font-size:20px; color:#475569; font-weight:bold;">check</span>`
+                : '';
+
+            let valueStr = '';
+            if (record.amount) {
+                valueStr = record.amount.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+            }
+
+            return `
+                <tr>
+                    <td>${dateStr}</td>
+                    <td>${this.escapeHtml(record.description || '')}</td>
+                    <td>${donorCell}</td>
+                    <td>${fundBadge}</td>
+                    <td class="text-center" style="text-align:center;">${ackSent}</td>
+                    <td class="text-right" style="text-align:right; font-weight:600; color:#334155;">${valueStr}</td>
+                    <td class="text-right" style="text-align:right; width:1px; white-space:nowrap;">
+                        <button type="button" class="action-btn delete-inkind-btn" data-id="${record.id}" title="Slett tingsgave" style="color:#ef4444; background:none; border:none; cursor:pointer;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        const tableBodyHtml = tableRows || `<tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen tingsgaver registrert.</td></tr>`;
+
+        container.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; padding-top:8px;">
+                <h3 style="margin:0; font-size:24px; font-weight:700; color:#0f172a;">${inKindCount} In-Kind Donations</h3>
+                <button type="button" class="btn-primary" id="add-manual-inkind-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
+                    <span class="material-symbols-outlined" style="font-size:20px;">volunteer_activism</span>
+                    Registrer tingsgave
+                </button>
+            </div>
+            
+            <div class="card" style="margin-bottom:24px; overflow:hidden;">
+                <div style="overflow-x:auto;">
+                    <table class="data-table" style="width:100%;">
+                        <thead>
+                            <tr>
+                                <th>Date Received</th>
+                                <th>Description</th>
+                                <th>Donor</th>
+                                <th>Fund</th>
+                                <th style="text-align:center;">Acknowledgment Sent</th>
+                                <th style="text-align:right;">Fair Market Value</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="inkind-transactions-body">
+                            ${tableBodyHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('add-manual-inkind-btn')?.addEventListener('click', () => this.openManualInKindModal());
+
+        container.querySelectorAll('.delete-inkind-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const donationId = btn.dataset.id;
+                await this.deleteInKindDonation(donationId);
+            });
+        });
+    }
+
+    openManualInKindModal() {
+        const modal = document.getElementById('manual-inkind-modal');
+        if (!modal) return;
+        const form = document.getElementById('manual-inkind-form');
+        if (form) form.reset();
+        modal.style.display = 'flex';
+    }
+
+    closeManualInKindModal() {
+        const modal = document.getElementById('manual-inkind-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    handleManualInKindUserSelect(userId) {
+        const user = userId ? this.adminUserMap?.get(userId) : null;
+        const nameInput = document.getElementById('manual-inkind-donor-name');
+        const emailInput = document.getElementById('manual-inkind-donor-email');
+        if (!user) return;
+
+        if (nameInput) {
+            nameInput.value = user.displayName || user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim() || user.email || '';
+        }
+        if (emailInput) emailInput.value = user.email || '';
+    }
+
+    async saveManualInKind() {
+        const saveBtn = document.getElementById('save-manual-inkind-btn');
+        const getValue = (id) => document.getElementById(id)?.value?.trim() || '';
+        const selectedUserId = getValue('manual-inkind-user');
+        const donorName = getValue('manual-inkind-donor-name');
+        const donorEmail = getValue('manual-inkind-donor-email').toLowerCase();
+        const desc = getValue('manual-inkind-desc');
+        const dateValue = getValue('manual-inkind-date');
+        const fund = getValue('manual-inkind-fund') || 'general';
+        const valueUsd = Number(getValue('manual-inkind-value')) || null;
+        const ackSent = document.getElementById('manual-inkind-ack')?.checked || false;
+
+        const selectedUser = selectedUserId ? this.adminUserMap?.get(selectedUserId) : null;
+        const resolvedUserId = selectedUserId || '';
+        const resolvedName = donorName || selectedUser?.displayName || selectedUser?.fullName || selectedUser?.email || 'Ukjent giver';
+        const resolvedEmail = donorEmail || selectedUser?.email || '';
+
+        if (!desc) {
+            this.showToast('Skriv inn en beskrivelse av tingsgaven.', 'warning', 3500);
+            return;
+        }
+
+        const donationDate = dateValue ? new Date(dateValue) : new Date();
+        if (Number.isNaN(donationDate.getTime())) {
+            this.showToast('Datoen er ikke gyldig.', 'warning', 3500);
+            return;
+        }
+
+        await this._runWriteLocked('manual-inkind:create', async () => this._withButtonLoading(saveBtn, async () => {
+            const docRef = firebaseService.db.collection('donations').doc();
+            const docId = docRef.id;
+            const timestamp = firebase.firestore.Timestamp.fromDate(donationDate);
+            const currentAdmin = firebase.auth().currentUser;
+            const payload = {
+                transactionId: docId,
+                paymentIntentId: docId,
+                manualDonationId: docId,
+                amount: valueUsd || 0,
+                amountNok: valueUsd || 0,
+                amountOre: (valueUsd || 0) * 100,
+                currency: 'USD',
+                method: 'in_kind',
+                status: 'completed',
+                timestamp,
+                completedAt: timestamp,
+                userId: resolvedUserId || null,
+                donorName: resolvedName,
+                donorEmail: resolvedEmail || 'Ukjent',
+                description: desc,
+                fund,
+                acknowledgmentSent: ackSent,
+                isInKind: true,
+                type: 'Gave',
+                source: 'manual_admin',
+                registeredBy: currentAdmin?.uid || null,
+                registeredByEmail: currentAdmin?.email || '',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            await docRef.set(payload);
+
+            const newRecord = { id: docId, ...payload, createdAt: new Date(), updatedAt: new Date() };
+            this.allDonationRecords = [newRecord, ...(this.allDonationRecords || [])]
+                .sort((a, b) => {
+                    const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+                    const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+                    return bDate - aDate;
+                });
+
+            this.closeManualInKindModal();
+            await this.renderInKindDonations();
+            this.showToast('Tingsgaven er registrert.', 'success', 4000);
+        }, {
+            loadingText: 'Lagrer...'
+        }));
+    }
+
+    async deleteInKindDonation(donationId) {
+        if (!donationId) return;
+        const confirmed = await this.showConfirm(
+            'Slett tingsgave',
+            'Er du sikker på at du vil slette denne tingsgaven? Dette vil fjerne gaven permanent fra databasen.',
+            'Slett'
+        );
+        if (!confirmed) return;
+        try {
+            await firebaseService.db.collection('donations').doc(donationId).delete();
+            this.allDonationRecords = (this.allDonationRecords || []).filter(r => r.id !== donationId);
+            await this.renderInKindDonations();
+            this.showToast('Tingsgaven ble slettet permanent.', 'success', 4000);
+        } catch (e) {
+            console.error('Kunne ikke slette tingsgave:', e);
+            this.showToast('Kunne ikke slette tingsgaven: ' + e.message, 'error', 5000);
         }
     }
 
@@ -13195,9 +13812,10 @@ class AdminManager {
             if (firebaseService.db) {
                 const donationsSnapshot = await firebaseService.db.collection('donations').get();
                 donationRecords = donationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                donationCount = donationRecords.length;
+                const monetaryRecords = donationRecords.filter(r => !r.isInKind);
+                donationCount = monetaryRecords.length;
                 if (!donationsSnapshot.empty) {
-                    donationRecords.forEach(data => {
+                    monetaryRecords.forEach(data => {
                         if (['completed', 'succeeded', 'captured'].includes(String(data.status || '').toLowerCase())) {
                             completedDonationCount++;
                             totalDonations += this.normalizeDonationAmountNok(data);
@@ -13233,388 +13851,503 @@ class AdminManager {
             })
             .join('');
 
-
         section.innerHTML = `
-            <div class="stats-grid" style="margin-bottom: 32px;">
-                <div class="stat-card modern">
-                    <div class="stat-icon-wrap green">
-                        <span class="material-symbols-outlined">payments</span>
+            <!-- Tabs Navigation -->
+            <div class="causes-tabs-container" style="margin-bottom: 24px;">
+                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
+                    <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
+                    <button class="automation-tab" data-tab="donations">By Donation</button>
+                    <button class="automation-tab" data-tab="donors">By Donor</button>
+                    <button class="automation-tab" data-tab="inkind">In-Kind</button>
+                </div>
+            </div>
+
+            <!-- Tab 1: Dashboard Content -->
+            <div id="cause-tab-content-dashboard" class="cause-tab-pane" style="display: block;">
+                <div id="causes-dashboard-container">
+                    <div style="display:flex; justify-content:center; padding:32px;">
+                        <div class="loader">Laster dashboard...</div>
                     </div>
-                    <div class="stat-content">
-                        <h3 class="stat-label">Fullført totalt</h3>
-                        <p class="stat-value" id="donation-total-amount">${formattedTotal}</p>
-                        <p class="stat-trend">Alle fullførte gaver</p>
+                </div>
+                
+                <div class="card" style="margin-top: 24px;">
+                    <div class="card-header flex-between">
+                        <div>
+                            <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Administrer dine pågående kampanjer.</p>
+                        </div>
+                        <button class="btn-primary" id="add-cause-btn">
+                            <span class="material-symbols-outlined">add</span>
+                            Ny aksjon
+                        </button>
+                    </div>
+                    <div class="card-body" id="causes-list">
+                        <div class="loader"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: By Donation Content -->
+            <div id="cause-tab-content-donations" class="cause-tab-pane" style="display: none;">
+                <div class="stats-grid" style="margin-bottom: 32px;">
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap green">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Fullført totalt</h3>
+                            <p class="stat-value" id="donation-total-amount">${formattedTotal}</p>
+                            <p class="stat-trend">Alle fullførte gaver</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Antall gaver</h3>
+                            <p class="stat-value" id="donation-total-count">${donationCount}</p>
+                            <span class="stat-meta">Registrerte transaksjoner</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap mint">
+                            <span class="material-symbols-outlined">trending_up</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Snittgave</h3>
+                            <p class="stat-value" id="donation-average-amount">${formattedAverage}</p>
+                            <span class="stat-meta">Per donasjon</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap purple">
+                            <span class="material-symbols-outlined">today</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Dagens gaver</h3>
+                            <p class="stat-value" id="donation-today-amount">--</p>
+                            <span class="stat-meta" id="donation-today-count">Laster...</span>
+                        </div>
                     </div>
                 </div>
 
-                        <div class="stat-card modern">
-                            <div class="stat-icon-wrap blue">
-                                <span class="material-symbols-outlined">volunteer_activism</span>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-label">Antall gaver</h3>
-                                <p class="stat-value" id="donation-total-count">${donationCount}</p>
-                                <span class="stat-meta">Registrerte transaksjoner</span>
-                            </div>
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                        <div>
+                            <h3 class="card-title">Gaveoversikt</h3>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på dato, status, metode eller giver.</p>
                         </div>
-
-                        <div class="stat-card modern">
-                            <div class="stat-icon-wrap mint">
-                                <span class="material-symbols-outlined">trending_up</span>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-label">Snittgave</h3>
-                                <p class="stat-value" id="donation-average-amount">${formattedAverage}</p>
-                                <span class="stat-meta">Per donasjon</span>
-                            </div>
-                        </div>
-
-                        <div class="stat-card modern">
-                            <div class="stat-icon-wrap purple">
-                                <span class="material-symbols-outlined">today</span>
-                            </div>
-                            <div class="stat-content">
-                                <h3 class="stat-label">Dagens gaver</h3>
-                                <p class="stat-value" id="donation-today-amount">--</p>
-                                <span class="stat-meta" id="donation-today-count">Laster...</span>
-                            </div>
+                        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
+                            <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">add_card</span>
+                                Registrer gave
+                            </button>
+                            <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
+                                Importer bank
+                            </button>
+                            <button type="button" class="btn-secondary" id="donation-clear-filters" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
+                                Nullstill
+                            </button>
                         </div>
                     </div>
-
-                    <div class="card" style="margin-bottom: 24px;">
-                        <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-                            <div>
-                                <h3 class="card-title">Gaveoversikt</h3>
-                                <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på dato, status, metode eller giver.</p>
+                    <div class="card-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                            <div class="form-group" style="margin:0;">
+                                <label>Periode</label>
+                                <select id="donation-date-preset" class="form-control">
+                                    <option value="today">I dag</option>
+                                    <option value="7">Siste 7 dager</option>
+                                    <option value="30" selected>Siste 30 dager</option>
+                                    <option value="month">Denne måneden</option>
+                                    <option value="year">I år</option>
+                                    <option value="all">Alle</option>
+                                    <option value="custom">Egendefinert</option>
+                                </select>
                             </div>
-                            <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-                                <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
-                                    <span class="material-symbols-outlined" style="font-size:20px;">add_card</span>
-                                    Registrer gave
-                                </button>
-                                <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
-                                    <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
-                                    Importer bank
-                                </button>
-                                <button type="button" class="btn-secondary" id="donation-clear-filters" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
-                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
-                                    Nullstill
-                                </button>
+                            <div class="form-group" style="margin:0;">
+                                <label>Status</label>
+                                <select id="donation-status-filter" class="form-control">
+                                    <option value="all">Alle statuser</option>
+                                    <option value="completed">Fullført</option>
+                                    <option value="pending">Venter</option>
+                                    <option value="processing">Behandles</option>
+                                    <option value="failed">Feilet</option>
+                                    <option value="cancelled">Avbrutt</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="card-body">
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
-                                <div class="form-group" style="margin:0;">
-                                    <label>Periode</label>
-                                    <select id="donation-date-preset" class="form-control">
-                                        <option value="today">I dag</option>
-                                        <option value="7">Siste 7 dager</option>
-                                        <option value="30" selected>Siste 30 dager</option>
-                                        <option value="month">Denne måneden</option>
-                                        <option value="year">I år</option>
-                                        <option value="all">Alle</option>
-                                        <option value="custom">Egendefinert</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="margin:0;">
-                                    <label>Status</label>
-                                    <select id="donation-status-filter" class="form-control">
-                                        <option value="all">Alle statuser</option>
-                                        <option value="completed">Fullført</option>
-                                        <option value="pending">Venter</option>
-                                        <option value="processing">Behandles</option>
-                                        <option value="failed">Feilet</option>
-                                        <option value="cancelled">Avbrutt</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="margin:0;">
-                                    <label>Metode</label>
-                                    <select id="donation-method-filter" class="form-control">
-                                        <option value="all">Alle metoder</option>
-                                        <option value="stripe">Stripe</option>
-                                        <option value="vipps">Vipps</option>
-                                        <option value="vipps_manual">Vipps manuelt</option>
-                                        <option value="card">Kort</option>
-                                        <option value="bank">Bank</option>
-                                        <option value="cash">Kontant</option>
-                                        <option value="manual">Manuell</option>
-                                        <option value="other">Annen tjeneste</option>
-                                    </select>
-                                </div>
-                                <div class="form-group" style="margin:0;">
-                                    <label>Søk</label>
-                                    <input id="donation-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
-                                </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Metode</label>
+                                <select id="donation-method-filter" class="form-control">
+                                    <option value="all">Alle metoder</option>
+                                    <option value="stripe">Stripe</option>
+                                    <option value="vipps">Vipps</option>
+                                    <option value="vipps_manual">Vipps manuelt</option>
+                                    <option value="card">Kort</option>
+                                    <option value="bank">Bank</option>
+                                    <option value="cash">Kontant</option>
+                                    <option value="manual">Manuell</option>
+                                    <option value="other">Annen tjeneste</option>
+                                </select>
                             </div>
-                            <div id="donation-custom-dates" style="display:none;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
-                                <div class="form-group" style="margin:0;">
-                                    <label>Fra dato</label>
-                                    <input id="donation-start-date" class="form-control" type="date">
-                                </div>
-                                <div class="form-group" style="margin:0;">
-                                    <label>Til dato</label>
-                                    <input id="donation-end-date" class="form-control" type="date">
-                                </div>
-                            </div>
-
-                            <div class="stats-grid donation-metrics-grid" style="margin-bottom: 20px;">
-                                <div class="stat-card modern">
-                                    <div class="stat-content">
-                                        <h3 class="stat-label">Valgt periode</h3>
-                                        <p class="stat-value" id="donation-period-amount">--</p>
-                                        <span class="stat-meta" id="donation-period-count">Laster...</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card modern">
-                                    <div class="stat-content">
-                                        <h3 class="stat-label">Givere</h3>
-                                        <p class="stat-value" id="donation-donor-count">--</p>
-                                        <span class="stat-meta">Unike givere i filteret</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card modern">
-                                    <div class="stat-content">
-                                        <h3 class="stat-label">Under behandling</h3>
-                                        <p class="stat-value" id="donation-pending-count">--</p>
-                                        <span class="stat-meta">Ikke fullført ennå</span>
-                                    </div>
-                                </div>
-                                <div class="stat-card modern">
-                                    <div class="stat-content">
-                                        <h3 class="stat-label">Ukoblede</h3>
-                                        <p class="stat-value" id="donation-unmatched-count">--</p>
-                                        <span class="stat-meta">Mangler profilkobling</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div style="overflow-x:auto;">
-                                <table class="data-table" style="width:100%;">
-                                    <thead>
-                                        <tr>
-                                            <th>Dato</th>
-                                            <th>Giver</th>
-                                            <th>Metode</th>
-                                            <th>Status</th>
-                                            <th>Profil</th>
-                                            <th class="text-right">Beløp</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="donation-transactions-body">
-                                        <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster gaver...</td></tr>
-                                    </tbody>
-                                </table>
+                            <div class="form-group" style="margin:0;">
+                                <label>Søk</label>
+                                <input id="donation-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
                             </div>
                         </div>
-                    </div>
-
-                    <div class="card" style="margin-bottom: 24px;">
-                        <div class="card-header flex-between">
-                            <div>
-                                <h3 class="card-title">Givere</h3>
-                                <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
+                        <div id="donation-custom-dates" style="display:none;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                            <div class="form-group" style="margin:0;">
+                                <label>Fra dato</label>
+                                <input id="donation-start-date" class="form-control" type="date">
                             </div>
-                            <div class="form-group" style="margin:0;min-width:240px;">
-                                <input id="donor-search" class="form-control" type="search" placeholder="Søk etter giver">
+                            <div class="form-group" style="margin:0;">
+                                <label>Til dato</label>
+                                <input id="donation-end-date" class="form-control" type="date">
                             </div>
                         </div>
-                        <div class="card-body" style="overflow-x:auto;">
+
+                        <div class="stats-grid donation-metrics-grid" style="margin-bottom: 20px;">
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Valgt periode</h3>
+                                    <p class="stat-value" id="donation-period-amount">--</p>
+                                    <span class="stat-meta" id="donation-period-count">Laster...</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Givere</h3>
+                                    <p class="stat-value" id="donation-donor-count">--</p>
+                                    <span class="stat-meta">Unike givere i filteret</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Under behandling</h3>
+                                    <p class="stat-value" id="donation-pending-count">--</p>
+                                    <span class="stat-meta">Ikke fullført ennå</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Ukoblede</h3>
+                                    <p class="stat-value" id="donation-unmatched-count">--</p>
+                                    <span class="stat-meta">Mangler profilkobling</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="overflow-x:auto;">
                             <table class="data-table" style="width:100%;">
                                 <thead>
                                     <tr>
+                                        <th>Dato</th>
                                         <th>Giver</th>
-                                        <th>Fullført / totalt</th>
-                                        <th>Metoder</th>
-                                        <th>Siste gave</th>
+                                        <th>Metode</th>
+                                        <th>Status</th>
                                         <th>Profil</th>
-                                        <th class="text-right">Sum</th>
+                                        <th class="text-right">Beløp</th>
                                     </tr>
                                 </thead>
-                                <tbody id="donation-donors-body">
-                                    <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
+                                <tbody id="donation-transactions-body">
+                                    <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster gaver...</td></tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div id="bank-import-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
-                        <div class="modal-backdrop" onclick="window.adminManager?.closeBankImportModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
-                        <div class="modal-content" style="max-width:1100px;position:relative;max-height:min(92vh,820px);overflow:auto;">
-                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
-                                <div>
-                                    <h3 style="margin:0;">Importer bankgaver</h3>
-                                    <p class="section-subtitle" style="margin:4px 0 0;">Last opp CSV eller CAMT/XML fra nettbanken. Du får forhåndsvisning før lagring.</p>
-                                </div>
-                                <button class="modal-close" type="button" onclick="window.adminManager?.closeBankImportModal?.()">×</button>
-                            </div>
-                            <div class="modal-body" style="display:grid;gap:16px;">
-                                <div style="display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:14px;align-items:end;">
-                                    <div class="form-group" style="margin:0;">
-                                        <label>Bankfil</label>
-                                        <input id="bank-import-file" class="form-control" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml">
-                                    </div>
-                                    <div style="font-size:12px;line-height:1.5;color:#64748b;padding-bottom:8px;">
-                                        Støtter vanlige CSV-filer og ISO 20022 CAMT XML.
-                                    </div>
-                                </div>
-                                <div id="bank-import-summary" style="font-size:13px;color:#475569;font-weight:700;"></div>
-                                <div id="bank-import-preview">
-                                    <div style="padding:24px;text-align:center;color:#64748b;">Velg en CSV- eller CAMT/XML-fil fra nettbanken.</div>
-                                </div>
-                            </div>
-                            <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
-                                <button class="btn-secondary" type="button" id="cancel-bank-import-btn">Avbryt</button>
-                                <button class="btn-primary" type="button" id="save-bank-import-btn" disabled>
-                                    <span class="material-symbols-outlined">cloud_upload</span>
-                                    Importer valgte
-                                </button>
-                            </div>
+            <!-- Tab 3: By Donor Content -->
+            <div id="cause-tab-content-donors" class="cause-tab-pane" style="display: none;">
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header flex-between">
+                        <div>
+                            <h3 class="card-title">Givere</h3>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
+                        </div>
+                        <div class="form-group" style="margin:0;min-width:240px;">
+                            <input id="donor-search" class="form-control" type="search" placeholder="Søk etter giver">
                         </div>
                     </div>
+                    <div class="card-body" style="overflow-x:auto;">
+                        <table class="data-table" style="width:100%;">
+                            <thead>
+                                <tr>
+                                    <th>Giver</th>
+                                    <th>Fullført / totalt</th>
+                                    <th>Metoder</th>
+                                    <th>Siste gave</th>
+                                    <th>Profil</th>
+                                    <th class="text-right">Sum</th>
+                                </tr>
+                            </thead>
+                            <tbody id="donation-donors-body">
+                                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
-                    <div id="manual-donation-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
-                        <div class="modal-backdrop" onclick="window.adminManager?.closeManualDonationModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
-                        <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
-                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
-                                <div>
-                                    <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer manuell gave</h3>
-                                    <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">For bank, kontant, Vipps utenom nettbetaling eller andre tjenester.</p>
-                                </div>
-                                <button class="modal-close" type="button" onclick="window.adminManager?.closeManualDonationModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
-                                    <span class="material-symbols-outlined" style="font-size:24px;">close</span>
-                                </button>
+            <!-- Tab 4: In-Kind Content -->
+            <div id="cause-tab-content-inkind" class="cause-tab-pane" style="display: none;">
+                <div id="inkind-donations-container">
+                    <!-- Loaded dynamically -->
+                </div>
+            </div>
+
+            <!-- Global Modals -->
+            <div id="bank-import-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:20px;">
+                <div class="modal-backdrop" onclick="window.adminManager?.closeBankImportModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+                <div class="modal-content" style="max-width:1100px;position:relative;max-height:min(92vh,820px);overflow:auto;">
+                    <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <h3 style="margin:0;">Importer bankgaver</h3>
+                            <p class="section-subtitle" style="margin:4px 0 0;">Last opp CSV eller CAMT/XML fra nettbanken. Du får forhåndsvisning før lagring.</p>
+                        </div>
+                        <button class="modal-close" type="button" onclick="window.adminManager?.closeBankImportModal?.()">×</button>
+                    </div>
+                    <div class="modal-body" style="display:grid;gap:16px;">
+                        <div style="display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:14px;align-items:end;">
+                            <div class="form-group" style="margin:0;">
+                                <label>Bankfil</label>
+                                <input id="bank-import-file" class="form-control" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml">
                             </div>
-                            <form id="manual-donation-form">
-                                <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
-                                    <div class="form-group" style="margin:0;">
-                                        <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
-                                        <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                            <option value="">Ikke koble til profil</option>
-                                            ${manualDonationUserOptions}
-                                        </select>
-                                    </div>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
-                                        <div class="form-group" style="margin:0;">
-                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
-                                            <input id="manual-donor-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                        </div>
-                                        <div class="form-group" style="margin:0;">
-                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
-                                            <input id="manual-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                        </div>
-                                    </div>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
-                                        <div class="form-group" style="margin:0;">
-                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beløp (NOK)</label>
-                                            <input id="manual-donation-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="500" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                        </div>
-                                        <div class="form-group" style="margin:0;">
-                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato</label>
-                                            <input id="manual-donation-date" class="form-control" type="datetime-local" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                        </div>
-                                    </div>
-                                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
-                                        <div class="form-group" style="margin:0;">
-                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
-                                            <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                                <option value="bank">Bank</option>
-                                                <option value="manual">Manuell</option>
-                                                <option value="vipps_manual">Vipps manuelt</option>
-                                                <option value="cash">Kontant</option>
-                                                <option value="other">Annen tjeneste</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group" style="margin:0;">
-                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
-                                            <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                                <option value="completed">Fullført</option>
-                                                <option value="pending">Venter</option>
-                                                <option value="processing">Behandles</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group" style="margin:0;">
-                                            <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Referanse</label>
-                                            <input id="manual-donation-reference" class="form-control" type="text" placeholder="Bankreferanse e.l." style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
-                                        </div>
-                                    </div>
-                                    <div class="form-group" style="margin:0;">
-                                        <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Notat</label>
-                                        <textarea id="manual-donation-note" class="form-control" rows="3" placeholder="Valgfritt internt notat" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease; resize:vertical;"></textarea>
-                                    </div>
-                                </div>
-                                <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; align-items:center; gap:16px;">
-                                    <button class="btn-secondary" type="button" id="cancel-manual-donation-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Avbryt</button>
-                                    <button class="btn-primary" type="submit" id="save-manual-donation-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease;">
-                                        <span class="material-symbols-outlined" style="font-size:20px;">save</span>
-                                        Lagre gave
-                                    </button>
-                                </div>
-                            </form>
+                            <div style="font-size:12px;line-height:1.5;color:#64748b;padding-bottom:8px;">
+                                Støtter vanlige CSV-filer og ISO 20022 CAMT XML.
+                            </div>
+                        </div>
+                        <div id="bank-import-summary" style="font-size:13px;color:#475569;font-weight:700;"></div>
+                        <div id="bank-import-preview">
+                            <div style="padding:24px;text-align:center;color:#64748b;">Velg en CSV- eller CAMT/XML-fil fra nettbanken.</div>
                         </div>
                     </div>
+                    <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
+                        <button class="btn-secondary" type="button" id="cancel-bank-import-btn">Avbryt</button>
+                        <button class="btn-primary" type="button" id="save-bank-import-btn" disabled>
+                            <span class="material-symbols-outlined">cloud_upload</span>
+                            Importer valgte
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                    <div class="card">
-                        <div class="card-header flex-between">
-                            <div>
-                                <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
-                                <p class="section-subtitle" style="margin-bottom: 0;">Administrer dine pågående kampanjer.</p>
+            <div id="manual-donation-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
+                <div class="modal-backdrop" onclick="window.adminManager?.closeManualDonationModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+                <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
+                    <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer manuell gave</h3>
+                            <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">For bank, kontant, Vipps utenom nettbetaling eller andre tjenester.</p>
+                        </div>
+                        <button class="modal-close" type="button" onclick="window.adminManager?.closeManualDonationModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
+                            <span class="material-symbols-outlined" style="font-size:24px;">close</span>
+                        </button>
+                    </div>
+                    <form id="manual-donation-form">
+                        <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
+                            <div class="form-group" style="margin:0;">
+                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
+                                <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <option value="">Ikke koble til profil</option>
+                                    ${manualDonationUserOptions}
+                                </select>
                             </div>
-                            <button class="btn-primary" id="add-cause-btn">
-                                <span class="material-symbols-outlined">add</span>
-                                Ny aksjon
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
+                                    <input id="manual-donor-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
+                                    <input id="manual-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beløp (NOK)</label>
+                                    <input id="manual-donation-amount" class="form-control" type="number" min="1" step="0.01" required placeholder="500" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato</label>
+                                    <input id="manual-donation-date" class="form-control" type="datetime-local" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
+                                    <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                        <option value="bank">Bank</option>
+                                        <option value="manual">Manuell</option>
+                                        <option value="vipps_manual">Vipps manuelt</option>
+                                        <option value="cash">Kontant</option>
+                                        <option value="other">Annen tjeneste</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
+                                    <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                        <option value="completed">Fullført</option>
+                                        <option value="pending">Venter</option>
+                                        <option value="processing">Behandles</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Referanse</label>
+                                    <input id="manual-donation-reference" class="form-control" type="text" placeholder="Bankreferanse e.l." style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Notat</label>
+                                <textarea id="manual-donation-note" class="form-control" rows="3" placeholder="Valgfritt internt notat" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease; resize:vertical;"></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; align-items:center; gap:16px;">
+                            <button class="btn-secondary" type="button" id="cancel-manual-donation-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Avbryt</button>
+                            <button class="btn-primary" type="submit" id="save-manual-donation-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">save</span>
+                                Lagre gave
                             </button>
                         </div>
-                        <div class="card-body" id="causes-list">
-                            <div class="loader"></div>
-                        </div>
-                    </div>
+                    </form>
+                </div>
+            </div>
 
-                    <div id="cause-form-modal" style="display: none;">
-                        <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
-                        <div class="modal-content" style="max-width: 600px;">
-                            <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
-                                <h3 id="form-title">Ny innsamlingsaksjon</h3>
-                                <button class="modal-close" onclick="document.getElementById('cause-form-modal').style.display = 'none'">×</button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="form-group">
-                                    <label>Tittel</label>
-                                    <input type="text" id="cause-title" class="form-control" placeholder="f.eks. Støtt vårt arbeid">
-                                </div>
-                                <div class="form-group">
-                                    <label>Beskrivelse</label>
-                                    <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
-                                </div>
-                                <div class="form-group">
-                                    <label>Innsamlet beløp (kr)</label>
-                                    <input type="number" id="cause-collected" class="form-control" placeholder="0" value="0">
-                                </div>
-                                <div class="form-group">
-                                    <label>Målbeløp (kr)</label>
-                                    <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
-                                </div>
-                                <div class="form-group">
-                                    <label>Bildekilde (URL)</label>
-                                    <div style="display: flex; gap: 8px;">
-                                        <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/..." style="flex: 1;">
-                                        <button type="button" id="cause-unsplash-btn" class="btn btn-secondary" style="padding: 0 12px; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 13px;">
-                                            <span class="material-symbols-outlined" style="font-size: 18px;">image_search</span> Unsplash
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
-                                <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').style.display = 'none'">Avbryt</button>
-                                <button class="btn-primary" id="save-cause-btn">Lagre</button>
+            <div id="cause-form-modal" style="display: none;">
+                <div class="modal-backdrop" onclick="document.getElementById('cause-form-modal').style.display = 'none'"></div>
+                <div class="modal-content" style="max-width: 600px;">
+                    <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                        <h3 id="form-title">Ny innsamlingsaksjon</h3>
+                        <button class="modal-close" onclick="document.getElementById('cause-form-modal').style.display = 'none'">×</button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label>Tittel</label>
+                            <input type="text" id="cause-title" class="form-control" placeholder="f.eks. Støtt vårt arbeid">
+                        </div>
+                        <div class="form-group">
+                            <label>Beskrivelse</label>
+                            <textarea id="cause-description" class="form-control" style="height: 100px;" placeholder="Beskriv hva innsamlingen er for..."></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>Innsamlet beløp (kr)</label>
+                            <input type="number" id="cause-collected" class="form-control" placeholder="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Målbeløp (kr)</label>
+                            <input type="number" id="cause-goal" class="form-control" placeholder="100000" value="100000">
+                        </div>
+                        <div class="form-group">
+                            <label>Bildekilde (URL)</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="url" id="cause-image" class="form-control" placeholder="https://images.unsplash.com/..." style="flex: 1;">
+                                <button type="button" id="cause-unsplash-btn" class="btn btn-secondary" style="padding: 0 12px; border-radius: 8px; display: flex; align-items: center; gap: 4px; font-size: 13px;">
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">image_search</span> Unsplash
+                                </button>
                             </div>
                         </div>
                     </div>
-                    `;
+                    <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
+                        <button class="btn-secondary" onclick="document.getElementById('cause-form-modal').style.display = 'none'">Avbryt</button>
+                        <button class="btn-primary" id="save-cause-btn">Lagre</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Manual In-Kind Modal -->
+            <div id="manual-inkind-modal" style="display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;">
+                <div class="modal-backdrop" onclick="window.adminManager?.closeManualInKindModal?.()" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+                <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
+                    <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
+                        <div>
+                            <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer tingsgave</h3>
+                            <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">For registrering av fysiske gaver, utstyr, tjenester eller aksjer.</p>
+                        </div>
+                        <button class="modal-close" type="button" onclick="window.adminManager?.closeManualInKindModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
+                            <span class="material-symbols-outlined" style="font-size:24px;">close</span>
+                        </button>
+                    </div>
+                    <form id="manual-inkind-form">
+                        <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
+                            <div class="form-group" style="margin:0;">
+                                <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
+                                <select id="manual-inkind-user" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <option value="">Ikke koble til profil</option>
+                                    ${manualDonationUserOptions}
+                                </select>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers navn</label>
+                                    <input id="manual-inkind-donor-name" class="form-control" type="text" placeholder="Fullt navn" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Givers e-post</label>
+                                    <input id="manual-inkind-donor-email" class="form-control" type="email" placeholder="navn@eksempel.no" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beskrivelse av tingsgave</label>
+                                    <input id="manual-inkind-desc" class="form-control" type="text" required placeholder="f.eks. Kjøleskap, maling, etc." style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Dato mottatt</label>
+                                    <input id="manual-inkind-date" class="form-control" type="date" required style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Formål (Fund)</label>
+                                    <select id="manual-inkind-fund" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                        <option value="general">general</option>
+                                        <option value="new-building">new-building</option>
+                                        <option value="domestic-missions-sandnes">domestic-missions-sandnes</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="margin:0;">
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Verdi (USD, valgfritt)</label>
+                                    <input id="manual-inkind-value" class="form-control" type="number" min="0" step="0.01" placeholder="300" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                </div>
+                                <div class="form-group" style="margin:0; display:flex; align-items:center; padding-top:28px;">
+                                    <label style="display:flex; align-items:center; gap:8px; font-weight:600; color:#334155; font-size:0.875rem; cursor:pointer;">
+                                        <input id="manual-inkind-ack" type="checkbox" style="width:18px; height:18px; cursor:pointer;">
+                                        Mottaksbekreftelse sendt
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="padding:24px 32px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; align-items:center; gap:16px;">
+                            <button class="btn-secondary" type="button" id="cancel-manual-inkind-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Avbryt</button>
+                            <button class="btn-primary" type="submit" id="save-manual-inkind-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">save</span>
+                                Lagre tingsgave
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
         section.setAttribute('data-rendered', 'true');
 
         this.bindDonationAdminFilters();
         this.renderDonationAdminViews();
         await this.loadCauses();
+
+        this.bindCausesTabs();
+
+        document.getElementById('manual-inkind-user')?.addEventListener('change', (event) => this.handleManualInKindUserSelect(event.target.value));
+        document.getElementById('manual-inkind-form')?.addEventListener('submit', (event) => {
+            event.preventDefault();
+            this.saveManualInKind();
+        });
+        document.getElementById('cancel-manual-inkind-btn')?.addEventListener('click', () => this.closeManualInKindModal());
 
         document.getElementById('add-cause-btn').addEventListener('click', () => {
             document.getElementById('form-title').textContent = 'Ny innsamlingsaksjon';
@@ -13627,7 +14360,6 @@ class AdminManager {
             document.getElementById('cause-form-modal').style.display = 'flex';
         });
 
-        // --- Unsplash Listener for Causes ---
         const causeUnsplashBtn = document.getElementById('cause-unsplash-btn');
         if (causeUnsplashBtn) {
             causeUnsplashBtn.onclick = () => {
