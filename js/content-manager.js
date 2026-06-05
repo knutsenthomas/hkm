@@ -1175,10 +1175,10 @@ class ContentManager {
         const articleHtml = this.resolveArticleHtml(item, sourceItem);
         const heroImage = this.getContentItemImage(item, sourceItem, articleHtml);
         if (heroEl && heroImage) {
-            heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${heroImage}')`;
-            heroEl.style.backgroundSize = 'cover';
-            heroEl.style.backgroundPosition = 'center center';
-            heroEl.style.backgroundRepeat = 'no-repeat';
+            heroEl.style.setProperty('background', `linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('${heroImage}')`, 'important');
+            heroEl.style.setProperty('background-size', 'cover', 'important');
+            heroEl.style.setProperty('background-position', 'center center', 'important');
+            heroEl.style.setProperty('background-repeat', 'no-repeat', 'important');
         }
 
         // --- Calculate Reading Time ---
@@ -2782,7 +2782,10 @@ class ContentManager {
                 const heroEl = document.querySelector('.page-hero') || document.querySelector('.hero-section') || el;
                 if (heroEl) {
                     heroEl.style.transition = 'background-image 0.7s cubic-bezier(0.4,0,0.2,1)';
-                    heroEl.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`;
+                    heroEl.style.setProperty('background', `linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('${bgUrl}')`, 'important');
+                    heroEl.style.setProperty('background-size', 'cover', 'important');
+                    heroEl.style.setProperty('background-position', 'center center', 'important');
+                    heroEl.style.setProperty('background-repeat', 'no-repeat', 'important');
                 }
                 return;
             }
@@ -3386,7 +3389,10 @@ class ContentManager {
                 // Also update Hero Background when image is ready
                 const pageHero = document.querySelector('.page-hero');
                 if (pageHero) {
-                    pageHero.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${imageUrl}')`;
+                    pageHero.style.setProperty('background', `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url('${imageUrl}')`, 'important');
+                    pageHero.style.setProperty('background-size', 'cover', 'important');
+                    pageHero.style.setProperty('background-position', 'center center', 'important');
+                    pageHero.style.setProperty('background-repeat', 'no-repeat', 'important');
                 }
             };
             tempImg.onerror = function () {
