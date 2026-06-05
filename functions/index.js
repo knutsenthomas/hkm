@@ -2367,7 +2367,7 @@ function getVippsSystemHeaders(config) {
 
 async function getVippsPayment(config, baseUrl, accessToken, reference) {
   const paymentResponse = await fetch(
-      `${baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}`,
+      `${baseUrl}/ecomm/v2/payments/${encodeURIComponent(reference)}/details`,
       {
         method: "GET",
         headers: {
@@ -2389,7 +2389,31 @@ async function getVippsPayment(config, baseUrl, accessToken, reference) {
     throw new Error(`Vipps get payment error: ${errorDetail}`);
   }
 
-  return paymentPayload;
+  // Normalize eCom v2 response to match expected state structure
+  const history = paymentPayload.transactionLogHistory || [];
+  let state = "INITIATED";
+  const successOps = history.filter(h => h.operationSuccess);
+  if (successOps.length > 0) {
+    const latestOp = successOps[successOps.length - 1].operation;
+    if (latestOp === "CAPTURE") state = "CAPTURED";
+    else if (latestOp === "RESERVE") state = "AUTHORIZED";
+    else if (latestOp === "CANCEL" || latestOp === "VOID") state = "CANCELLED";
+    else if (latestOp === "REFUND") state = "REFUNDED";
+  }
+
+  let amountVal = 0;
+  if (history.length > 0) {
+    amountVal = history[0].amount;
+  }
+
+  return {
+    ...paymentPayload,
+    state,
+    amount: {
+      value: amountVal,
+      currency: "NOK"
+    }
+  };
 }
 
 async function captureVippsPayment(config, baseUrl, accessToken, reference, amount) {
@@ -2398,7 +2422,7 @@ async function captureVippsPayment(config, baseUrl, accessToken, reference, amou
     `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
   const captureResponse = await fetch(
-      `${baseUrl}/epayment/v1/payments/${encodeURIComponent(reference)}/capture`,
+      `${baseUrl}/ecomm/v2/payments/${encodeURIComponent(reference)}/capture`,
       {
         method: "POST",
         headers: {
@@ -2406,13 +2430,16 @@ async function captureVippsPayment(config, baseUrl, accessToken, reference, amou
           Authorization: `Bearer ${accessToken}`,
           "Ocp-Apim-Subscription-Key": config.subscriptionKey,
           "Merchant-Serial-Number": config.merchantSerialNumber,
-          "Idempotency-Key": idempotencyKey,
+          "X-Request-Id": idempotencyKey,
           ...getVippsSystemHeaders(config),
         },
         body: JSON.stringify({
-          modificationAmount: {
-            currency: amount && amount.currency ? amount.currency : "NOK",
-            value: amount && Number.isFinite(amount.value) ? amount.value : 0,
+          merchantInfo: {
+            merchantSerialNumber: config.merchantSerialNumber,
+          },
+          transaction: {
+            amount: amount && Number.isFinite(amount.value) ? amount.value : 0,
+            transactionText: "Capture donasjon",
           },
         }),
       },
@@ -2619,21 +2646,22 @@ exports.createVippsPayment = onRequest({
     const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
 
     const paymentRequest = {
-      amount: {
-        currency: "NOK",
-        value: amountOre,
+      merchantInfo: {
+        merchantSerialNumber: config.merchantSerialNumber,
+        callbackPrefix: "https://europe-west3-his-kingdom-ministry.cloudfunctions.net", // adjust if needed
+        fallBack: paymentReturnUrl,
+        isApp: false
       },
-      paymentMethod: {
-        type: "WALLET",
-      },
-      reference,
-      returnUrl: paymentReturnUrl,
-      userFlow: "WEB_REDIRECT",
-      paymentDescription: "Donasjon til His Kingdom Ministry"
+      customerInfo: {},
+      transaction: {
+        amount: amountOre,
+        orderId: reference,
+        transactionText: "Donasjon til His Kingdom Ministry"
+      }
     };
 
     if (phoneNumber) {
-      paymentRequest.customer = { phoneNumber };
+      paymentRequest.customerInfo.mobileNumber = phoneNumber;
     }
 
     // Lagre en "pending" donasjon i databasen før vi i det hele tatt spør Vipps
@@ -2654,16 +2682,11 @@ exports.createVippsPayment = onRequest({
       type: "Gave"
     });
 
-    const idempotencyKey = crypto.randomUUID ?
-      crypto.randomUUID() :
-      `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-
-    const paymentResponse = await fetch(`${baseUrl}/epayment/v1/payments`, {
+    const paymentResponse = await fetch(`${baseUrl}/ecomm/v2/payments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${accessToken}`,
-        "Idempotency-Key": idempotencyKey,
         "Ocp-Apim-Subscription-Key": config.subscriptionKey,
         "Merchant-Serial-Number": config.merchantSerialNumber,
         ...getVippsSystemHeaders(config),
@@ -2680,12 +2703,12 @@ exports.createVippsPayment = onRequest({
       throw new Error(`Vipps create payment error: ${errorDetail}`);
     }
 
-    if (!paymentPayload.redirectUrl) {
-      throw new Error("Vipps did not return redirectUrl");
+    if (!paymentPayload.url) {
+      throw new Error("Vipps did not return url");
     }
 
     res.status(200).send({
-      redirectUrl: paymentPayload.redirectUrl,
+      redirectUrl: paymentPayload.url,
       reference,
       state: paymentPayload.state || null,
     });
@@ -2818,7 +2841,7 @@ exports.vippsWebhook = onRequest({
     // Vipps Webhook payload (avhenger litt av ePayment v1 strukturen)
     // De sender normalt "name" (event name) og "reference" eller "orderId"
     const reference = payload.reference || payload.orderId;
-    const eventName = payload.name; // F.eks. "payment.captured" eller "payment.authorized"
+    const eventName = payload.name || payload.status; // Support both ePayment name and eCom status
     
     if (!reference) {
       res.status(400).send("Missing reference");
@@ -2826,7 +2849,13 @@ exports.vippsWebhook = onRequest({
     }
 
     // Hvis betalingen er reservert (authorized) eller trukket (captured), anser vi gaven som mottatt
-    if (eventName === 'payment.captured' || eventName === 'payment.authorized' || !eventName) {
+    if (
+      eventName === 'payment.captured' ||
+      eventName === 'payment.authorized' ||
+      eventName === 'RESERVE' ||
+      eventName === 'CAPTURE' ||
+      !eventName
+    ) {
       
       // Vi oppdaterer den eksisterende "pending"-posten vi opprettet i createVippsPayment
       await db.collection('donations').doc(reference).set({

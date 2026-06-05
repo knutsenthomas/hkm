@@ -12547,12 +12547,28 @@ class AdminManager {
                         <td><span class="method-tag">${method}</span></td>
                         <td><span class="method-tag">${status}</span></td>
                         <td>${profileStatus}</td>
-                        <td class="text-right"><strong>${amount}</strong></td>
+                        <td class="text-right">
+                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+                                <strong>${amount}</strong>
+                                <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett gave" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                </button>
+                            </div>
+                        </td>
                     </tr>
                 `;
             }).join('') : `
                 <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen gaver matcher filteret.</td></tr>
             `;
+
+            // Bind click events to delete buttons
+            transactionsBody.querySelectorAll('.delete-donation-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const donationId = btn.dataset.id;
+                    await this.deleteDonation(donationId);
+                });
+            });
         }
 
         const donorsBody = document.getElementById('donation-donors-body');
@@ -12700,6 +12716,25 @@ class AdminManager {
         }, {
             loadingText: 'Lagrer...'
         }));
+    }
+
+    async deleteDonation(donationId) {
+        if (!donationId) return;
+        const confirmed = await this.showConfirm(
+            'Slett gave',
+            'Er du sikker på at du vil slette denne gaven? Dette vil fjerne gaven permanent fra databasen.',
+            'Slett'
+        );
+        if (!confirmed) return;
+        try {
+            await firebaseService.db.collection('donations').doc(donationId).delete();
+            this.allDonationRecords = (this.allDonationRecords || []).filter(r => r.id !== donationId);
+            this.renderDonationAdminViews();
+            this.showToast('Gaven ble slettet permanent.', 'success', 4000);
+        } catch (e) {
+            console.error('Kunne ikke slette gave:', e);
+            this.showToast('Kunne ikke slette gaven: ' + e.message, 'error', 5000);
+        }
     }
 
     openBankImportModal() {
