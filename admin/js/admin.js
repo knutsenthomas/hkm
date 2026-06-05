@@ -12907,8 +12907,8 @@ class AdminManager {
         }).join('') || '<p style="color:#64748b; font-size:13px; text-align:center;">Ingen merkelapper brukt ennå</p>';
 
         container.innerHTML = `
-            <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr) !important; gap: 24px; margin-bottom: 24px;">
-                <div class="card" style="grid-column: span 3; padding: 24px;">
+            <div class="stats-grid" style="gap: 24px; margin-bottom: 24px;">
+                <div class="card" style="grid-column: span 12 !important; padding: 24px;">
                     <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <span style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonshistorikk</span>
@@ -12925,7 +12925,7 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between; min-height: 240px;">
+                <div class="card" style="grid-column: span 4 !important; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; min-height: 240px;">
                     <div style="margin-bottom: 20px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Givere i perioden</span>
                         <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donorCount} givere</h4>
@@ -12952,7 +12952,7 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px; min-height: 240px;">
+                <div class="card" style="grid-column: span 4 !important; padding: 24px; min-height: 240px;">
                     <div style="margin-bottom: 16px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Gaver registrert</span>
                         <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donationCount30Days} gaver</h4>
@@ -12998,7 +12998,7 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px; min-height: 240px; display: flex; flex-direction: column;">
+                <div class="card" style="grid-column: span 4 !important; padding: 24px; min-height: 240px; display: flex; flex-direction: column;">
                     <div style="margin-bottom: 16px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Fordelt på formål</span>
                         <h4 style="margin: 4px 0 0; font-size: 16px; font-weight: 800; color: #0f172a; margin-bottom: 12px;">Aktive formål</h4>
@@ -13008,7 +13008,7 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px; min-height: 240px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                <div class="card" style="grid-column: span 6 !important; padding: 24px; min-height: 240px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
                     <div style="width:100%; text-align:left; margin-bottom:12px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonsfordeling</span>
                     </div>
@@ -13024,7 +13024,7 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="padding: 24px; min-height: 240px; display:flex; flex-direction:column; justify-content:space-between;">
+                <div class="card" style="grid-column: span 6 !important; padding: 24px; min-height: 240px; display:flex; flex-direction:column; justify-content:space-between;">
                     <div>
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Aksjonsprogresjon</span>
                         <h4 style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
