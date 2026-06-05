@@ -13117,7 +13117,7 @@ class AdminManager {
 
         container.innerHTML = `
             <div style="display:flex; justify-content:center; padding:32px;">
-                <div class="loader">Laster tingsgaver...</div>
+                <div class="loader">Laster fysiske gaver...</div>
             </div>
         `;
 
@@ -13180,7 +13180,7 @@ class AdminManager {
                     <td class="text-center" style="text-align:center;">${ackSent}</td>
                     <td class="text-right" style="text-align:right; font-weight:600; color:#334155;">${valueStr}</td>
                     <td class="text-right" style="text-align:right; width:1px; white-space:nowrap;">
-                        <button type="button" class="action-btn delete-inkind-btn" data-id="${record.id}" title="Slett tingsgave" style="color:#ef4444; background:none; border:none; cursor:pointer;">
+                        <button type="button" class="action-btn delete-inkind-btn" data-id="${record.id}" title="Slett fysisk gave" style="color:#ef4444; background:none; border:none; cursor:pointer;">
                             <span class="material-symbols-outlined" style="font-size:20px;">delete</span>
                         </button>
                     </td>
@@ -13188,14 +13188,14 @@ class AdminManager {
             `;
         }).join('');
 
-        const tableBodyHtml = tableRows || `<tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen tingsgaver registrert.</td></tr>`;
+        const tableBodyHtml = tableRows || `<tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen fysiske gaver registrert.</td></tr>`;
 
         container.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; padding-top:8px;">
-                <h3 style="margin:0; font-size:24px; font-weight:700; color:#0f172a;">${inKindCount} tingsgaver</h3>
+                <h3 style="margin:0; font-size:24px; font-weight:700; color:#0f172a;">${inKindCount} fysiske gaver</h3>
                 <button type="button" class="btn-primary" id="add-manual-inkind-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
                     <span class="material-symbols-outlined" style="font-size:20px;">volunteer_activism</span>
-                    Registrer tingsgave
+                    Registrer fysisk gave
                 </button>
             </div>
             
@@ -13275,7 +13275,7 @@ class AdminManager {
         const resolvedEmail = donorEmail || selectedUser?.email || '';
 
         if (!desc) {
-            this.showToast('Skriv inn en beskrivelse av tingsgaven.', 'warning', 3500);
+            this.showToast('Skriv inn en beskrivelse av den fysiske gaven.', 'warning', 3500);
             return;
         }
 
@@ -13329,7 +13329,7 @@ class AdminManager {
 
             this.closeManualInKindModal();
             await this.renderInKindDonations();
-            this.showToast('Tingsgaven er registrert.', 'success', 4000);
+            this.showToast('Den fysiske gaven er registrert.', 'success', 4000);
         }, {
             loadingText: 'Lagrer...'
         }));
@@ -13338,8 +13338,8 @@ class AdminManager {
     async deleteInKindDonation(donationId) {
         if (!donationId) return;
         const confirmed = await this.showConfirm(
-            'Slett tingsgave',
-            'Er du sikker på at du vil slette denne tingsgaven? Dette vil fjerne gaven permanent fra databasen.',
+            'Slett fysisk gave',
+            'Er du sikker på at du vil slette denne fysiske gaven? Dette vil fjerne gaven permanent fra databasen.',
             'Slett'
         );
         if (!confirmed) return;
@@ -13347,10 +13347,10 @@ class AdminManager {
             await firebaseService.db.collection('donations').doc(donationId).delete();
             this.allDonationRecords = (this.allDonationRecords || []).filter(r => r.id !== donationId);
             await this.renderInKindDonations();
-            this.showToast('Tingsgaven ble slettet permanent.', 'success', 4000);
+            this.showToast('Den fysiske gaven ble slettet permanent.', 'success', 4000);
         } catch (e) {
-            console.error('Kunne ikke slette tingsgave:', e);
-            this.showToast('Kunne ikke slette tingsgaven: ' + e.message, 'error', 5000);
+            console.error('Kunne ikke slette fysisk gave:', e);
+            this.showToast('Kunne ikke slette den fysiske gaven: ' + e.message, 'error', 5000);
         }
     }
 
@@ -13879,7 +13879,7 @@ class AdminManager {
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
                     <button class="automation-tab" data-tab="donations">Per gave</button>
                     <button class="automation-tab" data-tab="donors">Per giver</button>
-                    <button class="automation-tab" data-tab="inkind">Tingsgaver</button>
+                    <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
                 </div>
             </div>
 
@@ -14287,7 +14287,7 @@ class AdminManager {
                 <div class="modal-content" style="max-width:720px;position:relative;max-height:min(90vh,760px);overflow:auto;">
                     <div class="modal-header" style="padding:24px 32px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:flex-start;">
                         <div>
-                            <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer tingsgave</h3>
+                            <h3 style="margin:0; font-size:1.5rem; color:#0f172a; font-weight:700;">Registrer fysisk gave</h3>
                             <p class="section-subtitle" style="margin:8px 0 0; color:#64748b; font-size:0.875rem; line-height:1.5;">For registrering av fysiske gaver, utstyr, tjenester eller aksjer.</p>
                         </div>
                         <button class="modal-close" type="button" onclick="window.adminManager?.closeManualInKindModal?.()" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; margin:-4px; display:flex; align-items:center; justify-content:center; transition:color 0.2s ease, transform 0.2s ease;" onmouseover="this.style.color='#0f172a'; this.style.transform='scale(1.1)';" onmouseout="this.style.color='#64748b'; this.style.transform='scale(1)';">
@@ -14315,7 +14315,7 @@ class AdminManager {
                             </div>
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
-                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beskrivelse av tingsgave</label>
+                                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Beskrivelse av fysisk gave</label>
                                     <input id="manual-inkind-desc" class="form-control" type="text" required placeholder="f.eks. Kjøleskap, maling, etc." style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                 </div>
                                 <div class="form-group" style="margin:0;">
@@ -14348,7 +14348,7 @@ class AdminManager {
                             <button class="btn-secondary" type="button" id="cancel-manual-inkind-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; cursor:pointer; transition:all 0.2s ease;">Avbryt</button>
                             <button class="btn-primary" type="submit" id="save-manual-inkind-btn" style="padding:12px 24px; border-radius:8px; font-weight:600; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s ease;">
                                 <span class="material-symbols-outlined" style="font-size:20px;">save</span>
-                                Lagre tingsgave
+                                Lagre fysisk gave
                             </button>
                         </div>
                     </form>
