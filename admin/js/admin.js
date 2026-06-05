@@ -1155,18 +1155,24 @@ class AdminManager {
                !k.includes('tiktok');
     }
 
-    async _buildPageContentTranslation(obj, targetLang, sourceLang = 'no') {
+    async _buildPageContentTranslation(obj, targetLang, sourceLang = 'no', existingTranslation = null, existingSource = null) {
         if (Array.isArray(obj)) {
             const result = [];
-            for (const item of obj) {
+            for (let i = 0; i < obj.length; i++) {
+                const item = obj[i];
+                const existingVal = (Array.isArray(existingSource) && existingSource.length > i) ? existingSource[i] : null;
+                const existingTransVal = (Array.isArray(existingTranslation) && existingTranslation.length > i) ? existingTranslation[i] : null;
+
                 if (typeof item === 'string') {
-                    if (this._isLikelyNonTranslatableToken(item)) {
+                    if (existingVal === item && existingTransVal !== undefined && existingTransVal !== null) {
+                        result.push(existingTransVal);
+                    } else if (this._isLikelyNonTranslatableToken(item)) {
                         result.push(item);
                     } else {
                         result.push(await this._translateRichText(item, targetLang, sourceLang));
                     }
                 } else if (typeof item === 'object' && item !== null) {
-                    result.push(await this._buildPageContentTranslation(item, targetLang, sourceLang));
+                    result.push(await this._buildPageContentTranslation(item, targetLang, sourceLang, existingTransVal, existingVal));
                 } else {
                     result.push(item);
                 }
@@ -1181,14 +1187,19 @@ class AdminManager {
                 if (key === 'translations') {
                     continue;
                 }
+                const existingVal = existingSource ? existingSource[key] : null;
+                const existingTransVal = existingTranslation ? existingTranslation[key] : null;
+
                 if (typeof value === 'string') {
-                    if (this._isTranslatableKey(key) && !this._isLikelyNonTranslatableToken(value)) {
+                    if (existingVal === value && existingTransVal !== undefined && existingTransVal !== null) {
+                        result[key] = existingTransVal;
+                    } else if (this._isTranslatableKey(key) && !this._isLikelyNonTranslatableToken(value)) {
                         result[key] = await this._translateRichText(value, targetLang, sourceLang);
                     } else {
                         result[key] = value;
                     }
                 } else if (typeof value === 'object' && value !== null) {
-                    result[key] = await this._buildPageContentTranslation(value, targetLang, sourceLang);
+                    result[key] = await this._buildPageContentTranslation(value, targetLang, sourceLang, existingTransVal, existingVal);
                 } else {
                     result[key] = value;
                 }
@@ -18177,8 +18188,9 @@ class AdminManager {
                         sanitized.translations = sanitized.translations || {};
                         try {
                             this.showToast('Oversetter innhold til engelsk og spansk...', 'info', 3000);
-                            sanitized.translations.en = await this._buildPageContentTranslation(sanitized, 'en', 'no');
-                            sanitized.translations.es = await this._buildPageContentTranslation(sanitized, 'es', 'no');
+                            const currentDoc = await firebaseService.getPageContent(pageId) || {};
+                            sanitized.translations.en = await this._buildPageContentTranslation(sanitized, 'en', 'no', currentDoc?.translations?.en, currentDoc);
+                            sanitized.translations.es = await this._buildPageContentTranslation(sanitized, 'es', 'no', currentDoc?.translations?.es, currentDoc);
                         } catch (transErr) {
                             console.error('Kunne ikke fullføre automatisk oversettelse:', transErr);
                             this.showToast('⚠️ Lagret, men oversettelse feilet: ' + transErr.message, 'warning', 8000);
