@@ -317,11 +317,11 @@ class AdminManager {
     /**
      * Executes an async callback while showing a loading state on the provided button.
      */
-    async _withButtonLoading(btn, callback) {
+    async _withButtonLoading(btn, callback, options = {}) {
         if (!btn) return await callback();
         const utils = window.HKMAdminUtils || {};
         if (typeof utils.withButtonLoading === 'function') {
-            return await utils.withButtonLoading(btn, callback);
+            return await utils.withButtonLoading(btn, callback, options);
         }
         return await callback();
     }
@@ -10909,6 +10909,15 @@ class AdminManager {
                             } else {
                                 this.showToast(`⚠️ Delvis oversettelse lagret (${successfulLanguages.length}/${targetLanguages.length} språk).`, 'warning', 6500);
                             }
+
+                            // Show checkmark success indicator on the button
+                            const originalHtml = translateBtn.dataset.hkmOriginalHtml || translateBtn.innerHTML;
+                            setTimeout(() => {
+                                translateBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size: 18px; color: #10b981; vertical-align: middle; margin-right: 4px;">check_circle</span><span>Oversatt</span>';
+                                setTimeout(() => {
+                                    translateBtn.innerHTML = originalHtml;
+                                }, 3000);
+                            }, 50);
                         } catch (error) {
                             console.error('Error translating current blog item:', error);
                             this.showToast(error?.message || 'Kunne ikke oversette innlegget nå.', 'error', 6000);
@@ -10916,7 +10925,7 @@ class AdminManager {
                             if (slowNoticeTimer) clearTimeout(slowNoticeTimer);
                         }
                     }, {
-                        loadingText: '<span class="material-symbols-outlined" style="font-size:18px;">hourglass_top</span> Oversetter...'
+                        loadingText: '<span class="material-symbols-outlined spin" style="font-size:18px; vertical-align:middle; margin-right:4px;">sync</span> Oversetter...'
                     });
                 };
             }
