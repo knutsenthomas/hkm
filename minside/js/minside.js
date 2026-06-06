@@ -1246,9 +1246,8 @@ class MinSideManager {
 
         const queries = [];
         if (uid) {
-            let q = db.collection('donations').where('userId', '==', uid);
-            if (order) q = q.orderBy('timestamp', 'desc');
-            queries.push(q.get());
+            queries.push(db.collection('donations').where('userId', '==', uid).get());
+            queries.push(db.collection('donations').where('uid', '==', uid).get());
         }
         if (email) {
             queries.push(db.collection('donations').where('donorEmail', '==', email).get());
