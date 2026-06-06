@@ -267,9 +267,12 @@ function openAgreementModal() {
                 <!-- Personal Info -->
                 <div class="hkm-form-group">
                     <label class="hkm-form-label">Dine opplysninger</label>
+                    <label for="hkm-donor-name" class="sr-only">Fullt navn</label>
                     <input type="text" id="hkm-donor-name" name="name" autocomplete="name" class="hkm-input" placeholder="Fullt navn" required style="margin-bottom: 8px;">
+                    <label for="hkm-donor-email" class="sr-only">E-postadresse</label>
                     <input type="email" id="hkm-donor-email" name="email" autocomplete="email" class="hkm-input" placeholder="E-postadresse" required value="${currentUser ? currentUser.email : ''}" style="margin-bottom: 8px;">
-                    <input type="tel" id="hkm-donor-phone" name="phone" autocomplete="tel" class="hkm-input" placeholder="Mobilnummer" required>
+                    <label for="hkm-donor-phone" class="sr-only">Mobilnummer</label>
+                    <input type="tel" id="hkm-donor-phone" name="tel" autocomplete="tel" class="hkm-input" placeholder="Mobilnummer" required>
                 </div>
 
                 <!-- Fund purpose (hidden or defaults to general) -->
