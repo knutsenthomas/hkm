@@ -1764,9 +1764,6 @@ class ContentManager {
                 <div class="media-card">
                     <div class="media-thumbnail">
                         <img src="${item.imageUrl || 'https://via.placeholder.com/600x400?text=Ingen+bilde'}" alt="${item.title}">
-                        <div class="media-play-button">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
                         ${item.category ? `<span class="media-duration" style="background: var(--primary-color); left: 10px; right: auto; padding: 3px 10px; border-radius: 4px;">${item.category}</span>` : ''}
                     </div>
                     <div class="media-content">

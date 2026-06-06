@@ -3286,9 +3286,6 @@ class ContentManager {
                 <a href="${this.getLocalizedLink('blogg-post.html')}?id=${encodeURIComponent(item.id || item.title)}" class="media-card cms-media-card-link">
                     <div class="media-thumbnail">
                         <img src="${itemImage}" alt="${item.title}">
-                        <div class="media-play-button">
-                            <i class="fas fa-chalkboard-teacher"></i>
-                        </div>
                         ${item.category ? `<span class="media-duration cms-media-duration-badge">${item.category}</span>` : ''}
                     </div>
                     <div class="media-content">
