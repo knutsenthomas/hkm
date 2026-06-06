@@ -2650,7 +2650,7 @@ exports.createVippsPayment = onRequest({
     const paymentRequest = {
       merchantInfo: {
         merchantSerialNumber: config.merchantSerialNumber,
-        callbackPrefix: "https://europe-west3-his-kingdom-ministry.cloudfunctions.net", // adjust if needed
+        callbackPrefix: "https://us-central1-his-kingdom-ministry.cloudfunctions.net/vippsWebhook", // adjust if needed
         fallBack: paymentReturnUrl,
         isApp: false
       },
@@ -3085,11 +3085,26 @@ exports.stripeWebhook = onRequest({
   // Vi bryr oss bare om betalinger som faktisk går igjennom
   if (event.type === 'payment_intent.succeeded') {
     const paymentIntent = event.data.object;
+    const metadata = paymentIntent.metadata || {};
+    const amount = paymentIntent.amount ? (paymentIntent.amount / 100) : 0;
     
     try {
       await db.collection('donations').doc(paymentIntent.id).set({
+        transactionId: paymentIntent.id,
+        amount: amount,
+        amountNok: amount,
+        amountOre: paymentIntent.amount || 0,
+        currency: paymentIntent.currency || "nok",
+        method: "stripe",
         status: 'completed',
-        completedAt: admin.firestore.FieldValue.serverTimestamp()
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        userId: metadata.user_id || null,
+        donorName: metadata.customer_name || "Ukjent",
+        donorEmail: metadata.customer_email || paymentIntent.receipt_email || "Ukjent",
+        message: metadata.message || "",
+        type: "Gave",
+        fund: metadata.fund || "general"
       }, { merge: true });
       
       console.log("Stripe donasjon godkjent og oppdatert i db:", paymentIntent.id);
