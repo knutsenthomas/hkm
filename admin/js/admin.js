@@ -10774,21 +10774,21 @@ class AdminManager {
                         </head>
                         <body>
                             <div class="preview-container">
-                                \${category ? \`<span class="category-badge">\${category}</span>\` : ''}
-                                <h1>\${titleText}</h1>
+                                ${category ? `<span class="category-badge">${category}</span>` : ''}
+                                <h1>${titleText}</h1>
                                 
                                 <div class="meta-area">
-                                    <div class="meta-avatar">\${author.substring(0,2).toUpperCase()}</div>
+                                    <div class="meta-avatar">${author.substring(0,2).toUpperCase()}</div>
                                     <div>
-                                        <div style="font-weight: 700; color: #1e293b;">\${author}</div>
-                                        <div style="font-size: 11px;">\${dateStr}</div>
+                                        <div style="font-weight: 700; color: #1e293b;">${author}</div>
+                                        <div style="font-size: 11px;">${dateStr}</div>
                                     </div>
                                 </div>
 
-                                \${coverImage ? \`<img src="\${coverImage}" class="cover-image">\` : ''}
+                                ${coverImage ? `<img src="${coverImage}" class="cover-image">` : ''}
 
                                 <div class="content-body">
-                                    \${contentHtml || '<p style="color:#94a3b8; font-style:italic;">Skriv innhold for å se forhåndsvisning...</p>'}
+                                    ${contentHtml || '<p style="color:#94a3b8; font-style:italic;">Skriv innhold for å se forhåndsvisning...</p>'}
                                 </div>
                             </div>
                         </body>
