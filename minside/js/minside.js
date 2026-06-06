@@ -2684,28 +2684,30 @@ class MinSideManager {
                         <p>${t('giving.noGiftsSub')}</p>
                     </div>
                 ` : `
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>${t('giving.colDate')}</th>
-                                <th>${t('giving.colType')}</th>
-                                <th>${t('giving.colMethod')}</th>
-                                <th class="text-right">${t('giving.colAmount')}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${donations.map(d => {
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>${t('giving.colDate')}</th>
+                                    <th>${t('giving.colType')}</th>
+                                    <th>${t('giving.colMethod')}</th>
+                                    <th class="text-right">${t('giving.colAmount')}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${donations.map(d => {
             const date = this._getDonationDate(d) || new Date();
             const amountNok = this._normalizeDonationAmountNok(d);
             return `<tr class="donation-row" data-donation-id="${this._escapeHtml(d.id)}" tabindex="0">
-                                    <td>${date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                                    <td>${this._escapeHtml(d.type || t('giving.typeGift'))}</td>
-                                    <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
-                                    <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
-                                </tr>`;
+                                        <td>${date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                        <td>${this._escapeHtml(d.type || t('giving.typeGift'))}</td>
+                                        <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
+                                        <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
+                                    </tr>`;
         }).join('')}
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 `}
             </div>
 
