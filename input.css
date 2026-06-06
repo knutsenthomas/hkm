@@ -5532,7 +5532,7 @@ ol.block-list {
     color: var(--text-dark);
     text-decoration: none;
     transition: color 0.25s ease, transform 0.25s ease;
-    transform-origin: left center;
+    transform-origin: center;
     display: inline-block;
 }
 
