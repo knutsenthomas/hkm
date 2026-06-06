@@ -2789,6 +2789,277 @@ exports.finalizeVippsPayment = onRequest({
   }
 });
 
+exports.createVippsAgreement = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [
+    vippsClientIdParam,
+    vippsClientSecretParam,
+    vippsSubscriptionKeyParam,
+    vippsMsnParam,
+  ],
+}, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send({ error: "Method not allowed" });
+    return;
+  }
+
+  try {
+    const {
+      amount,
+      currency = "NOK",
+      customerDetails = {},
+      returnUrl = "",
+    } = req.body || {};
+
+    const parsedAmount = Number(amount);
+    const normalizedCurrency = typeof currency === "string" ? currency.toUpperCase() : "NOK";
+
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      res.status(400).send({ error: "Missing or invalid amount" });
+      return;
+    }
+
+    if (normalizedCurrency !== "NOK") {
+      res.status(400).send({ error: "Vipps støtter kun NOK for denne avtalen." });
+      return;
+    }
+
+    const resolvedUserId = await resolveDonationUserId(customerDetails);
+    const amountOre = Math.round(parsedAmount * 100);
+
+    const config = getVippsConfig();
+    if (!config.isValid) {
+      console.error("Vipps configuration missing:", config.missing);
+      res.status(500).send({
+        error: "Server configuration error: Missing Vipps credentials.",
+        missing: config.missing,
+      });
+      return;
+    }
+
+    const vippsAuth = await getVippsAccessToken(config);
+    const { accessToken, baseUrl } = vippsAuth;
+    const reference = buildVippsReference();
+    const agreementReturnUrl = buildVippsReturnUrl(returnUrl, reference);
+    const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
+
+    const agreementRequest = {
+      currency: "NOK",
+      price: amountOre,
+      productName: "Fast givertjeneste - His Kingdom Ministry",
+      merchantRedirectUrl: agreementReturnUrl,
+      merchantAgreementUrl: "https://www.hiskingdomministry.no/betingelser.html",
+      interval: {
+        type: "MONTHLY",
+        count: 1
+      },
+      initialCharge: {
+        amount: amountOre,
+        currency: "NOK",
+        description: "Første donasjon",
+        transactionType: "DIRECT_CAPTURE",
+        orderId: reference
+      }
+    };
+
+    if (phoneNumber) {
+      agreementRequest.phoneNumber = phoneNumber;
+    }
+
+    // Lagre avtalen i databasen som pending
+    await db.collection('vipps_agreements').doc(reference).set({
+      agreementExternalId: reference,
+      agreementId: null,
+      amount: parsedAmount,
+      amountOre,
+      currency: "NOK",
+      status: "pending",
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      userId: resolvedUserId || null,
+      donorName: customerDetails.name || "Ukjent",
+      donorEmail: customerDetails.email || "Ukjent",
+      donorPhone: customerDetails.phone || "Ukjent",
+      donorAddress: customerDetails.address || "",
+      donorZip: customerDetails.zip || "",
+      donorCity: customerDetails.city || "",
+      donorMessage: customerDetails.message || "",
+      fund: customerDetails.fund || "general",
+      type: "fast_giver"
+    });
+
+    // Lagre en pending donasjon for den første betalingen
+    await db.collection('donations').doc(reference).set({
+      transactionId: reference,
+      amount: parsedAmount,
+      amountNok: parsedAmount,
+      amountOre,
+      currency: "NOK",
+      method: "vipps",
+      status: "pending",
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      userId: resolvedUserId || null,
+      donorName: customerDetails.name || "Ukjent",
+      donorEmail: customerDetails.email || "Ukjent",
+      message: customerDetails.message || "Første donasjon (Vipps Fast avtale)",
+      type: "Gave",
+      fund: customerDetails.fund || "general",
+      isRecurringInit: true
+    });
+
+    const response = await fetch(`${baseUrl}/recurring/v3/agreements`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+        "Merchant-Serial-Number": config.merchantSerialNumber,
+        ...getVippsSystemHeaders(config),
+      },
+      body: JSON.stringify(agreementRequest),
+    });
+
+    const payload = await parseJsonResponse(response);
+    if (!response.ok) {
+      const errorDetail = resolveVippsErrorDetail(
+          payload,
+          `Create agreement failed (${response.status})`,
+      );
+      throw new Error(`Vipps create agreement error: ${errorDetail}`);
+    }
+
+    if (!payload.vippsConfirmationUrl) {
+      throw new Error("Vipps did not return confirmation url");
+    }
+
+    await db.collection('vipps_agreements').doc(reference).update({
+      agreementId: payload.agreementId
+    });
+
+    res.status(200).send({
+      redirectUrl: payload.vippsConfirmationUrl,
+      agreementId: payload.agreementId,
+      reference,
+    });
+  } catch (error) {
+    console.error("Vipps create agreement failed:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown Vipps error" });
+  }
+});
+
+exports.finalizeVippsAgreement = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [
+    vippsClientIdParam,
+    vippsClientSecretParam,
+    vippsSubscriptionKeyParam,
+    vippsMsnParam,
+  ],
+}, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+    res.status(204).send("");
+    return;
+  }
+
+  if (req.method !== "POST") {
+    res.status(405).send({ error: "Method not allowed" });
+    return;
+  }
+
+  try {
+    const { reference } = req.body || {};
+    const normalizedReference = typeof reference === "string" ? reference.trim() : "";
+
+    if (!normalizedReference) {
+      res.status(400).send({ error: "Missing reference" });
+      return;
+    }
+
+    const agreementDoc = await db.collection('vipps_agreements').doc(normalizedReference).get();
+    if (!agreementDoc.exists) {
+      res.status(404).send({ error: "Agreement not found" });
+      return;
+    }
+
+    const agreementData = agreementDoc.data();
+    const agreementId = agreementData.agreementId;
+
+    if (!agreementId) {
+      res.status(400).send({ error: "Agreement does not have an agreement ID from Vipps yet." });
+      return;
+    }
+
+    const config = getVippsConfig();
+    const vippsAuth = await getVippsAccessToken(config);
+    const { accessToken, baseUrl } = vippsAuth;
+
+    const vippsResponse = await fetch(`${baseUrl}/recurring/v3/agreements/${encodeURIComponent(agreementId)}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+        "Ocp-Apim-Subscription-Key": config.subscriptionKey,
+        "Merchant-Serial-Number": config.merchantSerialNumber,
+        ...getVippsSystemHeaders(config),
+      }
+    });
+
+    const vippsAgreement = await parseJsonResponse(vippsResponse);
+    if (!vippsResponse.ok) {
+      const errorDetail = resolveVippsErrorDetail(
+          vippsAgreement,
+          `Get agreement details failed (${vippsResponse.status})`,
+      );
+      throw new Error(`Vipps get agreement error: ${errorDetail}`);
+    }
+
+    const agreementStatus = String(vippsAgreement.status || '').toUpperCase();
+    console.log(`[FinalizeVippsAgreement] Status for ${agreementId}: ${agreementStatus}`);
+
+    if (agreementStatus === "ACTIVE") {
+      await agreementDoc.ref.set({
+        status: "active",
+        activatedAt: admin.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+
+      await db.collection('donations').doc(normalizedReference).set({
+        status: "completed",
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
+        vippsAgreementId: agreementId
+      }, { merge: true });
+    } else {
+      await agreementDoc.ref.set({
+        status: agreementStatus.toLowerCase()
+      }, { merge: true });
+
+      await db.collection('donations').doc(normalizedReference).set({
+        status: "failed"
+      }, { merge: true });
+    }
+
+    res.status(200).send({
+      reference: normalizedReference,
+      agreementId,
+      status: vippsAgreement.status,
+    });
+  } catch (error) {
+    console.error("Vipps finalize agreement failed:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown Vipps error" });
+  }
+});
+
 /**
  * STRIPE WEBHOOK: Lytter etter fullførte Stripe-betalinger og oppdaterer databasen
  */
@@ -2841,32 +3112,137 @@ exports.vippsWebhook = onRequest({
   try {
     const payload = req.body;
     
-    // Vipps Webhook payload (avhenger litt av ePayment v1 strukturen)
-    // De sender normalt "name" (event name) og "reference" eller "orderId"
-    const reference = payload.reference || payload.orderId;
-    const eventName = payload.name || payload.status; // Support both ePayment name and eCom status
-    
-    if (!reference) {
+    // Identifiser event type og ID-er
+    const eventType = payload.eventType || payload.name || payload.status;
+    const agreementId = payload.agreementId;
+    const externalId = payload.agreementExternalId || payload.chargeExternalId || payload.reference || payload.orderId;
+
+    console.log(`[VippsWebhook] Event received: ${eventType}, agreementId: ${agreementId}, externalId: ${externalId}`);
+
+    // Håndter recurring events
+    if (eventType && typeof eventType === 'string' && eventType.startsWith('recurring.')) {
+      if (eventType === 'recurring.agreement-activated.v1') {
+        if (agreementId) {
+          const qSnap = await db.collection('vipps_agreements').where('agreementId', '==', agreementId).get();
+          if (!qSnap.empty) {
+            const batch = db.batch();
+            qSnap.docs.forEach(doc => {
+              batch.update(doc.ref, {
+                status: 'active',
+                activatedAt: admin.firestore.FieldValue.serverTimestamp()
+              });
+            });
+            await batch.commit();
+            console.log(`[VippsWebhook] Agreement ${agreementId} activated in Firestore.`);
+          }
+        }
+      } else if (eventType === 'recurring.agreement-stopped.v1' || eventType === 'recurring.agreement-expired.v1' || eventType === 'recurring.agreement-rejected.v1') {
+        if (agreementId) {
+          const qSnap = await db.collection('vipps_agreements').where('agreementId', '==', agreementId).get();
+          if (!qSnap.empty) {
+            const batch = db.batch();
+            qSnap.docs.forEach(doc => {
+              batch.update(doc.ref, {
+                status: eventType === 'recurring.agreement-stopped.v1' ? 'stopped' : eventType === 'recurring.agreement-rejected.v1' ? 'rejected' : 'expired',
+                stoppedAt: admin.firestore.FieldValue.serverTimestamp(),
+                stoppedActor: payload.actor || null
+              });
+            });
+            await batch.commit();
+            console.log(`[VippsWebhook] Agreement ${agreementId} marked as inactive (${eventType}) in Firestore.`);
+          }
+        }
+      } else if (eventType === 'recurring.charge-captured.v1') {
+        const chargeId = payload.chargeId;
+        const chargeExternalId = payload.chargeExternalId;
+        const amount = payload.amount; // i øre
+        const currency = payload.currency || 'NOK';
+
+        if (agreementId && chargeId) {
+          // 1. Sjekk om denne betalingen allerede finnes i databasen (for initial charge)
+          let donationRef = null;
+          if (chargeExternalId) {
+            const extDoc = await db.collection('donations').doc(chargeExternalId).get();
+            if (extDoc.exists) {
+              donationRef = extDoc.ref;
+            }
+          }
+
+          if (!donationRef) {
+            const idDoc = await db.collection('donations').doc(chargeId).get();
+            if (idDoc.exists) {
+              donationRef = idDoc.ref;
+            }
+          }
+
+          // 2. Hent avtaleinformasjon for å hente giverens opplysninger
+          let agreementData = null;
+          const qSnap = await db.collection('vipps_agreements').where('agreementId', '==', agreementId).get();
+          if (!qSnap.empty) {
+            agreementData = qSnap.docs[0].data();
+          }
+
+          const parsedAmount = amount ? (amount / 100) : (agreementData ? agreementData.amount : 0);
+
+          if (donationRef) {
+            // Oppdater eksisterende pending donasjon
+            await donationRef.set({
+              status: 'completed',
+              completedAt: admin.firestore.FieldValue.serverTimestamp(),
+              vippsChargeId: chargeId,
+              vippsAgreementId: agreementId
+            }, { merge: true });
+            console.log(`[VippsWebhook] Existing pending donation updated to completed: ${donationRef.id}`);
+          } else {
+            // Opprett en ny donasjon i historikken for løpende månedlig trekk
+            const docId = chargeId;
+            await db.collection('donations').doc(docId).set({
+              transactionId: docId,
+              vippsChargeId: chargeId,
+              vippsAgreementId: agreementId,
+              amount: parsedAmount,
+              amountNok: parsedAmount,
+              amountOre: amount || (parsedAmount * 100),
+              currency: currency,
+              method: 'vipps',
+              status: 'completed',
+              timestamp: admin.firestore.FieldValue.serverTimestamp(),
+              completedAt: admin.firestore.FieldValue.serverTimestamp(),
+              userId: agreementData ? (agreementData.userId || null) : null,
+              donorName: agreementData ? (agreementData.donorName || 'Ukjent') : 'Ukjent',
+              donorEmail: agreementData ? (agreementData.donorEmail || 'Ukjent') : 'Ukjent',
+              message: payload.chargeType === 'INITIAL' ? 'Første donasjon (Vipps Fast avtale)' : 'Fast månedlig gave via Vipps',
+              type: 'Gave',
+              fund: agreementData ? (agreementData.fund || 'general') : 'general'
+            });
+            console.log(`[VippsWebhook] Recorded subsequent recurring payment: ${docId}`);
+          }
+        }
+      }
+      
+      res.status(200).send("OK");
+      return;
+    }
+
+    // Fallback til standard ePayment/eCom webhook
+    if (!externalId) {
       res.status(400).send("Missing reference");
       return;
     }
 
-    // Hvis betalingen er reservert (authorized) eller trukket (captured), anser vi gaven som mottatt
     if (
-      eventName === 'payment.captured' ||
-      eventName === 'payment.authorized' ||
-      eventName === 'RESERVE' ||
-      eventName === 'CAPTURE' ||
-      !eventName
+      eventType === 'payment.captured' ||
+      eventType === 'payment.authorized' ||
+      eventType === 'RESERVE' ||
+      eventType === 'CAPTURE' ||
+      !eventType
     ) {
-      
-      // Vi oppdaterer den eksisterende "pending"-posten vi opprettet i createVippsPayment
-      await db.collection('donations').doc(reference).set({
+      await db.collection('donations').doc(externalId).set({
          status: 'completed',
          completedAt: admin.firestore.FieldValue.serverTimestamp()
       }, { merge: true });
       
-      console.log("Vipps donasjon godkjent og oppdatert i db:", reference);
+      console.log("Vipps standard donasjon godkjent og oppdatert i db:", externalId);
     }
     
     res.status(200).send("OK");
