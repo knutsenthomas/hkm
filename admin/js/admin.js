@@ -73,6 +73,7 @@ class AdminManager {
         this._editorRestoreStateKey = 'hkm_admin_open_editor_state';
         this._restoringEditorState = false;
         this._activeEditorInstance = null;
+        this.isEditorOpen = false;
         this.analyticsRangeDays = this._getSavedAnalyticsRangeDays();
         // User Detail View State
         this.currentUserDetailId = null;
@@ -478,7 +479,12 @@ class AdminManager {
         if (this._restoringEditorState) return;
         
         // If the editor modal is already active in the DOM, skip restoring/re-opening
-        if (document.querySelector('.dashboard-modal .editor-layout-v2')) {
+        if (
+            this.isEditorOpen ||
+            document.querySelector('.dashboard-modal .editor-layout-v2') ||
+            document.querySelector('.dashboard-modal') ||
+            this._activeEditorInstance
+        ) {
             return;
         }
 
@@ -1503,6 +1509,14 @@ class AdminManager {
         const unsub = firebaseService.subscribeToPage(docId, () => {
             const isActive = this.currentSection === collectionId;
             const listEl = document.getElementById(`${collectionId}-list`);
+            
+            // Guard: If the editor modal is open, do not reload the collection and re-render the background list in real-time.
+            // This prevents screen flickering and focus/UI lag caused by background updates.
+            if (this.isEditorOpen || document.querySelector('.dashboard-modal .editor-layout-v2')) {
+                console.log(`[AdminManager] Ignoring realtime Firestore update for '${collectionId}' because the editor is currently open.`);
+                return;
+            }
+            
             if (isActive && listEl) {
                 this.loadCollection(collectionId);
             }
@@ -7882,6 +7896,7 @@ class AdminManager {
     }
 
     async editCollectionItem(collectionId, index) {
+        this.isEditorOpen = true;
         let triggerAutosave = null;
         let updateLivePreview = null;
         try {
@@ -10413,6 +10428,9 @@ class AdminManager {
                         document.removeEventListener('selectionchange', selectionChangeHandler);
                     }
                     modal.remove();
+                    this.isEditorOpen = false;
+                    this._activeEditorInstance = null;
+                    this.loadCollection(collectionId);
                 };
             }
 
@@ -10425,6 +10443,9 @@ class AdminManager {
                     if (selectionChangeHandler) {
                         document.removeEventListener('selectionchange', selectionChangeHandler);
                     }
+                    this.isEditorOpen = false;
+                    this._activeEditorInstance = null;
+                    this.loadCollection(collectionId);
                 }
             };
             document.addEventListener('keydown', escHandler);
@@ -11360,6 +11381,7 @@ class AdminManager {
                 };
             }
         } catch (err) {
+            this.isEditorOpen = false;
             console.error('Error opening editor:', err);
             const errorMsg = err.message || JSON.stringify(err);
             this.showToast(`Kunne ikke åpne elementet.Feilmelding: ${errorMsg}. Sjekk at Editor.js scriptet er lastet.`, 'error', 7000);

@@ -5175,6 +5175,10 @@ ol.block-list {
     border-color: white;
 }
 
+.hero-nav:active {
+    transform: scale(0.95);
+}
+
 .hero-nav.prev {
     left: 40px;
     right: auto;
@@ -5209,7 +5213,7 @@ ol.block-list {
     }
 
     .hero-nav {
-        bottom: 24px;
+        bottom: 96px; /* Moved up to prevent overlapping with mobile browser navigation bar */
         width: 44px;
         height: 44px;
     }
