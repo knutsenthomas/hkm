@@ -476,6 +476,12 @@ class AdminManager {
 
     _attemptRestoreOpenEditor(collectionId, items) {
         if (this._restoringEditorState) return;
+        
+        // If the editor modal is already active in the DOM, skip restoring/re-opening
+        if (document.querySelector('.dashboard-modal .editor-layout-v2')) {
+            return;
+        }
+
         const saved = this._getOpenEditorState();
         if (!saved || saved.collectionId !== collectionId) return;
 
