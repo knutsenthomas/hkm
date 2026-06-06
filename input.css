@@ -5218,6 +5218,12 @@ ol.block-list {
         height: 44px;
     }
 
+    @media (display-mode: standalone), (display-mode: minimal-ui), (display-mode: fullscreen) {
+        .hero-nav {
+            bottom: 32px; /* Positioned lower in standalone webapp mode since there is no browser bottom bar */
+        }
+    }
+
     .hero-nav.prev {
         left: 20px;
         right: auto;

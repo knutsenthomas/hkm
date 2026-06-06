@@ -4296,7 +4296,13 @@ ol.block-list {
     }
 
     .hero-nav {
-        bottom: 30px;
+        bottom: 96px;
+    }
+
+    @media (display-mode: standalone), (display-mode: minimal-ui), (display-mode: fullscreen) {
+        .hero-nav {
+            bottom: 32px;
+        }
     }
 
     .hero-nav.prev {
