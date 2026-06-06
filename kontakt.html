@@ -420,7 +420,7 @@
                     <form id="contact-form" novalidate>
                         <div class="form-group">
                             <label for="name">Navn <span class="required-star">*</span></label>
-                            <input type="text" id="name" name="name" class="form-control" required
+                            <input type="text" id="name" name="name" autocomplete="name" class="form-control" required
                                 placeholder="Ditt fulle navn">
                             <span class="form-error-msg" id="err-name">Vennligst fyll inn navn.</span>
                         </div>
@@ -428,12 +428,12 @@
                         <div class="form-group">
                             <label for="phone">Telefon <span
                                     style="font-size:12px; font-weight:400; color:#94a3b8;">(valgfritt)</span></label>
-                            <input type="tel" id="phone" name="phone" class="form-control" placeholder="+47 000 00 000">
+                            <input type="tel" id="phone" name="phone" autocomplete="tel" class="form-control" placeholder="+47 000 00 000">
                         </div>
 
                         <div class="form-group">
                             <label for="email">E-post <span class="required-star">*</span></label>
-                            <input type="email" id="email" name="email" class="form-control" required
+                            <input type="email" id="email" name="email" autocomplete="email" class="form-control" required
                                 placeholder="din@epost.no">
                             <span class="form-error-msg" id="err-email">Vennligst fyll inn en gyldig
                                 e-postadresse.</span>

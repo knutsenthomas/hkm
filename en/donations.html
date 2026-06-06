@@ -390,18 +390,18 @@
                                 style="display: block; font-weight: 600; margin-bottom: 15px; color: var(--text-dark);">Your
                                 Information</label>
                             <div style="display: grid; gap: 15px;">
-                                <input type="text" id="donor-name" placeholder="Full Name" required
+                                <input type="text" id="donor-name" name="name" autocomplete="name" placeholder="Full Name" required
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                <input type="email" id="donor-email" placeholder="Email Address" required
+                                <input type="email" id="donor-email" name="email" autocomplete="email" placeholder="Email Address" required
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                <input type="tel" id="donor-phone" placeholder="Mobile Number" required
+                                <input type="tel" id="donor-phone" name="phone" autocomplete="tel" placeholder="Mobile Number" required
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                <input type="text" id="donor-address" placeholder="Address"
+                                <input type="text" id="donor-address" name="address" autocomplete="street-address" placeholder="Address"
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
                                 <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 15px;">
-                                    <input type="text" id="donor-zip" placeholder="Zip code"
+                                    <input type="text" id="donor-zip" name="zip" autocomplete="postal-code" placeholder="Zip code"
                                         style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
-                                    <input type="text" id="donor-city" placeholder="City"
+                                    <input type="text" id="donor-city" name="city" autocomplete="address-level2" placeholder="City"
                                         style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px;">
                                 </div>
                                 <textarea id="donor-message" placeholder="Message (optional)" rows="4"
