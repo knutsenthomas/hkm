@@ -245,8 +245,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         const service = window.firebaseService;
         if (!service || !service.isInitialized || !user) return;
 
-        const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-        if (!userDoc.exists) {
+        let userDoc = null;
+        let attempts = 0;
+        const maxAttempts = 3;
+
+        while (attempts < maxAttempts) {
+            try {
+                userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+                break; // Suksess, bryt ut av løkken
+            } catch (error) {
+                attempts++;
+                const isPermissionError = error && (error.code === 'permission-denied' || String(error.message || '').toLowerCase().includes('permission'));
+                if (isPermissionError && attempts < maxAttempts) {
+                    console.warn(`[HKM] Firestore read permission denied. Retrying in 200ms (attempt ${attempts}/${maxAttempts})...`);
+                    await new Promise(resolve => setTimeout(resolve, 200));
+                } else {
+                    throw error;
+                }
+            }
+        }
+
+        if (userDoc && !userDoc.exists) {
             await firebase.firestore().collection('users').doc(user.uid).set({
                 email: user.email,
                 displayName: user.displayName || '',
