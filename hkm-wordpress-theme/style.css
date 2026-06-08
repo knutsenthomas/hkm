@@ -903,32 +903,17 @@ section {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px 16px; /* px-4 */
+    padding: 32px 40px;
+    /* Increased for "luft" on large screens */
     width: 100%;
-    max-width: 1440px;
+    max-width: 1400px;
     margin: 0 auto;
     transition: padding 0.3s ease;
 }
 
-@media (min-width: 640px) {
-    .header-content {
-        padding-left: 24px; /* sm:px-6 */
-        padding-right: 24px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .header-content {
-        padding-left: 32px; /* lg:px-8 */
-        padding-right: 32px;
-        padding-top: 32px;
-        padding-bottom: 32px;
-    }
-}
-
 .header.scrolled .header-content {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding: 15px 40px;
+    /* Balanced shrink on scroll */
 }
 
 /* Enable backdrop-filter only on desktop for performance */

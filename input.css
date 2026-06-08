@@ -120,38 +120,22 @@ th {
     hyphens: auto;
 }
 
-/* === Header Grid Alignment & Responsiveness === */
+/* === Header Width Expansion === */
 #header-container {
     display: flex !important;
     justify-content: space-between !important;
     align-items: center !important;
-    max-width: 1440px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    width: 100% !important;
-    padding-left: 16px !important; /* px-4 */
-    padding-right: 16px !important;
+    max-width: 1600px !important;
+    padding-left: 5% !important;
+    padding-right: 5% !important;
     height: 100px !important;
-    transition: height 0.3s ease, padding 0.3s ease !important;
 }
 
-@media (min-width: 640px) {
+@media (max-width: 1600px) {
     #header-container {
-        padding-left: 24px !important; /* sm:px-6 */
-        padding-right: 24px !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
     }
-}
-
-@media (min-width: 1024px) {
-    #header-container {
-        padding-left: 32px !important; /* lg:px-8 */
-        padding-right: 32px !important;
-    }
-}
-
-/* Scrolled state: shrink the header height on scroll */
-.header.scrolled #header-container {
-    height: 70px !important;
 }
 
 /* YouTube kategori-knapper */
@@ -1255,32 +1239,17 @@ body:not(.header-dark-start) .header:not(.scrolled):not(.menu-open) .header-sear
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 24px 16px; /* px-4 */
+    padding: 32px 40px;
+    /* Increased for "luft" on large screens */
     width: 100%;
-    max-width: 1440px;
+    max-width: 1400px;
     margin: 0 auto;
     transition: padding 0.3s ease;
 }
 
-@media (min-width: 640px) {
-    .header-content {
-        padding-left: 24px; /* sm:px-6 */
-        padding-right: 24px;
-    }
-}
-
-@media (min-width: 1024px) {
-    .header-content {
-        padding-left: 32px; /* lg:px-8 */
-        padding-right: 32px;
-        padding-top: 32px;
-        padding-bottom: 32px;
-    }
-}
-
 .header.scrolled .header-content {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding: 15px 40px;
+    /* Balanced shrink on scroll */
 }
 
 /* Enable backdrop-filter only on desktop for performance */
