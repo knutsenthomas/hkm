@@ -4615,12 +4615,116 @@ exports.googleChatBridge = onRequest({
 });
 
 /**
+ * Cache helpers for podcast and youtube to keep chatbot response times low
+ */
+async function getOrUpdatePodcastCache() {
+  const cacheRef = db.collection("content").doc("cache_podcast");
+  try {
+    const snap = await cacheRef.get();
+    if (snap.exists) {
+      const data = snap.data();
+      const ageMs = Date.now() - (data.updatedAt?.toDate().getTime() || 0);
+      if (ageMs < 4 * 60 * 60 * 1000 && Array.isArray(data.items)) {
+        return data.items;
+      }
+    }
+  } catch (err) {
+    console.warn("[Cache] Kunne ikke lese podcast-cache:", err);
+  }
+
+  try {
+    console.log("[Cache] Henter podcast RSS fra nettverket...");
+    const response = await fetch("https://anchor.fm/s/f7a13dec/podcast/rss", {
+      signal: AbortSignal.timeout(5000)
+    });
+    if (response.ok) {
+      const pText = await response.text();
+      const pData = await parseStringPromise(pText);
+      const channel = Array.isArray(pData?.rss?.channel) ? pData.rss.channel[0] : pData?.rss?.channel;
+      const pItems = (channel.item || []).slice(0, 5).map(it => ({
+        title: it.title ? it.title[0] : "Ukjent episode",
+        link: it.link ? it.link[0] : "https://anchor.fm/s/f7a13dec/podcast/rss",
+        description: it.description ? it.description[0].replace(/<[^>]*>/g, '').substring(0, 200) : "",
+        imageUrl: it['itunes:image'] ? it['itunes:image'][0].$.href : (channel.image ? channel.image[0].url[0] : "")
+      }));
+
+      await cacheRef.set({
+        items: pItems,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      return pItems;
+    }
+  } catch (err) {
+    console.error("[Cache] Feil under oppdatering av podcast-cache:", err);
+  }
+
+  // Fallback to stale cache
+  try {
+    const snap = await cacheRef.get();
+    if (snap.exists && Array.isArray(snap.data().items)) {
+      return snap.data().items;
+    }
+  } catch (err) {}
+  return [];
+}
+
+async function getOrUpdateYoutubeCache() {
+  const cacheRef = db.collection("content").doc("cache_youtube");
+  try {
+    const snap = await cacheRef.get();
+    if (snap.exists) {
+      const data = snap.data();
+      const ageMs = Date.now() - (data.updatedAt?.toDate().getTime() || 0);
+      if (ageMs < 4 * 60 * 60 * 1000 && Array.isArray(data.items)) {
+        return data.items;
+      }
+    }
+  } catch (err) {
+    console.warn("[Cache] Kunne ikke lese youtube-cache:", err);
+  }
+
+  try {
+    console.log("[Cache] Henter youtube RSS fra nettverket...");
+    const url = "https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent("https://www.youtube.com/feeds/videos.xml?channel_id=UCFbX-Mf7NqDm2a07hk6hveg");
+    const response = await fetch(url, {
+      signal: AbortSignal.timeout(5000)
+    });
+    if (response.ok) {
+      const ytData = await response.json();
+      const items = ytData.items || [];
+      const ytItems = items.slice(0, 10).map(v => ({
+        title: v.title || "",
+        link: v.link || "",
+        thumbnail: v.thumbnail || ""
+      }));
+
+      await cacheRef.set({
+        items: ytItems,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      return ytItems;
+    }
+  } catch (err) {
+    console.error("[Cache] Feil under oppdatering av youtube-cache:", err);
+  }
+
+  // Fallback to stale cache
+  try {
+    const snap = await cacheRef.get();
+    if (snap.exists && Array.isArray(snap.data().items)) {
+      return snap.data().items;
+    }
+  } catch (err) {}
+  return [];
+}
+
+/**
  * AI-drevet chatbot for His Kingdom Ministry.
  * Svarer automatisk på nye meldinger fra besøkende ved bruk av Gemini.
  */
 exports.onVisitorChatMessageAI = onDocumentCreated({
   document: "visitorChats/{chatId}/messages/{messageId}",
-  secrets: [geminiApiKeyParam],
+  secrets: [geminiApiKeyParam, openaiApiKeyParam],
 }, async (event) => {
   const snapshot = event.data;
   if (!snapshot) return;
@@ -4642,22 +4746,12 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
   try {
     const cleanKey = geminiKey.trim();
-    const apiBase = "https://generativelanguage.googleapis.com/v1beta";
-
-    // Use cached model resolution to avoid a listModels roundtrip on every message.
-    const selectedModel = await resolveGeminiModel(cleanKey);
-    if (!selectedModel) {
-      console.error("Fant ingen Gemini-modell med generateContent-stotte.");
-      return;
-    }
-
-    const url = `${apiBase}/${selectedModel}:generateContent?key=${cleanKey}`;
 
     // Only fetch podcast/YouTube when the message is relevant — these are slow external calls.
     const msgText = (msgData.text || "").toLowerCase();
     const needsMedia = /podcast|episode|youtube|video|kanal|media/.test(msgText);
 
-    // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold
+    // 1. Hent kontekst om nettstedet, butikk, arrangementer og innhold in parallel
     const firestoreReads = [
       db.collection("siteContent").doc("settings_seo").get(),
       db.collection("content").doc("ekstern_products").get(),
@@ -4666,11 +4760,11 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
       db.collection("content").doc("collection_teaching").get(),
     ];
     const mediaReads = needsMedia ? [
-      fetch("https://anchor.fm/s/f7a13dec/podcast/rss").catch(() => null),
-      fetch("https://api.rss2json.com/v1/api.json?rss_url=" + encodeURIComponent("https://www.youtube.com/feeds/videos.xml?channel_id=UCFbX-Mf7NqDm2a07hk6hveg")).catch(() => null),
-    ] : [Promise.resolve(null), Promise.resolve(null)];
+      getOrUpdatePodcastCache(),
+      getOrUpdateYoutubeCache(),
+    ] : [Promise.resolve([]), Promise.resolve([])];
 
-    const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastRes, youtubeRes] = await Promise.all([
+    const [settingsSnap, productsSnap, eventsSnap, blogSnap, teachingSnap, podcastItems, youtubeItems] = await Promise.all([
       ...firestoreReads,
       ...mediaReads,
     ]);
@@ -4721,37 +4815,16 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
 
     // Forbered podcast-info
     let podcastContext = "";
-    if (podcastRes && podcastRes.ok) {
-      try {
-        const pText = await podcastRes.text();
-        const pData = await parseStringPromise(pText);
-        const channel = Array.isArray(pData?.rss?.channel) ? pData.rss.channel[0] : pData?.rss?.channel;
-        const pItems = (channel.item || []).slice(0, 5).map(it => ({
-          title: it.title ? it.title[0] : "Ukjent episode",
-          link: it.link ? it.link[0] : "https://anchor.fm/s/f7a13dec/podcast/rss",
-          description: it.description ? it.description[0].replace(/<[^>]*>/g, '').substring(0, 200) : "",
-          imageUrl: it['itunes:image'] ? it['itunes:image'][0].$.href : (channel.image ? channel.image[0].url[0] : "")
-        }));
-        podcastContext = "\nPODCAST (Siste episoder):\n" + 
-          pItems.map(it => `- Episode: ${it.title}\n  Om: ${it.description}\n  Link: ${it.link}\n  Bilde: ${it.imageUrl}`).join("\n");
-      } catch (err) {
-        console.warn("Feil ved parsing av podcast RSS:", err);
-      }
+    if (podcastItems && podcastItems.length > 0) {
+      podcastContext = "\nPODCAST (Siste episoder):\n" + 
+        podcastItems.map(it => `- Episode: ${it.title}\n  Om: ${it.description || ''}\n  Link: ${it.link}\n  Bilde: ${it.imageUrl || ''}`).join("\n");
     }
 
     // Forbered youtube-info
     let youtubeContext = "";
-    if (youtubeRes && youtubeRes.ok) {
-      try {
-        const ytData = await youtubeRes.json();
-        const items = ytData.items || [];
-        if (items.length > 0) {
-          youtubeContext = "\nYOUTUBE-VIDEOER (Siste fra kanalen):\n" + 
-            items.slice(0, 10).map(v => `- Tittel: ${v.title}\n  URL: ${v.link}\n  Bilde: ${v.thumbnail}`).join("\n");
-        }
-      } catch (e) {
-        console.error("Feil ved parsing av YouTube RSS:", e);
-      }
+    if (youtubeItems && youtubeItems.length > 0) {
+      youtubeContext = "\nYOUTUBE-VIDEOER (Siste fra kanalen):\n" + 
+        youtubeItems.map(v => `- Tittel: ${v.title}\n  URL: ${v.link}\n  Bilde: ${v.thumbnail}`).join("\n");
     }
 
     const systemPrompt = `
@@ -4796,7 +4869,7 @@ exports.onVisitorChatMessageAI = onDocumentCreated({
     // 1. Prøv Gemini (Primary & Fallback models)
     try {
       const genAI = new GoogleGenerativeAI(cleanKey);
-      const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite"];
+      const modelsToTry = ["gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-1.5-flash"];
       
       for (const modelName of modelsToTry) {
         try {
