@@ -5394,6 +5394,20 @@ ol.block-list {
     padding-top: 148px !important;
 }
 
+@media (min-width: 769px) {
+    .mega-menu {
+        bottom: auto !important;
+        height: auto !important;
+        max-height: 90vh !important;
+        border-bottom: 1px solid #f0f0f0;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08) !important;
+    }
+    #mega-menu>div {
+        padding-top: 148px !important;
+        padding-bottom: 48px !important;
+    }
+}
+
 @media (max-width: 768px) {
     #mega-menu>div {
         padding-top: 132px !important;
