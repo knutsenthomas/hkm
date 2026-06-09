@@ -81,8 +81,8 @@
 
 /* === Global Font Size Variables === */
 :root {
-    --fs-h1-desktop: 38px !important;
-    --fs-h1-mobile: 28px !important;
+    --fs-h1-desktop: 34px !important;
+    --fs-h1-mobile: 24px !important;
     --fs-h2-desktop: 28px !important;
     --fs-h2-mobile: 20px !important;
     --fs-body: 16px !important;
@@ -3357,7 +3357,7 @@ body {
 }
 
 .page-hero-title {
-    font-size: 3.5rem;
+    font-size: 2.25rem;
     font-weight: 900;
     margin-bottom: 1rem;
     position: relative;
@@ -3750,7 +3750,7 @@ body {
     }
 
     .page-hero-title {
-        font-size: 2.5rem;
+        font-size: 1.75rem;
     }
 
     .page-hero-subtitle {
@@ -5800,7 +5800,7 @@ a[href*="#deduccion-fiscal"],
     }
 
     .page-hero-title {
-        font-size: clamp(1.4rem, 6vw, 2rem) !important;
+        font-size: clamp(1.4rem, 6vw, 1.75rem) !important;
         line-height: 1.15 !important;
     }
 

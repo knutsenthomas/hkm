@@ -38,8 +38,8 @@
 .page-hero-title,
 .hero-title {
   color: white !important;
-  font-size: var(--fs-h1-desktop, 48px);
-  line-height: 1.3;
+  font-size: var(--fs-h1-desktop, 36px);
+  line-height: 1.2;
   text-align: center;
   width: 100%;
   overflow-wrap: break-word;
@@ -51,7 +51,7 @@
 
   .page-hero-title,
   .hero-title {
-    font-size: var(--fs-h1-mobile, 32px) !important;
+    font-size: var(--fs-h1-mobile, 26px) !important;
     padding-left: 20px;
     padding-right: 20px;
     max-width: 100vw;
