@@ -3041,6 +3041,10 @@ body {
     object-position: center 25%;
 }
 
+.team-photo-focus-hilde {
+    object-position: center 18%;
+}
+
 .team-name {
     font-size: 1.5rem;
     margin-bottom: 5px;
