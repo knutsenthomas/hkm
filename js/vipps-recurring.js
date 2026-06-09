@@ -3,7 +3,6 @@ const VIPPS_CREATE_AGREEMENT_URL = "https://createvippsagreement-42bhgdjkcq-uc.a
 const VIPPS_FINALIZE_AGREEMENT_URL = "https://finalizevippsagreement-42bhgdjkcq-uc.a.run.app";
 
 // Inject required scoped CSS for the recurring modal
-// Inject required scoped CSS for the recurring modal
 const modalStyles = `
 .hkm-modal-overlay {
     position: fixed;
@@ -17,6 +16,8 @@ const modalStyles = `
     pointer-events: none;
     transition: opacity 0.3s ease;
     z-index: 9999;
+    overflow-y: auto;
+    padding: 20px 0;
 }
 .hkm-modal-overlay.active {
     opacity: 1;
@@ -29,7 +30,7 @@ const modalStyles = `
     border-radius: 24px;
     box-shadow: 0 32px 64px -12px rgba(27, 73, 101, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.8) inset;
     padding: 32px;
-    margin: 16px;
+    margin: auto 16px;
     position: relative;
     transform: translateY(24px) translateZ(0) !important;
     backface-visibility: hidden !important;
@@ -218,6 +219,28 @@ const modalStyles = `
 @keyframes hkm-spin {
     to { transform: rotate(360deg); }
 }
+@media (max-width: 480px) {
+    .hkm-modal-overlay {
+        align-items: flex-start;
+        padding: 16px 0;
+    }
+    .hkm-modal-panel {
+        margin: 16px auto;
+        padding: 24px 20px;
+        border-radius: 20px;
+    }
+    .hkm-modal-title {
+        font-size: 20px;
+    }
+    .hkm-modal-subtitle {
+        font-size: 13px;
+        margin-top: 6px;
+    }
+    .hkm-amount-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+}
 @media (max-height: 550px) and (orientation: landscape) {
     .hkm-modal-panel {
         max-height: 90vh;
@@ -307,10 +330,26 @@ function openAgreementModal() {
                     <label class="hkm-form-label">Dine opplysninger</label>
                     <label for="hkm-donor-name" class="sr-only">Fullt navn</label>
                     <input type="text" id="hkm-donor-name" name="name" autocomplete="name" class="hkm-input" placeholder="Fullt navn" required style="margin-bottom: 16px;">
+                    
                     <label for="hkm-donor-email" class="sr-only">E-postadresse</label>
                     <input type="email" id="hkm-donor-email" name="email" autocomplete="email" class="hkm-input" placeholder="E-postadresse" required value="${currentUser ? currentUser.email : ''}" style="margin-bottom: 16px;">
+                    
                     <label for="hkm-donor-phone" class="sr-only">Mobilnummer</label>
-                    <input type="tel" id="hkm-donor-phone" name="tel" autocomplete="tel" class="hkm-input" placeholder="Mobilnummer" required>
+                    <input type="tel" id="hkm-donor-phone" name="tel" autocomplete="tel" class="hkm-input" placeholder="Mobilnummer" required style="margin-bottom: 16px;">
+                    
+                    <label for="hkm-donor-address" class="sr-only">Adresse</label>
+                    <input type="text" id="hkm-donor-address" name="address" autocomplete="street-address" class="hkm-input" placeholder="Adresse" required style="margin-bottom: 16px;">
+                    
+                    <div style="display: flex; gap: 12px;">
+                        <div style="flex: 1;">
+                            <label for="hkm-donor-zip" class="sr-only">Postnr</label>
+                            <input type="text" id="hkm-donor-zip" name="postal-code" autocomplete="postal-code" class="hkm-input" placeholder="Postnr" required>
+                        </div>
+                        <div style="flex: 2;">
+                            <label for="hkm-donor-city" class="sr-only">Sted</label>
+                            <input type="text" id="hkm-donor-city" name="city" autocomplete="address-level2" class="hkm-input" placeholder="Sted" required>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Fund purpose (hidden or defaults to general) -->
@@ -383,6 +422,9 @@ function openAgreementModal() {
             const donorName = modal.querySelector("#hkm-donor-name").value.trim();
             const donorEmail = modal.querySelector("#hkm-donor-email").value.trim();
             const donorPhone = modal.querySelector("#hkm-donor-phone").value.trim();
+            const donorAddress = modal.querySelector("#hkm-donor-address").value.trim();
+            const donorZip = modal.querySelector("#hkm-donor-zip").value.trim();
+            const donorCity = modal.querySelector("#hkm-donor-city").value.trim();
             const fund = modal.querySelector("#hkm-donor-fund").value;
 
             const response = await fetch(VIPPS_CREATE_AGREEMENT_URL, {
@@ -395,6 +437,9 @@ function openAgreementModal() {
                         name: donorName,
                         email: donorEmail,
                         phone: donorPhone,
+                        address: donorAddress,
+                        zip: donorZip,
+                        city: donorCity,
                         fund: fund,
                         userId: currentUser ? currentUser.uid : null
                     },
