@@ -332,7 +332,7 @@ function openAgreementModal() {
                     <input type="text" id="hkm-donor-name" name="name" autocomplete="name" class="hkm-input" placeholder="Fullt navn" required style="margin-bottom: 16px;">
                     
                     <label for="hkm-donor-email" class="sr-only">E-postadresse</label>
-                    <input type="email" id="hkm-donor-email" name="email" autocomplete="email" class="hkm-input" placeholder="E-postadresse" required value="${currentUser ? currentUser.email : ''}" style="margin-bottom: 16px;">
+                    <input type="email" id="hkm-donor-email" name="email" autocomplete="email" class="hkm-input" placeholder="E-postadresse" required style="margin-bottom: 16px;">
                     
                     <label for="hkm-donor-phone" class="sr-only">Mobilnummer</label>
                     <input type="tel" id="hkm-donor-phone" name="tel" autocomplete="tel" class="hkm-input" placeholder="Mobilnummer" required style="margin-bottom: 16px;">
