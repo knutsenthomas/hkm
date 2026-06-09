@@ -15,7 +15,7 @@ const modalStyles = `
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.3s ease;
-    z-index: 9999;
+    z-index: 100005 !important;
     overflow-y: auto;
     padding: 20px 0;
 }
@@ -197,7 +197,7 @@ const modalStyles = `
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    z-index: 10000;
+    z-index: 100006 !important;
     color: #ffffff;
     opacity: 0;
     pointer-events: none;
