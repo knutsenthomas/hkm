@@ -2853,13 +2853,16 @@ exports.createVippsAgreement = onRequest({
     const phoneNumber = normalizeVippsPhoneNumber(customerDetails.phone);
 
     const agreementRequest = {
-      currency: "NOK",
-      price: amountOre,
+      pricing: {
+        type: "LEGACY",
+        amount: amountOre,
+        currency: "NOK"
+      },
       productName: "Fast givertjeneste - His Kingdom Ministry",
       merchantRedirectUrl: agreementReturnUrl,
       merchantAgreementUrl: "https://www.hiskingdomministry.no/betingelser.html",
       interval: {
-        type: "MONTHLY",
+        unit: "MONTH",
         count: 1
       },
       initialCharge: {
@@ -2922,6 +2925,7 @@ exports.createVippsAgreement = onRequest({
         Authorization: `Bearer ${accessToken}`,
         "Ocp-Apim-Subscription-Key": config.subscriptionKey,
         "Merchant-Serial-Number": config.merchantSerialNumber,
+        "Idempotency-Key": reference,
         ...getVippsSystemHeaders(config),
       },
       body: JSON.stringify(agreementRequest),
@@ -2929,6 +2933,7 @@ exports.createVippsAgreement = onRequest({
 
     const payload = await parseJsonResponse(response);
     if (!response.ok) {
+      console.error("Vipps create agreement error payload:", JSON.stringify(payload));
       const errorDetail = resolveVippsErrorDetail(
           payload,
           `Create agreement failed (${response.status})`,
