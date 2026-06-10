@@ -2542,7 +2542,7 @@ class AdminManager {
                 transition: opacity 0.3s ease;
             `;
             loaderOverlay.innerHTML = `
-                <div class="card" style="padding: 40px !important; text-align: center !important; max-width: 480px !important; width: 90% !important; border-radius: 24px !important; background: white !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box !important;">
+                <div class="card" style="padding: 40px !important; text-align: center !important; max-width: 480px !important; width: 90% !important; height: auto !important; min-height: auto !important; border-radius: 24px !important; background: white !important; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important; transform: scale(0.9); transition: transform 0.3s ease; box-sizing: border-box !important;">
                     <div style="width: 80px; height: 80px; margin: 0 auto 24px; background: linear-gradient(135deg, #d17d39, #bd4f2a); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(209, 125, 57, 0.25);">
                         <span class="material-symbols-outlined" style="font-size: 36px; color: white; animation: spin 2s linear infinite;">auto_awesome</span>
                     </div>
