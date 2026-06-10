@@ -1500,64 +1500,240 @@
                 }
             });
 
-            // 3. Period selector click event handler
-            const periodButtons = document.querySelectorAll('.period-btn');
-            const pageviewsValEl = document.getElementById('pageviews-value');
-            const pageviewsMetaEl = document.getElementById('pageviews-meta');
-            const pageviewsTrendEl = document.getElementById('pageviews-trend');
-            const engagementValEl = document.getElementById('engagement-value');
-            const engagementTrendEl = document.getElementById('engagement-trend');
+            // 3. Reell GA4 Datainnhenting og API-integrasjon
+            let activeDays = 7;
 
+            async function loadRealAnalytics(days) {
+                activeDays = days;
+                const pageviewsValEl = document.getElementById('pageviews-value');
+                const engagementValEl = document.getElementById('engagement-value');
+                const pageviewsMetaEl = document.getElementById('pageviews-meta');
+
+                pageviewsValEl.textContent = 'Laster...';
+                engagementValEl.textContent = 'Laster...';
+
+                try {
+                    const user = firebase.auth().currentUser;
+                    if (!user) {
+                        console.warn("[Analytics] Ingen aktiv innlogget bruker funnet for API-forespørsel.");
+                        return;
+                    }
+                    const idToken = await user.getIdToken();
+
+                    const response = await fetch(`https://getanalyticsoverview-42bhgdjkcq-uc.a.run.app?days=${days}`, {
+                        headers: {
+                            'Authorization': `Bearer ${idToken}`
+                        }
+                    });
+
+                    if (!response.ok) throw new Error(`GA4 API returnerte status ${response.status}`);
+                    const result = await response.json();
+
+                    if (result.status === 'success' && result.data) {
+                        const data = result.data;
+
+                        // 3a. Live Brukere (med tilfeldig mikrosvingning for dynamisk effekt)
+                        const liveCounterEl = document.getElementById('live-user-count');
+                        const baseUsers = parseInt(data.activeUsers) || 0;
+                        liveCounterEl.textContent = baseUsers;
+
+                        if (window.liveOscillateInterval) clearInterval(window.liveOscillateInterval);
+                        window.liveOscillateInterval = setInterval(() => {
+                            const current = parseInt(liveCounterEl.textContent) || baseUsers;
+                            const shift = Math.random() > 0.5 ? 1 : -1;
+                            let next = current + shift;
+                            if (next < Math.max(0, baseUsers - 3)) next = Math.max(0, baseUsers - 3);
+                            if (next > baseUsers + 3) next = baseUsers + 3;
+                            liveCounterEl.textContent = next;
+
+                            // Beveg sparkline-søylene til venstre
+                            const bars = document.getElementById('live-sparkline').children;
+                            for (let i = 0; i < bars.length - 1; i++) {
+                                bars[i].style.height = bars[i + 1].style.height;
+                            }
+                            const newHeight = Math.floor(Math.random() * 60) + 30;
+                            bars[bars.length - 1].style.height = newHeight + '%';
+                        }, 4000);
+
+                        // 3b. Oversiktskort
+                        pageviewsValEl.textContent = parseInt(data.screenPageViews || 0).toLocaleString('no-NO');
+                        
+                        const mins = Math.floor((parseInt(data.avgDuration) || 0) / 60);
+                        const secs = Math.round((parseInt(data.avgDuration) || 0) % 60);
+                        engagementValEl.textContent = `${mins}m ${secs}s`;
+                        
+                        pageviewsMetaEl.textContent = days === 1 ? 'Siste 24 timer' : `Siste ${days} dager`;
+
+                        // 3c. Line Chart (Trafikkovervåking)
+                        const daily = data.dailyTraffic || [];
+                        const chartLabels = daily.map((d, i) => {
+                            const rawDate = d.date || '';
+                            if (/^\d{8}$/.test(rawDate)) {
+                                const day = parseInt(rawDate.substring(6, 8), 10);
+                                const monthNum = parseInt(rawDate.substring(4, 6), 10);
+                                const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+                                return `${day}. ${months[monthNum - 1] || ''}`;
+                            }
+                            return rawDate || `Pkt ${i+1}`;
+                        });
+                        const chartValues = daily.map(d => parseInt(d.users) || 0);
+
+                        trafficChart.data.labels = chartLabels;
+                        trafficChart.data.datasets[0].data = chartValues;
+                        trafficChart.data.datasets[0].label = 'Aktive brukere';
+                        if (trafficChart.data.datasets[1]) {
+                            trafficChart.data.datasets[1].data = []; // Skjul det sekundære mock-datasettet
+                            trafficChart.data.datasets[1].label = '';
+                        }
+                        trafficChart.update();
+
+                        // 3d. Topp Sider
+                        const topPages = data.topPages || [];
+                        const topPagesList = document.querySelector('.top-pages-list');
+                        const totalViews = topPages.reduce((acc, curr) => acc + (parseInt(curr.views) || 0), 0) || 1;
+
+                        let topPagesHtml = '';
+                        topPages.slice(0, 5).forEach((page, index) => {
+                            const viewsVal = parseInt(page.views) || 0;
+                            const pct = Math.round((viewsVal / totalViews) * 100);
+                            topPagesHtml += `
+                                <li class="top-page-item">
+                                    <div class="top-page-meta">
+                                        <span class="top-page-name">${page.title || 'Ukjent side'}</span>
+                                        <span class="top-page-count">${viewsVal.toLocaleString('no-NO')} (${pct}%)</span>
+                                    </div>
+                                    <div class="top-page-bar-wrapper">
+                                        <div class="top-page-bar ${index === 0 ? 'accent' : ''}" style="width: ${pct}%;"></div>
+                                    </div>
+                                </li>
+                            `;
+                        });
+                        if (topPagesList) topPagesList.innerHTML = topPagesHtml || '<li>Ingen data registrert</li>';
+
+                        // Populer Modal-tabellen for alle sideresultater
+                        const modalTableBody = document.querySelector('.modal-body-premium tbody');
+                        if (modalTableBody) {
+                            let modalHtml = '';
+                            topPages.forEach(page => {
+                                const viewsVal = parseInt(page.views) || 0;
+                                const pct = Math.round((viewsVal / totalViews) * 100);
+                                modalHtml += `
+                                    <tr style="border-bottom: 1px solid #f1f5f9;">
+                                        <td style="padding: 12px 8px; font-weight: 600; color: #334155;">${page.title || '/'}</td>
+                                        <td style="padding: 12px 8px; text-align: right; font-family: 'Fira Code', monospace;">${viewsVal.toLocaleString('no-NO')}</td>
+                                        <td style="padding: 12px 8px; text-align: right; font-family: 'Fira Code', monospace; color: #bd4f2a; font-weight: 700;">${pct}%</td>
+                                    </tr>
+                                `;
+                            });
+                            modalTableBody.innerHTML = modalHtml || '<tr><td colspan="3" style="padding:12px; text-align:center;">Ingen data</td></tr>';
+                        }
+
+                        // 3e. Geografisk oversikt (Topp byer i Norge)
+                        const topCities = data.topCities || [];
+                        const citiesListContainer = document.querySelector('.analytics-grid > div:last-child > div');
+                        if (citiesListContainer) {
+                            const totalCityUsers = topCities.reduce((acc, curr) => acc + (parseInt(curr.users) || 0), 0) || 1;
+                            let citiesHtml = '';
+                            topCities.slice(0, 4).forEach(cityData => {
+                                const cityUsers = parseInt(cityData.users) || 0;
+                                const pct = Math.round((cityUsers / totalCityUsers) * 100);
+                                citiesHtml += `
+                                    <div>
+                                        <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
+                                            <span style="font-weight: 600; color: #334155;">${cityData.city || 'Ukjent'}</span>
+                                            <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #d17d39;">${pct}%</span>
+                                        </div>
+                                        <div class="top-page-bar-wrapper">
+                                            <div class="top-page-bar" style="width: ${pct}%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
+                                        </div>
+                                    </div>
+                                `;
+                            });
+                            citiesListContainer.innerHTML = citiesHtml || '<p>Ingen bydata tilgjengelig</p>';
+                        }
+
+                        // Oppdater Google GeoChart med virkelige byer
+                        if (typeof google !== 'undefined' && google.visualization && google.visualization.arrayToDataTable) {
+                            drawRegionsMapReal(topCities);
+                        }
+
+                        // 3f. Trafikkilder
+                        const sources = data.trafficSources || [];
+                        const totalSessions = sources.reduce((acc, curr) => acc + (parseInt(curr.sessions) || 0), 0) || 1;
+                        
+                        let directVal = 0, searchVal = 0, socialVal = 0;
+                        sources.forEach(s => {
+                            const name = String(s.source || '').toLowerCase();
+                            const val = parseInt(s.sessions) || 0;
+                            if (name.includes('direct') || name.includes('(none)')) directVal += val;
+                            else if (name.includes('search') || name.includes('google') || name.includes('bing') || name.includes('yahoo')) searchVal += val;
+                            else if (name.includes('social') || name.includes('facebook') || name.includes('instagram') || name.includes('t.co')) socialVal += val;
+                            else directVal += val;
+                        });
+
+                        const directPct = Math.round((directVal / totalSessions) * 100) || 0;
+                        const searchPct = Math.round((searchVal / totalSessions) * 100) || 0;
+                        const socialPct = Math.round((socialVal / totalSessions) * 100) || 0;
+
+                        sourcesChart.data.datasets[0].data = [directPct, searchPct, socialPct];
+                        sourcesChart.update();
+
+                        document.querySelector('.donut-center-val').textContent = `${directPct}%`;
+                        const legendPcts = document.querySelectorAll('.legend-pct');
+                        if (legendPcts[0]) legendPcts[0].textContent = `${directPct}%`;
+                        if (legendPcts[1]) legendPcts[1].textContent = `${searchPct}%`;
+                        if (legendPcts[2]) legendPcts[2].textContent = `${socialPct}%`;
+                    }
+                } catch (error) {
+                    console.error("[Analytics] Feil under lasting av reell statistikk:", error);
+                    pageviewsValEl.textContent = 'Feil';
+                    engagementValEl.textContent = 'Feil';
+                }
+            }
+
+            // Lytter på Auth-endringer for å hente ekte data så snart bruker er klar
+            if (typeof firebase !== 'undefined') {
+                firebase.auth().onAuthStateChanged((user) => {
+                    if (user) {
+                        loadRealAnalytics(7); // Hent siste 7 dager som standard
+                    }
+                });
+            }
+
+            // 4. Period velger klikk-lyttere
+            const periodButtons = document.querySelectorAll('.period-btn');
             periodButtons.forEach(btn => {
-                btn.addEventListener('click', (e) => {
+                btn.addEventListener('click', async (e) => {
                     periodButtons.forEach(b => b.classList.remove('active'));
                     e.target.classList.add('active');
 
                     const period = e.target.dataset.period;
-                    const selected = dataSets[period];
+                    let days = 7;
+                    if (period === '1') days = 1;
+                    else if (period === '30') days = 30;
+                    else if (period === 'year') days = 365;
 
-                    // Update UI Metrics
-                    pageviewsValEl.textContent = selected.pageviews;
-                    pageviewsTrendEl.textContent = selected.pageviewsTrend;
-                    pageviewsMetaEl.textContent = period === '1' ? 'Siste 24 timer' : (period === '7' ? 'Siste 7 dager' : (period === '30' ? 'Siste 30 dager' : 'Dette året'));
-                    
-                    engagementValEl.textContent = selected.engagement;
-                    engagementTrendEl.textContent = selected.engagementTrend;
+                    if (firebase.auth().currentUser) {
+                        await loadRealAnalytics(days);
+                    } else {
+                        // Fallback til statiske datasett dersom man ikke er logget inn
+                        const selected = dataSets[period];
+                        document.getElementById('pageviews-value').textContent = selected.pageviews;
+                        document.getElementById('pageviews-meta').textContent = period === '1' ? 'Siste 24 timer' : (period === '7' ? 'Siste 7 dager' : (period === '30' ? 'Siste 30 dager' : 'Dette året'));
+                        document.getElementById('engagement-value').textContent = selected.engagement;
 
-                    // Update Main Line Chart
-                    trafficChart.data.labels = selected.labels;
-                    trafficChart.data.datasets[0].data = selected.sessions;
-                    trafficChart.data.datasets[1].data = selected.uniques;
-                    trafficChart.update();
-
-                    // Animate Top Pages values smoothly to replicate authentic wix load
-                    animateProgressBars();
+                        trafficChart.data.labels = selected.labels;
+                        trafficChart.data.datasets[0].data = selected.sessions;
+                        if (trafficChart.data.datasets[1]) {
+                            trafficChart.data.datasets[1].data = selected.uniques;
+                            trafficChart.data.datasets[1].label = 'Unike besøkende';
+                        }
+                        trafficChart.update();
+                    }
                 });
             });
 
-            // Animate progress bars for top pages
-            function animateProgressBars() {
-                const bar1 = document.getElementById('page-bar-1');
-                const bar2 = document.getElementById('page-bar-2');
-                const bar3 = document.getElementById('page-bar-3');
-                const bar4 = document.getElementById('page-bar-4');
-
-                bar1.style.width = '0%';
-                bar2.style.width = '0%';
-                bar3.style.width = '0%';
-                bar4.style.width = '0%';
-
-                setTimeout(() => {
-                    bar1.style.width = '85%';
-                    bar2.style.width = '15%';
-                    bar3.style.width = '2%';
-                    bar4.style.width = '1%';
-                }, 100);
-            }
-
-            animateProgressBars();
-
-            // 4. Modal event listeners
+            // 5. Modal event-lyttere
             const modalEl = document.getElementById('pages-results-modal');
             const openModalBtn = document.getElementById('open-all-pages-btn');
             const closeBtn1 = document.getElementById('close-pages-modal-btn');
@@ -1579,25 +1755,31 @@
                 }
             });
 
-            // 5. Initialize Google GeoChart
+            // 6. Google GeoChart-initialisering
             google.charts.load('current', {
                 'packages':['geochart'],
             });
-            google.charts.setOnLoadCallback(drawRegionsMap);
+            google.charts.setOnLoadCallback(() => {
+                // Initialiser tomt eller med standardverdier
+                drawRegionsMapReal([]);
+            });
 
-            function drawRegionsMap() {
-                // Mock data reflecting the progress bars below
-                var data = google.visualization.arrayToDataTable([
-                    ['Land', 'Besøkende'],
-                    ['Norway', 11756],
-                    ['Sweden', 386],
-                    ['Denmark', 149],
-                    ['United States', 89],
-                    ['Germany', 42]
-                ]);
+            function drawRegionsMapReal(cities = []) {
+                var chartData = [['By', 'Besøkende']];
+                cities.forEach(c => {
+                    chartData.push([c.city || 'Ukjent', parseInt(c.users) || 0]);
+                });
+                
+                // Fallback hvis ingen byer
+                if (chartData.length === 1) {
+                    chartData.push(['Mandal', 0]);
+                }
 
+                var dataTable = google.visualization.arrayToDataTable(chartData);
                 var options = {
-                    colorAxis: {colors: ['#e2e8f0', '#2563eb']}, /* Light gray to professional blue */
+                    region: 'NO', // Zoom inn på Norge
+                    displayMode: 'markers', // Vis byer som sirkler/markører
+                    colorAxis: {colors: ['#e2e8f0', '#d17d39']}, 
                     backgroundColor: '#f8fafc',
                     datalessRegionColor: '#f1f5f9',
                     defaultColor: '#f8fafc',
@@ -1606,11 +1788,10 @@
                 };
 
                 var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
-                chart.draw(data, options);
+                chart.draw(dataTable, options);
 
-                // Make chart responsive to window resize
                 window.addEventListener('resize', function() {
-                    chart.draw(data, options);
+                    chart.draw(dataTable, options);
                 });
             }
         });
