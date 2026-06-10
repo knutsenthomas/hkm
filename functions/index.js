@@ -669,7 +669,7 @@ exports.getAnalyticsOverview = onRequest({
       // Fallback to Firestore if secrets are missing
       if (!propertyId || !clientEmail || !privateKeyRaw) {
         console.log("[Analytics] Secrets missing, checking Firestore fallback...");
-        const settingsDoc = await admin.firestore().collection('pages_content').doc('settings_integrations').get();
+        const settingsDoc = await admin.firestore().collection('content').doc('settings_integrations').get();
         if (settingsDoc.exists) {
             const ga = settingsDoc.data().googleAnalytics || {};
             if (!propertyId) propertyId = ga.propertyId;
@@ -4023,6 +4023,7 @@ exports.onContactFormSubmit = onDocumentCreated({
   const defaultAdminEmails = [
     "post@hiskingdomministry.no",
     "thomas@hiskingdomministry.no",
+    "knutsenthomas@gmail.com",
   ];
   const backupAdminEmail = (
     process.env.CHAT_ALERT_EMAIL ||
@@ -5552,7 +5553,7 @@ exports.scheduledAiSuggestions = onSchedule({
         `;
 
         await sendEmail({
-          to: "post@hiskingdomministry.no, thomas@hiskingdomministry.no",
+          to: "post@hiskingdomministry.no, thomas@hiskingdomministry.no, knutsenthomas@gmail.com",
           subject: `[HKM Studio Assistent] 💡 Ukens innholdsforslag er klare: ${emailTitle}`,
           html: htmlContent,
           text: `Hei! AI-assistenten har gjort klart ukens forslag til nyhetsbrev: "${emailTitle}". Gå til HKM Studio for å vurdere og godkjenne dem.`,

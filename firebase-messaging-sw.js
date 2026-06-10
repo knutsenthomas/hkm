@@ -12,7 +12,7 @@ const firebaseConfig = {
     storageBucket: "his-kingdom-ministry.firebasestorage.app",
     messagingSenderId: "791237361706",
     appId: "1:791237361706:web:63516ba3d74436f23ac353",
-    measurementId: "G-5CH82CHQ0B"
+    measurementId: "G-28GVKTMCZE"
 };
 
 firebase.initializeApp(firebaseConfig);

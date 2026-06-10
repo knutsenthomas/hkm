@@ -771,7 +771,7 @@ class FirebaseService {
             ? Math.round(options.timeoutMs)
             : 2500;
         const cachedRole = this._getCachedUserRole(safeUid);
-        const fallbackSuperadmins = ['thomas@hiskingdomministry.no'];
+        const fallbackSuperadmins = ['thomas@hiskingdomministry.no', 'knutsenthomas@gmail.com'];
         const currentUser = this.auth && this.auth.currentUser ? this.auth.currentUser : null;
         if (currentUser && fallbackSuperadmins.includes((currentUser.email || '').toLowerCase())) {
             this._setCachedUserRole(safeUid, 'superadmin');

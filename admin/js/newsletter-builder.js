@@ -1824,7 +1824,7 @@ class NewsletterBuilder {
                         { type: 'header', content: { text: 'Ukeshilsen' } },
                         { type: 'image', content: { url: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=800&q=80' } },
                         { type: 'text', content: { text: '<h3>Kjære brødre og søstre,</h3><p>Vi ønsker deg en velsignet uke! I dag vil vi dele noen ord til oppmuntring om Guds trofasthet og kjærlighet i hverdagen...</p>' } },
-                        { type: 'button', content: { text: 'Les hele andakten', url: 'https://hkm.no' } }
+                        { type: 'button', content: { text: 'Les hele andakten', url: 'https://www.hiskingdomministry.no' } }
                     ]
                 },
                 {
@@ -1837,7 +1837,7 @@ class NewsletterBuilder {
                         { type: 'header', content: { text: 'Nyheter & Kunngjøringer' } },
                         { type: 'text', content: { text: '<h2>Hva skjer i His Kingdom Ministry?</h2><p>Her er en oversikt over kommende møter, reiser og siste nytt fra arbeidet vårt.</p>' } },
                         { type: 'image', content: { url: 'https://images.unsplash.com/photo-1447069387593-a5de0862481e?auto=format&fit=crop&w=800&q=80' } },
-                        { type: 'button', content: { text: 'Se arrangementskalender', url: 'https://hkm.no/kalender' } }
+                        { type: 'button', content: { text: 'Se arrangementskalender', url: 'https://www.hiskingdomministry.no/kalender' } }
                     ]
                 },
                 {
@@ -1849,7 +1849,7 @@ class NewsletterBuilder {
                     blocks: [
                         { type: 'header', content: { text: 'Bibeltimer & Undervisning' } },
                         { type: 'text', content: { text: '<h2>Ukens Bibelstudium</h2><p>Bli med oss å dykke dypere ned i Guds ord denne uken. Vi studerer skriftene sammen...</p>' } },
-                        { type: 'button', content: { text: 'Åpne leksjonsplan', url: 'https://hkm.no/undervisning' } }
+                        { type: 'button', content: { text: 'Åpne leksjonsplan', url: 'https://www.hiskingdomministry.no/undervisning' } }
                     ]
                 }
             ];

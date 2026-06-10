@@ -23,7 +23,7 @@ service cloud.firestore {
     function isBootstrapAdminEmail() {
       return signedIn() &&
         request.auth.token.email is string &&
-        request.auth.token.email == 'thomas@hiskingdomministry.no';
+        (request.auth.token.email == 'thomas@hiskingdomministry.no' || request.auth.token.email == 'knutsenthomas@gmail.com');
     }
 
     function isAdmin() {
