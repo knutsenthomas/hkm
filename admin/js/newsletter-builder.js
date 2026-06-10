@@ -2526,12 +2526,14 @@ class NewsletterBuilder {
             
             updateStep(70, "Genererer kreative vinklinger for nyhetsbrev, blogg og undervisning...");
             
+            const today = new Date();
+            const dateString = today.toLocaleDateString('no-NO', { year: 'numeric', month: 'long', day: 'numeric' });
             const prompt = `
                 Du er en inspirerende og strategisk innholdsrådgiver og teolog for His Kingdom Ministry (HKM).
-                Generer tre konkrete, dype og inspirerende ideer/utkast for den kommende uken basert på:
+                Generer tre konkrete, dype og inspirerende ideer/utkast for den kommende uken basert på dagens dato (${dateString}):
                 - Aktuelle kristne nyheter og happenings i Norge og globalt (f.eks. misjonsarbeid, kirkevekst, konferanser, kristent samfunnsansvar).
                 - HKMs podcast-profil, bibelstudier og ønske om å fremme Guds rike.
-                - Sesongen (Pinse/Pentecost, sommerforberedelser, kristent samfunnsliv).
+                - Sesongen og tiden på året (f.eks. merkedager, høytider, sommer/høst/vinter/vår og kristent samfunnsliv basert på dagens dato).
 
                 Du må levere nøyaktig 3 ideer:
                 1. Ett Nyhetsbrev (newsletter) til abonnenter.
@@ -2871,12 +2873,14 @@ class NewsletterBuilder {
             };
 
             const config = promptTypeMap[type];
+            const today = new Date();
+            const dateString = today.toLocaleDateString('no-NO', { year: 'numeric', month: 'long', day: 'numeric' });
             const prompt = `
                 Du er en inspirerende og strategisk innholdsrådgiver og teolog for His Kingdom Ministry (HKM).
-                Generer nøyaktig ETT nytt, unikt og inspirerende forslag til et ${config.label} for den kommende uken basert på:
+                Generer nøyaktig ETT nytt, unikt og inspirerende forslag til et ${config.label} for den kommende uken basert på dagens dato (${dateString}):
                 - Aktuelle kristne nyheter og happenings i Norge og globalt.
                 - HKMs podcast-profil, bibelstudier og ønske om å fremme Guds rike.
-                - Sesongen (Pinse/Pentecost, sommerforberedelser, kristent samfunnsliv).
+                - Sesongen og tiden på året (f.eks. merkedager, høytider, sommer/høst/vinter/vår og kristent samfunnsliv basert på dagens dato).
 
                 ${config.reqs}
 

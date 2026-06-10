@@ -5380,18 +5380,21 @@ exports.scheduledAiSuggestions = onSchedule({
       return;
     }
 
+    const today = new Date();
+    const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+    const dateString = today.toLocaleDateString('no-NO', dateOptions);
+
     const prompt = [
       "Du er en inspirerende og strategisk innholdsrådgiver og",
       "teolog for His Kingdom Ministry (HKM).",
       "Generer tre konkrete, dype og inspirerende ideer/utkast for",
-      "den kommende uken basert på:",
+      `den kommende uken basert på dagens dato (${dateString}):`,
       "- Aktuelle kristne nyheter og happenings i Norge og globalt",
       "(f.eks. misjonsarbeid, kirkevekst, konferanser, kristent",
       "samfunnsansvar).",
       "- HKMs podcast-profil, bibelstudier og ønske om å fremme",
       "Guds rike.",
-      "- Sesongen (Pinse/Pentecost, sommerforberedelser, kristent",
-      "samfunnsolsk).",
+      "- Sesongen og tiden på året (f.eks. merkedager, høytider, sommer/høst/vinter/vår og kristent samfunnsliv basert på dagens dato).",
       "",
       "Du må levere nøyaktig 3 ideer:",
       "1. Ett Nyhetsbrev (newsletter) til abonnenter.",
