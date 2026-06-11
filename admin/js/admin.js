@@ -16963,10 +16963,10 @@ class AdminManager {
                 regular_donor: {
                     title: "Vær med på å skape varig endring",
                     description: "Som fast giver er du med på å sikre forutsigbarhet i vårt arbeid, slik at vi kan planlegge og gjennomføre flere prosjekter for Guds rike.",
-                    vipps: {
-                        title: "Fast gave via Vipps",
-                        text: "Den enkleste måten å bli fast giver på. Du oppretter en fast avtale direkte i Vipps-appen.",
-                        cta: "Opprett i Vipps"
+                    recurring: {
+                        title: "Fast gave (Vipps / Kort)",
+                        text: "Den enkleste måten å bli fast giver på. Du oppretter en fast avtale enkelt med Vipps eller bankkort.",
+                        cta: "Opprett fast gave"
                     },
                     bank: {
                         title: "Bankoverføring",

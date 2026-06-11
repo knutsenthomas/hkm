@@ -19,6 +19,8 @@
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../styles.css">
     <link rel="stylesheet" href="../css/cookie-consent.css">
+    <link rel="stylesheet" href="../css/stripe-checkout.css">
+    <script src="https://js.stripe.com/v3/"></script>
 
     <!-- Tailwind CSS Play CDN -->
     <script>
@@ -254,13 +256,27 @@
                             <i class="fas fa-mobile-alt"></i>
                         </div>
                         <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.vipps.title">Regular Gift via Vipps</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.vipps.text">The easiest way to become a regular
-                            donor. You create a regular agreement directly in the Vipps app.</p>
-                        <a href="https://vipps.no" target="_blank" class="btn btn-outline"
-                            style="color: #FF5B24; border-color: #FF5B24;" data-content-key="regular_donor.vipps.cta">Create in Vipps</a>
+                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.vipps.text">The easiest way to become a regular donor. You create a regular agreement directly in the Vipps app.</p>
+                        <a href="javascript:void(0)" class="btn btn-outline"
+                            style="color: #FF5B24; border-color: #FF5B24;" data-content-key="regular_donor.vipps.cta" id="vipps-recurring-trigger">Create in Vipps</a>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 15px;" data-content-key="regular_donor.vipps.subtext">No lock-in period. The agreement can easily be cancelled in Vipps or via email. See our <a href="/betingelser" style="text-decoration: underline;">terms for regular payments</a>.</p>
                     </div>
 
-                    <!-- Option 2: Bank Transfer -->
+                    <!-- Option 2: Card Payment (Stripe) -->
+                    <div
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
+                        <div
+                            style="width: 70px; height: 70px; background: #1B4965; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.stripe.title">Regular Gift with Card</h3>
+                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.stripe.text">Support us with a monthly deduction from your credit card (Visa or Mastercard) via Stripe.</p>
+                        <a href="javascript:void(0)" class="btn btn-outline"
+                            style="color: #1B4965; border-color: #1B4965;" data-content-key="regular_donor.stripe.cta" id="stripe-recurring-trigger">Create with card</a>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 15px;" data-content-key="regular_donor.stripe.subtext">No lock-in period. The agreement can easily be cancelled via email or My Page. See our <a href="/betingelser" style="text-decoration: underline;">terms for regular payments</a>.</p>
+                    </div>
+
+                    <!-- Option 3: Bank Transfer -->
                     <div
                         style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
                         <div
@@ -268,8 +284,7 @@
                             <i class="fas fa-university"></i>
                         </div>
                         <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.bank.title">Bank Transfer</h3>
-                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.bank.text">Set up a regular transfer in your
-                            online bank to our account. This gives us the lowest fees.</p>
+                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.bank.text">Set up a regular transfer in your online bank to our account. This gives us the lowest fees.</p>
                         <div
                             style="background: white; padding: 15px; border-radius: 8px; font-weight: 700; color: var(--primary-orange); border: 1px dashed var(--primary-orange);" data-content-key="regular_donor.bank.account">
                             Account: 3000.66.08759
@@ -427,7 +442,8 @@
     <script type="module" src="../js/i18n.js"></script>
     <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
     <script type="module" src="../js/content-manager.js?v=2026.05.10.8"></script>
-    <script type="module" src="../js/cookie-consent.js"></script>
+    <script type="module" src="../js/stripe-checkout.js"></script>
+    <script type="module" src="../js/vipps-recurring.js"></script>
 </body>
 
 </html>
