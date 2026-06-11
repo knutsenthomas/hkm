@@ -2789,6 +2789,205 @@ exports.capturePayPalOrder = onRequest({
   }
 });
 
+async function getOrCreatePayPalProduct(accessToken, config) {
+  const configDocRef = db.collection('settings').doc('paypal_config');
+  const configDoc = await configDocRef.get();
+  
+  if (configDoc.exists && configDoc.data().productId) {
+    return configDoc.data().productId;
+  }
+  
+  // Create product in PayPal
+  const response = await fetch(`${config.apiBase}/v1/catalogs/products`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation'
+    },
+    body: JSON.stringify({
+      name: "His Kingdom Ministry Fast Giver",
+      description: "Månedlige donasjoner til His Kingdom Ministry",
+      type: "SERVICE",
+      category: "CHARITY",
+      home_url: "https://www.hiskingdomministry.no"
+    })
+  });
+  
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`PayPal Product Creation Failed: ${response.status} - ${errText}`);
+  }
+  
+  const product = await response.json();
+  await configDocRef.set({ productId: product.id }, { merge: true });
+  return product.id;
+}
+
+exports.createPayPalSubscriptionPlan = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [paypalClientIdParam, paypalClientSecretParam],
+}, async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { amount } = req.body;
+    const parsedAmount = Number(amount);
+    
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      res.status(400).send({ error: "Missing or invalid amount" });
+      return;
+    }
+
+    const config = getPayPalConfig();
+    const accessToken = await getPayPalAccessToken(config);
+    
+    // Get or create PayPal Product ID
+    const productId = await getOrCreatePayPalProduct(accessToken, config);
+
+    // Create a plan for the specific monthly amount
+    const planPayload = {
+      product_id: productId,
+      name: `Månedlig gave - ${parsedAmount} kr`,
+      description: `Månedlig gave på ${parsedAmount} kr til His Kingdom Ministry`,
+      status: "ACTIVE",
+      billing_cycles: [
+        {
+          frequency: {
+            interval_unit: "MONTH",
+            interval_count: 1
+          },
+          tenure_type: "REGULAR",
+          sequence: 1,
+          total_cycles: 0,
+          pricing_scheme: {
+            fixed_price: {
+              value: parsedAmount.toFixed(2),
+              currency_code: "NOK"
+            }
+          }
+        }
+      ],
+      payment_preferences: {
+        auto_bill_outstanding: true,
+        setup_fee_failure_action: "CONTINUE",
+        payment_failure_threshold: 3
+      }
+    };
+
+    const response = await fetch(`${config.apiBase}/v1/billing/plans`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation'
+      },
+      body: JSON.stringify(planPayload)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`PayPal Plan Creation Failed: ${response.status} - ${errText}`);
+    }
+
+    const plan = await response.json();
+    res.status(200).send({ planId: plan.id });
+
+  } catch (error) {
+    console.error("PayPal create plan error:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown PayPal error" });
+  }
+});
+
+exports.activatePayPalSubscription = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [paypalClientIdParam, paypalClientSecretParam],
+}, async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { subscriptionId, customerDetails = {}, amount } = req.body;
+    const parsedAmount = Number(amount);
+    
+    if (!subscriptionId) {
+      res.status(400).send({ error: "Missing subscriptionId" });
+      return;
+    }
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      res.status(400).send({ error: "Missing or invalid amount" });
+      return;
+    }
+
+    const config = getPayPalConfig();
+    const accessToken = await getPayPalAccessToken(config);
+
+    // Get Subscription Details from PayPal to verify status
+    const response = await fetch(`${config.apiBase}/v1/billing/subscriptions/${subscriptionId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`PayPal Subscription Retrieval Failed: ${response.status} - ${errText}`);
+    }
+
+    const subscription = await response.json();
+
+    if (subscription.status === "ACTIVE" || subscription.status === "APPROVED") {
+      const resolvedUserId = await resolveDonationUserId(customerDetails);
+
+      // Save recurring donation/agreement record in Firestore donations collection
+      await db.collection('donations').doc(subscriptionId).set({
+        transactionId: subscriptionId,
+        subscriptionId: subscriptionId,
+        amount: parsedAmount,
+        amountNok: parsedAmount,
+        currency: "NOK",
+        method: "paypal_subscription",
+        status: "completed",
+        timestamp: admin.firestore.FieldValue.serverTimestamp(),
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
+        userId: resolvedUserId,
+        donorName: customerDetails.name || "Ukjent",
+        donorEmail: customerDetails.email || "Ukjent",
+        donorPhone: customerDetails.phone || "",
+        donorAddress: customerDetails.address || "",
+        donorZip: customerDetails.zip || "",
+        donorCity: customerDetails.city || "",
+        message: customerDetails.message || "",
+        type: "Fast giver",
+        fund: customerDetails.fund || "general"
+      });
+
+      res.status(200).send({ status: "success", subscriptionId });
+    } else {
+      throw new Error(`PayPal Subscription is not active. Status: ${subscription.status}`);
+    }
+
+  } catch (error) {
+    console.error("PayPal activate subscription error:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown PayPal error" });
+  }
+});
+
 exports.createStripeSubscription = onRequest({
   cors: true,
   invoker: "public",
