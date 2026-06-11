@@ -2506,7 +2506,7 @@ exports.createPaymentIntent = onRequest({
       res.status(500).send({ error: "Server configuration error: Missing Stripe Key." });
       return;
     }
-    const stripe = require('stripe')(stripeKey);
+    const stripe = require('stripe')(stripeKey, { apiVersion: '2023-10-16' });
 
     const paymentIntentPayload = {
       amount: amountOre, // Stripe bruker ore (cents)
@@ -3033,7 +3033,7 @@ exports.createStripeSubscription = onRequest({
       res.status(500).send({ error: "Server configuration error: Missing Stripe Key." });
       return;
     }
-    const stripe = require('stripe')(stripeKey);
+    const stripe = require('stripe')(stripeKey, { apiVersion: '2023-10-16' });
 
     // 1. Finn eller opprett kunde i Stripe
     let customer;
@@ -3612,7 +3612,7 @@ exports.stripeWebhook = onRequest({
   
   try {
     const stripeKey = stripeSecretKeyParam.value();
-    const stripe = require('stripe')(stripeKey);
+    const stripe = require('stripe')(stripeKey, { apiVersion: '2023-10-16' });
     event = stripe.webhooks.constructEvent(req.rawBody, sig, endpointSecret);
   } catch (err) {
     console.error(`Stripe Webhook Error: ${err.message}`);
