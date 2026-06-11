@@ -318,9 +318,7 @@ function openAgreementModal(method = "vipps") {
         ? "Opprett avtale i Vipps" 
         : "Gå til betaling";
 
-    const submitBtnStyle = method === "stripe" 
-        ? "background: linear-gradient(135deg, #1B4965 0%, #10344d 100%); box-shadow: 0 8px 20px rgba(27, 73, 101, 0.2);" 
-        : "";
+    const submitBtnStyle = "";
 
     modal.innerHTML = `
         <div class="hkm-modal-panel">
@@ -514,7 +512,7 @@ function openAgreementModal(method = "vipps") {
                         <div id="payment-element" style="margin-bottom: 16px;">
                             <!-- Stripe.js injects the Payment Element here -->
                         </div>
-                        <button id="submit-payment" class="hkm-submit-btn" type="button" style="background: linear-gradient(135deg, #1B4965 0%, #10344d 100%); box-shadow: 0 8px 20px rgba(27, 73, 101, 0.2);">
+                        <button id="submit-payment" class="hkm-submit-btn" type="button">
                             <span class="hkm-spinner hidden" id="spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>
                             <span id="button-text">Bekreft avtale (${amount} kr/mnd)</span>
                         </button>
@@ -633,7 +631,7 @@ function showResultModal(isSuccess, message) {
                 ${isSuccess ? 'Fullført!' : 'Avbrutt'}
             </h3>
             <p style="color: #5a6e7f; font-size: 15px; margin-bottom: 32px; line-height: 1.6; text-align: center; font-weight: 500;">${message}</p>
-            <button class="hkm-submit-btn" id="hkm-result-close-btn" style="background: #1B4965; box-shadow: 0 8px 20px rgba(27, 73, 101, 0.25);">
+            <button class="hkm-submit-btn" id="hkm-result-close-btn">
                 Lukk
             </button>
         </div>
