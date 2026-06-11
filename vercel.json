@@ -3,6 +3,8 @@
   "trailingSlash": false,
   "redirects": [
     { "source": "/category/all-products", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/category/cups-bottles", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
+    { "source": "/category/:path*", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
     { "source": "/kontakt-oss", "destination": "/kontakt", "permanent": true },
     { "source": "/hvem-vi-er", "destination": "/om-oss", "permanent": true },
     { "source": "/butikk", "destination": "https://www.hiskingdomdesigns.no/", "permanent": true },
