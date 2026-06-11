@@ -277,7 +277,18 @@ document.addEventListener("DOMContentLoaded", () => {
         trigger.removeAttribute("target");
         trigger.addEventListener("click", (e) => {
             e.preventDefault();
-            openAgreementModal();
+            openAgreementModal("vipps");
+        });
+    }
+
+    const stripeTrigger = document.getElementById("stripe-recurring-trigger");
+    if (stripeTrigger) {
+        // Prevent default navigation
+        stripeTrigger.setAttribute("href", "javascript:void(0)");
+        stripeTrigger.removeAttribute("target");
+        stripeTrigger.addEventListener("click", (e) => {
+            e.preventDefault();
+            openAgreementModal("stripe");
         });
     }
     
@@ -286,7 +297,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // Helper to open modal
-function openAgreementModal() {
+function openAgreementModal(method = "vipps") {
     // Remove existing modal if any
     const existing = document.getElementById("vipps-recurring-modal");
     if (existing) existing.remove();
@@ -298,12 +309,25 @@ function openAgreementModal() {
     const modal = document.createElement("div");
     modal.id = "vipps-recurring-modal";
     modal.className = "hkm-modal-overlay";
+    
+    const subtitleText = method === "vipps" 
+        ? "Opprett en fast månedlig avtale direkte i Vipps" 
+        : "Opprett en fast månedlig avtale med bankkort (Stripe)";
+        
+    const submitBtnText = method === "vipps" 
+        ? "Opprett avtale i Vipps" 
+        : "Gå til betaling";
+
+    const submitBtnStyle = method === "stripe" 
+        ? "background: linear-gradient(135deg, #1B4965 0%, #10344d 100%); box-shadow: 0 8px 20px rgba(27, 73, 101, 0.2);" 
+        : "";
+
     modal.innerHTML = `
         <div class="hkm-modal-panel">
             <div class="hkm-modal-header">
                 <div class="hkm-modal-title-wrapper">
                     <h3 class="hkm-modal-title">Bli fast giver</h3>
-                    <p class="hkm-modal-subtitle">Opprett en fast månedlig avtale direkte i Vipps</p>
+                    <p class="hkm-modal-subtitle">${subtitleText}</p>
                 </div>
                 <button class="hkm-modal-close" id="hkm-modal-close-btn" type="button" aria-label="Lukk">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -355,8 +379,8 @@ function openAgreementModal() {
                 <!-- Fund purpose (hidden or defaults to general) -->
                 <input type="hidden" id="hkm-donor-fund" value="general">
 
-                <button type="submit" class="hkm-submit-btn" id="hkm-submit-btn">
-                    Opprett avtale i Vipps
+                <button type="submit" class="hkm-submit-btn" id="hkm-submit-btn" style="${submitBtnStyle}">
+                    ${submitBtnText}
                 </button>
             </form>
         </div>
@@ -416,54 +440,130 @@ function openAgreementModal() {
         const submitBtn = modal.querySelector("#hkm-submit-btn");
         const originalText = submitBtn.textContent;
         submitBtn.disabled = true;
-        submitBtn.innerHTML = `<span class="hkm-spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>Starter Vipps...`;
 
-        try {
-            const donorName = modal.querySelector("#hkm-donor-name").value.trim();
-            const donorEmail = modal.querySelector("#hkm-donor-email").value.trim();
-            const donorPhone = modal.querySelector("#hkm-donor-phone").value.trim();
-            const donorAddress = modal.querySelector("#hkm-donor-address").value.trim();
-            const donorZip = modal.querySelector("#hkm-donor-zip").value.trim();
-            const donorCity = modal.querySelector("#hkm-donor-city").value.trim();
-            const fund = modal.querySelector("#hkm-donor-fund").value;
+        const donorName = modal.querySelector("#hkm-donor-name").value.trim();
+        const donorEmail = modal.querySelector("#hkm-donor-email").value.trim();
+        const donorPhone = modal.querySelector("#hkm-donor-phone").value.trim();
+        const donorAddress = modal.querySelector("#hkm-donor-address").value.trim();
+        const donorZip = modal.querySelector("#hkm-donor-zip").value.trim();
+        const donorCity = modal.querySelector("#hkm-donor-city").value.trim();
+        const fund = modal.querySelector("#hkm-donor-fund").value;
 
-            const response = await fetch(VIPPS_CREATE_AGREEMENT_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    amount,
-                    currency: "NOK",
-                    customerDetails: {
-                        name: donorName,
-                        email: donorEmail,
-                        phone: donorPhone,
-                        address: donorAddress,
-                        zip: donorZip,
-                        city: donorCity,
-                        fund: fund,
-                        userId: currentUser ? currentUser.uid : null
-                    },
-                    returnUrl: window.location.href.split("?")[0]
-                })
-            });
+        if (method === "vipps") {
+            submitBtn.innerHTML = `<span class="hkm-spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>Starter Vipps...`;
 
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.error || `Serverfeil: ${response.status}`);
+            try {
+                const response = await fetch(VIPPS_CREATE_AGREEMENT_URL, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        amount,
+                        currency: "NOK",
+                        customerDetails: {
+                            name: donorName,
+                            email: donorEmail,
+                            phone: donorPhone,
+                            address: donorAddress,
+                            zip: donorZip,
+                            city: donorCity,
+                            fund: fund,
+                            userId: currentUser ? currentUser.uid : null
+                        },
+                        returnUrl: window.location.href.split("?")[0]
+                    })
+                });
+
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || `Serverfeil: ${response.status}`);
+                }
+
+                if (!data.redirectUrl) {
+                    throw new Error("Mottok ikke bekreftelseslenke fra Vipps.");
+                }
+
+                // Redirect to Vipps confirmation screen
+                window.location.href = data.redirectUrl;
+
+            } catch (err) {
+                console.error("Vipps recurring initiation failed:", err);
+                alert("Kunne ikke starte avtalen: " + err.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
             }
+        } else {
+            // Stripe payment flow
+            submitBtn.innerHTML = `<span class="hkm-spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>Initialiserer...`;
 
-            if (!data.redirectUrl) {
-                throw new Error("Mottok ikke bekreftelseslenke fra Vipps.");
+            try {
+                const customerDetails = {
+                    name: donorName,
+                    email: donorEmail,
+                    phone: donorPhone,
+                    address: donorAddress,
+                    zip: donorZip,
+                    city: donorCity,
+                    fund: fund,
+                    userId: currentUser ? currentUser.uid : null
+                };
+
+                // Replace the form inside the modal with the Stripe checkout container structure
+                form.innerHTML = `
+                    <div id="stripe-checkout-container" style="display: block; margin: 0; padding: 0; box-shadow: none; background: transparent;">
+                        <h4 style="margin-bottom: 16px; color: #1B4965; font-weight: 700; font-size: 16px; text-align: center;">Tast inn kortopplysninger</h4>
+                        <div id="payment-element" style="margin-bottom: 16px;">
+                            <!-- Stripe.js injects the Payment Element here -->
+                        </div>
+                        <button id="submit-payment" class="hkm-submit-btn" type="button" style="background: linear-gradient(135deg, #1B4965 0%, #10344d 100%); box-shadow: 0 8px 20px rgba(27, 73, 101, 0.2);">
+                            <span class="hkm-spinner hidden" id="spinner" style="width: 20px; height: 20px; border-width: 2px; margin-right: 10px; margin-bottom: 0; display: inline-block; vertical-align: middle;"></span>
+                            <span id="button-text">Bekreft avtale (${amount} kr/mnd)</span>
+                        </button>
+                        <div id="payment-message" class="hidden"></div>
+                    </div>
+                `;
+
+                if (typeof window.initializeStripe !== "function") {
+                    throw new Error("Stripe checkout-skriptet er ikke ferdig lastet.");
+                }
+
+                // Call the globally exposed initializeStripe function
+                await window.initializeStripe(amount, customerDetails, "card", true);
+
+                // Add submit payment event listener
+                const submitPaymentBtn = form.querySelector("#submit-payment");
+                if (submitPaymentBtn) {
+                    submitPaymentBtn.addEventListener("click", async (ev) => {
+                        ev.preventDefault();
+                        
+                        const billingDetails = {
+                            name: donorName,
+                            email: donorEmail,
+                            phone: donorPhone,
+                            address: {
+                                line1: donorAddress,
+                                city: donorCity,
+                                postal_code: donorZip,
+                                country: 'NO',
+                            }
+                        };
+                        
+                        if (window.handleStripeSubmit) {
+                            await window.handleStripeSubmit(ev, { billingDetails });
+                        } else {
+                            console.error("handleStripeSubmit is not defined!");
+                            alert("Kunne ikke fullføre betalingen: betalingsskriptet mangler.");
+                        }
+                    });
+                }
+
+            } catch (err) {
+                console.error("Stripe recurring initiation failed:", err);
+                alert("Kunne ikke starte avtalen: " + err.message);
+                
+                // Close modal on failure so user can try again
+                modal.classList.remove("active");
+                setTimeout(() => modal.remove(), 300);
             }
-
-            // Redirect to Vipps confirmation screen
-            window.location.href = data.redirectUrl;
-
-        } catch (err) {
-            console.error("Vipps recurring initiation failed:", err);
-            alert("Kunne ikke starte avtalen: " + err.message);
-            submitBtn.disabled = false;
-            submitBtn.textContent = originalText;
         }
     });
 }
@@ -552,3 +652,6 @@ function showResultModal(isSuccess, message) {
         if (e.target === modal) closeModal();
     });
 }
+
+// Expose globally
+window.showResultModal = showResultModal;

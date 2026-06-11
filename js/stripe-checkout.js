@@ -2,6 +2,7 @@
 // TODO: User needs to replace this placeholder or configure environment variables
 const stripe = Stripe("pk_live_51Pab8rAL393JGrO9bTUitYflDKlHGpLiqZCCBp0dCzBEV3ZFxARFfK6MgWraehq7i79tJHPIEzlpMwPiT2K3HsiZ00gJ1TQ71Y");
 const STRIPE_PAYMENT_INTENT_URL = "https://createpaymentintent-42bhgdjkcq-uc.a.run.app";
+const STRIPE_CREATE_SUBSCRIPTION_URL = "https://createstripesubscription-42bhgdjkcq-uc.a.run.app";
 const VIPPS_CREATE_PAYMENT_URL = "https://createvippspayment-42bhgdjkcq-uc.a.run.app";
 const VIPPS_FINALIZE_PAYMENT_URL = "https://finalizevippspayment-42bhgdjkcq-uc.a.run.app";
 
@@ -37,13 +38,14 @@ async function parseJsonOrThrow(response) {
     return data;
 }
 
-async function initializeStripe(amount, customerDetails = {}, paymentMethodPreference = "auto") {
+async function initializeStripe(amount, customerDetails = {}, paymentMethodPreference = "auto", isRecurring = false) {
     // Show spinner
     setLoading(true);
 
     try {
-        // Call your backend to create the PaymentIntent
-        const response = await fetch(STRIPE_PAYMENT_INTENT_URL, {
+        // Call your backend to create the PaymentIntent or Subscription
+        const targetUrl = isRecurring ? STRIPE_CREATE_SUBSCRIPTION_URL : STRIPE_PAYMENT_INTENT_URL;
+        const response = await fetch(targetUrl, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -244,7 +246,11 @@ async function checkStatus() {
 
     switch (paymentIntent.status) {
         case "succeeded":
-            showMessage("Betalingen var vellykket! Takk for din gave.");
+            if (window.showResultModal) {
+                window.showResultModal(true, "Betalingen var vellykket! Tusen takk for at du blir fast giver.");
+            } else {
+                showMessage("Betalingen var vellykket! Takk for din gave.");
+            }
             // Record to Firestore
             await recordDonation(paymentIntent);
             break;
@@ -252,12 +258,23 @@ async function checkStatus() {
             showMessage("Betalingen behandles.");
             break;
         case "requires_payment_method":
-            showMessage("Betalingen feilet, vennligst prøv igjen.");
+            if (window.showResultModal) {
+                window.showResultModal(false, "Betalingen feilet eller ble avbrutt. Vennligst prøv igjen.");
+            } else {
+                showMessage("Betalingen feilet, vennligst prøv igjen.");
+            }
             break;
         default:
             showMessage("Noe gikk galt.");
             break;
     }
+
+    // Clean up url parameters
+    const url = new URL(window.location.href);
+    url.searchParams.delete("payment_intent_client_secret");
+    url.searchParams.delete("payment_intent");
+    url.searchParams.delete("redirect_status");
+    window.history.replaceState({}, document.title, url.toString());
 }
 
 async function recordDonation(paymentIntent) {

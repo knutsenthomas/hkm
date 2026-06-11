@@ -2584,6 +2584,135 @@ exports.createPaymentIntent = onRequest({
   }
 });
 
+exports.createStripeSubscription = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [stripeSecretKeyParam],
+}, async (req, res) => {
+  // Håndter preflight requests (CORS)
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const {
+      amount,
+      currency = "nok",
+      customerDetails = {},
+    } = req.body;
+
+    const parsedAmount = Number(amount);
+    const normalizedCurrency = typeof currency === "string" ?
+      currency.toLowerCase() : "nok";
+
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      res.status(400).send({ error: "Missing or invalid amount" });
+      return;
+    }
+
+    if (!customerDetails.email) {
+      res.status(400).send({ error: "Missing customer email address" });
+      return;
+    }
+
+    const resolvedUserId = await resolveDonationUserId(customerDetails);
+    const amountOre = Math.round(parsedAmount * 100);
+
+    // Initialize Stripe lazily
+    const stripeKey = stripeSecretKeyParam.value();
+    if (!stripeKey) {
+      console.error("Stripe Secret Key is missing!");
+      res.status(500).send({ error: "Server configuration error: Missing Stripe Key." });
+      return;
+    }
+    const stripe = require('stripe')(stripeKey);
+
+    // 1. Finn eller opprett kunde i Stripe
+    let customer;
+    const existingCustomers = await stripe.customers.list({
+      email: customerDetails.email,
+      limit: 1,
+    });
+
+    if (existingCustomers.data.length > 0) {
+      customer = existingCustomers.data[0];
+    } else {
+      customer = await stripe.customers.create({
+        email: customerDetails.email,
+        name: customerDetails.name || undefined,
+        phone: customerDetails.phone || undefined,
+      });
+    }
+
+    // 2. Opprett et dynamisk pris-objekt (Recurring Price) for beløpet
+    const price = await stripe.prices.create({
+      unit_amount: amountOre,
+      currency: normalizedCurrency,
+      recurring: { interval: 'month' },
+      product_data: {
+        name: 'Fast givertjeneste - His Kingdom Ministry',
+      },
+    });
+
+    // 3. Opprett abonnement (Subscription)
+    const subscription = await stripe.subscriptions.create({
+      customer: customer.id,
+      items: [{ price: price.id }],
+      payment_behavior: 'default_incomplete',
+      payment_settings: { save_default_payment_method: 'on_subscription' },
+      expand: ['latest_invoice.payment_intent'],
+      metadata: {
+        customer_name: customerDetails.name || "",
+        customer_email: customerDetails.email || "",
+        customer_phone: customerDetails.phone || "",
+        message: customerDetails.message || "",
+        user_id: resolvedUserId || "",
+        fund: customerDetails.fund || "general",
+      },
+    });
+
+    const paymentIntent = subscription.latest_invoice.payment_intent;
+
+    if (!paymentIntent) {
+      throw new Error("Kunne ikke hente PaymentIntent for abonnementets første faktura.");
+    }
+
+    // 4. Lagre abonnementet i databasen som pending
+    await db.collection('donations').doc(paymentIntent.id).set({
+      transactionId: paymentIntent.id,
+      subscriptionId: subscription.id,
+      amount: parsedAmount,
+      amountNok: parsedAmount,
+      amountOre,
+      currency: normalizedCurrency,
+      method: "stripe_subscription",
+      status: "pending",
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      userId: resolvedUserId,
+      donorName: customerDetails.name || "Ukjent",
+      donorEmail: customerDetails.email || "Ukjent",
+      message: customerDetails.message || "",
+      type: "Fast giver",
+      fund: customerDetails.fund || "general"
+    });
+
+    // Returner clientSecret til frontend
+    res.status(200).send({
+      clientSecret: paymentIntent.client_secret,
+      subscriptionId: subscription.id,
+    });
+
+  } catch (error) {
+    console.error("Stripe Subscription error:", error);
+    const stripeMessage = (error && error.message) ? error.message : "Unknown Stripe error";
+    res.status(500).send({ error: stripeMessage });
+  }
+});
+
 exports.createVippsPayment = onRequest({
   cors: true,
   invoker: "public",

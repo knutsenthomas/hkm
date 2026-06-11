@@ -20,6 +20,8 @@
     <link rel="stylesheet" href="styles.css?v=2026.05.05.15">
     <link rel="stylesheet" href="css/cookie-consent.css">
     <link rel="stylesheet" href="css/subpage-hero.css">
+    <link rel="stylesheet" href="css/stripe-checkout.css">
+    <script src="https://js.stripe.com/v3/"></script>
     
     <!-- Firebase Config & Service (Moved to head for early loading) -->
     <script type="module" src="js/firebase-config.js"></script>
@@ -249,6 +251,20 @@
                         <p style="font-size: 0.85rem; color: #666; margin-top: 15px;" data-content-key="regular_donor.vipps.subtext">Ingen bindingstid. Avtalen kan enkelt avsluttes i Vipps eller via e-post. Se våre <a href="/betingelser" style="text-decoration: underline;">vilkår for faste betalinger</a>.</p>
                     </div>
 
+                    <!-- Option 2: Kortbetaling (Stripe) -->
+                    <div
+                        style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
+                        <div
+                            style="width: 70px; height: 70px; background: #1B4965; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 25px; color: white; font-size: 30px;">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h3 style="margin-bottom: 15px;" data-content-key="regular_donor.stripe.title">Fast gave med kort</h3>
+                        <p style="color: var(--text-light); margin-bottom: 25px;" data-content-key="regular_donor.stripe.text">Støtt oss med et månedlig trekk fra ditt bankkort (Visa eller Mastercard) via Stripe.</p>
+                        <a href="javascript:void(0)" class="btn btn-outline"
+                            style="color: #1B4965; border-color: #1B4965;" data-content-key="regular_donor.stripe.cta" id="stripe-recurring-trigger">Opprett med kort</a>
+                        <p style="font-size: 0.85rem; color: #666; margin-top: 15px;" data-content-key="regular_donor.stripe.subtext">Ingen bindingstid. Avtalen kan enkelt avsluttes via e-post eller Min Side. Se våre <a href="/betingelser" style="text-decoration: underline;">vilkår for faste betalinger</a>.</p>
+                    </div>
+
                     <!-- Option 2: Bankoverføring -->
                     <div
                         style="background: #f8f9fa; padding: 40px; border-radius: 15px; text-align: center; border: 1px solid #eee;">
@@ -421,6 +437,7 @@
     <script type="module" src="script.js?v=2026.05.05.15"></script>
     <script type="module" src="js/cookie-consent.js"></script>
     <script type="module" src="js/i18n.js"></script>
+    <script type="module" src="js/stripe-checkout.js"></script>
     <script type="module" src="js/vipps-recurring.js"></script>
 </body>
 
