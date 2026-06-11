@@ -25,6 +25,13 @@
       "**/node_modules/**"
     ],
     "cleanUrls": true,
+    "redirects": [
+      { "source": "/category/all-products", "destination": "https://www.hiskingdomdesigns.no/", "type": 301 },
+      { "source": "/kontakt-oss", "destination": "/kontakt", "type": 301 },
+      { "source": "/hvem-vi-er", "destination": "/om-oss", "type": 301 },
+      { "source": "/butikk", "destination": "https://www.hiskingdomdesigns.no/", "type": 301 },
+      { "source": "/butikk.html", "destination": "https://www.hiskingdomdesigns.no/", "type": 301 }
+    ],
     "rewrites": [
       {
         "source": "/api/facebook-feed",
