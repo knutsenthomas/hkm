@@ -389,6 +389,12 @@
                                 </label>
                                 <label
                                     style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
+                                    <input type="radio" name="payment-method" value="paypal" style="margin-right: 10px;">
+                                    <span style="font-weight: 600;"><i class="fab fa-paypal"
+                                            style="margin-right: 8px; color: #003087;"></i>PayPal</span>
+                                </label>
+                                <label
+                                    style="display: flex; align-items: center; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.3s;">
                                     <input type="radio" name="payment-method" value="bank" style="margin-right: 10px;">
                                     <span style="font-weight: 600;"><i class="fas fa-university"
                                             style="margin-right: 8px; color: #2196F3;"></i>Banco</span>
@@ -431,6 +437,9 @@
                                     style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; resize: vertical;"></textarea>
                             </div>
                         </div>
+
+                        <!-- PayPal Button Container -->
+                        <div id="paypal-button-container" style="display: none; margin-bottom: 20px;"></div>
 
                         <!-- Submit Button -->
                         <button type="submit" class="btn btn-primary"
@@ -595,12 +604,50 @@
     <script type="module" src="../js/i18n.js"></script>
     <script type="module" src="../script.js?v=2026.04.26.12.00"></script>
     <script type="module" src="../js/stripe-checkout.js"></script>
+    <script type="module" src="../js/paypal-checkout.js"></script>
     <script>
         window.addEventListener('load', function () {
             setTimeout(function () {
                 if (typeof initDonationForm === 'function') {
                     initDonationForm();
                 }
+
+                // Toggle PayPal container and default submit button based on selected payment method
+                const paymentMethodRadios = document.querySelectorAll('input[name="payment-method"]');
+                const submitBtn = document.querySelector('.donation-form-content button[type="submit"]');
+                const paypalContainer = document.getElementById('paypal-button-container');
+                const stripeContainer = document.getElementById('stripe-checkout-container');
+
+                function handlePaymentMethodChange() {
+                    const selectedMethod = document.querySelector('input[name="payment-method"]:checked')?.value;
+                    
+                    if (selectedMethod === 'paypal') {
+                        if (submitBtn) submitBtn.style.display = 'none';
+                        if (stripeContainer) stripeContainer.style.display = 'none';
+                        if (paypalContainer) {
+                            paypalContainer.style.display = 'block';
+                            if (typeof window.initPayPalDonation === 'function') {
+                                window.initPayPalDonation();
+                            }
+                        }
+                    } else {
+                        if (submitBtn) submitBtn.style.display = 'block';
+                        if (paypalContainer) paypalContainer.style.display = 'none';
+                    }
+                }
+
+                paymentMethodRadios.forEach(radio => {
+                    radio.addEventListener('change', handlePaymentMethodChange);
+                });
+
+                // Default to card if no method is selected yet
+                const defaultPaymentMethod = document.querySelector('input[name="payment-method"][value="card"]');
+                if (defaultPaymentMethod && !document.querySelector('input[name="payment-method"]:checked')) {
+                    defaultPaymentMethod.checked = true;
+                }
+
+                // Trigger initial check
+                handlePaymentMethodChange();
 
                 const donationForm = document.querySelector('.donation-form-content');
                 if (donationForm) {
@@ -618,6 +665,12 @@
                         }
 
                         if (amount > 0) {
+                            const selectedPaymentMethod = document.querySelector('input[name="payment-method"]:checked');
+                            if (!selectedPaymentMethod) {
+                                alert("Por favor, seleccione un método de pago.");
+                                return;
+                            }
+
                             const getValue = (id) => {
                                 const el = document.getElementById(id);
                                 return el ? el.value : '';
@@ -636,7 +689,17 @@
                                 fund: fundSelect ? fundSelect.value : 'general'
                             };
 
-                            initializeStripe(amount, customerDetails);
+                            if (selectedPaymentMethod.value === 'vipps') {
+                                if (typeof startVippsPayment !== 'function') {
+                                    alert("El pago por Vipps no está disponible en este momento. Por favor, inténtelo de nuevo más tarde.");
+                                    return;
+                                }
+
+                                startVippsPayment(amount, customerDetails);
+                                return;
+                            }
+
+                            initializeStripe(amount, customerDetails, selectedPaymentMethod.value);
                         } else {
                             alert("Por favor, seleccione o ingrese un monto.");
                         }

@@ -14,6 +14,8 @@ const googleChatWebhookUrlParam = defineSecret('GOOGLE_CHAT_WEBHOOK_URL');
 const googleChatBridgeTokenParam = defineSecret('GOOGLE_CHAT_BRIDGE_TOKEN');
 const stripeSecretKeyParam = defineSecret('STRIPE_SECRET_KEY');
 const stripeWebhookSecretParam = defineSecret('STRIPE_WEBHOOK_SECRET');
+const paypalClientIdParam = defineSecret('PAYPAL_CLIENT_ID');
+const paypalClientSecretParam = defineSecret('PAYPAL_CLIENT_SECRET');
 
 const { onRequest, onCall, HttpsError } = require('firebase-functions/v2/https');
 const { onDocumentCreated } = require('firebase-functions/v2/firestore');
@@ -2581,6 +2583,209 @@ exports.createPaymentIntent = onRequest({
     }
 
     res.status(500).send({ error: stripeMessage });
+  }
+});
+
+// ==========================================
+// PayPal Integration (Donations / Engangsgaver)
+// ==========================================
+
+function getPayPalConfig() {
+  const clientId = paypalClientIdParam.value();
+  const clientSecret = paypalClientSecretParam.value();
+  const isSandbox = !clientId || clientId.startsWith('sb-') || clientId.includes('sandbox') || process.env.FUNCTIONS_EMULATOR === 'true';
+  const apiBase = isSandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+  
+  return {
+    clientId,
+    clientSecret,
+    apiBase,
+    isSandbox
+  };
+}
+
+async function getPayPalAccessToken(config) {
+  const { clientId, clientSecret, apiBase } = config;
+  
+  if (!clientId || !clientSecret) {
+    throw new Error("Missing PayPal API credentials");
+  }
+  
+  const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  
+  const response = await fetch(`${apiBase}/v1/oauth2/token`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: 'grant_type=client_credentials'
+  });
+  
+  if (!response.ok) {
+    const errText = await response.text();
+    throw new Error(`PayPal Auth Failed: ${response.status} - ${errText}`);
+  }
+  
+  const data = await response.json();
+  return data.access_token;
+}
+
+exports.createPayPalOrder = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [paypalClientIdParam, paypalClientSecretParam],
+}, async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { amount, currency = "NOK", customerDetails = {} } = req.body;
+    const parsedAmount = Number(amount);
+    
+    if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
+      res.status(400).send({ error: "Missing or invalid amount" });
+      return;
+    }
+
+    const config = getPayPalConfig();
+    const accessToken = await getPayPalAccessToken(config);
+    const resolvedUserId = await resolveDonationUserId(customerDetails);
+
+    // Create PayPal Checkout Order
+    const orderPayload = {
+      intent: "CAPTURE",
+      purchase_units: [{
+        amount: {
+          currency_code: currency.toUpperCase(),
+          value: parsedAmount.toFixed(2)
+        },
+        description: `Donasjon til His Kingdom Ministry fra ${customerDetails.name || "Ukjent"}`,
+        shipping: customerDetails.name && customerDetails.address ? {
+          name: {
+            full_name: customerDetails.name
+          },
+          address: {
+            address_line_1: customerDetails.address,
+            admin_area_2: customerDetails.city,
+            postal_code: customerDetails.zip,
+            country_code: "NO"
+          }
+        } : undefined
+      }],
+      application_context: {
+        shipping_preference: customerDetails.address ? "SET_PROVIDED_ADDRESS" : "NO_SHIPPING",
+        user_action: "PAY_NOW"
+      }
+    };
+
+    const response = await fetch(`${config.apiBase}/v2/checkout/orders`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(orderPayload)
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`PayPal Order Creation Failed: ${response.status} - ${errText}`);
+    }
+
+    const order = await response.json();
+
+    // Save pending donation record
+    await db.collection('donations').doc(order.id).set({
+      transactionId: order.id,
+      amount: parsedAmount,
+      amountNok: parsedAmount,
+      currency: currency.toUpperCase(),
+      method: "paypal",
+      status: "pending",
+      timestamp: admin.firestore.FieldValue.serverTimestamp(),
+      userId: resolvedUserId,
+      donorName: customerDetails.name || "Ukjent",
+      donorEmail: customerDetails.email || "Ukjent",
+      donorPhone: customerDetails.phone || "",
+      donorAddress: customerDetails.address || "",
+      donorZip: customerDetails.zip || "",
+      donorCity: customerDetails.city || "",
+      message: customerDetails.message || "",
+      type: "Gave",
+      fund: customerDetails.fund || "general"
+    });
+
+    res.status(200).send({ orderId: order.id });
+
+  } catch (error) {
+    console.error("PayPal create order error:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown PayPal error" });
+  }
+});
+
+exports.capturePayPalOrder = onRequest({
+  cors: true,
+  invoker: "public",
+  secrets: [paypalClientIdParam, paypalClientSecretParam],
+}, async (req, res) => {
+  if (req.method === 'OPTIONS') {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Methods', 'POST');
+    res.set('Access-Control-Allow-Headers', 'Content-Type');
+    res.status(204).send('');
+    return;
+  }
+
+  try {
+    const { orderId } = req.body;
+    
+    if (!orderId) {
+      res.status(400).send({ error: "Missing orderId" });
+      return;
+    }
+
+    const config = getPayPalConfig();
+    const accessToken = await getPayPalAccessToken(config);
+
+    // Capture PayPal Checkout Order
+    const response = await fetch(`${config.apiBase}/v2/checkout/orders/${orderId}/capture`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      const errText = await response.text();
+      throw new Error(`PayPal Capture Failed: ${response.status} - ${errText}`);
+    }
+
+    const captureData = await response.json();
+
+    if (captureData.status === "COMPLETED") {
+      // Update pending donation to completed status
+      const donationRef = db.collection('donations').doc(orderId);
+      await donationRef.update({
+        status: "completed",
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
+        paypalCaptureId: captureData.purchase_units[0].payments.captures[0].id
+      });
+
+      res.status(200).send({ status: "success", orderId });
+    } else {
+      throw new Error(`PayPal Order not completed. Status: ${captureData.status}`);
+    }
+
+  } catch (error) {
+    console.error("PayPal capture order error:", error);
+    res.status(500).send({ error: error && error.message ? error.message : "Unknown PayPal error" });
   }
 });
 
