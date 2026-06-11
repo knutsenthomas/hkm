@@ -165,6 +165,20 @@
             transform: scale(0.98) !important;
         }
 
+        .btn-bank-premium {
+            border-color: #2196F3 !important;
+            color: #2196F3 !important;
+            background: transparent !important;
+        }
+        .btn-bank-premium:hover {
+            background: #2196F3 !important;
+            color: white !important;
+            box-shadow: 0 8px 24px rgba(33, 150, 243, 0.25) !important;
+        }
+        .btn-bank-premium:active {
+            transform: scale(0.98) !important;
+        }
+
         /* Bankoverføring Detaljer */
         .bank-details-box {
             background: #f8fafc !important;
@@ -245,6 +259,57 @@
         .subpage-hero.hidden + .regular-donor,
         .subpage-hero[style*="display: none"] + .regular-donor {
             padding-top: 160px !important;
+        }
+
+        /* Hover Reveal animasjon */
+        .donor-card-details {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }
+
+        @media (hover: hover) {
+            .donor-card-details {
+                max-height: 0 !important;
+                opacity: 0 !important;
+                overflow: hidden !important;
+                transform: translateY(10px) !important;
+            }
+
+            .donor-card:hover .donor-card-details {
+                max-height: 300px !important;
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+                margin-top: 16px !important;
+            }
+
+            .btn-bank-premium {
+                opacity: 1 !important;
+                max-height: 60px !important;
+                overflow: hidden !important;
+                white-space: nowrap !important;
+                transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+            }
+
+            .donor-card:hover .btn-bank-premium {
+                opacity: 0 !important;
+                max-height: 0 !important;
+                padding-top: 0 !important;
+                padding-bottom: 0 !important;
+                margin-bottom: 0 !important;
+                border-width: 0 !important;
+                pointer-events: none !important;
+            }
+        }
+
+        @media (hover: none) {
+            .btn-bank-premium {
+                display: none !important;
+            }
+            .donor-card-details {
+                max-height: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+                margin-top: 16px !important;
+            }
         }
     </style>
 </head>
@@ -454,7 +519,9 @@
                         <div>
                             <a href="javascript:void(0)" class="donor-card-btn btn-vipps-premium"
                                 data-content-key="regular_donor.vipps.cta" id="vipps-recurring-trigger">Create in Vipps</a>
-                            <p class="donor-card-subtext" data-content-key="regular_donor.vipps.subtext">No lock-in period. The agreement can easily be cancelled in Vipps or via email. See our <a href="/betingelser">terms for regular payments</a>.</p>
+                            <div class="donor-card-details">
+                                <p class="donor-card-subtext" data-content-key="regular_donor.vipps.subtext">No lock-in period. The agreement can easily be cancelled in Vipps or via email. See our <a href="/betingelser">terms for regular payments</a>.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -470,7 +537,9 @@
                         <div>
                             <a href="javascript:void(0)" class="donor-card-btn btn-stripe-premium"
                                 data-content-key="regular_donor.stripe.cta" id="stripe-recurring-trigger">Create with card</a>
-                            <p class="donor-card-subtext" data-content-key="regular_donor.stripe.subtext">No lock-in period. The agreement can easily be cancelled via email or My Page. See our <a href="/betingelser">terms for regular payments</a>.</p>
+                            <div class="donor-card-details">
+                                <p class="donor-card-subtext" data-content-key="regular_donor.stripe.subtext">No lock-in period. The agreement can easily be cancelled via email or My Page. See our <a href="/betingelser">terms for regular payments</a>.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -486,7 +555,9 @@
                         <div>
                             <a href="javascript:void(0)" class="donor-card-btn btn-paypal-premium"
                                 data-content-key="regular_donor.paypal.cta" id="paypal-recurring-trigger">Create with PayPal</a>
-                            <p class="donor-card-subtext" data-content-key="regular_donor.paypal.subtext">No lock-in period. Can easily be cancelled in PayPal or via email. See our <a href="/betingelser">terms for regular payments</a>.</p>
+                            <div class="donor-card-details">
+                                <p class="donor-card-subtext" data-content-key="regular_donor.paypal.subtext">No lock-in period. Can easily be cancelled in PayPal or via email. See our <a href="/betingelser">terms for regular payments</a>.</p>
+                            </div>
                         </div>
                     </div>
 
@@ -500,36 +571,39 @@
                             <p class="donor-card-text" data-content-key="regular_donor.bank.text">Set up a regular transfer in your online bank to our account. This gives us the lowest fees.</p>
                         </div>
                         <div>
-                            <div class="bank-details-box">
-                                <div class="bank-detail-row">
-                                    <span class="bank-detail-label">Account</span>
-                                    <span class="bank-detail-value">
-                                        3000.66.08759
-                                        <button class="copy-btn" onclick="copyToClipboard('3000.66.08759', this)" title="Copy account number">
-                                            <i class="far fa-copy"></i>
-                                        </button>
-                                    </span>
+                            <div class="donor-card-btn btn-bank-premium">Show Bank Details</div>
+                            <div class="donor-card-details">
+                                <div class="bank-details-box">
+                                    <div class="bank-detail-row">
+                                        <span class="bank-detail-label">Account</span>
+                                        <span class="bank-detail-value">
+                                            3000.66.08759
+                                            <button class="copy-btn" onclick="copyToClipboard('3000.66.08759', this)" title="Copy account number">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="bank-detail-row">
+                                        <span class="bank-detail-label">IBAN</span>
+                                        <span class="bank-detail-value">
+                                            NO7230006608759
+                                            <button class="copy-btn" onclick="copyToClipboard('NO7230006608759', this)" title="Copy IBAN">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div class="bank-detail-row">
+                                        <span class="bank-detail-label">SWIFT/BIC</span>
+                                        <span class="bank-detail-value">
+                                            SPSONO22
+                                            <button class="copy-btn" onclick="copyToClipboard('SPSONO22', this)" title="Copy SWIFT/BIC">
+                                                <i class="far fa-copy"></i>
+                                            </button>
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="bank-detail-row">
-                                    <span class="bank-detail-label">IBAN</span>
-                                    <span class="bank-detail-value">
-                                        NO7230006608759
-                                        <button class="copy-btn" onclick="copyToClipboard('NO7230006608759', this)" title="Copy IBAN">
-                                            <i class="far fa-copy"></i>
-                                        </button>
-                                    </span>
-                                </div>
-                                <div class="bank-detail-row">
-                                    <span class="bank-detail-label">SWIFT/BIC</span>
-                                    <span class="bank-detail-value">
-                                        SPSONO22
-                                        <button class="copy-btn" onclick="copyToClipboard('SPSONO22', this)" title="Copy SWIFT/BIC">
-                                            <i class="far fa-copy"></i>
-                                        </button>
-                                    </span>
-                                </div>
+                                <p class="donor-card-subtext">Bank: Sparebanken Sør. Please mark the transfer with "Gift" and your name as reference.</p>
                             </div>
-                            <p class="donor-card-subtext">Bank: Sparebanken Sør. Please mark the transfer with "Gift" and your name as reference.</p>
                         </div>
                     </div>
                 </div>
