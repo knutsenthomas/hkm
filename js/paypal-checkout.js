@@ -1,5 +1,5 @@
 // Replace 'test' with your live Client ID.
-const PAYPAL_CLIENT_ID = "AWFbTEfu-RZi2CSdcxp6L0nvCNaa_UgiOYbiRKR8YI5oHHYTL05qR2RmHm2wS3JP45hetc1qI6FdFcsQ"; 
+const PAYPAL_CLIENT_ID = "Adja3K8kDYk5_GUz10nBkwlYMgHNNXwiiwfGdGD7wkU354Z-qf9UJApOfD_YfV98t-SuzjXJZg2kPp-a"; 
 const PAYPAL_CREATE_ORDER_URL = "https://createpaypalorder-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_CAPTURE_ORDER_URL = "https://capturepaypalorder-42bhgdjkcq-uc.a.run.app";
 

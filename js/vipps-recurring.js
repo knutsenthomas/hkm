@@ -3,7 +3,7 @@ const VIPPS_CREATE_AGREEMENT_URL = "https://createvippsagreement-42bhgdjkcq-uc.a
 const VIPPS_FINALIZE_AGREEMENT_URL = "https://finalizevippsagreement-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_CREATE_PLAN_URL = "https://createpaypalsubscriptionplan-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_ACTIVATE_SUB_URL = "https://activatepaypalsubscription-42bhgdjkcq-uc.a.run.app";
-const PAYPAL_CLIENT_ID = "AWFbTEfu-RZi2CSdcxp6L0nvCNaa_UgiOYbiRKR8YI5oHHYTL05qR2RmHm2wS3JP45hetc1qI6FdFcsQ";
+const PAYPAL_CLIENT_ID = "Adja3K8kDYk5_GUz10nBkwlYMgHNNXwiiwfGdGD7wkU354Z-qf9UJApOfD_YfV98t-SuzjXJZg2kPp-a";
 
 // Localization settings
 const isEnglish = window.location.href.includes("/en/");
