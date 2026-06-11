@@ -3,6 +3,7 @@ const VIPPS_CREATE_AGREEMENT_URL = "https://createvippsagreement-42bhgdjkcq-uc.a
 const VIPPS_FINALIZE_AGREEMENT_URL = "https://finalizevippsagreement-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_CREATE_PLAN_URL = "https://createpaypalsubscriptionplan-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_ACTIVATE_SUB_URL = "https://activatepaypalsubscription-42bhgdjkcq-uc.a.run.app";
+const PAYPAL_CLIENT_ID = "AWFbTEfu-RZi2CSdcxp6L0nvCNaa_UgiOYbiRKR8YI5oHHYTL05qR2RmHm2wS3JP45hetc1qI6FdFcsQ";
 
 // Localization settings
 const isEnglish = window.location.href.includes("/en/");
@@ -410,7 +411,7 @@ function loadPayPalSdkRecurring(callback) {
     }
 
     const script = document.createElement("script");
-    script.src = `https://www.paypal.com/sdk/js?client-id=test&currency=NOK&vault=true&intent=subscription`;
+    script.src = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=NOK&vault=true&intent=subscription`;
     script.async = true;
     script.onload = () => {
         paypalSdkRecurringLoaded = true;

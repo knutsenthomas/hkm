@@ -1,6 +1,5 @@
-// PayPal Integration for Donations
-// Standard Client ID set to 'test' for Sandbox evaluation. Replace with your live Client ID.
-const PAYPAL_CLIENT_ID = "test"; 
+// Replace 'test' with your live Client ID.
+const PAYPAL_CLIENT_ID = "AWFbTEfu-RZi2CSdcxp6L0nvCNaa_UgiOYbiRKR8YI5oHHYTL05qR2RmHm2wS3JP45hetc1qI6FdFcsQ"; 
 const PAYPAL_CREATE_ORDER_URL = "https://createpaypalorder-42bhgdjkcq-uc.a.run.app";
 const PAYPAL_CAPTURE_ORDER_URL = "https://capturepaypalorder-42bhgdjkcq-uc.a.run.app";
 
