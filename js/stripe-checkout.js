@@ -158,6 +158,13 @@ async function startVippsPayment(amount, customerDetails = {}) {
 }
 
 async function finalizeVippsReturn() {
+    // Overlat Vipps Recurring Agreement-håndtering til vipps-recurring.js på fast giver-sider
+    if (window.location.pathname.includes("bli-fast-giver") || 
+        window.location.pathname.includes("regular-donors") || 
+        window.location.pathname.includes("donantes-regulares")) {
+        return;
+    }
+
     const searchParams = new URLSearchParams(window.location.search);
     const reference = searchParams.get("vipps_reference");
     const isVippsReturn = searchParams.get("vipps_return") === "1";
