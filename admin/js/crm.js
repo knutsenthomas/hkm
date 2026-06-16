@@ -152,6 +152,9 @@ class CRMManager {
         const hkmBulkStatus = document.getElementById('hkm-bulk-status-btn');
         if (hkmBulkStatus) hkmBulkStatus.onclick = () => this.bulkEditStatus();
 
+        const hkmBulkMerge = document.getElementById('hkm-bulk-merge-btn');
+        if (hkmBulkMerge) hkmBulkMerge.onclick = () => this.bulkMergeContacts();
+
         const hkmBulkExport = document.getElementById('hkm-bulk-export-btn');
         if (hkmBulkExport) hkmBulkExport.onclick = () => this.bulkExportCsv();
 
@@ -1378,9 +1381,14 @@ class CRMManager {
         
         const floatingBar = document.getElementById('hkm-bulk-actions-bar');
         const countText = document.getElementById('hkm-bulk-selected-count');
+        const mergeBtn = document.getElementById('hkm-bulk-merge-btn');
 
         const count = this.selectedContactIds.size;
         
+        if (mergeBtn) {
+            mergeBtn.style.display = count === 2 ? 'inline-flex' : 'none';
+        }
+
         if (count > 0) {
             if (btn && text) {
                 btn.style.display = 'flex';
@@ -1540,6 +1548,172 @@ class CRMManager {
                 this.notify(`Status oppdatert til "${selectedValue.replaceAll('_', ' ')}" for ${count} kontakter.`);
             }
         });
+    }
+
+    bulkMergeContacts() {
+        const ids = Array.from(this.selectedContactIds);
+        if (ids.length !== 2) {
+            this.notify("Du må velge nøyaktig 2 kontakter for å slå dem sammen.", "error");
+            return;
+        }
+
+        const contactA = this.contacts.find(c => c.id === ids[0]);
+        const contactB = this.contacts.find(c => c.id === ids[1]);
+        if (!contactA || !contactB) return;
+
+        let modal = document.getElementById('crm-merge-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'crm-merge-modal';
+            modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;';
+            document.body.appendChild(modal);
+        }
+
+        const labelA = contactA.displayName || `${contactA.firstName || ''} ${contactA.lastName || ''}`.trim() || contactA.email;
+        const labelB = contactB.displayName || `${contactB.firstName || ''} ${contactB.lastName || ''}`.trim() || contactB.email;
+
+        modal.innerHTML = `
+            <div class="modal-backdrop" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+            <div class="modal-content" style="max-width:640px;position:relative;background:#fff;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);width:100%;overflow:hidden;animation: modalAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div class="modal-header" style="padding:20px 24px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; font-size:1.25rem; color:#0f172a; font-weight:700;">Slå sammen 2 kontakter</h3>
+                    <button class="modal-close" type="button" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="font-size:24px;">close</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding:24px; display:flex; flex-direction:column; gap:20px;">
+                    <p style="margin:0; color:#475569; font-size:0.875rem; line-height:1.5;">
+                        Velg hvilken kontakt du vil beholde som <strong>hovedkontakt</strong>. Data fra den andre kontakten (inkludert etiketter og manglende felt) vil bli flettet inn, og den sekundære kontakten vil deretter bli slettet.
+                    </p>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+                        <!-- Alternativ A -->
+                        <label style="border:2px solid #cbd5e1; border-radius:12px; padding:16px; cursor:pointer; display:flex; flex-direction:column; gap:8px; transition:all 0.2s;" class="merge-option" id="merge-opt-a">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="primary-contact-select" value="A" checked style="accent-color:#1B4965;">
+                                <strong style="color:#0f172a;">Behold denne (Hoved)</strong>
+                            </div>
+                            <div style="font-size:0.875rem; margin-top:8px;">
+                                <div style="font-weight:700; color:#1e293b;">${this.escapeHtml(labelA)}</div>
+                                <div style="color:#64748b; font-size:12px;">${this.escapeHtml(contactA.email)}</div>
+                                <div style="color:#94a3b8; font-size:11px; margin-top:4px;">Status: ${this.escapeHtml(contactA.status || 'IKKE_MEDLEM')}</div>
+                                <div style="color:#94a3b8; font-size:11px;">Tlf: ${this.escapeHtml(contactA.phone || 'Ingen tlf')}</div>
+                            </div>
+                        </label>
+
+                        <!-- Alternativ B -->
+                        <label style="border:2px solid #cbd5e1; border-radius:12px; padding:16px; cursor:pointer; display:flex; flex-direction:column; gap:8px; transition:all 0.2s;" class="merge-option" id="merge-opt-b">
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                <input type="radio" name="primary-contact-select" value="B" style="accent-color:#1B4965;">
+                                <strong style="color:#0f172a;">Behold denne (Hoved)</strong>
+                            </div>
+                            <div style="font-size:0.875rem; margin-top:8px;">
+                                <div style="font-weight:700; color:#1e293b;">${this.escapeHtml(labelB)}</div>
+                                <div style="color:#64748b; font-size:12px;">${this.escapeHtml(contactB.email)}</div>
+                                <div style="color:#94a3b8; font-size:11px; margin-top:4px;">Status: ${this.escapeHtml(contactB.status || 'IKKE_MEDLEM')}</div>
+                                <div style="color:#94a3b8; font-size:11px;">Tlf: ${this.escapeHtml(contactB.phone || 'Ingen tlf')}</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:16px 24px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
+                    <button class="btn-secondary modal-cancel" type="button" style="padding:8px 16px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; cursor:pointer; font-weight:600;">Avbryt</button>
+                    <button class="btn-primary modal-save" type="button" style="padding:8px 16px; border-radius:8px; background:#1B4965; color:#fff; border:none; cursor:pointer; font-weight:600;">Slå sammen</button>
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+
+        const updateBorders = () => {
+            const optA = document.getElementById('merge-opt-a');
+            const optB = document.getElementById('merge-opt-b');
+            const radA = modal.querySelector('input[value="A"]');
+            
+            if (radA.checked) {
+                optA.style.borderColor = '#1B4965';
+                optA.style.background = '#f0f4f8';
+                optB.style.borderColor = '#cbd5e1';
+                optB.style.background = '#fff';
+            } else {
+                optB.style.borderColor = '#1B4965';
+                optB.style.background = '#f0f4f8';
+                optA.style.borderColor = '#cbd5e1';
+                optA.style.background = '#fff';
+            }
+        };
+
+        updateBorders();
+        modal.querySelectorAll('input[name="primary-contact-select"]').forEach(input => {
+            input.addEventListener('change', updateBorders);
+        });
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+        };
+
+        modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+        modal.querySelector('.modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.modal-cancel').addEventListener('click', closeModal);
+
+        const saveBtn = modal.querySelector('.modal-save');
+        saveBtn.addEventListener('click', async () => {
+            const isA = modal.querySelector('input[value="A"]').checked;
+            const primary = isA ? contactA : contactB;
+            const secondary = isA ? contactB : contactA;
+
+            closeModal();
+            await this.executeMergeContacts(primary, secondary);
+        });
+    }
+
+    async executeMergeContacts(primary, secondary) {
+        this.notify('Slår sammen kontakter...');
+        try {
+            const db = window.firebaseService.db;
+
+            // 1. Merge labels
+            const labelsA = Array.isArray(primary.labels) ? primary.labels : (primary.label ? [primary.label] : []);
+            const labelsB = Array.isArray(secondary.labels) ? secondary.labels : (secondary.label ? [secondary.label] : []);
+            const mergedLabels = Array.from(new Set([...labelsA, ...labelsB])).filter(Boolean);
+
+            // 2. Build merged contact data (avoiding duplicates or empty fields)
+            const mergedData = {
+                firstName: primary.firstName || secondary.firstName || '',
+                lastName: primary.lastName || secondary.lastName || '',
+                displayName: primary.displayName || secondary.displayName || '',
+                email: primary.email || secondary.email || '',
+                phone: primary.phone || secondary.phone || '',
+                label: mergedLabels[0] || 'Medlem',
+                labels: mergedLabels,
+                status: primary.status === 'NETTSTEDSMEDLEM' || secondary.status === 'NETTSTEDSMEDLEM' ? 'NETTSTEDSMEDLEM' : primary.status || 'IKKE_MEDLEM',
+                updatedAt: new Date().toISOString(),
+                updatedBy: 'admin-merge'
+            };
+
+            // 3. Write updates and delete in a batch
+            const batch = db.batch();
+            batch.update(db.collection('contacts').doc(primary.id), mergedData);
+            batch.delete(db.collection('contacts').doc(secondary.id));
+            
+            await batch.commit();
+
+            // 4. If status became NETTSTEDSMEDLEM, ensure user profile exists
+            if (mergedData.status === 'NETTSTEDSMEDLEM') {
+                await this.syncContactToUserCollection(mergedData.email, mergedData.displayName, mergedData.phone);
+            }
+
+            this.selectedContactIds.clear();
+            const selectAll = document.getElementById('select-all-contacts');
+            if (selectAll) selectAll.checked = false;
+
+            this.updateBulkActionsVisibility();
+            await this.loadContacts();
+            this.notify('Kontaktene ble slått sammen!');
+        } catch (error) {
+            console.error('Feil ved sammenslåing:', error);
+            this.notify('Kunne ikke slå sammen: ' + error.message, 'error');
+        }
     }
 
     bulkExportCsv() {
