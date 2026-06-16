@@ -698,7 +698,18 @@ exports.getAnalyticsOverview = onRequest({
       const rangeStartDate = `${rangeDays}daysAgo`;
       const accessToken = await getGaAccessToken({ clientEmail, privateKey });
 
-      const [summaryReport, pagesReport, sourcesReport, realtimeReport, devicesReport, geoReport, dailyReport] = await Promise.all([
+      const [
+        summaryReport,
+        pagesReport,
+        sourcesReport,
+        realtimeReport,
+        devicesReport,
+        geoReport,
+        dailyReport,
+        gscSummaryReport,
+        gscDailyReport,
+        aiSourcesReport
+      ] = await Promise.all([
         googleGaPost({
           path: `/properties/${propertyId}:runReport`,
           accessToken,
