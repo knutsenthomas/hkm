@@ -89,8 +89,8 @@ class AdminManager {
             'users': { id: 'users', label: 'Brukere', icon: 'group', color: 'mint', default: true },
             'blog': { id: 'blog', label: 'Blogginnlegg', icon: 'edit_note', color: 'blue', default: true },
             'teaching': { id: 'teaching', label: 'Undervisning', icon: 'school', color: 'mint', default: true },
-            'donations': { id: 'donations', label: 'Donasjoner', icon: 'volunteer_activism', color: 'donation', default: true },
-            'donation-amount': { id: 'donation-amount', label: 'Gaver i beløp', icon: 'payments', color: 'donation', default: true },
+            'donations': { id: 'donations', label: 'Donasjoner (siste 30 dager)', icon: 'volunteer_activism', color: 'donation', default: true },
+            'donation-amount': { id: 'donation-amount', label: 'Gaver i beløp (siste 30 dager)', icon: 'payments', color: 'donation', default: true },
             'youtube': { id: 'youtube', label: 'YouTube Abonnenter', icon: 'video_library', color: 'youtube', default: true },
             'podcast': { id: 'podcast', label: 'Podcast Episoder', icon: 'podcasts', color: 'podcast', default: false },
             'campaigns': { id: 'campaigns', label: 'Innsamlinger', icon: 'campaign', color: 'megaphone', default: false },
@@ -4346,8 +4346,13 @@ class AdminManager {
 
                 // Fetch donations
                 const donationsSnapshot = await firebaseService.db.collection('donations').get();
+                const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
                 donationsSnapshot.forEach(doc => {
                     const data = doc.data();
+                    const donationDate = this.getDonationDate(data);
+                    if (!donationDate || donationDate < thirtyDaysAgo) {
+                        return;
+                    }
                     donationCount++;
                     if (data.amountNok != null || data.amountNOK != null || data.totalNok != null) {
                         const raw = data.amountNok ?? data.amountNOK ?? data.totalNok;
