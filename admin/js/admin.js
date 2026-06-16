@@ -12909,7 +12909,7 @@ class AdminManager {
                 return `
                     <tr>
                         <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <strong>${name}</strong>
                                 ${typeBadge}
@@ -13019,7 +13019,7 @@ class AdminManager {
                 return `
                     <tr>
                         <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
-                        <td>
+                        <td style="white-space: nowrap;">
                             <strong>${name}</strong>
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
@@ -13121,7 +13121,7 @@ class AdminManager {
 
                 return `
                     <tr>
-                        <td>
+                        <td style="white-space: nowrap;">
                             <strong>${this.escapeHtml(mainName)}</strong>
                             ${otherNamesStr}
                             <div style="font-size:12px;color:#64748b;">${this.escapeHtml(donor.email || 'Ingen e-post')}</div>
@@ -14525,20 +14525,60 @@ class AdminManager {
         });
 
         const maxAmount = Math.max(...dailyData.map(d => d.amount), 1000);
-        const chartBarsHtml = dailyData.map(d => {
-            const pct = Math.round((d.amount / maxAmount) * 100);
+        
+        // Calculate points for SVG line chart
+        const points = dailyData.map((d, idx) => {
+            const x = (idx / (numIntervals - 1)) * 800;
+            const y = 160 - (d.amount / maxAmount) * 140; // range 20 to 160
             let dateLabel = '';
             if (diffMs <= 24 * 60 * 60 * 1000) {
                 dateLabel = `${d.start.getHours().toString().padStart(2, '0')}:${d.start.getMinutes().toString().padStart(2, '0')}`;
             } else {
                 dateLabel = `${d.start.getDate()}/${d.start.getMonth()+1}`;
             }
-            const tooltip = `${dateLabel}: ${d.amount.toLocaleString('no-NO')} kr`;
+            return { x, y, amount: d.amount, dateLabel };
+        });
+
+        const linePath = `M ${points.map(p => `${p.x} ${p.y}`).join(' L ')}`;
+        const areaPath = `${linePath} L 800 180 L 0 180 Z`;
+
+        // Render SVG elements
+        const svgPathHtml = `
+            <svg viewBox="0 0 800 180" width="100%" height="100%" preserveAspectRatio="none" style="display: block; overflow: visible;">
+                <defs>
+                    <linearGradient id="chart-area-grad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#1B4965" stop-opacity="0.25"></stop>
+                        <stop offset="100%" stop-color="#1B4965" stop-opacity="0.00"></stop>
+                    </linearGradient>
+                </defs>
+                <!-- Horizontal Grid Lines -->
+                <line x1="0" y1="20" x2="800" y2="20" stroke="#f1f5f9" stroke-width="1"></line>
+                <line x1="0" y1="90" x2="800" y2="90" stroke="#f1f5f9" stroke-width="1"></line>
+                <line x1="0" y1="160" x2="800" y2="160" stroke="#e2e8f0" stroke-width="1"></line>
+                
+                <!-- Area -->
+                <path d="${areaPath}" fill="url(#chart-area-grad)"></path>
+                
+                <!-- Line -->
+                <path d="${linePath}" fill="none" stroke="#1B4965" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
+                
+                <!-- Dots -->
+                ${points.map((p, idx) => `
+                    <circle id="chart-dot-${idx}" cx="${p.x}" cy="${p.y}" r="4" fill="#ffffff" stroke="#1B4965" stroke-width="2.5" style="transition: r 0.15s ease-in-out;"></circle>
+                `).join('')}
+            </svg>
+        `;
+
+        // Render overlay hover columns centered on each point
+        const colWidth = 100 / (numIntervals - 1);
+        const chartBarsHtml = points.map((p, idx) => {
+            const tooltip = `${p.dateLabel}: ${p.amount.toLocaleString('no-NO')} kr`;
+            const left = (idx / (numIntervals - 1)) * 100;
             return `
-                <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; position:relative;" title="${tooltip}">
-                    <div style="width:12px; height:80%; background:#f1f5f9; border-radius:999px; display:flex; flex-direction:column; justify-content:flex-end; overflow:hidden;">
-                        <div style="height:${pct}%; background:#1B4965; border-radius:999px; transition: height 0.5s ease-out;"></div>
-                    </div>
+                <div style="position: absolute; top: 0; bottom: 0; left: ${left}%; width: ${colWidth}%; transform: translateX(-50%); cursor: pointer; z-index: 10;" 
+                     title="${tooltip}"
+                     onmouseover="document.getElementById('chart-dot-${idx}')?.setAttribute('r', '7')"
+                     onmouseout="document.getElementById('chart-dot-${idx}')?.setAttribute('r', '4')">
                 </div>
             `;
         }).join('');
@@ -14737,8 +14777,15 @@ class AdminManager {
                         </div>
                         <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
                     </div>
-                    <div style="height: 180px; display:flex; gap: 16px; align-items: flex-end; padding: 10px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
-                        ${chartBarsHtml}
+                    <div style="height: 180px; position: relative; padding: 10px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
+                        <!-- SVG background -->
+                        <div style="position: absolute; inset: 0; pointer-events: none; padding: 10px 0;">
+                            ${svgPathHtml}
+                        </div>
+                        <!-- Hover overlay columns -->
+                        <div style="position: absolute; inset: 0; padding: 10px 0; overflow: hidden;">
+                            ${chartBarsHtml}
+                        </div>
                     </div>
                     <div style="display:flex; justify-content:space-between; color: #94a3b8; font-size: 11px; font-weight: 600;">
                         <span>${footerStartLabel}</span>

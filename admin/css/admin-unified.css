@@ -6953,6 +6953,27 @@ body.minside-body select.form-control {
   overflow-y: auto !important;
 }
 
+/* Remove browser-default blue outlines on focus for buttons, tabs, select, and input fields */
+.automation-tab:focus,
+.automation-tab:focus-visible,
+.automation-tab:active,
+body.admin-body button:focus,
+body.admin-body button:focus-visible,
+body.admin-body a:focus,
+body.admin-body a:focus-visible,
+body.admin-body select:focus,
+body.admin-body select:focus-visible,
+body.admin-body input:focus,
+body.admin-body input:focus-visible,
+body.admin-body textarea:focus,
+body.admin-body textarea:focus-visible,
+body.admin-body [role="button"]:focus,
+body.admin-body [role="button"]:focus-visible,
+body.admin-body div:focus,
+body.admin-body div:focus-visible {
+  outline: none !important;
+}
+
 
 
 
