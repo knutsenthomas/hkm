@@ -90,6 +90,7 @@ class AdminManager {
             'blog': { id: 'blog', label: 'Blogginnlegg', icon: 'edit_note', color: 'blue', default: true },
             'teaching': { id: 'teaching', label: 'Undervisning', icon: 'school', color: 'mint', default: true },
             'donations': { id: 'donations', label: 'Donasjoner', icon: 'volunteer_activism', color: 'donation', default: true },
+            'donation-amount': { id: 'donation-amount', label: 'Gaver i beløp', icon: 'payments', color: 'donation', default: true },
             'youtube': { id: 'youtube', label: 'YouTube Abonnenter', icon: 'video_library', color: 'youtube', default: true },
             'podcast': { id: 'podcast', label: 'Podcast Episoder', icon: 'podcasts', color: 'podcast', default: false },
             'campaigns': { id: 'campaigns', label: 'Innsamlinger', icon: 'campaign', color: 'megaphone', default: false },
@@ -3645,8 +3646,14 @@ class AdminManager {
         const openWidgetConfig = () => {
             // Build the list
             container.innerHTML = '';
-            const enabledWidgets = JSON.parse(localStorage.getItem('hkm_dashboard_widgets')) ||
-                Object.keys(this.widgetLibrary).filter(id => this.widgetLibrary[id].default);
+            const savedOrder = JSON.parse(localStorage.getItem('hkm_dashboard_widgets'));
+            let enabledWidgets = savedOrder || Object.keys(this.widgetLibrary).filter(id => this.widgetLibrary[id].default);
+            if (savedOrder && savedOrder.includes('donations') && !savedOrder.includes('donation-amount')) {
+                const idx = savedOrder.indexOf('donations');
+                savedOrder.splice(idx + 1, 0, 'donation-amount');
+                enabledWidgets = savedOrder;
+                localStorage.setItem('hkm_dashboard_widgets', JSON.stringify(savedOrder));
+            }
 
             Object.values(this.widgetLibrary).forEach(widget => {
                 const isChecked = enabledWidgets.includes(widget.id);
@@ -4361,14 +4368,20 @@ class AdminManager {
 
         // Get Enabled Widgets & Order
         const savedOrder = JSON.parse(localStorage.getItem('hkm_dashboard_widgets'));
-        const enabledWidgets = savedOrder || Object.keys(this.widgetLibrary).filter(id => this.widgetLibrary[id].default);
+        let enabledWidgets = savedOrder || Object.keys(this.widgetLibrary).filter(id => this.widgetLibrary[id].default);
+        if (savedOrder && savedOrder.includes('donations') && !savedOrder.includes('donation-amount')) {
+            const idx = savedOrder.indexOf('donations');
+            savedOrder.splice(idx + 1, 0, 'donation-amount');
+            enabledWidgets = savedOrder;
+            localStorage.setItem('hkm_dashboard_widgets', JSON.stringify(savedOrder));
+        }
         const savedSpans = JSON.parse(localStorage.getItem('hkm_dashboard_widget_spans')) || {};
 
         // Define Categories & Groups
         const categories = [
             { id: 'traffic', label: 'Trafikk & Innsikt', icon: 'monitoring', widgets: ['visitors', 'analytics-engagement', 'users'] },
             { id: 'content', label: 'Innhold', icon: 'description', widgets: ['blog', 'podcast', 'teaching'] },
-            { id: 'social', label: 'Sosialt & Drift', icon: 'hub', widgets: ['youtube', 'donations', 'status'] }
+            { id: 'social', label: 'Sosialt & Drift', icon: 'hub', widgets: ['youtube', 'donations', 'donation-amount', 'status'] }
         ];
 
         // Build HTML for columns
@@ -4431,6 +4444,7 @@ class AdminManager {
                     case 'blog': value = blogCount; break;
                     case 'teaching': value = teachingCount; break;
                     case 'donations': value = donationCount; break;
+                    case 'donation-amount': value = `kr ${donationTotal.toLocaleString('no-NO', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`; break;
                     case 'youtube': value = youtubeStats.subscribers || '453'; break;
                     case 'podcast': value = podcastCount; break;
                 }
