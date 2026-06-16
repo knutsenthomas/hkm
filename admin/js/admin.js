@@ -12903,7 +12903,7 @@ class AdminManager {
                 <div class="modal-body" style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
                     <div class="form-group">
                         <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Velg brukerprofil</label>
-                        <select id="link-profile-user-select" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none;">
+                        <select id="link-profile-user-select" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none;">
                             <option value="">(Ukoblet / Ingen profil)</option>
                             ${userOptions}
                         </select>
@@ -14710,7 +14710,7 @@ class AdminManager {
                     <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
                         <div class="form-group" style="margin:0; min-width:200px;">
                             <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Periode</label>
-                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 12px !important;">
+                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 36px 0 12px !important;">
                                 <option value="today">I dag</option>
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
@@ -15063,7 +15063,7 @@ class AdminManager {
                         <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                             <div class="form-group" style="margin:0;">
                                 <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
-                                <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                <select id="manual-donation-user" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                     <option value="">Ikke koble til profil</option>
                                     ${manualDonationUserOptions}
                                 </select>
@@ -15091,7 +15091,7 @@ class AdminManager {
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Metode</label>
-                                    <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-donation-method" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="bank">Bank</option>
                                         <option value="manual">Manuell</option>
                                         <option value="vipps_manual">Vipps manuelt</option>
@@ -15101,7 +15101,7 @@ class AdminManager {
                                 </div>
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Status</label>
-                                    <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-donation-status" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="completed">Fullført</option>
                                         <option value="pending">Venter</option>
                                         <option value="processing">Behandles</option>
@@ -15186,7 +15186,7 @@ class AdminManager {
                         <div class="modal-body" style="display:grid;gap:24px; padding:24px 32px;">
                             <div class="form-group" style="margin:0;">
                                 <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Koble til eksisterende bruker</label>
-                                <select id="manual-inkind-user" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                <select id="manual-inkind-user" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                     <option value="">Ikke koble til profil</option>
                                     ${manualDonationUserOptions}
                                 </select>
@@ -15214,7 +15214,7 @@ class AdminManager {
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;">
                                 <div class="form-group" style="margin:0;">
                                     <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Formål (Fund)</label>
-                                    <select id="manual-inkind-fund" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
+                                    <select id="manual-inkind-fund" class="form-control" style="width:100%; padding:10px 36px 10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none; transition:border-color 0.2s ease;">
                                         <option value="general">general</option>
                                         <option value="new-building">new-building</option>
                                         <option value="domestic-missions-sandnes">domestic-missions-sandnes</option>

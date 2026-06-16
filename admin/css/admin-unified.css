@@ -6925,6 +6925,19 @@ body.admin-body .profile-header-card-body {
   }
 }
 
+/* Style all select dropdowns globally to look premium and consistent across browsers */
+body.admin-body select.form-control,
+body.crm-body select.form-control,
+body.minside-body select.form-control {
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231B4965' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 14px center !important;
+  background-size: 14px !important;
+  padding-right: 36px !important;
+}
+
 
 
 
