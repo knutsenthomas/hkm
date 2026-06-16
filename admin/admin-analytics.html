@@ -1418,7 +1418,6 @@
             }, 3000);
 
             // clear dashboard values to loading/empty state initially
-            clearAnalyticsToEmpty();
 
             function clearAnalyticsToEmpty() {
                 document.getElementById('live-user-count').textContent = '--';
@@ -1714,6 +1713,7 @@
             });
 
             // No initial static/fictional data is populated on load.
+            clearAnalyticsToEmpty();
 
             // 3. Reell GA4 Datainnhenting og API-integrasjon
             let activeDays = 7;
