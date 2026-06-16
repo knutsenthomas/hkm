@@ -6938,6 +6938,12 @@ body.minside-body select.form-control {
   padding-right: 36px !important;
 }
 
+/* Fix modals that are taller than viewport by applying max-height and scrolling content */
+.modal-content {
+  max-height: calc(100vh - 40px) !important;
+  overflow-y: auto !important;
+}
+
 
 
 
