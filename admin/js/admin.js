@@ -13710,12 +13710,6 @@ class AdminManager {
                         ${causesProgressHtml}
                     </div>
                 </div>
-            </div>: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
-                        ${causesProgressHtml}
-                    </div>
-                </div>
             </div>
         `;
     }
