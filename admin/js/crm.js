@@ -1209,12 +1209,53 @@ class CRMManager {
                 });
                 this.notify("Kontakt lagret!");
             }
+            if (status === 'NETTSTEDSMEDLEM') {
+                await this.syncContactToUserCollection(email, `${firstName} ${lastName}`.trim(), phone);
+            }
             this.toggleModal(false);
             event.target.reset();
             await this.loadContacts();
         } catch (error) {
             console.error("Error saving contact:", error);
             this.notify("Kunne ikke lagre: " + error.message, 'error');
+        }
+    }
+
+    async syncContactToUserCollection(email, displayName, phone) {
+        if (!email) return;
+        try {
+            const db = window.firebaseService.db;
+            const emailLower = email.toLowerCase().trim();
+            const snap = await db.collection('users').where('email', '==', emailLower).get();
+            if (snap.empty) {
+                const newDoc = await db.collection('users').add({
+                    email: emailLower,
+                    displayName: displayName || '',
+                    phone: phone || '',
+                    role: 'medlem',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    syncedFromCrm: true
+                });
+
+                try {
+                    await db.collection('admin_notifications').add({
+                        type: 'NEW_USER_REGISTRATION',
+                        userId: newDoc.id,
+                        userEmail: emailLower,
+                        userName: displayName || '',
+                        message: `Brukerprofil automatisk opprettet fra CRM: ${displayName || emailLower}`,
+                        read: false,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                } catch (err) {
+                    console.warn('Kunne ikke opprette admin-varsel:', err);
+                }
+                
+                this.notify(`Opprettet også brukerprofil for ${emailLower}!`);
+            }
+        } catch (e) {
+            console.error('Error syncing contact to users collection:', e);
+            this.notify('Feil ved synkronisering til brukerprofil: ' + e.message, 'error');
         }
     }
 
@@ -1478,6 +1519,17 @@ class CRMManager {
                 });
 
                 await batch.commit();
+
+                // Sync to users collection if changed to NETTSTEDSMEDLEM
+                if (selectedValue === 'NETTSTEDSMEDLEM') {
+                    for (const id of ids) {
+                        const contact = this.contacts.find(c => c.id === id);
+                        if (contact && contact.email) {
+                            const name = contact.displayName || `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
+                            await this.syncContactToUserCollection(contact.email, name, contact.phone);
+                        }
+                    }
+                }
 
                 this.selectedContactIds.clear();
                 const selectAll = document.getElementById('select-all-contacts');
