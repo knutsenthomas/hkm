@@ -4068,44 +4068,153 @@ exports.onUserCreate = onDocumentCreated({
 
   if (!email) return;
 
-  const fallback = {
-    subject: "Velkommen til His Kingdom Ministry!",
-    body: `<h2>Velkommen til oss, {{name}}!</h2>
-      <p>Vi er så glade for at du har registrert deg i vårt system.</p>
-      <p>Her er litt informasjon om hva du kan gjøre:</p>
-      <ul>
-        <li><strong>Min Side:</strong> Se din profil og historikk.</li>
-        <li><strong>Ressurser:</strong> Tilgang til eksklusivt innhold.</li>
-      </ul>`
-  };
-
-  const template = await getEmailTemplate("welcome_email", fallback);
-  const subject = template.subject.replace("{{name}}", name);
-  const htmlBody = template.body.replace("{{name}}", name);
-
-  const html = `
-    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-      ${htmlBody}
-      <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
-        Dette er en automatisk utsendt e-post fra His Kingdom Ministry.
-      </div>
-    </div>
-  `;
+  const emailLower = email.toLowerCase().trim();
+  const userId = event.params.userId;
 
   try {
-    const ok = await sendEmail({
-      to: email,
-      subject,
-      html,
-      text: `Velkommen til oss, ${name}!`
-    });
-    if (ok) {
-      console.log(`Velkomst-e-post sendt til ${email}`);
-    } else {
-      console.warn(`[onUserCreate] Kunne ikke sende velkomst-e-post til ${email}.`);
+    // 1. Duplicates check and auto-merging (CRM vs Auth profiles)
+    const usersSnap = await db.collection('users').where('email', '==', emailLower).get();
+    
+    if (usersSnap.size > 1) {
+      console.log(`[onUserCreate] Found duplicate profiles for email: ${emailLower}`);
+      
+      // Separate Auth user (ID length 28) and CRM user (ID length 20)
+      const authDoc = usersSnap.docs.find(d => d.id.length === 28);
+      const crmDocs = usersSnap.docs.filter(d => d.id.length === 20);
+      
+      if (authDoc && crmDocs.length > 0) {
+        const primaryRef = authDoc.ref;
+        const primaryData = authDoc.data();
+        
+        for (const crmDoc of crmDocs) {
+          const crmData = crmDoc.data();
+          const crmId = crmDoc.id;
+          
+          console.log(`[onUserCreate] Merging CRM profile ${crmId} into Auth profile ${authDoc.id}`);
+          
+          // Merge missing CRM fields to Auth profile (address, zip, city, country, phone, syncedFromCrm)
+          const mergedUpdates = {};
+          const fieldsToMerge = ['address', 'zip', 'city', 'country', 'phone', 'displayName', 'fullName', 'syncedFromCrm'];
+          fieldsToMerge.forEach(field => {
+            if (!primaryData[field] && crmData[field]) {
+              mergedUpdates[field] = crmData[field];
+            }
+          });
+          
+          if (Object.keys(mergedUpdates).length > 0) {
+            await primaryRef.update({
+              ...mergedUpdates,
+              updatedAt: admin.firestore.FieldValue.serverTimestamp()
+            });
+          }
+          
+          // Re-link donations linked to the old CRM document ID to the Auth profile UID
+          const donationsSnap = await db.collection('donations').where('userId', '==', crmId).get();
+          if (!donationsSnap.empty) {
+            console.log(`[onUserCreate] Updating ${donationsSnap.size} donations to new userId ${authDoc.id}`);
+            const batch = db.batch();
+            donationsSnap.docs.forEach(dDoc => {
+              batch.update(dDoc.ref, { userId: authDoc.id });
+            });
+            await batch.commit();
+          }
+          
+          // Delete duplicate CRM document
+          await crmDoc.ref.delete();
+          console.log(`[onUserCreate] Deleted duplicate CRM profile: ${crmId}`);
+          
+          // Create admin notification about the merge
+          try {
+            await db.collection('admin_notifications').add({
+              type: 'NEW_USER_REGISTRATION',
+              userId: authDoc.id,
+              userEmail: emailLower,
+              userName: primaryData.displayName || primaryData.fullName || emailLower,
+              message: `Brukerprofil '${crmId}' ble automatisk flettet inn i Auth-ID '${authDoc.id}' ved registrering.`,
+              read: false,
+              timestamp: admin.firestore.FieldValue.serverTimestamp()
+            });
+          } catch (err) {
+            console.warn('Kunne ikke opprette admin-varsel for fletting:', err);
+          }
+        }
+      }
     }
   } catch (error) {
-    console.error("Feil ved sending av velkomst-e-post:", error);
+    console.error("[onUserCreate] Feil under duplikat-sjekk og fletting:", error);
+  }
+
+  // 2. Auto-link any donations matching this user's email that are currently unlinked
+  if (userId.length === 28) {
+    try {
+      const emailDonations1 = await db.collection('donations').where('donorEmail', '==', emailLower).get();
+      const emailDonations2 = await db.collection('donations').where('email', '==', emailLower).get();
+      
+      const toLink = [];
+      const addDocs = (snap) => {
+        snap.forEach(dDoc => {
+          if (!dDoc.data().userId) {
+            toLink.push(dDoc);
+          }
+        });
+      };
+      addDocs(emailDonations1);
+      addDocs(emailDonations2);
+      
+      if (toLink.length > 0) {
+        console.log(`[onUserCreate] Auto-linking ${toLink.length} unmatched email donations to userId ${userId}`);
+        const batch = db.batch();
+        toLink.forEach(dDoc => {
+          batch.update(dDoc.ref, { userId: userId, matchMethod: 'auto_email_registration' });
+        });
+        await batch.commit();
+      }
+    } catch (err) {
+      console.warn('[onUserCreate] Feil ved automatisk e-post-gavekobling:', err);
+    }
+  }
+
+  // 3. Send welcome email (only for the Auth user profile)
+  if (userId.length === 28) {
+    const fallback = {
+      subject: "Velkommen til His Kingdom Ministry!",
+      body: `<h2>Velkommen til oss, {{name}}!</h2>
+        <p>Vi er så glade for at du har registrert deg i vårt system.</p>
+        <p>Her er litt informasjon om hva du kan gjøre:</p>
+        <ul>
+          <li><strong>Min Side:</strong> Se din profil og historikk.</li>
+          <li><strong>Ressurser:</strong> Tilgang til eksklusivt innhold.</li>
+        </ul>`
+    };
+
+    const template = await getEmailTemplate("welcome_email", fallback);
+    const subject = template.subject.replace("{{name}}", name);
+    const htmlBody = template.body.replace("{{name}}", name);
+
+    const html = `
+      <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+        ${htmlBody}
+        <div style="margin-top: 32px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #888;">
+          Dette er en automatisk utsendt e-post fra His Kingdom Ministry.
+        </div>
+      </div>
+    `;
+
+    try {
+      const ok = await sendEmail({
+        to: email,
+        subject,
+        html,
+        text: `Velkommen til oss, ${name}!`
+      });
+      if (ok) {
+        console.log(`Velkomst-e-post sendt til ${email}`);
+      } else {
+        console.warn(`[onUserCreate] Kunne ikke sende velkomst-e-post til ${email}.`);
+      }
+    } catch (error) {
+      console.error("Feil ved sending av velkomst-e-post:", error);
+    }
   }
 });
 

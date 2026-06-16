@@ -6119,18 +6119,21 @@ body.admin-body .template-item:active {
 }
 
 #donation-transactions-body tr,
-#donation-donors-body tr {
+#donation-donors-body tr,
+#shop-transactions-body tr {
   background-color: #ffffff !important;
   transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 #donation-transactions-body tr:hover,
-#donation-donors-body tr:hover {
+#donation-donors-body tr:hover,
+#shop-transactions-body tr:hover {
   background-color: #f8fafc !important;
 }
 
 #donation-transactions-body td,
-#donation-donors-body td {
+#donation-donors-body td,
+#shop-transactions-body td {
   padding: 12px 20px !important; /* Mer kompakt premium padding */
   vertical-align: middle !important;
   border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important; /* Premium visual divider */
@@ -6139,32 +6142,37 @@ body.admin-body .template-item:active {
 }
 
 #donation-transactions-body td strong,
-#donation-donors-body td strong {
+#donation-donors-body td strong,
+#shop-transactions-body td strong {
   font-size: 13.5px !important; /* Mer balansert størrelse for navn og beløp */
   font-weight: 600 !important; /* Mindre aggressiv skrifttykkelse */
   color: #0f172a !important;
 }
 
 #donation-transactions-body td div,
-#donation-donors-body td div {
+#donation-donors-body td div,
+#shop-transactions-body td div {
   font-size: 11px !important; /* Mindre tekst for e-post og sekundærinfo */
   color: #64748b !important;
   margin-top: 2px !important;
 }
 
 #donation-transactions-body tr:last-child td,
-#donation-donors-body tr:last-child td {
+#donation-donors-body tr:last-child td,
+#shop-transactions-body tr:last-child td {
   border-bottom: none !important; /* Rent design uten linje under siste rad */
 }
 
 #donation-transactions-body td:first-child,
-#donation-donors-body td:first-child {
+#donation-donors-body td:first-child,
+#shop-transactions-body td:first-child {
   border-top-left-radius: 8px;
   border-bottom-left-radius: 8px;
 }
 
 #donation-transactions-body td:last-child,
-#donation-donors-body td:last-child {
+#donation-donors-body td:last-child,
+#shop-transactions-body td:last-child {
   border-top-right-radius: 8px;
   border-bottom-right-radius: 8px;
 }

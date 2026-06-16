@@ -12980,7 +12980,7 @@ class AdminManager {
                 const date = this.getDonationDate(record);
                 const name = this.escapeHtml(this.getDonationDonorName(record, userMap));
                 const email = this.escapeHtml(this.getDonationDonorEmail(record, userMap) || 'Ingen e-post');
-                const status = this.escapeHtml(this.getDonationStatusLabel(record.status));
+                const reference = this.escapeHtml(record.transactionId || record.reference || record.id || 'Ingen referanse');
                 const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
                 const method = this.escapeHtml(this.getDonationMethodLabel(record.method));
                 
@@ -13001,20 +13001,18 @@ class AdminManager {
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
                         <td><span class="method-tag">${method}</span></td>
-                        <td><span class="method-tag">${status}</span></td>
+                        <td><span class="method-tag">${reference}</span></td>
                         <td>${profileStatus}</td>
-                        <td class="text-right">
-                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
-                                <strong>${amount}</strong>
-                                <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett salg" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
-                                    <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
-                                </button>
-                            </div>
+                        <td class="text-right"><strong>${amount}</strong></td>
+                        <td class="text-right" style="width:1px; white-space:nowrap; padding-left:0;">
+                            <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett salg" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                            </button>
                         </td>
                     </tr>
                 `;
             }).join('') : `
-                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen salg matcher filteret.</td></tr>
+                <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen salg matcher filteret.</td></tr>
             `;
 
             // Bind click events to delete buttons
