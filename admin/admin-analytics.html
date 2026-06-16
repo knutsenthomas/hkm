@@ -1427,14 +1427,11 @@
             }
         }
 
-        // Run immediately if firebase is undefined (e.g. adblocker)
-        if (typeof firebase === 'undefined') {
-            setTimeout(() => {
-                showDashboardError("Firebase SDK ble ikke lastet inn. Vennligst deaktiver eventuelle annonseblokkerere (AdBlocker / Brave Shields) for denne nettsiden, da de kan forhindre Google-tjenester i å fungere.");
-            }, 100);
-        }
-
         document.addEventListener('DOMContentLoaded', async () => {
+            if (typeof firebase === 'undefined') {
+                showDashboardError("Firebase SDK ble ikke lastet inn. Dette kan skyldes en nettverksfeil eller at en annonseblokkerer (AdBlocker) hindrer Google-tjenester i å kjøre.");
+                return;
+            }
             // Wait for Firebase to load and fetch actual real-time counts from collections
             setTimeout(async () => {
                 try {
