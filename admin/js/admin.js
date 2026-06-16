@@ -14521,7 +14521,7 @@ class AdminManager {
                     <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
                         <div class="form-group" style="margin:0; min-width:200px;">
                             <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Periode</label>
-                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:8px 12px;">
+                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 12px !important;">
                                 <option value="today">I dag</option>
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
@@ -14534,11 +14534,11 @@ class AdminManager {
                         <div id="global-custom-dates" style="display:none; align-items:center; gap:12px; flex-wrap:wrap;">
                             <div class="form-group" style="margin:0;">
                                 <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Fra dato</label>
-                                <input id="global-start-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:8px 12px;">
+                                <input id="global-start-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:0 12px !important;">
                             </div>
                             <div class="form-group" style="margin:0;">
                                 <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Til dato</label>
-                                <input id="global-end-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:8px 12px;">
+                                <input id="global-end-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:0 12px !important;">
                             </div>
                         </div>
                     </div>
