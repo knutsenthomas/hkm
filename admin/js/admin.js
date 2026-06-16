@@ -13532,12 +13532,14 @@ class AdminManager {
             this.pendingBankImportRows = rows.map((row, index) => {
                 const match = this.matchBankImportUser(row);
                 const isDuplicate = this.isLikelyDuplicateBankDonation(row);
+                const type = this.determineBankDonationType(row);
                 return {
                     ...row,
                     importId: `bank-import-${Date.now()}-${index}`,
                     selected: row.amountNok > 0 && !isDuplicate,
                     isDuplicate,
                     userId: match?.user?.id || '',
+                    type,
                     matchLabel: isDuplicate ? 'Mulig duplikat - ikke valgt' : (match?.label || 'Ingen sikker match')
                 };
             });
@@ -13579,13 +13581,26 @@ class AdminManager {
                 text: String(row.text || row.description || row.message || '').trim(),
                 reference: String(row.reference || row.kid || row.transactionId || '').trim(),
                 donorName: String(row.donorName || row.name || row.payer || '').trim(),
-                donorEmail: String(row.donorEmail || row.email || '').trim().toLowerCase()
+                donorEmail: String(row.donorEmail || row.email || '').trim().toLowerCase(),
+                category: String(row.category || '').trim()
             }))
             .filter(row => row.amountNok > 0)
             .filter(row => row.date && !Number.isNaN(row.date.getTime()));
 
         if (!incoming.length) throw new Error('Fant ingen positive innbetalinger i filen.');
         return incoming;
+    }
+
+    determineBankDonationType(row) {
+        const category = String(row.category || '').trim().toLowerCase();
+        if (category === 'butikk') return 'Butikk';
+        
+        const message = String(row.text || row.description || '').toLowerCase();
+        const keywords = ['plakat', 'plakater', 'klistermerke', 'klistermerker', 'butikk'];
+        if (keywords.some(word => message.includes(word))) {
+            return 'Butikk';
+        }
+        return 'Gave';
     }
 
     parseCsvBankImport(text) {
@@ -13611,7 +13626,8 @@ class AdminManager {
                 donorName: raw.navn || raw.name || raw.avsender || raw.fra || raw.betaler || raw.payer || raw.kundensnavn || raw.kundenavn,
                 donorEmail: raw.epost || raw.email,
                 text: raw.tekst || raw.beskrivelse || raw.description || raw.melding || raw.message || raw.info || raw.detaljer,
-                reference: raw.kid || raw.referanse || raw.reference || raw.bilag || raw.transactionid || raw.transaksjonsid || raw.ordreidreferanse || raw.pspreferanse
+                reference: raw.kid || raw.referanse || raw.reference || raw.bilag || raw.transactionid || raw.transaksjonsid || raw.ordreidreferanse || raw.pspreferanse,
+                category: raw.kategori || ''
             };
         });
     }
@@ -13801,7 +13817,13 @@ class AdminManager {
                                 <td><input type="checkbox" class="bank-import-select" data-index="${index}" ${row.selected ? 'checked' : ''}></td>
                                 <td>${row.date ? row.date.toLocaleDateString('no-NO') : 'Ukjent'}</td>
                                 <td>
-                                    <strong>${this.escapeHtml(row.donorName || 'Ukjent giver')}</strong>
+                                    <div style="display:inline-flex; align-items:center; gap:8px;">
+                                        <strong>${this.escapeHtml(row.donorName || 'Ukjent giver')}</strong>
+                                        ${row.type === 'Butikk' 
+                                            ? `<span style="background:#f1f5f9; color:#475569; border:1px solid #e2e8f0; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:600; line-height:1.2;">Butikk</span>`
+                                            : `<span style="background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe; padding:1px 6px; border-radius:4px; font-size:10px; font-weight:600; line-height:1.2;">Gave</span>`
+                                        }
+                                    </div>
                                     <div style="font-size:12px;color:#64748b;max-width:360px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${this.escapeHtml(row.text || row.reference || '')}</div>
                                     ${row.reference ? `<div style="font-size:12px;color:#94a3b8;">Ref: ${this.escapeHtml(row.reference)}</div>` : ''}
                                 </td>
@@ -13870,11 +13892,11 @@ class AdminManager {
                     timestamp,
                     completedAt: timestamp,
                     userId: row.userId || null,
-                    donorName: row.donorName || user?.displayName || user?.fullName || user?.email || 'Ukjent giver',
+                    donorName: (user ? (user.displayName || user.fullName || user.email) : null) || (row.donorName && row.donorName.trim() ? row.donorName.trim() : null) || 'Ukjent',
                     donorEmail: row.donorEmail || user?.email || 'Ukjent',
                     message: row.text || '',
                     reference: row.reference || '',
-                    type: 'Gave',
+                    type: row.type || 'Gave',
                     source: 'bank_import',
                     matchMethod: row.userId ? (row.matchLabel || 'bank_import_match') : 'bank_import_unmatched',
                     registeredBy: currentAdmin?.uid || null,
