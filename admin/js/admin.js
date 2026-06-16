@@ -14529,7 +14529,7 @@ class AdminManager {
         // Calculate points for SVG line chart
         const points = dailyData.map((d, idx) => {
             const x = (idx / (numIntervals - 1)) * 800;
-            const y = 160 - (d.amount / maxAmount) * 140; // range 20 to 160
+            const y = 240 - (d.amount / maxAmount) * 200; // range 40 to 240
             let dateLabel = '';
             if (diffMs <= 24 * 60 * 60 * 1000) {
                 dateLabel = `${d.start.getHours().toString().padStart(2, '0')}:${d.start.getMinutes().toString().padStart(2, '0')}`;
@@ -14540,11 +14540,11 @@ class AdminManager {
         });
 
         const linePath = `M ${points.map(p => `${p.x} ${p.y}`).join(' L ')}`;
-        const areaPath = `${linePath} L 800 180 L 0 180 Z`;
+        const areaPath = `${linePath} L 800 260 L 0 260 Z`;
 
         // Render SVG elements
         const svgPathHtml = `
-            <svg viewBox="0 0 800 180" width="100%" height="100%" preserveAspectRatio="none" style="display: block; overflow: visible;">
+            <svg viewBox="0 0 800 260" width="100%" height="100%" preserveAspectRatio="none" style="display: block; overflow: visible;">
                 <defs>
                     <linearGradient id="chart-area-grad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stop-color="#1B4965" stop-opacity="0.25"></stop>
@@ -14553,8 +14553,8 @@ class AdminManager {
                 </defs>
                 <!-- Horizontal Grid Lines -->
                 <line x1="0" y1="20" x2="800" y2="20" stroke="#f1f5f9" stroke-width="1"></line>
-                <line x1="0" y1="90" x2="800" y2="90" stroke="#f1f5f9" stroke-width="1"></line>
-                <line x1="0" y1="160" x2="800" y2="160" stroke="#e2e8f0" stroke-width="1"></line>
+                <line x1="0" y1="130" x2="800" y2="130" stroke="#f1f5f9" stroke-width="1"></line>
+                <line x1="0" y1="240" x2="800" y2="240" stroke="#e2e8f0" stroke-width="1"></line>
                 
                 <!-- Area -->
                 <path d="${areaPath}" fill="url(#chart-area-grad)"></path>
@@ -14777,7 +14777,7 @@ class AdminManager {
                         </div>
                         <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
                     </div>
-                    <div style="height: 180px; position: relative; padding: 10px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
+                    <div style="height: 260px; position: relative; padding: 10px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
                         <!-- SVG background -->
                         <div style="position: absolute; inset: 0; pointer-events: none; padding: 10px 0;">
                             ${svgPathHtml}
