@@ -13396,6 +13396,18 @@ class AdminManager {
         const latestDate = this.getDonationDate(firstRec);
         const latestDateStr = latestDate ? latestDate.toLocaleDateString('no-NO') : 'Ukjent';
 
+        // Extract unique years for the dropdown
+        const yearsSet = new Set();
+        donations.forEach(d => {
+            const date = this.getDonationDate(d);
+            if (date) yearsSet.add(date.getFullYear());
+        });
+        const sortedYears = Array.from(yearsSet).sort((a, b) => b - a);
+        const yearOptionsHtml = [
+            '<option value="all">Alle år</option>',
+            ...sortedYears.map(y => `<option value="${y}">${y}</option>`)
+        ].join('');
+
         const tableRowsHtml = donations.map(d => {
             const date = this.getDonationDate(d);
             const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
@@ -13456,11 +13468,11 @@ class AdminManager {
                     <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px;">
                         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
                             <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Totalt bidrag</span>
-                            <div style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${this.formatDonationCurrency(donorTotal)}</div>
+                            <div id="donor-modal-total-sum" style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${this.formatDonationCurrency(donorTotal)}</div>
                         </div>
                         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
                             <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Fullførte gaver</span>
-                            <div style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${completedCount} av ${giftCount}</div>
+                            <div id="donor-modal-gifts-count" style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${completedCount} av ${giftCount}</div>
                         </div>
                         <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
                             <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Siste aktivitet</span>
@@ -13468,7 +13480,18 @@ class AdminManager {
                         </div>
                     </div>
 
-                    <h4 style="margin:0 0 12px 0; font-size:15px; font-weight:700; color:#0f172a;">Transaksjonshistorikk</h4>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                        <h4 style="margin:0; font-size:15px; font-weight:700; color:#0f172a;">Transaksjonshistorikk</h4>
+                        <div style="display:flex; gap:8px; align-items:center;">
+                            <select id="donor-modal-year-filter" class="form-control" style="font-size:13px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; font-weight:600; width:140px; margin:0;">
+                                ${yearOptionsHtml}
+                            </select>
+                            <button type="button" class="btn-primary" id="donor-modal-print-btn" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600; height:32px; background:#1B4965; color:white; border:none; cursor:pointer;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">print</span>
+                                Skriv ut
+                            </button>
+                        </div>
+                    </div>
                     
                     <div style="overflow-x:auto; border:1px solid #e2e8f0; border-radius:10px; background:white;">
                         <table class="data-table" style="width:100%; margin:0;">
@@ -13482,7 +13505,7 @@ class AdminManager {
                                     <th style="font-size:12px; padding:10px 12px; text-align:right; width:1px;"></th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="donor-modal-tbody">
                                 ${tableRowsHtml}
                             </tbody>
                         </table>
@@ -13507,7 +13530,93 @@ class AdminManager {
         });
         modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
 
-        // Bind delete donation button listeners in the details modal
+        const yearFilterEl = modal.querySelector('#donor-modal-year-filter');
+        const updateRows = () => {
+            const selectedYear = yearFilterEl.value;
+            const filtered = selectedYear === 'all'
+                ? donations
+                : donations.filter(d => {
+                    const date = this.getDonationDate(d);
+                    return date && date.getFullYear().toString() === selectedYear;
+                  });
+
+            const completed = filtered.filter(isCompleted);
+            const total = completed.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+            
+            modal.querySelector('#donor-modal-total-sum').textContent = this.formatDonationCurrency(total);
+            modal.querySelector('#donor-modal-gifts-count').textContent = `${completed.length} av ${filtered.length}`;
+
+            const rowsHtml = filtered.map(d => {
+                const date = this.getDonationDate(d);
+                const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
+                const method = this.escapeHtml(this.getDonationMethodLabel(d.method) || (d.isInKind ? 'Fysisk' : 'Ukjent'));
+                
+                const isRecurring = String(d.type || '').toLowerCase() === 'fast';
+                const typeText = d.isInKind ? 'Fysisk' : (isRecurring ? 'Fast' : 'Enkelt');
+                const typeBadge = `<span style="background: ${d.isInKind ? '#fef3c7' : (isRecurring ? '#e0f2fe' : '#f1f5f9')}; color: ${d.isInKind ? '#b45309' : (isRecurring ? '#0369a1' : '#475569')}; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">${typeText}</span>`;
+                
+                const statusLabel = this.escapeHtml(this.getDonationStatusLabel(d.status));
+                const statusBadge = `<span class="method-tag">${statusLabel}</span>`;
+                
+                const amountVal = this.normalizeDonationAmountNok(d);
+                const amountStr = isCompleted(d) || d.isInKind
+                    ? `<strong>${this.formatDonationCurrency(amountVal)}</strong>`
+                    : `<span style="color:#94a3b8; text-decoration:line-through;">${this.formatDonationCurrency(amountVal)}</span>`;
+
+                return `
+                    <tr>
+                        <td style="padding:10px 12px; font-size:13px;">${dateStr}</td>
+                        <td style="padding:10px 12px; font-size:13px;">${method}</td>
+                        <td style="padding:10px 12px; font-size:13px;">${typeBadge}</td>
+                        <td style="padding:10px 12px; font-size:13px;">${statusBadge}</td>
+                        <td style="padding:10px 12px; font-size:13px; text-align:right;">${amountStr}</td>
+                        <td style="padding:10px 12px; text-align:right; width:1px; white-space:nowrap;">
+                            <button type="button" class="action-btn delete-donor-detail-donation-btn" data-id="${d.id}" data-inkind="${d.isInKind ? 'true' : 'false'}" title="Slett gave" style="color:#ef4444; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:4px; border-radius:4px; transition:background 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            modal.querySelector('#donor-modal-tbody').innerHTML = rowsHtml || `
+                <tr><td colspan="6" style="padding:20px; text-align:center; color:#64748b;">Ingen transaksjoner registrert i ${selectedYear}.</td></tr>
+            `;
+
+            // Bind delete donation button listeners in the details modal
+            modal.querySelectorAll('.delete-donor-detail-donation-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const donationId = btn.dataset.id;
+                    const isInKind = btn.dataset.inkind === 'true';
+                    let deleted = false;
+                    if (isInKind) {
+                        deleted = await this.deleteInKindDonation(donationId);
+                    } else {
+                        deleted = await this.deleteDonation(donationId);
+                    }
+                    if (deleted) {
+                        const remaining = this.getDonationsForDonor(donorKey);
+                        if (remaining.length > 0) {
+                            this.openDonorDetailsModal(donorKey);
+                        } else {
+                            modal.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        };
+
+        if (yearFilterEl) {
+            yearFilterEl.addEventListener('change', updateRows);
+        }
+
+        // Bind print button in modal
+        modal.querySelector('#donor-modal-print-btn')?.addEventListener('click', () => {
+            this.printReport('donor-statement', donorKey);
+        });
+
+        // Initial binding of delete buttons (since updateRows isn't run initially)
         modal.querySelectorAll('.delete-donor-detail-donation-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 e.stopPropagation();
@@ -13529,6 +13638,407 @@ class AdminManager {
                 }
             });
         });
+    }
+
+    async printReport(type, donorKey = null) {
+        const userMap = this.adminUserMap || new Map();
+        let title = '';
+        let headersHtml = '';
+        let rowsHtml = '';
+        let summaryCardsHtml = '';
+        let footerHtml = '';
+        
+        // Get global period text
+        const presetEl = document.getElementById('global-date-preset');
+        let periodText = presetEl ? presetEl.options[presetEl.selectedIndex].text : 'Valgt periode';
+        if (presetEl && presetEl.value === 'custom') {
+            const start = document.getElementById('global-start-date')?.value;
+            const end = document.getElementById('global-end-date')?.value;
+            if (start && end) {
+                periodText = `${new Date(start).toLocaleDateString('no-NO')} - ${new Date(end).toLocaleDateString('no-NO')}`;
+            }
+        }
+
+        const isCompleted = (r) => ['completed', 'succeeded', 'captured'].includes(String(r.status || '').toLowerCase());
+
+        if (type === 'donations') {
+            title = 'Gaverapport';
+            const records = this.getFilteredDonationRecords();
+            const completedRecords = records.filter(isCompleted);
+            const totalSum = completedRecords.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+            const avgSum = completedRecords.length ? totalSum / completedRecords.length : 0;
+
+            summaryCardsHtml = `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Fullført totalt</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${this.formatDonationCurrency(totalSum)}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Antall gaver</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${records.length}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Snittgave</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${this.formatDonationCurrency(avgSum)}</div>
+                </div>
+            `;
+
+            headersHtml = `
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Dato</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Giver</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">E-post</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Metode</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Type</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Status</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:right;">Beløp</th>
+            `;
+
+            rowsHtml = records.map(r => {
+                const date = this.getDonationDate(r);
+                const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
+                const name = this.getDonationDonorName(r, userMap);
+                const email = this.getDonationDonorEmail(r, userMap) || 'Ingen e-post';
+                const method = this.getDonationMethodLabel(r.method);
+                const isRecurring = String(r.type || '').toLowerCase() === 'fast';
+                const typeText = r.isInKind ? 'Fysisk' : (isRecurring ? 'Fast' : 'Enkelt');
+                const status = this.getDonationStatusLabel(r.status);
+                const amount = this.normalizeDonationAmountNok(r);
+                
+                return `
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:8px; font-size:11px; color:#334155;">${this.escapeHtml(dateStr)}</td>
+                        <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:600;">${this.escapeHtml(name)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(email)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(method)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${typeText}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(status)}</td>
+                        <td style="padding:8px; font-size:11px; text-align:right; font-weight:700;">${this.formatDonationCurrency(amount)}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+        } else if (type === 'donors') {
+            title = 'Giverrapport';
+            const donorRecords = this.getFilteredDonorRecords();
+            const donors = this.buildDonorSummaries(donorRecords);
+            const totalGifts = donors.reduce((sum, d) => sum + d.totalGifts, 0);
+            const totalShop = donors.reduce((sum, d) => sum + d.totalShop, 0);
+
+            summaryCardsHtml = `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Givere totalt</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${donors.length}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Gave-omsetning</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${this.formatDonationCurrency(totalGifts)}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Butikk-omsetning</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${this.formatDonationCurrency(totalShop)}</div>
+                </div>
+            `;
+
+            headersHtml = `
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Giver</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">E-post</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Antall (Fullført / Totalt)</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Metoder</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Siste aktivitet</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:right;">Gave-sum</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:right;">Butikk-sum</th>
+            `;
+
+            rowsHtml = donors.map(d => {
+                const methodList = Array.from(d.methods).map(m => this.getDonationMethodLabel(m));
+                if (d.types && d.types.has('butikk')) {
+                    methodList.push('Butikk');
+                }
+                const methodText = methodList.join(', ') || 'Ukjent';
+                const latestDateStr = d.latestDate ? d.latestDate.toLocaleDateString('no-NO') : 'Ukjent';
+
+                return `
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:600;">${this.escapeHtml(d.name)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(d.email || 'Ingen e-post')}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${d.completedCount} / ${d.giftCount}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(methodText)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${latestDateStr}</td>
+                        <td style="padding:8px; font-size:11px; text-align:right; font-weight:700; color:#047857;">${this.formatDonationCurrency(d.totalGifts)}</td>
+                        <td style="padding:8px; font-size:11px; text-align:right; font-weight:700; color:#1B4965;">${this.formatDonationCurrency(d.totalShop)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+        } else if (type === 'shop') {
+            title = 'Salgsrapport Butikk';
+            const records = this.getFilteredShopRecords();
+            const completedRecords = records.filter(isCompleted);
+            const totalSum = completedRecords.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+            const avgSum = completedRecords.length ? totalSum / completedRecords.length : 0;
+
+            summaryCardsHtml = `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Omsetning butikk</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${this.formatDonationCurrency(totalSum)}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Antall ordre</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${records.length}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Snittordre</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${this.formatDonationCurrency(avgSum)}</div>
+                </div>
+            `;
+
+            headersHtml = `
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Dato</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Kjøper</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">E-post</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Metode</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">ID / Referanse</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Status</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:right;">Beløp</th>
+            `;
+
+            rowsHtml = records.map(r => {
+                const date = this.getDonationDate(r);
+                const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
+                const name = this.getDonationDonorName(r, userMap);
+                const email = this.getDonationDonorEmail(r, userMap) || 'Ingen e-post';
+                const method = this.getDonationMethodLabel(r.method);
+                const reference = r.transactionId || r.reference || r.id || 'Ingen referanse';
+                const status = this.getDonationStatusLabel(r.status);
+                const amount = this.normalizeDonationAmountNok(r);
+                
+                return `
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:8px; font-size:11px; color:#334155;">${this.escapeHtml(dateStr)}</td>
+                        <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:600;">${this.escapeHtml(name)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(email)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(method)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(reference)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(status)}</td>
+                        <td style="padding:8px; font-size:11px; text-align:right; font-weight:700;">${this.formatDonationCurrency(amount)}</td>
+                    </tr>
+                `;
+            }).join('');
+        } else if (type === 'donor-statement') {
+            const donations = this.getDonationsForDonor(donorKey);
+            if (donations.length === 0) return;
+
+            const firstRec = donations[0];
+            const donorName = this.getDonationDonorName(firstRec, userMap);
+            const donorEmail = this.getDonationDonorEmail(firstRec, userMap);
+            
+            // Get selected year from modal or default to 'all'
+            const yearSelect = document.getElementById('donor-modal-year-filter');
+            const selectedYear = yearSelect ? yearSelect.value : 'all';
+
+            const filtered = selectedYear === 'all'
+                ? donations
+                : donations.filter(d => {
+                    const date = this.getDonationDate(d);
+                    return date && date.getFullYear().toString() === selectedYear;
+                  });
+
+            const completed = filtered.filter(isCompleted);
+            const totalSum = completed.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+            const giftCount = filtered.length;
+            const completedCount = completed.length;
+
+            title = 'Årsoppgave over gaver';
+            periodText = selectedYear === 'all' ? 'Hele historikken' : `Kalenderåret ${selectedYear}`;
+
+            // Get address info if available
+            const userId = filtered.find(d => d.userId)?.userId;
+            const user = userId ? userMap.get(userId) : null;
+            const address = user?.address || user?.adresse || '';
+            const zipCode = user?.zipCode || user?.postnummer || '';
+            const city = user?.city || user?.poststed || '';
+            const country = user?.country || user?.land || '';
+            let addressHtml = '';
+            if (address) {
+                addressHtml = `
+                    <div style="margin-top:12px; font-size:12px; line-height:1.5; color:#334155; border-left:2px solid #1B4965; padding-left:12px;">
+                        <strong>Postadresse:</strong><br>
+                        ${this.escapeHtml(address)}<br>
+                        ${this.escapeHtml(zipCode)} ${this.escapeHtml(city)}${country ? ` &bull; ${this.escapeHtml(country)}` : ''}
+                    </div>
+                `;
+            }
+
+            summaryCardsHtml = `
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Mottatt beløp</span>
+                    <div style="font-size:18px; font-weight:800; color:#047857; margin-top:2px;">${this.formatDonationCurrency(totalSum)}</div>
+                </div>
+                <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px 16px; border-radius:8px; text-align:center; flex:1;">
+                    <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Fullførte overføringer</span>
+                    <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:2px;">${completedCount} av ${giftCount}</div>
+                </div>
+            `;
+
+            headersHtml = `
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Dato</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Betalingsmetode</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Type</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:left;">Status</th>
+                <th style="padding:10px 8px; font-size:11px; text-align:right;">Beløp</th>
+            `;
+
+            rowsHtml = filtered.map(d => {
+                const date = this.getDonationDate(d);
+                const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
+                const method = this.getDonationMethodLabel(d.method) || (d.isInKind ? 'Fysisk' : 'Ukjent');
+                const isRecurring = String(d.type || '').toLowerCase() === 'fast';
+                const typeText = d.isInKind ? 'Fysisk' : (isRecurring ? 'Fast' : 'Enkelt');
+                const status = this.getDonationStatusLabel(d.status);
+                const amountVal = this.normalizeDonationAmountNok(d);
+                const amountText = isCompleted(d) || d.isInKind
+                    ? `<strong>${this.formatDonationCurrency(amountVal)}</strong>`
+                    : `<span style="color:#94a3b8; text-decoration:line-through;">${this.formatDonationCurrency(amountVal)}</span>`;
+
+                return `
+                    <tr style="border-bottom:1px solid #e2e8f0;">
+                        <td style="padding:8px; font-size:11px; color:#334155;">${this.escapeHtml(dateStr)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(method)}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${typeText}</td>
+                        <td style="padding:8px; font-size:11px; color:#475569;">${this.escapeHtml(status)}</td>
+                        <td style="padding:8px; font-size:11px; text-align:right;">${amountText}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            const donorMetaHeader = `
+                <div style="margin-bottom:24px; padding:16px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px;">
+                    <div>
+                        <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Giverinformasjon</span>
+                        <div style="font-size:16px; font-weight:700; color:#0f172a; margin-top:4px;">${this.escapeHtml(donorName)}</div>
+                        <div style="font-size:12px; color:#475569; margin-top:2px;">${this.escapeHtml(donorEmail || 'Ingen e-post registrert')}</div>
+                        ${addressHtml}
+                    </div>
+                    <div style="text-align:right; min-width:150px;">
+                        <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Organisasjon</span>
+                        <div style="font-size:14px; font-weight:700; color:#1B4965; margin-top:4px;">His Kingdom Ministry</div>
+                        <div style="font-size:11px; color:#475569; margin-top:2px;">Org.nr: 925 832 995</div>
+                        <div style="font-size:11px; color:#475569;">Mandal, Norge</div>
+                    </div>
+                </div>
+            `;
+
+            footerHtml = `
+                <div style="margin-top:50px; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px; font-size:12px; line-height:1.6; color:#475569;">
+                    <strong>Informasjon om skattefradrag:</strong><br>
+                    Dette er en offisiell oppgave over gaver gitt til His Kingdom Ministry i ${selectedYear === 'all' ? 'hele perioden' : selectedYear}. 
+                    Gaver til frivillige organisasjoner kan gi rett til skattefradrag etter skattelovens § 6-50. 
+                    Oppgavene rapporteres automatisk til Skatteetaten dersom fødselsnummer/organisasjonsnummer er registrert hos oss. 
+                    Ta vare på denne oppgaven som dokumentasjon for ditt regnskap.
+                </div>
+                
+                <div style="margin-top:60px; display:flex; justify-content:space-between; align-items:flex-end;">
+                    <div style="width:200px; border-bottom:1px solid #94a3b8; padding-bottom:8px; text-align:center;">
+                        <p style="margin:0; font-size:12px; color:#0f172a; font-weight:700;">Hilde Karin Knutsen</p>
+                        <p style="margin:2px 0 0; font-size:11px; color:#64748b;">His Kingdom Ministry</p>
+                    </div>
+                    <div style="width:200px; border-bottom:1px solid #94a3b8; padding-bottom:8px; text-align:center;">
+                        <p style="margin:0; font-size:12px; color:#0f172a; font-weight:700;">Thomas Knutsen</p>
+                        <p style="margin:2px 0 0; font-size:11px; color:#64748b;">His Kingdom Ministry</p>
+                    </div>
+                </div>
+            `;
+
+            title = donorMetaHeader + '<h2 style="margin:0 0 16px 0; font-size:18px; font-weight:700; color:#0f172a;">' + title + '</h2>';
+        }
+
+        // Write to popup window and print
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            this.showToast('Popup-blokkerer forhindret åpning av utskriftsvinduet. Vennligst tillat popups for dette nettstedet.', 'error', 5000);
+            return;
+        }
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>${type === 'donor-statement' ? 'Årsoppgave' : title} - His Kingdom Ministry</title>
+                <style>
+                    body {
+                        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                        color: #1e293b;
+                        background: white;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    @media print {
+                        body {
+                            padding: 0;
+                        }
+                        .no-print {
+                            display: none !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="no-print" style="margin-bottom:20px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:#475569; font-weight:500;">Dette er en forhåndsvisning av rapporten. Bruk utskriftsknappen eller Ctrl+P/Cmd+P for å lagre som PDF / skrive ut.</span>
+                    <button onclick="window.print()" style="background:#1B4965; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px; display:flex; align-items:center; gap:6px;">
+                        Skriv ut / PDF
+                    </button>
+                </div>
+
+                <div style="padding: 20px; max-width: 1000px; margin: 0 auto;">
+                    <!-- Logo & Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1B4965; padding-bottom:16px; margin-bottom:24px;">
+                        <div>
+                            <h1 style="margin:0; font-size:24px; font-weight:800; color:#1B4965; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
+                            <p style="margin:4px 0 0; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Regnskapsrapport &bull; Mandal Regnskapskontor</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <p style="margin:0; font-size:11px; color:#64748b;">Dato: ${new Date().toLocaleDateString('no-NO')}</p>
+                            <p style="margin:2px 0 0; font-size:11px; color:#64748b;">Generert av: Administrator</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Content Area -->
+                    <div style="margin-bottom:24px;">
+                        ${type !== 'donor-statement' ? `<h2 style="margin:0; font-size:18px; font-weight:700; color:#0f172a;">${title}</h2>` : title}
+                        ${type !== 'donor-statement' ? `<p style="margin:4px 0 0; font-size:13px; color:#64748b; font-weight:500;">Periode: ${periodText}</p>` : ''}
+                    </div>
+                    
+                    <!-- Summary Cards -->
+                    <div style="display:flex; gap:16px; margin-bottom:24px;">
+                        ${summaryCardsHtml}
+                    </div>
+                    
+                    <!-- Main Table -->
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:40px;">
+                        <thead>
+                            <tr style="border-bottom:2px solid #1B4965;">
+                                ${headersHtml}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml || '<tr><td colspan="10" style="padding:24px; text-align:center; color:#64748b;">Ingen transaksjoner funnet.</td></tr>'}
+                        </tbody>
+                    </table>
+
+                    <!-- Footer Details -->
+                    ${footerHtml}
+                </div>
+                <script>
+                    window.onload = function() {
+                        setTimeout(function() {
+                            window.print();
+                        }, 300);
+                    };
+                </script>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 
     openManualDonationModal() {
@@ -14973,6 +15483,11 @@ class AdminManager {
             this.saveManualDonation();
         });
 
+        // Report print triggers
+        document.getElementById('print-donations-report-btn')?.addEventListener('click', () => this.printReport('donations'));
+        document.getElementById('print-donors-report-btn')?.addEventListener('click', () => this.printReport('donors'));
+        document.getElementById('print-shop-report-btn')?.addEventListener('click', () => this.printReport('shop'));
+
         const clearFilters = () => {
             this.donationFilters = { 
                 preset: '30', 
@@ -15300,11 +15815,15 @@ class AdminManager {
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header">
+                    <div class="card-header flex-between">
                         <div>
                             <h3 class="card-title">Gaveoversikt</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode, transaksjonstype eller giver.</p>
                         </div>
+                        <button type="button" class="btn-secondary" id="print-donations-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                            Skriv ut rapport
+                        </button>
                     </div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
@@ -15408,9 +15927,15 @@ class AdminManager {
             <!-- Tab 3: By Donor Content -->
             <div id="cause-tab-content-donors" class="cause-tab-pane" style="display: none;">
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header">
-                        <h3 class="card-title">Givere</h3>
-                        <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
+                    <div class="card-header flex-between">
+                        <div>
+                            <h3 class="card-title">Givere</h3>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
+                        </div>
+                        <button type="button" class="btn-secondary" id="print-donors-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                            Skriv ut rapport
+                        </button>
                     </div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
@@ -15567,11 +16092,15 @@ class AdminManager {
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header">
+                    <div class="card-header flex-between">
                         <div>
                             <h3 class="card-title">Butikktransaksjoner</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode eller søk etter kjøper.</p>
                         </div>
+                        <button type="button" class="btn-secondary" id="print-shop-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                            Skriv ut rapport
+                        </button>
                     </div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
