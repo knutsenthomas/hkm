@@ -65,7 +65,7 @@ class CRMManager {
     setupEventListeners() {
         // Modal toggles
         const addBtn = document.getElementById('add-contact-btn');
-        const closeBtns = document.querySelectorAll('.close-modal, .close-modal-btn');
+        const closeBtns = document.querySelectorAll('.close-modal, .close-modal-btn, .cancel-modal-btn');
         const modal = document.getElementById('contact-modal');
 
         if (addBtn) addBtn.onclick = () => this.openCreateContactModal();
@@ -1034,6 +1034,11 @@ class CRMManager {
         const rawStatus = get('status', 'medlemsstatus', 'membershipstatus');
         const label = get('label', 'etikett', 'tag', 'tags') || 'Ny';
 
+        const address = get('address', 'adresse', 'gateadresse', 'street', 'streetaddress');
+        const zip = get('zip', 'postnummer', 'postnr', 'postalcode', 'zipcode');
+        const city = get('city', 'poststed', 'sted', 'town', 'postalcity');
+        const country = get('country', 'land') || 'Norge';
+
         let resolvedFirstName = firstName || (displayName ? displayName.split(/\s+/)[0] : '');
         const resolvedLastName = lastName || (displayName ? displayName.split(/\s+/).slice(1).join(' ') : '');
 
@@ -1051,6 +1056,10 @@ class CRMManager {
             displayName: displayName || `${resolvedFirstName} ${resolvedLastName}`.trim(),
             email,
             phone,
+            address: address || '',
+            zip: zip || '',
+            city: city || '',
+            country: country || 'Norge',
             role: role || 'medlem',
             status: 'IKKE_MEDLEM', // Alltid importer som kontakt (IKKE_MEDLEM) som standard
             label,
@@ -1147,6 +1156,10 @@ class CRMManager {
             form.elements.lastName.value = lastName || '';
             form.elements.email.value = contact.email || '';
             form.elements.phone.value = contact.phone || '';
+            if (form.elements.address) form.elements.address.value = contact.address || '';
+            if (form.elements.zip) form.elements.zip.value = contact.zip || '';
+            if (form.elements.city) form.elements.city.value = contact.city || '';
+            if (form.elements.country) form.elements.country.value = contact.country || 'Norge';
             form.elements.label.value = (contact.label || contact.labels?.[0] || 'Ny');
             form.elements.status.value = contact.status || 'IKKE_MEDLEM';
 
@@ -1156,6 +1169,7 @@ class CRMManager {
         }
 
         form.reset();
+        if (form.elements.country) form.elements.country.value = 'Norge';
         if (form.elements.status) form.elements.status.value = 'NETTSTEDSMEDLEM';
         if (form.elements.label) form.elements.label.value = 'Ny';
         if (titleEl) titleEl.textContent = 'Opprett ny kontakt';
@@ -1179,6 +1193,10 @@ class CRMManager {
         const lastName = String(formData.get('lastName') || '').trim();
         const email = String(formData.get('email') || '').trim();
         const phone = String(formData.get('phone') || '').trim();
+        const address = String(formData.get('address') || '').trim();
+        const zip = String(formData.get('zip') || '').trim();
+        const city = String(formData.get('city') || '').trim();
+        const country = String(formData.get('country') || 'Norge').trim();
         const label = String(formData.get('label') || 'Ny').trim() || 'Ny';
         const status = String(formData.get('status') || 'IKKE_MEDLEM').trim() || 'IKKE_MEDLEM';
 
@@ -1193,6 +1211,10 @@ class CRMManager {
             displayName: `${firstName} ${lastName}`.trim(),
             email,
             phone,
+            address,
+            zip,
+            city,
+            country,
             label,
             labels: [label],
             status,
@@ -1213,7 +1235,7 @@ class CRMManager {
                 this.notify("Kontakt lagret!");
             }
             if (status === 'NETTSTEDSMEDLEM') {
-                await this.syncContactToUserCollection(email, `${firstName} ${lastName}`.trim(), phone);
+                await this.syncContactToUserCollection(email, `${firstName} ${lastName}`.trim(), phone, address, zip, city, country);
             }
             this.toggleModal(false);
             event.target.reset();
@@ -1224,20 +1246,29 @@ class CRMManager {
         }
     }
 
-    async syncContactToUserCollection(email, displayName, phone) {
+    async syncContactToUserCollection(email, displayName, phone, address = '', zip = '', city = '', country = '') {
         if (!email) return;
         try {
             const db = window.firebaseService.db;
             const emailLower = email.toLowerCase().trim();
             const snap = await db.collection('users').where('email', '==', emailLower).get();
+            
+            const userData = {
+                email: emailLower,
+                displayName: displayName || '',
+                phone: phone || '',
+                address: address || '',
+                zip: zip || '',
+                city: city || '',
+                country: country || 'Norge',
+                syncedFromCrm: true
+            };
+
             if (snap.empty) {
                 const newDoc = await db.collection('users').add({
-                    email: emailLower,
-                    displayName: displayName || '',
-                    phone: phone || '',
+                    ...userData,
                     role: 'medlem',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    syncedFromCrm: true
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
 
                 try {
@@ -1255,6 +1286,18 @@ class CRMManager {
                 }
                 
                 this.notify(`Opprettet også brukerprofil for ${emailLower}!`);
+            } else {
+                // If user exists, update their details
+                const userDoc = snap.docs[0];
+                await userDoc.ref.update({
+                    displayName: displayName || '',
+                    phone: phone || '',
+                    address: address || '',
+                    zip: zip || '',
+                    city: city || '',
+                    country: country || 'Norge',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
             }
         } catch (e) {
             console.error('Error syncing contact to users collection:', e);
@@ -1534,7 +1577,15 @@ class CRMManager {
                         const contact = this.contacts.find(c => c.id === id);
                         if (contact && contact.email) {
                             const name = contact.displayName || `${contact.firstName || ''} ${contact.lastName || ''}`.trim();
-                            await this.syncContactToUserCollection(contact.email, name, contact.phone);
+                            await this.syncContactToUserCollection(
+                                contact.email, 
+                                name, 
+                                contact.phone, 
+                                contact.address, 
+                                contact.zip, 
+                                contact.city, 
+                                contact.country
+                            );
                         }
                     }
                 }
@@ -1684,6 +1735,10 @@ class CRMManager {
                 displayName: primary.displayName || secondary.displayName || '',
                 email: primary.email || secondary.email || '',
                 phone: primary.phone || secondary.phone || '',
+                address: primary.address || secondary.address || '',
+                zip: primary.zip || secondary.zip || '',
+                city: primary.city || secondary.city || '',
+                country: primary.country || secondary.country || 'Norge',
                 label: mergedLabels[0] || 'Medlem',
                 labels: mergedLabels,
                 status: primary.status === 'NETTSTEDSMEDLEM' || secondary.status === 'NETTSTEDSMEDLEM' ? 'NETTSTEDSMEDLEM' : primary.status || 'IKKE_MEDLEM',
@@ -1700,7 +1755,15 @@ class CRMManager {
 
             // 4. If status became NETTSTEDSMEDLEM, ensure user profile exists
             if (mergedData.status === 'NETTSTEDSMEDLEM') {
-                await this.syncContactToUserCollection(mergedData.email, mergedData.displayName, mergedData.phone);
+                await this.syncContactToUserCollection(
+                    mergedData.email, 
+                    mergedData.displayName, 
+                    mergedData.phone,
+                    mergedData.address,
+                    mergedData.zip,
+                    mergedData.city,
+                    mergedData.country
+                );
             }
 
             this.selectedContactIds.clear();
@@ -1958,6 +2021,10 @@ class CRMManager {
                     <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
                         <span style="color: var(--text-muted); font-size: 13px;">Telefon</span>
                         <span style="font-weight: 600; font-size: 13px;">${this.escapeHtml(contact.phone || '-')}</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
+                        <span style="color: var(--text-muted); font-size: 13px;">Adresse</span>
+                        <span style="font-weight: 600; font-size: 13px; text-align: right;">${[contact.address, [contact.zip, contact.city].filter(Boolean).join(' '), contact.country].filter(Boolean).join(', ') || '-'}</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color);">
                         <span style="color: var(--text-muted); font-size: 13px;">Rolle</span>

@@ -12761,6 +12761,57 @@ class AdminManager {
             document.body.appendChild(modal);
         }
 
+        const donation = this.allDonationRecords?.find(r => r.id === donationId);
+        const userMap = this.adminUserMap || new Map();
+        const donorName = donation ? this.getDonationDonorName(donation, userMap) : '';
+        const donorEmail = donation ? this.getDonationDonorEmail(donation, userMap) : '';
+
+        const otherUnlinkedDonations = donation ? (this.allDonationRecords || []).filter(r => {
+            if (r.id === donationId) return false;
+            if (r.userId) return false;
+            if (r.isInKind) return false;
+            
+            const rEmail = String(r.donorEmail || r.email || '').trim().toLowerCase();
+            if (donorEmail && rEmail === donorEmail) return true;
+            
+            const rName = String(r.donorName || r.name || '').trim().toLowerCase();
+            const cleanDonorName = donorName.trim().toLowerCase();
+            if (cleanDonorName && cleanDonorName !== 'ukjent giver' && rName === cleanDonorName) return true;
+            
+            return false;
+        }) : [];
+
+        let additionalGiftsHtml = '';
+        if (otherUnlinkedDonations.length > 0) {
+            const listItems = otherUnlinkedDonations.map(r => {
+                const amt = this.formatDonationCurrency(this.normalizeDonationAmountNok(r));
+                const date = this.getDonationDate(r);
+                const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Ukjent dato';
+                const methodLabel = this.getDonationMethodLabel(r.method);
+                return `
+                    <label style="display:flex; align-items:center; gap:10px; padding:10px 12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; cursor:pointer; font-size:0.875rem; color:#334155; transition:background 0.2s; user-select:none; line-height: 1.4;" class="additional-donation-checkbox-label">
+                        <input type="checkbox" name="additionalDonationId" value="${this.escapeHtml(r.id)}" checked style="width:16px; height:16px; accent-color:#1B4965; cursor:pointer; margin:0;">
+                        <div style="flex:1;">
+                            <strong>${amt}</strong> (${methodLabel})
+                            <div style="font-size:0.75rem; color:#64748b;">Dato: ${dateStr}</div>
+                        </div>
+                    </label>
+                `;
+            }).join('');
+            
+            additionalGiftsHtml = `
+                <div class="form-group" style="margin-top:16px; border-top:1px solid #f1f5f9; padding-top:16px;">
+                    <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">
+                        Vi fant ${otherUnlinkedDonations.length} andre ukoblede gaver fra "${this.escapeHtml(donorName)}":
+                    </label>
+                    <div style="display:flex; flex-direction:column; gap:8px; max-height:180px; overflow-y:auto; padding-right:4px;">
+                        ${listItems}
+                    </div>
+                    <p style="font-size:0.75rem; color:#64748b; margin:6px 0 0 0;">De valgte gavene vil også koble seg til denne brukerprofilen.</p>
+                </div>
+            `;
+        }
+
         const userOptions = Array.from(this.adminUserMap?.values?.() || [])
             .slice()
             .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
@@ -12789,6 +12840,7 @@ class AdminManager {
                             ${userOptions}
                         </select>
                     </div>
+                    ${additionalGiftsHtml}
                 </div>
                 <div class="modal-footer" style="padding:16px 24px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
                     <button class="btn-secondary modal-cancel" type="button" style="padding:8px 16px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; cursor:pointer; font-weight:600;">Avbryt</button>
@@ -12811,37 +12863,58 @@ class AdminManager {
         saveBtn.addEventListener('click', async () => {
             const select = document.getElementById('link-profile-user-select');
             const newUserId = select.value || null;
+            
+            const checkedBoxes = modal.querySelectorAll('input[name="additionalDonationId"]:checked');
+            const donationIdsToUpdate = [donationId];
+            checkedBoxes.forEach(cb => {
+                donationIdsToUpdate.push(cb.value);
+            });
+
             closeModal();
-            await this.updateDonationUserLink(donationId, newUserId);
+            await this.updateMultipleDonationsUserLink(donationIdsToUpdate, newUserId);
         });
     }
 
     async updateDonationUserLink(donationId, userId) {
+        await this.updateMultipleDonationsUserLink([donationId], userId);
+    }
+
+    async updateMultipleDonationsUserLink(donationIds, userId) {
         const loadingToast = this.showToast('Oppdaterer kobling...', 'info', 10000);
         try {
+            const db = firebaseService.db;
+            const batch = db.batch();
+            
             const updates = {
                 userId: userId || null,
                 matchMethod: userId ? 'manual_admin_linked' : 'manual_admin_unlinked',
                 updatedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            await firebaseService.db.collection('donations').doc(donationId).update(updates);
+            donationIds.forEach(id => {
+                const docRef = db.collection('donations').doc(id);
+                batch.update(docRef, updates);
+            });
+            
+            await batch.commit();
             
             if (this.allDonationRecords) {
-                const rec = this.allDonationRecords.find(r => r.id === donationId);
-                if (rec) {
-                    rec.userId = userId || null;
-                    rec.matchMethod = updates.matchMethod;
-                }
+                donationIds.forEach(id => {
+                    const rec = this.allDonationRecords.find(r => r.id === id);
+                    if (rec) {
+                        rec.userId = userId || null;
+                        rec.matchMethod = updates.matchMethod;
+                    }
+                });
             }
             
             if (loadingToast && typeof loadingToast.dismiss === 'function') loadingToast.dismiss();
-            this.showToast('Gavekobling oppdatert!', 'success', 3000);
+            this.showToast(`${donationIds.length} gavekobling(er) oppdatert!`, 'success', 3000);
             this.renderDonationAdminViews();
         } catch (error) {
-            console.error('Kunne ikke oppdatere kobling:', error);
+            console.error('Kunne ikke oppdatere koblinger:', error);
             if (loadingToast && typeof loadingToast.dismiss === 'function') loadingToast.dismiss();
-            this.showToast('Kunne ikke oppdatere kobling: ' + error.message, 'danger', 5000);
+            this.showToast('Kunne ikke oppdatere koblinger: ' + error.message, 'danger', 5000);
         }
     }
 
@@ -14034,19 +14107,64 @@ class AdminManager {
     bindDonationAdminFilters() {
         const setFilter = (key, value) => {
             this.donationFilters = { ...(this.donationFilters || {}), [key]: value };
+            
+            // Sync values to DOM elements on BOTH tabs
+            const presetEl1 = document.getElementById('donation-date-preset');
+            const presetEl2 = document.getElementById('donor-date-preset');
+            if (presetEl1) presetEl1.value = this.donationFilters.preset || '30';
+            if (presetEl2) presetEl2.value = this.donationFilters.preset || '30';
+
+            const startEl1 = document.getElementById('donation-start-date');
+            const startEl2 = document.getElementById('donor-start-date');
+            if (startEl1) startEl1.value = this.donationFilters.start || '';
+            if (startEl2) startEl2.value = this.donationFilters.start || '';
+
+            const endEl1 = document.getElementById('donation-end-date');
+            const endEl2 = document.getElementById('donor-end-date');
+            if (endEl1) endEl1.value = this.donationFilters.end || '';
+            if (endEl2) endEl2.value = this.donationFilters.end || '';
+
+            const statusEl1 = document.getElementById('donation-status-filter');
+            const statusEl2 = document.getElementById('donor-status-filter');
+            if (statusEl1) statusEl1.value = this.donationFilters.status || 'all';
+            if (statusEl2) statusEl2.value = this.donationFilters.status || 'all';
+
+            const methodEl1 = document.getElementById('donation-method-filter');
+            const methodEl2 = document.getElementById('donor-method-filter');
+            if (methodEl1) methodEl1.value = this.donationFilters.method || 'all';
+            if (methodEl2) methodEl2.value = this.donationFilters.method || 'all';
+
+            const queryEl = document.getElementById('donation-search');
+            if (queryEl) queryEl.value = this.donationFilters.query || '';
+
+            const donorQueryEl = document.getElementById('donor-search');
+            if (donorQueryEl) donorQueryEl.value = this.donationFilters.donorQuery || '';
+
             const customVisible = this.donationFilters.preset === 'custom';
-            const customDates = document.getElementById('donation-custom-dates');
-            if (customDates) customDates.style.display = customVisible ? 'grid' : 'none';
+            const customDates1 = document.getElementById('donation-custom-dates');
+            const customDates2 = document.getElementById('donor-custom-dates');
+            if (customDates1) customDates1.style.display = customVisible ? 'grid' : 'none';
+            if (customDates2) customDates2.style.display = customVisible ? 'grid' : 'none';
+
             this.renderDonationAdminViews();
         };
 
+        // Donation tab listeners
         document.getElementById('donation-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
         document.getElementById('donation-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
         document.getElementById('donation-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
         document.getElementById('donation-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
         document.getElementById('donation-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
         document.getElementById('donation-search')?.addEventListener('input', (event) => setFilter('query', event.target.value));
+
+        // Donor tab listeners
+        document.getElementById('donor-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
+        document.getElementById('donor-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
+        document.getElementById('donor-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+        document.getElementById('donor-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
+        document.getElementById('donor-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
         document.getElementById('donor-search')?.addEventListener('input', (event) => setFilter('donorQuery', event.target.value));
+
         document.getElementById('add-manual-donation-btn')?.addEventListener('click', () => this.openManualDonationModal());
         document.getElementById('open-bank-import-btn')?.addEventListener('click', () => this.openBankImportModal());
         document.getElementById('cancel-bank-import-btn')?.addEventListener('click', () => this.closeBankImportModal());
@@ -14060,15 +14178,34 @@ class AdminManager {
         });
         document.getElementById('donation-clear-filters')?.addEventListener('click', () => {
             this.donationFilters = { preset: '30', status: 'all', method: 'all', query: '', donorQuery: '', start: '', end: '' };
-            document.getElementById('donation-date-preset').value = '30';
-            document.getElementById('donation-status-filter').value = 'all';
-            document.getElementById('donation-method-filter').value = 'all';
-            document.getElementById('donation-search').value = '';
-            document.getElementById('donor-search').value = '';
-            document.getElementById('donation-start-date').value = '';
-            document.getElementById('donation-end-date').value = '';
-            const customDates = document.getElementById('donation-custom-dates');
-            if (customDates) customDates.style.display = 'none';
+            
+            ['donation-date-preset', 'donor-date-preset'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '30';
+            });
+            ['donation-status-filter', 'donor-status-filter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 'all';
+            });
+            ['donation-method-filter', 'donor-method-filter'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = 'all';
+            });
+            const qEl = document.getElementById('donation-search');
+            if (qEl) qEl.value = '';
+            const dqEl = document.getElementById('donor-search');
+            if (dqEl) dqEl.value = '';
+            
+            ['donation-start-date', 'donor-start-date', 'donation-end-date', 'donor-end-date'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            
+            ['donation-custom-dates', 'donor-custom-dates'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.style.display = 'none';
+            });
+            
             this.renderDonationAdminViews();
         });
 
@@ -14412,17 +14549,66 @@ class AdminManager {
             <!-- Tab 3: By Donor Content -->
             <div id="cause-tab-content-donors" class="cause-tab-pane" style="display: none;">
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between">
-                        <div>
-                            <h3 class="card-title">Givere</h3>
-                            <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
-                        </div>
-                        <div class="form-group" style="margin:0;min-width:240px;">
-                            <input id="donor-search" class="form-control" type="search" placeholder="Søk etter giver">
-                        </div>
+                    <div class="card-header">
+                        <h3 class="card-title">Givere</h3>
+                        <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
                     </div>
-                    <div class="card-body" style="overflow-x:auto;">
-                        <table class="data-table" style="width:100%;">
+                    <div class="card-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                            <div class="form-group" style="margin:0;">
+                                <label>Periode</label>
+                                <select id="donor-date-preset" class="form-control">
+                                    <option value="today">I dag</option>
+                                    <option value="7">Siste 7 dager</option>
+                                    <option value="30" selected>Siste 30 dager</option>
+                                    <option value="month">Denne måneden</option>
+                                    <option value="year">I år</option>
+                                    <option value="all">Alle</option>
+                                    <option value="custom">Egendefinert</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Status</label>
+                                <select id="donor-status-filter" class="form-control">
+                                    <option value="all">Alle statuser</option>
+                                    <option value="completed">Fullført</option>
+                                    <option value="pending">Venter</option>
+                                    <option value="processing">Behandles</option>
+                                    <option value="failed">Feilet</option>
+                                    <option value="cancelled">Avbrutt</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Metode</label>
+                                <select id="donor-method-filter" class="form-control">
+                                    <option value="all">Alle metoder</option>
+                                    <option value="stripe">Stripe</option>
+                                    <option value="vipps">Vipps</option>
+                                    <option value="vipps_manual">Vipps manuelt</option>
+                                    <option value="card">Kort</option>
+                                    <option value="bank">Bank</option>
+                                    <option value="cash">Kontant</option>
+                                    <option value="manual">Manuell</option>
+                                    <option value="other">Annen tjeneste</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Søk etter giver</label>
+                                <input id="donor-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
+                            </div>
+                        </div>
+                        <div id="donor-custom-dates" style="display:none;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                            <div class="form-group" style="margin:0;">
+                                <label>Fra dato</label>
+                                <input type="date" id="donor-start-date" class="form-control">
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Til dato</label>
+                                <input type="date" id="donor-end-date" class="form-control">
+                            </div>
+                        </div>
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;">
                             <thead>
                                 <tr>
                                     <th>Giver</th>

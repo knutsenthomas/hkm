@@ -450,6 +450,24 @@
                     <input type="tel" name="phone">
                 </div>
                 <div class="form-group">
+                    <label>Adresse</label>
+                    <input type="text" name="address" placeholder="Gateadresse">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Postnummer</label>
+                        <input type="text" name="zip" placeholder="f.eks. 4500">
+                    </div>
+                    <div class="form-group">
+                        <label>Poststed</label>
+                        <input type="text" name="city" placeholder="f.eks. Mandal">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Land</label>
+                    <input type="text" name="country" value="Norge">
+                </div>
+                <div class="form-group">
                     <label>Etikett</label>
                     <select name="label" id="contact-label-select">
                         <option value="Ny">Ny</option>
@@ -471,7 +489,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary close-modal-btn">Avbryt</button>
+                    <button type="button" class="btn btn-secondary cancel-modal-btn">Avbryt</button>
                     <button type="submit" class="btn btn-primary">Lagre kontakt</button>
                 </div>
             </form>
