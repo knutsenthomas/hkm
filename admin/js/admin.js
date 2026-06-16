@@ -14139,17 +14139,17 @@ class AdminManager {
                 raw[header] = values[index] || '';
             });
 
-            const amount = raw.amount || raw.belop || raw.innbetalt || raw.inn || raw.credit || raw.kredit || raw.sum || raw.valuta;
-            const outAmount = raw.ut || raw.debet || raw.debit || raw.withdrawal;
+            const amount = raw.amount || raw.belop || raw.innbetalt || raw.inn || raw.credit || raw.kredit || raw.sum || raw.valuta || raw.belopinn || raw.innbetaling || raw.innskudd;
+            const outAmount = raw.ut || raw.debet || raw.debit || raw.withdrawal || raw.beloput || raw.utbetaling || raw.uttak;
             const resolvedAmount = amount || (outAmount ? `-${outAmount}` : '');
 
             return {
-                date: raw.dato || raw.date || raw.bokfortdato || raw.valutadato || raw.posteringsdato || raw.tidspunkt || raw.bokforingsdato,
+                date: raw.dato || raw.date || raw.bokfortdato || raw.valutadato || raw.posteringsdato || raw.tidspunkt || raw.bokforingsdato || raw.utfortdato || raw.rentedato,
                 amountNok: resolvedAmount,
                 donorName: raw.navn || raw.name || raw.avsender || raw.fra || raw.betaler || raw.payer || raw.kundensnavn || raw.kundenavn,
                 donorEmail: raw.epost || raw.email,
-                text: raw.tekst || raw.beskrivelse || raw.description || raw.melding || raw.message || raw.info || raw.detaljer,
-                reference: raw.kid || raw.referanse || raw.reference || raw.bilag || raw.transactionid || raw.transaksjonsid || raw.ordreidreferanse || raw.pspreferanse,
+                text: raw.tekst || raw.beskrivelse || raw.description || raw.melding || raw.message || raw.info || raw.detaljer || raw.meldingkidfaktnr,
+                reference: raw.kid || raw.referanse || raw.reference || raw.bilag || raw.transactionid || raw.transaksjonsid || raw.ordreidreferanse || raw.pspreferanse || raw.meldingkidfaktnr || raw.arkivref || raw.numref,
                 category: raw.kategori || ''
             };
         });
@@ -14227,11 +14227,31 @@ class AdminManager {
         let raw = String(value || '').trim();
         if (!raw) return 0;
         const isNegative = raw.includes('-') || raw.includes('−');
-        raw = raw
-            .replace(/\s/g, '')
-            .replace(/[^\d,.-]/g, '')
-            .replace(/\.(?=\d{3}(\D|$))/g, '')
-            .replace(',', '.');
+        
+        raw = raw.replace(/\s/g, '').replace(/[^\d,.-]/g, '');
+        
+        if (raw.includes('.') && raw.includes(',')) {
+            const dotIndex = raw.indexOf('.');
+            const commaIndex = raw.indexOf(',');
+            if (dotIndex < commaIndex) {
+                raw = raw.replace(/\./g, '').replace(',', '.');
+            } else {
+                raw = raw.replace(/,/g, '');
+            }
+        } else if (raw.includes(',')) {
+            raw = raw.replace(',', '.');
+        } else if (raw.includes('.')) {
+            const parts = raw.split('.');
+            if (parts.length === 2 && parts[1].length === 3) {
+                const beforeDot = parts[0];
+                if (beforeDot.length <= 3) {
+                    raw = raw.replace(/\./g, '');
+                }
+            } else if (parts.length > 2) {
+                raw = raw.replace(/\./g, '');
+            }
+        }
+        
         const parsed = Number(raw);
         if (!Number.isFinite(parsed)) return 0;
         return isNegative && parsed > 0 ? -parsed : parsed;
