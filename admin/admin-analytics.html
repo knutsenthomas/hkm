@@ -924,6 +924,12 @@
         </div>
 
         <div class="analytics-container">
+            <!-- Global Diagnostic Banner -->
+            <div id="analytics-error-banner" style="display: none; background-color: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 16px 20px; border-radius: 12px; margin-bottom: 24px; font-size: 14px; font-weight: 600; align-items: center; gap: 12px; transition: all 0.3s ease;">
+                <span class="material-symbols-outlined" style="color: #ef4444;">error</span>
+                <span id="analytics-error-text">Noe gikk galt under lasting av statistikk.</span>
+            </div>
+
             <!-- Period Selector Row (8px spacing guidelines) -->
             <div class="analytics-header-row">
                 <h2 style="font-size: 18px; font-weight: 700; color: #1e293b; margin: 0;">Analyseoversikt</h2>
@@ -1394,6 +1400,40 @@
 
     <!-- Live Analytics Dashboard Logic -->
     <script type="module">
+        function showDashboardError(message, type = 'error') {
+            const banner = document.getElementById('analytics-error-banner');
+            const textEl = document.getElementById('analytics-error-text');
+            if (banner && textEl) {
+                textEl.textContent = message;
+                banner.style.display = 'flex';
+                const iconEl = banner.querySelector('.material-symbols-outlined');
+                if (type === 'warning') {
+                    banner.style.backgroundColor = '#fffbeb';
+                    banner.style.borderColor = '#fde047';
+                    banner.style.color = '#854d0e';
+                    if (iconEl) {
+                        iconEl.style.color = '#eab308';
+                        iconEl.textContent = 'warning';
+                    }
+                } else {
+                    banner.style.backgroundColor = '#fef2f2';
+                    banner.style.borderColor = '#fca5a5';
+                    banner.style.color = '#991b1b';
+                    if (iconEl) {
+                        iconEl.style.color = '#ef4444';
+                        iconEl.textContent = 'error';
+                    }
+                }
+            }
+        }
+
+        // Run immediately if firebase is undefined (e.g. adblocker)
+        if (typeof firebase === 'undefined') {
+            setTimeout(() => {
+                showDashboardError("Firebase SDK ble ikke lastet inn. Vennligst deaktiver eventuelle annonseblokkerere (AdBlocker / Brave Shields) for denne nettsiden, da de kan forhindre Google-tjenester i å fungere.");
+            }, 100);
+        }
+
         document.addEventListener('DOMContentLoaded', async () => {
             // Wait for Firebase to load and fetch actual real-time counts from collections
             setTimeout(async () => {
@@ -2089,11 +2129,21 @@
                                 if (aiAlertText) aiAlertText.textContent = `Det er ikke registrert noen henvisninger fra ChatGPT, Gemini, Claude eller Perplexity i denne perioden (0 av ${data.trafficSources ? data.trafficSources.reduce((acc, curr) => acc + (parseInt(curr.sessions) || 0), 0) : 0} sesjoner).`;
                             }
                         }
+                    } else {
+                        throw new Error(result.message || `Uventet API-status: ${result.status}`);
                     }
                 } catch (error) {
                     console.error("[Analytics] Feil under lasting av reell statistikk:", error);
                     pageviewsValEl.textContent = 'Feil';
                     engagementValEl.textContent = 'Feil';
+                    
+                    if (error.message.includes('403') || error.message.includes('Forbidden') || error.message.includes('permission')) {
+                        showDashboardError("Rettighetsfeil (403): Brukerkontoen din har ikke tilgang til å hente Google Analytics-data. Vennligst kontakt superadmin.");
+                    } else if (error.message.includes('unconfigured') || error.message.includes('mangler')) {
+                        showDashboardError("Google Analytics er ikke ferdig konfigurert i integrasjonsinnstillingene: " + error.message, 'warning');
+                    } else {
+                        showDashboardError("Kunne ikke laste statistikk: " + error.message);
+                    }
                 }
             }
 
@@ -2101,11 +2151,19 @@
             if (typeof firebase !== 'undefined') {
                 let authInitChecked = false;
                 firebase.auth().onAuthStateChanged((user) => {
-                    if (user && !authInitChecked) {
+                    if (user) {
                         authInitChecked = true;
+                        const banner = document.getElementById('analytics-error-banner');
+                        if (banner) banner.style.display = 'none';
                         loadRealAnalytics(7); // Hent siste 7 dager som standard
-                    } else if (!user) {
+                    } else {
                         clearAnalyticsToEmpty();
+                        // Delay login check to prevent initial blink
+                        setTimeout(() => {
+                            if (typeof firebase !== 'undefined' && !firebase.auth().currentUser) {
+                                showDashboardError("Du er ikke logget inn i Firebase. Vennligst logg inn på nytt for å se statistikk.", 'warning');
+                            }
+                        }, 2000);
                     }
                 });
             }
