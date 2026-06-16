@@ -2377,8 +2377,33 @@
                     'mandal': { lat: 58.0294, lon: 7.4534 },
                     'grimstad': { lat: 58.3405, lon: 8.5936 },
                     'lillehammer': { lat: 61.1153, lon: 10.4662 },
-                    'helsinki': { lat: 60.1699, lon: 24.9384 }
+                    // International cities
+                    'helsinki': { lat: 60.1699, lon: 24.9384 },
+                    'stockholm': { lat: 59.3293, lon: 18.0686 },
+                    'copenhagen': { lat: 55.6761, lon: 12.5683 },
+                    'københavn': { lat: 55.6761, lon: 12.5683 },
+                    'gothenburg': { lat: 57.7089, lon: 11.9746 },
+                    'göteborg': { lat: 57.7089, lon: 11.9746 },
+                    'malmö': { lat: 55.6050, lon: 13.0038 },
+                    'malmo': { lat: 55.6050, lon: 13.0038 },
+                    'london': { lat: 51.5074, lon: -0.1278 },
+                    'paris': { lat: 48.8566, lon: 2.3522 },
+                    'berlin': { lat: 52.5200, lon: 13.4050 },
+                    'new york': { lat: 40.7128, lon: -74.0060 },
+                    'washington': { lat: 38.9072, lon: -77.0369 },
+                    'chicago': { lat: 41.8781, lon: -87.6298 },
+                    'los angeles': { lat: 34.0522, lon: -118.2437 },
+                    'reykjavik': { lat: 64.1466, lon: -21.9426 },
+                    'reykjavík': { lat: 64.1466, lon: -21.9426 }
                 };
+
+                let hasForeignVisitors = false;
+                cities.forEach(c => {
+                    const country = c.country || '';
+                    if (country && country.toLowerCase() !== 'norway' && country.toLowerCase() !== 'no') {
+                        hasForeignVisitors = true;
+                    }
+                });
 
                 var chartData = [];
                 var hasCoordsData = false;
@@ -2389,7 +2414,8 @@
                         cityName = cityName.replace(/\s+municipality/i, '').trim();
                         const key = cityName.toLowerCase();
                         if (cityCoords[key]) {
-                            chartData.push([cityCoords[key].lat, cityCoords[key].lon, cityName, parseInt(c.users) || 0]);
+                            const countryName = c.country || 'Norway';
+                            chartData.push([cityCoords[key].lat, cityCoords[key].lon, cityName + ', ' + countryName, parseInt(c.users) || 0]);
                             hasCoordsData = true;
                         }
                     }
@@ -2414,7 +2440,7 @@
 
                 var dataTable = google.visualization.arrayToDataTable(chartData);
                 var options = {
-                    region: 'NO', // Zoom inn på Norge
+                    region: hasForeignVisitors ? 'world' : 'NO', // Zoom inn på Norge hvis kun Norge, ellers hele verden
                     displayMode: 'markers', // Vis byer som sirkler/markører
                     colorAxis: {colors: ['#e2e8f0', '#d17d39']}, 
                     backgroundColor: '#f8fafc',
