@@ -280,7 +280,7 @@ service cloud.firestore {
     // Donations recorded client-side after successful Stripe confirmation.
     // Note: this is create-only for public clients; consider moving fully to webhook-only writes.
     match /donations/{donationId} {
-      allow create: if validDonationCreate(donationId);
+      allow create: if isAdmin() || validDonationCreate(donationId);
       allow read: if isAdmin() || canReadOwnDonation();
       allow update, delete: if isAdmin();
     }
