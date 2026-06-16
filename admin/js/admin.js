@@ -13848,7 +13848,7 @@ class AdminManager {
             const giftCount = filtered.length;
             const completedCount = completed.length;
 
-            title = 'Årsoppgave over gaver';
+            title = 'Rapport over gaver';
             periodText = selectedYear === 'all' ? 'Hele historikken' : `Kalenderåret ${selectedYear}`;
 
             // Get address info if available
@@ -13928,26 +13928,7 @@ class AdminManager {
                 </div>
             `;
 
-            footerHtml = `
-                <div style="margin-top:50px; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px; font-size:12px; line-height:1.6; color:#475569;">
-                    <strong>Informasjon om skattefradrag:</strong><br>
-                    Dette er en offisiell oppgave over gaver gitt til His Kingdom Ministry i ${selectedYear === 'all' ? 'hele perioden' : selectedYear}. 
-                    Gaver til frivillige organisasjoner kan gi rett til skattefradrag etter skattelovens § 6-50. 
-                    Oppgavene rapporteres automatisk til Skatteetaten dersom fødselsnummer/organisasjonsnummer er registrert hos oss. 
-                    Ta vare på denne oppgaven som dokumentasjon for ditt regnskap.
-                </div>
-                
-                <div style="margin-top:60px; display:flex; justify-content:space-between; align-items:flex-end;">
-                    <div style="width:200px; border-bottom:1px solid #94a3b8; padding-bottom:8px; text-align:center;">
-                        <p style="margin:0; font-size:12px; color:#0f172a; font-weight:700;">Hilde Karin Knutsen</p>
-                        <p style="margin:2px 0 0; font-size:11px; color:#64748b;">His Kingdom Ministry</p>
-                    </div>
-                    <div style="width:200px; border-bottom:1px solid #94a3b8; padding-bottom:8px; text-align:center;">
-                        <p style="margin:0; font-size:12px; color:#0f172a; font-weight:700;">Thomas Knutsen</p>
-                        <p style="margin:2px 0 0; font-size:11px; color:#64748b;">His Kingdom Ministry</p>
-                    </div>
-                </div>
-            `;
+            footerHtml = '';
 
             title = donorMetaHeader + '<h2 style="margin:0 0 16px 0; font-size:18px; font-weight:700; color:#0f172a;">' + title + '</h2>';
         }
@@ -13962,7 +13943,7 @@ class AdminManager {
         printWindow.document.write(`
             <html>
             <head>
-                <title>${type === 'donor-statement' ? 'Årsoppgave' : title} - His Kingdom Ministry</title>
+                <title>${type === 'donor-statement' ? 'Rapport over gaver' : title} - His Kingdom Ministry</title>
                 <style>
                     body {
                         font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -13991,10 +13972,13 @@ class AdminManager {
 
                 <div style="padding: 20px; max-width: 1000px; margin: 0 auto;">
                     <!-- Logo & Header -->
-                    <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:3px solid #1B4965; padding-bottom:16px; margin-bottom:24px;">
-                        <div>
-                            <h1 style="margin:0; font-size:24px; font-weight:800; color:#1B4965; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
-                            <p style="margin:4px 0 0; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Regnskapsrapport &bull; Mandal Regnskapskontor</p>
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #1B4965; padding-bottom:16px; margin-bottom:24px;">
+                        <div style="display:flex; align-items:center; gap:16px;">
+                            <img src="/img/logo-hkm.png" alt="Logo" style="height:55px; width:auto; object-fit:contain; border-radius:4px;">
+                            <div>
+                                <h1 style="margin:0; font-size:24px; font-weight:800; color:#1B4965; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
+                                <p style="margin:4px 0 0; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Regnskapsrapport</p>
+                            </div>
                         </div>
                         <div style="text-align:right;">
                             <p style="margin:0; font-size:11px; color:#64748b;">Dato: ${new Date().toLocaleDateString('no-NO')}</p>
