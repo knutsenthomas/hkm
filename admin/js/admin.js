@@ -13457,6 +13457,7 @@ class AdminManager {
         if (summary) summary.textContent = '';
         if (saveBtn) saveBtn.disabled = true;
         this.pendingBankImportRows = [];
+        this.resetBankImportDropzone();
         modal.style.display = 'flex';
     }
 
@@ -13465,8 +13466,60 @@ class AdminManager {
         if (modal) modal.style.display = 'none';
     }
 
+    resetBankImportDropzone() {
+        const dropzone = document.getElementById('bank-import-dropzone');
+        if (!dropzone) return;
+        dropzone.innerHTML = `
+            <span class="material-symbols-outlined" style="font-size:48px; color:#1B4965;">cloud_upload</span>
+            <div>
+                <span style="font-weight:700; color:#1B4965; font-size:1rem;">Dra og slipp bankfilen her</span>
+                <span style="color:#64748b; font-size:0.875rem; display:block; margin-top:4px;">eller klikk for å velge fra filutforsker</span>
+            </div>
+            <span style="font-size:0.75rem; color:#94a3b8; line-height:1.5; margin-top:4px;">
+                Støtter vanlige CSV-filer (inkludert Vipps) og ISO 20022 CAMT XML.
+            </span>
+        `;
+        dropzone.style.borderColor = '#cbd5e1';
+        dropzone.style.background = '#f8fafc';
+    }
+
+    updateBankImportDropzone(fileName) {
+        const dropzone = document.getElementById('bank-import-dropzone');
+        if (!dropzone) return;
+        dropzone.innerHTML = `
+            <span class="material-symbols-outlined" style="font-size:48px; color:#10b981;">check_circle</span>
+            <div>
+                <span style="font-weight:700; color:#0f172a; font-size:1rem;">Fil valgt: ${this.escapeHtml(fileName)}</span>
+                <span style="color:#d17d39; font-size:0.875rem; display:block; margin-top:4px; font-weight:600;">Klikk eller dra en ny fil hit for å erstatte</span>
+            </div>
+            <span style="font-size:0.75rem; color:#64748b; line-height:1.5; margin-top:4px;">
+                Klar til import! Se forhåndsvisning under.
+            </span>
+        `;
+        dropzone.style.borderColor = '#10b981';
+        dropzone.style.background = '#f0fdf4';
+    }
+
+    showBankImportDropzoneError(errorMessage) {
+        const dropzone = document.getElementById('bank-import-dropzone');
+        if (!dropzone) return;
+        dropzone.innerHTML = `
+            <span class="material-symbols-outlined" style="font-size:48px; color:#ef4444;">error</span>
+            <div>
+                <span style="font-weight:700; color:#ef4444; font-size:1rem;">Feil ved lesing av fil</span>
+                <span style="color:#d17d39; font-size:0.875rem; display:block; margin-top:4px; font-weight:600;">Klikk eller dra en ny fil hit for å prøve igjen</span>
+            </div>
+            <span style="font-size:0.75rem; color:#64748b; line-height:1.5; margin-top:4px;">
+                ${this.escapeHtml(errorMessage)}
+            </span>
+        `;
+        dropzone.style.borderColor = '#ef4444';
+        dropzone.style.background = '#fef2f2';
+    }
+
     async handleBankImportFile(file) {
         if (!file) return;
+        this.updateBankImportDropzone(file.name);
         const preview = document.getElementById('bank-import-preview');
         const summary = document.getElementById('bank-import-summary');
         const saveBtn = document.getElementById('save-bank-import-btn');
@@ -13498,6 +13551,7 @@ class AdminManager {
         } catch (error) {
             console.error('Bank import parse failed:', error);
             this.pendingBankImportRows = [];
+            this.showBankImportDropzoneError(error.message || 'Ukjent feil');
             if (preview) preview.innerHTML = `<div style="padding:24px;text-align:center;color:#991b1b;">Kunne ikke lese filen: ${this.escapeHtml(error.message || 'Ukjent feil')}</div>`;
             if (summary) summary.textContent = '';
         }
@@ -13886,6 +13940,38 @@ class AdminManager {
             if (customDates) customDates.style.display = 'none';
             this.renderDonationAdminViews();
         });
+
+        // Drag & Drop listeners for Premium Bank Import Dropzone
+        const dropzone = document.getElementById('bank-import-dropzone');
+        const fileInput = document.getElementById('bank-import-file');
+        if (dropzone && fileInput) {
+            dropzone.addEventListener('click', () => fileInput.click());
+
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.style.borderColor = '#1B4965';
+                dropzone.style.background = '#f0f4f8';
+            });
+
+            dropzone.addEventListener('dragleave', () => {
+                const hasFile = fileInput.files && fileInput.files.length > 0;
+                dropzone.style.borderColor = hasFile ? '#10b981' : '#cbd5e1';
+                dropzone.style.background = hasFile ? '#f0fdf4' : '#f8fafc';
+            });
+
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                const file = e.dataTransfer?.files?.[0];
+                if (file) {
+                    fileInput.files = e.dataTransfer.files;
+                    this.handleBankImportFile(file);
+                } else {
+                    const hasFile = fileInput.files && fileInput.files.length > 0;
+                    dropzone.style.borderColor = hasFile ? '#10b981' : '#cbd5e1';
+                    dropzone.style.background = hasFile ? '#f0fdf4' : '#f8fafc';
+                }
+            });
+        }
     }
 
     async renderCausesManager() {
@@ -14228,12 +14314,19 @@ class AdminManager {
                         <button class="modal-close" type="button" onclick="window.adminManager?.closeBankImportModal?.()">×</button>
                     </div>
                     <div class="modal-body" style="display:grid;gap:16px; padding:24px 32px;">
-                        <div class="form-group" style="margin:0; display:flex; flex-direction:column; gap:8px;">
-                            <label style="display:block; font-weight:600; color:#334155; font-size:0.875rem; margin:0;">Bankfil</label>
-                            <input id="bank-import-file" class="form-control" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml" style="width:100%;">
-                            <p style="margin:2px 0 0; font-size:0.75rem; color:#64748b; line-height:1.5;">
-                                Støtter vanlige CSV-filer og ISO 20022 CAMT XML.
-                            </p>
+                        <div class="form-group" style="margin:0;">
+                            <label style="display:block; font-weight:600; color:#334155; font-size:0.875rem; margin-bottom:12px;">Bankfil</label>
+                            <input id="bank-import-file" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml" style="display:none;">
+                            <div id="bank-import-dropzone" style="border:2px dashed #cbd5e1; border-radius:12px; padding:32px 24px; text-align:center; background:#f8fafc; cursor:pointer; transition:all 0.2s ease-in-out; display:flex; flex-direction:column; align-items:center; gap:12px;" onmouseover="this.style.borderColor='#1B4965'; this.style.background='#f0f4f8';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.background='#f8fafc';">
+                                <span class="material-symbols-outlined" style="font-size:48px; color:#1B4965;">cloud_upload</span>
+                                <div>
+                                    <span style="font-weight:700; color:#1B4965; font-size:1rem;">Dra og slipp bankfilen her</span>
+                                    <span style="color:#64748b; font-size:0.875rem; display:block; margin-top:4px;">eller klikk for å velge fra filutforsker</span>
+                                </div>
+                                <span style="font-size:0.75rem; color:#94a3b8; line-height:1.5; margin-top:4px;">
+                                    Støtter vanlige CSV-filer (inkludert Vipps) og ISO 20022 CAMT XML.
+                                </span>
+                            </div>
                         </div>
                         <div id="bank-import-summary" style="font-size:13px;color:#475569;font-weight:700;"></div>
                         <div id="bank-import-preview">
