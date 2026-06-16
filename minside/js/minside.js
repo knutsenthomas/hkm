@@ -1059,6 +1059,7 @@ class MinSideManager {
             type: typeof raw.type === 'string' && raw.type.trim() ? raw.type.trim().toLowerCase() : 'default',
             link: typeof raw.link === 'string' ? raw.link : '',
             read: raw.read === true,
+            archived: raw.archived === true,
             createdAt: raw.createdAt || null,
         };
     }
@@ -2462,6 +2463,10 @@ class MinSideManager {
         const uid = this.currentUser?.uid;
         const activeFilter = this._notifFilter || 'all';
 
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+        const filterArchivedLabel = isNo ? 'Arkivert' : (isEs ? 'Archivado' : 'Archived');
+
         const iconMap = {
             push:    { icon: 'campaign',      cls: 'activity-icon-tone-push' },
             message: { icon: 'mail',          cls: 'activity-icon-tone-message' },
@@ -2473,6 +2478,7 @@ class MinSideManager {
             { id: 'unread',  label: t('notifications.filterUnread')  || 'Ulest' },
             { id: 'push',    label: t('notifications.filterPush')    || 'Push' },
             { id: 'message', label: t('notifications.filterMessage') || 'Meldinger' },
+            { id: 'archived', label: filterArchivedLabel }
         ];
 
         container.innerHTML = `
@@ -2502,9 +2508,15 @@ class MinSideManager {
 
         const renderList = (allItems) => {
             let items = allItems;
-            if (activeFilter === 'unread')  items = allItems.filter(n => !n.read);
-            if (activeFilter === 'push')    items = allItems.filter(n => n.type === 'push');
-            if (activeFilter === 'message') items = allItems.filter(n => n.type === 'message');
+            
+            if (activeFilter === 'archived') {
+                items = allItems.filter(n => n.archived);
+            } else {
+                items = allItems.filter(n => !n.archived);
+                if (activeFilter === 'unread')  items = items.filter(n => !n.read);
+                if (activeFilter === 'push')    items = items.filter(n => n.type === 'push');
+                if (activeFilter === 'message') items = items.filter(n => n.type === 'message');
+            }
 
             if (items.length === 0) {
                 inner.innerHTML = `<div class="empty-state">
@@ -2519,21 +2531,43 @@ class MinSideManager {
                 const date = n.createdAt?.toDate ? n.createdAt.toDate() : new Date(0);
                 const m = iconMap[n.type] || iconMap.default;
                 const iconCls = !n.read ? 'activity-icon-tone-notif-unread' : m.cls;
-                return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}" style="cursor:pointer;">
-                    <div class="activity-icon ${iconCls}">
+                
+                const archiveIcon = n.archived ? 'unarchive' : 'archive';
+                const archiveTitle = n.archived 
+                    ? (isNo ? 'Legg tilbake i innkurv' : (isEs ? 'Desarchivar' : 'Unarchive')) 
+                    : (isNo ? 'Arkiver varsel' : (isEs ? 'Archivar' : 'Archive'));
+                const deleteTitle = isNo ? 'Slett permanent' : (isEs ? 'Eliminar permanentemente' : 'Delete permanently');
+
+                return `<div class="activity-item${!n.read ? ' unread' : ''}" data-id="${n.id}" style="cursor:pointer; display:flex; align-items:center; width:100%; position:relative;">
+                    <div class="activity-icon ${iconCls}" style="flex-shrink:0;">
                         <span class="material-symbols-outlined">${m.icon}</span>
                     </div>
-                    <div class="activity-content">
-                        <div class="activity-title">${n.title}</div>
-                        ${n.body ? `<div class="activity-body">${n.body}</div>` : ''}
-                        <div class="activity-time">${this._timeAgo(date)}</div>
+                    <div class="activity-content" style="flex:1; min-width:0; margin-right:12px;">
+                        <div class="activity-title" style="font-weight:700; color:var(--text-main); font-size:14px;">${this._escapeHtml(n.title)}</div>
+                        ${n.body ? `<div class="activity-body" style="font-size:13px; color:var(--text-muted); margin-top:2px;">${this._escapeHtml(n.body)}</div>` : ''}
+                        <div class="activity-time" style="font-size:11px; color:var(--text-muted); margin-top:4px;">${this._timeAgo(date)}</div>
                     </div>
-                    ${!n.read ? `<div class="ms-unread-dot"></div>` : ''}
+                    
+                    <div class="activity-right-section" style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                        ${!n.read ? `<div class="ms-unread-dot" style="margin-right:4px;"></div>` : ''}
+                        
+                        <div class="notif-actions" style="display:flex; gap:4px; align-items:center;">
+                            <button type="button" class="btn-archive-notif" data-id="${n.id}" title="${archiveTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important;">${archiveIcon}</span>
+                            </button>
+                            <button type="button" class="btn-delete-notif" data-id="${n.id}" title="${deleteTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; transform: translateY(2.5px) !important; color:#ef4444 !important; margin:0 !important;">delete</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>`;
             }).join('');
 
+            // Bind click to open detail modal (but NOT when clicking action buttons)
             inner.querySelectorAll('.activity-item').forEach(el => {
-                el.addEventListener('click', () => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('.notif-actions')) return;
+                    
                     const notif = items.find(n => n.id === el.dataset.id);
                     if (notif) this.showNotificationModal(notif);
                     if (notif && !notif.read) {
@@ -2551,6 +2585,70 @@ class MinSideManager {
                     }
                 });
             });
+
+            // Bind action buttons hover
+            inner.querySelectorAll('.btn-archive-notif, .btn-delete-notif').forEach(btn => {
+                btn.addEventListener('mouseenter', () => {
+                    btn.style.backgroundColor = 'var(--border-solid)';
+                    if (!btn.classList.contains('btn-delete-notif')) {
+                        btn.style.color = 'var(--text-main)';
+                    }
+                });
+                btn.addEventListener('mouseleave', () => {
+                    btn.style.backgroundColor = 'transparent';
+                    if (!btn.classList.contains('btn-delete-notif')) {
+                        btn.style.color = 'var(--text-muted)';
+                    }
+                });
+            });
+
+            // Bind archive click
+            inner.querySelectorAll('.btn-archive-notif').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const notifId = btn.dataset.id;
+                    const notif = allItems.find(n => n.id === notifId);
+                    if (!notif) return;
+                    
+                    const newArchivedState = !notif.archived;
+                    try {
+                        await firebase.firestore().collection('user_notifications').doc(notifId)
+                            .update({ archived: newArchivedState });
+                        
+                        const msg = newArchivedState 
+                            ? (isNo ? 'Melding arkivert' : (isEs ? 'Mensaje archivado' : 'Message archived'))
+                            : (isNo ? 'Melding flyttet til innkurv' : (isEs ? 'Mensaje movido a la bandeja de entrada' : 'Message moved to inbox'));
+                        this._notify(msg, 'success');
+                        
+                        this.renderNotifications(container);
+                    } catch (err) {
+                        console.error('Error archiving notification:', err);
+                        this._notify(isNo ? 'Kunne ikke arkivere melding' : (isEs ? 'Error al archivar' : 'Failed to archive message'), 'warning');
+                    }
+                });
+            });
+
+            // Bind delete click
+            inner.querySelectorAll('.btn-delete-notif').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const notifId = btn.dataset.id;
+                    const confirmMsg = isNo 
+                        ? 'Vil du slette denne meldingen permanent?' 
+                        : (isEs ? '¿Eliminar este mensaje permanentemente?' : 'Delete this message permanently?');
+                    
+                    if (confirm(confirmMsg)) {
+                        try {
+                            await firebase.firestore().collection('user_notifications').doc(notifId).delete();
+                            this._notify(isNo ? 'Melding slettet' : (isEs ? 'Mensaje de alerta eliminado' : 'Message deleted'), 'success');
+                            this.renderNotifications(container);
+                        } catch (err) {
+                            console.error('Error deleting notification:', err);
+                            this._notify(isNo ? 'Kunne ikke slette melding' : (isEs ? 'Error al eliminar' : 'Failed to delete message'), 'warning');
+                        }
+                    }
+                });
+            });
         };
 
         try {
@@ -2562,7 +2660,7 @@ class MinSideManager {
                 .get();
 
             const allItems = snap.docs.map(d => this._normalizeNotificationDoc(d));
-            const unreadItems = allItems.filter(n => !n.read);
+            const unreadItems = allItems.filter(n => !n.read && !n.archived);
 
             // Show unread count badge on Ulest tab
             const unreadBadge = container.querySelector('#unread-count-badge');
@@ -2649,80 +2747,359 @@ class MinSideManager {
         } catch (e) { }
         this.currentGivingDonations = donations;
 
-        const currentYear = new Date().getFullYear();
-        const yearTotal = donations.filter(d => this._getDonationDate(d)?.getFullYear?.() === currentYear)
-            .reduce((s, d) => s + this._normalizeDonationAmountNok(d), 0);
-        const lastGift = donations[0];
-        const lastGiftAmount = lastGift ? this._normalizeDonationAmountNok(lastGift) : 0;
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+        const allTypesLabel = isNo ? 'Alle typer' : (isEs ? 'Todos los tipos' : 'All types');
+        const allYearsLabel = isNo ? 'Alle år' : (isEs ? 'Todos los años' : 'All years');
+        const printReportLabel = isNo ? 'Skriv ut rapport' : (isEs ? 'Imprimir informe' : 'Print report');
+        const typeGiftLabel = isNo ? 'Gave' : (isEs ? 'Ofrenda' : 'Gift');
+        const typeShopLabel = isNo ? 'Butikk' : (isEs ? 'Tienda' : 'Shop');
+
+        // Extract years dynamically from donations list
+        const years = new Set();
+        donations.forEach(d => {
+            const date = this._getDonationDate(d);
+            if (date && !isNaN(date.getFullYear())) {
+                years.add(date.getFullYear());
+            }
+        });
+        const yearsList = Array.from(years).sort((a, b) => b - a);
+
+        let selectedType = 'all';
+        let selectedYear = 'all';
+
+        const updateGivingView = () => {
+            const filtered = donations.filter(d => {
+                const date = this._getDonationDate(d);
+                const year = date ? date.getFullYear() : null;
+                const matchesYear = (selectedYear === 'all' || String(year) === selectedYear);
+                
+                const type = (d.type || 'Gave').toLowerCase();
+                const matchesType = (selectedType === 'all' || 
+                    (selectedType === 'gave' && type === 'gave') || 
+                    (selectedType === 'butikk' && type === 'butikk'));
+                
+                return matchesYear && matchesType;
+            });
+
+            // Update stats chips
+            const currentYear = new Date().getFullYear();
+            const statsYear = selectedYear === 'all' ? currentYear : parseInt(selectedYear);
+            const yearTotal = donations.filter(d => {
+                const date = this._getDonationDate(d);
+                return date && date.getFullYear() === statsYear && (d.type || 'Gave').toLowerCase() === 'gave';
+            }).reduce((s, d) => s + this._normalizeDonationAmountNok(d), 0);
+
+            const stat1Label = container.querySelector('#giving-stat-year-label');
+            const stat1Value = container.querySelector('#giving-stat-year-value');
+            if (stat1Label) {
+                stat1Label.textContent = t('giving.givenInYear', { year: statsYear });
+            }
+            if (stat1Value) {
+                stat1Value.textContent = yearTotal > 0 ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}` : '—';
+            }
+
+            const filteredGiftsOnly = filtered.filter(d => (d.type || 'Gave').toLowerCase() === 'gave');
+            const lastGift = filteredGiftsOnly[0];
+            const lastGiftAmount = lastGift ? this._normalizeDonationAmountNok(lastGift) : 0;
+            const stat2Value = container.querySelector('#giving-stat-last-value');
+            const stat2Sub = container.querySelector('#giving-stat-last-sub');
+            if (stat2Value) {
+                stat2Value.textContent = lastGift ? `kr ${lastGiftAmount.toLocaleString('no-NO')}` : '—';
+            }
+            if (stat2Sub) {
+                stat2Sub.textContent = lastGift ? (this._getDonationDate(lastGift)?.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO') || '') : '';
+            }
+
+            const stat3Value = container.querySelector('#giving-stat-count-value');
+            if (stat3Value) {
+                stat3Value.textContent = filtered.length || '—';
+            }
+
+            const tableContainer = container.querySelector('#giving-table-wrapper');
+            if (tableContainer) {
+                if (filtered.length === 0) {
+                    tableContainer.innerHTML = `
+                        <div class="empty-state ms-empty-state-giving" style="padding: 40px 20px; text-align: center;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: var(--text-muted); margin-bottom: 12px;">volunteer_activism</span>
+                            <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">${t('giving.noGiftsYet')}</h3>
+                            <p style="font-size: 0.9rem; color: var(--text-muted);">${t('giving.noGiftsSub')}</p>
+                        </div>
+                    `;
+                } else {
+                    tableContainer.innerHTML = `
+                        <div class="table-responsive">
+                            <table class="data-table" style="width: 100%; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>${t('giving.colDate')}</th>
+                                        <th>${t('giving.colType')}</th>
+                                        <th>${t('giving.colMethod')}</th>
+                                        <th class="text-right">${t('giving.colAmount')}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${filtered.map(d => {
+                                        const date = this._getDonationDate(d) || new Date();
+                                        const amountNok = this._normalizeDonationAmountNok(d);
+                                        const typeStr = (d.type || 'Gave');
+                                        const typeLabel = typeStr.charAt(0).toUpperCase() + typeStr.slice(1);
+                                        return `<tr class="donation-row" data-donation-id="${this._escapeHtml(d.id)}" tabindex="0" style="cursor: pointer;">
+                                            <td>${date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
+                                            <td>${this._escapeHtml(typeLabel)}</td>
+                                            <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
+                                            <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
+                                        </tr>`;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    `;
+
+                    tableContainer.querySelectorAll('.donation-row').forEach(row => {
+                        const open = () => this.showDonationDetails(row.dataset.donationId);
+                        row.addEventListener('click', open);
+                        row.addEventListener('keydown', (event) => {
+                            if (event.key === 'Enter' || event.key === ' ') {
+                                event.preventDefault();
+                                open();
+                            }
+                        });
+                    });
+                }
+            }
+        };
 
         container.innerHTML = `
         <div>
             <div class="giving-stats">
                 <div class="stat-chip">
-                    <div class="stat-chip-label">${t('giving.givenInYear', { year: currentYear })}</div>
-                    <div class="stat-chip-value">${yearTotal > 0 ? `kr ${yearTotal.toLocaleString('no-NO', { minimumFractionDigits: 0 })}` : '—'}</div>
+                    <div class="stat-chip-label" id="giving-stat-year-label">${t('giving.givenInYear', { year: new Date().getFullYear() })}</div>
+                    <div class="stat-chip-value" id="giving-stat-year-value">—</div>
                 </div>
                 <div class="stat-chip">
                     <div class="stat-chip-label">${t('giving.lastGift')}</div>
-                    <div class="stat-chip-value">${lastGift ? `kr ${lastGiftAmount.toLocaleString('no-NO')}` : '—'}</div>
-                    <div class="stat-chip-sub">${lastGift ? (this._getDonationDate(lastGift)?.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO') || '') : ''}</div>
+                    <div class="stat-chip-value" id="giving-stat-last-value">—</div>
+                    <div class="stat-chip-sub" id="giving-stat-last-sub"></div>
                 </div>
                 <div class="stat-chip">
                     <div class="stat-chip-label">${t('giving.totalGiftsCount')}</div>
-                    <div class="stat-chip-value">${donations.length || '—'}</div>
+                    <div class="stat-chip-value" id="giving-stat-count-value">—</div>
                 </div>
             </div>
 
             <div class="table-card">
-                <div class="table-card-header">
-                    <h3>${t('giving.givingHistory')}</h3>
+                <div class="table-card-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; padding: 12px 20px;">
+                    <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: var(--text-main);">${t('giving.givingHistory')}</h3>
+                    
+                    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                        <select id="giving-type-filter" class="form-control" style="font-size:12px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; border:1.5px solid var(--border-solid); background:var(--card-bg); color:var(--text-main); font-weight:600; width:110px; cursor:pointer; margin:0;">
+                            <option value="all">${allTypesLabel}</option>
+                            <option value="gave">${typeGiftLabel}</option>
+                            <option value="butikk">${typeShopLabel}</option>
+                        </select>
+                        <select id="giving-year-filter" class="form-control" style="font-size:12px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; border:1.5px solid var(--border-solid); background:var(--card-bg); color:var(--text-main); font-weight:600; width:100px; cursor:pointer; margin:0;">
+                            <option value="all">${allYearsLabel}</option>
+                            ${yearsList.map(y => `<option value="${y}">${y}</option>`).join('')}
+                        </select>
+                        <button type="button" class="btn btn-ghost" id="giving-print-report-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 12px !important; border-radius:6px !important; font-size:12px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; cursor:pointer !important; transform-origin: center !important; margin:0;">
+                            <span class="material-symbols-outlined" style="font-size:16px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important; margin-right:4px !important;">print</span>
+                            <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">${printReportLabel}</span>
+                        </button>
+                    </div>
                 </div>
-                ${donations.length === 0 ? `
-                    <div class="empty-state ms-empty-state-giving">
-                        <span class="material-symbols-outlined">volunteer_activism</span>
-                        <h3>${t('giving.noGiftsYet')}</h3>
-                        <p>${t('giving.noGiftsSub')}</p>
-                    </div>
-                ` : `
-                    <div class="table-responsive">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>${t('giving.colDate')}</th>
-                                    <th>${t('giving.colType')}</th>
-                                    <th>${t('giving.colMethod')}</th>
-                                    <th class="text-right">${t('giving.colAmount')}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${donations.map(d => {
-            const date = this._getDonationDate(d) || new Date();
-            const amountNok = this._normalizeDonationAmountNok(d);
-            return `<tr class="donation-row" data-donation-id="${this._escapeHtml(d.id)}" tabindex="0">
-                                        <td>${date.toLocaleDateString(document.documentElement.lang === 'en' ? 'en-US' : document.documentElement.lang === 'es' ? 'es-ES' : 'no-NO', { day: '2-digit', month: 'short', year: 'numeric' })}</td>
-                                        <td>${this._escapeHtml(d.type || t('giving.typeGift'))}</td>
-                                        <td><span class="method-tag">${this._escapeHtml(this._getDonationMethodLabel(d.method || 'Kort'))}</span></td>
-                                        <td class="text-right"><strong>kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</strong></td>
-                                    </tr>`;
-        }).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                `}
+                <div id="giving-table-wrapper"></div>
             </div>
-
         </div>`;
 
-        container.querySelectorAll('.donation-row').forEach(row => {
-            const open = () => this.showDonationDetails(row.dataset.donationId);
-            row.addEventListener('click', open);
-            row.addEventListener('keydown', (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    open();
-                }
+        const typeFilter = container.querySelector('#giving-type-filter');
+        const yearFilter = container.querySelector('#giving-year-filter');
+        const printBtn = container.querySelector('#giving-print-report-btn');
+
+        if (typeFilter) {
+            typeFilter.addEventListener('change', (e) => {
+                selectedType = e.target.value;
+                updateGivingView();
             });
+        }
+        if (yearFilter) {
+            yearFilter.addEventListener('change', (e) => {
+                selectedYear = e.target.value;
+                updateGivingView();
+            });
+        }
+        if (printBtn) {
+            printBtn.addEventListener('click', () => {
+                this.printGivingReport(selectedType, selectedYear);
+            });
+        }
+
+        updateGivingView();
+    }
+
+    printGivingReport(selectedType, selectedYear) {
+        const donations = this.currentGivingDonations || [];
+        const filtered = donations.filter(d => {
+            const date = this._getDonationDate(d);
+            const year = date ? date.getFullYear() : null;
+            const matchesYear = (selectedYear === 'all' || String(year) === selectedYear);
+            
+            const type = (d.type || 'Gave').toLowerCase();
+            const matchesType = (selectedType === 'all' || 
+                (selectedType === 'gave' && type === 'gave') || 
+                (selectedType === 'butikk' && type === 'butikk'));
+            
+            return matchesYear && matchesType;
         });
+
+        const totalSum = filtered.reduce((s, d) => s + this._normalizeDonationAmountNok(d), 0);
+
+        const isNo = document.documentElement.lang === 'no' || !document.documentElement.lang;
+        const isEs = document.documentElement.lang === 'es';
+        const title = isNo ? 'Gaveoversikt' : (isEs ? 'Resumen de Ofrendas' : 'Donation Overview');
+        const subtitle = isNo ? 'Min gaveoversikt' : (isEs ? 'Mi historial de ofrendas' : 'My giving overview');
+        const dateLabel = isNo ? 'Dato' : (isEs ? 'Fecha' : 'Date');
+        const typeLabelStr = isNo ? 'Type' : (isEs ? 'Tipo' : 'Type');
+        const methodLabelStr = isNo ? 'Metode' : (isEs ? 'Método' : 'Method');
+        const amountLabelStr = isNo ? 'Beløp' : (isEs ? 'Monto' : 'Amount');
+        const totalLabelStr = isNo ? 'Total sum' : (isEs ? 'Suma total' : 'Total sum');
+        const periodLabelStr = isNo ? 'Periode' : (isEs ? 'Periodo' : 'Period');
+        const filterLabelStr = isNo ? 'Filter' : (isEs ? 'Filtro' : 'Filter');
+        const countLabelStr = isNo ? 'Antall poster' : (isEs ? 'Registros' : 'Record count');
+        const noTransLabel = isNo ? 'Ingen transaksjoner funnet.' : (isEs ? 'No se encontraron transacciones.' : 'No transactions found.');
+        const docLabel = isNo ? 'Dette dokumentet viser dine registrerte gaver og betalinger hos His Kingdom Ministry.' : (isEs ? 'Este documento muestra sus ofrendas y pagos registrados en His Kingdom Ministry.' : 'This document shows your registered donations and payments with His Kingdom Ministry.');
+        const previewLabel = isNo ? 'Dette er en forhåndsvisning av din gaveoversikt. Bruk utskriftsknappen eller Ctrl+P/Cmd+P for å lagre som PDF / skrive ut.' : (isEs ? 'Esta es una vista previa de su historial de ofrendas. Use el botón de impresión o Ctrl+P/Cmd+P para guardar como PDF / imprimir.' : 'This is a preview of your donation overview. Use the print button or Ctrl+P/Cmd+P to save as PDF / print.');
+        const printBtnLabel = isNo ? 'Skriv ut / PDF' : (isEs ? 'Imprimir / PDF' : 'Print / PDF');
+
+        const periodText = selectedYear === 'all' ? (isNo ? 'Alle år' : (isEs ? 'Todos los años' : 'All years')) : `${selectedYear}`;
+        const typeText = selectedType === 'all' ? (isNo ? 'Alle transaksjoner' : (isEs ? 'Todas las transacciones' : 'All transactions')) : (selectedType === 'gave' ? (isNo ? 'Kun gaver' : (isEs ? 'Solo ofrendas' : 'Donations only')) : (isNo ? 'Kun butikkjøp' : (isEs ? 'Solo tienda' : 'Shop purchases only')));
+
+        const userName = this.profileData?.fullName || this.currentUser?.displayName || (isNo ? 'Medlem' : (isEs ? 'Miembro' : 'Member'));
+        const userEmail = this.currentUser?.email || '';
+        const userAddress = [
+            this.profileData?.adresse,
+            [this.profileData?.postnummer, this.profileData?.poststed].filter(Boolean).join(' '),
+            this.profileData?.land
+        ].filter(Boolean).join(', ') || (isNo ? 'Ingen registrert adresse' : (isEs ? 'Sin dirección registrada' : 'No registered address'));
+
+        const printWindow = window.open('', '_blank');
+        if (!printWindow) {
+            this._notify('Popup-blokkerer forhindret åpning av utskriftsvinduet. Vennligst tillat popups.', 'warning');
+            return;
+        }
+
+        const rowsHtml = filtered.map(d => {
+            const date = this._getDonationDate(d) || new Date();
+            const amountNok = this._normalizeDonationAmountNok(d);
+            const typeStr = (d.type || 'Gave');
+            const typeLabel = typeStr.charAt(0).toUpperCase() + typeStr.slice(1);
+            const methodLabel = this._getDonationMethodLabel(d.method || 'Kort');
+            
+            return `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:8px; font-size:11px; color:#334155;">${date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+                    <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:600;">${typeLabel}</td>
+                    <td style="padding:8px; font-size:11px; color:#475569;">${methodLabel}</td>
+                    <td style="padding:8px; font-size:11px; color:#0f172a; font-weight:700; text-align:right;">kr ${amountNok.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</td>
+                </tr>
+            `;
+        }).join('');
+
+        printWindow.document.write(`
+            <html>
+            <head>
+                <title>${title} - His Kingdom Ministry</title>
+                <style>
+                    body {
+                        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                        color: #1e293b;
+                        background: white;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    @media print {
+                        body {
+                            padding: 0;
+                        }
+                        .no-print {
+                            display: none !important;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="no-print" style="margin-bottom:20px; padding:12px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:13px; color:#475569; font-weight:500;">${previewLabel}</span>
+                    <button onclick="window.print()" style="background:#1B4965; color:white; border:none; padding:8px 16px; border-radius:6px; font-weight:600; cursor:pointer; font-size:13px;">
+                        ${printBtnLabel}
+                    </button>
+                </div>
+
+                <div style="padding: 20px; max-width: 800px; margin: 0 auto;">
+                    <!-- Logo & Header -->
+                    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #1B4965; padding-bottom:16px; margin-bottom:24px;">
+                        <div style="display:flex; align-items:center; gap:16px;">
+                            <img src="/img/logo-hkm.png" alt="Logo" style="height:55px; width:auto; object-fit:contain; border-radius:4px;">
+                            <div>
+                                <h1 style="margin:0; font-size:24px; font-weight:800; color:#1B4965; letter-spacing:-0.02em;">HIS KINGDOM MINISTRY</h1>
+                                <p style="margin:4px 0 0; font-size:11px; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">${subtitle}</p>
+                            </div>
+                        </div>
+                        <div style="text-align:right;">
+                            <p style="margin:0; font-size:11px; color:#64748b;">Dato: ${new Date().toLocaleDateString('no-NO')}</p>
+                        </div>
+                    </div>
+
+                    <!-- Member Info & Meta -->
+                    <div style="display:flex; justify-content:space-between; margin-bottom:24px; gap:20px;">
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px;">
+                            <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Giver</h3>
+                            <p style="margin:0; font-size:14px; font-weight:700; color:#0f172a;">${this._escapeHtml(userName)}</p>
+                            ${userEmail ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userEmail)}</p>` : ''}
+                            ${userAddress && userAddress !== 'Ingen registrert adresse' && userAddress !== 'Sin dirección registrada' && userAddress !== 'No registered address' ? `<p style="margin:4px 0 0; font-size:12px; color:#475569;">${this._escapeHtml(userAddress)}</p>` : ''}
+                        </div>
+                        <div style="flex:1; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px;">
+                            <h3 style="margin:0 0 8px 0; font-size:12px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Rapportinfo</h3>
+                            <p style="margin:0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${periodLabelStr}:</strong> ${periodText}</p>
+                            <p style="margin:4px 0 0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${filterLabelStr}:</strong> ${typeText}</p>
+                            <p style="margin:4px 0 0; font-size:13px; color:#334155;"><strong style="color:#0f172a;">${countLabelStr}:</strong> ${filtered.length}</p>
+                        </div>
+                    </div>
+
+                    <!-- Main Table -->
+                    <table style="width:100%; border-collapse:collapse; margin-bottom:32px;">
+                        <thead>
+                            <tr style="border-bottom:2px solid #1B4965; text-align:left;">
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase;">${dateLabel}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase;">${typeLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase;">${methodLabelStr}</th>
+                                <th style="padding:10px 8px; font-size:11px; font-weight:700; color:#1B4965; text-transform:uppercase; text-align:right;">${amountLabelStr}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${rowsHtml || `<tr><td colspan="4" style="padding:24px; text-align:center; color:#64748b;">${noTransLabel}</td></tr>`}
+                        </tbody>
+                    </table>
+
+                    <!-- Total Block -->
+                    <div style="display:flex; justify-content:flex-end; margin-bottom:40px;">
+                        <div style="background:#1B4965; color:white; padding:12px 24px; border-radius:8px; text-align:right; min-width:200px;">
+                            <span style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.05em; opacity:0.85;">${totalLabelStr}</span>
+                            <div style="font-size:22px; font-weight:800; margin-top:2px;">kr ${totalSum.toLocaleString('no-NO', { minimumFractionDigits: 2 })}</div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Details -->
+                    <div style="border-top:1px dashed #cbd5e1; padding-top:20px; text-align:center; color:#64748b; font-size:11px; line-height:1.5;">
+                        <p style="margin:0; font-weight:600; color:#475569;">His Kingdom Ministry</p>
+                        <p style="margin:2px 0 0;">Org.nr: 928 290 839 | E-post: post@hkm.no | Web: www.hkm.no</p>
+                        <p style="margin:4px 0 0; font-style:italic;">${docLabel}</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `);
+        printWindow.document.close();
     }
 
     showDonationDetails(donationId) {
