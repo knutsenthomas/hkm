@@ -12911,7 +12911,7 @@ class AdminManager {
                        </button>`;
                 return `
                     <tr>
-                        <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
+                        <td style="white-space: nowrap;">${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
                         <td style="white-space: nowrap;">
                             <div style="display:flex; align-items:center; gap:6px;">
                                 <strong>${name}</strong>
@@ -13024,7 +13024,7 @@ class AdminManager {
                        </button>`;
                 return `
                     <tr>
-                        <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
+                        <td style="white-space: nowrap;">${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
                         <td style="white-space: nowrap;">
                             <strong>${name}</strong>
                             <div style="font-size:12px;color:#64748b;">${email}</div>
