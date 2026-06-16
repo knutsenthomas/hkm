@@ -12670,8 +12670,14 @@ class AdminManager {
                 const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
                 const method = this.escapeHtml(this.getDonationMethodLabel(record.method));
                 const profileStatus = record.userId
-                    ? `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>Koblet</span>`
-                    : `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>Ukoblet</span>`;
+                    ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
+                        <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>
+                        Koblet
+                       </button>`
+                    : `<button type="button" class="btn-link-profile link-unconnected" data-id="${record.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
+                        <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
+                        Ukoblet
+                       </button>`;
                 return `
                     <tr>
                         <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
@@ -12704,6 +12710,16 @@ class AdminManager {
                     await this.deleteDonation(donationId);
                 });
             });
+
+            // Bind click events to link buttons
+            transactionsBody.querySelectorAll('.btn-link-profile').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const donationId = btn.dataset.id;
+                    const currentUserId = btn.dataset.userid || '';
+                    this.openLinkProfileModal(donationId, currentUserId);
+                });
+            });
         }
 
         const donorsBody = document.getElementById('donation-donors-body');
@@ -12733,6 +12749,99 @@ class AdminManager {
             }).join('') : `
                 <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen givere matcher søket.</td></tr>
             `;
+        }
+    }
+
+    openLinkProfileModal(donationId, currentUserId) {
+        let modal = document.getElementById('link-profile-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'link-profile-modal';
+            modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;';
+            document.body.appendChild(modal);
+        }
+
+        const userOptions = Array.from(this.adminUserMap?.values?.() || [])
+            .slice()
+            .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
+            .map(user => {
+                const label = user.displayName || user.fullName || user.email || user.id;
+                const email = user.email ? ` (${user.email})` : '';
+                const selected = user.id === currentUserId ? 'selected' : '';
+                return `<option value="${this.escapeHtml(user.id)}" ${selected}>${this.escapeHtml(label + email)}</option>`;
+            })
+            .join('');
+
+        modal.innerHTML = `
+            <div class="modal-backdrop" style="position:absolute;inset:0;background:rgba(15,23,42,.55);backdrop-filter:blur(8px);"></div>
+            <div class="modal-content" style="max-width:500px;position:relative;background:#fff;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);width:100%;overflow:hidden;animation: modalAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);">
+                <div class="modal-header" style="padding:20px 24px; border-bottom:1px solid #f1f5f9; display:flex; justify-content:space-between; align-items:center;">
+                    <h3 style="margin:0; font-size:1.25rem; color:#0f172a; font-weight:700;">Koble gave til profil</h3>
+                    <button class="modal-close" type="button" style="background:transparent; border:none; color:#64748b; cursor:pointer; padding:4px; display:flex; align-items:center; justify-content:center;">
+                        <span class="material-symbols-outlined" style="font-size:24px;">close</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding:20px 24px; display:flex; flex-direction:column; gap:16px;">
+                    <div class="form-group">
+                        <label style="display:block; margin-bottom:8px; font-weight:600; color:#334155; font-size:0.875rem;">Velg brukerprofil</label>
+                        <select id="link-profile-user-select" class="form-control" style="width:100%; padding:10px 16px; border:1px solid #cbd5e1; border-radius:8px; outline:none;">
+                            <option value="">(Ukoblet / Ingen profil)</option>
+                            ${userOptions}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding:16px 24px; background:#f8fafc; border-top:1px solid #f1f5f9; display:flex; justify-content:flex-end; gap:12px;">
+                    <button class="btn-secondary modal-cancel" type="button" style="padding:8px 16px; border-radius:8px; border:1px solid #cbd5e1; background:#fff; cursor:pointer; font-weight:600;">Avbryt</button>
+                    <button class="btn-primary modal-save" type="button" style="padding:8px 16px; border-radius:8px; background:#1B4965; color:#fff; border:none; cursor:pointer; font-weight:600;">Lagre kobling</button>
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+        };
+
+        modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+        modal.querySelector('.modal-close').addEventListener('click', closeModal);
+        modal.querySelector('.modal-cancel').addEventListener('click', closeModal);
+
+        const saveBtn = modal.querySelector('.modal-save');
+        saveBtn.addEventListener('click', async () => {
+            const select = document.getElementById('link-profile-user-select');
+            const newUserId = select.value || null;
+            closeModal();
+            await this.updateDonationUserLink(donationId, newUserId);
+        });
+    }
+
+    async updateDonationUserLink(donationId, userId) {
+        const loadingToast = this.showToast('Oppdaterer kobling...', 'info', 10000);
+        try {
+            const updates = {
+                userId: userId || null,
+                matchMethod: userId ? 'manual_admin_linked' : 'manual_admin_unlinked',
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            await firebaseService.db.collection('donations').doc(donationId).update(updates);
+            
+            if (this.allDonationRecords) {
+                const rec = this.allDonationRecords.find(r => r.id === donationId);
+                if (rec) {
+                    rec.userId = userId || null;
+                    rec.matchMethod = updates.matchMethod;
+                }
+            }
+            
+            if (loadingToast && typeof loadingToast.dismiss === 'function') loadingToast.dismiss();
+            this.showToast('Gavekobling oppdatert!', 'success', 3000);
+            this.renderDonationAdminViews();
+        } catch (error) {
+            console.error('Kunne ikke oppdatere kobling:', error);
+            if (loadingToast && typeof loadingToast.dismiss === 'function') loadingToast.dismiss();
+            this.showToast('Kunne ikke oppdatere kobling: ' + error.message, 'danger', 5000);
         }
     }
 
@@ -14071,6 +14180,21 @@ class AdminManager {
                     body.admin-body .causes-stats-grid > * {
                         grid-column: span 12 !important;
                     }
+                }
+                .btn-link-profile {
+                    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                }
+                .btn-link-profile:hover {
+                    transform: translateY(-1px) !important;
+                    filter: brightness(0.95) !important;
+                    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08) !important;
+                }
+                .btn-link-profile:active {
+                    transform: translateY(0) scale(0.97) !important;
+                }
+                @keyframes modalAppear {
+                    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+                    to { opacity: 1; transform: scale(1) translateY(0); }
                 }
             </style>
 
