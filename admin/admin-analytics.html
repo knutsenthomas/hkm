@@ -1427,6 +1427,14 @@
             }
         }
 
+        // Register global error listeners immediately to catch any crashes
+        window.addEventListener('error', (event) => {
+            showDashboardError("Det oppstod en nettleser-feil: " + (event.error?.message || event.message));
+        });
+        window.addEventListener('unhandledrejection', (event) => {
+            showDashboardError("Det oppstod en uventet feil i en bakgrunnsprosess: " + (event.reason?.message || event.reason || "Ukjent feil"));
+        });
+
         document.addEventListener('DOMContentLoaded', async () => {
             if (typeof firebase === 'undefined') {
                 showDashboardError("Firebase SDK ble ikke lastet inn. Dette kan skyldes en nettverksfeil eller at en annonseblokkerer (AdBlocker) hindrer Google-tjenester i å kjøre.");
