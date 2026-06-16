@@ -13486,13 +13486,13 @@ class AdminManager {
                             <select id="donor-modal-year-filter" class="form-control" style="font-size:13px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; font-weight:600; width:140px; margin:0;">
                                 ${yearOptionsHtml}
                             </select>
-                            <button type="button" class="btn-primary" id="donor-modal-print-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600; height:32px; background:#1B4965; color:white; border:none; cursor:pointer; transform-origin: center;">
-                                <span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">print</span>
-                                <span style="display:inline-flex; align-items:center; line-height:1;">Skriv ut</span>
+                            <button type="button" class="btn-primary" id="donor-modal-print-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 12px !important; border-radius:6px !important; font-size:13px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; background:#1B4965 !important; color:white !important; border:none !important; cursor:pointer !important; transform-origin: center !important;">
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">print</span>
+                                <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Skriv ut</span>
                             </button>
-                            <button type="button" class="btn-secondary" id="donor-modal-email-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600; height:32px; cursor:pointer; transform-origin: center;">
-                                <span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">mail</span>
-                                <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post</span>
+                            <button type="button" class="btn-secondary" id="donor-modal-email-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 12px !important; border-radius:6px !important; font-size:13px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; cursor:pointer !important; transform-origin: center !important;">
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">mail</span>
+                                <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Send e-post</span>
                             </button>
                         </div>
                     </div>
