@@ -15165,6 +15165,9 @@ class AdminManager {
                 .btn-link-profile:active, .btn-link-donor-profile:active {
                     transform: translateY(0) scale(0.97) !important;
                 }
+                .data-table th, .data-table th div {
+                    white-space: nowrap !important;
+                }
                 @keyframes modalAppear {
                     from { opacity: 0; transform: scale(0.95) translateY(10px); }
                     to { opacity: 1; transform: scale(1) translateY(0); }
