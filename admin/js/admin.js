@@ -14085,7 +14085,17 @@ class AdminManager {
     readTextFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => resolve(String(reader.result || ''));
+            reader.onload = () => {
+                const text = String(reader.result || '');
+                if (text.includes('\uFFFD')) {
+                    const reader2 = new FileReader();
+                    reader2.onload = () => resolve(String(reader2.result || ''));
+                    reader2.onerror = () => reject(new Error('Kunne ikke lese filen med ISO-8859-1.'));
+                    reader2.readAsText(file, 'ISO-8859-1');
+                } else {
+                    resolve(text);
+                }
+            };
             reader.onerror = () => reject(new Error('Kunne ikke lese filen.'));
             reader.readAsText(file, 'utf-8');
         });
@@ -14139,12 +14149,12 @@ class AdminManager {
                 raw[header] = values[index] || '';
             });
 
-            const amount = raw.amount || raw.belop || raw.innbetalt || raw.inn || raw.credit || raw.kredit || raw.sum || raw.valuta || raw.belopinn || raw.innbetaling || raw.innskudd;
-            const outAmount = raw.ut || raw.debet || raw.debit || raw.withdrawal || raw.beloput || raw.utbetaling || raw.uttak;
+            const amount = raw.amount || raw.belop || raw.belopinn || raw.belpinn || raw.belp || raw.innbetalt || raw.inn || raw.credit || raw.kredit || raw.sum || raw.valuta || raw.innskudd || raw.innbetaling;
+            const outAmount = raw.ut || raw.debet || raw.debit || raw.withdrawal || raw.beloput || raw.belput || raw.utbetaling || raw.uttak;
             const resolvedAmount = amount || (outAmount ? `-${outAmount}` : '');
 
             return {
-                date: raw.dato || raw.date || raw.bokfortdato || raw.valutadato || raw.posteringsdato || raw.tidspunkt || raw.bokforingsdato || raw.utfortdato || raw.rentedato,
+                date: raw.dato || raw.date || raw.bokfortdato || raw.bokfrtdato || raw.utfortdato || raw.utfrtdato || raw.valutadato || raw.posteringsdato || raw.tidspunkt || raw.bokforingsdato || raw.rentedato,
                 amountNok: resolvedAmount,
                 donorName: raw.navn || raw.name || raw.avsender || raw.fra || raw.betaler || raw.payer || raw.kundensnavn || raw.kundenavn,
                 donorEmail: raw.epost || raw.email,
