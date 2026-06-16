@@ -12512,10 +12512,10 @@ class AdminManager {
 
     getDonationDonorName(donation, userMap = new Map()) {
         const user = donation.userId ? userMap.get(donation.userId) : null;
-        return donation.donorName
-            || donation.name
-            || user?.displayName
+        return user?.displayName
             || user?.fullName
+            || donation.donorName
+            || donation.name
             || user?.email
             || donation.donorEmail
             || donation.email
@@ -12524,7 +12524,9 @@ class AdminManager {
 
     getDonationDonorEmail(donation, userMap = new Map()) {
         const user = donation.userId ? userMap.get(donation.userId) : null;
-        return String(donation.donorEmail || donation.email || user?.email || '').trim().toLowerCase();
+        const email = String(user?.email || donation.donorEmail || donation.email || '').trim().toLowerCase();
+        if (email === 'ukjent' || email === 'unknown') return '';
+        return email;
     }
 
     buildDonationDateRange(preset, startValue, endValue) {
@@ -12553,6 +12555,7 @@ class AdminManager {
         const query = String(filters.query || '').trim().toLowerCase();
         const status = String(filters.status || 'all').toLowerCase();
         const method = String(filters.method || 'all').toLowerCase();
+        const type = String(filters.type || 'all').toLowerCase();
 
         return records.filter((record) => {
             if (record.isInKind) return false;
@@ -12565,6 +12568,12 @@ class AdminManager {
                 if (status !== 'completed' && recordStatus !== status) return false;
             }
             if (method !== 'all' && String(record.method || '').toLowerCase() !== method) return false;
+            
+            if (type !== 'all') {
+                const recordType = String(record.type || 'gave').toLowerCase();
+                if (recordType !== type) return false;
+            }
+
             if (!query) return true;
             const haystack = [
                 record.id,
@@ -12586,10 +12595,25 @@ class AdminManager {
 
         records.forEach((record) => {
             const email = this.getDonationDonorEmail(record, userMap);
-            const key = record.userId || email || record.donorName || record.id;
+            const name = this.getDonationDonorName(record, userMap);
+            
+            let key = record.userId;
+            if (!key && email) {
+                key = email;
+            }
+            if (!key && name) {
+                const cleanName = name.trim().toLowerCase();
+                if (cleanName && cleanName !== 'ukjent' && cleanName !== 'unknown' && cleanName !== 'ukjent giver') {
+                    key = name.trim();
+                }
+            }
+            if (!key) {
+                key = record.id;
+            }
+
             const existing = donors.get(key) || {
                 key,
-                name: this.getDonationDonorName(record, userMap),
+                name,
                 email,
                 userId: record.userId || '',
                 giftCount: 0,
@@ -12597,7 +12621,8 @@ class AdminManager {
                 total: 0,
                 latestDate: null,
                 methods: new Set(),
-                statuses: new Set()
+                statuses: new Set(),
+                names: new Set()
             };
 
             const amount = this.normalizeDonationAmountNok(record);
@@ -12610,6 +12635,11 @@ class AdminManager {
             if (date && (!existing.latestDate || date > existing.latestDate)) existing.latestDate = date;
             if (record.method) existing.methods.add(String(record.method));
             if (record.status) existing.statuses.add(String(record.status));
+            
+            const recName = this.getDonationDonorName(record, userMap);
+            if (recName && recName !== 'Ukjent giver' && recName !== 'ukjent' && recName !== 'unknown') {
+                existing.names.add(recName);
+            }
 
             donors.set(key, existing);
         });
@@ -12669,6 +12699,12 @@ class AdminManager {
                 const status = this.escapeHtml(this.getDonationStatusLabel(record.status));
                 const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
                 const method = this.escapeHtml(this.getDonationMethodLabel(record.method));
+                
+                const isRecurring = String(record.type || '').toLowerCase() === 'fast';
+                const typeBadge = isRecurring 
+                    ? `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">FAST</span>` 
+                    : `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">ENKELT</span>`;
+
                 const profileStatus = record.userId
                     ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
                         <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>
@@ -12682,7 +12718,10 @@ class AdminManager {
                     <tr>
                         <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
                         <td>
-                            <strong>${name}</strong>
+                            <div style="display:flex; align-items:center; gap:6px;">
+                                <strong>${name}</strong>
+                                ${typeBadge}
+                            </div>
                             <div style="font-size:12px;color:#64748b;">${email}</div>
                         </td>
                         <td><span class="method-tag">${method}</span></td>
@@ -12731,10 +12770,18 @@ class AdminManager {
 
             donorsBody.innerHTML = visibleDonors.length ? visibleDonors.map((donor) => {
                 const methodText = Array.from(donor.methods).map(m => this.getDonationMethodLabel(m)).join(', ') || 'Ukjent';
+                
+                const mainName = donor.name || 'Ukjent giver';
+                const otherNames = Array.from(donor.names).filter(n => n !== mainName);
+                const otherNamesStr = otherNames.length > 0 
+                    ? `<div style="font-size:11px;color:#64748b;margin-top:2px;">Også registrert som: ${otherNames.map(n => this.escapeHtml(n)).join(', ')}</div>` 
+                    : '';
+
                 return `
                     <tr>
                         <td>
-                            <strong>${this.escapeHtml(donor.name || 'Ukjent giver')}</strong>
+                            <strong>${this.escapeHtml(mainName)}</strong>
+                            ${otherNamesStr}
                             <div style="font-size:12px;color:#64748b;">${this.escapeHtml(donor.email || 'Ingen e-post')}</div>
                         </td>
                         <td>${donor.completedCount} / ${donor.giftCount}</td>
@@ -12771,12 +12818,19 @@ class AdminManager {
             if (r.userId) return false;
             if (r.isInKind) return false;
             
-            const rEmail = String(r.donorEmail || r.email || '').trim().toLowerCase();
+            const rEmail = this.getDonationDonorEmail(r, userMap);
             if (donorEmail && rEmail === donorEmail) return true;
             
-            const rName = String(r.donorName || r.name || '').trim().toLowerCase();
+            const rName = this.getDonationDonorName(r, userMap);
             const cleanDonorName = donorName.trim().toLowerCase();
-            if (cleanDonorName && cleanDonorName !== 'ukjent giver' && rName === cleanDonorName) return true;
+            const cleanRName = rName.trim().toLowerCase();
+            if (cleanDonorName && 
+                cleanDonorName !== 'ukjent giver' && 
+                cleanDonorName !== 'ukjent' && 
+                cleanDonorName !== 'unknown' && 
+                cleanRName === cleanDonorName) {
+                return true;
+            }
             
             return false;
         }) : [];
@@ -13093,37 +13147,59 @@ class AdminManager {
         const allRecords = Array.isArray(this.allDonationRecords) ? this.allDonationRecords : [];
         const monetaryRecords = allRecords.filter(r => !r.isInKind);
         
+        const filters = this.donationFilters || {};
+        let { start, end } = this.buildDonationDateRange(filters.preset || '30', filters.start || '', filters.end || '');
         const now = new Date();
-        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        const last30DaysRecords = monetaryRecords.filter(r => {
+        if (!start) {
+            if (monetaryRecords.length > 0) {
+                const dates = monetaryRecords.map(r => this.getDonationDate(r)).filter(Boolean);
+                if (dates.length > 0) {
+                    start = new Date(Math.min(...dates.map(d => d.getTime())));
+                }
+            }
+            if (!start) {
+                start = new Date(now.getTime() - 365 * 24 * 60 * 60 * 1000);
+            }
+        }
+        if (!end) {
+            end = now;
+        }
+
+        const periodRecords = monetaryRecords.filter(r => {
             const d = this.getDonationDate(r);
-            return d && d >= thirtyDaysAgo && d <= now;
+            return d && d >= start && d <= end;
         });
         
         const isCompleted = (r) => ['completed', 'succeeded', 'captured'].includes(String(r.status || '').toLowerCase());
-        const last30DaysCompleted = last30DaysRecords.filter(isCompleted);
-        const last30DaysTotal = last30DaysCompleted.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+        const periodCompleted = periodRecords.filter(isCompleted);
+        const periodTotal = periodCompleted.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
         
         const pad = (n) => String(n).padStart(2, '0');
-        const rangeText = `${pad(thirtyDaysAgo.getDate())}/${pad(thirtyDaysAgo.getMonth()+1)}/${thirtyDaysAgo.getFullYear()} - ${pad(now.getDate())}/${pad(now.getMonth()+1)}/${now.getFullYear()} - ${this.formatDonationCurrency(last30DaysTotal)}`;
+        const rangeText = `${pad(start.getDate())}/${pad(start.getMonth()+1)}/${start.getFullYear()} - ${pad(end.getDate())}/${pad(end.getMonth()+1)}/${end.getFullYear()} - ${this.formatDonationCurrency(periodTotal)}`;
 
+        const diffMs = end.getTime() - start.getTime();
         const numIntervals = 15;
-        const intervalMs = (30 * 24 * 60 * 60 * 1000) / numIntervals;
+        const intervalMs = diffMs / numIntervals;
         const dailyData = Array.from({ length: numIntervals }).map((_, idx) => {
-            const start = new Date(thirtyDaysAgo.getTime() + idx * intervalMs);
-            const end = new Date(start.getTime() + intervalMs);
-            const intervalRecords = last30DaysCompleted.filter(r => {
+            const intervalStart = new Date(start.getTime() + idx * intervalMs);
+            const intervalEnd = new Date(intervalStart.getTime() + intervalMs);
+            const intervalRecords = periodCompleted.filter(r => {
                 const d = this.getDonationDate(r);
-                return d && d >= start && d < end;
+                return d && d >= intervalStart && d < intervalEnd;
             });
             const amount = intervalRecords.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
-            return { start, end, amount };
+            return { start: intervalStart, end: intervalEnd, amount };
         });
 
         const maxAmount = Math.max(...dailyData.map(d => d.amount), 1000);
         const chartBarsHtml = dailyData.map(d => {
             const pct = Math.round((d.amount / maxAmount) * 100);
-            const dateLabel = `${d.start.getDate()}/${d.start.getMonth()+1}`;
+            let dateLabel = '';
+            if (diffMs <= 24 * 60 * 60 * 1000) {
+                dateLabel = `${d.start.getHours().toString().padStart(2, '0')}:${d.start.getMinutes().toString().padStart(2, '0')}`;
+            } else {
+                dateLabel = `${d.start.getDate()}/${d.start.getMonth()+1}`;
+            }
             const tooltip = `${dateLabel}: ${d.amount.toLocaleString('no-NO')} kr`;
             return `
                 <div style="flex:1; display:flex; flex-direction:column; align-items:center; height:100%; justify-content:flex-end; position:relative;" title="${tooltip}">
@@ -13134,16 +13210,40 @@ class AdminManager {
             `;
         }).join('');
 
-        const uniqueDonors = new Set(last30DaysRecords.map(r => r.userId || r.donorEmail || r.donorName));
+        const uniqueDonors = new Set();
+        periodRecords.forEach(r => {
+            const email = this.getDonationDonorEmail(r, this.adminUserMap);
+            const name = this.getDonationDonorName(r, this.adminUserMap);
+            let key = r.userId;
+            if (!key && email) key = email;
+            if (!key && name) {
+                const cleanName = name.trim().toLowerCase();
+                if (cleanName && cleanName !== 'ukjent' && cleanName !== 'unknown' && cleanName !== 'ukjent giver') {
+                    key = name.trim();
+                }
+            }
+            if (!key) key = r.id;
+            uniqueDonors.add(key);
+        });
         const donorCount = uniqueDonors.size;
         
         const donorFirstDonation = new Map();
         monetaryRecords.forEach(r => {
-            const donorKey = r.userId || r.donorEmail || r.donorName;
+            const email = this.getDonationDonorEmail(r, this.adminUserMap);
+            const name = this.getDonationDonorName(r, this.adminUserMap);
+            let key = r.userId;
+            if (!key && email) key = email;
+            if (!key && name) {
+                const cleanName = name.trim().toLowerCase();
+                if (cleanName && cleanName !== 'ukjent' && cleanName !== 'unknown' && cleanName !== 'ukjent giver') {
+                    key = name.trim();
+                }
+            }
+            if (!key) key = r.id;
             const date = this.getDonationDate(r);
             if (date) {
-                if (!donorFirstDonation.has(donorKey) || date < donorFirstDonation.get(donorKey)) {
-                    donorFirstDonation.set(donorKey, date);
+                if (!donorFirstDonation.has(key) || date < donorFirstDonation.get(key)) {
+                    donorFirstDonation.set(key, date);
                 }
             }
         });
@@ -13151,7 +13251,7 @@ class AdminManager {
         let newDonors = 0;
         uniqueDonors.forEach(k => {
             const firstDate = donorFirstDonation.get(k);
-            if (firstDate && firstDate >= thirtyDaysAgo) {
+            if (firstDate && firstDate >= start) {
                 newDonors++;
             }
         });
@@ -13159,8 +13259,18 @@ class AdminManager {
         const donorCompletedCounts = new Map();
         monetaryRecords.forEach(r => {
             if (isCompleted(r)) {
-                const donorKey = r.userId || r.donorEmail || r.donorName;
-                donorCompletedCounts.set(donorKey, (donorCompletedCounts.get(donorKey) || 0) + 1);
+                const email = this.getDonationDonorEmail(r, this.adminUserMap);
+                const name = this.getDonationDonorName(r, this.adminUserMap);
+                let key = r.userId;
+                if (!key && email) key = email;
+                if (!key && name) {
+                    const cleanName = name.trim().toLowerCase();
+                    if (cleanName && cleanName !== 'ukjent' && cleanName !== 'unknown' && cleanName !== 'ukjent giver') {
+                        key = name.trim();
+                    }
+                }
+                if (!key) key = r.id;
+                donorCompletedCounts.set(key, (donorCompletedCounts.get(key) || 0) + 1);
             }
         });
         
@@ -13171,11 +13281,11 @@ class AdminManager {
             }
         });
 
-        const textDonors = last30DaysCompleted.filter(r => String(r.method || '').toLowerCase() === 'vipps' || String(r.method || '').toLowerCase() === 'vipps_manual').length;
+        const textDonors = periodCompleted.filter(r => String(r.method || '').toLowerCase() === 'vipps' || String(r.method || '').toLowerCase() === 'vipps_manual').length;
 
-        const donationCount30Days = last30DaysCompleted.length;
+        const donationCountPeriod = periodCompleted.length;
         const methodsMap = new Map();
-        last30DaysCompleted.forEach(r => {
+        periodCompleted.forEach(r => {
             const m = String(r.method || 'other').toLowerCase();
             methodsMap.set(m, (methodsMap.get(m) || 0) + 1);
         });
@@ -13183,12 +13293,12 @@ class AdminManager {
         const stripeCount = methodsMap.get('stripe') || 0;
         const vippsCount = (methodsMap.get('vipps') || 0) + (methodsMap.get('vipps_manual') || 0);
         const bankCount = methodsMap.get('bank') || 0;
-        const otherCount = donationCount30Days - stripeCount - vippsCount - bankCount;
+        const otherCount = donationCountPeriod - stripeCount - vippsCount - bankCount;
 
-        const stripePct = donationCount30Days ? Math.round((stripeCount / donationCount30Days) * 100) : 0;
-        const vippsPct = donationCount30Days ? Math.round((vippsCount / donationCount30Days) * 100) : 0;
-        const bankPct = donationCount30Days ? Math.round((bankCount / donationCount30Days) * 100) : 0;
-        const otherPct = donationCount30Days ? Math.round((otherCount / donationCount30Days) * 100) : 0;
+        const stripePct = donationCountPeriod ? Math.round((stripeCount / donationCountPeriod) * 100) : 0;
+        const vippsPct = donationCountPeriod ? Math.round((vippsCount / donationCountPeriod) * 100) : 0;
+        const bankPct = donationCountPeriod ? Math.round((bankCount / donationCountPeriod) * 100) : 0;
+        const otherPct = donationCountPeriod ? Math.round((otherCount / donationCountPeriod) * 100) : 0;
 
         let accumulatedPct = 0;
         const donutSlices = [
@@ -13248,13 +13358,49 @@ class AdminManager {
             }).join('');
         }
 
+        const presetLabels = {
+            'today': 'I dag',
+            '7': 'Siste 7 dager',
+            '30': 'Siste 30 dager',
+            'month': 'Denne måneden',
+            'year': 'I år',
+            'all': 'Alle visninger',
+            'custom': 'Egendefinert periode'
+        };
+        const periodTitle = presetLabels[filters.preset || '30'] || 'Valgt periode';
+
+        let footerStartLabel = 'Start';
+        let footerEndLabel = 'Slutt';
+        if (filters.preset === 'today') {
+            footerStartLabel = 'Start på dagen';
+            footerEndLabel = 'Slutt på dagen';
+        } else if (filters.preset === '7') {
+            footerStartLabel = '7 dager siden';
+            footerEndLabel = 'I dag';
+        } else if (filters.preset === '30') {
+            footerStartLabel = '30 dager siden';
+            footerEndLabel = 'I dag';
+        } else if (filters.preset === 'month') {
+            footerStartLabel = 'Månedens start';
+            footerEndLabel = 'I dag';
+        } else if (filters.preset === 'year') {
+            footerStartLabel = 'Årets start';
+            footerEndLabel = 'I dag';
+        } else if (filters.preset === 'all') {
+            footerStartLabel = 'Første transaksjon';
+            footerEndLabel = 'I dag';
+        } else {
+            footerStartLabel = start.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            footerEndLabel = end.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
         container.innerHTML = `
             <div class="stats-grid causes-stats-grid" style="margin-bottom: 24px;">
                 <div class="card" style="grid-column: span 12; padding: 24px;">
                     <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
                         <div>
                             <span style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonshistorikk</span>
-                            <h4 style="margin: 4px 0 0; font-size: 18px; font-weight: 700; color: #0f172a;">Siste 30 dager</h4>
+                            <h4 style="margin: 4px 0 0; font-size: 18px; font-weight: 700; color: #0f172a;">${periodTitle}</h4>
                         </div>
                         <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
                     </div>
@@ -13262,8 +13408,8 @@ class AdminManager {
                         ${chartBarsHtml}
                     </div>
                     <div style="display:flex; justify-content:space-between; color: #94a3b8; font-size: 11px; font-weight: 600;">
-                        <span>30 dager siden</span>
-                        <span>I dag</span>
+                        <span>${footerStartLabel}</span>
+                        <span>${footerEndLabel}</span>
                     </div>
                 </div>
 
@@ -13297,7 +13443,7 @@ class AdminManager {
                 <div class="card" style="grid-column: span 4; padding: 24px; min-height: 240px;">
                     <div style="margin-bottom: 16px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Gaver registrert</span>
-                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donationCount30Days} gaver</h4>
+                        <h4 style="margin: 4px 0 0; font-size: 24px; font-weight: 800; color: #0f172a;">${donationCountPeriod} gaver</h4>
                     </div>
                     <div style="display: flex; gap: 20px; align-items: center;">
                         <div style="flex: 1; display:flex; flex-direction:column; gap:8px;">
@@ -13375,6 +13521,12 @@ class AdminManager {
                         ${causesProgressHtml}
                     </div>
                 </div>
+            </div>: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
+                        ${causesProgressHtml}
+                    </div>
+                </div>
             </div>
         `;
     }
@@ -13396,15 +13548,8 @@ class AdminManager {
 
         await this.seedInKindDonationsIfEmpty();
 
-        let inKindDonations = [];
-        try {
-            if (firebaseService.db) {
-                const snapshot = await firebaseService.db.collection('donations').where('isInKind', '==', true).get();
-                inKindDonations = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            }
-        } catch (e) {
-            console.error("Failed to load in-kind donations:", e);
-        }
+        const allRecords = Array.isArray(this.allDonationRecords) ? this.allDonationRecords : [];
+        let inKindDonations = allRecords.filter(r => r.isInKind);
 
         inKindDonations.sort((a, b) => {
             const aDate = this.getDonationDate(a)?.getTime?.() || 0;
@@ -13412,10 +13557,23 @@ class AdminManager {
             return bDate - aDate;
         });
 
-        const inKindCount = inKindDonations.length;
+        const filters = this.donationFilters || {};
+        const { start, end } = this.buildDonationDateRange(filters.preset || '30', filters.start || '', filters.end || '');
+
+        let filteredInKind = inKindDonations;
+        if (start || end) {
+            filteredInKind = inKindDonations.filter(r => {
+                const d = this.getDonationDate(r);
+                if (start && (!d || d < start)) return false;
+                if (end && (!d || d > end)) return false;
+                return true;
+            });
+        }
+
+        const inKindCount = filteredInKind.length;
         const userMap = this.adminUserMap || new Map();
 
-        const tableRows = inKindDonations.map(record => {
+        const tableRows = filteredInKind.map(record => {
             const date = this.getDonationDate(record);
             const dateStr = date ? `${date.getMonth()+1}/${date.getDate()}/${date.getFullYear()}` : 'Ukjent';
             const name = this.escapeHtml(record.donorName || 'Ukjent');
@@ -13461,7 +13619,7 @@ class AdminManager {
             `;
         }).join('');
 
-        const tableBodyHtml = tableRows || `<tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen fysiske gaver registrert.</td></tr>`;
+        const tableBodyHtml = tableRows || `<tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen fysiske gaver registrert i denne perioden.</td></tr>`;
 
         container.innerHTML = `
             <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:24px; padding-top:8px;">
@@ -14108,21 +14266,15 @@ class AdminManager {
         const setFilter = (key, value) => {
             this.donationFilters = { ...(this.donationFilters || {}), [key]: value };
             
-            // Sync values to DOM elements on BOTH tabs
-            const presetEl1 = document.getElementById('donation-date-preset');
-            const presetEl2 = document.getElementById('donor-date-preset');
-            if (presetEl1) presetEl1.value = this.donationFilters.preset || '30';
-            if (presetEl2) presetEl2.value = this.donationFilters.preset || '30';
+            // Sync values to DOM elements
+            const presetEl = document.getElementById('global-date-preset');
+            if (presetEl) presetEl.value = this.donationFilters.preset || '30';
 
-            const startEl1 = document.getElementById('donation-start-date');
-            const startEl2 = document.getElementById('donor-start-date');
-            if (startEl1) startEl1.value = this.donationFilters.start || '';
-            if (startEl2) startEl2.value = this.donationFilters.start || '';
+            const startEl = document.getElementById('global-start-date');
+            if (startEl) startEl.value = this.donationFilters.start || '';
 
-            const endEl1 = document.getElementById('donation-end-date');
-            const endEl2 = document.getElementById('donor-end-date');
-            if (endEl1) endEl1.value = this.donationFilters.end || '';
-            if (endEl2) endEl2.value = this.donationFilters.end || '';
+            const endEl = document.getElementById('global-end-date');
+            if (endEl) endEl.value = this.donationFilters.end || '';
 
             const statusEl1 = document.getElementById('donation-status-filter');
             const statusEl2 = document.getElementById('donor-status-filter');
@@ -14134,6 +14286,11 @@ class AdminManager {
             if (methodEl1) methodEl1.value = this.donationFilters.method || 'all';
             if (methodEl2) methodEl2.value = this.donationFilters.method || 'all';
 
+            const typeEl1 = document.getElementById('donation-type-filter');
+            const typeEl2 = document.getElementById('donor-type-filter');
+            if (typeEl1) typeEl1.value = this.donationFilters.type || 'all';
+            if (typeEl2) typeEl2.value = this.donationFilters.type || 'all';
+
             const queryEl = document.getElementById('donation-search');
             if (queryEl) queryEl.value = this.donationFilters.query || '';
 
@@ -14141,28 +14298,29 @@ class AdminManager {
             if (donorQueryEl) donorQueryEl.value = this.donationFilters.donorQuery || '';
 
             const customVisible = this.donationFilters.preset === 'custom';
-            const customDates1 = document.getElementById('donation-custom-dates');
-            const customDates2 = document.getElementById('donor-custom-dates');
-            if (customDates1) customDates1.style.display = customVisible ? 'grid' : 'none';
-            if (customDates2) customDates2.style.display = customVisible ? 'grid' : 'none';
+            const customDates = document.getElementById('global-custom-dates');
+            if (customDates) customDates.style.display = customVisible ? 'flex' : 'none';
 
             this.renderDonationAdminViews();
+            this.renderGiftsDashboard();
+            this.renderInKindDonations();
         };
 
+        // Global period listeners
+        document.getElementById('global-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
+        document.getElementById('global-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
+        document.getElementById('global-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+
         // Donation tab listeners
-        document.getElementById('donation-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
-        document.getElementById('donation-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
-        document.getElementById('donation-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
         document.getElementById('donation-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
         document.getElementById('donation-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
+        document.getElementById('donation-type-filter')?.addEventListener('change', (event) => setFilter('type', event.target.value));
         document.getElementById('donation-search')?.addEventListener('input', (event) => setFilter('query', event.target.value));
 
         // Donor tab listeners
-        document.getElementById('donor-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
-        document.getElementById('donor-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
-        document.getElementById('donor-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
         document.getElementById('donor-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
         document.getElementById('donor-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
+        document.getElementById('donor-type-filter')?.addEventListener('change', (event) => setFilter('type', event.target.value));
         document.getElementById('donor-search')?.addEventListener('input', (event) => setFilter('donorQuery', event.target.value));
 
         document.getElementById('add-manual-donation-btn')?.addEventListener('click', () => this.openManualDonationModal());
@@ -14176,38 +14334,50 @@ class AdminManager {
             event.preventDefault();
             this.saveManualDonation();
         });
-        document.getElementById('donation-clear-filters')?.addEventListener('click', () => {
-            this.donationFilters = { preset: '30', status: 'all', method: 'all', query: '', donorQuery: '', start: '', end: '' };
+
+        const clearFilters = () => {
+            this.donationFilters = { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', start: '', end: '' };
             
-            ['donation-date-preset', 'donor-date-preset'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '30';
-            });
-            ['donation-status-filter', 'donor-status-filter'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = 'all';
-            });
-            ['donation-method-filter', 'donor-method-filter'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = 'all';
-            });
+            const presetEl = document.getElementById('global-date-preset');
+            if (presetEl) presetEl.value = '30';
+
+            const startEl = document.getElementById('global-start-date');
+            if (startEl) startEl.value = '';
+
+            const endEl = document.getElementById('global-end-date');
+            if (endEl) endEl.value = '';
+
+            const customDates = document.getElementById('global-custom-dates');
+            if (customDates) customDates.style.display = 'none';
+
+            const statusEl1 = document.getElementById('donation-status-filter');
+            const statusEl2 = document.getElementById('donor-status-filter');
+            if (statusEl1) statusEl1.value = 'all';
+            if (statusEl2) statusEl2.value = 'all';
+
+            const methodEl1 = document.getElementById('donation-method-filter');
+            const methodEl2 = document.getElementById('donor-method-filter');
+            if (methodEl1) methodEl1.value = 'all';
+            if (methodEl2) methodEl2.value = 'all';
+
+            const typeEl1 = document.getElementById('donation-type-filter');
+            const typeEl2 = document.getElementById('donor-type-filter');
+            if (typeEl1) typeEl1.value = 'all';
+            if (typeEl2) typeEl2.value = 'all';
+
             const qEl = document.getElementById('donation-search');
             if (qEl) qEl.value = '';
+
             const dqEl = document.getElementById('donor-search');
             if (dqEl) dqEl.value = '';
             
-            ['donation-start-date', 'donor-start-date', 'donation-end-date', 'donor-end-date'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.value = '';
-            });
-            
-            ['donation-custom-dates', 'donor-custom-dates'].forEach(id => {
-                const el = document.getElementById(id);
-                if (el) el.style.display = 'none';
-            });
-            
             this.renderDonationAdminViews();
-        });
+            this.renderGiftsDashboard();
+            this.renderInKindDonations();
+        };
+
+        document.getElementById('donation-clear-filters')?.addEventListener('click', clearFilters);
+        document.getElementById('donor-clear-filters')?.addEventListener('click', clearFilters);
 
         // Drag & Drop listeners for Premium Bank Import Dropzone
         const dropzone = document.getElementById('bank-import-dropzone');
@@ -14287,7 +14457,7 @@ class AdminManager {
             return bDate - aDate;
         });
         this.adminUserMap = new Map(users.map(user => [user.id, user]));
-        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', query: '', donorQuery: '', start: '', end: '' };
+        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', start: '', end: '' };
         const manualDonationUserOptions = users
             .slice()
             .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
@@ -14342,6 +14512,47 @@ class AdminManager {
                     <button class="automation-tab" data-tab="donations">Per gave</button>
                     <button class="automation-tab" data-tab="donors">Per giver</button>
                     <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
+                </div>
+            </div>
+
+            <!-- Global Period Selector -->
+            <div class="card" style="margin-bottom: 24px; padding: 16px 24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
+                        <div class="form-group" style="margin:0; min-width:200px;">
+                            <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Periode</label>
+                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:8px 12px;">
+                                <option value="today">I dag</option>
+                                <option value="7">Siste 7 dager</option>
+                                <option value="30" selected>Siste 30 dager</option>
+                                <option value="month">Denne måneden</option>
+                                <option value="year">I år</option>
+                                <option value="all">Alle</option>
+                                <option value="custom">Egendefinert</option>
+                            </select>
+                        </div>
+                        <div id="global-custom-dates" style="display:none; align-items:center; gap:12px; flex-wrap:wrap;">
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Fra dato</label>
+                                <input id="global-start-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:8px 12px;">
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Til dato</label>
+                                <input id="global-end-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:8px 12px;">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                        <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">add_card</span>
+                            Registrer gave
+                        </button>
+                        <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                            <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
+                            Importer bank
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -14419,40 +14630,14 @@ class AdminManager {
                 </div>
 
                 <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                    <div class="card-header">
                         <div>
                             <h3 class="card-title">Gaveoversikt</h3>
-                            <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på dato, status, metode eller giver.</p>
-                        </div>
-                        <div style="display:flex; gap:16px; align-items:center; flex-wrap:wrap;">
-                            <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
-                                <span class="material-symbols-outlined" style="font-size:20px;">add_card</span>
-                                Registrer gave
-                            </button>
-                            <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
-                                <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
-                                Importer bank
-                            </button>
-                            <button type="button" class="btn-secondary" id="donation-clear-filters" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600;">
-                                <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
-                                Nullstill
-                            </button>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode, transaksjonstype eller giver.</p>
                         </div>
                     </div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
-                            <div class="form-group" style="margin:0;">
-                                <label>Periode</label>
-                                <select id="donation-date-preset" class="form-control">
-                                    <option value="today">I dag</option>
-                                    <option value="7">Siste 7 dager</option>
-                                    <option value="30" selected>Siste 30 dager</option>
-                                    <option value="month">Denne måneden</option>
-                                    <option value="year">I år</option>
-                                    <option value="all">Alle</option>
-                                    <option value="custom">Egendefinert</option>
-                                </select>
-                            </div>
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donation-status-filter" class="form-control">
@@ -14479,18 +14664,22 @@ class AdminManager {
                                 </select>
                             </div>
                             <div class="form-group" style="margin:0;">
+                                <label>Type transaksjon</label>
+                                <select id="donation-type-filter" class="form-control">
+                                    <option value="all">Alle typer</option>
+                                    <option value="gave">Gave</option>
+                                    <option value="butikk">Butikk</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
                                 <label>Søk</label>
                                 <input id="donation-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
                             </div>
-                        </div>
-                        <div id="donation-custom-dates" style="display:none;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
-                            <div class="form-group" style="margin:0;">
-                                <label>Fra dato</label>
-                                <input id="donation-start-date" class="form-control" type="date">
-                            </div>
-                            <div class="form-group" style="margin:0;">
-                                <label>Til dato</label>
-                                <input id="donation-end-date" class="form-control" type="date">
+                            <div style="display:flex; align-items:flex-end;">
+                                <button type="button" class="btn-secondary" id="donation-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
+                                    Nullstill
+                                </button>
                             </div>
                         </div>
 
@@ -14556,18 +14745,6 @@ class AdminManager {
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
-                                <label>Periode</label>
-                                <select id="donor-date-preset" class="form-control">
-                                    <option value="today">I dag</option>
-                                    <option value="7">Siste 7 dager</option>
-                                    <option value="30" selected>Siste 30 dager</option>
-                                    <option value="month">Denne måneden</option>
-                                    <option value="year">I år</option>
-                                    <option value="all">Alle</option>
-                                    <option value="custom">Egendefinert</option>
-                                </select>
-                            </div>
-                            <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donor-status-filter" class="form-control">
                                     <option value="all">Alle statuser</option>
@@ -14593,18 +14770,22 @@ class AdminManager {
                                 </select>
                             </div>
                             <div class="form-group" style="margin:0;">
+                                <label>Type transaksjon</label>
+                                <select id="donor-type-filter" class="form-control">
+                                    <option value="all">Alle typer</option>
+                                    <option value="gave">Gave</option>
+                                    <option value="butikk">Butikk</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
                                 <label>Søk etter giver</label>
                                 <input id="donor-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
                             </div>
-                        </div>
-                        <div id="donor-custom-dates" style="display:none;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
-                            <div class="form-group" style="margin:0;">
-                                <label>Fra dato</label>
-                                <input type="date" id="donor-start-date" class="form-control">
-                            </div>
-                            <div class="form-group" style="margin:0;">
-                                <label>Til dato</label>
-                                <input type="date" id="donor-end-date" class="form-control">
+                            <div style="display:flex; align-items:flex-end;">
+                                <button type="button" class="btn-secondary" id="donor-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
+                                    Nullstill
+                                </button>
                             </div>
                         </div>
                         <div style="overflow-x:auto;">
@@ -14626,6 +14807,7 @@ class AdminManager {
                     </div>
                 </div>
             </div>
+        </div>
 
             <!-- Tab 4: In-Kind Content -->
             <div id="cause-tab-content-inkind" class="cause-tab-pane" style="display: none;">
