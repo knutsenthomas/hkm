@@ -15956,7 +15956,7 @@ class AdminManager {
                         </button>
                     </div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donation-status-filter" class="form-control">
@@ -16068,7 +16068,7 @@ class AdminManager {
                         </button>
                     </div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="donor-status-filter" class="form-control">
@@ -16233,7 +16233,7 @@ class AdminManager {
                         </button>
                     </div>
                     <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
                             <div class="form-group" style="margin:0;">
                                 <label>Status</label>
                                 <select id="shop-status-filter" class="form-control">
