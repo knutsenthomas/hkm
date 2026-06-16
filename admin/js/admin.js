@@ -12866,9 +12866,12 @@ class AdminManager {
 
         const donationDonors = this.buildDonorSummaries(records);
 
-        if (topTotalEl) topTotalEl.textContent = this.formatDonationCurrency(allCompletedTotal);
-        if (topCountEl) topCountEl.textContent = allRecords.length.toLocaleString('no-NO');
-        if (topAverageEl) topAverageEl.textContent = this.formatDonationCurrency(allAverage);
+        const filteredCompletedRecords = records.filter(isCompleted);
+        const filteredAverage = filteredCompletedRecords.length ? filteredTotal / filteredCompletedRecords.length : 0;
+
+        if (topTotalEl) topTotalEl.textContent = this.formatDonationCurrency(filteredTotal);
+        if (topCountEl) topCountEl.textContent = records.length.toLocaleString('no-NO');
+        if (topAverageEl) topAverageEl.textContent = this.formatDonationCurrency(filteredAverage);
         if (todayAmountEl) todayAmountEl.textContent = this.formatDonationCurrency(todayTotal);
         if (todayCountEl) todayCountEl.textContent = `${todayRecords.length} registrert i dag`;
         if (periodAmountEl) periodAmountEl.textContent = this.formatDonationCurrency(filteredTotal);
@@ -12984,9 +12987,12 @@ class AdminManager {
         const shopPendingCountEl = document.getElementById('shop-pending-count');
         const shopUnmatchedCountEl = document.getElementById('shop-unmatched-count');
 
-        if (shopTotalAmountEl) shopTotalAmountEl.textContent = this.formatDonationCurrency(allShopTotal);
-        if (shopTotalCountEl) shopTotalCountEl.textContent = allShopRecords.length.toLocaleString('no-NO');
-        if (shopAverageAmountEl) shopAverageAmountEl.textContent = this.formatDonationCurrency(allShopAverage);
+        const filteredCompletedShopRecords = shopRecords.filter(isCompleted);
+        const filteredShopAverage = filteredCompletedShopRecords.length ? filteredShopTotal / filteredCompletedShopRecords.length : 0;
+
+        if (shopTotalAmountEl) shopTotalAmountEl.textContent = this.formatDonationCurrency(filteredShopTotal);
+        if (shopTotalCountEl) shopTotalCountEl.textContent = shopRecords.length.toLocaleString('no-NO');
+        if (shopAverageAmountEl) shopAverageAmountEl.textContent = this.formatDonationCurrency(filteredShopAverage);
         if (shopTodayAmountEl) shopTodayAmountEl.textContent = this.formatDonationCurrency(todayShopTotal);
         if (shopTodayCountEl) shopTodayCountEl.textContent = `${todayShopRecords.length} registrert i dag`;
         if (shopPeriodAmountEl) shopPeriodAmountEl.textContent = this.formatDonationCurrency(filteredShopTotal);
@@ -16025,7 +16031,7 @@ class AdminManager {
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
-                    <button class="automation-tab" data-tab="donations">Per gave</button>
+                    <button class="automation-tab" data-tab="donations">Pr. gave</button>
                     <button class="automation-tab" data-tab="donors">Per giver</button>
                     <button class="automation-tab" data-tab="shop">Butikk</button>
                     <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
@@ -16106,9 +16112,9 @@ class AdminManager {
                             <span class="material-symbols-outlined">payments</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Fullført totalt</h3>
+                            <h3 class="stat-label">Fullført i perioden</h3>
                             <p class="stat-value" id="donation-total-amount">${formattedTotal}</p>
-                            <p class="stat-trend">Alle fullførte gaver</p>
+                            <p class="stat-trend" id="donation-total-subtitle">Fullførte gaver i perioden</p>
                         </div>
                     </div>
 
@@ -16117,9 +16123,9 @@ class AdminManager {
                             <span class="material-symbols-outlined">volunteer_activism</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Antall gaver</h3>
+                            <h3 class="stat-label">Antall gaver i perioden</h3>
                             <p class="stat-value" id="donation-total-count">${donationCount}</p>
-                            <span class="stat-meta">Registrerte transaksjoner</span>
+                            <span class="stat-meta" id="donation-count-subtitle">Transaksjoner i perioden</span>
                         </div>
                     </div>
 
@@ -16128,9 +16134,9 @@ class AdminManager {
                             <span class="material-symbols-outlined">trending_up</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Snittgave</h3>
+                            <h3 class="stat-label">Snittgave i perioden</h3>
                             <p class="stat-value" id="donation-average-amount">${formattedAverage}</p>
-                            <span class="stat-meta">Per donasjon</span>
+                            <span class="stat-meta" id="donation-average-subtitle">Snitt per donasjon i perioden</span>
                         </div>
                     </div>
 
@@ -16389,9 +16395,9 @@ class AdminManager {
                             <span class="material-symbols-outlined">shopping_bag</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Omsetning butikk</h3>
+                            <h3 class="stat-label">Omsetning i perioden</h3>
                             <p class="stat-value" id="shop-total-amount">0 kr</p>
-                            <p class="stat-trend">Alle fullførte butikkjøp</p>
+                            <p class="stat-trend">Fullførte butikkjøp i perioden</p>
                         </div>
                     </div>
 
@@ -16400,9 +16406,9 @@ class AdminManager {
                             <span class="material-symbols-outlined">receipt_long</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Antall ordre</h3>
+                            <h3 class="stat-label">Antall ordre i perioden</h3>
                             <p class="stat-value" id="shop-total-count">0</p>
-                            <span class="stat-meta">Registrerte butikktransaksjoner</span>
+                            <span class="stat-meta">Registrerte butikkordre i perioden</span>
                         </div>
                     </div>
 
@@ -16411,9 +16417,9 @@ class AdminManager {
                             <span class="material-symbols-outlined">trending_up</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Snittordre</h3>
+                            <h3 class="stat-label">Snittordre i perioden</h3>
                             <p class="stat-value" id="shop-average-amount">0 kr</p>
-                            <span class="stat-meta">Per kjøp</span>
+                            <span class="stat-meta">Snitt per butikkjøp i perioden</span>
                         </div>
                     </div>
 
