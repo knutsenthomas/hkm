@@ -14793,17 +14793,17 @@ class AdminManager {
                         </div>
                         <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
                     </div>
-                    <div style="height: 260px; position: relative; padding: 10px 0; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
+                    <div style="height: 260px; position: relative; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
                         <!-- SVG background -->
-                        <div style="position: absolute; inset: 0; pointer-events: none; padding: 10px 0;">
+                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; pointer-events: none;">
                             ${svgPathHtml}
                         </div>
                         <!-- HTML Dots (perfectly circular overlay) -->
-                        <div style="position: absolute; inset: 0; pointer-events: none; padding: 10px 0;">
+                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; pointer-events: none;">
                             ${chartDotsHtml}
                         </div>
                         <!-- Hover overlay columns -->
-                        <div style="position: absolute; inset: 0; padding: 10px 0; overflow: hidden;">
+                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; overflow: hidden;">
                             ${chartBarsHtml}
                         </div>
                     </div>
