@@ -14227,15 +14227,13 @@ class AdminManager {
                         </div>
                         <button class="modal-close" type="button" onclick="window.adminManager?.closeBankImportModal?.()">×</button>
                     </div>
-                    <div class="modal-body" style="display:grid;gap:16px;">
-                        <div style="display:grid;grid-template-columns:minmax(220px,1fr) auto;gap:14px;align-items:end;">
-                            <div class="form-group" style="margin:0;">
-                                <label>Bankfil</label>
-                                <input id="bank-import-file" class="form-control" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml">
-                            </div>
-                            <div style="font-size:12px;line-height:1.5;color:#64748b;padding-bottom:8px;">
+                    <div class="modal-body" style="display:grid;gap:16px; padding:24px 32px;">
+                        <div class="form-group" style="margin:0; display:flex; flex-direction:column; gap:8px;">
+                            <label style="display:block; font-weight:600; color:#334155; font-size:0.875rem; margin:0;">Bankfil</label>
+                            <input id="bank-import-file" class="form-control" type="file" accept=".csv,.txt,.xml,text/csv,text/plain,application/xml,text/xml" style="width:100%;">
+                            <p style="margin:2px 0 0; font-size:0.75rem; color:#64748b; line-height:1.5;">
                                 Støtter vanlige CSV-filer og ISO 20022 CAMT XML.
-                            </div>
+                            </p>
                         </div>
                         <div id="bank-import-summary" style="font-size:13px;color:#475569;font-weight:700;"></div>
                         <div id="bank-import-preview">
