@@ -12511,7 +12511,31 @@ class AdminManager {
     }
 
     getDonationDonorName(donation, userMap = new Map()) {
-        const user = donation.userId ? userMap.get(donation.userId) : null;
+        let user = donation.userId ? userMap.get(donation.userId) : null;
+        
+        // Fallback: search by email in userMap
+        const donorEmailRaw = String(donation.donorEmail || donation.email || '').trim().toLowerCase();
+        if (!user && donorEmailRaw && donorEmailRaw !== 'ukjent' && donorEmailRaw !== 'unknown') {
+            for (const u of userMap.values()) {
+                if (u.email && u.email.trim().toLowerCase() === donorEmailRaw) {
+                    user = u;
+                    break;
+                }
+            }
+        }
+        
+        // Fallback: search by name in userMap
+        const donorNameRaw = String(donation.donorName || donation.name || '').trim().toLowerCase();
+        if (!user && donorNameRaw && donorNameRaw !== 'ukjent giver' && donorNameRaw !== 'ukjent' && donorNameRaw !== 'unknown') {
+            for (const u of userMap.values()) {
+                const uName = String(u.displayName || u.fullName || u.name || '').trim().toLowerCase();
+                if (uName && uName === donorNameRaw) {
+                    user = u;
+                    break;
+                }
+            }
+        }
+
         return user?.displayName
             || user?.fullName
             || donation.donorName
@@ -12523,7 +12547,31 @@ class AdminManager {
     }
 
     getDonationDonorEmail(donation, userMap = new Map()) {
-        const user = donation.userId ? userMap.get(donation.userId) : null;
+        let user = donation.userId ? userMap.get(donation.userId) : null;
+        
+        // Fallback: search by email in userMap if userId is not linked
+        const donorEmailRaw = String(donation.donorEmail || donation.email || '').trim().toLowerCase();
+        if (!user && donorEmailRaw && donorEmailRaw !== 'ukjent' && donorEmailRaw !== 'unknown') {
+            for (const u of userMap.values()) {
+                if (u.email && u.email.trim().toLowerCase() === donorEmailRaw) {
+                    user = u;
+                    break;
+                }
+            }
+        }
+        
+        // Fallback: search by name in userMap
+        const donorNameRaw = String(donation.donorName || donation.name || '').trim().toLowerCase();
+        if (!user && donorNameRaw && donorNameRaw !== 'ukjent giver' && donorNameRaw !== 'ukjent' && donorNameRaw !== 'unknown') {
+            for (const u of userMap.values()) {
+                const uName = String(u.displayName || u.fullName || u.name || '').trim().toLowerCase();
+                if (uName && uName === donorNameRaw) {
+                    user = u;
+                    break;
+                }
+            }
+        }
+
         const email = String(user?.email || donation.donorEmail || donation.email || '').trim().toLowerCase();
         if (email === 'ukjent' || email === 'unknown') return '';
         return email;
@@ -12599,23 +12647,38 @@ class AdminManager {
             
             let key = record.userId;
             if (!key && email) {
-                key = email;
+                const matchedUser = Array.from(userMap.values()).find(u => u.email && u.email.trim().toLowerCase() === email.trim().toLowerCase());
+                if (matchedUser) {
+                    key = matchedUser.id;
+                } else {
+                    key = email;
+                }
             }
             if (!key && name) {
                 const cleanName = name.trim().toLowerCase();
                 if (cleanName && cleanName !== 'ukjent' && cleanName !== 'unknown' && cleanName !== 'ukjent giver') {
-                    key = name.trim();
+                    const matchedUser = Array.from(userMap.values()).find(u => {
+                        const uName = String(u.displayName || u.fullName || u.name || '').trim().toLowerCase();
+                        return uName && uName === cleanName;
+                    });
+                    if (matchedUser) {
+                        key = matchedUser.id;
+                    } else {
+                        key = name.trim();
+                    }
                 }
             }
             if (!key) {
                 key = record.id;
             }
 
+            const resolvedUserId = (key && !key.includes('@') && !key.startsWith('bank-import-') && key !== record.id) ? key : '';
+
             const existing = donors.get(key) || {
                 key,
                 name,
                 email,
-                userId: record.userId || '',
+                userId: record.userId || resolvedUserId,
                 giftCount: 0,
                 completedCount: 0,
                 total: 0,
@@ -12788,8 +12851,14 @@ class AdminManager {
                         <td>${this.escapeHtml(methodText)}</td>
                         <td>${donor.latestDate ? donor.latestDate.toLocaleDateString('no-NO') : 'Ukjent'}</td>
                         <td>${donor.userId
-                            ? `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>Koblet</span>`
-                            : `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>Ukoblet</span>`}</td>
+                            ? `<button type="button" class="btn-link-donor-profile link-connected" data-key="${this.escapeHtml(donor.key)}" data-userid="${this.escapeHtml(donor.userId)}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
+                                <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>
+                                Koblet
+                               </button>`
+                            : `<button type="button" class="btn-link-donor-profile link-unconnected" data-key="${this.escapeHtml(donor.key)}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
+                                <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
+                                Ukoblet
+                               </button>`}</td>
                         <td class="text-right"><strong>${this.formatDonationCurrency(donor.total)}</strong></td>
                         <td class="text-right" style="text-align:right; width:1px; white-space:nowrap;">
                             <button type="button" class="action-btn view-donor-details-btn" data-key="${this.escapeHtml(donor.key)}" title="Vis historikk" style="color:#1B4965; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:4px; border-radius:4px; transition:background 0.2s;">
@@ -12808,6 +12877,21 @@ class AdminManager {
                     e.stopPropagation();
                     const donorKey = btn.dataset.key;
                     this.openDonorDetailsModal(donorKey);
+                });
+            });
+
+            // Bind click events to link buttons in donors tab
+            donorsBody.querySelectorAll('.btn-link-donor-profile').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const donorKey = btn.dataset.key;
+                    const userId = btn.dataset.userid || '';
+                    const donations = this.getDonationsForDonor(donorKey);
+                    if (donations.length > 0) {
+                        this.openLinkProfileModal(donations[0].id, userId);
+                    } else {
+                        this.showToast('Ingen gaver funnet for denne giveren.', 'error', 4000);
+                    }
                 });
             });
         }
