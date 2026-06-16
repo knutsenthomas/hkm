@@ -13621,7 +13621,7 @@ class AdminManager {
         });
 
         // Bind email button in modal
-        modal.querySelector('#donor-modal-email-btn')?.addEventListener('click', async () => {
+        modal.querySelector('#donor-modal-email-btn')?.addEventListener('click', () => {
             if (!donorEmail || donorEmail === 'ukjent' || donorEmail === 'unknown') {
                 this.showToast('Kan ikke sende e-post: Giveren har ingen registrert e-postadresse.', 'error');
                 return;
@@ -13630,34 +13630,8 @@ class AdminManager {
             // Get selected year from dropdown
             const yearSelect = document.getElementById('donor-modal-year-filter');
             const selectedYear = yearSelect ? yearSelect.value : 'all';
-            const periodText = selectedYear === 'all' ? 'alle gaver' : `gaver i ${selectedYear}`;
             
-            const confirmed = confirm(`Vil du sende rapporten over ${periodText} til ${donorEmail}?`);
-            if (!confirmed) return;
-
-            const emailBtn = modal.querySelector('#donor-modal-email-btn');
-            if (emailBtn) {
-                emailBtn.disabled = true;
-                emailBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; animation: admin-spin 1s linear infinite; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">sync</span> <span style="display:inline-flex; align-items:center; line-height:1;">Sender...</span>';
-            }
-
-            try {
-                // Generate HTML report content for email body
-                const htmlContent = this.generateEmailReportHtml(donorKey, selectedYear);
-                const subject = selectedYear === 'all' 
-                    ? 'Gaveoversikt - His Kingdom Ministry' 
-                    : `Gaveoversikt for kalenderåret ${selectedYear} - His Kingdom Ministry`;
-                
-                await this.sendEmailToUser(donorEmail, subject, 'Se vedlagt gaveoversikt i e-posten.', htmlContent);
-            } catch (error) {
-                console.error('Feil ved sending av e-postrapport:', error);
-                this.showToast('Kunne ikke sende e-post: ' + error.message, 'error');
-            } finally {
-                if (emailBtn) {
-                    emailBtn.disabled = false;
-                    emailBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">mail</span> <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post</span>';
-                }
-            }
+            this.openEmailPreviewModal(donorKey, selectedYear, donorEmail);
         });
 
         // Initial binding of delete buttons (since updateRows isn't run initially)
@@ -14069,7 +14043,7 @@ class AdminManager {
         printWindow.document.close();
     }
 
-    generateEmailReportHtml(donorKey, selectedYear) {
+    generateEmailReportHtml(donorKey, selectedYear, customIntroHtml = null) {
         const userMap = this.adminUserMap || new Map();
         const donations = this.getDonationsForDonor(donorKey);
         
@@ -14126,8 +14100,7 @@ class AdminManager {
                     <div style="padding:24px 24px 16px;">
                         <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a;">Hei ${this.escapeHtml(donorName)},</h3>
                         <p style="margin:10px 0 0; font-size:14px; line-height:1.5; color:#475569;">
-                            Her er en oversikt over gaver registrert hos oss for ${periodText}. 
-                            Tusen takk for dine bidrag og din støtte til arbeidet vårt!
+                            ${customIntroHtml !== null ? customIntroHtml.replace(/\n/g, '<br>') : `Her er en oversikt over gaver registrert hos oss for ${periodText}.<br><br>Tusen takk for dine bidrag og din støtte til arbeidet vårt!`}
                         </p>
                     </div>
 
@@ -14166,6 +14139,137 @@ class AdminManager {
                 </div>
             </div>
         `;
+    }
+
+    openEmailPreviewModal(donorKey, selectedYear, donorEmail) {
+        let previewModal = document.getElementById('email-preview-modal');
+        if (!previewModal) {
+            previewModal = document.createElement('div');
+            previewModal.id = 'email-preview-modal';
+            previewModal.style.cssText = 'display:none;position:fixed;inset:0;z-index:20000;align-items:center;justify-content:center;padding:24px;';
+            document.body.appendChild(previewModal);
+        }
+
+        const periodText = selectedYear === 'all' ? 'hele historikken' : `kalenderåret ${selectedYear}`;
+        const defaultIntro = `Her er en oversikt over gaver registrert hos oss for ${periodText}.\n\nTusen takk for dine bidrag og din støtte til arbeidet vårt!`;
+        const defaultSubject = selectedYear === 'all' 
+            ? 'Gaveoversikt - His Kingdom Ministry' 
+            : `Gaveoversikt for kalenderåret ${selectedYear} - His Kingdom Ministry`;
+
+        previewModal.innerHTML = `
+            <div class="modal-backdrop close-email-preview-btn" style="position:absolute;inset:0;background:rgba(15,23,42,0.4);backdrop-filter:blur(4px);"></div>
+            <div class="modal-container" style="position:relative;background:white;border-radius:16px;box-shadow:0 25px 50px -12px rgba(0,0,0,0.25);width:100%;max-width:1100px;height:85vh;display:flex;flex-direction:column;overflow:hidden;animation:modalAppear 0.25s ease-out;z-index:1;">
+                <!-- Header -->
+                <div style="padding:16px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+                    <div>
+                        <h3 style="margin:0; font-size:18px; font-weight:700; color:#1B4965; display:flex; align-items:center; gap:8px;">
+                            <span class="material-symbols-outlined" style="font-size:22px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">mail</span>
+                            <span style="display:inline-flex; align-items:center; line-height:1;">Forhåndsvis og rediger e-post</span>
+                        </h3>
+                    </div>
+                    <button type="button" class="close-email-preview-btn" style="background:none; border:none; cursor:pointer; color:#64748b; display:flex; align-items:center; justify-content:center; padding:6px; border-radius:999px; transition:background 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size:22px;">close</span>
+                    </button>
+                </div>
+                
+                <!-- Two-column Body -->
+                <div style="flex:1; display:flex; min-height:0; overflow:hidden;">
+                    <!-- Left Panel: Form & Editor -->
+                    <div style="width:40%; border-right:1px solid #e2e8f0; padding:20px; display:flex; flex-direction:column; gap:16px; overflow-y:auto; background:#f8fafc;">
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-weight:700; color:#1b4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Mottaker</label>
+                            <input type="email" id="email-preview-to" class="form-control" style="font-weight:600; width:100%; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px;" value="${this.escapeHtml(donorEmail)}">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-weight:700; color:#1b4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Emne</label>
+                            <input type="text" id="email-preview-subject" class="form-control" style="font-weight:600; width:100%; border: 1px solid #cbd5e1; padding: 8px 12px; border-radius: 6px;" value="${this.escapeHtml(defaultSubject)}">
+                        </div>
+                        <div class="form-group" style="margin:0; flex:1; display:flex; flex-direction:column;">
+                            <label style="font-weight:700; color:#1b4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Følgebrev / Melding (HTML tillatt)</label>
+                            <textarea id="email-preview-intro" class="form-control" style="flex:1; resize:none; font-family:inherit; font-size:13px; line-height:1.5; padding:12px; border: 1px solid #cbd5e1; border-radius:8px; min-height:200px; margin:0;">${defaultIntro}</textarea>
+                            <span style="font-size:11px; color:#64748b; margin-top:4px;">Dette vil erstatte introduksjonsteksten i e-posten.</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Right Panel: Live HTML Preview -->
+                    <div style="width:60%; padding:20px; display:flex; flex-direction:column; background:#cbd5e1; min-height:0;">
+                        <label style="font-weight:700; color:#475569; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:8px;">Live Forhåndsvisning</label>
+                        <div style="flex:1; background:white; border-radius:8px; overflow:hidden; box-shadow:0 4px 6px -1px rgba(0,0,0,0.1); border:1px solid #94a3b8; display:flex; flex-direction:column;">
+                            <iframe id="email-preview-iframe" style="width:100%; flex:1; border:none; background:#f8fafc;"></iframe>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; background:#f8fafc; gap:12px;">
+                    <button type="button" class="btn-secondary close-email-preview-btn" style="padding:10px 20px; border-radius:8px; font-weight:600; height:38px; cursor:pointer;">Avbryt</button>
+                    <button type="button" class="btn-primary" id="email-preview-send-btn" style="padding:10px 24px; border-radius:8px; font-weight:700; height:38px; background:#1B4965; color:white; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                        <span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">send</span>
+                        <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post nå</span>
+                    </button>
+                </div>
+            </div>
+        `;
+
+        const updatePreview = () => {
+            const introVal = document.getElementById('email-preview-intro').value;
+            const html = this.generateEmailReportHtml(donorKey, selectedYear, introVal);
+            const iframe = document.getElementById('email-preview-iframe');
+            if (iframe) {
+                const doc = iframe.contentDocument || iframe.contentWindow.document;
+                doc.open();
+                doc.write(html);
+                doc.close();
+            }
+        };
+
+        const closeModal = () => {
+            previewModal.style.display = 'none';
+        };
+
+        previewModal.querySelectorAll('.close-email-preview-btn').forEach(btn => {
+            btn.addEventListener('click', closeModal);
+        });
+
+        document.getElementById('email-preview-intro').addEventListener('input', updatePreview);
+
+        document.getElementById('email-preview-send-btn').addEventListener('click', async () => {
+            const recipient = document.getElementById('email-preview-to').value.trim();
+            const subject = document.getElementById('email-preview-subject').value.trim();
+            const introText = document.getElementById('email-preview-intro').value;
+
+            if (!recipient) {
+                this.showToast('Mottaker e-post kan ikke være tom.', 'error');
+                return;
+            }
+            if (!subject) {
+                this.showToast('Emnefeltet kan ikke være tomt.', 'error');
+                return;
+            }
+
+            const sendBtn = document.getElementById('email-preview-send-btn');
+            if (sendBtn) {
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; animation: admin-spin 1s linear infinite; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">sync</span> <span style="display:inline-flex; align-items:center; line-height:1;">Sender...</span>';
+            }
+
+            try {
+                const htmlContent = this.generateEmailReportHtml(donorKey, selectedYear, introText);
+                await this.sendEmailToUser(recipient, subject, 'Se vedlagt gaveoversikt i e-posten.', htmlContent);
+                closeModal();
+            } catch (error) {
+                console.error('Feil ved sending av e-postrapport:', error);
+                this.showToast('Kunne ikke sende e-post: ' + error.message, 'error');
+            } finally {
+                if (sendBtn) {
+                    sendBtn.disabled = false;
+                    sendBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">send</span> <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post nå</span>';
+                }
+            }
+        });
+
+        previewModal.style.display = 'flex';
+        updatePreview();
     }
 
     openManualDonationModal() {
@@ -21314,6 +21418,10 @@ class AdminManager {
         }
 
         try {
+            const user = firebase.auth().currentUser;
+            if (!user) throw new Error('Du er ikke logget inn.');
+            const idToken = await user.getIdToken();
+
             const payload = {
                 to: email,
                 subject: subject,
@@ -21328,7 +21436,10 @@ class AdminManager {
 
             const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`
+                },
                 body: JSON.stringify(payload)
             });
 
