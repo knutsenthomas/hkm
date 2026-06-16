@@ -13486,9 +13486,13 @@ class AdminManager {
                             <select id="donor-modal-year-filter" class="form-control" style="font-size:13px; padding:4px 28px 4px 8px !important; height:32px; border-radius:6px; font-weight:600; width:140px; margin:0;">
                                 ${yearOptionsHtml}
                             </select>
-                            <button type="button" class="btn-primary" id="donor-modal-print-btn" style="display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600; height:32px; background:#1B4965; color:white; border:none; cursor:pointer;">
-                                <span class="material-symbols-outlined" style="font-size:18px;">print</span>
-                                Skriv ut
+                            <button type="button" class="btn-primary" id="donor-modal-print-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600; height:32px; background:#1B4965; color:white; border:none; cursor:pointer; transform-origin: center;">
+                                <span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">print</span>
+                                <span style="display:inline-flex; align-items:center; line-height:1;">Skriv ut</span>
+                            </button>
+                            <button type="button" class="btn-secondary" id="donor-modal-email-btn" style="display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:6px 12px; border-radius:6px; font-size:13px; font-weight:600; height:32px; cursor:pointer; transform-origin: center;">
+                                <span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">mail</span>
+                                <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post</span>
                             </button>
                         </div>
                     </div>
@@ -13614,6 +13618,46 @@ class AdminManager {
         // Bind print button in modal
         modal.querySelector('#donor-modal-print-btn')?.addEventListener('click', () => {
             this.printReport('donor-statement', donorKey);
+        });
+
+        // Bind email button in modal
+        modal.querySelector('#donor-modal-email-btn')?.addEventListener('click', async () => {
+            if (!donorEmail || donorEmail === 'ukjent' || donorEmail === 'unknown') {
+                this.showToast('Kan ikke sende e-post: Giveren har ingen registrert e-postadresse.', 'error');
+                return;
+            }
+            
+            // Get selected year from dropdown
+            const yearSelect = document.getElementById('donor-modal-year-filter');
+            const selectedYear = yearSelect ? yearSelect.value : 'all';
+            const periodText = selectedYear === 'all' ? 'alle gaver' : `gaver i ${selectedYear}`;
+            
+            const confirmed = confirm(`Vil du sende rapporten over ${periodText} til ${donorEmail}?`);
+            if (!confirmed) return;
+
+            const emailBtn = modal.querySelector('#donor-modal-email-btn');
+            if (emailBtn) {
+                emailBtn.disabled = true;
+                emailBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; animation: admin-spin 1s linear infinite; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">sync</span> <span style="display:inline-flex; align-items:center; line-height:1;">Sender...</span>';
+            }
+
+            try {
+                // Generate HTML report content for email body
+                const htmlContent = this.generateEmailReportHtml(donorKey, selectedYear);
+                const subject = selectedYear === 'all' 
+                    ? 'Gaveoversikt - His Kingdom Ministry' 
+                    : `Gaveoversikt for kalenderåret ${selectedYear} - His Kingdom Ministry`;
+                
+                await this.sendEmailToUser(donorEmail, subject, 'Se vedlagt gaveoversikt i e-posten.', htmlContent);
+            } catch (error) {
+                console.error('Feil ved sending av e-postrapport:', error);
+                this.showToast('Kunne ikke sende e-post: ' + error.message, 'error');
+            } finally {
+                if (emailBtn) {
+                    emailBtn.disabled = false;
+                    emailBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">mail</span> <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post</span>';
+                }
+            }
         });
 
         // Initial binding of delete buttons (since updateRows isn't run initially)
@@ -13923,7 +13967,7 @@ class AdminManager {
                         <span style="font-size:10px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Organisasjon</span>
                         <div style="font-size:14px; font-weight:700; color:#1B4965; margin-top:4px;">His Kingdom Ministry</div>
                         <div style="font-size:11px; color:#475569; margin-top:2px;">Org.nr: 925 832 995</div>
-                        <div style="font-size:11px; color:#475569;">Mandal, Norge</div>
+                        <div style="font-size:11px; color:#475569;">Lyngdal, Norge</div>
                     </div>
                 </div>
             `;
@@ -14023,6 +14067,105 @@ class AdminManager {
             </html>
         `);
         printWindow.document.close();
+    }
+
+    generateEmailReportHtml(donorKey, selectedYear) {
+        const userMap = this.adminUserMap || new Map();
+        const donations = this.getDonationsForDonor(donorKey);
+        
+        const firstRec = donations[0];
+        const donorName = this.getDonationDonorName(firstRec, userMap);
+        
+        const filtered = selectedYear === 'all'
+            ? donations
+            : donations.filter(d => {
+                const date = this.getDonationDate(d);
+                return date && date.getFullYear().toString() === selectedYear;
+              });
+
+        const isCompleted = (r) => ['completed', 'succeeded', 'captured'].includes(String(r.status || '').toLowerCase());
+        const completed = filtered.filter(isCompleted);
+        const totalSum = completed.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+        
+        const periodText = selectedYear === 'all' ? 'hele historikken' : `kalenderåret ${selectedYear}`;
+        
+        const rowsHtml = filtered.map(d => {
+            const date = this.getDonationDate(d);
+            const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
+            const method = this.getDonationMethodLabel(d.method) || (d.isInKind ? 'Fysisk' : 'Ukjent');
+            const isRecurring = String(d.type || '').toLowerCase() === 'fast';
+            const typeText = d.isInKind ? 'Fysisk' : (isRecurring ? 'Fast' : 'Enkelt');
+            const status = this.getDonationStatusLabel(d.status);
+            const amountVal = this.normalizeDonationAmountNok(d);
+            const amountText = isCompleted(d) || d.isInKind
+                ? `<strong>${this.formatDonationCurrency(amountVal)}</strong>`
+                : `<span style="color:#94a3b8; text-decoration:line-through;">${this.formatDonationCurrency(amountVal)}</span>`;
+
+            return `
+                <tr style="border-bottom:1px solid #e2e8f0;">
+                    <td style="padding:10px; font-size:12px; color:#334155; border-bottom:1px solid #f1f5f9;">${dateStr}</td>
+                    <td style="padding:10px; font-size:12px; color:#475569; border-bottom:1px solid #f1f5f9;">${method}</td>
+                    <td style="padding:10px; font-size:12px; color:#475569; border-bottom:1px solid #f1f5f9;">${typeText}</td>
+                    <td style="padding:10px; font-size:12px; color:#475569; border-bottom:1px solid #f1f5f9;">${status}</td>
+                    <td style="padding:10px; font-size:12px; text-align:right; border-bottom:1px solid #f1f5f9;">${amountText}</td>
+                </tr>
+            `;
+        }).join('');
+
+        return `
+            <div style="font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color:#1e293b; background:#f8fafc; padding:32px 16px; min-height:100%;">
+                <div style="max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                    <!-- Header -->
+                    <div style="background:#1B4965; padding:24px; text-align:center;">
+                        <img src="https://www.hiskingdomministry.no/img/logo-hkm.png" alt="His Kingdom Ministry Logo" style="height:60px; width:auto; border-radius:6px; margin-bottom:12px;">
+                        <h2 style="margin:0; color:white; font-size:20px; font-weight:800; letter-spacing:-0.01em;">HIS KINGDOM MINISTRY</h2>
+                        <p style="margin:4px 0 0; color:#93c5fd; font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Gaveoversikt</p>
+                    </div>
+
+                    <!-- Intro -->
+                    <div style="padding:24px 24px 16px;">
+                        <h3 style="margin:0; font-size:16px; font-weight:700; color:#0f172a;">Hei ${this.escapeHtml(donorName)},</h3>
+                        <p style="margin:10px 0 0; font-size:14px; line-height:1.5; color:#475569;">
+                            Her er en oversikt over gaver registrert hos oss for ${periodText}. 
+                            Tusen takk for dine bidrag og din støtte til arbeidet vårt!
+                        </p>
+                    </div>
+
+                    <!-- Summary Card -->
+                    <div style="margin: 0 24px 24px; background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:8px; text-align:center;">
+                        <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Mottatt beløp totalt</span>
+                        <div style="font-size:24px; font-weight:800; color:#047857; margin-top:4px;">${this.formatDonationCurrency(totalSum)}</div>
+                    </div>
+
+                    <!-- Table -->
+                    <div style="padding:0 24px 24px;">
+                        <table style="width:100%; border-collapse:collapse;">
+                            <thead>
+                                <tr style="border-bottom:2px solid #1B4965; text-align:left;">
+                                    <th style="padding:10px; font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">Dato</th>
+                                    <th style="padding:10px; font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">Metode</th>
+                                    <th style="padding:10px; font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">Type</th>
+                                    <th style="padding:10px; font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase;">Status</th>
+                                    <th style="padding:10px; font-size:11px; color:#64748b; font-weight:700; text-transform:uppercase; text-align:right;">Beløp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer -->
+                    <div style="background:#f8fafc; border-top:1px solid #e2e8f0; padding:20px; text-align:center; font-size:12px; color:#64748b;">
+                        <p style="margin:0; font-weight:600;">His Kingdom Ministry</p>
+                        <p style="margin:4px 0 0;">Org.nr: 925 832 995 &bull; Lyngdal, Norge</p>
+                        <p style="margin:12px 0 0; font-size:11px; color:#94a3b8; line-height:1.4;">
+                            Hvis du har spørsmål vedrørende denne oversikten, vennligst ta kontakt med oss ved å svare på denne e-posten.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
     }
 
     openManualDonationModal() {
@@ -15667,9 +15810,12 @@ class AdminManager {
                 .data-table th, .data-table th div {
                     white-space: nowrap !important;
                 }
+                .modal-container, .modal-content {
+                    transform-origin: center !important;
+                }
                 @keyframes modalAppear {
-                    from { opacity: 0; transform: scale(0.95) translateY(10px); }
-                    to { opacity: 1; transform: scale(1) translateY(0); }
+                    from { opacity: 0; transform: scale(0.85); }
+                    to { opacity: 1; transform: scale(1); }
                 }
             </style>
 
@@ -21161,22 +21307,29 @@ class AdminManager {
         }
     }
 
-    async sendEmailToUser(email, subject, message) {
+    async sendEmailToUser(email, subject, message, html = null) {
         if (!email) {
             this.showToast('Brukeren mangler e-postadresse.', 'error');
             return;
         }
 
         try {
+            const payload = {
+                to: email,
+                subject: subject,
+                fromName: 'His Kingdom Ministry'
+            };
+            if (html) {
+                payload.html = html;
+                payload.message = message || 'Se vedlagte rapport.';
+            } else {
+                payload.message = message;
+            }
+
             const response = await fetch('https://sendmanualemail-42bhgdjkcq-uc.a.run.app', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    to: email,
-                    subject: subject,
-                    message: message,
-                    fromName: 'His Kingdom Ministry'
-                })
+                body: JSON.stringify(payload)
             });
 
             const result = await response.json();
