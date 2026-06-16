@@ -2211,25 +2211,48 @@
             }
 
             // Lytter på Auth-endringer for å hente ekte data så snart bruker er klar
-            if (typeof firebase !== 'undefined') {
-                let authInitChecked = false;
-                firebase.auth().onAuthStateChanged((user) => {
-                    if (user) {
-                        authInitChecked = true;
-                        const banner = document.getElementById('analytics-error-banner');
-                        if (banner) banner.style.display = 'none';
-                        loadRealAnalytics(7); // Hent siste 7 dager som standard
-                    } else {
-                        clearAnalyticsToEmpty();
-                        // Delay login check to prevent initial blink
-                        setTimeout(() => {
-                            if (typeof firebase !== 'undefined' && !firebase.auth().currentUser) {
-                                showDashboardError("Du er ikke logget inn i Firebase. Vennligst logg inn på nytt for å se statistikk.", 'warning');
-                            }
-                        }, 2000);
-                    }
-                });
-            }
+            const initAuthListener = async () => {
+                let service = window.firebaseService;
+                for (let i = 0; i < 20; i++) {
+                    if (service && service.isInitialized) break;
+                    await new Promise(r => setTimeout(r, 100));
+                    service = window.firebaseService;
+                }
+
+                if (service && service.isInitialized) {
+                    service.onAuthChange((user) => {
+                        if (user) {
+                            const banner = document.getElementById('analytics-error-banner');
+                            if (banner) banner.style.display = 'none';
+                            loadRealAnalytics(7); // Hent siste 7 dager som standard
+                        } else {
+                            clearAnalyticsToEmpty();
+                            setTimeout(() => {
+                                if (window.firebaseService && !window.firebaseService.auth.currentUser) {
+                                    showDashboardError("Du er ikke logget inn i Firebase. Vennligst logg inn på nytt for å se statistikk.", 'warning');
+                                }
+                            }, 2000);
+                        }
+                    });
+                } else if (typeof firebase !== 'undefined') {
+                    // Fallback to legacy auth listener
+                    firebase.auth().onAuthStateChanged((user) => {
+                        if (user) {
+                            const banner = document.getElementById('analytics-error-banner');
+                            if (banner) banner.style.display = 'none';
+                            loadRealAnalytics(7);
+                        } else {
+                            clearAnalyticsToEmpty();
+                            setTimeout(() => {
+                                if (typeof firebase !== 'undefined' && !firebase.auth().currentUser) {
+                                    showDashboardError("Du er ikke logget inn i Firebase. Vennligst logg inn på nytt for å se statistikk.", 'warning');
+                                }
+                            }, 2000);
+                        }
+                    });
+                }
+            };
+            initAuthListener();
 
             // 4. Period velger klikk-lyttere
             const periodButtons = document.querySelectorAll('.period-btn');

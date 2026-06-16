@@ -184,13 +184,17 @@ class FirebaseService {
 
             // Enable offline persistence for faster subsequent loads
             // Use synchronizeTabs: true to allow multiple tabs to share the same persistence layer
-            this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
-                if (err.code === 'failed-precondition') {
-                    console.warn("[FirebaseService] Persistence failed (multiple tabs open without sync)");
-                } else if (err.code === 'unimplemented') {
-                    console.warn("[FirebaseService] Persistence not supported by browser");
-                }
-            });
+            try {
+                this.db.enablePersistence({ synchronizeTabs: true }).catch((err) => {
+                    if (err.code === 'failed-precondition') {
+                        console.warn("[FirebaseService] Persistence failed (multiple tabs open without sync)");
+                    } else if (err.code === 'unimplemented') {
+                        console.warn("[FirebaseService] Persistence not supported by browser");
+                    }
+                });
+            } catch (persistenceError) {
+                console.warn("[FirebaseService] enablePersistence threw synchronous error:", persistenceError);
+            }
         } catch (error) {
             console.error("❌ Firebase initialization failed:", error);
         }
@@ -1241,7 +1245,9 @@ class FirebaseService {
 }
 
 // Global instance
-window.firebaseService = new FirebaseService();
+if (!window.firebaseService) {
+    window.firebaseService = new FirebaseService();
+}
 
 // ESM Export for Vite/Rollup bundling support
 export const firebaseService = window.firebaseService;
