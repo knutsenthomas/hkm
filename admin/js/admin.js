@@ -12607,6 +12607,9 @@ class AdminManager {
 
         return records.filter((record) => {
             if (record.isInKind) return false;
+            // Exclude shop transactions from the donations list
+            if (String(record.type || '').toLowerCase() === 'butikk') return false;
+
             const date = this.getDonationDate(record);
             if (start && (!date || date < start)) return false;
             if (end && (!date || date > end)) return false;
@@ -12634,6 +12637,73 @@ class AdminManager {
                 record.type
             ].join(' ').toLowerCase();
             return haystack.includes(query);
+        });
+    }
+
+    getFilteredShopRecords() {
+        const records = Array.isArray(this.allDonationRecords) ? this.allDonationRecords : [];
+        const filters = this.donationFilters || {};
+        const { start, end } = this.buildDonationDateRange(filters.preset || '30', filters.start || '', filters.end || '');
+        const query = String(filters.shopQuery || '').trim().toLowerCase();
+        const status = String(filters.shopStatus || 'all').toLowerCase();
+        const method = String(filters.shopMethod || 'all').toLowerCase();
+
+        return records.filter((record) => {
+            if (record.isInKind) return false;
+            // Only include shop transactions
+            if (String(record.type || '').toLowerCase() !== 'butikk') return false;
+
+            const date = this.getDonationDate(record);
+            if (start && (!date || date < start)) return false;
+            if (end && (!date || date > end)) return false;
+            const recordStatus = String(record.status || '').toLowerCase();
+            if (status !== 'all') {
+                if (status === 'completed' && !['completed', 'succeeded', 'captured'].includes(recordStatus)) return false;
+                if (status !== 'completed' && recordStatus !== status) return false;
+            }
+            if (method !== 'all' && String(record.method || '').toLowerCase() !== method) return false;
+
+            if (!query) return true;
+            const haystack = [
+                record.id,
+                record.transactionId,
+                record.donorName,
+                record.donorEmail,
+                record.email,
+                record.method,
+                record.status
+            ].join(' ').toLowerCase();
+            return haystack.includes(query);
+        });
+    }
+
+    getFilteredDonorRecords() {
+        const records = Array.isArray(this.allDonationRecords) ? this.allDonationRecords : [];
+        const filters = this.donationFilters || {};
+        const { start, end } = this.buildDonationDateRange(filters.preset || '30', filters.start || '', filters.end || '');
+        const status = String(filters.status || 'all').toLowerCase();
+        const method = String(filters.method || 'all').toLowerCase();
+        const type = String(filters.type || 'all').toLowerCase();
+
+        return records.filter((record) => {
+            if (record.isInKind) return false;
+
+            const date = this.getDonationDate(record);
+            if (start && (!date || date < start)) return false;
+            if (end && (!date || date > end)) return false;
+            const recordStatus = String(record.status || '').toLowerCase();
+            if (status !== 'all') {
+                if (status === 'completed' && !['completed', 'succeeded', 'captured'].includes(recordStatus)) return false;
+                if (status !== 'completed' && recordStatus !== status) return false;
+            }
+            if (method !== 'all' && String(record.method || '').toLowerCase() !== method) return false;
+            
+            if (type !== 'all') {
+                const recordType = String(record.type || 'gave').toLowerCase();
+                if (recordType !== type) return false;
+            }
+
+            return true;
         });
     }
 
@@ -12682,6 +12752,8 @@ class AdminManager {
                 giftCount: 0,
                 completedCount: 0,
                 total: 0,
+                totalGifts: 0,
+                totalShop: 0,
                 latestDate: null,
                 methods: new Set(),
                 types: new Set(),
@@ -12695,6 +12767,11 @@ class AdminManager {
             if (['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase())) {
                 existing.completedCount += 1;
                 existing.total += amount;
+                if (String(record.type || '').toLowerCase() === 'butikk') {
+                    existing.totalShop += amount;
+                } else {
+                    existing.totalGifts += amount;
+                }
             }
             if (date && (!existing.latestDate || date > existing.latestDate)) existing.latestDate = date;
             if (record.method) existing.methods.add(String(record.method));
@@ -12734,13 +12811,16 @@ class AdminManager {
         const records = this.getFilteredDonationRecords();
         const userMap = this.adminUserMap || new Map();
         const todayRange = this.buildDonationDateRange('today');
+        
+        // 1. Calculations for donations tab
         const todayRecords = (this.allDonationRecords || []).filter((record) => {
             if (record.isInKind) return false;
+            if (String(record.type || '').toLowerCase() === 'butikk') return false;
             const date = this.getDonationDate(record);
             return date && date >= todayRange.start && date <= todayRange.end;
         });
         const isCompleted = (record) => ['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase());
-        const allRecords = (this.allDonationRecords || []).filter(r => !r.isInKind);
+        const allRecords = (this.allDonationRecords || []).filter(r => !r.isInKind && String(r.type || '').toLowerCase() !== 'butikk');
         const allCompletedRecords = allRecords.filter(isCompleted);
         const allCompletedTotal = allCompletedRecords.reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
         const allAverage = allCompletedRecords.length ? allCompletedTotal / allCompletedRecords.length : 0;
@@ -12748,8 +12828,8 @@ class AdminManager {
         const filteredTotal = records.filter(isCompleted).reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
         const pendingCount = records.filter(record => String(record.status || '').toLowerCase() === 'pending').length;
         const unmatchedCount = records.filter(record => !record.userId).length;
-        const donors = this.buildDonorSummaries(records);
 
+        // Render donation stats
         const todayAmountEl = document.getElementById('donation-today-amount');
         const todayCountEl = document.getElementById('donation-today-count');
         const periodAmountEl = document.getElementById('donation-period-amount');
@@ -12761,6 +12841,8 @@ class AdminManager {
         const topCountEl = document.getElementById('donation-total-count');
         const topAverageEl = document.getElementById('donation-average-amount');
 
+        const donationDonors = this.buildDonorSummaries(records);
+
         if (topTotalEl) topTotalEl.textContent = this.formatDonationCurrency(allCompletedTotal);
         if (topCountEl) topCountEl.textContent = allRecords.length.toLocaleString('no-NO');
         if (topAverageEl) topAverageEl.textContent = this.formatDonationCurrency(allAverage);
@@ -12768,10 +12850,11 @@ class AdminManager {
         if (todayCountEl) todayCountEl.textContent = `${todayRecords.length} registrert i dag`;
         if (periodAmountEl) periodAmountEl.textContent = this.formatDonationCurrency(filteredTotal);
         if (periodCountEl) periodCountEl.textContent = `${records.length} transaksjoner i valgt periode`;
-        if (donorCountEl) donorCountEl.textContent = donors.length.toLocaleString('no-NO');
+        if (donorCountEl) donorCountEl.textContent = donationDonors.length.toLocaleString('no-NO');
         if (pendingEl) pendingEl.textContent = `${pendingCount} venter`;
         if (unmatchedEl) unmatchedEl.textContent = `${unmatchedCount} uten profilkobling`;
 
+        // Render donation transactions table
         const transactionsBody = document.getElementById('donation-transactions-body');
         if (transactionsBody) {
             const visibleRecords = records.slice(0, 100);
@@ -12787,8 +12870,6 @@ class AdminManager {
                 let typeBadge = '';
                 if (recType === 'fast') {
                     typeBadge = `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">FAST</span>`;
-                } else if (recType === 'butikk') {
-                    typeBadge = `<span style="background: #fef3c7; color: #d97706; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">BUTIKK</span>`;
                 } else {
                     typeBadge = `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">ENKELT</span>`;
                 }
@@ -12849,8 +12930,118 @@ class AdminManager {
             });
         }
 
+        // 2. Calculations for shop tab
+        const shopRecords = this.getFilteredShopRecords();
+        const allShopRecords = (this.allDonationRecords || []).filter(r => !r.isInKind && String(r.type || '').toLowerCase() === 'butikk');
+        const allCompletedShopRecords = allShopRecords.filter(isCompleted);
+        const allShopTotal = allCompletedShopRecords.reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
+        const allShopAverage = allCompletedShopRecords.length ? allShopTotal / allCompletedShopRecords.length : 0;
+        
+        const todayShopRecords = (this.allDonationRecords || []).filter((record) => {
+            if (record.isInKind) return false;
+            if (String(record.type || '').toLowerCase() !== 'butikk') return false;
+            const date = this.getDonationDate(record);
+            return date && date >= todayRange.start && date <= todayRange.end;
+        });
+        const todayShopTotal = todayShopRecords.filter(isCompleted).reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
+        const filteredShopTotal = shopRecords.filter(isCompleted).reduce((sum, record) => sum + this.normalizeDonationAmountNok(record), 0);
+        const pendingShopCount = shopRecords.filter(record => String(record.status || '').toLowerCase() === 'pending').length;
+        const unmatchedShopCount = shopRecords.filter(record => !record.userId).length;
+        const shopDonors = this.buildDonorSummaries(shopRecords);
+
+        // Render shop stats
+        const shopTotalAmountEl = document.getElementById('shop-total-amount');
+        const shopTotalCountEl = document.getElementById('shop-total-count');
+        const shopAverageAmountEl = document.getElementById('shop-average-amount');
+        const shopTodayAmountEl = document.getElementById('shop-today-amount');
+        const shopTodayCountEl = document.getElementById('shop-today-count');
+        const shopPeriodAmountEl = document.getElementById('shop-period-amount');
+        const shopPeriodCountEl = document.getElementById('shop-period-count');
+        const shopDonorCountEl = document.getElementById('shop-donor-count');
+        const shopPendingCountEl = document.getElementById('shop-pending-count');
+        const shopUnmatchedCountEl = document.getElementById('shop-unmatched-count');
+
+        if (shopTotalAmountEl) shopTotalAmountEl.textContent = this.formatDonationCurrency(allShopTotal);
+        if (shopTotalCountEl) shopTotalCountEl.textContent = allShopRecords.length.toLocaleString('no-NO');
+        if (shopAverageAmountEl) shopAverageAmountEl.textContent = this.formatDonationCurrency(allShopAverage);
+        if (shopTodayAmountEl) shopTodayAmountEl.textContent = this.formatDonationCurrency(todayShopTotal);
+        if (shopTodayCountEl) shopTodayCountEl.textContent = `${todayShopRecords.length} registrert i dag`;
+        if (shopPeriodAmountEl) shopPeriodAmountEl.textContent = this.formatDonationCurrency(filteredShopTotal);
+        if (shopPeriodCountEl) shopPeriodCountEl.textContent = `${shopRecords.length} transaksjoner i valgt periode`;
+        if (shopDonorCountEl) shopDonorCountEl.textContent = shopDonors.length.toLocaleString('no-NO');
+        if (shopPendingCountEl) shopPendingCountEl.textContent = `${pendingShopCount} venter`;
+        if (shopUnmatchedCountEl) shopUnmatchedCountEl.textContent = `${unmatchedShopCount} uten profilkobling`;
+
+        // Render shop transactions table
+        const shopTransactionsBody = document.getElementById('shop-transactions-body');
+        if (shopTransactionsBody) {
+            const visibleShopRecords = shopRecords.slice(0, 100);
+            shopTransactionsBody.innerHTML = visibleShopRecords.length ? visibleShopRecords.map((record) => {
+                const date = this.getDonationDate(record);
+                const name = this.escapeHtml(this.getDonationDonorName(record, userMap));
+                const email = this.escapeHtml(this.getDonationDonorEmail(record, userMap) || 'Ingen e-post');
+                const status = this.escapeHtml(this.getDonationStatusLabel(record.status));
+                const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
+                const method = this.escapeHtml(this.getDonationMethodLabel(record.method));
+                
+                const profileStatus = record.userId
+                    ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
+                        <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>
+                        Koblet
+                       </button>`
+                    : `<button type="button" class="btn-link-profile link-unconnected" data-id="${record.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
+                        <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
+                        Ukoblet
+                       </button>`;
+                return `
+                    <tr>
+                        <td>${date ? date.toLocaleString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent dato'}</td>
+                        <td>
+                            <strong>${name}</strong>
+                            <div style="font-size:12px;color:#64748b;">${email}</div>
+                        </td>
+                        <td><span class="method-tag">${method}</span></td>
+                        <td><span class="method-tag">${status}</span></td>
+                        <td>${profileStatus}</td>
+                        <td class="text-right">
+                            <div style="display:flex; justify-content:flex-end; align-items:center; gap:8px;">
+                                <strong>${amount}</strong>
+                                <button type="button" class="action-btn delete-donation-btn" data-id="${record.id}" title="Slett salg" style="color: #ef4444; background: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
+                                    <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('') : `
+                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen salg matcher filteret.</td></tr>
+            `;
+
+            // Bind click events to delete buttons
+            shopTransactionsBody.querySelectorAll('.delete-donation-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const donationId = btn.dataset.id;
+                    await this.deleteDonation(donationId);
+                });
+            });
+
+            // Bind click events to link buttons
+            shopTransactionsBody.querySelectorAll('.btn-link-profile').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const donationId = btn.dataset.id;
+                    const currentUserId = btn.dataset.userid || '';
+                    this.openLinkProfileModal(donationId, currentUserId);
+                });
+            });
+        }
+
+        // 3. Render donors tab
         const donorsBody = document.getElementById('donation-donors-body');
         if (donorsBody) {
+            const donorRecords = this.getFilteredDonorRecords();
+            const donors = this.buildDonorSummaries(donorRecords);
             const sortBy = this.donationFilters?.donorSortBy || 'latestDate';
             const sortDir = this.donationFilters?.donorSortDir || 'desc';
 
@@ -12873,6 +13064,10 @@ class AdminManager {
                 let comp = 0;
                 if (sortBy === 'total') {
                     comp = a.total - b.total || a.giftCount - b.giftCount;
+                } else if (sortBy === 'totalGifts') {
+                    comp = a.totalGifts - b.totalGifts || a.giftCount - b.giftCount;
+                } else if (sortBy === 'totalShop') {
+                    comp = a.totalShop - b.totalShop || a.giftCount - b.giftCount;
                 } else if (sortBy === 'giftCount') {
                     comp = a.giftCount - b.giftCount || a.total - b.total;
                 } else if (sortBy === 'name') {
@@ -12922,7 +13117,8 @@ class AdminManager {
                                 <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
                                 Ukoblet
                                </button>`}</td>
-                        <td class="text-right"><strong>${this.formatDonationCurrency(donor.total)}</strong></td>
+                        <td class="text-right"><strong>${this.formatDonationCurrency(donor.totalGifts)}</strong></td>
+                        <td class="text-right"><strong>${this.formatDonationCurrency(donor.totalShop)}</strong></td>
                         <td class="text-right" style="text-align:right; width:1px; white-space:nowrap;">
                             <button type="button" class="action-btn view-donor-details-btn" data-key="${this.escapeHtml(donor.key)}" title="Vis historikk" style="color:#1B4965; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:4px; border-radius:4px; transition:background 0.2s;">
                                 <span class="material-symbols-outlined" style="font-size:20px;">visibility</span>
@@ -12931,7 +13127,7 @@ class AdminManager {
                     </tr>
                 `;
             }).join('') : `
-                <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen givere matcher søket.</td></tr>
+                <tr><td colspan="8" style="padding:28px;text-align:center;color:#64748b;">Ingen givere matcher søket.</td></tr>
             `;
 
             // Bind click events to details buttons
@@ -14697,6 +14893,16 @@ class AdminManager {
             const donorSortEl = document.getElementById('donor-sort-by');
             if (donorSortEl) donorSortEl.value = this.donationFilters.donorSortBy || 'latestDate';
 
+            // Sync shop tab elements
+            const shopStatusEl = document.getElementById('shop-status-filter');
+            if (shopStatusEl) shopStatusEl.value = this.donationFilters.shopStatus || 'all';
+
+            const shopMethodEl = document.getElementById('shop-method-filter');
+            if (shopMethodEl) shopMethodEl.value = this.donationFilters.shopMethod || 'all';
+
+            const shopQueryEl = document.getElementById('shop-search');
+            if (shopQueryEl) shopQueryEl.value = this.donationFilters.shopQuery || '';
+
             const customVisible = this.donationFilters.preset === 'custom';
             const customDates = document.getElementById('global-custom-dates');
             if (customDates) customDates.style.display = customVisible ? 'flex' : 'none';
@@ -14730,6 +14936,11 @@ class AdminManager {
                 donorSortDir: dir
             });
         });
+
+        // Shop tab listeners
+        document.getElementById('shop-status-filter')?.addEventListener('change', (event) => setFilter('shopStatus', event.target.value));
+        document.getElementById('shop-method-filter')?.addEventListener('change', (event) => setFilter('shopMethod', event.target.value));
+        document.getElementById('shop-search')?.addEventListener('input', (event) => setFilter('shopQuery', event.target.value));
 
         // Sortable table headers listeners
         document.querySelectorAll('.sortable-header').forEach(header => {
@@ -14765,7 +14976,21 @@ class AdminManager {
         });
 
         const clearFilters = () => {
-            this.donationFilters = { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', donorSortDir: 'desc', start: '', end: '' };
+            this.donationFilters = { 
+                preset: '30', 
+                status: 'all', 
+                method: 'all', 
+                type: 'all', 
+                query: '', 
+                donorQuery: '', 
+                donorSortBy: 'latestDate', 
+                donorSortDir: 'desc', 
+                start: '', 
+                end: '',
+                shopStatus: 'all',
+                shopMethod: 'all',
+                shopQuery: ''
+            };
             
             const presetEl = document.getElementById('global-date-preset');
             if (presetEl) presetEl.value = '30';
@@ -14802,6 +15027,15 @@ class AdminManager {
 
             const dSortEl = document.getElementById('donor-sort-by');
             if (dSortEl) dSortEl.value = 'latestDate';
+
+            const shopStatusEl = document.getElementById('shop-status-filter');
+            if (shopStatusEl) shopStatusEl.value = 'all';
+
+            const shopMethodEl = document.getElementById('shop-method-filter');
+            if (shopMethodEl) shopMethodEl.value = 'all';
+
+            const shopQueryEl = document.getElementById('shop-search');
+            if (shopQueryEl) shopQueryEl.value = '';
             
             this.renderDonationAdminViews();
             this.renderGiftsDashboard();
@@ -14810,6 +15044,7 @@ class AdminManager {
 
         document.getElementById('donation-clear-filters')?.addEventListener('click', clearFilters);
         document.getElementById('donor-clear-filters')?.addEventListener('click', clearFilters);
+        document.getElementById('shop-clear-filters')?.addEventListener('click', clearFilters);
 
         // Drag & Drop listeners for Premium Bank Import Dropzone
         const dropzone = document.getElementById('bank-import-dropzone');
@@ -14889,7 +15124,7 @@ class AdminManager {
             return bDate - aDate;
         });
         this.adminUserMap = new Map(users.map(user => [user.id, user]));
-        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', donorSortDir: 'desc', start: '', end: '' };
+        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', donorSortDir: 'desc', start: '', end: '', shopStatus: 'all', shopMethod: 'all', shopQuery: '' };
         const manualDonationUserOptions = users
             .slice()
             .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
@@ -14943,6 +15178,7 @@ class AdminManager {
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
                     <button class="automation-tab" data-tab="donations">Per gave</button>
                     <button class="automation-tab" data-tab="donors">Per giver</button>
+                    <button class="automation-tab" data-tab="shop">Butikk</button>
                     <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
                 </div>
             </div>
@@ -15098,9 +15334,9 @@ class AdminManager {
                             <div class="form-group" style="margin:0;">
                                 <label>Type transaksjon</label>
                                 <select id="donation-type-filter" class="form-control">
-                                    <option value="all">Alle typer</option>
-                                    <option value="gave">Gave</option>
-                                    <option value="butikk">Butikk</option>
+                                    <option value="all">Alle gaver</option>
+                                    <option value="gave">Enkeltgave</option>
+                                    <option value="fast">Fast avtale</option>
                                 </select>
                             </div>
                             <div class="form-group" style="margin:0;">
@@ -15205,7 +15441,8 @@ class AdminManager {
                                 <label>Type transaksjon</label>
                                 <select id="donor-type-filter" class="form-control">
                                     <option value="all">Alle typer</option>
-                                    <option value="gave">Gave</option>
+                                    <option value="gave">Enkeltgave</option>
+                                    <option value="fast">Fast avtale</option>
                                     <option value="butikk">Butikk</option>
                                 </select>
                             </div>
@@ -15216,9 +15453,11 @@ class AdminManager {
                             <div class="form-group" style="margin:0;">
                                 <label>Sortering</label>
                                 <select id="donor-sort-by" class="form-control">
-                                    <option value="latestDate">Siste gave (Standard)</option>
+                                    <option value="latestDate">Siste aktivitet (Standard)</option>
                                     <option value="total">Sum totalt (Høyest først)</option>
-                                    <option value="giftCount">Antall gaver (Flest først)</option>
+                                    <option value="totalGifts">Sum gaver (Høyest først)</option>
+                                    <option value="totalShop">Sum butikk (Høyest først)</option>
+                                    <option value="giftCount">Antall transaksjoner (Flest først)</option>
                                     <option value="name">Navn (A-Å)</option>
                                 </select>
                             </div>
@@ -15253,9 +15492,15 @@ class AdminManager {
                                         </div>
                                     </th>
                                     <th>Profil</th>
-                                    <th class="sortable-header text-right" data-sort="total" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                    <th class="sortable-header text-right" data-sort="totalGifts" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
-                                            Sum
+                                            Gave-sum
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                        </div>
+                                    </th>
+                                    <th class="sortable-header text-right" data-sort="totalShop" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                        <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
+                                            Butikk-sum
                                             <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
                                         </div>
                                     </th>
@@ -15263,13 +15508,175 @@ class AdminManager {
                                 </tr>
                             </thead>
                             <tbody id="donation-donors-body">
-                                <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
+                                <tr><td colspan="8" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </div>
+
+            <!-- Tab: Shop Content -->
+            <div id="cause-tab-content-shop" class="cause-tab-pane" style="display: none;">
+                <div class="stats-grid causes-stats-grid" style="margin-bottom: 32px;">
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap green">
+                            <span class="material-symbols-outlined">shopping_bag</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Omsetning butikk</h3>
+                            <p class="stat-value" id="shop-total-amount">0 kr</p>
+                            <p class="stat-trend">Alle fullførte butikkjøp</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Antall ordre</h3>
+                            <p class="stat-value" id="shop-total-count">0</p>
+                            <span class="stat-meta">Registrerte butikktransaksjoner</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap mint">
+                            <span class="material-symbols-outlined">trending_up</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Snittordre</h3>
+                            <p class="stat-value" id="shop-average-amount">0 kr</p>
+                            <span class="stat-meta">Per kjøp</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap purple">
+                            <span class="material-symbols-outlined">today</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Dagens salg</h3>
+                            <p class="stat-value" id="shop-today-amount">0 kr</p>
+                            <span class="stat-meta" id="shop-today-count">0 ordre</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">Butikktransaksjoner</h3>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode eller søk etter kjøper.</p>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:16px;">
+                            <div class="form-group" style="margin:0;">
+                                <label>Status</label>
+                                <select id="shop-status-filter" class="form-control">
+                                    <option value="all">Alle statuser</option>
+                                    <option value="completed">Fullført</option>
+                                    <option value="pending">Venter</option>
+                                    <option value="processing">Behandles</option>
+                                    <option value="failed">Feilet</option>
+                                    <option value="cancelled">Avbrutt</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Metode</label>
+                                <select id="shop-method-filter" class="form-control">
+                                    <option value="all">Alle metoder</option>
+                                    <option value="stripe">Stripe</option>
+                                    <option value="vipps">Vipps</option>
+                                    <option value="vipps_manual">Vipps manuelt</option>
+                                    <option value="card">Kort</option>
+                                    <option value="bank">Bank</option>
+                                    <option value="cash">Kontant</option>
+                                    <option value="manual">Manuell</option>
+                                    <option value="other">Annen tjeneste</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Søk etter kjøper</label>
+                                <input id="shop-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
+                            </div>
+                            <div style="display:flex; align-items:flex-end;">
+                                <button type="button" class="btn-secondary" id="shop-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
+                                    Nullstill
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid donation-metrics-grid causes-stats-grid" style="margin-bottom: 20px;">
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Valgt periode</h3>
+                                    <p class="stat-value" id="shop-period-amount">--</p>
+                                    <span class="stat-meta" id="shop-period-count">Laster...</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Kunder</h3>
+                                    <p class="stat-value" id="shop-customer-count">--</p>
+                                    <span class="stat-meta">Unike kunder i filteret</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Under behandling</h3>
+                                    <p class="stat-value" id="shop-pending-count">--</p>
+                                    <span class="stat-meta">Ikke fullført ennå</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Ukoblede</h3>
+                                    <p class="stat-value" id="shop-unmatched-count">--</p>
+                                    <span class="stat-meta">Ikke koblet til nettstedsprofil</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable-header" data-sort="date" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                            <div style="display:inline-flex; align-items:center; gap:6px;">
+                                                Dato
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            </div>
+                                        </th>
+                                        <th class="sortable-header" data-sort="name" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                            <div style="display:inline-flex; align-items:center; gap:6px;">
+                                                Kjøper
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            </div>
+                                        </th>
+                                        <th>Metode</th>
+                                        <th>ID / Referanse</th>
+                                        <th>Profil</th>
+                                        <th class="sortable-header text-right" data-sort="amount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                            <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
+                                                Beløp
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            </div>
+                                        </th>
+                                        <th style="width:1px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shop-transactions-body">
+                                    <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Laster transaksjoner...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Tab 4: In-Kind Content -->
             <div id="cause-tab-content-inkind" class="cause-tab-pane" style="display: none;">
