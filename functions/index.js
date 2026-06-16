@@ -693,7 +693,7 @@ exports.getAnalyticsOverview = onRequest({
       }
 
       const requestedDays = Number.parseInt(req.query.days, 10);
-      const allowedDays = [7, 14, 30, 60, 90, 180, 365];
+      const allowedDays = [1, 7, 14, 30, 60, 90, 180, 365];
       const rangeDays = allowedDays.includes(requestedDays) ? requestedDays : 30;
       const rangeStartDate = `${rangeDays}daysAgo`;
       const accessToken = await getGaAccessToken({ clientEmail, privateKey });
@@ -768,7 +768,7 @@ exports.getAnalyticsOverview = onRequest({
           accessToken,
           body: {
             dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
-            dimensions: [{ name: "city" }],
+            dimensions: [{ name: "city" }, { name: "country" }],
             metrics: [{ name: "activeUsers" }],
             limit: 8,
             orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }]
@@ -858,6 +858,7 @@ exports.getAnalyticsOverview = onRequest({
 
       const topCities = (geoReport.rows || []).map(row => ({
         city: row.dimensionValues[0].value,
+        country: row.dimensionValues[1] ? row.dimensionValues[1].value : '',
         users: row.metricValues[0].value
       }));
 

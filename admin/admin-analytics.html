@@ -1567,6 +1567,8 @@
                     sourcesChart.update();
                 }
                 document.querySelector('.donut-center-val').textContent = '--';
+                const centerTextEl = document.querySelector('.donut-center-text');
+                if (centerTextEl) centerTextEl.textContent = 'laster...';
                 const legendPcts = document.querySelectorAll('.legend-pct');
                 if (legendPcts[0]) legendPcts[0].textContent = '--';
                 if (legendPcts[1]) legendPcts[1].textContent = '--';
@@ -1834,6 +1836,9 @@
 
                 pageviewsValEl.textContent = 'Laster...';
                 engagementValEl.textContent = 'Laster...';
+                
+                const centerTextEl = document.querySelector('.donut-center-text');
+                if (centerTextEl) centerTextEl.textContent = 'laster...';
 
                 try {
                     const user = firebase.auth().currentUser;
@@ -2005,6 +2010,8 @@
                         sourcesChart.update();
 
                         document.querySelector('.donut-center-val').textContent = `${directPct}%`;
+                        const centerTextEl = document.querySelector('.donut-center-text');
+                        if (centerTextEl) centerTextEl.textContent = 'direkte';
                         const legendPcts = document.querySelectorAll('.legend-pct');
                         if (legendPcts[0]) legendPcts[0].textContent = `${directPct}%`;
                         if (legendPcts[1]) legendPcts[1].textContent = `${searchPct}%`;
@@ -2333,7 +2340,8 @@
                     if (cityName && cityName !== 'Ukjent' && cityName !== '(not set)' && cityName.toLowerCase() !== 'unknown') {
                         // Clean "Municipality" suffix so Google GeoChart can geocode the city successfully
                         cityName = cityName.replace(/\s+municipality/i, '').trim();
-                        chartData.push([cityName, parseInt(c.users) || 0]);
+                        const countryName = c.country || 'Norway';
+                        chartData.push([cityName + ', ' + countryName, parseInt(c.users) || 0]);
                     }
                 });
                 
