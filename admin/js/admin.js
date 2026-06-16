@@ -16054,10 +16054,16 @@ class AdminManager {
                             <h3 class="card-title">Gaveoversikt</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode, transaksjonstype eller giver.</p>
                         </div>
-                        <button type="button" class="btn-secondary" id="print-donations-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                            <span class="material-symbols-outlined" style="font-size:20px;">print</span>
-                            Skriv ut rapport
-                        </button>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="position:relative; width:220px;">
+                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
+                                <input id="donation-search" class="form-control" type="search" placeholder="Søk..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
+                            </div>
+                            <button type="button" class="btn-secondary" id="print-donations-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                                Skriv ut rapport
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
@@ -16094,10 +16100,7 @@ class AdminManager {
                                     <option value="fast">Fast avtale</option>
                                 </select>
                             </div>
-                            <div class="form-group" style="margin:0;">
-                                <label>Søk</label>
-                                <input id="donation-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
-                            </div>
+
                             <div style="display:flex; align-items:flex-end;">
                                 <button type="button" class="btn-secondary" id="donation-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
                                     <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
@@ -16166,10 +16169,16 @@ class AdminManager {
                             <h3 class="card-title">Givere</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Aggregert oversikt per giver i valgt periode.</p>
                         </div>
-                        <button type="button" class="btn-secondary" id="print-donors-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                            <span class="material-symbols-outlined" style="font-size:20px;">print</span>
-                            Skriv ut rapport
-                        </button>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="position:relative; width:220px;">
+                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
+                                <input id="donor-search" class="form-control" type="search" placeholder="Søk etter giver..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
+                            </div>
+                            <button type="button" class="btn-secondary" id="print-donors-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                                Skriv ut rapport
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
@@ -16207,10 +16216,7 @@ class AdminManager {
                                     <option value="butikk">Butikk</option>
                                 </select>
                             </div>
-                            <div class="form-group" style="margin:0;">
-                                <label>Søk etter giver</label>
-                                <input id="donor-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
-                            </div>
+
                             <div class="form-group" style="margin:0;">
                                 <label>Sortering</label>
                                 <select id="donor-sort-by" class="form-control">
@@ -16331,10 +16337,16 @@ class AdminManager {
                             <h3 class="card-title">Butikktransaksjoner</h3>
                             <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode eller søk etter kjøper.</p>
                         </div>
-                        <button type="button" class="btn-secondary" id="print-shop-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                            <span class="material-symbols-outlined" style="font-size:20px;">print</span>
-                            Skriv ut rapport
-                        </button>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="position:relative; width:220px;">
+                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
+                                <input id="shop-search" class="form-control" type="search" placeholder="Søk etter kjøper..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
+                            </div>
+                            <button type="button" class="btn-secondary" id="print-shop-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                                Skriv ut rapport
+                            </button>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
@@ -16363,10 +16375,7 @@ class AdminManager {
                                     <option value="other">Annen tjeneste</option>
                                 </select>
                             </div>
-                            <div class="form-group" style="margin:0;">
-                                <label>Søk etter kjøper</label>
-                                <input id="shop-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
-                            </div>
+
                             <div style="display:flex; align-items:flex-end;">
                                 <button type="button" class="btn-secondary" id="shop-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
                                     <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
