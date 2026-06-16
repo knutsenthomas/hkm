@@ -1960,10 +1960,12 @@
                             topCities.slice(0, 4).forEach(cityData => {
                                 const cityUsers = parseInt(cityData.users) || 0;
                                 const pct = Math.round((cityUsers / totalCityUsers) * 100);
+                                const rawCityName = cityData.city || 'Ukjent';
+                                const cleanCityName = rawCityName.replace(/\s+municipality/i, '').trim();
                                 citiesHtml += `
                                     <div>
                                         <div style="display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px;">
-                                            <span style="font-weight: 600; color: #334155;">${cityData.city || 'Ukjent'}</span>
+                                            <span style="font-weight: 600; color: #334155;">${cleanCityName}</span>
                                             <span style="font-family: 'Fira Code', monospace; font-weight: 700; color: #d17d39;">${pct}%</span>
                                         </div>
                                         <div class="top-page-bar-wrapper">
@@ -2327,8 +2329,10 @@
 
                 var chartData = [['By', 'Besøkende']];
                 cities.forEach(c => {
-                    const cityName = c.city || '';
+                    let cityName = c.city || '';
                     if (cityName && cityName !== 'Ukjent' && cityName !== '(not set)' && cityName.toLowerCase() !== 'unknown') {
+                        // Clean "Municipality" suffix so Google GeoChart can geocode the city successfully
+                        cityName = cityName.replace(/\s+municipality/i, '').trim();
                         chartData.push([cityName, parseInt(c.users) || 0]);
                     }
                 });
