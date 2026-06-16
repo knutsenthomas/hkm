@@ -12684,6 +12684,7 @@ class AdminManager {
                 total: 0,
                 latestDate: null,
                 methods: new Set(),
+                types: new Set(),
                 statuses: new Set(),
                 names: new Set()
             };
@@ -12697,6 +12698,7 @@ class AdminManager {
             }
             if (date && (!existing.latestDate || date > existing.latestDate)) existing.latestDate = date;
             if (record.method) existing.methods.add(String(record.method));
+            if (record.type) existing.types.add(String(record.type).toLowerCase());
             if (record.status) existing.statuses.add(String(record.status));
             
             const recName = this.getDonationDonorName(record, userMap);
@@ -12708,22 +12710,23 @@ class AdminManager {
         });
 
         const sortBy = this.donationFilters?.donorSortBy || 'latestDate';
+        const sortDir = this.donationFilters?.donorSortDir || 'desc';
         return Array.from(donors.values()).sort((a, b) => {
+            let comp = 0;
             if (sortBy === 'total') {
-                return (b.total - a.total) || (b.giftCount - a.giftCount);
-            }
-            if (sortBy === 'giftCount') {
-                return (b.giftCount - a.giftCount) || (b.total - a.total);
-            }
-            if (sortBy === 'name') {
+                comp = a.total - b.total || a.giftCount - b.giftCount;
+            } else if (sortBy === 'giftCount') {
+                comp = a.giftCount - b.giftCount || a.total - b.total;
+            } else if (sortBy === 'name') {
                 const aName = a.name || '';
                 const bName = b.name || '';
-                return aName.localeCompare(bName, 'no');
+                comp = aName.localeCompare(bName, 'no');
+            } else {
+                const aTime = a.latestDate?.getTime() || 0;
+                const bTime = b.latestDate?.getTime() || 0;
+                comp = aTime - bTime;
             }
-            // Default: latestDate
-            const aTime = a.latestDate?.getTime() || 0;
-            const bTime = b.latestDate?.getTime() || 0;
-            return bTime - aTime;
+            return sortDir === 'desc' ? -comp : comp;
         });
     }
 
@@ -12780,10 +12783,15 @@ class AdminManager {
                 const amount = this.formatDonationCurrency(this.normalizeDonationAmountNok(record));
                 const method = this.escapeHtml(this.getDonationMethodLabel(record.method));
                 
-                const isRecurring = String(record.type || '').toLowerCase() === 'fast';
-                const typeBadge = isRecurring 
-                    ? `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">FAST</span>` 
-                    : `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">ENKELT</span>`;
+                const recType = String(record.type || '').toLowerCase();
+                let typeBadge = '';
+                if (recType === 'fast') {
+                    typeBadge = `<span style="background: #e0f2fe; color: #0369a1; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">FAST</span>`;
+                } else if (recType === 'butikk') {
+                    typeBadge = `<span style="background: #fef3c7; color: #d97706; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">BUTIKK</span>`;
+                } else {
+                    typeBadge = `<span style="background: #f1f5f9; color: #475569; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px; margin-left: 6px;">ENKELT</span>`;
+                }
 
                 const profileStatus = record.userId
                     ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
@@ -12844,18 +12852,37 @@ class AdminManager {
         const donorsBody = document.getElementById('donation-donors-body');
         if (donorsBody) {
             const sortBy = this.donationFilters?.donorSortBy || 'latestDate';
+            const sortDir = this.donationFilters?.donorSortDir || 'desc';
+
+            // Update table header sort UI
+            document.querySelectorAll('.sortable-header').forEach(header => {
+                const field = header.dataset.sort;
+                const icon = header.querySelector('.sort-icon');
+                if (icon) {
+                    if (field === sortBy) {
+                        icon.style.display = 'inline-flex';
+                        icon.textContent = sortDir === 'asc' ? 'arrow_upward' : 'arrow_downward';
+                        icon.style.color = '#d17d39'; // Orange theme accent color
+                    } else {
+                        icon.style.display = 'none';
+                    }
+                }
+            });
+
             donors.sort((a, b) => {
+                let comp = 0;
                 if (sortBy === 'total') {
-                    return b.total - a.total || b.giftCount - a.giftCount;
+                    comp = a.total - b.total || a.giftCount - b.giftCount;
                 } else if (sortBy === 'giftCount') {
-                    return b.giftCount - a.giftCount || b.total - a.total;
+                    comp = a.giftCount - b.giftCount || a.total - b.total;
                 } else if (sortBy === 'name') {
-                    return String(a.name || '').localeCompare(String(b.name || ''), 'no');
+                    comp = String(a.name || '').localeCompare(String(b.name || ''), 'no');
                 } else {
                     const aTime = a.latestDate?.getTime() || 0;
                     const bTime = b.latestDate?.getTime() || 0;
-                    return bTime - aTime;
+                    comp = aTime - bTime;
                 }
+                return sortDir === 'desc' ? -comp : comp;
             });
 
             const query = String(this.donationFilters?.donorQuery || '').trim().toLowerCase();
@@ -12864,7 +12891,11 @@ class AdminManager {
                 .slice(0, 100);
 
             donorsBody.innerHTML = visibleDonors.length ? visibleDonors.map((donor) => {
-                const methodText = Array.from(donor.methods).map(m => this.getDonationMethodLabel(m)).join(', ') || 'Ukjent';
+                const methodList = Array.from(donor.methods).map(m => this.getDonationMethodLabel(m));
+                if (donor.types && donor.types.has('butikk')) {
+                    methodList.push('Butikk');
+                }
+                const methodText = methodList.join(', ') || 'Ukjent';
                 
                 const mainName = donor.name || 'Ukjent giver';
                 const otherNames = Array.from(donor.names).filter(n => n !== mainName);
@@ -14626,7 +14657,11 @@ class AdminManager {
 
     bindDonationAdminFilters() {
         const setFilter = (key, value) => {
-            this.donationFilters = { ...(this.donationFilters || {}), [key]: value };
+            if (typeof key === 'object') {
+                this.donationFilters = { ...(this.donationFilters || {}), ...key };
+            } else {
+                this.donationFilters = { ...(this.donationFilters || {}), [key]: value };
+            }
             
             // Sync values to DOM elements
             const presetEl = document.getElementById('global-date-preset');
@@ -14687,7 +14722,35 @@ class AdminManager {
         document.getElementById('donor-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
         document.getElementById('donor-type-filter')?.addEventListener('change', (event) => setFilter('type', event.target.value));
         document.getElementById('donor-search')?.addEventListener('input', (event) => setFilter('donorQuery', event.target.value));
-        document.getElementById('donor-sort-by')?.addEventListener('change', (event) => setFilter('donorSortBy', event.target.value));
+        document.getElementById('donor-sort-by')?.addEventListener('change', (event) => {
+            const val = event.target.value;
+            const dir = val === 'name' ? 'asc' : 'desc';
+            setFilter({
+                donorSortBy: val,
+                donorSortDir: dir
+            });
+        });
+
+        // Sortable table headers listeners
+        document.querySelectorAll('.sortable-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const field = header.dataset.sort;
+                const currentSortBy = this.donationFilters.donorSortBy || 'latestDate';
+                const currentSortDir = this.donationFilters.donorSortDir || 'desc';
+                
+                let nextDir = 'desc';
+                if (field === currentSortBy) {
+                    nextDir = currentSortDir === 'desc' ? 'asc' : 'desc';
+                } else {
+                    nextDir = field === 'name' ? 'asc' : 'desc';
+                }
+                
+                setFilter({
+                    donorSortBy: field,
+                    donorSortDir: nextDir
+                });
+            });
+        });
 
         document.getElementById('add-manual-donation-btn')?.addEventListener('click', () => this.openManualDonationModal());
         document.getElementById('open-bank-import-btn')?.addEventListener('click', () => this.openBankImportModal());
@@ -14702,7 +14765,7 @@ class AdminManager {
         });
 
         const clearFilters = () => {
-            this.donationFilters = { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', start: '', end: '' };
+            this.donationFilters = { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', donorSortDir: 'desc', start: '', end: '' };
             
             const presetEl = document.getElementById('global-date-preset');
             if (presetEl) presetEl.value = '30';
@@ -14826,7 +14889,7 @@ class AdminManager {
             return bDate - aDate;
         });
         this.adminUserMap = new Map(users.map(user => [user.id, user]));
-        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', start: '', end: '' };
+        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', donorSortDir: 'desc', start: '', end: '' };
         const manualDonationUserOptions = users
             .slice()
             .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
@@ -15170,12 +15233,32 @@ class AdminManager {
                             <table class="data-table" style="width:100%;">
                             <thead>
                                 <tr>
-                                    <th>Giver</th>
-                                    <th>Fullført / totalt</th>
+                                    <th class="sortable-header" data-sort="name" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                        <div style="display:inline-flex; align-items:center; gap:6px;">
+                                            Giver
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                        </div>
+                                    </th>
+                                    <th class="sortable-header" data-sort="giftCount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                        <div style="display:inline-flex; align-items:center; gap:6px;">
+                                            Fullført / totalt
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                        </div>
+                                    </th>
                                     <th>Metoder</th>
-                                    <th>Siste gave</th>
+                                    <th class="sortable-header" data-sort="latestDate" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                        <div style="display:inline-flex; align-items:center; gap:6px;">
+                                            Siste gave
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                        </div>
+                                    </th>
                                     <th>Profil</th>
-                                    <th class="text-right">Sum</th>
+                                    <th class="sortable-header text-right" data-sort="total" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                        <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
+                                            Sum
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                        </div>
+                                    </th>
                                     <th style="width:1px;"></th>
                                 </tr>
                             </thead>
