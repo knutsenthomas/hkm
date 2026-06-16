@@ -1504,6 +1504,9 @@
             let activeDays = 7;
             let lastLoadedCities = null;
             let chartsLoaded = false;
+            let lastDrawnCitiesJSON = null;
+            let lastWidth = 0;
+            let lastHeight = 0;
 
             async function loadRealAnalytics(days) {
                 activeDays = days;
@@ -1696,8 +1699,10 @@
 
             // Lytter på Auth-endringer for å hente ekte data så snart bruker er klar
             if (typeof firebase !== 'undefined') {
+                let authInitChecked = false;
                 firebase.auth().onAuthStateChanged((user) => {
-                    if (user) {
+                    if (user && !authInitChecked) {
+                        authInitChecked = true;
                         loadRealAnalytics(7); // Hent siste 7 dager som standard
                     }
                 });
@@ -1773,6 +1778,19 @@
             });
 
             function drawRegionsMapReal(cities = []) {
+                const citiesJSON = JSON.stringify(cities);
+                if (citiesJSON === lastDrawnCitiesJSON) {
+                    return; // Unngå duplikat tegning av nøyaktig samme data
+                }
+
+                const containerEl = document.getElementById('regions_div');
+                if (!containerEl) return;
+
+                // Ikke tegn hvis containeren er skjult eller har 0 bredde/høyde
+                if (containerEl.offsetWidth === 0 || containerEl.offsetHeight === 0) {
+                    return;
+                }
+
                 var chartData = [['By', 'Besøkende']];
                 cities.forEach(c => {
                     const cityName = c.city || '';
@@ -1798,17 +1816,39 @@
                     tooltip: { textStyle: { fontName: 'Inter', fontSize: 13 } }
                 };
 
-                var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
+                var chart = new google.visualization.GeoChart(containerEl);
                 chart.draw(dataTable, options);
 
                 window.activeGeoChart = chart;
                 window.activeGeoChartDataTable = dataTable;
                 window.activeGeoChartOptions = options;
+                
+                lastDrawnCitiesJSON = citiesJSON;
+                lastWidth = containerEl.offsetWidth;
+                lastHeight = containerEl.offsetHeight;
 
                 if (!window.geoChartResizeListenerAdded) {
+                    let resizeTimeout = null;
                     window.addEventListener('resize', function() {
-                        if (window.activeGeoChart && window.activeGeoChartDataTable && window.activeGeoChartOptions) {
-                            window.activeGeoChart.draw(window.activeGeoChartDataTable, window.activeGeoChartOptions);
+                        const currentContainer = document.getElementById('regions_div');
+                        if (!currentContainer) return;
+
+                        const newWidth = currentContainer.offsetWidth;
+                        const newHeight = currentContainer.offsetHeight;
+
+                        // Bare tegn på nytt hvis bredde eller høyde faktisk har endret seg
+                        if (newWidth !== lastWidth || newHeight !== lastHeight) {
+                            lastWidth = newWidth;
+                            lastHeight = newHeight;
+
+                            clearTimeout(resizeTimeout);
+                            resizeTimeout = setTimeout(() => {
+                                if (window.activeGeoChart && window.activeGeoChartDataTable && window.activeGeoChartOptions) {
+                                    if (newWidth > 0 && newHeight > 0) {
+                                        window.activeGeoChart.draw(window.activeGeoChartDataTable, window.activeGeoChartOptions);
+                                    }
+                                }
+                            }, 250); // Debounce på 250ms
                         }
                     });
                     window.geoChartResizeListenerAdded = true;
