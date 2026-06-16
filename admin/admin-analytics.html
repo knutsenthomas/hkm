@@ -1539,6 +1539,16 @@
             const colorBrandOrange = '#d17d39';
             const colorAccentRed = '#bd4f2a';
 
+            // Generate last 7 days of dates dynamically for the demo/placeholder view
+            const getPastDateShortStr = (daysAgo) => {
+                const d = new Date();
+                d.setDate(d.getDate() - daysAgo);
+                const day = String(d.getDate()).padStart(2, '0');
+                const month = String(d.getMonth() + 1).padStart(2, '0');
+                const year = String(d.getFullYear()).substring(2, 4);
+                return `${day}.${month}.${year}`;
+            };
+
             // Dataset values for different periods
             const dataSets = {
                 '1': {
@@ -1551,7 +1561,15 @@
                     engagementTrend: '+4.1%'
                 },
                 '7': {
-                    labels: ['05.07.24', '06.07.24', '07.07.24', '08.07.24', '09.07.24', '10.07.24', '11.07.24'],
+                    labels: [
+                        getPastDateShortStr(6),
+                        getPastDateShortStr(5),
+                        getPastDateShortStr(4),
+                        getPastDateShortStr(3),
+                        getPastDateShortStr(2),
+                        getPastDateShortStr(1),
+                        getPastDateShortStr(0)
+                    ],
                     sessions: [920, 1150, 840, 1420, 1280, 1850, 1540],
                     uniques: [680, 850, 610, 1100, 940, 1410, 1230],
                     pageviews: '12,482',
