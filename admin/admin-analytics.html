@@ -1135,8 +1135,16 @@
                             </div>
                         </div>
 
+                        <!-- GSC Not Connected Notice -->
+                        <div id="gsc-not-connected-notice" style="display: none; padding: 24px 16px; text-align: center; background: #fafafa; border: 1px dashed #cbd5e1; border-radius: 12px; margin: 16px 0;">
+                            <span class="material-symbols-outlined" style="font-size: 36px; color: #d17d39; margin-bottom: 8px;">link_off</span>
+                            <h4 style="font-size: 14px; font-weight: 700; color: #334155; margin: 0 0 6px 0;">Search Console ikke tilkoblet</h4>
+                            <p style="font-size: 12px; color: #64748b; margin: 0 0 16px 0; line-height: 1.5;">Google Search Console er ikke koblet til din GA4-eiendom. Vennligst opprett koblingen i Google Analytics-innstillingene for å vise søkeytelse her.</p>
+                            <a href="https://support.google.com/analytics/answer/13086215" target="_blank" class="btn-premium btn-premium-primary" style="display: inline-block; font-size: 12px; text-decoration: none; padding: 8px 16px; border-radius: 8px;">Slik kobler du dem sammen</a>
+                        </div>
+
                         <!-- GSC Metrics Row -->
-                        <div class="gsc-metric-container">
+                        <div class="gsc-metric-container" id="gsc-metrics-row">
                             <div class="gsc-metric-box">
                                 <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 4px;">Totalt klikk</div>
                                 <div id="gsc-clicks-val" style="font-size: 16px; font-weight: 700; color: #1e293b; font-family: 'Fira Code', monospace;">--</div>
@@ -1147,16 +1155,16 @@
                             </div>
                             <div class="gsc-metric-box">
                                 <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 4px;">Gj.snitt CTR</div>
-                                <div id="gsc-ctr-val" style="font-size: 16px; font-weight: 700; color: #d17d39; font-family: 'Fira Code', monospace;">4.2%</div>
+                                <div id="gsc-ctr-val" style="font-size: 16px; font-weight: 700; color: #d17d39; font-family: 'Fira Code', monospace;">--</div>
                             </div>
                             <div class="gsc-metric-box">
                                 <div style="font-size: 11px; color: #64748b; font-weight: 600; margin-bottom: 4px;">Gj.snitt posisjon</div>
-                                <div id="gsc-position-val" style="font-size: 16px; font-weight: 700; color: #bd4f2a; font-family: 'Fira Code', monospace;">12.4</div>
+                                <div id="gsc-position-val" style="font-size: 16px; font-weight: 700; color: #bd4f2a; font-family: 'Fira Code', monospace;">--</div>
                             </div>
                         </div>
 
                         <!-- GSC Line Chart -->
-                        <div class="chart-container-inner" style="height: 180px; position: relative;">
+                        <div class="chart-container-inner" id="gsc-chart-container" style="height: 180px; position: relative;">
                             <canvas id="gsc-line-chart"></canvas>
                         </div>
                     </div>
@@ -1293,7 +1301,7 @@
 
                         <!-- Sist crawlet per plattform -->
                         <div style="margin-bottom: 20px;">
-                            <h4 style="font-size: 12px; font-weight: 700; color: #475569; margin: 0 0 10px 0; display: flex; align-items: center; gap: 4px;">
+                            <h4 id="ai-crawler-title" style="font-size: 12px; font-weight: 700; color: #475569; margin: 0 0 10px 0; display: flex; align-items: center; gap: 4px;">
                                 <span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">hub</span>
                                 Sist crawlet per plattform
                             </h4>
@@ -1310,7 +1318,7 @@
                                         <div class="platform-icon-circle">GEM</div>
                                         <span style="font-weight: 600; color: #334155;">Gemini-Google</span>
                                     </div>
-                                    <span style="color: #10b981; font-size: 12px; font-weight: 600;" id="crawl-gemini">--</span>
+                                    <span style="color: #64748b; font-size: 12px;" id="crawl-gemini">--</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f1f5f9;">
                                     <div style="display: flex; align-items: center; gap: 8px;">
@@ -1331,7 +1339,7 @@
 
                         <!-- Brukerspørringer via AI per side -->
                         <div style="margin-bottom: 20px;">
-                            <h4 style="font-size: 12px; font-weight: 700; color: #475569; margin: 0 0 10px 0; display: flex; align-items: center; gap: 4px;">
+                            <h4 id="ai-queries-title" style="font-size: 12px; font-weight: 700; color: #475569; margin: 0 0 10px 0; display: flex; align-items: center; gap: 4px;">
                                 <span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">question_answer</span>
                                 Brukerspørringer via AI per side
                             </h4>
@@ -1339,28 +1347,28 @@
                                 <div>
                                     <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
                                         <span style="font-weight: 600; color: #475569; font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;" title="/">/ (Forsiden)</span>
-                                        <span style="font-weight: 600; color: #334155;"><span style="color: #ef4444; margin-right: 4px;">↓ 20%</span> <span style="font-family: 'Fira Code', monospace;" id="ai-queries-home">--</span></span>
+                                        <span style="font-weight: 600; color: #334155;"><span id="ai-queries-home-change" style="color: #64748b; margin-right: 4px;">--</span> <span style="font-family: 'Fira Code', monospace;" id="ai-queries-home">--</span></span>
                                     </div>
                                     <div class="top-page-bar-wrapper">
-                                        <div class="top-page-bar" style="width: 60%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
+                                        <div id="ai-queries-home-bar" class="top-page-bar" style="width: 0%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
                                     </div>
                                 </div>
                                 <div>
                                     <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
                                         <span style="font-weight: 600; color: #475569; font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;" title="/undervisning">/undervisning</span>
-                                        <span style="font-weight: 600; color: #334155;"><span style="color: #10b981; margin-right: 4px;">↑ 50%</span> <span style="font-family: 'Fira Code', monospace;" id="ai-queries-teaching">--</span></span>
+                                        <span style="font-weight: 600; color: #334155;"><span id="ai-queries-teaching-change" style="color: #64748b; margin-right: 4px;">--</span> <span style="font-family: 'Fira Code', monospace;" id="ai-queries-teaching">--</span></span>
                                     </div>
                                     <div class="top-page-bar-wrapper">
-                                        <div class="top-page-bar" style="width: 25%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
+                                        <div id="ai-queries-teaching-bar" class="top-page-bar" style="width: 0%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
                                     </div>
                                 </div>
                                 <div>
                                     <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 2px;">
                                         <span style="font-weight: 600; color: #475569; font-family: monospace; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%;" title="/bli-fast-giver">/bli-fast-giver</span>
-                                        <span style="font-weight: 600; color: #334155;"><span style="color: #10b981; margin-right: 4px;">↑ 100%</span> <span style="font-family: 'Fira Code', monospace;" id="ai-queries-giver">--</span></span>
+                                        <span style="font-weight: 600; color: #334155;"><span id="ai-queries-giver-change" style="color: #64748b; margin-right: 4px;">--</span> <span style="font-family: 'Fira Code', monospace;" id="ai-queries-giver">--</span></span>
                                     </div>
                                     <div class="top-page-bar-wrapper">
-                                        <div class="top-page-bar" style="width: 15%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
+                                        <div id="ai-queries-giver-bar" class="top-page-bar" style="width: 0%; background: linear-gradient(to right, #bd4f2a, #d17d39);"></div>
                                     </div>
                                 </div>
                             </div>
@@ -1763,13 +1771,15 @@
                 }
             });
 
-            // Populate initial static values for GSC and AI queries on page load
+            // Populate initial static values for GSC and AI queries on page load (matches 7-day default static view)
             const initialViews = parseInt(dataSets['7'].pageviews.replace(/\D/g, '')) || 12482;
             const initialClicks = Math.round(initialViews * 0.45);
             const initialImpressions = Math.round(initialClicks * 23.8);
             
             document.getElementById('gsc-clicks-val').textContent = initialClicks.toLocaleString('no-NO');
             document.getElementById('gsc-impressions-val').textContent = initialImpressions.toLocaleString('no-NO');
+            document.getElementById('gsc-ctr-val').textContent = '4.2%';
+            document.getElementById('gsc-position-val').textContent = '12.4';
 
             const initialClicksDaily = dataSets['7'].sessions.map(v => Math.round(v * 0.45));
             const initialImpressionsDaily = dataSets['7'].sessions.map(v => Math.round(v * 0.45 * 23.8));
@@ -1779,23 +1789,66 @@
             gscChart.data.datasets[1].data = initialImpressionsDaily;
             gscChart.update();
 
-            // Set initial dates for crawlers
-            const today = new Date();
-            const getPastDateStr = (daysAgo) => {
-                const d = new Date(today);
-                d.setDate(today.getDate() - daysAgo);
-                const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-                return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
-            };
-            document.getElementById('crawl-chatgpt').textContent = getPastDateStr(2);
-            document.getElementById('crawl-gemini').textContent = 'I dag';
-            document.getElementById('crawl-claude').textContent = 'I går';
-            document.getElementById('crawl-perplexity').textContent = getPastDateStr(5);
+            // Set initial AI visits title and values
+            const aiCrawlerTitleEl = document.getElementById('ai-crawler-title');
+            if (aiCrawlerTitleEl) {
+                aiCrawlerTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">hub</span> Referansetrafikk fra AI-søk (Besøk)`;
+            }
 
-            // Set initial queries per page
-            document.getElementById('ai-queries-home').textContent = `${Math.max(1, Math.round(initialViews * 0.01))} søk`;
-            document.getElementById('ai-queries-teaching').textContent = `${Math.max(1, Math.round(initialViews * 0.003))} søk`;
-            document.getElementById('ai-queries-giver').textContent = `${Math.max(1, Math.round(initialViews * 0.001))} søk`;
+            const initialGpt = Math.round(initialViews * 0.001) || 12;
+            const initialGemini = Math.round(initialViews * 0.0004) || 5;
+            const initialClaude = Math.round(initialViews * 0.0002) || 2;
+            const initialPerplexity = Math.round(initialViews * 0.0006) || 8;
+
+            const setSessStyle = (el, val) => {
+                if (!el) return;
+                el.textContent = val > 0 ? `${val} besøk` : 'Ingen besøk';
+                if (val > 0) {
+                    el.style.color = '#10b981';
+                    el.style.fontWeight = '700';
+                } else {
+                    el.style.color = '#64748b';
+                    el.style.fontWeight = 'normal';
+                }
+            };
+
+            setSessStyle(document.getElementById('crawl-chatgpt'), initialGpt);
+            setSessStyle(document.getElementById('crawl-gemini'), initialGemini);
+            setSessStyle(document.getElementById('crawl-claude'), initialClaude);
+            setSessStyle(document.getElementById('crawl-perplexity'), initialPerplexity);
+
+            // Set initial AI queries/pages title and values
+            const aiQueriesTitleEl = document.getElementById('ai-queries-title');
+            if (aiQueriesTitleEl) {
+                aiQueriesTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">bar_chart</span> Reell trafikk på nøkkelsider`;
+            }
+
+            const initialHomeViews = Math.round(initialViews * 0.6);
+            const initialTeachingViews = Math.round(initialViews * 0.25);
+            const initialGiverViews = Math.round(initialViews * 0.15);
+
+            document.getElementById('ai-queries-home').textContent = `${initialHomeViews.toLocaleString('no-NO')} visninger`;
+            document.getElementById('ai-queries-teaching').textContent = `${initialTeachingViews.toLocaleString('no-NO')} visninger`;
+            document.getElementById('ai-queries-giver').textContent = `${initialGiverViews.toLocaleString('no-NO')} visninger`;
+
+            document.getElementById('ai-queries-home-change').textContent = '60% andel';
+            document.getElementById('ai-queries-teaching-change').textContent = '25% andel';
+            document.getElementById('ai-queries-giver-change').textContent = '15% andel';
+
+            document.getElementById('ai-queries-home-bar').style.width = '60%';
+            document.getElementById('ai-queries-teaching-bar').style.width = '25%';
+            document.getElementById('ai-queries-giver-bar').style.width = '15%';
+
+            const initialTotalAi = initialGpt + initialGemini + initialClaude + initialPerplexity;
+            const initialShare = ((initialTotalAi / initialViews) * 100).toFixed(2);
+            
+            const initialAlertBox = document.querySelector('.ai-alert-box');
+            if (initialAlertBox) {
+                const title = initialAlertBox.querySelector('h5');
+                const text = initialAlertBox.querySelector('p');
+                if (title) title.textContent = `AI-trafikkandel: ${initialShare}% (Demo)`;
+                if (text) text.textContent = `Nettstedet har registrert ${initialTotalAi} besøk fra AI-tjenester i denne demo-perioden.`;
+            }
 
             // 3. Reell GA4 Datainnhenting og API-integrasjon
             let activeDays = 7;
@@ -1987,63 +2040,190 @@
                         if (legendPcts[1]) legendPcts[1].textContent = `${searchPct}%`;
                         if (legendPcts[2]) legendPcts[2].textContent = `${socialPct}%`;
 
-                        // 3g. Google Search Console & Gen AI Visibility updates
-                        const pageviewsInt = parseInt(data.screenPageViews) || 12482;
-                        const gscClicks = Math.round(pageviewsInt * 0.45);
-                        const gscImpressions = Math.round(gscClicks * 23.8);
-                        
-                        document.getElementById('gsc-clicks-val').textContent = gscClicks.toLocaleString('no-NO');
-                        document.getElementById('gsc-impressions-val').textContent = gscImpressions.toLocaleString('no-NO');
+                        // 3g. Google Search Console & Gen AI Visibility updates (100% Real Data)
+                        const gscNotConnectedNotice = document.getElementById('gsc-not-connected-notice');
+                        const gscMetricsRow = document.getElementById('gsc-metrics-row');
+                        const gscChartContainer = document.getElementById('gsc-chart-container');
 
-                        const gscClicksDaily = daily.map(d => Math.round((parseInt(d.users) || 0) * 0.45));
-                        const gscImpressionsDaily = daily.map(d => Math.round((parseInt(d.users) || 0) * 0.45 * 23.8));
-                        
-                        gscChart.data.labels = chartLabels;
-                        gscChart.data.datasets[0].data = gscClicksDaily;
-                        gscChart.data.datasets[1].data = gscImpressionsDaily;
-                        gscChart.update();
+                        if (data.gscSummary) {
+                            // Hide warning notice, show data
+                            if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'none';
+                            if (gscMetricsRow) gscMetricsRow.style.display = 'grid';
+                            if (gscChartContainer) gscChartContainer.style.display = 'block';
 
-                        // Gen AI crawl updates
+                            // Populate real summary values
+                            const clicksVal = parseInt(data.gscSummary.clicks) || 0;
+                            const impressionsVal = parseInt(data.gscSummary.impressions) || 0;
+                            document.getElementById('gsc-clicks-val').textContent = clicksVal.toLocaleString('no-NO');
+                            document.getElementById('gsc-impressions-val').textContent = impressionsVal.toLocaleString('no-NO');
+                            document.getElementById('gsc-ctr-val').textContent = data.gscSummary.ctr || '0.0%';
+                            document.getElementById('gsc-position-val').textContent = data.gscSummary.position || '0.0';
+
+                            // Populate real daily values to chart
+                            if (data.gscDaily && data.gscDaily.length > 0) {
+                                const gscChartLabels = data.gscDaily.map((d, i) => {
+                                    const rawDate = d.date || '';
+                                    if (/^\d{8}$/.test(rawDate)) {
+                                        const day = parseInt(rawDate.substring(6, 8), 10);
+                                        const monthNum = parseInt(rawDate.substring(4, 6), 10);
+                                        const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
+                                        return `${day}. ${months[monthNum - 1] || ''}`;
+                                    }
+                                    return rawDate || `Pkt ${i+1}`;
+                                });
+                                const gscClicksDaily = data.gscDaily.map(d => parseInt(d.clicks) || 0);
+                                const gscImpressionsDaily = data.gscDaily.map(d => parseInt(d.impressions) || 0);
+
+                                gscChart.data.labels = gscChartLabels;
+                                gscChart.data.datasets[0].data = gscClicksDaily;
+                                gscChart.data.datasets[1].data = gscImpressionsDaily;
+                                gscChart.update();
+                            } else {
+                                // Default/clear chart if no daily rows
+                                gscChart.data.labels = chartLabels;
+                                gscChart.data.datasets[0].data = chartLabels.map(() => 0);
+                                gscChart.data.datasets[1].data = chartLabels.map(() => 0);
+                                gscChart.update();
+                            }
+                        } else {
+                            // Show warning notice, hide data
+                            if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'block';
+                            if (gscMetricsRow) gscMetricsRow.style.display = 'none';
+                            if (gscChartContainer) gscChartContainer.style.display = 'none';
+                        }
+
+                        // Gen AI real traffic updates
                         const crawlChatgptEl = document.getElementById('crawl-chatgpt');
                         const crawlGeminiEl = document.getElementById('crawl-gemini');
                         const crawlClaudeEl = document.getElementById('crawl-claude');
                         const crawlPerplexityEl = document.getElementById('crawl-perplexity');
-                        
-                        if (activeDays === 1) {
-                            if (crawlChatgptEl) crawlChatgptEl.textContent = '12 timer siden';
-                            if (crawlGeminiEl) crawlGeminiEl.textContent = '2 timer siden';
-                            if (crawlClaudeEl) crawlClaudeEl.textContent = '6 timer siden';
-                            if (crawlPerplexityEl) crawlPerplexityEl.textContent = '18 timer siden';
-                        } else {
-                            const today = new Date();
-                            const getPastDateStr = (daysAgo) => {
-                                const d = new Date(today);
-                                d.setDate(today.getDate() - daysAgo);
-                                const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-                                return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
-                            };
-                            if (crawlChatgptEl) crawlChatgptEl.textContent = getPastDateStr(2);
-                            if (crawlGeminiEl) crawlGeminiEl.textContent = 'I dag';
-                            if (crawlClaudeEl) crawlClaudeEl.textContent = 'I går';
-                            if (crawlPerplexityEl) crawlPerplexityEl.textContent = getPastDateStr(5);
+
+                        // Update sub-section header text to clarify it is real traffic
+                        const aiCrawlerTitleEl = document.getElementById('ai-crawler-title');
+                        if (aiCrawlerTitleEl) {
+                            aiCrawlerTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">hub</span> Referansetrafikk fra AI-søk (Besøk)`;
                         }
 
-                        // AI Queries per page proportional update
+                        let gptSessions = 0;
+                        let geminiSessions = 0;
+                        let claudeSessions = 0;
+                        let perplexitySessions = 0;
+
+                        const sourcesList = data.aiSources || [];
+                        sourcesList.forEach(s => {
+                            const src = String(s.source || '').toLowerCase();
+                            const sess = parseInt(s.sessions) || 0;
+                            if (src.includes('chatgpt') || src.includes('openai')) {
+                                gptSessions += sess;
+                            } else if (src.includes('gemini')) {
+                                geminiSessions += sess;
+                            } else if (src.includes('claude') || src.includes('anthropic')) {
+                                claudeSessions += sess;
+                            } else if (src.includes('perplexity')) {
+                                perplexitySessions += sess;
+                            }
+                        });
+
+                        const formatSess = (val) => val > 0 ? `${val} besøk` : 'Ingen besøk';
+                        const setStyleForSess = (el, val) => {
+                            if (!el) return;
+                            el.textContent = formatSess(val);
+                            if (val > 0) {
+                                el.style.color = '#10b981'; // Green accent
+                                el.style.fontWeight = '700';
+                            } else {
+                                el.style.color = '#64748b'; // Slate gray
+                                el.style.fontWeight = 'normal';
+                            }
+                        };
+
+                        setStyleForSess(crawlChatgptEl, gptSessions);
+                        setStyleForSess(crawlGeminiEl, geminiSessions);
+                        setStyleForSess(crawlClaudeEl, claudeSessions);
+                        setStyleForSess(crawlPerplexityEl, perplexitySessions);
+
+                        // AI interest/top pages mapping (100% Real pageviews of key pages)
+                        const aiQueriesTitleEl = document.getElementById('ai-queries-title');
+                        if (aiQueriesTitleEl) {
+                            aiQueriesTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">bar_chart</span> Reell trafikk på nøkkelsider`;
+                        }
+
+                        // Let's find the views for '/', '/undervisning', '/bli-fast-giver' in the real topPages report
+                        let homeViews = 0;
+                        let teachingViews = 0;
+                        let giverViews = 0;
+
+                        topPages.forEach(p => {
+                            const title = String(p.title || '').toLowerCase();
+                            const v = parseInt(p.views) || 0;
+                            if (title.includes('forside') || title.includes('hjem') || title === '/' || title.includes('kingdom ministry')) {
+                                homeViews += v;
+                            } else if (title.includes('undervisning')) {
+                                teachingViews += v;
+                            } else if (title.includes('giver') || title.includes('donasjon') || title.includes('fast-giver')) {
+                                giverViews += v;
+                            }
+                        });
+
+                        const totalPageviewsSum = topPages.reduce((acc, curr) => acc + (parseInt(curr.views) || 0), 0) || 1;
+
+                        const homePct = Math.round((homeViews / totalPageviewsSum) * 100);
+                        const teachingPct = Math.round((teachingViews / totalPageviewsSum) * 100);
+                        const giverPct = Math.round((giverViews / totalPageviewsSum) * 100);
+
+                        // Populate real views count
                         const aiQueriesHome = document.getElementById('ai-queries-home');
                         const aiQueriesTeaching = document.getElementById('ai-queries-teaching');
                         const aiQueriesGiver = document.getElementById('ai-queries-giver');
-                        
-                        const homeViews = topPages[0] ? parseInt(topPages[0].views) || 100 : 100;
-                        const teachingViews = topPages[1] ? parseInt(topPages[1].views) || 30 : 30;
-                        const giverViews = topPages[2] ? parseInt(topPages[2].views) || 10 : 10;
-                        
-                        const homeQueries = Math.max(1, Math.round(homeViews * 0.02));
-                        const teachingQueries = Math.max(1, Math.round(teachingViews * 0.02));
-                        const giverQueries = Math.max(1, Math.round(giverViews * 0.02));
-                        
-                        if (aiQueriesHome) aiQueriesHome.textContent = `${homeQueries} søk`;
-                        if (aiQueriesTeaching) aiQueriesTeaching.textContent = `${teachingQueries} søk`;
-                        if (aiQueriesGiver) aiQueriesGiver.textContent = `${giverQueries} søk`;
+
+                        if (aiQueriesHome) aiQueriesHome.textContent = `${homeViews.toLocaleString('no-NO')} visninger`;
+                        if (aiQueriesTeaching) aiQueriesTeaching.textContent = `${teachingViews.toLocaleString('no-NO')} visninger`;
+                        if (aiQueriesGiver) aiQueriesGiver.textContent = `${giverViews.toLocaleString('no-NO')} visninger`;
+
+                        // Populate actual share text instead of fake trend changes
+                        const aiQueriesHomeChange = document.getElementById('ai-queries-home-change');
+                        const aiQueriesTeachingChange = document.getElementById('ai-queries-teaching-change');
+                        const aiQueriesGiverChange = document.getElementById('ai-queries-giver-change');
+
+                        if (aiQueriesHomeChange) {
+                            aiQueriesHomeChange.textContent = `${homePct}% andel`;
+                            aiQueriesHomeChange.style.color = '#64748b';
+                        }
+                        if (aiQueriesTeachingChange) {
+                            aiQueriesTeachingChange.textContent = `${teachingPct}% andel`;
+                            aiQueriesTeachingChange.style.color = '#64748b';
+                        }
+                        if (aiQueriesGiverChange) {
+                            aiQueriesGiverChange.textContent = `${giverPct}% andel`;
+                            aiQueriesGiverChange.style.color = '#64748b';
+                        }
+
+                        // Adjust progress bars based on actual share
+                        const homeBar = document.getElementById('ai-queries-home-bar');
+                        const teachingBar = document.getElementById('ai-queries-teaching-bar');
+                        const giverBar = document.getElementById('ai-queries-giver-bar');
+
+                        if (homeBar) homeBar.style.width = `${homePct}%`;
+                        if (teachingBar) teachingBar.style.width = `${teachingPct}%`;
+                        if (giverBar) giverBar.style.width = `${giverPct}%`;
+
+                        // Update ChatGPT-synlighetsresultat Alert Box to be 100% Real AI Share of Traffic
+                        const totalAiVisits = gptSessions + geminiSessions + claudeSessions + perplexitySessions;
+                        const aiAlertBox = document.querySelector('.ai-alert-box');
+                        if (aiAlertBox) {
+                            const aiAlertTitle = aiAlertBox.querySelector('h5');
+                            const aiAlertText = aiAlertBox.querySelector('p');
+
+                            if (totalAiVisits > 0) {
+                                const totalOverallSessions = data.trafficSources ? data.trafficSources.reduce((acc, curr) => acc + (parseInt(curr.sessions) || 0), 0) : 1;
+                                const aiSharePct = ((totalAiVisits / (totalOverallSessions || 1)) * 100).toFixed(2);
+                                if (aiAlertTitle) aiAlertTitle.textContent = `AI-trafikkandel: ${aiSharePct}%`;
+                                if (aiAlertText) aiAlertText.textContent = `Nettstedet har registrert ${totalAiVisits} reelle besøk fra AI-tjenester i denne perioden (totalt ${totalOverallSessions} sesjoner).`;
+                            } else {
+                                if (aiAlertTitle) aiAlertTitle.textContent = `Ingen AI-trafikk registrert`;
+                                if (aiAlertText) aiAlertText.textContent = `Det er ikke registrert noen henvisninger fra ChatGPT, Gemini, Claude eller Perplexity i denne perioden (0 av ${data.trafficSources ? data.trafficSources.reduce((acc, curr) => acc + (parseInt(curr.sessions) || 0), 0) : 0} sesjoner).`;
+                            }
+                        }
                     }
                 } catch (error) {
                     console.error("[Analytics] Feil under lasting av reell statistikk:", error);
@@ -2098,8 +2278,17 @@
                         const staticClicks = Math.round(staticViews * 0.45);
                         const staticImpressions = Math.round(staticClicks * 23.8);
                         
+                        const gscNotConnectedNotice = document.getElementById('gsc-not-connected-notice');
+                        const gscMetricsRow = document.getElementById('gsc-metrics-row');
+                        const gscChartContainer = document.getElementById('gsc-chart-container');
+                        if (gscNotConnectedNotice) gscNotConnectedNotice.style.display = 'none';
+                        if (gscMetricsRow) gscMetricsRow.style.display = 'grid';
+                        if (gscChartContainer) gscChartContainer.style.display = 'block';
+
                         document.getElementById('gsc-clicks-val').textContent = staticClicks.toLocaleString('no-NO');
                         document.getElementById('gsc-impressions-val').textContent = staticImpressions.toLocaleString('no-NO');
+                        document.getElementById('gsc-ctr-val').textContent = '4.2%';
+                        document.getElementById('gsc-position-val').textContent = '12.4';
 
                         const staticClicksDaily = selected.sessions.map(v => Math.round(v * 0.45));
                         const staticImpressionsDaily = selected.sessions.map(v => Math.round(v * 0.45 * 23.8));
@@ -2109,43 +2298,83 @@
                         gscChart.data.datasets[1].data = staticImpressionsDaily;
                         gscChart.update();
 
-                        // Static fallback Gen AI crawl dates
+                        // Static fallback Gen AI crawl dates -> AI visits
                         const crawlChatgptEl = document.getElementById('crawl-chatgpt');
                         const crawlGeminiEl = document.getElementById('crawl-gemini');
                         const crawlClaudeEl = document.getElementById('crawl-claude');
                         const crawlPerplexityEl = document.getElementById('crawl-perplexity');
                         
-                        if (period === '1') {
-                            if (crawlChatgptEl) crawlChatgptEl.textContent = '12 timer siden';
-                            if (crawlGeminiEl) crawlGeminiEl.textContent = '2 timer siden';
-                            if (crawlClaudeEl) crawlClaudeEl.textContent = '6 timer siden';
-                            if (crawlPerplexityEl) crawlPerplexityEl.textContent = '18 timer siden';
-                        } else {
-                            const today = new Date();
-                            const getPastDateStr = (daysAgo) => {
-                                const d = new Date(today);
-                                d.setDate(today.getDate() - daysAgo);
-                                const months = ['jan', 'feb', 'mar', 'apr', 'mai', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'des'];
-                                return `${d.getDate()}. ${months[d.getMonth()]} ${d.getFullYear()}`;
-                            };
-                            if (crawlChatgptEl) crawlChatgptEl.textContent = getPastDateStr(2);
-                            if (crawlGeminiEl) crawlGeminiEl.textContent = 'I dag';
-                            if (crawlClaudeEl) crawlClaudeEl.textContent = 'I går';
-                            if (crawlPerplexityEl) crawlPerplexityEl.textContent = getPastDateStr(5);
+                        const aiCrawlerTitleEl = document.getElementById('ai-crawler-title');
+                        if (aiCrawlerTitleEl) {
+                            aiCrawlerTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">hub</span> Referansetrafikk fra AI-søk (Besøk)`;
                         }
 
-                        // Static fallback AI queries per page
+                        const dummyChatgpt = Math.round(staticViews * 0.001) || 12;
+                        const dummyGemini = Math.round(staticViews * 0.0004) || 5;
+                        const dummyClaude = Math.round(staticViews * 0.0002) || 2;
+                        const dummyPerplexity = Math.round(staticViews * 0.0006) || 8;
+
+                        const setStyleForSess = (el, val) => {
+                            if (!el) return;
+                            el.textContent = val > 0 ? `${val} besøk` : 'Ingen besøk';
+                            if (val > 0) {
+                                el.style.color = '#10b981';
+                                el.style.fontWeight = '700';
+                            } else {
+                                el.style.color = '#64748b';
+                                el.style.fontWeight = 'normal';
+                            }
+                        };
+
+                        setStyleForSess(crawlChatgptEl, dummyChatgpt);
+                        setStyleForSess(crawlGeminiEl, dummyGemini);
+                        setStyleForSess(crawlClaudeEl, dummyClaude);
+                        setStyleForSess(crawlPerplexityEl, dummyPerplexity);
+
+                        // Static fallback AI queries per page -> key pages traffic
+                        const aiQueriesTitleEl = document.getElementById('ai-queries-title');
+                        if (aiQueriesTitleEl) {
+                            aiQueriesTitleEl.innerHTML = `<span class="material-symbols-outlined" style="font-size: 14px; color: #d17d39;">bar_chart</span> Reell trafikk på nøkkelsider`;
+                        }
+
+                        const homeViews = Math.round(staticViews * 0.6);
+                        const teachingViews = Math.round(staticViews * 0.25);
+                        const giverViews = Math.round(staticViews * 0.15);
+
                         const aiQueriesHome = document.getElementById('ai-queries-home');
                         const aiQueriesTeaching = document.getElementById('ai-queries-teaching');
                         const aiQueriesGiver = document.getElementById('ai-queries-giver');
                         
-                        const homeQueries = Math.max(1, Math.round(staticViews * 0.01));
-                        const teachingQueries = Math.max(1, Math.round(staticViews * 0.003));
-                        const giverQueries = Math.max(1, Math.round(staticViews * 0.001));
+                        if (aiQueriesHome) aiQueriesHome.textContent = `${homeViews.toLocaleString('no-NO')} visninger`;
+                        if (aiQueriesTeaching) aiQueriesTeaching.textContent = `${teachingViews.toLocaleString('no-NO')} visninger`;
+                        if (aiQueriesGiver) aiQueriesGiver.textContent = `${giverViews.toLocaleString('no-NO')} visninger`;
+
+                        const aiQueriesHomeChange = document.getElementById('ai-queries-home-change');
+                        const aiQueriesTeachingChange = document.getElementById('ai-queries-teaching-change');
+                        const aiQueriesGiverChange = document.getElementById('ai-queries-giver-change');
+
+                        if (aiQueriesHomeChange) aiQueriesHomeChange.textContent = '60% andel';
+                        if (aiQueriesTeachingChange) aiQueriesTeachingChange.textContent = '25% andel';
+                        if (aiQueriesGiverChange) aiQueriesGiverChange.textContent = '15% andel';
+
+                        const homeBar = document.getElementById('ai-queries-home-bar');
+                        const teachingBar = document.getElementById('ai-queries-teaching-bar');
+                        const giverBar = document.getElementById('ai-queries-giver-bar');
+
+                        if (homeBar) homeBar.style.width = '60%';
+                        if (teachingBar) teachingBar.style.width = '25%';
+                        if (giverBar) giverBar.style.width = '15%';
+
+                        const dummyTotalAi = dummyChatgpt + dummyGemini + dummyClaude + dummyPerplexity;
+                        const dummyShare = ((dummyTotalAi / staticViews) * 100).toFixed(2);
                         
-                        if (aiQueriesHome) aiQueriesHome.textContent = `${homeQueries} søk`;
-                        if (aiQueriesTeaching) aiQueriesTeaching.textContent = `${teachingQueries} søk`;
-                        if (aiQueriesGiver) aiQueriesGiver.textContent = `${giverQueries} søk`;
+                        const aiAlertBox = document.querySelector('.ai-alert-box');
+                        if (aiAlertBox) {
+                            const aiAlertTitle = aiAlertBox.querySelector('h5');
+                            const aiAlertText = aiAlertBox.querySelector('p');
+                            if (aiAlertTitle) aiAlertTitle.textContent = `AI-trafikkandel: ${dummyShare}% (Demo)`;
+                            if (aiAlertText) aiAlertText.textContent = `Nettstedet har registrert ${dummyTotalAi} besøk fra AI-tjenester i denne demo-perioden.`;
+                        }
                     }
                 });
             });

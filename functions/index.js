@@ -773,6 +773,56 @@ exports.getAnalyticsOverview = onRequest({
             orderBys: [{ dimension: { dimensionName: "date" }, desc: false }]
           },
         }),
+        // 8. Google Search Console Summary
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
+            metrics: [
+              { name: "organicGoogleSearchClicks" },
+              { name: "organicGoogleSearchImpressions" },
+              { name: "organicGoogleSearchAveragePosition" },
+              { name: "organicGoogleSearchClickThroughRate" }
+            ],
+            limit: 1,
+          },
+        }).catch((err) => {
+          console.warn("[Analytics] GSC summary report failed:", err.message);
+          return null;
+        }),
+        // 9. Google Search Console Daily
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
+            dimensions: [{ name: "date" }],
+            metrics: [
+              { name: "organicGoogleSearchClicks" },
+              { name: "organicGoogleSearchImpressions" }
+            ],
+            orderBys: [{ dimension: { dimensionName: "date" }, desc: false }]
+          },
+        }).catch((err) => {
+          console.warn("[Analytics] GSC daily report failed:", err.message);
+          return null;
+        }),
+        // 10. AI Referral sources
+        googleGaPost({
+          path: `/properties/${propertyId}:runReport`,
+          accessToken,
+          body: {
+            dateRanges: [{ startDate: rangeStartDate, endDate: "today" }],
+            dimensions: [{ name: "sessionSource" }],
+            metrics: [{ name: "sessions" }],
+            limit: 100,
+            orderBys: [{ metric: { metricName: "sessions" }, desc: true }]
+          },
+        }).catch((err) => {
+          console.warn("[Analytics] AI referral sources report failed:", err.message);
+          return null;
+        }),
       ]);
 
       const dailyTraffic = (dailyReport.rows || []).map(row => ({
@@ -806,6 +856,39 @@ exports.getAnalyticsOverview = onRequest({
       const avgDuration = summaryReport.rows?.[0]?.metricValues?.[2]?.value || "0";
       const bounceRate = summaryReport.rows?.[0]?.metricValues?.[3]?.value || "0";
 
+      // Google Search Console parsing
+      let gscSummary = null;
+      if (gscSummaryReport && gscSummaryReport.rows && gscSummaryReport.rows[0]) {
+        const row = gscSummaryReport.rows[0];
+        gscSummary = {
+          clicks: row.metricValues[0].value,
+          impressions: row.metricValues[1].value,
+          position: parseFloat(row.metricValues[2].value).toFixed(1),
+          ctr: (parseFloat(row.metricValues[3].value) * 100).toFixed(1) + "%"
+        };
+      }
+
+      const gscDaily = (gscDailyReport && gscDailyReport.rows || []).map(row => ({
+        date: row.dimensionValues[0].value,
+        clicks: row.metricValues[0].value,
+        impressions: row.metricValues[1].value
+      }));
+
+      // AI referrals parsing
+      const aiSources = (aiSourcesReport && aiSourcesReport.rows || []).map(row => ({
+        source: row.dimensionValues[0].value,
+        sessions: row.metricValues[0].value
+      })).filter(s => {
+        const srcName = String(s.source || '').toLowerCase();
+        return srcName.includes('chatgpt') || 
+               srcName.includes('openai') || 
+               srcName.includes('gemini') || 
+               srcName.includes('claude') || 
+               srcName.includes('perplexity') ||
+               srcName.includes('anthropic') ||
+               srcName.includes('cohere');
+      });
+
       res.json({
         status: "success",
         data: {
@@ -820,7 +903,10 @@ exports.getAnalyticsOverview = onRequest({
           trafficSources,
           devices,
           topCities,
-          dailyTraffic
+          dailyTraffic,
+          gscSummary,
+          gscDaily,
+          aiSources
         }
       });
 
