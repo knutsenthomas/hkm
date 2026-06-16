@@ -12875,11 +12875,11 @@ class AdminManager {
                 }
 
                 const profileStatus = record.userId
-                    ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
+                    ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
                         <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>
                         Koblet
                        </button>`
-                    : `<button type="button" class="btn-link-profile link-unconnected" data-id="${record.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
+                    : `<button type="button" class="btn-link-profile link-unconnected" data-id="${record.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
                         <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
                         Ukoblet
                        </button>`;
@@ -12985,11 +12985,11 @@ class AdminManager {
                 const method = this.escapeHtml(this.getDonationMethodLabel(record.method));
                 
                 const profileStatus = record.userId
-                    ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
+                    ? `<button type="button" class="btn-link-profile link-connected" data-id="${record.id}" data-userid="${record.userId}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
                         <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>
                         Koblet
                        </button>`
-                    : `<button type="button" class="btn-link-profile link-unconnected" data-id="${record.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
+                    : `<button type="button" class="btn-link-profile link-unconnected" data-id="${record.id}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
                         <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
                         Ukoblet
                        </button>`;
@@ -13107,11 +13107,11 @@ class AdminManager {
                         <td>${this.escapeHtml(methodText)}</td>
                         <td>${donor.latestDate ? donor.latestDate.toLocaleDateString('no-NO') : 'Ukjent'}</td>
                         <td>${donor.userId
-                            ? `<button type="button" class="btn-link-donor-profile link-connected" data-key="${this.escapeHtml(donor.key)}" data-userid="${this.escapeHtml(donor.userId)}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
+                            ? `<button type="button" class="btn-link-donor-profile link-connected" data-key="${this.escapeHtml(donor.key)}" data-userid="${this.escapeHtml(donor.userId)}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05); cursor:pointer; font-family:inherit;">
                                 <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>
                                 Koblet
                                </button>`
-                            : `<button type="button" class="btn-link-donor-profile link-unconnected" data-key="${this.escapeHtml(donor.key)}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
+                            : `<button type="button" class="btn-link-donor-profile link-unconnected" data-key="${this.escapeHtml(donor.key)}" style="display:inline-flex; align-items:center; justify-content:center; gap:4px; white-space:nowrap; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05); cursor:pointer; font-family:inherit;">
                                 <span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>
                                 Ukoblet
                                </button>`}</td>
@@ -15153,15 +15153,16 @@ class AdminManager {
                         grid-column: span 12 !important;
                     }
                 }
-                .btn-link-profile {
+                .btn-link-profile, .btn-link-donor-profile {
                     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+                    white-space: nowrap !important;
                 }
-                .btn-link-profile:hover {
+                .btn-link-profile:hover, .btn-link-donor-profile:hover {
                     transform: translateY(-1px) !important;
                     filter: brightness(0.95) !important;
                     box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08) !important;
                 }
-                .btn-link-profile:active {
+                .btn-link-profile:active, .btn-link-donor-profile:active {
                     transform: translateY(0) scale(0.97) !important;
                 }
                 @keyframes modalAppear {
