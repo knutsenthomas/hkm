@@ -12791,11 +12791,25 @@ class AdminManager {
                             ? `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#ecfdf5; color:#047857; border:1px solid #a7f3d0; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(16,185,129,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#10b981; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link</span>Koblet</span>`
                             : `<span style="display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff7ed; color:#b45309; border:1px solid #ffedd5; padding:4px 10px; border-radius:9999px; font-size:12px; font-weight:700; line-height:12px !important; box-shadow:0 1px 2px rgba(245,158,11,0.05);"><span class="material-symbols-outlined" style="font-size:14px; font-weight:900; color:#f59e0b; line-height:1 !important; display:inline-flex !important; align-items:center; justify-content:center; width:14px; height:14px; margin:0 !important; padding:0 !important;">link_off</span>Ukoblet</span>`}</td>
                         <td class="text-right"><strong>${this.formatDonationCurrency(donor.total)}</strong></td>
+                        <td class="text-right" style="text-align:right; width:1px; white-space:nowrap;">
+                            <button type="button" class="action-btn view-donor-details-btn" data-key="${this.escapeHtml(donor.key)}" title="Vis historikk" style="color:#1B4965; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:4px; border-radius:4px; transition:background 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">visibility</span>
+                            </button>
+                        </td>
                     </tr>
                 `;
             }).join('') : `
-                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen givere matcher søket.</td></tr>
+                <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen givere matcher søket.</td></tr>
             `;
+
+            // Bind click events to details buttons
+            donorsBody.querySelectorAll('.view-donor-details-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const donorKey = btn.dataset.key;
+                    this.openDonorDetailsModal(donorKey);
+                });
+            });
         }
     }
 
@@ -12970,6 +12984,181 @@ class AdminManager {
             if (loadingToast && typeof loadingToast.dismiss === 'function') loadingToast.dismiss();
             this.showToast('Kunne ikke oppdatere koblinger: ' + error.message, 'danger', 5000);
         }
+    }
+
+    getDonationsForDonor(donorKey) {
+        const userMap = this.adminUserMap || new Map();
+        const records = Array.isArray(this.allDonationRecords) ? this.allDonationRecords : [];
+        return records.filter(record => {
+            const email = this.getDonationDonorEmail(record, userMap);
+            const name = this.getDonationDonorName(record, userMap);
+            
+            let key = record.userId;
+            if (!key && email) {
+                key = email;
+            }
+            if (!key && name) {
+                const cleanName = name.trim().toLowerCase();
+                if (cleanName && cleanName !== 'ukjent' && cleanName !== 'unknown' && cleanName !== 'ukjent giver') {
+                    key = name.trim();
+                }
+            }
+            if (!key) {
+                key = record.id;
+            }
+            return key === donorKey;
+        }).sort((a, b) => {
+            const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+            const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+            return bDate - aDate;
+        });
+    }
+
+    openDonorDetailsModal(donorKey) {
+        let modal = document.getElementById('donor-details-modal');
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = 'donor-details-modal';
+            modal.style.cssText = 'display:none;position:fixed;inset:0;z-index:10000;align-items:center;justify-content:center;padding:24px;';
+            document.body.appendChild(modal);
+        }
+
+        const donations = this.getDonationsForDonor(donorKey);
+        if (donations.length === 0) {
+            this.showToast('Fant ingen transaksjoner for denne giveren.', 'error', 4000);
+            return;
+        }
+
+        const userMap = this.adminUserMap || new Map();
+        const firstRec = donations[0];
+        const donorName = this.getDonationDonorName(firstRec, userMap);
+        const donorEmail = this.getDonationDonorEmail(firstRec, userMap);
+        
+        // Collect alternative names
+        const names = new Set();
+        donations.forEach(d => {
+            const n = this.getDonationDonorName(d, userMap);
+            if (n && n !== 'Ukjent giver' && n !== 'ukjent' && n !== 'unknown') {
+                names.add(n);
+            }
+        });
+        const otherNames = Array.from(names).filter(n => n !== donorName);
+        const otherNamesStr = otherNames.length > 0 ? `Også registrert som: ${otherNames.map(n => this.escapeHtml(n)).join(', ')}` : '';
+
+        // Calculate summary stats
+        const isCompleted = (r) => ['completed', 'succeeded', 'captured'].includes(String(r.status || '').toLowerCase());
+        const completedGifts = donations.filter(isCompleted);
+        const donorTotal = completedGifts.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+        const giftCount = donations.length;
+        const completedCount = completedGifts.length;
+        
+        const latestDate = this.getDonationDate(firstRec);
+        const latestDateStr = latestDate ? latestDate.toLocaleDateString('no-NO') : 'Ukjent';
+
+        const tableRowsHtml = donations.map(d => {
+            const date = this.getDonationDate(d);
+            const dateStr = date ? date.toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Ukjent';
+            const method = this.escapeHtml(this.getDonationMethodLabel(d.method) || (d.isInKind ? 'Fysisk' : 'Ukjent'));
+            
+            const isRecurring = String(d.type || '').toLowerCase() === 'fast';
+            const typeText = d.isInKind ? 'Fysisk' : (isRecurring ? 'Fast' : 'Enkelt');
+            const typeBadge = `<span style="background: ${d.isInKind ? '#fef3c7' : (isRecurring ? '#e0f2fe' : '#f1f5f9')}; color: ${d.isInKind ? '#b45309' : (isRecurring ? '#0369a1' : '#475569')}; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-size: 11px;">${typeText}</span>`;
+            
+            const statusLabel = this.escapeHtml(this.getDonationStatusLabel(d.status));
+            const statusBadge = `<span class="method-tag">${statusLabel}</span>`;
+            
+            const amountVal = this.normalizeDonationAmountNok(d);
+            const amountStr = isCompleted(d) || d.isInKind
+                ? `<strong>${this.formatDonationCurrency(amountVal)}</strong>`
+                : `<span style="color:#94a3b8; text-decoration:line-through;">${this.formatDonationCurrency(amountVal)}</span>`;
+
+            return `
+                <tr>
+                    <td style="padding:10px 12px; font-size:13px;">${dateStr}</td>
+                    <td style="padding:10px 12px; font-size:13px;">${method}</td>
+                    <td style="padding:10px 12px; font-size:13px;">${typeBadge}</td>
+                    <td style="padding:10px 12px; font-size:13px;">${statusBadge}</td>
+                    <td style="padding:10px 12px; font-size:13px; text-align:right;">${amountStr}</td>
+                </tr>
+            `;
+        }).join('');
+
+        modal.innerHTML = `
+            <div class="modal-backdrop" style="position:absolute;inset:0;background:rgba(15,23,42,0.3);backdrop-filter:blur(4px);transition:opacity 0.2s ease;"></div>
+            <div class="modal-container" style="position:relative;background:white;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);width:100%;max-width:700px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;animation:modalAppear 0.2s ease-out;z-index:1;">
+                
+                <!-- Header -->
+                <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
+                    <div>
+                        <h3 style="margin:0; font-size:20px; font-weight:700; color:#1B4965; display:flex; align-items:center; gap:8px;">
+                            <span class="material-symbols-outlined" style="font-size:24px; color:#1B4965;">person</span>
+                            ${this.escapeHtml(donorName)}
+                        </h3>
+                        <div style="font-size:13px; color:#64748b; margin-top:4px;">
+                            ${this.escapeHtml(donorEmail || 'Ingen e-post registrert')}
+                            ${otherNamesStr ? ` &bull; ${otherNamesStr}` : ''}
+                        </div>
+                    </div>
+                    <button type="button" class="close-donor-details-btn" style="background:none; border:none; cursor:pointer; color:#64748b; display:flex; align-items:center; justify-content:center; padding:6px; border-radius:999px; transition:background 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size:24px;">close</span>
+                    </button>
+                </div>
+                
+                <!-- Body -->
+                <div style="padding:24px; overflow-y:auto; flex:1;">
+                    <!-- Stats Summary Box -->
+                    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px;">
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
+                            <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Totalt bidrag</span>
+                            <div style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${this.formatDonationCurrency(donorTotal)}</div>
+                        </div>
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
+                            <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Fullførte gaver</span>
+                            <div style="font-size:20px; font-weight:800; color:#1B4965; margin-top:4px;">${completedCount} av ${giftCount}</div>
+                        </div>
+                        <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:16px; border-radius:12px; text-align:center;">
+                            <span style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase; letter-spacing:0.05em;">Siste aktivitet</span>
+                            <div style="font-size:18px; font-weight:800; color:#1B4965; margin-top:6px;">${latestDateStr}</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin:0 0 12px 0; font-size:15px; font-weight:700; color:#0f172a;">Transaksjonshistorikk</h4>
+                    
+                    <div style="overflow-x:auto; border:1px solid #e2e8f0; border-radius:10px; background:white;">
+                        <table class="data-table" style="width:100%; margin:0;">
+                            <thead>
+                                <tr>
+                                    <th style="font-size:12px; padding:10px 12px;">Dato</th>
+                                    <th style="font-size:12px; padding:10px 12px;">Metode</th>
+                                    <th style="font-size:12px; padding:10px 12px;">Type</th>
+                                    <th style="font-size:12px; padding:10px 12px;">Status</th>
+                                    <th style="font-size:12px; padding:10px 12px; text-align:right;">Beløp</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${tableRowsHtml}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; background:#f8fafc; gap:12px;">
+                    <button type="button" class="btn-secondary close-donor-details-btn" style="padding:10px 20px; border-radius:8px; font-weight:600;">Lukk</button>
+                </div>
+            </div>
+        `;
+
+        const closeModal = () => {
+            modal.style.display = 'none';
+        };
+
+        modal.style.display = 'flex';
+
+        modal.querySelectorAll('.close-donor-details-btn').forEach(el => {
+            el.addEventListener('click', closeModal);
+        });
+        modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
     }
 
     openManualDonationModal() {
@@ -14798,10 +14987,11 @@ class AdminManager {
                                     <th>Siste gave</th>
                                     <th>Profil</th>
                                     <th class="text-right">Sum</th>
+                                    <th style="width:1px;"></th>
                                 </tr>
                             </thead>
                             <tbody id="donation-donors-body">
-                                <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
+                                <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Laster givere...</td></tr>
                             </tbody>
                         </table>
                     </div>
