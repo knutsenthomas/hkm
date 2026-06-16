@@ -4700,6 +4700,10 @@ class AdminManager {
                             <span class="material-symbols-outlined">dashboard_customize</span>
                             Se sideinnhold
                         </button>
+                        <button type="button" class="overview-hero-action-secondary" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('causes')}else{window.location.hash='causes'}">
+                            <span class="material-symbols-outlined">volunteer_activism</span>
+                            Se gaver
+                        </button>
                     </div>
                 </div>
                 <!-- Subtle background decoration -->

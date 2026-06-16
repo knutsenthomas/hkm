@@ -755,11 +755,20 @@
                             Her har du rask oversikt over innhold, meldinger og aktivitet. Bruk menyen til venstre for
                             å redigere nettsiden og følge opp kommunikasjonen.
                         </p>
-                        <button type="button" class="overview-hero-action"
-                            onclick="window.location.href='/admin/admin-meldinger.html'">
-                            Gå til meldinger
-                            <span class="material-symbols-outlined">arrow_forward</span>
-                        </button>
+                        <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; align-items: center; justify-content: flex-start;">
+                            <button type="button" class="overview-hero-action" onclick="window.location.href='/admin/admin-meldinger.html'">
+                                <span class="material-symbols-outlined">mail</span>
+                                Gå til meldinger
+                            </button>
+                            <button type="button" class="overview-hero-action-secondary" onclick="window.location.href='/admin/index.html#content'">
+                                <span class="material-symbols-outlined">dashboard_customize</span>
+                                Se sideinnhold
+                            </button>
+                            <button type="button" class="overview-hero-action-secondary" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('causes')}else{window.location.hash='causes'}">
+                                <span class="material-symbols-outlined">volunteer_activism</span>
+                                Se gaver
+                            </button>
+                        </div>
                     </div>
                     <div class="section-header-icon">
                         <span class="material-symbols-outlined">mail</span>
