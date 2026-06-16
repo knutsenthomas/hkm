@@ -4380,8 +4380,8 @@ class AdminManager {
         // Define Categories & Groups
         const categories = [
             { id: 'traffic', label: 'Trafikk & Innsikt', icon: 'monitoring', widgets: ['visitors', 'analytics-engagement', 'users'] },
-            { id: 'content', label: 'Innhold', icon: 'description', widgets: ['blog', 'podcast', 'teaching'] },
-            { id: 'social', label: 'Sosialt & Drift', icon: 'hub', widgets: ['youtube', 'donations', 'donation-amount', 'status'] }
+            { id: 'content', label: 'Innhold', icon: 'description', widgets: ['blog', 'podcast', 'teaching', 'status'] },
+            { id: 'social', label: 'Sosialt & Drift', icon: 'hub', widgets: ['youtube', 'donations', 'donation-amount'] }
         ];
 
         // Build HTML for columns
