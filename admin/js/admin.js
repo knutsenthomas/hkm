@@ -13487,11 +13487,11 @@ class AdminManager {
                                 ${yearOptionsHtml}
                             </select>
                             <button type="button" class="btn-primary" id="donor-modal-print-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 12px !important; border-radius:6px !important; font-size:13px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; background:#1B4965 !important; color:white !important; border:none !important; cursor:pointer !important; transform-origin: center !important;">
-                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">print</span>
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important; margin-right:4px !important;">print</span>
                                 <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Skriv ut</span>
                             </button>
                             <button type="button" class="btn-secondary" id="donor-modal-email-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 12px !important; border-radius:6px !important; font-size:13px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; cursor:pointer !important; transform-origin: center !important;">
-                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">mail</span>
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important; margin-right:4px !important;">mail</span>
                                 <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Send e-post</span>
                             </button>
                         </div>
@@ -14204,7 +14204,7 @@ class AdminManager {
                 <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; background:#f8fafc; gap:12px;">
                     <button type="button" class="btn-secondary close-email-preview-btn" style="padding:10px 20px; border-radius:8px; font-weight:600; height:38px; cursor:pointer;">Avbryt</button>
                     <button type="button" class="btn-primary" id="email-preview-send-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 20px !important; border-radius:8px !important; font-size:13px !important; font-weight:600 !important; height:38px !important; min-height:38px !important; background:#1B4965 !important; color:white !important; border:none !important; cursor:pointer !important; transform-origin: center !important;">
-                        <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">send</span>
+                        <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important; margin-right:4px !important;">send</span>
                         <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Send e-post nå</span>
                     </button>
                 </div>
@@ -14269,7 +14269,7 @@ class AdminManager {
                 if (sendBtn) {
                     sendBtn.disabled = false;
                     sendBtn.innerHTML = `
-                        <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">send</span>
+                        <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important; margin-right:4px !important;">send</span>
                         <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Send e-post nå</span>
                     `;
                 }
