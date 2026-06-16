@@ -1502,6 +1502,8 @@
 
             // 3. Reell GA4 Datainnhenting og API-integrasjon
             let activeDays = 7;
+            let lastLoadedCities = null;
+            let chartsLoaded = false;
 
             async function loadRealAnalytics(days) {
                 activeDays = days;
@@ -1653,7 +1655,8 @@
                         }
 
                         // Oppdater Google GeoChart med virkelige byer
-                        if (typeof google !== 'undefined' && google.visualization && google.visualization.arrayToDataTable) {
+                        lastLoadedCities = topCities;
+                        if (chartsLoaded && typeof google !== 'undefined' && google.visualization && google.visualization.arrayToDataTable) {
                             drawRegionsMapReal(topCities);
                         }
 
@@ -1760,14 +1763,22 @@
                 'packages':['geochart'],
             });
             google.charts.setOnLoadCallback(() => {
-                // Initialiser tomt eller med standardverdier
-                drawRegionsMapReal([]);
+                chartsLoaded = true;
+                if (lastLoadedCities) {
+                    drawRegionsMapReal(lastLoadedCities);
+                } else {
+                    // Initialiser tomt eller med standardverdier
+                    drawRegionsMapReal([]);
+                }
             });
 
             function drawRegionsMapReal(cities = []) {
                 var chartData = [['By', 'Besøkende']];
                 cities.forEach(c => {
-                    chartData.push([c.city || 'Ukjent', parseInt(c.users) || 0]);
+                    const cityName = c.city || '';
+                    if (cityName && cityName !== 'Ukjent' && cityName !== '(not set)' && cityName.toLowerCase() !== 'unknown') {
+                        chartData.push([cityName, parseInt(c.users) || 0]);
+                    }
                 });
                 
                 // Fallback hvis ingen byer
@@ -1790,9 +1801,18 @@
                 var chart = new google.visualization.GeoChart(document.getElementById('regions_div'));
                 chart.draw(dataTable, options);
 
-                window.addEventListener('resize', function() {
-                    chart.draw(dataTable, options);
-                });
+                window.activeGeoChart = chart;
+                window.activeGeoChartDataTable = dataTable;
+                window.activeGeoChartOptions = options;
+
+                if (!window.geoChartResizeListenerAdded) {
+                    window.addEventListener('resize', function() {
+                        if (window.activeGeoChart && window.activeGeoChartDataTable && window.activeGeoChartOptions) {
+                            window.activeGeoChart.draw(window.activeGeoChartDataTable, window.activeGeoChartOptions);
+                        }
+                    });
+                    window.geoChartResizeListenerAdded = true;
+                }
             }
         });
     </script>
