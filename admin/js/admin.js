@@ -14541,7 +14541,6 @@ class AdminManager {
 
         const linePath = `M ${points.map(p => `${p.x} ${p.y}`).join(' L ')}`;
         const areaPath = `${linePath} L 800 260 L 0 260 Z`;
-
         // Render SVG elements
         const svgPathHtml = `
             <svg viewBox="0 0 800 260" width="100%" height="100%" preserveAspectRatio="none" style="display: block; overflow: visible;">
@@ -14561,13 +14560,31 @@ class AdminManager {
                 
                 <!-- Line -->
                 <path d="${linePath}" fill="none" stroke="#1B4965" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"></path>
-                
-                <!-- Dots -->
-                ${points.map((p, idx) => `
-                    <circle id="chart-dot-${idx}" cx="${p.x}" cy="${p.y}" r="4" fill="#ffffff" stroke="#1B4965" stroke-width="2.5" style="transition: r 0.15s ease-in-out;"></circle>
-                `).join('')}
             </svg>
         `;
+
+        // Render HTML dots to avoid non-uniform SVG stretching
+        const chartDotsHtml = points.map((p, idx) => {
+            const left = (p.x / 800) * 100;
+            const top = (p.y / 260) * 100;
+            return `
+                <div id="chart-dot-${idx}" 
+                     style="position: absolute; 
+                            left: ${left}%; 
+                            top: ${top}%; 
+                            width: 8px; 
+                            height: 8px; 
+                            background: #ffffff; 
+                            border: 2.5px solid #1B4965; 
+                            border-radius: 50%; 
+                            transform: translate(-50%, -50%); 
+                            transition: transform 0.15s ease-in-out, width 0.15s ease-in-out, height 0.15s ease-in-out; 
+                            pointer-events: none; 
+                            box-sizing: border-box; 
+                            z-index: 5;">
+                </div>
+            `;
+        }).join('');
 
         // Render overlay hover columns centered on each point
         const colWidth = 100 / (numIntervals - 1);
@@ -14577,12 +14594,11 @@ class AdminManager {
             return `
                 <div style="position: absolute; top: 0; bottom: 0; left: ${left}%; width: ${colWidth}%; transform: translateX(-50%); cursor: pointer; z-index: 10;" 
                      title="${tooltip}"
-                     onmouseover="document.getElementById('chart-dot-${idx}')?.setAttribute('r', '7')"
-                     onmouseout="document.getElementById('chart-dot-${idx}')?.setAttribute('r', '4')">
+                     onmouseover="const dot = document.getElementById('chart-dot-${idx}'); if (dot) { dot.style.width = '14px'; dot.style.height = '14px'; dot.style.transform = 'translate(-50%, -50%) scale(1.1)'; }"
+                     onmouseout="const dot = document.getElementById('chart-dot-${idx}'); if (dot) { dot.style.width = '8px'; dot.style.height = '8px'; dot.style.transform = 'translate(-50%, -50%) scale(1)'; }">
                 </div>
             `;
         }).join('');
-
         const uniqueDonors = new Set();
         periodRecords.forEach(r => {
             const email = this.getDonationDonorEmail(r, this.adminUserMap);
@@ -14781,6 +14797,10 @@ class AdminManager {
                         <!-- SVG background -->
                         <div style="position: absolute; inset: 0; pointer-events: none; padding: 10px 0;">
                             ${svgPathHtml}
+                        </div>
+                        <!-- HTML Dots (perfectly circular overlay) -->
+                        <div style="position: absolute; inset: 0; pointer-events: none; padding: 10px 0;">
+                            ${chartDotsHtml}
                         </div>
                         <!-- Hover overlay columns -->
                         <div style="position: absolute; inset: 0; padding: 10px 0; overflow: hidden;">
