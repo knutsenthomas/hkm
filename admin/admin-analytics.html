@@ -1429,10 +1429,16 @@
 
         // Register global error listeners immediately to catch any crashes
         window.addEventListener('error', (event) => {
-            showDashboardError("Det oppstod en nettleser-feil: " + (event.error?.message || event.message));
+            const err = event.error;
+            const msg = err?.message || event.message || "Ukjent feil";
+            const stack = err?.stack ? " | Stack: " + err.stack.substring(0, 180) : "";
+            showDashboardError("Det oppstod en nettleser-feil: " + msg + stack);
         });
         window.addEventListener('unhandledrejection', (event) => {
-            showDashboardError("Det oppstod en uventet feil i en bakgrunnsprosess: " + (event.reason?.message || event.reason || "Ukjent feil"));
+            const err = event.reason;
+            const msg = err?.message || String(err || "Ukjent feil");
+            const stack = err?.stack ? " | Stack: " + err.stack.substring(0, 180) : "";
+            showDashboardError("Det oppstod en uventet feil i en bakgrunnsprosess: " + msg + stack);
         });
 
         document.addEventListener('DOMContentLoaded', async () => {
