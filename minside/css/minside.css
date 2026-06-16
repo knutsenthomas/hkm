@@ -802,6 +802,7 @@ body.admin-body .btn-full,
     grid-template-columns: 1fr 300px;
     gap: 0 20px;
     width: 100%;
+    align-items: start;
 }
 
 .profile-left,
@@ -812,7 +813,7 @@ body.admin-body .btn-full,
 
 /* HOUSEHOLD */
 .family-search {
-    padding: 14px 22px;
+    padding: 8px 24px;
     border-bottom: 1px solid var(--border-color);
 }
 
@@ -852,10 +853,18 @@ body.admin-body .btn-full,
     font-weight: 600;
 }
 
+.family-search-status:empty {
+    display: none !important;
+}
+
 .family-search-results {
     display: grid;
     gap: 6px;
     margin-top: 6px;
+}
+
+.family-search-results:empty {
+    display: none !important;
 }
 
 .family-result-row {
