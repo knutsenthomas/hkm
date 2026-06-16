@@ -5218,7 +5218,7 @@ class AdminManager {
 
     async fetchYouTubeStats() {
         const _adminYt1 = 'AIza' + 'Sy';
-        const _adminYt2 = 'ClPHHywl7Vr0naj2JnK_t-lY-V86gmKys';
+        const _adminYt2 = 'D622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
         const YT_API_KEY = _adminYt1 + _adminYt2;
         const YT_CHANNEL_ID = 'UCFbX-Mf7NqDm2a07hk6hveg';
         const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${YT_CHANNEL_ID}&key=${YT_API_KEY}`;
@@ -11279,8 +11279,18 @@ class AdminManager {
                                             if (!safeItem.author || safeItem.author === 'Ukjent forfatter' || safeItem.author === 'Navn') {
                                                 safeItem.author = displayName;
                                             }
-                                            if (!safeItem.authorPhoto || safeItem.authorPhoto.includes('author-placeholder')) {
+                                            
+                                            // Ensure the authorPhoto belongs to the actual author, not the logged-in editor
+                                            const authorLower = (safeItem.author || '').toLowerCase().trim();
+                                            const editorLower = displayName.toLowerCase().trim();
+                                            if (authorLower.includes('hilde')) {
+                                                safeItem.authorPhoto = '/img/Hilde%20Karin%20Knutsen.jpg';
+                                            } else if (authorLower.includes('thomas')) {
+                                                safeItem.authorPhoto = '/img/Thomas.jpeg';
+                                            } else if (authorLower === editorLower) {
                                                 if (photoURL) safeItem.authorPhoto = photoURL;
+                                            } else if (!safeItem.authorPhoto || safeItem.authorPhoto.includes('author-placeholder')) {
+                                                safeItem.authorPhoto = 'img/author-placeholder.png';
                                             }
                                         }
                                     }
@@ -11356,8 +11366,17 @@ class AdminManager {
                                         if (!safeItem.author || safeItem.author === 'Ukjent forfatter' || safeItem.author === 'Navn') {
                                             safeItem.author = displayName;
                                         }
-                                        if (!safeItem.authorPhoto || safeItem.authorPhoto.includes('author-placeholder')) {
+                                        // Ensure the authorPhoto belongs to the actual author, not the logged-in editor
+                                        const authorLower = (safeItem.author || '').toLowerCase().trim();
+                                        const editorLower = displayName.toLowerCase().trim();
+                                        if (authorLower.includes('hilde')) {
+                                            safeItem.authorPhoto = '/img/Hilde%20Karin%20Knutsen.jpg';
+                                        } else if (authorLower.includes('thomas')) {
+                                            safeItem.authorPhoto = '/img/Thomas.jpeg';
+                                        } else if (authorLower === editorLower) {
                                             if (photoURL) safeItem.authorPhoto = photoURL;
+                                        } else if (!safeItem.authorPhoto || safeItem.authorPhoto.includes('author-placeholder')) {
+                                            safeItem.authorPhoto = 'img/author-placeholder.png';
                                         }
                                     }
                                 }

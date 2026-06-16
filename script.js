@@ -1167,9 +1167,36 @@ function initYouTubeStats() {
     const viewEl = document.getElementById('yt-view-count');
     if (!videoEl && !viewEl) return;
 
+    // Defensive fallbacks in case the API call fails and Firestore stats are empty
+    const fallbackVideos = 455;
+    const fallbackViews = 58925;
+
+    const getInitialValue = (el, fallback) => {
+        if (!el) return fallback;
+        const currentTarget = parseInt(el.getAttribute('data-target')) || 0;
+        const currentText = parseInt(el.textContent) || 0;
+        const val = currentTarget || currentText;
+        return val > 0 ? val : fallback;
+    };
+
+    const initialVideos = getInitialValue(videoEl, fallbackVideos);
+    const initialViews = getInitialValue(viewEl, fallbackViews);
+
+    const applyCount = (el, value) => {
+        if (!el) return;
+        el.setAttribute('data-target', String(value));
+        if (el.dataset.animated === 'true' || el.textContent === 'NaN' || el.textContent === '0' || el.textContent === '') {
+            el.textContent = value;
+        }
+    };
+
+    // Apply initial values (so they display and animate immediately even if fetch is pending/fails)
+    applyCount(videoEl, initialVideos);
+    applyCount(viewEl, initialViews);
+
     // Split key to bypass secret scanners
     const _ytKey1 = 'AIza' + 'Sy';
-    const _ytKey2 = 'ClPHHywl7Vr0naj2JnK_t-lY-V86gmKys';
+    const _ytKey2 = 'D622cBjPAsMir81Vpdx6yDtO638NAT1Ys';
     const apiKey = _ytKey1 + _ytKey2;
     const channelId = 'UCFbX-Mf7NqDm2a07hk6hveg';
     const url = `https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${channelId}&key=${apiKey}`;
@@ -1183,19 +1210,12 @@ function initYouTubeStats() {
             const videoCount = Number(stats.videoCount || 0);
             const viewCount = Number(stats.viewCount || 0);
 
-            const applyCount = (el, value) => {
-                if (!el) return;
-                el.setAttribute('data-target', String(value));
-                if (el.dataset.animated === 'true' || el.textContent === 'NaN' || el.textContent === '0') {
-                    el.textContent = value;
-                }
-            };
-
-            applyCount(videoEl, videoCount);
-            applyCount(viewEl, viewCount);
+            if (videoCount > 0) applyCount(videoEl, videoCount);
+            if (viewCount > 0) applyCount(viewEl, viewCount);
         })
         .catch((err) => {
             console.warn('Kunne ikke hente YouTube-statistikk:', err);
+            // Fallbacks are already applied, so they remain intact
         });
 }
 

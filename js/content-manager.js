@@ -1101,9 +1101,25 @@ class ContentManager {
         // Populate author avatar in hero
         const avatarEl = document.getElementById('single-post-author-avatar');
         if (avatarEl) {
-            // HKM Fix: Use actual author photo or a professional icon fallback
-            let avatarUrl = item.authorPhoto || sourceItem?.authorPhoto;
+            // HKM Fix: Map author name to correct default image immediately to prevent wrong-face flickering
             const authorName = item.author || sourceItem?.author || '';
+            const authorLower = authorName.toLowerCase().trim();
+            
+            let defaultAvatar = 'img/author-placeholder.png';
+            if (authorLower.includes('hilde')) {
+                defaultAvatar = '/img/Hilde%20Karin%20Knutsen.jpg';
+            } else if (authorLower.includes('thomas')) {
+                defaultAvatar = '/img/Thomas.jpeg';
+            }
+
+            let avatarUrl = item.authorPhoto || sourceItem?.authorPhoto;
+            
+            // Reject mismatched/wrong Google avatars in the database by enforcing default local avatar first
+            if (authorLower.includes('hilde') || authorLower.includes('thomas')) {
+                avatarUrl = defaultAvatar;
+            } else if (!avatarUrl) {
+                avatarUrl = defaultAvatar;
+            }
             
             const renderAvatar = (url) => {
                 const el = document.getElementById('single-post-author-avatar');
