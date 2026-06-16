@@ -2553,10 +2553,10 @@ class MinSideManager {
                         
                         <div class="notif-actions" style="display:flex; gap:4px; align-items:center;">
                             <button type="button" class="btn-archive-notif" data-id="${n.id}" title="${archiveTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
-                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important;">${archiveIcon}</span>
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; margin:0 !important;">${archiveIcon}</span>
                             </button>
                             <button type="button" class="btn-delete-notif" data-id="${n.id}" title="${deleteTitle}" style="background:transparent; border:none; color:var(--text-muted); cursor:pointer; padding:6px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; width:30px; height:30px; transition: background-color 0.2s, color 0.2s;">
-                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; transform: translateY(2.5px) !important; color:#ef4444 !important; margin:0 !important;">delete</span>
+                                <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; color:#ef4444 !important; margin:0 !important;">delete</span>
                             </button>
                         </div>
                     </div>
@@ -2902,8 +2902,8 @@ class MinSideManager {
                             <option value="all">${allYearsLabel}</option>
                             ${yearsList.map(y => `<option value="${y}">${y}</option>`).join('')}
                         </select>
-                        <button type="button" class="btn btn-ghost" id="giving-print-report-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 12px !important; border-radius:6px !important; font-size:12px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; cursor:pointer !important; transform-origin: center !important; margin:0;">
-                            <span class="material-symbols-outlined" style="font-size:16px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(2.5px) !important; margin:0 !important; margin-right:4px !important;">print</span>
+                        <button type="button" class="btn btn-ghost" id="giving-print-report-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:8px !important; padding:6px 12px !important; border-radius:6px !important; font-size:12px !important; font-weight:600 !important; height:32px !important; min-height:32px !important; cursor:pointer !important; transform-origin: center !important; margin:0;">
+                            <span class="material-symbols-outlined" style="font-size:16px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; line-height:1 !important; margin:0 !important;">print</span>
                             <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">${printReportLabel}</span>
                         </button>
                     </div>
