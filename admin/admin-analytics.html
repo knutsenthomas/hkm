@@ -829,7 +829,7 @@
     <meta name="apple-mobile-web-app-title" content="HKM Admin">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="apple-touch-icon" href="/img/logo-hkm.png">
-    <script type="module" src="js/admin-pwa.js?v=20260520_PWA2"></script>
+    <script type="module" src="js/admin-pwa.js?v=20260616_PWA3"></script>
 
     <link rel="icon" type="image/png" href="/img/logo-hkm.png">
     <!-- FORCED MENU LINE REMOVAL (IPAD / MOBILE CACHE BUSTER) -->
@@ -1447,10 +1447,16 @@
                 return;
             }
 
-            // Declare chart variables as let to avoid Temporal Dead Zone (TDZ) reference errors
+            // Declare all state and chart variables at the top to avoid Temporal Dead Zone (TDZ) reference errors
             let trafficChart = null;
             let sourcesChart = null;
             let gscChart = null;
+            let activeDays = 7;
+            let lastLoadedCities = null;
+            let chartsLoaded = false;
+            let lastDrawnCitiesJSON = null;
+            let lastWidth = 0;
+            let lastHeight = 0;
             // Wait for Firebase to load and fetch actual real-time counts from collections
             setTimeout(async () => {
                 try {
@@ -1778,12 +1784,6 @@
             clearAnalyticsToEmpty();
 
             // 3. Reell GA4 Datainnhenting og API-integrasjon
-            let activeDays = 7;
-            let lastLoadedCities = null;
-            let chartsLoaded = false;
-            let lastDrawnCitiesJSON = null;
-            let lastWidth = 0;
-            let lastHeight = 0;
 
             async function loadRealAnalytics(days) {
                 activeDays = days;
