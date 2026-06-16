@@ -1400,6 +1400,47 @@
 
     <!-- Live Analytics Dashboard Logic -->
     <script type="module">
+        // Diagnostic Logger
+        (function() {
+            const logs = [];
+            const originalLog = console.log;
+            const originalError = console.error;
+            const originalWarn = console.warn;
+            
+            function saveLog(type, args) {
+                const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+                logs.push({ type, msg, ts: new Date().toISOString() });
+                
+                // Write to Firestore if firebase is initialized
+                if (window.firebase && firebase.apps.length > 0) {
+                    firebase.firestore().collection('system_logs').doc('admin_analytics_diagnostic').set({
+                        logs: logs,
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    }).catch(() => {});
+                }
+            }
+            
+            console.log = function(...args) {
+                originalLog.apply(console, args);
+                saveLog('log', args);
+            };
+            console.error = function(...args) {
+                originalError.apply(console, args);
+                saveLog('error', args);
+            };
+            console.warn = function(...args) {
+                originalWarn.apply(console, args);
+                saveLog('warn', args);
+            };
+            
+            window.addEventListener('error', (event) => {
+                saveLog('uncaught_error', [event.message, event.error?.stack]);
+            });
+            window.addEventListener('unhandledrejection', (event) => {
+                saveLog('unhandled_rejection', [event.reason?.message || event.reason]);
+            });
+        })();
+
         function showDashboardError(message, type = 'error') {
             const banner = document.getElementById('analytics-error-banner');
             const textEl = document.getElementById('analytics-error-text');
