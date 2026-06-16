@@ -12707,7 +12707,24 @@ class AdminManager {
             donors.set(key, existing);
         });
 
-        return Array.from(donors.values()).sort((a, b) => b.total - a.total || b.giftCount - a.giftCount);
+        const sortBy = this.donationFilters?.donorSortBy || 'latestDate';
+        return Array.from(donors.values()).sort((a, b) => {
+            if (sortBy === 'total') {
+                return (b.total - a.total) || (b.giftCount - a.giftCount);
+            }
+            if (sortBy === 'giftCount') {
+                return (b.giftCount - a.giftCount) || (b.total - a.total);
+            }
+            if (sortBy === 'name') {
+                const aName = a.name || '';
+                const bName = b.name || '';
+                return aName.localeCompare(bName, 'no');
+            }
+            // Default: latestDate
+            const aTime = a.latestDate?.getTime() || 0;
+            const bTime = b.latestDate?.getTime() || 0;
+            return bTime - aTime;
+        });
     }
 
     renderDonationAdminViews() {
@@ -12826,6 +12843,21 @@ class AdminManager {
 
         const donorsBody = document.getElementById('donation-donors-body');
         if (donorsBody) {
+            const sortBy = this.donationFilters?.donorSortBy || 'latestDate';
+            donors.sort((a, b) => {
+                if (sortBy === 'total') {
+                    return b.total - a.total || b.giftCount - a.giftCount;
+                } else if (sortBy === 'giftCount') {
+                    return b.giftCount - a.giftCount || b.total - a.total;
+                } else if (sortBy === 'name') {
+                    return String(a.name || '').localeCompare(String(b.name || ''), 'no');
+                } else {
+                    const aTime = a.latestDate?.getTime() || 0;
+                    const bTime = b.latestDate?.getTime() || 0;
+                    return bTime - aTime;
+                }
+            });
+
             const query = String(this.donationFilters?.donorQuery || '').trim().toLowerCase();
             const visibleDonors = donors
                 .filter((donor) => !query || [donor.name, donor.email, donor.userId].join(' ').toLowerCase().includes(query))
@@ -13163,13 +13195,18 @@ class AdminManager {
                     <td style="padding:10px 12px; font-size:13px;">${typeBadge}</td>
                     <td style="padding:10px 12px; font-size:13px;">${statusBadge}</td>
                     <td style="padding:10px 12px; font-size:13px; text-align:right;">${amountStr}</td>
+                    <td style="padding:10px 12px; text-align:right; width:1px; white-space:nowrap;">
+                        <button type="button" class="action-btn delete-donor-detail-donation-btn" data-id="${d.id}" data-inkind="${d.isInKind ? 'true' : 'false'}" title="Slett gave" style="color:#ef4444; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; padding:4px; border-radius:4px; transition:background 0.2s;">
+                            <span class="material-symbols-outlined" style="font-size:18px;">delete</span>
+                        </button>
+                    </td>
                 </tr>
             `;
         }).join('');
 
         modal.innerHTML = `
             <div class="modal-backdrop" style="position:absolute;inset:0;background:rgba(15,23,42,0.3);backdrop-filter:blur(4px);transition:opacity 0.2s ease;"></div>
-            <div class="modal-container" style="position:relative;background:white;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);width:100%;max-width:700px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;animation:modalAppear 0.2s ease-out;z-index:1;">
+            <div class="modal-container" style="position:relative;background:white;border-radius:16px;box-shadow:0 20px 25px -5px rgba(0,0,0,0.1),0 10px 10px -5px rgba(0,0,0,0.04);width:100%;max-width:750px;max-height:85vh;display:flex;flex-direction:column;overflow:hidden;animation:modalAppear 0.2s ease-out;z-index:1;">
                 
                 <!-- Header -->
                 <div style="padding:20px 24px; border-bottom:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; background:#f8fafc;">
@@ -13217,6 +13254,7 @@ class AdminManager {
                                     <th style="font-size:12px; padding:10px 12px;">Type</th>
                                     <th style="font-size:12px; padding:10px 12px;">Status</th>
                                     <th style="font-size:12px; padding:10px 12px; text-align:right;">Beløp</th>
+                                    <th style="font-size:12px; padding:10px 12px; text-align:right; width:1px;"></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -13243,6 +13281,29 @@ class AdminManager {
             el.addEventListener('click', closeModal);
         });
         modal.querySelector('.modal-backdrop').addEventListener('click', closeModal);
+
+        // Bind delete donation button listeners in the details modal
+        modal.querySelectorAll('.delete-donor-detail-donation-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const donationId = btn.dataset.id;
+                const isInKind = btn.dataset.inkind === 'true';
+                let deleted = false;
+                if (isInKind) {
+                    deleted = await this.deleteInKindDonation(donationId);
+                } else {
+                    deleted = await this.deleteDonation(donationId);
+                }
+                if (deleted) {
+                    const remaining = this.getDonationsForDonor(donorKey);
+                    if (remaining.length > 0) {
+                        this.openDonorDetailsModal(donorKey);
+                    } else {
+                        modal.style.display = 'none';
+                    }
+                }
+            });
+        });
     }
 
     openManualDonationModal() {
@@ -13363,21 +13424,23 @@ class AdminManager {
     }
 
     async deleteDonation(donationId) {
-        if (!donationId) return;
+        if (!donationId) return false;
         const confirmed = await this.showConfirm(
             'Slett gave',
             'Er du sikker på at du vil slette denne gaven? Dette vil fjerne gaven permanent fra databasen.',
             'Slett'
         );
-        if (!confirmed) return;
+        if (!confirmed) return false;
         try {
             await firebaseService.db.collection('donations').doc(donationId).delete();
             this.allDonationRecords = (this.allDonationRecords || []).filter(r => r.id !== donationId);
             this.renderDonationAdminViews();
             this.showToast('Gaven ble slettet permanent.', 'success', 4000);
+            return true;
         } catch (e) {
             console.error('Kunne ikke slette gave:', e);
             this.showToast('Kunne ikke slette gaven: ' + e.message, 'error', 5000);
+            return false;
         }
     }
 
@@ -14034,21 +14097,23 @@ class AdminManager {
     }
 
     async deleteInKindDonation(donationId) {
-        if (!donationId) return;
+        if (!donationId) return false;
         const confirmed = await this.showConfirm(
             'Slett fysisk gave',
             'Er du sikker på at du vil slette denne fysiske gaven? Dette vil fjerne gaven permanent fra databasen.',
             'Slett'
         );
-        if (!confirmed) return;
+        if (!confirmed) return false;
         try {
             await firebaseService.db.collection('donations').doc(donationId).delete();
             this.allDonationRecords = (this.allDonationRecords || []).filter(r => r.id !== donationId);
             await this.renderInKindDonations();
             this.showToast('Den fysiske gaven ble slettet permanent.', 'success', 4000);
+            return true;
         } catch (e) {
             console.error('Kunne ikke slette fysisk gave:', e);
             this.showToast('Kunne ikke slette den fysiske gaven: ' + e.message, 'error', 5000);
+            return false;
         }
     }
 
@@ -14594,6 +14659,9 @@ class AdminManager {
             const donorQueryEl = document.getElementById('donor-search');
             if (donorQueryEl) donorQueryEl.value = this.donationFilters.donorQuery || '';
 
+            const donorSortEl = document.getElementById('donor-sort-by');
+            if (donorSortEl) donorSortEl.value = this.donationFilters.donorSortBy || 'latestDate';
+
             const customVisible = this.donationFilters.preset === 'custom';
             const customDates = document.getElementById('global-custom-dates');
             if (customDates) customDates.style.display = customVisible ? 'flex' : 'none';
@@ -14619,6 +14687,7 @@ class AdminManager {
         document.getElementById('donor-method-filter')?.addEventListener('change', (event) => setFilter('method', event.target.value));
         document.getElementById('donor-type-filter')?.addEventListener('change', (event) => setFilter('type', event.target.value));
         document.getElementById('donor-search')?.addEventListener('input', (event) => setFilter('donorQuery', event.target.value));
+        document.getElementById('donor-sort-by')?.addEventListener('change', (event) => setFilter('donorSortBy', event.target.value));
 
         document.getElementById('add-manual-donation-btn')?.addEventListener('click', () => this.openManualDonationModal());
         document.getElementById('open-bank-import-btn')?.addEventListener('click', () => this.openBankImportModal());
@@ -14633,7 +14702,7 @@ class AdminManager {
         });
 
         const clearFilters = () => {
-            this.donationFilters = { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', start: '', end: '' };
+            this.donationFilters = { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', start: '', end: '' };
             
             const presetEl = document.getElementById('global-date-preset');
             if (presetEl) presetEl.value = '30';
@@ -14667,6 +14736,9 @@ class AdminManager {
 
             const dqEl = document.getElementById('donor-search');
             if (dqEl) dqEl.value = '';
+
+            const dSortEl = document.getElementById('donor-sort-by');
+            if (dSortEl) dSortEl.value = 'latestDate';
             
             this.renderDonationAdminViews();
             this.renderGiftsDashboard();
@@ -14754,7 +14826,7 @@ class AdminManager {
             return bDate - aDate;
         });
         this.adminUserMap = new Map(users.map(user => [user.id, user]));
-        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', start: '', end: '' };
+        this.donationFilters = this.donationFilters || { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', start: '', end: '' };
         const manualDonationUserOptions = users
             .slice()
             .sort((a, b) => String(a.displayName || a.email || '').localeCompare(String(b.displayName || b.email || ''), 'no'))
@@ -15077,6 +15149,15 @@ class AdminManager {
                             <div class="form-group" style="margin:0;">
                                 <label>Søk etter giver</label>
                                 <input id="donor-search" class="form-control" type="search" placeholder="Navn, e-post, ID">
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Sortering</label>
+                                <select id="donor-sort-by" class="form-control">
+                                    <option value="latestDate">Siste gave (Standard)</option>
+                                    <option value="total">Sum totalt (Høyest først)</option>
+                                    <option value="giftCount">Antall gaver (Flest først)</option>
+                                    <option value="name">Navn (A-Å)</option>
+                                </select>
                             </div>
                             <div style="display:flex; align-items:flex-end;">
                                 <button type="button" class="btn-secondary" id="donor-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
