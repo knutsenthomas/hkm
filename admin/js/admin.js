@@ -14203,9 +14203,9 @@ class AdminManager {
                 <!-- Footer -->
                 <div style="padding:16px 24px; border-top:1px solid #e2e8f0; display:flex; justify-content:flex-end; background:#f8fafc; gap:12px;">
                     <button type="button" class="btn-secondary close-email-preview-btn" style="padding:10px 20px; border-radius:8px; font-weight:600; height:38px; cursor:pointer;">Avbryt</button>
-                    <button type="button" class="btn-primary" id="email-preview-send-btn" style="padding:10px 24px; border-radius:8px; font-weight:700; height:38px; background:#1B4965; color:white; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
-                        <span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">send</span>
-                        <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post nå</span>
+                    <button type="button" class="btn-primary" id="email-preview-send-btn" style="display:inline-flex !important; align-items:center !important; justify-content:center !important; gap:6px !important; padding:6px 20px !important; border-radius:8px !important; font-size:13px !important; font-weight:600 !important; height:38px !important; min-height:38px !important; background:#1B4965 !important; color:white !important; border:none !important; cursor:pointer !important; transform-origin: center !important;">
+                        <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">send</span>
+                        <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Send e-post nå</span>
                     </button>
                 </div>
             </div>
@@ -14250,7 +14250,12 @@ class AdminManager {
             const sendBtn = document.getElementById('email-preview-send-btn');
             if (sendBtn) {
                 sendBtn.disabled = true;
-                sendBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; animation: admin-spin 1s linear infinite; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">sync</span> <span style="display:inline-flex; align-items:center; line-height:1;">Sender...</span>';
+                sendBtn.innerHTML = `
+                    <span style="display:inline-flex !important; align-items:center !important; justify-content:center !important; width:18px !important; height:18px !important; margin-right:4px !important; line-height:1 !important;">
+                        <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; width:18px !important; height:18px !important; transform-origin:center center !important; animation:admin-spin 1s linear infinite !important; margin:0 !important; padding:0 !important; line-height:1 !important;">sync</span>
+                    </span>
+                    <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Sender...</span>
+                `;
             }
 
             try {
@@ -14263,7 +14268,10 @@ class AdminManager {
             } finally {
                 if (sendBtn) {
                     sendBtn.disabled = false;
-                    sendBtn.innerHTML = '<span class="material-symbols-outlined" style="font-size:18px; display:inline-flex; align-items:center; justify-content:center; vertical-align:middle; line-height:1;">send</span> <span style="display:inline-flex; align-items:center; line-height:1;">Send e-post nå</span>';
+                    sendBtn.innerHTML = `
+                        <span class="material-symbols-outlined" style="font-size:18px !important; display:inline-flex !important; align-items:center !important; justify-content:center !important; vertical-align:middle !important; line-height:1 !important; transform: translateY(1.5px) !important; margin:0 !important; margin-right:4px !important;">send</span>
+                        <span style="display:inline-flex !important; align-items:center !important; line-height:1 !important;">Send e-post nå</span>
+                    `;
                 }
             }
         });
