@@ -2334,20 +2334,82 @@
                     return;
                 }
 
-                var chartData = [['By', 'Besøkende']];
+                const cityCoords = {
+                    'oslo': { lat: 59.9139, lon: 10.7522 },
+                    'bergen': { lat: 60.3913, lon: 5.3221 },
+                    'trondheim': { lat: 63.4305, lon: 10.3951 },
+                    'stavanger': { lat: 58.9700, lon: 5.7331 },
+                    'kristiansand': { lat: 58.1467, lon: 7.9949 },
+                    'fredrikstad': { lat: 59.2205, lon: 10.9347 },
+                    'sandnes': { lat: 58.8524, lon: 5.7352 },
+                    'tromsø': { lat: 69.6492, lon: 18.9553 },
+                    'tromso': { lat: 69.6492, lon: 18.9553 },
+                    'drammen': { lat: 59.7440, lon: 10.2045 },
+                    'sarpsborg': { lat: 59.2839, lon: 11.1096 },
+                    'skien': { lat: 59.2096, lon: 9.6090 },
+                    'porsgrunn': { lat: 59.1395, lon: 9.6568 },
+                    'bodø': { lat: 67.2804, lon: 14.4049 },
+                    'bodo': { lat: 67.2804, lon: 14.4049 },
+                    'ålesund': { lat: 62.4722, lon: 6.1549 },
+                    'alesund': { lat: 62.4722, lon: 6.1549 },
+                    'arendal': { lat: 58.4618, lon: 8.7663 },
+                    'sandefjord': { lat: 59.1312, lon: 10.2168 },
+                    'larvik': { lat: 59.0533, lon: 10.0270 },
+                    'tønsberg': { lat: 59.2676, lon: 10.4076 },
+                    'tonsberg': { lat: 59.2676, lon: 10.4076 },
+                    'horten': { lat: 59.4136, lon: 10.4862 },
+                    'moss': { lat: 59.4340, lon: 10.6577 },
+                    'hamar': { lat: 60.7945, lon: 11.0680 },
+                    'halden': { lat: 59.1200, lon: 11.3800 },
+                    'harstad': { lat: 68.7986, lon: 16.5414 },
+                    'molde': { lat: 62.7375, lon: 7.1610 },
+                    'kristiansund': { lat: 63.1115, lon: 7.7320 },
+                    'gjøvik': { lat: 60.7957, lon: 10.6915 },
+                    'gjovik': { lat: 60.7957, lon: 10.6915 },
+                    'asker': { lat: 59.8351, lon: 10.4392 },
+                    'bærum': { lat: 59.8973, lon: 10.5222 },
+                    'baerum': { lat: 59.8973, lon: 10.5222 },
+                    'lillestrøm': { lat: 59.9560, lon: 11.0492 },
+                    'lillestrom': { lat: 59.9560, lon: 11.0492 },
+                    'steinkjer': { lat: 64.0150, lon: 11.4950 },
+                    'alta': { lat: 69.9689, lon: 23.2716 },
+                    'elverum': { lat: 60.8816, lon: 11.5623 },
+                    'mandal': { lat: 58.0294, lon: 7.4534 },
+                    'grimstad': { lat: 58.3405, lon: 8.5936 },
+                    'lillehammer': { lat: 61.1153, lon: 10.4662 },
+                    'helsinki': { lat: 60.1699, lon: 24.9384 }
+                };
+
+                var chartData = [];
+                var hasCoordsData = false;
+
                 cities.forEach(c => {
                     let cityName = c.city || '';
                     if (cityName && cityName !== 'Ukjent' && cityName !== '(not set)' && cityName.toLowerCase() !== 'unknown') {
-                        // Clean "Municipality" suffix so Google GeoChart can geocode the city successfully
                         cityName = cityName.replace(/\s+municipality/i, '').trim();
-                        const countryName = c.country || 'Norway';
-                        chartData.push([cityName + ', ' + countryName, parseInt(c.users) || 0]);
+                        const key = cityName.toLowerCase();
+                        if (cityCoords[key]) {
+                            chartData.push([cityCoords[key].lat, cityCoords[key].lon, cityName, parseInt(c.users) || 0]);
+                            hasCoordsData = true;
+                        }
                     }
                 });
-                
-                // Fallback hvis ingen byer
-                if (chartData.length === 1) {
-                    chartData.push(['Mandal', 0]);
+
+                if (hasCoordsData) {
+                    chartData.unshift(['Lat', 'Long', 'By', 'Besøkende']);
+                } else {
+                    chartData = [['By', 'Besøkende']];
+                    cities.forEach(c => {
+                        let cityName = c.city || '';
+                        if (cityName && cityName !== 'Ukjent' && cityName !== '(not set)' && cityName.toLowerCase() !== 'unknown') {
+                            cityName = cityName.replace(/\s+municipality/i, '').trim();
+                            const countryName = c.country || 'Norway';
+                            chartData.push([cityName + ', ' + countryName, parseInt(c.users) || 0]);
+                        }
+                    });
+                    if (chartData.length === 1) {
+                        chartData.push(['Mandal, Norway', 0]);
+                    }
                 }
 
                 var dataTable = google.visualization.arrayToDataTable(chartData);
