@@ -13039,6 +13039,33 @@ class AdminManager {
             `;
         }).join('') || '<p style="color:#64748b; font-size:13px; text-align:center;">Ingen merkelapper brukt ennå</p>';
 
+        const causes = Array.isArray(this.allCauses) ? this.allCauses : [];
+        let causesProgressHtml = '';
+        if (causes.length === 0) {
+            causesProgressHtml = `
+                <p style="color:#64748b; font-size:12px; text-align:center; padding: 24px 0; margin: 0;">Ingen aktive innsamlingsaksjoner registrert</p>
+            `;
+        } else {
+            causesProgressHtml = causes.slice(0, 3).map((cause, idx) => {
+                const collected = cause.collected || 0;
+                const goal = cause.goal || 100000;
+                const progress = goal > 0 ? Math.round((collected / goal) * 100) : 0;
+                const progressClamped = Math.min(progress, 100);
+                const color = idx % 2 === 0 ? '#1B4965' : '#d17d39';
+                return `
+                    <div style="background:#f8fafc; border-radius:8px; padding:10px 14px; border:1px solid #f1f5f9;">
+                        <div style="height:10px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:6px;">
+                            <div style="width:${progressClamped}%; height:100%; background:${color}; border-radius:99px;"></div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b;">
+                            <span>${this.escapeHtml(cause.title || 'Uten tittel')}</span>
+                            <span>${progress}% oppnådd</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
         container.innerHTML = `
             <div class="stats-grid causes-stats-grid" style="margin-bottom: 24px;">
                 <div class="card" style="grid-column: span 12; padding: 24px;">
@@ -13163,24 +13190,7 @@ class AdminManager {
                         <h4 style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
                     </div>
                     <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
-                        <div style="background:#f8fafc; border-radius:8px; padding:10px 14px; border:1px solid #f1f5f9;">
-                            <div style="height:10px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:6px;">
-                                <div style="width:80%; height:100%; background:#1B4965; border-radius:99px;"></div>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b;">
-                                <span>Aktiv aksjon</span>
-                                <span>80% oppnådd</span>
-                            </div>
-                        </div>
-                        <div style="background:#f8fafc; border-radius:8px; padding:10px 14px; border:1px solid #f1f5f9;">
-                            <div style="height:10px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:6px;">
-                                <div style="width:45%; height:100%; background:#d17d39; border-radius:99px;"></div>
-                            </div>
-                            <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b;">
-                                <span>Nytt bygg</span>
-                                <span>45% oppnådd</span>
-                            </div>
-                        </div>
+                        ${causesProgressHtml}
                     </div>
                 </div>
             </div>
@@ -13188,60 +13198,8 @@ class AdminManager {
     }
 
     async seedInKindDonationsIfEmpty() {
-        if (!firebaseService.db) return;
-        try {
-            const inKindSnapshot = await firebaseService.db.collection('donations').where('isInKind', '==', true).get();
-            if (inKindSnapshot.empty) {
-                console.log("Seeding mock in-kind donations...");
-                const batch = firebaseService.db.batch();
-                const inKindData = [
-                    { date: '2024-04-10', desc: 'Refrigerator', donor: 'Gene Perry', email: 'gene@perry.com', fund: 'new-building', ack: false, value: 300, userId: null },
-                    { date: '2024-04-09', desc: '25 Gallons of Interior Paint', donor: 'Marshall Johnson', email: 'marshall@johnson.com', fund: 'new-building', ack: true, value: 625, userId: 'marshall_johnson_placeholder' },
-                    { date: '2024-04-07', desc: 'Oven - Used', donor: 'Bruce Cook', email: 'bruce@cook.com', fund: 'new-building', ack: false, value: 250, userId: null },
-                    { date: '2024-03-29', desc: 'Artwork - A Small Monet Painting', donor: 'Suchi Gupta', email: 'suchi@gupta.com', fund: 'general', ack: true, value: 15000, userId: null },
-                    { date: '2024-03-17', desc: '2019 Toyota Corolla (Used)', donor: 'Alma Lopez', email: 'alma@lopez.com', fund: 'domestic-missions-sandnes', ack: false, value: 14500, userId: null },
-                    { date: '2024-02-15', desc: 'Maytag Refrigerator (Used)', donor: 'Ashley Johnson', email: 'ashley@johnson.com', fund: 'new-building', ack: true, value: null, userId: 'ashley_johnson_placeholder' },
-                    { date: '2024-02-05', desc: 'Drywall Install for 5 Rooms', donor: 'Jesse Cohen', email: 'jesse@cohen.com', fund: 'new-building', ack: false, value: null, userId: null },
-                    { date: '2024-01-09', desc: '30 Shares of Stock (GFI)', donor: 'Ashley Johnson', email: 'ashley@johnson.com', fund: 'general', ack: false, value: 530, userId: 'ashley_johnson_placeholder' },
-                    { date: '2024-01-07', desc: '75 Shares of Stock', donor: 'Joe Smith', email: 'joe@smith.com', fund: 'general', ack: true, value: 6750, userId: 'joe_smith_placeholder' }
-                ];
-
-                inKindData.forEach(item => {
-                    const docRef = firebaseService.db.collection('donations').doc();
-                    const docId = docRef.id;
-                    const timestamp = firebase.firestore.Timestamp.fromDate(new Date(item.date));
-                    const payload = {
-                        transactionId: docId,
-                        paymentIntentId: docId,
-                        manualDonationId: docId,
-                        amount: item.value || 0,
-                        amountNok: item.value || 0,
-                        amountOre: (item.value || 0) * 100,
-                        currency: 'USD',
-                        method: 'in_kind',
-                        status: 'completed',
-                        timestamp,
-                        completedAt: timestamp,
-                        userId: item.userId,
-                        donorName: item.donor,
-                        donorEmail: item.email,
-                        description: item.desc,
-                        fund: item.fund,
-                        acknowledgmentSent: item.ack,
-                        isInKind: true,
-                        type: 'Gave',
-                        source: 'manual_admin',
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    };
-                    batch.set(docRef, payload);
-                });
-                await batch.commit();
-                console.log("Seeding in-kind donations completed successfully!");
-            }
-        } catch (e) {
-            console.warn("Failed to seed in-kind donations:", e);
-        }
+        // Disabled mock seeding to ensure statistics are 100% real
+        return;
     }
 
     async renderInKindDonations() {
@@ -13960,6 +13918,8 @@ class AdminManager {
                 if (completedDonationCount > 0) {
                     averageDonation = totalDonations / completedDonationCount;
                 }
+                const causesData = await firebaseService.getPageContent('collection_causes');
+                this.allCauses = causesData && Array.isArray(causesData.items) ? causesData.items : [];
             }
         } catch (e) {
             console.warn('Kunne ikke hente donasjoner for Gaver-siden:', e);
