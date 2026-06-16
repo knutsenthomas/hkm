@@ -16032,7 +16032,7 @@ class AdminManager {
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
                     <button class="automation-tab" data-tab="donations">Pr. gave</button>
-                    <button class="automation-tab" data-tab="donors">Per giver</button>
+                    <button class="automation-tab" data-tab="donors">Pr. giver</button>
                     <button class="automation-tab" data-tab="shop">Butikk</button>
                     <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
                 </div>
