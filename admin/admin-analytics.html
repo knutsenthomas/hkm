@@ -1446,6 +1446,11 @@
                 showDashboardError("Firebase SDK ble ikke lastet inn. Dette kan skyldes en nettverksfeil eller at en annonseblokkerer (AdBlocker) hindrer Google-tjenester i å kjøre.");
                 return;
             }
+
+            // Declare chart variables as let to avoid Temporal Dead Zone (TDZ) reference errors
+            let trafficChart = null;
+            let sourcesChart = null;
+            let gscChart = null;
             // Wait for Firebase to load and fetch actual real-time counts from collections
             setTimeout(async () => {
                 try {
@@ -1476,13 +1481,15 @@
                 document.getElementById('engagement-value').textContent = '--';
                 
                 // Clear Traffic Chart
-                trafficChart.data.labels = [];
-                trafficChart.data.datasets[0].data = [];
-                if (trafficChart.data.datasets[1]) {
-                    trafficChart.data.datasets[1].data = [];
-                    trafficChart.data.datasets[1].label = '';
+                if (trafficChart) {
+                    trafficChart.data.labels = [];
+                    trafficChart.data.datasets[0].data = [];
+                    if (trafficChart.data.datasets[1]) {
+                        trafficChart.data.datasets[1].data = [];
+                        trafficChart.data.datasets[1].label = '';
+                    }
+                    trafficChart.update();
                 }
-                trafficChart.update();
 
                 // Clear Top Pages
                 const topPagesList = document.querySelector('.top-pages-list');
@@ -1508,8 +1515,10 @@
                 }
 
                 // Clear Sources Chart
-                sourcesChart.data.datasets[0].data = [0, 0, 0];
-                sourcesChart.update();
+                if (sourcesChart) {
+                    sourcesChart.data.datasets[0].data = [0, 0, 0];
+                    sourcesChart.update();
+                }
                 document.querySelector('.donut-center-val').textContent = '--';
                 const legendPcts = document.querySelectorAll('.legend-pct');
                 if (legendPcts[0]) legendPcts[0].textContent = '--';
@@ -1529,10 +1538,12 @@
                 document.getElementById('gsc-ctr-val').textContent = '--';
                 document.getElementById('gsc-position-val').textContent = '--';
 
-                gscChart.data.labels = [];
-                gscChart.data.datasets[0].data = [];
-                gscChart.data.datasets[1].data = [];
-                gscChart.update();
+                if (gscChart) {
+                    gscChart.data.labels = [];
+                    gscChart.data.datasets[0].data = [];
+                    gscChart.data.datasets[1].data = [];
+                    gscChart.update();
+                }
 
                 // Clear Gen AI
                 document.getElementById('crawl-chatgpt').textContent = '--';
@@ -1581,7 +1592,7 @@
             gradientSecondary.addColorStop(1, 'rgba(189, 79, 42, 0.0)');
 
             // 2a. Traffic Line Chart initialization
-            const trafficChart = new Chart(ctxTraffic, {
+            trafficChart = new Chart(ctxTraffic, {
                 type: 'line',
                 data: {
                     labels: [],
@@ -1675,7 +1686,7 @@
             });
 
             // 2b. Sources Donut Chart initialization
-            const sourcesChart = new Chart(ctxSources, {
+            sourcesChart = new Chart(ctxSources, {
                 type: 'doughnut',
                 data: {
                     labels: ['Direkte trafikk', 'Organisk søk', 'Sosiale medier'],
@@ -1711,7 +1722,7 @@
 
             // 2c. GSC Line Chart initialization
             const ctxGsc = document.getElementById('gsc-line-chart').getContext('2d');
-            const gscChart = new Chart(ctxGsc, {
+            gscChart = new Chart(ctxGsc, {
                 type: 'line',
                 data: {
                     labels: [],
