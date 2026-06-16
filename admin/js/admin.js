@@ -13552,12 +13552,12 @@ class AdminManager {
             const resolvedAmount = amount || (outAmount ? `-${outAmount}` : '');
 
             return {
-                date: raw.dato || raw.date || raw.bokfortdato || raw.valutadato || raw.posteringsdato,
+                date: raw.dato || raw.date || raw.bokfortdato || raw.valutadato || raw.posteringsdato || raw.tidspunkt || raw.bokforingsdato,
                 amountNok: resolvedAmount,
-                donorName: raw.navn || raw.name || raw.avsender || raw.fra || raw.betaler || raw.payer,
+                donorName: raw.navn || raw.name || raw.avsender || raw.fra || raw.betaler || raw.payer || raw.kundensnavn || raw.kundenavn,
                 donorEmail: raw.epost || raw.email,
                 text: raw.tekst || raw.beskrivelse || raw.description || raw.melding || raw.message || raw.info || raw.detaljer,
-                reference: raw.kid || raw.referanse || raw.reference || raw.bilag || raw.transactionid || raw.transaksjonsid
+                reference: raw.kid || raw.referanse || raw.reference || raw.bilag || raw.transactionid || raw.transaksjonsid || raw.ordreidreferanse || raw.pspreferanse
             };
         });
     }
