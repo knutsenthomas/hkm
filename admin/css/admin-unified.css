@@ -2101,12 +2101,20 @@ body.admin-body .welcome-subtitle {
 
 /* --- Automation Section Styles (Moved outside media query) --- */
 .automation-tabs {
-  display: flex;
+  display: flex !important;
   gap: 0;
   border-bottom: 2px solid var(--admin-border, #f1f5f9);
   background: #fff;
   padding: 0 16px;
   border-radius: var(--admin-radius-lg, 16px) var(--admin-radius-lg, 16px) 0 0;
+  overflow-x: auto !important;
+  white-space: nowrap !important;
+  -webkit-overflow-scrolling: touch !important;
+  scrollbar-width: none !important;
+}
+
+.automation-tabs::-webkit-scrollbar {
+  display: none !important;
 }
 
 /* Ensure custom confirmation modals are always on top (mobile nav uses z-index 12000). */
@@ -2124,6 +2132,8 @@ body.admin-body .welcome-subtitle {
   border-bottom: 3px solid transparent;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
 }
 
 .automation-tab:hover {
@@ -3838,9 +3848,11 @@ body.builder-active .newsletter-canvas {
     padding: 16px !important;
   }
 
-  body.admin-body #overview-section .overview-hero-action {
-    width: 100%;
-    justify-content: center;
+  body.admin-body #overview-section .overview-hero-action,
+  body.admin-body #overview-section .overview-hero-action-secondary {
+    width: 100% !important;
+    justify-content: center !important;
+    box-sizing: border-box !important;
   }
 
   body.builder-active .workspace-header .newsletter-meta {

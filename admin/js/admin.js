@@ -16776,7 +16776,7 @@ class AdminManager {
             <div class="causes-header-container" style="margin-bottom: 24px;">
                 <h2 style="font-weight:800; color:#1B4965; font-size:28px; margin:0 0 8px 0; display:flex; align-items:center; gap:12px;">
                     <span class="material-symbols-outlined" style="font-size:32px;">shopping_bag</span>
-                    Butikk & Wix Store
+                    Butikk
                 </h2>
                 <p style="color:#64748b; font-size:14px; margin:0;">
                     Administrer nettbutikkbestillinger fra Wix og manuelle registreringer.
@@ -16786,8 +16786,8 @@ class AdminManager {
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
-                    <button class="automation-tab active" data-tab="wix">Wix Oversikt</button>
-                    <button class="automation-tab" data-tab="wix-orders">Wix Ordrehistorikk</button>
+                    <button class="automation-tab active" data-tab="wix">Oversikt</button>
+                    <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
                     <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
                 </div>
             </div>
@@ -17435,7 +17435,7 @@ class AdminManager {
                     <!-- Top Customers -->
                     <div class="card" style="margin: 0;">
                         <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9;">
-                            <h3 class="card-title" style="margin: 0; font-size: 15px; font-weight: 700; color: #1B4965;">Toppkunder (Wix)</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 15px; font-weight: 700; color: #1B4965;">Toppkunder</h3>
                         </div>
                         <div class="card-body" style="padding: 16px 24px;">
                             <div style="display: flex; flex-direction: column; gap: 12px;">
@@ -17463,7 +17463,7 @@ class AdminManager {
                 <div class="card" style="margin: 0; width: 100%;">
                     <div class="card-header flex-between" style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
                         <div>
-                            <h3 class="card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965;">Ordrehistorikk (Wix)</h3>
+                            <h3 class="card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965;">Ordrehistorikk</h3>
                             <p class="section-subtitle" style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Klikk på en ordre for å se detaljer.</p>
                         </div>
                         <div style="display:flex; align-items:center; gap:12px;">
