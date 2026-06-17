@@ -12614,6 +12614,8 @@ class AdminManager {
         if (preset === 'today') return { start: todayStart, end: todayEnd };
         if (preset === '7') return { start: new Date(todayStart.getTime() - 6 * 86400000), end: todayEnd };
         if (preset === '30') return { start: new Date(todayStart.getTime() - 29 * 86400000), end: todayEnd };
+        if (preset === '90') return { start: new Date(todayStart.getTime() - 89 * 86400000), end: todayEnd };
+        if (preset === '365') return { start: new Date(todayStart.getTime() - 364 * 86400000), end: todayEnd };
         if (preset === 'month') return { start: new Date(now.getFullYear(), now.getMonth(), 1), end: todayEnd };
         if (preset === 'year') return { start: new Date(now.getFullYear(), 0, 1), end: todayEnd };
 
@@ -13699,11 +13701,12 @@ class AdminManager {
         let footerHtml = '';
         
         // Get global period text
-        const presetEl = document.getElementById('global-date-preset');
+        const isShop = this.currentSection === 'shop';
+        const presetEl = document.getElementById(isShop ? 'shop-date-preset' : 'causes-date-preset');
         let periodText = presetEl ? presetEl.options[presetEl.selectedIndex].text : 'Valgt periode';
         if (presetEl && presetEl.value === 'custom') {
-            const start = document.getElementById('global-start-date')?.value;
-            const end = document.getElementById('global-end-date')?.value;
+            const start = document.getElementById(isShop ? 'shop-start-date' : 'causes-start-date')?.value;
+            const end = document.getElementById(isShop ? 'shop-end-date' : 'causes-end-date')?.value;
             if (start && end) {
                 periodText = `${new Date(start).toLocaleDateString('no-NO')} - ${new Date(end).toLocaleDateString('no-NO')}`;
             }
@@ -15709,7 +15712,7 @@ class AdminManager {
                 this.donationFilters = { ...(this.donationFilters || {}), [key]: value };
             }
             
-            // Sync values to DOM elements
+            // Sync values to DOM elements (legacy/fallback if still used somewhere)
             const presetEl = document.getElementById('global-date-preset');
             if (presetEl) presetEl.value = this.donationFilters.preset || '30';
 
@@ -15718,6 +15721,29 @@ class AdminManager {
 
             const endEl = document.getElementById('global-end-date');
             if (endEl) endEl.value = this.donationFilters.end || '';
+
+            const customDates = document.getElementById('global-custom-dates');
+            if (customDates) customDates.style.display = (this.donationFilters.preset === 'custom') ? 'flex' : 'none';
+
+            // Sync causes period selector
+            const causesPresetEl = document.getElementById('causes-date-preset');
+            if (causesPresetEl) causesPresetEl.value = this.donationFilters.preset || '30';
+            const causesStartEl = document.getElementById('causes-start-date');
+            if (causesStartEl) causesStartEl.value = this.donationFilters.start || '';
+            const causesEndEl = document.getElementById('causes-end-date');
+            if (causesEndEl) causesEndEl.value = this.donationFilters.end || '';
+            const causesCustomDates = document.getElementById('causes-custom-dates');
+            if (causesCustomDates) causesCustomDates.style.display = (this.donationFilters.preset === 'custom') ? 'flex' : 'none';
+
+            // Sync shop period selector
+            const shopPresetEl = document.getElementById('shop-date-preset');
+            if (shopPresetEl) shopPresetEl.value = this.donationFilters.preset || '30';
+            const shopStartEl = document.getElementById('shop-start-date');
+            if (shopStartEl) shopStartEl.value = this.donationFilters.start || '';
+            const shopEndEl = document.getElementById('shop-end-date');
+            if (shopEndEl) shopEndEl.value = this.donationFilters.end || '';
+            const shopCustomDates = document.getElementById('shop-custom-dates');
+            if (shopCustomDates) shopCustomDates.style.display = (this.donationFilters.preset === 'custom') ? 'flex' : 'none';
 
             const statusEl1 = document.getElementById('donation-status-filter');
             const statusEl2 = document.getElementById('donor-status-filter');
@@ -15753,20 +15779,26 @@ class AdminManager {
             const shopQueryEl = document.getElementById('shop-search');
             if (shopQueryEl) shopQueryEl.value = this.donationFilters.shopQuery || '';
 
-            const customVisible = this.donationFilters.preset === 'custom';
-            const customDates = document.getElementById('global-custom-dates');
-            if (customDates) customDates.style.display = customVisible ? 'flex' : 'none';
-
             this.renderDonationAdminViews();
             this.renderGiftsDashboard();
             this.renderInKindDonations();
             this.renderWixStats();
         };
 
-        // Global period listeners
+        // Legacy period listeners
         document.getElementById('global-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
         document.getElementById('global-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
         document.getElementById('global-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+
+        // Causes period listeners
+        document.getElementById('causes-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
+        document.getElementById('causes-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
+        document.getElementById('causes-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
+
+        // Shop period listeners
+        document.getElementById('shop-date-preset')?.addEventListener('change', (event) => setFilter('preset', event.target.value));
+        document.getElementById('shop-start-date')?.addEventListener('change', (event) => setFilter('start', event.target.value));
+        document.getElementById('shop-end-date')?.addEventListener('change', (event) => setFilter('end', event.target.value));
 
         // Donation tab listeners
         document.getElementById('donation-status-filter')?.addEventListener('change', (event) => setFilter('status', event.target.value));
@@ -15860,6 +15892,26 @@ class AdminManager {
             const customDates = document.getElementById('global-custom-dates');
             if (customDates) customDates.style.display = 'none';
 
+            // Clear causes inputs
+            const causesPresetEl = document.getElementById('causes-date-preset');
+            if (causesPresetEl) causesPresetEl.value = '30';
+            const causesStartEl = document.getElementById('causes-start-date');
+            if (causesStartEl) causesStartEl.value = '';
+            const causesEndEl = document.getElementById('causes-end-date');
+            if (causesEndEl) causesEndEl.value = '';
+            const causesCustomDates = document.getElementById('causes-custom-dates');
+            if (causesCustomDates) causesCustomDates.style.display = 'none';
+
+            // Clear shop inputs
+            const shopPresetEl = document.getElementById('shop-date-preset');
+            if (shopPresetEl) shopPresetEl.value = '30';
+            const shopStartEl = document.getElementById('shop-start-date');
+            if (shopStartEl) shopStartEl.value = '';
+            const shopEndEl = document.getElementById('shop-end-date');
+            if (shopEndEl) shopEndEl.value = '';
+            const shopCustomDates = document.getElementById('shop-custom-dates');
+            if (shopCustomDates) shopCustomDates.style.display = 'none';
+
             const statusEl1 = document.getElementById('donation-status-filter');
             const statusEl2 = document.getElementById('donor-status-filter');
             if (statusEl1) statusEl1.value = 'all';
@@ -15896,6 +15948,7 @@ class AdminManager {
             this.renderDonationAdminViews();
             this.renderGiftsDashboard();
             this.renderInKindDonations();
+            this.renderWixStats();
         };
 
         document.getElementById('donation-clear-filters')?.addEventListener('click', clearFilters);
@@ -16729,7 +16782,8 @@ class AdminManager {
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
-                    <button class="automation-tab active" data-tab="wix">Wix Butikk</button>
+                    <button class="automation-tab active" data-tab="wix">Wix Oversikt</button>
+                    <button class="automation-tab" data-tab="wix-orders">Wix Ordrehistorikk</button>
                     <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
                 </div>
             </div>
@@ -16769,6 +16823,15 @@ class AdminManager {
                 <div id="wix-stats-container">
                     <div style="display:flex; justify-content:center; padding:32px;">
                         <div class="loader">Laster Wix-statistikk...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Wix Ordrehistorikk -->
+            <div id="cause-tab-content-wix-orders" class="cause-tab-pane" style="display: none;">
+                <div id="wix-orders-container">
+                    <div style="display:flex; justify-content:center; padding:32px;">
+                        <div class="loader">Laster Wix-ordrehistorikk...</div>
                     </div>
                 </div>
             </div>
@@ -16969,7 +17032,7 @@ class AdminManager {
                     p.style.display = p.id === `cause-tab-content-${target}` ? 'block' : 'none';
                 });
                 
-                if (target === 'wix') {
+                if (target === 'wix' || target === 'wix-orders') {
                     this.renderWixStats();
                 } else if (target === 'shop') {
                     this.renderDonationAdminViews();
@@ -16978,7 +17041,7 @@ class AdminManager {
         });
         
         const activeTab = document.querySelector('#shop-section .automation-tab.active')?.dataset.tab || 'wix';
-        if (activeTab === 'wix') {
+        if (activeTab === 'wix' || activeTab === 'wix-orders') {
             this.renderWixStats();
         } else {
             this.renderDonationAdminViews();
