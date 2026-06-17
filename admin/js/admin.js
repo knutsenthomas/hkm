@@ -17563,7 +17563,7 @@ class AdminManager {
                             <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Utsendelse</label>
                                 <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%;" onchange="window.adminManager.filterWixOrders()">
-                                    <option value="all">Alle</option>
+                                    <option value="all">Alle statuser</option>
                                     <option value="FULFILLED">Sendt</option>
                                     <option value="NOT_FULFILLED">Ikke sendt</option>
                                 </select>
