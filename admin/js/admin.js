@@ -17538,10 +17538,10 @@ class AdminManager {
                     </div>
                     <div class="card-body" style="padding: 0;">
                         <!-- Filters Grid -->
-                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px; padding: 16px 32px; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
-                            <div class="form-group" style="margin:0;">
+                        <div style="display:flex; flex-wrap:wrap; gap:16px; padding: 16px 32px; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                            <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Betalingsstatus</label>
-                                <select id="wix-payment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-payment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="PAID">Betalt</option>
                                     <option value="PENDING">Venter</option>
@@ -17550,9 +17550,9 @@ class AdminManager {
                                     <option value="NOT_PAID">Ikke betalt</option>
                                 </select>
                             </div>
-                            <div class="form-group" style="margin:0;">
+                            <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Ordrestatus</label>
-                                <select id="wix-order-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-order-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="COMPLETED">Fullført</option>
                                     <option value="APPROVED">Godkjent</option>
@@ -17560,15 +17560,15 @@ class AdminManager {
                                     <option value="CANCELED">Kansellert</option>
                                 </select>
                             </div>
-                            <div class="form-group" style="margin:0;">
+                            <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Utsendelse</label>
-                                <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle</option>
                                     <option value="FULFILLED">Sendt</option>
                                     <option value="NOT_FULFILLED">Ikke sendt</option>
                                 </select>
                             </div>
-                            <div style="display:flex; align-items:flex-end;">
+                            <div style="display:flex; align-items:flex-end; flex:1 1 140px; min-width: 120px;">
                                 <button type="button" class="btn-secondary" onclick="window.adminManager.clearWixFilters()" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">
                                     <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
                                     Nullstill
