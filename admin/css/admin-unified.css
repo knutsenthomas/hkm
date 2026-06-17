@@ -5033,7 +5033,12 @@ body.builder-active .builder-workspace {
 }
 
 body.crm-body .inbox-container,
-body.minside-body .inbox-container,
+body.minside-body .inbox-container {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  box-sizing: border-box !important;
+}
+
 body.builder-active .newsletter-builder-container,
 body.admin-body .segments-container,
 body.admin-body .content-wrapper,
