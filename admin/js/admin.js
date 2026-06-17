@@ -4632,11 +4632,11 @@ class AdminManager {
                 
                 /* Override dashboard.css SaaS styles with premium buttons */
                 .overview-hero-action {
-                    height: 48px !important;
+                    height: 42px !important;
                     background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
                     color: white !important;
                     border-radius: 8px !important;
-                    padding: 0 16px !important;
+                    padding: 0 12px !important;
                     font-weight: 600 !important;
                     border: none !important;
                     box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
@@ -4644,10 +4644,10 @@ class AdminManager {
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    gap: 10px !important;
+                    gap: 6px !important;
                     font-family: 'Inter', sans-serif !important;
                     transition: all 0.2s ease !important;
-                    font-size: 14px !important;
+                    font-size: 13px !important;
                     white-space: nowrap !important;
                     margin: 0 !important;
                 }
@@ -4657,11 +4657,11 @@ class AdminManager {
                     filter: brightness(1.05) !important;
                 }
                 .overview-hero-action-secondary {
-                    height: 48px !important;
+                    height: 42px !important;
                     background: #ffffff !important;
                     color: #475569 !important;
                     border-radius: 8px !important;
-                    padding: 0 16px !important;
+                    padding: 0 12px !important;
                     font-weight: 600 !important;
                     border: 1px solid #cbd5e1 !important;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
@@ -4669,10 +4669,10 @@ class AdminManager {
                     display: flex !important;
                     align-items: center !important;
                     justify-content: center !important;
-                    gap: 10px !important;
+                    gap: 6px !important;
                     font-family: 'Inter', sans-serif !important;
                     transition: all 0.2s ease !important;
-                    font-size: 14px !important;
+                    font-size: 13px !important;
                     white-space: nowrap !important;
                     margin: 0 !important;
                 }
@@ -4684,7 +4684,7 @@ class AdminManager {
                 }
                 .overview-hero-action .material-symbols-outlined,
                 .overview-hero-action-secondary .material-symbols-outlined {
-                    font-size: 20px !important;
+                    font-size: 18px !important;
                     color: inherit !important;
                 }
             </style>
@@ -4694,7 +4694,7 @@ class AdminManager {
                     <p class="overview-hero-text" style="font-size: 16px; opacity: 0.9; max-width: 600px; line-height: 1.6;">
                         Her har du en fullstendig oversikt over HKM Studio. Se sanntidsdata, administrer innhold og svar på meldinger fra én sentral flate.
                     </p>
-                    <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; align-items: center !important; justify-content: flex-start !important;">
+                    <div class="hero-actions-container" style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; align-items: center !important; justify-content: flex-start !important;">
                         <button type="button" class="overview-hero-action" onclick="window.location.href='/admin/admin-meldinger.html'">
                             <span class="material-symbols-outlined">mail</span>
                             Gå til meldinger
