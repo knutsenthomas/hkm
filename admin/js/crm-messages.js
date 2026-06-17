@@ -353,8 +353,8 @@ class MessagesManager {
         let avatarClass = '';
 
         if (isChat) {
-            icon = 'chat_bubble';
-            channelIcon = 'forum';
+            icon = 'person';
+            channelIcon = 'chat_bubble';
         } else if (isPush) {
             icon = 'send_to_mobile';
             channelIcon = 'campaign';
