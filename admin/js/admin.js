@@ -17272,14 +17272,25 @@ class AdminManager {
 
     async renderWixStats() {
         const container = document.getElementById('wix-stats-container');
-        if (!container) return;
+        const ordersContainer = document.getElementById('wix-orders-container');
+        if (!container && !ordersContainer) return;
 
-        container.innerHTML = `
-            <div style="display:flex; justify-content:center; align-items:center; padding:64px; flex-direction:column; gap:16px;">
-                <div class="loader"></div>
-                <p style="color:#64748b; font-weight:600; font-size:14px; margin:0;">Henter ordredata fra Wix-butikken...</p>
-            </div>
-        `;
+        if (container) {
+            container.innerHTML = `
+                <div style="display:flex; justify-content:center; align-items:center; padding:64px; flex-direction:column; gap:16px;">
+                    <div class="loader"></div>
+                    <p style="color:#64748b; font-weight:600; font-size:14px; margin:0;">Henter ordredata fra Wix-butikken...</p>
+                </div>
+            `;
+        }
+        if (ordersContainer) {
+            ordersContainer.innerHTML = `
+                <div style="display:flex; justify-content:center; align-items:center; padding:64px; flex-direction:column; gap:16px;">
+                    <div class="loader"></div>
+                    <p style="color:#64748b; font-weight:600; font-size:14px; margin:0;">Henter ordrehistorikk...</p>
+                </div>
+            `;
+        }
 
         try {
             const res = await fetch('https://hiskingdomdesigns.no/api/get-wix-stats');
@@ -17291,6 +17302,20 @@ class AdminManager {
 
             const orders = data.orders || [];
             
+            // Get date range filters
+            const filters = this.donationFilters || {};
+            const { start, end } = this.buildDonationDateRange(filters.preset || '30', filters.start || '', filters.end || '');
+
+            // Filter orders based on date range
+            const filteredOrders = orders.filter(o => {
+                const dateStr = o._createdDate || o.purchasedDate;
+                if (!dateStr) return true;
+                const date = new Date(dateStr);
+                if (start && date < start) return false;
+                if (end && date > end) return false;
+                return true;
+            });
+            
             // Process statistics
             let totalSales = 0;
             let paidSales = 0;
@@ -17299,7 +17324,7 @@ class AdminManager {
             const monthlySales = {};
             const customerSales = {};
 
-            orders.forEach(o => {
+            filteredOrders.forEach(o => {
                 const price = parseFloat(o.priceSummary?.total?.amount || 0);
                 totalSales += price;
 
@@ -17322,10 +17347,10 @@ class AdminManager {
                 customerSales[buyerName] = (customerSales[buyerName] || 0) + price;
             });
 
-            const avgOrder = orders.length > 0 ? (totalSales / orders.length) : 0;
+            const avgOrder = filteredOrders.length > 0 ? (totalSales / filteredOrders.length) : 0;
 
             // Render stats grid
-            let html = `
+            let statsHtml = `
                 <div class="stats-grid donation-metrics-grid causes-stats-grid" style="margin-bottom: 32px; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px;">
                     <div class="stat-card modern">
                         <div class="stat-icon-wrap green">
@@ -17334,7 +17359,7 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Total omsetning</h3>
                             <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${this.formatDonationCurrency(totalSales)}</p>
-                            <span class="stat-meta">Siste 100 ordre fra Wix-butikken</span>
+                            <span class="stat-meta">Valgt periode</span>
                         </div>
                     </div>
 
@@ -17344,7 +17369,7 @@ class AdminManager {
                         </div>
                         <div class="stat-content">
                             <h3 class="stat-label">Antall ordre</h3>
-                            <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${orders.length}</p>
+                            <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${filteredOrders.length}</p>
                             <span class="stat-meta">${paidCount} betalte ordre</span>
                         </div>
                     </div>
@@ -17361,124 +17386,130 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px; align-items: start;">
-                    <!-- Left: Wix Order List -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 24px; align-items: start;">
+                    <!-- Monthly Breakdown -->
                     <div class="card" style="margin: 0;">
-                        <div class="card-header flex-between" style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9;">
-                            <div>
-                                <h3 class="card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965;">Ordrehistorikk (Wix)</h3>
-                                <p class="section-subtitle" style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Klikk på en ordre for å se detaljer.</p>
-                            </div>
-                            <div style="display:flex; align-items:center; gap:12px;">
-                                <div style="position:relative; width:220px;">
-                                    <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
-                                    <input id="wix-search" class="form-control" type="search" placeholder="Søk etter kunde..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;" oninput="window.adminManager.filterWixOrders(this.value)">
-                                </div>
-                                <button type="button" class="btn-secondary" onclick="window.adminManager.renderWixStats()" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">
-                                    <span class="material-symbols-outlined" style="font-size:20px;">refresh</span>
-                                    Synkroniser
-                                </button>
-                            </div>
+                        <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9;">
+                            <h3 class="card-title" style="margin: 0; font-size: 15px; font-weight: 700; color: #1B4965;">Månedlig omsetning</h3>
                         </div>
-                        <div class="card-body" style="padding: 0;">
-                            <div class="table-responsive" style="overflow-x: auto;">
-                                <table class="data-table" style="width: 100%; margin: 0; border-collapse: collapse;">
-                                    <thead>
-                                        <tr>
-                                            <th>Ordrenummer</th>
-                                            <th>Dato</th>
-                                            <th>Kunde</th>
-                                            <th class="text-right">Beløp</th>
-                                            <th>Betaling</th>
-                                            <th>Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="wix-transactions-body">
-                                        ${orders.map(o => {
-                                            const date = o._createdDate ? new Date(o._createdDate).toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Ukjent';
-                                            const buyer = `${o.billingInfo?.contactDetails?.firstName || ''} ${o.billingInfo?.contactDetails?.lastName || ''}`.trim() || o.buyerInfo?.email || 'Ukjent';
-                                            const amount = parseFloat(o.priceSummary?.total?.amount || 0);
-                                            const pStatus = o.paymentStatus || 'UNKNOWN';
-                                            
-                                            let pBadge = `<span class="badge badge-secondary">${pStatus}</span>`;
-                                            if (pStatus === 'PAID') pBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Betalt</span>`;
-                                            else if (pStatus === 'PENDING') pBadge = `<span class="badge badge-warning" style="background:#fef9c3; color:#a16207; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Venter</span>`;
-
-                                            let statusBadge = `<span class="badge badge-secondary">${o.status}</span>`;
-                                            if (o.status === 'APPROVED') statusBadge = `<span class="badge badge-info" style="background:#e0f2fe; color:#0369a1; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Godkjent</span>`;
-                                            else if (o.status === 'COMPLETED') statusBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Fullført</span>`;
-
-                                            return `
-                                                <tr style="cursor: pointer; border-bottom: 1px solid #f1f5f9;" onclick="window.adminManager.showWixOrderDetails('${o._id}')">
-                                                    <td style="font-weight: 700; color:#1B4965; padding: 14px 16px;">#${o.number}</td>
-                                                    <td style="white-space: nowrap; padding: 14px 16px;">${date}</td>
-                                                    <td style="padding: 14px 16px;">${buyer}</td>
-                                                    <td class="text-right" style="font-weight: 600; padding: 14px 16px;">${this.formatDonationCurrency(amount)}</td>
-                                                    <td style="padding: 14px 16px;">${pBadge}</td>
-                                                    <td style="padding: 14px 16px;">${statusBadge}</td>
-                                                </tr>
-                                            `;
-                                        }).join('')}
-                                    </tbody>
-                                </table>
+                        <div class="card-body" style="padding: 16px 24px;">
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                ${Object.keys(monthlySales).length === 0 ? `
+                                    <div style="text-align: center; color: #64748b; padding: 16px; font-size: 13px;">Ingen salgsdata for denne perioden</div>
+                                ` : Object.entries(monthlySales).sort().reverse().map(([month, amount]) => {
+                                    const date = new Date(month + '-01');
+                                    const monthName = date.toLocaleDateString('no-NO', { month: 'long', year: 'numeric' });
+                                    return `
+                                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                                            <span style="font-weight: 500; color: #475569; text-transform: capitalize; font-size: 13px;">${monthName}</span>
+                                            <span style="font-weight: 700; color: #0f172a; font-size: 14px;">${this.formatDonationCurrency(amount)}</span>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                     </div>
 
-                    <!-- Right: Monthly and Top Customers -->
-                    <div style="display: flex; flex-direction: column; gap: 24px;">
-                        <!-- Monthly Breakdown -->
-                        <div class="card" style="margin: 0;">
-                            <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9;">
-                                <h3 class="card-title" style="margin: 0; font-size: 15px; font-weight: 700; color: #1B4965;">Månedlig omsetning</h3>
-                            </div>
-                            <div class="card-body" style="padding: 16px 24px;">
-                                <div style="display: flex; flex-direction: column; gap: 12px;">
-                                    ${Object.entries(monthlySales).sort().reverse().map(([month, amount]) => {
-                                        const date = new Date(month + '-01');
-                                        const monthName = date.toLocaleDateString('no-NO', { month: 'long', year: 'numeric' });
-                                        return `
-                                            <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
-                                                <span style="font-weight: 500; color: #475569; text-transform: capitalize; font-size: 13px;">${monthName}</span>
-                                                <span style="font-weight: 700; color: #0f172a; font-size: 14px;">${this.formatDonationCurrency(amount)}</span>
-                                            </div>
-                                        `;
-                                    }).join('')}
-                                </div>
-                            </div>
+                    <!-- Top Customers -->
+                    <div class="card" style="margin: 0;">
+                        <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9;">
+                            <h3 class="card-title" style="margin: 0; font-size: 15px; font-weight: 700; color: #1B4965;">Toppkunder (Wix)</h3>
                         </div>
-
-                        <!-- Top Customers -->
-                        <div class="card" style="margin: 0;">
-                            <div class="card-header" style="padding: 20px 24px; border-bottom: 1px solid #f1f5f9;">
-                                <h3 class="card-title" style="margin: 0; font-size: 15px; font-weight: 700; color: #1B4965;">Toppkunder (Wix)</h3>
-                            </div>
-                            <div class="card-body" style="padding: 16px 24px;">
-                                <div style="display: flex; flex-direction: column; gap: 12px;">
-                                    ${Object.entries(customerSales).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, amount], index) => {
-                                        return `
-                                            <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
-                                                <div style="display: flex; align-items: center; gap: 12px;">
-                                                    <span style="font-weight: 700; color: #94a3b8; font-size: 13px;">#${index + 1}</span>
-                                                    <span style="font-weight: 600; color: #334155; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${name}</span>
-                                                </div>
-                                                <span style="font-weight: 700; color: #1B4965; font-size: 14px;">${this.formatDonationCurrency(amount)}</span>
+                        <div class="card-body" style="padding: 16px 24px;">
+                            <div style="display: flex; flex-direction: column; gap: 12px;">
+                                ${Object.keys(customerSales).length === 0 ? `
+                                    <div style="text-align: center; color: #64748b; padding: 16px; font-size: 13px;">Ingen toppkunder i denne perioden</div>
+                                ` : Object.entries(customerSales).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, amount], index) => {
+                                    return `
+                                        <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #f1f5f9;">
+                                            <div style="display: flex; align-items: center; gap: 12px;">
+                                                <span style="font-weight: 700; color: #94a3b8; font-size: 13px;">#${index + 1}</span>
+                                                <span style="font-weight: 600; color: #334155; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 140px;">${name}</span>
                                             </div>
-                                        `;
-                                    }).join('')}
-                                </div>
+                                            <span style="font-weight: 700; color: #1B4965; font-size: 14px;">${this.formatDonationCurrency(amount)}</span>
+                                        </div>
+                                    `;
+                                }).join('')}
                             </div>
                         </div>
                     </div>
                 </div>
             `;
 
-            this.wixOrders = orders;
-            container.innerHTML = html;
+            // Render Wix Order List
+            let ordersHtml = `
+                <div class="card" style="margin: 0; width: 100%;">
+                    <div class="card-header flex-between" style="padding: 24px 32px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
+                        <div>
+                            <h3 class="card-title" style="margin: 0; font-size: 16px; font-weight: 700; color: #1B4965;">Ordrehistorikk (Wix)</h3>
+                            <p class="section-subtitle" style="margin: 4px 0 0; font-size: 13px; color: #64748b;">Klikk på en ordre for å se detaljer.</p>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="position:relative; width:220px;">
+                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
+                                <input id="wix-search" class="form-control" type="search" placeholder="Søk etter kunde..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;" oninput="window.adminManager.filterWixOrders(this.value)">
+                            </div>
+                            <button type="button" class="btn-secondary" onclick="window.adminManager.renderWixStats()" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">refresh</span>
+                                Synkroniser
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body" style="padding: 0;">
+                        <div class="table-responsive" style="overflow-x: auto;">
+                            <table class="data-table" style="width: 100%; margin: 0; border-collapse: collapse;">
+                                <thead>
+                                    <tr>
+                                        <th>Ordrenummer</th>
+                                        <th>Dato</th>
+                                        <th>Kunde</th>
+                                        <th class="text-right">Beløp</th>
+                                        <th>Betaling</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="wix-transactions-body">
+                                    ${filteredOrders.length === 0 ? `
+                                        <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre funnet for denne perioden</td></tr>
+                                    ` : filteredOrders.map(o => {
+                                        const date = o._createdDate ? new Date(o._createdDate).toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Ukjent';
+                                        const buyer = `${o.billingInfo?.contactDetails?.firstName || ''} ${o.billingInfo?.contactDetails?.lastName || ''}`.trim() || o.buyerInfo?.email || 'Ukjent';
+                                        const amount = parseFloat(o.priceSummary?.total?.amount || 0);
+                                        const pStatus = o.paymentStatus || 'UNKNOWN';
+                                        
+                                        let pBadge = `<span class="badge badge-secondary">${pStatus}</span>`;
+                                        if (pStatus === 'PAID') pBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Betalt</span>`;
+                                        else if (pStatus === 'PENDING') pBadge = `<span class="badge badge-warning" style="background:#fef9c3; color:#a16207; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Venter</span>`;
+
+                                        let statusBadge = `<span class="badge badge-secondary">${o.status}</span>`;
+                                        if (o.status === 'APPROVED') statusBadge = `<span class="badge badge-info" style="background:#e0f2fe; color:#0369a1; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Godkjent</span>`;
+                                        else if (o.status === 'COMPLETED') statusBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Fullført</span>`;
+
+                                        return `
+                                            <tr style="cursor: pointer; border-bottom: 1px solid #f1f5f9;" onclick="window.adminManager.showWixOrderDetails('${o._id}')">
+                                                <td style="font-weight: 700; color:#1B4965; padding: 14px 16px;">#${o.number}</td>
+                                                <td style="white-space: nowrap; padding: 14px 16px;">${date}</td>
+                                                <td style="padding: 14px 16px;">${buyer}</td>
+                                                <td class="text-right" style="font-weight: 600; padding: 14px 16px;">${this.formatDonationCurrency(amount)}</td>
+                                                <td style="padding: 14px 16px;">${pBadge}</td>
+                                                <td style="padding: 14px 16px;">${statusBadge}</td>
+                                            </tr>
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            this.wixOrders = filteredOrders;
+            if (container) container.innerHTML = statsHtml;
+            if (ordersContainer) ordersContainer.innerHTML = ordersHtml;
 
         } catch (err) {
             console.error('Kunne ikke hente Wix-statistikk:', err);
-            container.innerHTML = `
+            const errHtml = `
                 <div class="card" style="padding: 32px; text-align: center;">
                     <span class="material-symbols-outlined" style="font-size: 48px; color: #ef4444; margin-bottom: 16px;">error</span>
                     <h3 style="margin-bottom: 8px; color: #0f172a;">Feil ved lasting av Wix-data</h3>
@@ -17486,6 +17517,8 @@ class AdminManager {
                     <button class="btn btn-primary" onclick="window.adminManager.renderWixStats()" style="margin: 0 auto;">Prøv igjen</button>
                 </div>
             `;
+            if (container) container.innerHTML = errHtml;
+            if (ordersContainer) ordersContainer.innerHTML = errHtml;
         }
     }
 
