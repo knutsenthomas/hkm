@@ -4686,6 +4686,13 @@ class AdminManager {
                 .overview-hero-action-secondary .material-symbols-outlined {
                     font-size: 18px !important;
                     color: inherit !important;
+                    display: inline-flex !important;
+                    align-items: center !important;
+                    justify-content: center !important;
+                    vertical-align: middle !important;
+                    line-height: 1 !important;
+                    width: 18px !important;
+                    height: 18px !important;
                 }
             </style>
             <div class="overview-hero-card" style="background: var(--admin-orange-gradient); border-radius: 16px; padding: 48px; position: relative; overflow: hidden; color: white;">
