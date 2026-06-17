@@ -30,6 +30,9 @@ class CRMManager {
         };
         this._crmToolDialogConfirmResolver = null;
 
+        this.sortField = 'name';
+        this.sortDirection = 'asc';
+
         this.init();
     }
 
@@ -168,13 +171,43 @@ class CRMManager {
                 this.updateBulkActionsVisibility();
             };
         }
-
         document.addEventListener('click', (e) => {
             if (!this.openContactMenuId) return;
             const target = e.target;
             if (target && target.closest && target.closest('.contact-row-actions')) return;
             this.openContactMenuId = null;
             this.renderTable();
+        });
+
+        // Setup sortable headers dynamically
+        const headers = document.querySelectorAll('.crm-table thead th');
+        const sortFields = ['none', 'name', 'email', 'phone', 'status', 'labels', 'lastActivity'];
+        headers.forEach((header, index) => {
+            const field = sortFields[index];
+            if (field && field !== 'none') {
+                header.style.cursor = 'pointer';
+                header.style.userSelect = 'none';
+                header.style.position = 'relative';
+                
+                header.addEventListener('mouseover', () => {
+                    header.style.backgroundColor = '#f1f5f9';
+                    header.style.color = '#1b4965';
+                });
+                header.addEventListener('mouseout', () => {
+                    header.style.backgroundColor = '';
+                    header.style.color = '';
+                });
+
+                header.addEventListener('click', () => {
+                    if (this.sortField === field) {
+                        this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+                    } else {
+                        this.sortField = field;
+                        this.sortDirection = (field === 'name' || field === 'email' || field === 'status' || field === 'labels') ? 'asc' : 'desc';
+                    }
+                    this.applyCurrentFiltersAndSearch();
+                });
+            }
         });
     }
 
@@ -350,6 +383,7 @@ class CRMManager {
         });
 
         this.applyViewPreset();
+        this.updateSortHeaderUI();
     }
 
     getStatusClass(status) {
@@ -406,7 +440,91 @@ class CRMManager {
             return this.normalizeStatusFilter(c.status || 'IKKE_MEDLEM') === normalizedFilter;
         });
 
+        this.sortFilteredContacts();
+
         this.renderTable();
+    }
+
+    getContactFullName(c) {
+        let firstName = c.firstName || '';
+        let lastName = c.lastName || '';
+        let fullName = `${firstName} ${lastName}`.trim();
+
+        if (!fullName && c.displayName) {
+            fullName = c.displayName;
+        }
+
+        if (!fullName) {
+            fullName = c.email ? c.email.split('@')[0] : 'Ukjent Navn';
+        }
+        return fullName;
+    }
+
+    getContactTime(c) {
+        const dateVal = c.lastLogin || c.updatedAt || c.createdAt;
+        if (!dateVal) return 0;
+        if (dateVal.toDate && typeof dateVal.toDate === 'function') {
+            return dateVal.toDate().getTime();
+        }
+        const d = new Date(dateVal);
+        return isNaN(d.getTime()) ? 0 : d.getTime();
+    }
+
+    sortFilteredContacts() {
+        if (!this.sortField) return;
+
+        this.filteredContacts.sort((a, b) => {
+            let comp = 0;
+            if (this.sortField === 'name') {
+                const nameA = this.getContactFullName(a);
+                const nameB = this.getContactFullName(b);
+                comp = nameA.localeCompare(nameB, 'no');
+            } else if (this.sortField === 'email') {
+                comp = (a.email || '').localeCompare(b.email || '', 'no');
+            } else if (this.sortField === 'phone') {
+                comp = (a.phone || '').localeCompare(b.phone || '', 'no');
+            } else if (this.sortField === 'status') {
+                comp = (a.status || '').localeCompare(b.status || '', 'no');
+            } else if (this.sortField === 'labels') {
+                const labelsA = (a.labels || [a.label || 'Ny']).join(', ');
+                const labelsB = (b.labels || [b.label || 'Ny']).join(', ');
+                comp = labelsA.localeCompare(labelsB, 'no');
+            } else if (this.sortField === 'lastActivity') {
+                const timeA = this.getContactTime(a);
+                const timeB = this.getContactTime(b);
+                comp = timeA - timeB;
+            }
+            return this.sortDirection === 'asc' ? comp : -comp;
+        });
+    }
+
+    updateSortHeaderUI() {
+        const headers = document.querySelectorAll('.crm-table thead th');
+        const sortFields = ['none', 'name', 'email', 'phone', 'status', 'labels', 'lastActivity'];
+        headers.forEach((header, index) => {
+            const field = sortFields[index];
+            if (field && field !== 'none') {
+                // Remove existing sort icons if any
+                let icon = header.querySelector('.sort-icon');
+                if (!icon) {
+                    icon = document.createElement('span');
+                    icon.className = 'material-symbols-outlined sort-icon';
+                    icon.style.fontSize = '14px';
+                    icon.style.verticalAlign = 'middle';
+                    icon.style.marginLeft = '4px';
+                    icon.style.lineHeight = '1';
+                    header.appendChild(icon);
+                }
+                
+                if (field === this.sortField) {
+                    icon.style.display = 'inline-flex';
+                    icon.textContent = this.sortDirection === 'asc' ? 'arrow_upward' : 'arrow_downward';
+                    icon.style.color = '#d17d39'; // Orange theme accent color
+                } else {
+                    icon.style.display = 'none';
+                }
+            }
+        });
     }
 
     normalizeStatusFilter(value) {

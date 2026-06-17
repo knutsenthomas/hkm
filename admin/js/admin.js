@@ -83,6 +83,14 @@ class AdminManager {
         this.currentMediaPath = 'editor/';
         this.mediaSortOrder = 'date-desc';
 
+        // Wix Shop Orders Sorting State
+        this.wixSortField = 'date';
+        this.wixSortDir = 'desc';
+
+        // Physical Donations Sorting State
+        this.inkindSortField = 'date';
+        this.inkindSortDir = 'desc';
+
         this.widgetLibrary = {
             'visitors': { id: 'visitors', label: 'Sidevisninger', icon: 'visibility', color: 'purple', default: true },
             'status': { id: 'status', label: 'Systemstatus', icon: 'check_circle', color: 'green', default: true },
@@ -17715,6 +17723,32 @@ class AdminManager {
             return matchesQuery && matchesPay && matchesOrd && matchesFulfillment;
         });
 
+        if (this.wixSortField) {
+            filtered.sort((a, b) => {
+                let comp = 0;
+                if (this.wixSortField === 'number') {
+                    comp = (parseInt(a.number) || 0) - (parseInt(b.number) || 0);
+                } else if (this.wixSortField === 'date') {
+                    const timeA = a._createdDate ? new Date(a._createdDate).getTime() : 0;
+                    const timeB = b._createdDate ? new Date(b._createdDate).getTime() : 0;
+                    comp = timeA - timeB;
+                } else if (this.wixSortField === 'buyer') {
+                    const buyerA = `${a.billingInfo?.contactDetails?.firstName || ''} ${a.billingInfo?.contactDetails?.lastName || ''}`.trim() || a.buyerInfo?.email || '';
+                    const buyerB = `${b.billingInfo?.contactDetails?.firstName || ''} ${b.billingInfo?.contactDetails?.lastName || ''}`.trim() || b.buyerInfo?.email || '';
+                    comp = buyerA.localeCompare(buyerB, 'no');
+                } else if (this.wixSortField === 'amount') {
+                    comp = parseFloat(a.priceSummary?.total?.amount || 0) - parseFloat(b.priceSummary?.total?.amount || 0);
+                } else if (this.wixSortField === 'paymentStatus') {
+                    comp = (a.paymentStatus || '').localeCompare(b.paymentStatus || '', 'no');
+                } else if (this.wixSortField === 'fulfillmentStatus') {
+                    comp = (a.fulfillmentStatus || '').localeCompare(b.fulfillmentStatus || '', 'no');
+                } else if (this.wixSortField === 'status') {
+                    comp = (a.status || '').localeCompare(b.status || '', 'no');
+                }
+                return this.wixSortDir === 'desc' ? -comp : comp;
+            });
+        }
+
         tbody.innerHTML = filtered.length ? filtered.map(o => {
             const date = o._createdDate ? new Date(o._createdDate).toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Ukjent';
             const buyer = `${o.billingInfo?.contactDetails?.firstName || ''} ${o.billingInfo?.contactDetails?.lastName || ''}`.trim() || o.buyerInfo?.email || 'Ukjent';
@@ -17751,6 +17785,63 @@ class AdminManager {
         }).join('') : `
             <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre matcher søket eller filteret.</td></tr>
         `;
+
+        // Update Sorting UI
+        const container = document.getElementById('wix-transactions-body')?.closest('.table-responsive');
+        if (container) {
+            const headers = container.querySelectorAll('table.data-table thead th');
+            const sortFields = ['number', 'date', 'buyer', 'amount', 'paymentStatus', 'fulfillmentStatus', 'status'];
+            headers.forEach((header, index) => {
+                const field = sortFields[index];
+                if (field) {
+                    if (!header.dataset.initialized) {
+                        header.dataset.initialized = 'true';
+                        header.style.cursor = 'pointer';
+                        header.style.userSelect = 'none';
+                        header.style.position = 'relative';
+
+                        header.addEventListener('mouseover', () => {
+                            header.style.backgroundColor = '#f1f5f9';
+                            header.style.color = '#1B4965';
+                        });
+                        header.addEventListener('mouseout', () => {
+                            header.style.backgroundColor = '';
+                            header.style.color = '';
+                        });
+
+                        header.addEventListener('click', () => {
+                            if (this.wixSortField === field) {
+                                this.wixSortDir = this.wixSortDir === 'asc' ? 'desc' : 'asc';
+                            } else {
+                                this.wixSortField = field;
+                                this.wixSortDir = (field === 'date' || field === 'amount' || field === 'number') ? 'desc' : 'asc';
+                            }
+                            this.filterWixOrders();
+                        });
+                    }
+
+                    // Add/update sort-icon span
+                    let icon = header.querySelector('.sort-icon');
+                    if (!icon) {
+                        icon = document.createElement('span');
+                        icon.className = 'material-symbols-outlined sort-icon';
+                        icon.style.fontSize = '14px';
+                        icon.style.verticalAlign = 'middle';
+                        icon.style.marginLeft = '4px';
+                        icon.style.lineHeight = '1';
+                        header.appendChild(icon);
+                    }
+
+                    if (field === this.wixSortField) {
+                        icon.style.display = 'inline-flex';
+                        icon.textContent = this.wixSortDir === 'asc' ? 'arrow_upward' : 'arrow_downward';
+                        icon.style.color = '#d17d39';
+                    } else {
+                        icon.style.display = 'none';
+                    }
+                }
+            });
+        }
     }
 
     clearWixFilters() {
