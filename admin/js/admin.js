@@ -21741,7 +21741,7 @@ class AdminManager {
                                                                                             <div class="design-ui-panel">
                                                                                                 <div class="design-ui-panel-header" style="display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap;">
                                                                                                     <div style="display: flex; align-items: center; gap: 8px;">
-                                                                                                        <h3 class="design-ui-panel-title" style="margin: 0;">Aktive Brukere</h3>
+                                                                                                        <h3 class="design-ui-panel-title" style="margin: 0;">Aktive brukere</h3>
                                                                                                         <span class="status-badge" id="user-count-badge" style="background: #f1f5f9; color: #475569; font-size: 11px; font-weight: 600; padding: 4px 8px; border-radius: 12px;">- BRUKERE</span>
                                                                                                     </div>
                                                                                                     <div style="position: relative; width: 240px; margin-left: auto;">
