@@ -1400,6 +1400,7 @@ class MessagesManager {
 
         let filtered = this.unifiedThreads;
         if (filter === 'push') filtered = this.pushNotifications;
+        else if (filter === 'chat') filtered = this.visitorChats;
         else if (filter === 'message') filtered = this.messages;
 
         if (filtered.length === 0) {
