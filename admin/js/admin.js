@@ -13073,9 +13073,13 @@ class AdminManager {
                         if (!icon) {
                             icon = document.createElement('span');
                             icon.className = 'material-symbols-outlined sort-icon';
-                            icon.style.fontSize = '16px';
+                            icon.style.fontSize = '14px';
                             icon.style.lineHeight = '1';
                             icon.style.flexShrink = '0';
+                            icon.style.display = 'inline-flex';
+                            icon.style.alignItems = 'center';
+                            icon.style.position = 'relative';
+                            icon.style.top = '-1px';
                             wrapper.appendChild(icon);
                         }
 
@@ -15237,9 +15241,13 @@ class AdminManager {
                     if (!icon) {
                         icon = document.createElement('span');
                         icon.className = 'material-symbols-outlined sort-icon';
-                        icon.style.fontSize = '16px';
+                        icon.style.fontSize = '14px';
                         icon.style.lineHeight = '1';
                         icon.style.flexShrink = '0';
+                        icon.style.display = 'inline-flex';
+                        icon.style.alignItems = 'center';
+                        icon.style.position = 'relative';
+                        icon.style.top = '-1px';
                         wrapper.appendChild(icon);
                     }
 
@@ -18038,9 +18046,13 @@ class AdminManager {
                     if (!icon) {
                         icon = document.createElement('span');
                         icon.className = 'material-symbols-outlined sort-icon';
-                        icon.style.fontSize = '16px';
+                        icon.style.fontSize = '14px';
                         icon.style.lineHeight = '1';
                         icon.style.flexShrink = '0';
+                        icon.style.display = 'inline-flex';
+                        icon.style.alignItems = 'center';
+                        icon.style.position = 'relative';
+                        icon.style.top = '-1px';
                         wrapper.appendChild(icon);
                     }
 
