@@ -266,13 +266,13 @@
 }
 
 .thread-avatar > .material-symbols-outlined {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 24px;
-    height: 24px;
-    font-size: 24px;
-    line-height: 1;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    font-size: 24px !important;
+    line-height: 1 !important;
 }
 
 .thread-channel-icon {
@@ -291,13 +291,13 @@
 }
 
 .thread-channel-icon .material-symbols-outlined {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 12px;
-    height: 12px;
-    font-size: 12px;
-    line-height: 1;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 12px !important;
+    height: 12px !important;
+    font-size: 12px !important;
+    line-height: 1 !important;
 }
 
 .thread-info {
