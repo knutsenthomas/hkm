@@ -602,8 +602,17 @@
                     
                     logs = snapshot.docs.map(doc => {
                         const data = doc.data();
+                        
+                        let level = data.level || (data.severity ? data.severity.toLowerCase() : 'info');
+                        if (level === 'warning') level = 'warn';
+                        if (level === 'critical') level = 'error';
+                        
+                        let source = data.source || 'Nettside';
+                        
                         return {
                             ...data,
+                            level,
+                            source,
                             // Convert Firestore timestamp to ISO string if it exists
                             timestamp: data.timestamp ? data.timestamp.toDate().toISOString() : new Date().toISOString()
                         };

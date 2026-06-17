@@ -4693,13 +4693,21 @@ exports.logSystemError = onRequest({ cors: true, invoker: "public", secrets: [em
   }
 
   try {
-    const { type, message, severity = "INFO", userId = null, additionalData = {} } = req.body;
+    const { type, message, severity = "INFO", userId = null, additionalData = {}, level, source, url, userAgent } = req.body;
     const timestamp = admin.firestore.FieldValue.serverTimestamp();
+
+    let finalLevel = level || severity.toLowerCase();
+    if (finalLevel === 'warning') finalLevel = 'warn';
+    if (finalLevel === 'critical') finalLevel = 'error';
 
     await db.collection("system_logs").add({
       type,
       message,
       severity,
+      level: finalLevel,
+      source: source || "Nettside",
+      url: url || null,
+      userAgent: userAgent || null,
       userId,
       additionalData,
       timestamp,
