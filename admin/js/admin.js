@@ -17560,6 +17560,14 @@ class AdminManager {
                                     <option value="CANCELED">Kansellert</option>
                                 </select>
                             </div>
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Utsendelse</label>
+                                <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600;" onchange="window.adminManager.filterWixOrders()">
+                                    <option value="all">Alle</option>
+                                    <option value="FULFILLED">Sendt</option>
+                                    <option value="NOT_FULFILLED">Ikke sendt</option>
+                                </select>
+                            </div>
                             <div style="display:flex; align-items:flex-end;">
                                 <button type="button" class="btn-secondary" onclick="window.adminManager.clearWixFilters()" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">
                                     <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
@@ -17577,12 +17585,13 @@ class AdminManager {
                                         <th>Kunde</th>
                                         <th class="text-right">Beløp</th>
                                         <th>Betaling</th>
+                                        <th>Utsendelse</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody id="wix-transactions-body">
                                     ${filteredOrders.length === 0 ? `
-                                        <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre funnet for denne perioden</td></tr>
+                                        <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre funnet for denne perioden</td></tr>
                                     ` : filteredOrders.map(o => {
                                         const date = o._createdDate ? new Date(o._createdDate).toLocaleDateString('no-NO', { day: '2-digit', month: 'short', year: 'numeric' }) : 'Ukjent';
                                         const buyer = `${o.billingInfo?.contactDetails?.firstName || ''} ${o.billingInfo?.contactDetails?.lastName || ''}`.trim() || o.buyerInfo?.email || 'Ukjent';
@@ -17594,6 +17603,11 @@ class AdminManager {
                                         else if (pStatus === 'PENDING') pBadge = `<span class="badge badge-warning" style="background:#fef9c3; color:#a16207; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Venter</span>`;
                                         else if (pStatus === 'FULLY_REFUNDED') pBadge = `<span class="badge badge-danger" style="background:#fee2e2; color:#b91c1c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Refundert</span>`;
                                         else if (pStatus === 'PARTIALLY_REFUNDED') pBadge = `<span class="badge badge-warning" style="background:#ffedd5; color:#c2410c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Delvis ref.</span>`;
+
+                                        const fStatus = o.fulfillmentStatus || 'NOT_FULFILLED';
+                                        let fBadge = `<span class="badge badge-secondary">${fStatus}</span>`;
+                                        if (fStatus === 'FULFILLED') fBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Sendt</span>`;
+                                        else if (fStatus === 'NOT_FULFILLED') fBadge = `<span class="badge badge-warning" style="background:#ffedd5; color:#c2410c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Ikke sendt</span>`;
 
                                         let statusBadge = `<span class="badge badge-secondary">${o.status}</span>`;
                                         if (o.status === 'APPROVED') statusBadge = `<span class="badge badge-info" style="background:#e0f2fe; color:#0369a1; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Godkjent</span>`;
@@ -17607,6 +17621,7 @@ class AdminManager {
                                                 <td style="padding: 14px 16px;">${buyer}</td>
                                                 <td class="text-right" style="font-weight: 600; padding: 14px 16px;">${this.formatDonationCurrency(amount)}</td>
                                                 <td style="padding: 14px 16px;">${pBadge}</td>
+                                                <td style="padding: 14px 16px;">${fBadge}</td>
                                                 <td style="padding: 14px 16px;">${statusBadge}</td>
                                             </tr>
                                         `;
@@ -17641,10 +17656,12 @@ class AdminManager {
         const queryEl = document.getElementById('wix-search');
         const payStatusEl = document.getElementById('wix-payment-status-filter');
         const ordStatusEl = document.getElementById('wix-order-status-filter');
+        const fulfillmentStatusEl = document.getElementById('wix-fulfillment-status-filter');
         
         const q = queryEl ? String(queryEl.value || '').toLowerCase().trim() : '';
         const payStatus = payStatusEl ? String(payStatusEl.value || 'all') : 'all';
         const ordStatus = ordStatusEl ? String(ordStatusEl.value || 'all') : 'all';
+        const fulfillmentStatus = fulfillmentStatusEl ? String(fulfillmentStatusEl.value || 'all') : 'all';
         
         const tbody = document.getElementById('wix-transactions-body');
         if (!tbody || !this.wixOrders) return;
@@ -17664,7 +17681,11 @@ class AdminManager {
             const oStatus = o.status || 'UNKNOWN';
             const matchesOrd = ordStatus === 'all' || oStatus === ordStatus;
 
-            return matchesQuery && matchesPay && matchesOrd;
+            // Fulfillment status filter
+            const fStatus = o.fulfillmentStatus || 'NOT_FULFILLED';
+            const matchesFulfillment = fulfillmentStatus === 'all' || fStatus === fulfillmentStatus;
+
+            return matchesQuery && matchesPay && matchesOrd && matchesFulfillment;
         });
 
         tbody.innerHTML = filtered.length ? filtered.map(o => {
@@ -17679,6 +17700,11 @@ class AdminManager {
             else if (pStatus === 'FULLY_REFUNDED') pBadge = `<span class="badge badge-danger" style="background:#fee2e2; color:#b91c1c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Refundert</span>`;
             else if (pStatus === 'PARTIALLY_REFUNDED') pBadge = `<span class="badge badge-warning" style="background:#ffedd5; color:#c2410c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Delvis ref.</span>`;
 
+            const fStatus = o.fulfillmentStatus || 'NOT_FULFILLED';
+            let fBadge = `<span class="badge badge-secondary">${fStatus}</span>`;
+            if (fStatus === 'FULFILLED') fBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Sendt</span>`;
+            else if (fStatus === 'NOT_FULFILLED') fBadge = `<span class="badge badge-warning" style="background:#ffedd5; color:#c2410c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Ikke sendt</span>`;
+
             let statusBadge = `<span class="badge badge-secondary">${o.status}</span>`;
             if (o.status === 'APPROVED') statusBadge = `<span class="badge badge-info" style="background:#e0f2fe; color:#0369a1; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Godkjent</span>`;
             else if (o.status === 'COMPLETED') statusBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Fullført</span>`;
@@ -17691,11 +17717,12 @@ class AdminManager {
                     <td style="padding: 14px 16px;">${buyer}</td>
                     <td class="text-right" style="font-weight: 600; padding: 14px 16px;">${this.formatDonationCurrency(amount)}</td>
                     <td style="padding: 14px 16px;">${pBadge}</td>
+                    <td style="padding: 14px 16px;">${fBadge}</td>
                     <td style="padding: 14px 16px;">${statusBadge}</td>
                 </tr>
             `;
         }).join('') : `
-            <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre matcher søket eller filteret.</td></tr>
+            <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre matcher søket eller filteret.</td></tr>
         `;
     }
 
@@ -17703,10 +17730,12 @@ class AdminManager {
         const queryEl = document.getElementById('wix-search');
         const payStatusEl = document.getElementById('wix-payment-status-filter');
         const ordStatusEl = document.getElementById('wix-order-status-filter');
+        const fulfillmentStatusEl = document.getElementById('wix-fulfillment-status-filter');
         
         if (queryEl) queryEl.value = '';
         if (payStatusEl) payStatusEl.value = 'all';
         if (ordStatusEl) ordStatusEl.value = 'all';
+        if (fulfillmentStatusEl) fulfillmentStatusEl.value = 'all';
         
         this.filterWixOrders();
     }
@@ -17759,6 +17788,22 @@ class AdminManager {
                         <button class="modal-close" type="button" onclick="document.getElementById('wix-order-modal').remove()" style="font-size:28px; background:none; border:none; cursor:pointer; color:#94a3b8; line-height: 1; padding: 0 8px;">×</button>
                     </div>
                     <div class="modal-body" style="padding:24px 32px; display:flex; flex-direction:column; gap:20px; overflow-y: auto;">
+                        <!-- Levering & Utsendelse status -->
+                        <div style="display:flex; gap:24px; background:#f8fafc; border-radius:12px; padding:16px; border:1px solid #e2e8f0;">
+                            <div>
+                                <h4 style="font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.05em; color:#64748b; margin:0 0 6px 0;">Leveringsstatus</h4>
+                                ${order.fulfillmentStatus === 'FULFILLED' 
+                                    ? '<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700;">Sendt</span>' 
+                                    : '<span class="badge badge-warning" style="background:#ffedd5; color:#c2410c; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700;">Ikke sendt / Behandles</span>'}
+                            </div>
+                            <div style="border-left:1px solid #e2e8f0; padding-left:24px;">
+                                <h4 style="font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.05em; color:#64748b; margin:0 0 6px 0;">Betalingsstatus</h4>
+                                ${order.paymentStatus === 'PAID' 
+                                    ? '<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700;">Betalt</span>' 
+                                    : '<span class="badge badge-warning" style="background:#fef9c3; color:#a16207; padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700;">Venter</span>'}
+                            </div>
+                        </div>
+
                         <!-- Kundeinfo -->
                         <div>
                             <h4 style="font-weight:700; text-transform:uppercase; font-size:11px; letter-spacing:0.05em; color:#64748b; margin:0 0 8px 0;">Kundeinfo</h4>
