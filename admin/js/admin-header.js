@@ -391,6 +391,7 @@ const initAdminHeader = () => {
             { header: 'administrasjon', label: 'Administrasjon' },
             { label: 'Huskeliste', icon: 'playlist_add_check', section: 'todo', category: 'administrasjon', alwaysVisible: true },
             { label: 'Gaver', icon: 'volunteer_activism', section: 'causes', category: 'administrasjon' },
+            { label: 'Butikk', icon: 'shopping_cart', section: 'shop', category: 'administrasjon' },
             { label: 'Brukere', icon: 'group', section: 'users', category: 'administrasjon' },
             { label: 'Automatisering', icon: 'auto_awesome', section: 'automation', category: 'administrasjon' },
             { label: 'SEO & Meta', icon: 'search_insights', section: 'seo', category: 'administrasjon' },

@@ -2469,6 +2469,9 @@ class AdminManager {
                 case 'causes':
                     this.renderCausesManager();
                     break;
+                case 'shop':
+                    this.renderShopManager();
+                    break;
                 case 'hero':
                     this.renderHeroManager();
                     break;
@@ -15757,6 +15760,7 @@ class AdminManager {
             this.renderDonationAdminViews();
             this.renderGiftsDashboard();
             this.renderInKindDonations();
+            this.renderWixStats();
         };
 
         // Global period listeners
@@ -16038,8 +16042,6 @@ class AdminManager {
                     <button class="automation-tab" data-tab="causes">Innsamlinger</button>
                     <button class="automation-tab" data-tab="donations">Pr. gave</button>
                     <button class="automation-tab" data-tab="donors">Pr. giver</button>
-                    <button class="automation-tab" data-tab="shop">Butikk</button>
-                    <button class="automation-tab" data-tab="wix">Wix Butikk</button>
                     <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
                 </div>
             </div>
@@ -16396,183 +16398,7 @@ class AdminManager {
             </div>
         </div>
 
-            <!-- Tab: Shop Content -->
-            <div id="cause-tab-content-shop" class="cause-tab-pane" style="display: none;">
-                <div class="stats-grid causes-stats-grid" style="margin-bottom: 32px;">
-                    <div class="stat-card modern">
-                        <div class="stat-icon-wrap green">
-                            <span class="material-symbols-outlined">shopping_bag</span>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-label">Omsetning i perioden</h3>
-                            <p class="stat-value" id="shop-total-amount">0 kr</p>
-                            <p class="stat-trend">Fullførte butikkjøp i perioden</p>
-                        </div>
-                    </div>
 
-                    <div class="stat-card modern">
-                        <div class="stat-icon-wrap blue">
-                            <span class="material-symbols-outlined">receipt_long</span>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-label">Antall ordre i perioden</h3>
-                            <p class="stat-value" id="shop-total-count">0</p>
-                            <span class="stat-meta">Registrerte butikkordre i perioden</span>
-                        </div>
-                    </div>
-
-                    <div class="stat-card modern">
-                        <div class="stat-icon-wrap mint">
-                            <span class="material-symbols-outlined">trending_up</span>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-label">Snittordre i perioden</h3>
-                            <p class="stat-value" id="shop-average-amount">0 kr</p>
-                            <span class="stat-meta">Snitt per butikkjøp i perioden</span>
-                        </div>
-                    </div>
-
-                    <div class="stat-card modern">
-                        <div class="stat-icon-wrap purple">
-                            <span class="material-symbols-outlined">today</span>
-                        </div>
-                        <div class="stat-content">
-                            <h3 class="stat-label">Dagens salg</h3>
-                            <p class="stat-value" id="shop-today-amount">0 kr</p>
-                            <span class="stat-meta" id="shop-today-count">0 ordre</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card" style="margin-bottom: 24px;">
-                    <div class="card-header flex-between">
-                        <div>
-                            <h3 class="card-title">Butikktransaksjoner</h3>
-                            <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode eller søk etter kjøper.</p>
-                        </div>
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="position:relative; width:220px;">
-                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
-                                <input id="shop-search" class="form-control" type="search" placeholder="Søk etter kjøper..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
-                            </div>
-                            <button type="button" class="btn-secondary" id="print-shop-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
-                                Skriv ut rapport
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
-                            <div class="form-group" style="margin:0;">
-                                <label>Status</label>
-                                <select id="shop-status-filter" class="form-control">
-                                    <option value="all">Alle statuser</option>
-                                    <option value="completed">Fullført</option>
-                                    <option value="pending">Venter</option>
-                                    <option value="processing">Behandles</option>
-                                    <option value="failed">Feilet</option>
-                                    <option value="cancelled">Avbrutt</option>
-                                </select>
-                            </div>
-                            <div class="form-group" style="margin:0;">
-                                <label>Metode</label>
-                                <select id="shop-method-filter" class="form-control">
-                                    <option value="all">Alle metoder</option>
-                                    <option value="stripe">Stripe</option>
-                                    <option value="vipps">Vipps</option>
-                                    <option value="vipps_manual">Vipps manuelt</option>
-                                    <option value="card">Kort</option>
-                                    <option value="bank">Bank</option>
-                                    <option value="cash">Kontant</option>
-                                    <option value="manual">Manuell</option>
-                                    <option value="other">Annen tjeneste</option>
-                                </select>
-                            </div>
-
-                            <div style="display:flex; align-items:flex-end;">
-                                <button type="button" class="btn-secondary" id="shop-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
-                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
-                                    Nullstill
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="stats-grid donation-metrics-grid causes-stats-grid" style="margin-bottom: 20px;">
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Valgt periode</h3>
-                                    <p class="stat-value" id="shop-period-amount">--</p>
-                                    <span class="stat-meta" id="shop-period-count">Laster...</span>
-                                </div>
-                            </div>
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Kunder</h3>
-                                    <p class="stat-value" id="shop-customer-count">--</p>
-                                    <span class="stat-meta">Unike kunder i filteret</span>
-                                </div>
-                            </div>
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Under behandling</h3>
-                                    <p class="stat-value" id="shop-pending-count">--</p>
-                                    <span class="stat-meta">Ikke fullført ennå</span>
-                                </div>
-                            </div>
-                            <div class="stat-card modern">
-                                <div class="stat-content">
-                                    <h3 class="stat-label">Ukoblede</h3>
-                                    <p class="stat-value" id="shop-unmatched-count">--</p>
-                                    <span class="stat-meta">Ikke koblet til nettstedsprofil</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="overflow-x:auto;">
-                            <table class="data-table" style="width:100%;">
-                                <thead>
-                                    <tr>
-                                        <th class="sortable-header" data-sort="date" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
-                                            <div style="display:inline-flex; align-items:center; gap:6px;">
-                                                Dato
-                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
-                                            </div>
-                                        </th>
-                                        <th class="sortable-header" data-sort="name" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
-                                            <div style="display:inline-flex; align-items:center; gap:6px;">
-                                                Kjøper
-                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
-                                            </div>
-                                        </th>
-                                        <th>Metode</th>
-                                        <th>ID / Referanse</th>
-                                        <th>Profil</th>
-                                        <th class="sortable-header text-right" data-sort="amount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
-                                            <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
-                                                Beløp
-                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
-                                            </div>
-                                        </th>
-                                        <th style="width:1px;"></th>
-                                    </tr>
-                                </thead>
-                                <tbody id="shop-transactions-body">
-                                    <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Laster transaksjoner...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Tab: Wix Store Content -->
-            <div id="cause-tab-content-wix" class="cause-tab-pane" style="display: none;">
-                <div id="wix-stats-container">
-                    <div style="display:flex; justify-content:center; padding:32px;">
-                        <div class="loader">Laster Wix-statistikk...</div>
-                    </div>
-                </div>
-            </div>
 
             <!-- Tab 4: In-Kind Content -->
             <div id="cause-tab-content-inkind" class="cause-tab-pane" style="display: none;">
@@ -16859,6 +16685,304 @@ class AdminManager {
         }
 
         document.getElementById('save-cause-btn').addEventListener('click', () => this.saveCause());
+    }
+
+    async renderShopManager() {
+        const section = document.getElementById('shop-section');
+        if (!section) return;
+
+        if (section.getAttribute('data-rendered') === 'true') return;
+
+        if (!this.allDonationRecords || !this.adminUserMap) {
+            try {
+                if (firebaseService.db) {
+                    const donationsSnapshot = await firebaseService.db.collection('donations').get();
+                    const donationRecords = donationsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    this.allDonationRecords = donationRecords.sort((a, b) => {
+                        const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+                        const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+                        return bDate - aDate;
+                    });
+                    const usersSnapshot = await firebaseService.db.collection('users').get();
+                    const users = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    this.adminUserMap = new Map(users.map(user => [user.id, user]));
+                }
+            } catch (e) {
+                console.warn('Kunne ikke hente donasjoner for Butikk-siden:', e);
+            }
+        }
+        if (this.donationFilters === undefined) {
+            this.donationFilters = { preset: '30', status: 'all', method: 'all', type: 'all', query: '', donorQuery: '', donorSortBy: 'latestDate', donorSortDir: 'desc', start: '', end: '', shopStatus: 'all', shopMethod: 'all', shopQuery: '' };
+        }
+
+        section.innerHTML = `
+            <div class="causes-header-container" style="margin-bottom: 24px;">
+                <h2 style="font-weight:800; color:#1B4965; font-size:28px; margin:0 0 8px 0; display:flex; align-items:center; gap:12px;">
+                    <span class="material-symbols-outlined" style="font-size:32px;">shopping_bag</span>
+                    Butikk & Wix Store
+                </h2>
+                <p style="color:#64748b; font-size:14px; margin:0;">
+                    Administrer nettbutikkbestillinger fra Wix og manuelle registreringer.
+                </p>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="causes-tabs-container" style="margin-bottom: 24px;">
+                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
+                    <button class="automation-tab active" data-tab="wix">Wix Butikk</button>
+                    <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
+                </div>
+            </div>
+
+            <!-- Global Period Selector -->
+            <div class="card" style="margin-bottom: 24px; padding: 16px 24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
+                    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
+                        <div class="form-group" style="margin:0; min-width:200px;">
+                            <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Periode</label>
+                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 36px 0 12px !important;">
+                                <option value="7">Siste 7 dager</option>
+                                <option value="30" selected>Siste 30 dager</option>
+                                <option value="90">Siste 90 dager</option>
+                                <option value="365">Siste 365 dager</option>
+                                <option value="year">Dette året</option>
+                                <option value="all">Alt tid</option>
+                                <option value="custom">Egendefinert...</option>
+                            </select>
+                        </div>
+                        <div id="global-custom-dates" style="display:none; gap:12px; align-items:center;">
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Fra</label>
+                                <input type="date" id="global-start-date" class="form-control" style="border-radius:8px; height:40px;">
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Til</label>
+                                <input type="date" id="global-end-date" class="form-control" style="border-radius:8px; height:40px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Wix Store Content -->
+            <div id="cause-tab-content-wix" class="cause-tab-pane" style="display: block;">
+                <div id="wix-stats-container">
+                    <div style="display:flex; justify-content:center; padding:32px;">
+                        <div class="loader">Laster Wix-statistikk...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Shop Content -->
+            <div id="cause-tab-content-shop" class="cause-tab-pane" style="display: none;">
+                <div class="stats-grid causes-stats-grid" style="margin-bottom: 32px;">
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap green">
+                            <span class="material-symbols-outlined">shopping_bag</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Omsetning i perioden</h3>
+                            <p class="stat-value" id="shop-total-amount">0 kr</p>
+                            <p class="stat-trend">Fullførte butikkjøp i perioden</p>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap blue">
+                            <span class="material-symbols-outlined">receipt_long</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Antall ordre i perioden</h3>
+                            <p class="stat-value" id="shop-total-count">0</p>
+                            <span class="stat-meta">Registrerte butikkordre i perioden</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap mint">
+                            <span class="material-symbols-outlined">trending_up</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Snittordre i perioden</h3>
+                            <p class="stat-value" id="shop-average-amount">0 kr</p>
+                            <span class="stat-meta">Snitt per butikkjøp i perioden</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap purple">
+                            <span class="material-symbols-outlined">today</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Dagens salg</h3>
+                            <p class="stat-value" id="shop-today-amount">0 kr</p>
+                            <span class="stat-meta" id="shop-today-count">0 ordre</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 24px;">
+                    <div class="card-header flex-between">
+                        <div>
+                            <h3 class="card-title">Butikktransaksjoner</h3>
+                            <p class="section-subtitle" style="margin-bottom: 0;">Filtrer på status, metode eller søk etter kjøper.</p>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="position:relative; width:220px;">
+                                <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
+                                <input id="shop-search" class="form-control" type="search" placeholder="Søk etter kjøper..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;">
+                            </div>
+                            <button type="button" class="btn-secondary" id="print-shop-report-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
+                                <span class="material-symbols-outlined" style="font-size:20px;">print</span>
+                                Skriv ut rapport
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin-bottom:16px;">
+                            <div class="form-group" style="margin:0;">
+                                <label>Status</label>
+                                <select id="shop-status-filter" class="form-control">
+                                    <option value="all">Alle statuser</option>
+                                    <option value="completed">Fullført</option>
+                                    <option value="pending">Venter</option>
+                                    <option value="processing">Behandles</option>
+                                    <option value="failed">Feilet</option>
+                                    <option value="cancelled">Avbrutt</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label>Metode</label>
+                                <select id="shop-method-filter" class="form-control">
+                                    <option value="all">Alle metoder</option>
+                                    <option value="stripe">Stripe</option>
+                                    <option value="vipps">Vipps</option>
+                                    <option value="vipps_manual">Vipps manuelt</option>
+                                    <option value="card">Kort</option>
+                                    <option value="bank">Bank</option>
+                                    <option value="cash">Kontant</option>
+                                    <option value="manual">Manuell</option>
+                                    <option value="other">Annen tjeneste</option>
+                                </select>
+                            </div>
+
+                            <div style="display:flex; align-items:flex-end;">
+                                <button type="button" class="btn-secondary" id="shop-clear-filters" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
+                                    Nullstill
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="stats-grid donation-metrics-grid causes-stats-grid" style="margin-bottom: 20px;">
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Valgt periode</h3>
+                                    <p class="stat-value" id="shop-period-amount">--</p>
+                                    <span class="stat-meta" id="shop-period-count">Laster...</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Kunder</h3>
+                                    <p class="stat-value" id="shop-customer-count">--</p>
+                                    <span class="stat-meta">Unike kunder i filteret</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Under behandling</h3>
+                                    <p class="stat-value" id="shop-pending-count">--</p>
+                                    <span class="stat-meta">Ikke fullført ennå</span>
+                                </div>
+                            </div>
+                            <div class="stat-card modern">
+                                <div class="stat-content">
+                                    <h3 class="stat-label">Ukoblede</h3>
+                                    <p class="stat-value" id="shop-unmatched-count">--</p>
+                                    <span class="stat-meta">Ikke koblet til nettstedsprofil</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="overflow-x:auto;">
+                            <table class="data-table" style="width:100%;">
+                                <thead>
+                                    <tr>
+                                        <th class="sortable-header" data-sort="date" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                            <div style="display:inline-flex; align-items:center; gap:6px;">
+                                                Dato
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            </div>
+                                        </th>
+                                        <th class="sortable-header" data-sort="name" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                            <div style="display:inline-flex; align-items:center; gap:6px;">
+                                                Kjøper
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            </div>
+                                        </th>
+                                        <th>Metode</th>
+                                        <th>ID / Referanse</th>
+                                        <th>Profil</th>
+                                        <th class="sortable-header text-right" data-sort="amount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
+                                            <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
+                                                Beløp
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            </div>
+                                        </th>
+                                        <th style="width:1px;"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="shop-transactions-body">
+                                    <tr><td colspan="7" style="padding:28px;text-align:center;color:#64748b;">Laster transaksjoner...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        section.setAttribute('data-rendered', 'true');
+
+        this.bindDonationAdminFilters();
+        this.bindShopTabs();
+    }
+
+    bindShopTabs() {
+        const tabs = document.querySelectorAll('#shop-section .automation-tab');
+        const panes = document.querySelectorAll('#shop-section .cause-tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.tab;
+                tabs.forEach(t => {
+                    t.classList.toggle('active', t === tab);
+                    if (t === tab) {
+                        t.style.color = '#1B4965';
+                        t.style.borderBottomColor = '#1B4965';
+                    } else {
+                        t.style.color = '#64748b';
+                        t.style.borderBottomColor = 'transparent';
+                    }
+                });
+                panes.forEach(p => {
+                    p.style.display = p.id === `cause-tab-content-${target}` ? 'block' : 'none';
+                });
+                
+                if (target === 'wix') {
+                    this.renderWixStats();
+                } else if (target === 'shop') {
+                    this.renderDonationAdminViews();
+                }
+            });
+        });
+        
+        const activeTab = document.querySelector('#shop-section .automation-tab.active')?.dataset.tab || 'wix';
+        if (activeTab === 'wix') {
+            this.renderWixStats();
+        } else {
+            this.renderDonationAdminViews();
+        }
     }
 
     async loadCauses() {
