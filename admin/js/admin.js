@@ -16077,22 +16077,20 @@ class AdminManager {
 
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
-                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
-                    <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
-                    <button class="automation-tab" data-tab="causes">Innsamlinger</button>
-                    <button class="automation-tab" data-tab="donations">Pr. gave</button>
-                    <button class="automation-tab" data-tab="donors">Pr. giver</button>
-                    <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
-                </div>
-            </div>
-
-            <!-- Global Period Selector -->
-            <div class="card" style="margin-bottom: 24px; padding: 16px 24px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-                    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
-                        <div class="form-group" style="margin:0; min-width:200px;">
-                            <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Periode</label>
-                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 36px 0 12px !important;">
+                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
+                        <button class="automation-tab" data-tab="causes">Innsamlinger</button>
+                        <button class="automation-tab" data-tab="donations">Pr. gave</button>
+                        <button class="automation-tab" data-tab="donors">Pr. giver</button>
+                        <button class="automation-tab" data-tab="inkind">Fysiske gaver</button>
+                    </div>
+                    
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0; flex-wrap: wrap;">
+                        <!-- Global Period Selector -->
+                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
+                            <select id="global-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 8px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
                                 <option value="today">I dag</option>
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
@@ -16102,27 +16100,26 @@ class AdminManager {
                                 <option value="custom">Egendefinert</option>
                             </select>
                         </div>
-                        <div id="global-custom-dates" style="display:none; align-items:center; gap:12px; flex-wrap:wrap;">
-                            <div class="form-group" style="margin:0;">
-                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Fra dato</label>
-                                <input id="global-start-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:0 12px !important;">
+                        <div id="global-custom-dates" style="display: none; gap: 8px; align-items: center;">
+                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Fra:</label>
+                                <input type="date" id="global-start-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                             </div>
-                            <div class="form-group" style="margin:0;">
-                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Til dato</label>
-                                <input id="global-end-date" class="form-control" type="date" style="border-radius:8px; height:40px; padding:0 12px !important;">
+                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Til:</label>
+                                <input type="date" id="global-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                             </div>
                         </div>
-                    </div>
-                    
-                    <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
-                        <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                            <span class="material-symbols-outlined" style="font-size:20px;">add_card</span>
-                            Registrer gave
-                        </button>
-                        <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px;">
-                            <span class="material-symbols-outlined" style="font-size:20px;">upload_file</span>
-                            Importer bank
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button type="button" class="btn-primary" id="add-manual-donation-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">add_card</span>
+                                Registrer gave
+                            </button>
+                            <button type="button" class="btn-secondary" id="open-bank-import-btn" style="display:flex; align-items:center; gap:8px; padding:8px 16px; border-radius:8px; font-weight:600; height:36px; font-size: 13px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
+                                <span class="material-symbols-outlined" style="font-size:18px;">upload_file</span>
+                                Importer bank
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -16763,20 +16760,18 @@ class AdminManager {
         section.innerHTML = `
             <!-- Tabs Navigation -->
             <div class="causes-tabs-container" style="margin-bottom: 24px; margin-top: 8px;">
-                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
-                    <button class="automation-tab active" data-tab="wix">Oversikt</button>
-                    <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
-                    <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
-                </div>
-            </div>
-
-            <!-- Global Period Selector -->
-            <div class="card" style="margin-bottom: 24px; padding: 16px 24px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;">
-                    <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
-                        <div class="form-group" style="margin:0; min-width:200px;">
-                            <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Periode</label>
-                            <select id="shop-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 36px 0 12px !important;">
+                <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div style="display: flex; gap: 8px; align-items: center;">
+                        <button class="automation-tab active" data-tab="wix">Oversikt</button>
+                        <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
+                        <button class="automation-tab" data-tab="shop">Manuelle ordre</button>
+                    </div>
+                    
+                    <!-- Global Period Selector -->
+                    <div style="display: flex; align-items: center; gap: 12px; padding: 8px 0;">
+                        <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                            <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin: 0; white-space: nowrap;">Periode:</label>
+                            <select id="shop-date-preset" class="form-control" style="font-weight: 600; color: #0f172a; border-radius: 8px; height: 36px; padding: 0 32px 0 8px !important; font-size: 13px; min-width: 140px; margin: 0; border: 1px solid #cbd5e1; background: #fff;">
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
                                 <option value="90">Siste 90 dager</option>
@@ -16786,14 +16781,14 @@ class AdminManager {
                                 <option value="custom">Egendefinert...</option>
                             </select>
                         </div>
-                        <div id="shop-custom-dates" style="display:none; gap:12px; align-items:center;">
-                            <div class="form-group" style="margin:0;">
-                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Fra</label>
-                                <input type="date" id="shop-start-date" class="form-control" style="border-radius:8px; height:40px;">
+                        <div id="shop-custom-dates" style="display: none; gap: 8px; align-items: center;">
+                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Fra:</label>
+                                <input type="date" id="shop-start-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                             </div>
-                            <div class="form-group" style="margin:0;">
-                                <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Til</label>
-                                <input type="date" id="shop-end-date" class="form-control" style="border-radius:8px; height:40px;">
+                            <div class="form-group" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+                                <label style="font-weight: 700; color: #1B4965; font-size: 11px; text-transform: uppercase; margin: 0;">Til:</label>
+                                <input type="date" id="shop-end-date" class="form-control" style="border-radius: 8px; height: 36px; padding: 4px 8px; font-size: 12px; border: 1px solid #cbd5e1;">
                             </div>
                         </div>
                     </div>
