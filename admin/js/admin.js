@@ -13051,15 +13051,32 @@ class AdminManager {
                         }
 
                         // Add/update sort indicator
-                        let icon = header.querySelector('.sort-icon');
+                        let wrapper = header.querySelector('.sort-header-wrapper');
+                        if (!wrapper) {
+                            wrapper = document.createElement('div');
+                            wrapper.className = 'sort-header-wrapper';
+                            wrapper.style.display = 'inline-flex';
+                            wrapper.style.alignItems = 'center';
+                            wrapper.style.gap = '6px';
+                            wrapper.style.verticalAlign = 'middle';
+                            if (header.style.textAlign === 'right' || header.classList.contains('text-right')) {
+                                wrapper.style.width = '100%';
+                                wrapper.style.justifyContent = 'flex-end';
+                            }
+                            while (header.firstChild) {
+                                wrapper.appendChild(header.firstChild);
+                            }
+                            header.appendChild(wrapper);
+                        }
+
+                        let icon = wrapper.querySelector('.sort-icon');
                         if (!icon) {
                             icon = document.createElement('span');
                             icon.className = 'material-symbols-outlined sort-icon';
-                            icon.style.fontSize = '14px';
-                            icon.style.verticalAlign = 'middle';
-                            icon.style.marginLeft = '4px';
+                            icon.style.fontSize = '16px';
                             icon.style.lineHeight = '1';
-                            header.appendChild(icon);
+                            icon.style.flexShrink = '0';
+                            wrapper.appendChild(icon);
                         }
 
                         if (field === this.donationSortField) {
@@ -15198,15 +15215,32 @@ class AdminManager {
                     }
 
                     // Add/update sort indicator
-                    let icon = header.querySelector('.sort-icon');
+                    let wrapper = header.querySelector('.sort-header-wrapper');
+                    if (!wrapper) {
+                        wrapper = document.createElement('div');
+                        wrapper.className = 'sort-header-wrapper';
+                        wrapper.style.display = 'inline-flex';
+                        wrapper.style.alignItems = 'center';
+                        wrapper.style.gap = '6px';
+                        wrapper.style.verticalAlign = 'middle';
+                        if (header.style.textAlign === 'right' || header.classList.contains('text-right')) {
+                            wrapper.style.width = '100%';
+                            wrapper.style.justifyContent = 'flex-end';
+                        }
+                        while (header.firstChild) {
+                            wrapper.appendChild(header.firstChild);
+                        }
+                        header.appendChild(wrapper);
+                    }
+
+                    let icon = wrapper.querySelector('.sort-icon');
                     if (!icon) {
                         icon = document.createElement('span');
                         icon.className = 'material-symbols-outlined sort-icon';
-                        icon.style.fontSize = '14px';
-                        icon.style.verticalAlign = 'middle';
-                        icon.style.marginLeft = '4px';
+                        icon.style.fontSize = '16px';
                         icon.style.lineHeight = '1';
-                        header.appendChild(icon);
+                        icon.style.flexShrink = '0';
+                        wrapper.appendChild(icon);
                     }
 
                     if (field === this.inkindSortField) {
@@ -17982,15 +18016,32 @@ class AdminManager {
                     }
 
                     // Add/update sort-icon span
-                    let icon = header.querySelector('.sort-icon');
+                    let wrapper = header.querySelector('.sort-header-wrapper');
+                    if (!wrapper) {
+                        wrapper = document.createElement('div');
+                        wrapper.className = 'sort-header-wrapper';
+                        wrapper.style.display = 'inline-flex';
+                        wrapper.style.alignItems = 'center';
+                        wrapper.style.gap = '6px';
+                        wrapper.style.verticalAlign = 'middle';
+                        if (header.style.textAlign === 'right' || header.classList.contains('text-right')) {
+                            wrapper.style.width = '100%';
+                            wrapper.style.justifyContent = 'flex-end';
+                        }
+                        while (header.firstChild) {
+                            wrapper.appendChild(header.firstChild);
+                        }
+                        header.appendChild(wrapper);
+                    }
+
+                    let icon = wrapper.querySelector('.sort-icon');
                     if (!icon) {
                         icon = document.createElement('span');
                         icon.className = 'material-symbols-outlined sort-icon';
-                        icon.style.fontSize = '14px';
-                        icon.style.verticalAlign = 'middle';
-                        icon.style.marginLeft = '4px';
+                        icon.style.fontSize = '16px';
                         icon.style.lineHeight = '1';
-                        header.appendChild(icon);
+                        icon.style.flexShrink = '0';
+                        wrapper.appendChild(icon);
                     }
 
                     if (field === this.wixSortField) {
