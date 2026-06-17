@@ -2929,6 +2929,22 @@ window.addEventListener('load', () => {
             }
             [hidden] { display: none !important; }
             
+            /* Hardened Defensive Guard: Completely hide Wix Chat and conflicting widgets if loaded on public pages */
+            #wix-chat-root,
+            #wix-chat-root-container,
+            .wix-chat-launcher,
+            iframe[title="Wix Chat"],
+            iframe[src*="wix-chat"],
+            iframe[src*="wixlabs-chat-widget"],
+            #tawkchat-container,
+            .fb-customerchat,
+            #fb-root iframe {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+
             .hkm-chat-toggle {
                 position: relative !important;
                 width: 60px !important;

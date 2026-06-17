@@ -2643,11 +2643,17 @@ body.admin-body .btn-full,
     }
 }
 
-/* Hardened Defensive Guard: Completely hide visitor chatbot on all Min Side customer portal pages */
+/* Hardened Defensive Guard: Completely hide visitor chatbot and conflicting widgets on all Min Side customer portal pages */
 #hkm-visitor-chat-widget,
 .hkm-chat-toggle,
 .hkm-chat-panel,
-.hkm-chat-dot {
+.hkm-chat-dot,
+#wix-chat-root,
+#wix-chat-root-container,
+.wix-chat-launcher,
+iframe[title="Wix Chat"],
+iframe[src*="wix-chat"],
+iframe[src*="wixlabs-chat-widget"] {
     display: none !important;
     visibility: hidden !important;
     opacity: 0 !important;
