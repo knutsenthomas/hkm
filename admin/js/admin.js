@@ -14924,32 +14924,6 @@ class AdminManager {
                         <span>${footerEndLabel}</span>
                     </div>
                 </div>
-
-                <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                    <div style="width:100%; text-align:left; margin-bottom:12px;">
-                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonsfordeling</span>
-                    </div>
-                    <div style="position:relative; width:100px; height:100px;">
-                        <div style="position:absolute; inset:0; border-radius:50%; background:#eff6ff; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(59,130,246,0.1);">
-                            <div style="width:68px; height:68px; border-radius:50%; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center;">
-                                <span class="material-symbols-outlined" style="color:#fff; font-size:28px;">volunteer_activism</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="margin-top:12px; font-size:12px; font-weight:600; color:#64748b; text-align:center;">
-                        Alle fullførte donasjoner
-                    </div>
-                </div>
-
-                <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; justify-content:space-between;">
-                    <div>
-                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Aksjonsprogresjon</span>
-                        <h4 style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
-                        ${causesProgressHtml}
-                    </div>
-                </div>
             </div>
         `;
     }
@@ -16787,18 +16761,8 @@ class AdminManager {
         }
 
         section.innerHTML = `
-            <div class="causes-header-container" style="margin-bottom: 24px;">
-                <h2 style="font-weight:800; color:#1B4965; font-size:28px; margin:0 0 8px 0; display:flex; align-items:center; gap:12px;">
-                    <span class="material-symbols-outlined" style="font-size:32px;">shopping_bag</span>
-                    Butikk
-                </h2>
-                <p style="color:#64748b; font-size:14px; margin:0;">
-                    Administrer nettbutikkbestillinger fra Wix og manuelle registreringer.
-                </p>
-            </div>
-
             <!-- Tabs Navigation -->
-            <div class="causes-tabs-container" style="margin-bottom: 24px;">
+            <div class="causes-tabs-container" style="margin-bottom: 24px; margin-top: 8px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
                     <button class="automation-tab active" data-tab="wix">Oversikt</button>
                     <button class="automation-tab" data-tab="wix-orders">Ordrehistorikk</button>
@@ -17084,82 +17048,81 @@ class AdminManager {
                         </button>
                     </div>
                 `;
-                return;
+            } else {
+                const itemsHtml = causes.map((cause, index) => {
+                    const checkedCollected = cause.collected || 0;
+                    const checkedGoal = cause.goal || 100000;
+                    const progress = checkedGoal > 0 ? Math.round((checkedCollected / checkedGoal) * 100) : 0;
+
+                    // Beregn faktiske betalinger registrert på denne aksjonen
+                    const causeId = cause.id || this.generateSlug(cause.title || '');
+                    const matchingDonations = (this.allDonationRecords || []).filter(r => {
+                        const isCompleted = ['completed', 'succeeded', 'captured'].includes(String(r.status).toLowerCase());
+                        if (!isCompleted) return false;
+                        const f = String(r.fund || '').toLowerCase().trim();
+                        return f === causeId.toLowerCase().trim() || f === String(cause.title || '').toLowerCase().trim();
+                    });
+                    const actualSum = matchingDonations.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
+                    const hasDifference = actualSum !== checkedCollected;
+
+                    return `
+                        <div class="cause-item" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 16px; background: white;">
+                            <div class="cause-header-row" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
+                                <div class="cause-title-wrap">
+                                    <h4 class="cause-title-text" style="margin:0 0 4px 0; font-size:16px; font-weight:700; color:#1e293b;">${cause.title || 'Uten tittel'}</h4>
+                                    <p class="cause-desc-text" style="margin:0; font-size:13px; color:#64748b;">${cause.description || ''}</p>
+                                    <span style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:lowercase; display:inline-block; margin-top:6px;">ID: ${causeId}</span>
+                                </div>
+                                <div class="cause-actions-wrap" style="display:flex; gap:8px;">
+                                    <button class="action-btn edit-cause-btn" data-index="${index}" title="Rediger">
+                                        <span class="material-symbols-outlined" style="pointer-events: none;">edit</span>
+                                    </button>
+                                    <button class="action-btn delete-cause-btn" data-index="${index}" title="Slett" style="color: #ef4444;">
+                                        <span class="material-symbols-outlined" style="pointer-events: none;">delete</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="cause-stats-row" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-top:16px; padding-top:16px; border-top:1px solid #f1f5f9;">
+                                <div class="cause-stat-unit">
+                                    <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Visningsbeløp</span>
+                                    <span class="cause-stat-number success" style="font-size:15px; font-weight:700; color:#10b981;">${parseInt(checkedCollected).toLocaleString('no-NO')} kr</span>
+                                </div>
+                                <div class="cause-stat-unit">
+                                    <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Betalinger i DB</span>
+                                    <span class="cause-stat-number" style="font-size:15px; font-weight:700; color:#1B4965;">${parseInt(actualSum).toLocaleString('no-NO')} kr</span>
+                                </div>
+                                <div class="cause-stat-unit">
+                                    <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Mål</span>
+                                    <span class="cause-stat-number" style="font-size:15px; font-weight:700; color:#475569;">${parseInt(checkedGoal).toLocaleString('no-NO')} kr</span>
+                                </div>
+                                <div class="cause-stat-unit">
+                                    <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Progresjon</span>
+                                    <span class="cause-stat-number highlight" style="font-size:15px; font-weight:700; color:#d97706;">${progress}%</span>
+                                </div>
+                            </div>
+                            
+                            ${hasDifference ? `
+                            <div style="margin-top:16px; padding:12px; background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
+                                <div style="display:flex; align-items:center; gap:8px;">
+                                    <span class="material-symbols-outlined" style="color:#d97706; font-size:20px;">warning</span>
+                                    <span style="font-size:13px; color:#b45309; font-weight:500;">Avvik: Det er registrert ${actualSum.toLocaleString('no-NO')} kr i betalinger.</span>
+                                </div>
+                                <button type="button" class="btn btn-secondary sync-cause-btn" data-index="${index}" data-sum="${actualSum}" style="padding:6px 12px; font-size:12px; background:#fff; border:1px solid #d97706; color:#d97706; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
+                                    <span class="material-symbols-outlined" style="font-size:16px;">sync</span>
+                                    Synkroniser
+                                </button>
+                            </div>
+                            ` : ''}
+
+                            <div class="progress-bar-wrap" style="margin-top: 16px; height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
+                                <div class="progress-bar" style="width: ${Math.min(progress, 100)}%; height:100%; background:#10b981; border-radius:3px;"></div>
+                            </div>
+                        </div>
+                        `;
+                }).join('');
+
+                listEl.innerHTML = itemsHtml;
             }
-
-            const itemsHtml = causes.map((cause, index) => {
-                const checkedCollected = cause.collected || 0;
-                const checkedGoal = cause.goal || 100000;
-                const progress = checkedGoal > 0 ? Math.round((checkedCollected / checkedGoal) * 100) : 0;
-
-                // Beregn faktiske betalinger registrert på denne aksjonen
-                const causeId = cause.id || this.generateSlug(cause.title || '');
-                const matchingDonations = (this.allDonationRecords || []).filter(r => {
-                    const isCompleted = ['completed', 'succeeded', 'captured'].includes(String(r.status).toLowerCase());
-                    if (!isCompleted) return false;
-                    const f = String(r.fund || '').toLowerCase().trim();
-                    return f === causeId.toLowerCase().trim() || f === String(cause.title || '').toLowerCase().trim();
-                });
-                const actualSum = matchingDonations.reduce((sum, r) => sum + this.normalizeDonationAmountNok(r), 0);
-                const hasDifference = actualSum !== checkedCollected;
-
-                return `
-                    <div class="cause-item" style="border: 1px solid #e2e8f0; padding: 20px; border-radius: 12px; margin-bottom: 16px; background: white;">
-                        <div class="cause-header-row" style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px;">
-                            <div class="cause-title-wrap">
-                                <h4 class="cause-title-text" style="margin:0 0 4px 0; font-size:16px; font-weight:700; color:#1e293b;">${cause.title || 'Uten tittel'}</h4>
-                                <p class="cause-desc-text" style="margin:0; font-size:13px; color:#64748b;">${cause.description || ''}</p>
-                                <span style="font-size:11px; background:#f1f5f9; color:#475569; padding:2px 6px; border-radius:4px; font-weight:600; text-transform:lowercase; display:inline-block; margin-top:6px;">ID: ${causeId}</span>
-                            </div>
-                            <div class="cause-actions-wrap" style="display:flex; gap:8px;">
-                                <button class="action-btn edit-cause-btn" data-index="${index}" title="Rediger">
-                                    <span class="material-symbols-outlined" style="pointer-events: none;">edit</span>
-                                </button>
-                                <button class="action-btn delete-cause-btn" data-index="${index}" title="Slett" style="color: #ef4444;">
-                                    <span class="material-symbols-outlined" style="pointer-events: none;">delete</span>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="cause-stats-row" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:16px; margin-top:16px; padding-top:16px; border-top:1px solid #f1f5f9;">
-                            <div class="cause-stat-unit">
-                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Visningsbeløp</span>
-                                <span class="cause-stat-number success" style="font-size:15px; font-weight:700; color:#10b981;">${parseInt(checkedCollected).toLocaleString('no-NO')} kr</span>
-                            </div>
-                            <div class="cause-stat-unit">
-                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Betalinger i DB</span>
-                                <span class="cause-stat-number" style="font-size:15px; font-weight:700; color:#1B4965;">${parseInt(actualSum).toLocaleString('no-NO')} kr</span>
-                            </div>
-                            <div class="cause-stat-unit">
-                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Mål</span>
-                                <span class="cause-stat-number" style="font-size:15px; font-weight:700; color:#475569;">${parseInt(checkedGoal).toLocaleString('no-NO')} kr</span>
-                            </div>
-                            <div class="cause-stat-unit">
-                                <span class="cause-stat-label" style="display:block; font-size:11px; color:#94a3b8; font-weight:600; text-transform:uppercase;">Progresjon</span>
-                                <span class="cause-stat-number highlight" style="font-size:15px; font-weight:700; color:#d97706;">${progress}%</span>
-                            </div>
-                        </div>
-                        
-                        ${hasDifference ? `
-                        <div style="margin-top:16px; padding:12px; background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; display:flex; justify-content:space-between; align-items:center;">
-                            <div style="display:flex; align-items:center; gap:8px;">
-                                <span class="material-symbols-outlined" style="color:#d97706; font-size:20px;">warning</span>
-                                <span style="font-size:13px; color:#b45309; font-weight:500;">Avvik: Det er registrert ${actualSum.toLocaleString('no-NO')} kr i betalinger.</span>
-                            </div>
-                            <button type="button" class="btn btn-secondary sync-cause-btn" data-index="${index}" data-sum="${actualSum}" style="padding:6px 12px; font-size:12px; background:#fff; border:1px solid #d97706; color:#d97706; border-radius:6px; font-weight:600; cursor:pointer; display:flex; align-items:center; gap:4px;">
-                                <span class="material-symbols-outlined" style="font-size:16px;">sync</span>
-                                Synkroniser
-                            </button>
-                        </div>
-                        ` : ''}
-
-                        <div class="progress-bar-wrap" style="margin-top: 16px; height:6px; background:#f1f5f9; border-radius:3px; overflow:hidden;">
-                            <div class="progress-bar" style="width: ${Math.min(progress, 100)}%; height:100%; background:#10b981; border-radius:3px;"></div>
-                        </div>
-                    </div>
-                    `;
-            }).join('');
-
-            listEl.innerHTML = itemsHtml;
 
             // Render extra widgets (Donasjonsfordeling & Aksjonsprogresjon) under causes list
             const extraWidgetsEl = document.getElementById('causes-extra-widgets');
