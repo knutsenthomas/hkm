@@ -16610,33 +16610,33 @@ class AdminManager {
                                     <th class="sortable-header" data-sort="name" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div style="display:inline-flex; align-items:center; gap:6px;">
                                             Giver
-                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                         </div>
                                     </th>
                                     <th class="sortable-header" data-sort="giftCount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div style="display:inline-flex; align-items:center; gap:6px;">
                                             Fullført / totalt
-                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                         </div>
                                     </th>
                                     <th>Metoder</th>
                                     <th class="sortable-header" data-sort="latestDate" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div style="display:inline-flex; align-items:center; gap:6px;">
                                             Siste gave
-                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                         </div>
                                     </th>
                                     <th>Profil</th>
                                     <th class="sortable-header text-right" data-sort="totalGifts" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
                                             Gave-sum
-                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                         </div>
                                     </th>
                                     <th class="sortable-header text-right" data-sort="totalShop" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                         <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
                                             Butikk-sum
-                                            <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                            <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                         </div>
                                     </th>
                                     <th style="width:1px;"></th>
@@ -17163,13 +17163,13 @@ class AdminManager {
                                         <th class="sortable-header" data-sort="date" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                             <div style="display:inline-flex; align-items:center; gap:6px;">
                                                 Dato
-                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                             </div>
                                         </th>
                                         <th class="sortable-header" data-sort="name" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                             <div style="display:inline-flex; align-items:center; gap:6px;">
                                                 Kjøper
-                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                             </div>
                                         </th>
                                         <th>Metode</th>
@@ -17178,7 +17178,7 @@ class AdminManager {
                                         <th class="sortable-header text-right" data-sort="amount" style="cursor:pointer; user-select:none; transition:background-color 0.2s, color 0.2s; text-align:right;" onmouseover="this.style.backgroundColor='#f1f5f9'; this.style.color='#1B4965'" onmouseout="this.style.backgroundColor=''; this.style.color=''">
                                             <div style="display:inline-flex; align-items:center; justify-content:flex-end; gap:6px; width:100%;">
                                                 Beløp
-                                                <span class="material-symbols-outlined sort-icon" style="font-size:16px; display:none; vertical-align:middle; line-height:1;">arrow_upward</span>
+                                                <span class="material-symbols-outlined sort-icon" style="font-size:14px; display:none; vertical-align:middle; line-height:1; position:relative; top:-1px;">arrow_upward</span>
                                             </div>
                                         </th>
                                         <th style="width:1px;"></th>
