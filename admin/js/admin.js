@@ -4707,6 +4707,10 @@ class AdminManager {
                             <span class="material-symbols-outlined">volunteer_activism</span>
                             Se gaver
                         </button>
+                        <button type="button" class="overview-hero-action-secondary" onclick="if(window.handleSectionSwitch){window.handleSectionSwitch('shop')}else{window.location.hash='shop'}">
+                            <span class="material-symbols-outlined">shopping_cart</span>
+                            Se butikk
+                        </button>
                     </div>
                 </div>
                 <!-- Subtle background decoration -->
