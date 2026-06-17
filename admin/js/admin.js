@@ -12639,8 +12639,10 @@ class AdminManager {
 
         return records.filter((record) => {
             if (record.isInKind) return false;
-            // Exclude shop transactions from the donations list
-            if (String(record.type || '').toLowerCase() === 'butikk') return false;
+            // Exclude shop transactions from the donations list unless type is 'all' or 'butikk'
+            if (String(record.type || '').toLowerCase() === 'butikk') {
+                if (type !== 'all' && type !== 'butikk') return false;
+            }
 
             const date = this.getDonationDate(record);
             if (start && (!date || date < start)) return false;
@@ -16267,9 +16269,10 @@ class AdminManager {
                             <div class="form-group" style="margin:0;">
                                 <label>Type transaksjon</label>
                                 <select id="donation-type-filter" class="form-control">
-                                    <option value="all">Alle gaver</option>
+                                    <option value="all">Alle typer</option>
                                     <option value="gave">Enkeltgave</option>
                                     <option value="fast">Fast avtale</option>
+                                    <option value="butikk">Butikk</option>
                                 </select>
                             </div>
 
@@ -16798,7 +16801,7 @@ class AdminManager {
                     <div style="display:flex; align-items:center; gap:16px; flex-wrap:wrap; flex:1;">
                         <div class="form-group" style="margin:0; min-width:200px;">
                             <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Periode</label>
-                            <select id="global-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 36px 0 12px !important;">
+                            <select id="shop-date-preset" class="form-control" style="font-weight:600; color:#0f172a; border-radius:8px; height:40px; padding:0 36px 0 12px !important;">
                                 <option value="7">Siste 7 dager</option>
                                 <option value="30" selected>Siste 30 dager</option>
                                 <option value="90">Siste 90 dager</option>
@@ -16808,14 +16811,14 @@ class AdminManager {
                                 <option value="custom">Egendefinert...</option>
                             </select>
                         </div>
-                        <div id="global-custom-dates" style="display:none; gap:12px; align-items:center;">
+                        <div id="shop-custom-dates" style="display:none; gap:12px; align-items:center;">
                             <div class="form-group" style="margin:0;">
                                 <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Fra</label>
-                                <input type="date" id="global-start-date" class="form-control" style="border-radius:8px; height:40px;">
+                                <input type="date" id="shop-start-date" class="form-control" style="border-radius:8px; height:40px;">
                             </div>
                             <div class="form-group" style="margin:0;">
                                 <label style="font-weight:700; color:#1B4965; font-size:13px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Til</label>
-                                <input type="date" id="global-end-date" class="form-control" style="border-radius:8px; height:40px;">
+                                <input type="date" id="shop-end-date" class="form-control" style="border-radius:8px; height:40px;">
                             </div>
                         </div>
                     </div>
@@ -17342,13 +17345,23 @@ class AdminManager {
             const statusCounts = {};
             const monthlySales = {};
             const customerSales = {};
+            let validOrderCount = 0;
 
             // 1. Process Wix Orders
             filteredOrders.forEach(o => {
                 const price = parseFloat(o.priceSummary?.total?.amount || 0);
-                totalSales += price;
-
                 const pStatus = o.paymentStatus || 'UNKNOWN';
+                const isRefundedOrCanceled = pStatus === 'FULLY_REFUNDED' || o.status === 'CANCELED' || o.status === 'REFUNDED';
+                
+                statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
+
+                if (isRefundedOrCanceled) {
+                    return; // Skip adding to sales metrics
+                }
+
+                totalSales += price;
+                validOrderCount++;
+
                 if (pStatus === 'PAID') {
                     paidSales += price;
                     paidCount++;
@@ -17358,8 +17371,6 @@ class AdminManager {
                 items.forEach(item => {
                     totalItemsSold += parseInt(item.quantity || 0, 10);
                 });
-
-                statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
 
                 const dateStr = o._createdDate || o.purchasedDate;
                 if (dateStr) {
@@ -17375,17 +17386,24 @@ class AdminManager {
             // 2. Process Manual Shop Orders
             manualShopOrders.forEach(r => {
                 const amount = this.normalizeDonationAmountNok(r);
+                const mStatus = String(r.status || 'COMPLETED').toLowerCase();
+                const isRefundedOrCancelled = ['refunded', 'cancelled', 'canceled'].includes(mStatus);
+                
+                const mStatusUpper = mStatus.toUpperCase();
+                statusCounts[mStatusUpper] = (statusCounts[mStatusUpper] || 0) + 1;
+
+                if (isRefundedOrCancelled) {
+                    return; // Skip adding to sales metrics
+                }
+
                 totalSales += amount;
+                validOrderCount++;
                 paidSales += amount;
                 paidCount++;
 
                 // If quantity field is present, use it, otherwise assume 1 item
                 const quantity = parseInt(r.quantity || 1, 10);
                 totalItemsSold += quantity;
-
-                // Status mapping for manual orders
-                const mStatus = String(r.status || 'COMPLETED').toUpperCase();
-                statusCounts[mStatus] = (statusCounts[mStatus] || 0) + 1;
 
                 const date = this.getDonationDate(r);
                 if (date) {
@@ -17397,9 +17415,9 @@ class AdminManager {
                 customerSales[buyerName] = (customerSales[buyerName] || 0) + amount;
             });
 
-            const totalOrderCount = filteredOrders.length + manualShopOrders.length;
-            const avgOrder = totalOrderCount > 0 ? (totalSales / totalOrderCount) : 0;
-            const avgItems = totalOrderCount > 0 ? (totalItemsSold / totalOrderCount).toFixed(1) : 0;
+            const avgOrder = validOrderCount > 0 ? (totalSales / validOrderCount) : 0;
+            const avgItems = validOrderCount > 0 ? (totalItemsSold / validOrderCount).toFixed(1) : 0;
+            const totalOrderCount = validOrderCount;
 
             // Render stats grid
             let statsHtml = `
@@ -17510,7 +17528,7 @@ class AdminManager {
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div style="position:relative; width:220px;">
                                 <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
-                                <input id="wix-search" class="form-control" type="search" placeholder="Søk etter kunde..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;" oninput="window.adminManager.filterWixOrders(this.value)">
+                                <input id="wix-search" class="form-control" type="search" placeholder="Søk etter kunde..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;" oninput="window.adminManager.filterWixOrders()">
                             </div>
                             <button type="button" class="btn-secondary" onclick="window.adminManager.renderWixStats()" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">
                                 <span class="material-symbols-outlined" style="font-size:20px;">refresh</span>
@@ -17519,6 +17537,37 @@ class AdminManager {
                         </div>
                     </div>
                     <div class="card-body" style="padding: 0;">
+                        <!-- Filters Grid -->
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:16px; padding: 16px 32px; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Betalingsstatus</label>
+                                <select id="wix-payment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600;" onchange="window.adminManager.filterWixOrders()">
+                                    <option value="all">Alle statuser</option>
+                                    <option value="PAID">Betalt</option>
+                                    <option value="PENDING">Venter</option>
+                                    <option value="FULLY_REFUNDED">Refundert</option>
+                                    <option value="PARTIALLY_REFUNDED">Delvis refundert</option>
+                                    <option value="NOT_PAID">Ikke betalt</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Ordrestatus</label>
+                                <select id="wix-order-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600;" onchange="window.adminManager.filterWixOrders()">
+                                    <option value="all">Alle statuser</option>
+                                    <option value="COMPLETED">Fullført</option>
+                                    <option value="APPROVED">Godkjent</option>
+                                    <option value="IN_PROGRESS">Behandles</option>
+                                    <option value="CANCELED">Kansellert</option>
+                                </select>
+                            </div>
+                            <div style="display:flex; align-items:flex-end;">
+                                <button type="button" class="btn-secondary" onclick="window.adminManager.clearWixFilters()" style="display:flex; align-items:center; justify-content:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; width:100%; height:40px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">
+                                    <span class="material-symbols-outlined" style="font-size:20px;">filter_alt_off</span>
+                                    Nullstill
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="table-responsive" style="overflow-x: auto;">
                             <table class="data-table" style="width: 100%; margin: 0; border-collapse: collapse;">
                                 <thead>
@@ -17543,10 +17592,13 @@ class AdminManager {
                                         let pBadge = `<span class="badge badge-secondary">${pStatus}</span>`;
                                         if (pStatus === 'PAID') pBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Betalt</span>`;
                                         else if (pStatus === 'PENDING') pBadge = `<span class="badge badge-warning" style="background:#fef9c3; color:#a16207; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Venter</span>`;
+                                        else if (pStatus === 'FULLY_REFUNDED') pBadge = `<span class="badge badge-danger" style="background:#fee2e2; color:#b91c1c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Refundert</span>`;
+                                        else if (pStatus === 'PARTIALLY_REFUNDED') pBadge = `<span class="badge badge-warning" style="background:#ffedd5; color:#c2410c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Delvis ref.</span>`;
 
                                         let statusBadge = `<span class="badge badge-secondary">${o.status}</span>`;
                                         if (o.status === 'APPROVED') statusBadge = `<span class="badge badge-info" style="background:#e0f2fe; color:#0369a1; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Godkjent</span>`;
                                         else if (o.status === 'COMPLETED') statusBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Fullført</span>`;
+                                        else if (o.status === 'CANCELED') statusBadge = `<span class="badge badge-danger" style="background:#fee2e2; color:#b91c1c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Avbrutt</span>`;
 
                                         return `
                                             <tr style="cursor: pointer; border-bottom: 1px solid #f1f5f9;" onclick="window.adminManager.showWixOrderDetails('${o._id}')">
@@ -17585,16 +17637,34 @@ class AdminManager {
         }
     }
 
-    filterWixOrders(query) {
-        const q = String(query || '').toLowerCase().trim();
+    filterWixOrders() {
+        const queryEl = document.getElementById('wix-search');
+        const payStatusEl = document.getElementById('wix-payment-status-filter');
+        const ordStatusEl = document.getElementById('wix-order-status-filter');
+        
+        const q = queryEl ? String(queryEl.value || '').toLowerCase().trim() : '';
+        const payStatus = payStatusEl ? String(payStatusEl.value || 'all') : 'all';
+        const ordStatus = ordStatusEl ? String(ordStatusEl.value || 'all') : 'all';
+        
         const tbody = document.getElementById('wix-transactions-body');
         if (!tbody || !this.wixOrders) return;
 
         const filtered = this.wixOrders.filter(o => {
+            // Search filter
             const num = String(o.number || '');
             const buyer = `${o.billingInfo?.contactDetails?.firstName || ''} ${o.billingInfo?.contactDetails?.lastName || ''}`.toLowerCase();
             const email = String(o.buyerInfo?.email || '').toLowerCase();
-            return num.includes(q) || buyer.includes(q) || email.includes(q);
+            const matchesQuery = !q || num.includes(q) || buyer.includes(q) || email.includes(q);
+
+            // Payment status filter
+            const pStatus = o.paymentStatus || 'UNKNOWN';
+            const matchesPay = payStatus === 'all' || pStatus === payStatus;
+
+            // Order status filter
+            const oStatus = o.status || 'UNKNOWN';
+            const matchesOrd = ordStatus === 'all' || oStatus === ordStatus;
+
+            return matchesQuery && matchesPay && matchesOrd;
         });
 
         tbody.innerHTML = filtered.length ? filtered.map(o => {
@@ -17606,10 +17676,13 @@ class AdminManager {
             let pBadge = `<span class="badge badge-secondary">${pStatus}</span>`;
             if (pStatus === 'PAID') pBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Betalt</span>`;
             else if (pStatus === 'PENDING') pBadge = `<span class="badge badge-warning" style="background:#fef9c3; color:#a16207; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Venter</span>`;
+            else if (pStatus === 'FULLY_REFUNDED') pBadge = `<span class="badge badge-danger" style="background:#fee2e2; color:#b91c1c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Refundert</span>`;
+            else if (pStatus === 'PARTIALLY_REFUNDED') pBadge = `<span class="badge badge-warning" style="background:#ffedd5; color:#c2410c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Delvis ref.</span>`;
 
             let statusBadge = `<span class="badge badge-secondary">${o.status}</span>`;
             if (o.status === 'APPROVED') statusBadge = `<span class="badge badge-info" style="background:#e0f2fe; color:#0369a1; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Godkjent</span>`;
             else if (o.status === 'COMPLETED') statusBadge = `<span class="badge badge-success" style="background:#dcfce7; color:#15803d; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Fullført</span>`;
+            else if (o.status === 'CANCELED') statusBadge = `<span class="badge badge-danger" style="background:#fee2e2; color:#b91c1c; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700;">Avbrutt</span>`;
 
             return `
                 <tr style="cursor: pointer; border-bottom: 1px solid #f1f5f9;" onclick="window.adminManager.showWixOrderDetails('${o._id}')">
@@ -17622,8 +17695,20 @@ class AdminManager {
                 </tr>
             `;
         }).join('') : `
-            <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre matcher søket.</td></tr>
+            <tr><td colspan="6" style="padding:28px;text-align:center;color:#64748b;">Ingen ordre matcher søket eller filteret.</td></tr>
         `;
+    }
+
+    clearWixFilters() {
+        const queryEl = document.getElementById('wix-search');
+        const payStatusEl = document.getElementById('wix-payment-status-filter');
+        const ordStatusEl = document.getElementById('wix-order-status-filter');
+        
+        if (queryEl) queryEl.value = '';
+        if (payStatusEl) payStatusEl.value = 'all';
+        if (ordStatusEl) ordStatusEl.value = 'all';
+        
+        this.filterWixOrders();
     }
 
     showWixOrderDetails(orderId) {
