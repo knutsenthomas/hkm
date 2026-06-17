@@ -4636,7 +4636,7 @@ class AdminManager {
                     background: linear-gradient(135deg, #d17d39 0%, #bd4f2a 100%) !important;
                     color: white !important;
                     border-radius: 8px !important;
-                    padding: 0 24px !important;
+                    padding: 0 16px !important;
                     font-weight: 600 !important;
                     border: none !important;
                     box-shadow: 0 4px 12px rgba(209, 125, 57, 0.25) !important;
@@ -4661,7 +4661,7 @@ class AdminManager {
                     background: #ffffff !important;
                     color: #475569 !important;
                     border-radius: 8px !important;
-                    padding: 0 24px !important;
+                    padding: 0 16px !important;
                     font-weight: 600 !important;
                     border: 1px solid #cbd5e1 !important;
                     box-shadow: 0 2px 6px rgba(0,0,0,0.05) !important;
@@ -17324,6 +17324,7 @@ class AdminManager {
             let totalSales = 0;
             let paidSales = 0;
             let paidCount = 0;
+            let totalItemsSold = 0;
             const statusCounts = {};
             const monthlySales = {};
             const customerSales = {};
@@ -17337,6 +17338,11 @@ class AdminManager {
                     paidSales += price;
                     paidCount++;
                 }
+
+                const items = o.lineItems || [];
+                items.forEach(item => {
+                    totalItemsSold += parseInt(item.quantity || 0, 10);
+                });
 
                 statusCounts[o.status] = (statusCounts[o.status] || 0) + 1;
 
@@ -17352,6 +17358,7 @@ class AdminManager {
             });
 
             const avgOrder = filteredOrders.length > 0 ? (totalSales / filteredOrders.length) : 0;
+            const avgItems = filteredOrders.length > 0 ? (totalItemsSold / filteredOrders.length).toFixed(1) : 0;
 
             // Render stats grid
             let statsHtml = `
@@ -17391,12 +17398,12 @@ class AdminManager {
 
                     <div class="stat-card modern">
                         <div class="stat-icon-wrap mint">
-                            <span class="material-symbols-outlined">check_circle</span>
+                            <span class="material-symbols-outlined">shopping_bag</span>
                         </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Mottatt betaling</h3>
-                            <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${this.formatDonationCurrency(paidSales)}</p>
-                            <span class="stat-meta">${paidCount} betalte ordre</span>
+                            <h3 class="stat-label">Solgte varer</h3>
+                            <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${totalItemsSold} stk</p>
+                            <span class="stat-meta">Snitt på ${avgItems} per ordre</span>
                         </div>
                     </div>
                 </div>
