@@ -6043,6 +6043,39 @@ button.btn, a.btn, .btn {
   -webkit-font-smoothing: antialiased !important;
 }
 
+/* Perfect vertical centering for table sort headers and icons */
+.sort-header-wrapper {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  vertical-align: middle !important;
+  gap: 6px !important;
+  line-height: 1 !important;
+}
+
+th.text-right .sort-header-wrapper,
+th[style*="text-align: right"] .sort-header-wrapper,
+th[style*="text-align:right"] .sort-header-wrapper {
+  width: 100% !important;
+  justify-content: flex-end !important;
+}
+
+.sort-icon.material-symbols-outlined {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+  position: relative !important;
+  top: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+}
+
 /* ==========================================================================
    Lead UI/UX Global Spacing & Typography Overrides (Zero Margin & 4px Gap)
    ========================================================================== */
