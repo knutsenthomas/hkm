@@ -14814,34 +14814,6 @@ class AdminManager {
 
         container.innerHTML = `
             <div class="stats-grid causes-stats-grid" style="margin-bottom: 24px;">
-                <div class="card" style="grid-column: span 12; padding: 24px;">
-                    <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
-                        <div>
-                            <span style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonshistorikk</span>
-                            <h4 style="margin: 4px 0 0; font-size: 18px; font-weight: 700; color: #0f172a;">${periodTitle}</h4>
-                        </div>
-                        <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
-                    </div>
-                    <div style="height: 260px; position: relative; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
-                        <!-- SVG background -->
-                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; pointer-events: none;">
-                            ${svgPathHtml}
-                        </div>
-                        <!-- HTML Dots (perfectly circular overlay) -->
-                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; pointer-events: none;">
-                            ${chartDotsHtml}
-                        </div>
-                        <!-- Hover overlay columns -->
-                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; overflow: hidden;">
-                            ${chartBarsHtml}
-                        </div>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; color: #94a3b8; font-size: 11px; font-weight: 600;">
-                        <span>${footerStartLabel}</span>
-                        <span>${footerEndLabel}</span>
-                    </div>
-                </div>
-
                 <div class="card" style="grid-column: span 4; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; min-height: 240px;">
                     <div style="margin-bottom: 20px;">
                         <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Givere i perioden</span>
@@ -14925,29 +14897,31 @@ class AdminManager {
                     </div>
                 </div>
 
-                <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
-                    <div style="width:100%; text-align:left; margin-bottom:12px;">
-                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonsfordeling</span>
+                <div class="card" style="grid-column: span 12; padding: 24px;">
+                    <div style="margin-bottom: 16px; display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <span style="font-size: 13px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonshistorikk</span>
+                            <h4 style="margin: 4px 0 0; font-size: 18px; font-weight: 700; color: #0f172a;">${periodTitle}</h4>
+                        </div>
+                        <span style="font-size: 14px; font-weight: 700; color: #1B4965; background: #eff6ff; padding: 6px 12px; border-radius: 6px;">${rangeText}</span>
                     </div>
-                    <div style="position:relative; width:100px; height:100px;">
-                        <div style="position:absolute; inset:0; border-radius:50%; background:#eff6ff; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(59,130,246,0.1);">
-                            <div style="width:68px; height:68px; border-radius:50%; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center;">
-                                <span class="material-symbols-outlined" style="color:#fff; font-size:28px;">volunteer_activism</span>
-                            </div>
+                    <div style="height: 260px; position: relative; border-bottom: 1px solid #e2e8f0; margin-bottom: 8px;">
+                        <!-- SVG background -->
+                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; pointer-events: none;">
+                            ${svgPathHtml}
+                        </div>
+                        <!-- HTML Dots (perfectly circular overlay) -->
+                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; pointer-events: none;">
+                            ${chartDotsHtml}
+                        </div>
+                        <!-- Hover overlay columns -->
+                        <div style="position: absolute; top: 10px; bottom: 10px; left: 0; right: 0; overflow: hidden;">
+                            ${chartBarsHtml}
                         </div>
                     </div>
-                    <div style="margin-top:12px; font-size:12px; font-weight:600; color:#64748b; text-align:center;">
-                        Alle fullførte donasjoner
-                    </div>
-                </div>
-
-                <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; justify-content:space-between;">
-                    <div>
-                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Aksjonsprogresjon</span>
-                        <h4 style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
-                    </div>
-                    <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
-                        ${causesProgressHtml}
+                    <div style="display:flex; justify-content:space-between; color: #94a3b8; font-size: 11px; font-weight: 600;">
+                        <span>${footerStartLabel}</span>
+                        <span>${footerEndLabel}</span>
                     </div>
                 </div>
             </div>
@@ -16164,7 +16138,7 @@ class AdminManager {
 
             <!-- Tab: Innsamlinger Content -->
             <div id="cause-tab-content-causes" class="cause-tab-pane" style="display: none;">
-                <div class="card">
+                <div class="card" style="margin-bottom: 24px;">
                     <div class="card-header flex-between">
                         <div>
                             <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
@@ -16178,6 +16152,10 @@ class AdminManager {
                     <div class="card-body" id="causes-list">
                         <div class="loader"></div>
                     </div>
+                </div>
+                
+                <div class="stats-grid causes-stats-grid" id="causes-extra-widgets" style="display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 24px; width: 100%;">
+                    <!-- Populated dynamically in loadCauses() -->
                 </div>
             </div>
 
@@ -17156,6 +17134,64 @@ class AdminManager {
             }).join('');
 
             listEl.innerHTML = itemsHtml;
+
+            // Render extra widgets (Donasjonsfordeling & Aksjonsprogresjon) under causes list
+            const extraWidgetsEl = document.getElementById('causes-extra-widgets');
+            if (extraWidgetsEl) {
+                let causesProgressHtml = '';
+                if (causes.length === 0) {
+                    causesProgressHtml = `
+                        <p style="color:#64748b; font-size:12px; text-align:center; padding: 24px 0; margin: 0;">Ingen aktive innsamlingsaksjoner registrert</p>
+                    `;
+                } else {
+                    causesProgressHtml = causes.slice(0, 3).map((cause, idx) => {
+                        const collected = cause.collected || 0;
+                        const goal = cause.goal || 100000;
+                        const progress = goal > 0 ? Math.round((collected / goal) * 100) : 0;
+                        const progressClamped = Math.min(progress, 100);
+                        const color = idx % 2 === 0 ? '#1B4965' : '#d17d39';
+                        return `
+                            <div style="background:#f8fafc; border-radius:8px; padding:10px 14px; border:1px solid #f1f5f9;">
+                                <div style="height:10px; background:#e2e8f0; border-radius:99px; overflow:hidden; margin-bottom:6px;">
+                                    <div style="width:${progressClamped}%; height:100%; background:${color}; border-radius:99px;"></div>
+                                </div>
+                                <div style="display:flex; justify-content:space-between; font-size:11px; font-weight:700; color:#64748b;">
+                                    <span>${this.escapeHtml(cause.title || 'Uten tittel')}</span>
+                                    <span>${progress}% oppnådd</span>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+
+                extraWidgetsEl.innerHTML = `
+                    <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; align-items:center; justify-content:center; margin: 0;">
+                        <div style="width:100%; text-align:left; margin-bottom:12px;">
+                            <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonsfordeling</span>
+                        </div>
+                        <div style="position:relative; width:100px; height:100px;">
+                            <div style="position:absolute; inset:0; border-radius:50%; background:#eff6ff; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(59,130,246,0.1);">
+                                <div style="width:68px; height:68px; border-radius:50%; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center;">
+                                    <span class="material-symbols-outlined" style="color:#fff; font-size:28px;">volunteer_activism</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="margin-top:12px; font-size:12px; font-weight:600; color:#64748b; text-align:center;">
+                            Alle fullførte donasjoner
+                        </div>
+                    </div>
+
+                    <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; justify-content:space-between; margin: 0;">
+                        <div>
+                            <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Aksjonsprogresjon</span>
+                            <h4 style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
+                            ${causesProgressHtml}
+                        </div>
+                    </div>
+                `;
+            }
 
             // Add event listeners
             document.querySelectorAll('.edit-cause-btn').forEach(btn => {
