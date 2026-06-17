@@ -17319,6 +17319,20 @@ class AdminManager {
                 if (end && date > end) return false;
                 return true;
             });
+
+            // Get manual shop records from Firestore for the same period
+            const isCompleted = (record) => ['completed', 'succeeded', 'captured'].includes(String(record.status || '').toLowerCase());
+            const manualShopOrders = (this.allDonationRecords || []).filter(r => {
+                if (r.isInKind) return false;
+                if (String(r.type || '').toLowerCase() !== 'butikk') return false;
+                if (!isCompleted(r)) return false;
+                
+                const date = this.getDonationDate(r);
+                if (!date) return false;
+                if (start && date < start) return false;
+                if (end && date > end) return false;
+                return true;
+            });
             
             // Process statistics
             let totalSales = 0;
@@ -17329,6 +17343,7 @@ class AdminManager {
             const monthlySales = {};
             const customerSales = {};
 
+            // 1. Process Wix Orders
             filteredOrders.forEach(o => {
                 const price = parseFloat(o.priceSummary?.total?.amount || 0);
                 totalSales += price;
@@ -17357,8 +17372,34 @@ class AdminManager {
                 customerSales[buyerName] = (customerSales[buyerName] || 0) + price;
             });
 
-            const avgOrder = filteredOrders.length > 0 ? (totalSales / filteredOrders.length) : 0;
-            const avgItems = filteredOrders.length > 0 ? (totalItemsSold / filteredOrders.length).toFixed(1) : 0;
+            // 2. Process Manual Shop Orders
+            manualShopOrders.forEach(r => {
+                const amount = this.normalizeDonationAmountNok(r);
+                totalSales += amount;
+                paidSales += amount;
+                paidCount++;
+
+                // If quantity field is present, use it, otherwise assume 1 item
+                const quantity = parseInt(r.quantity || 1, 10);
+                totalItemsSold += quantity;
+
+                // Status mapping for manual orders
+                const mStatus = String(r.status || 'COMPLETED').toUpperCase();
+                statusCounts[mStatus] = (statusCounts[mStatus] || 0) + 1;
+
+                const date = this.getDonationDate(r);
+                if (date) {
+                    const yearMonth = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                    monthlySales[yearMonth] = (monthlySales[yearMonth] || 0) + amount;
+                }
+
+                const buyerName = r.donorName || r.name || r.email || r.donorEmail || 'Manuell Registrering';
+                customerSales[buyerName] = (customerSales[buyerName] || 0) + amount;
+            });
+
+            const totalOrderCount = filteredOrders.length + manualShopOrders.length;
+            const avgOrder = totalOrderCount > 0 ? (totalSales / totalOrderCount) : 0;
+            const avgItems = totalOrderCount > 0 ? (totalItemsSold / totalOrderCount).toFixed(1) : 0;
 
             // Render stats grid
             let statsHtml = `
@@ -17380,7 +17421,7 @@ class AdminManager {
                         </div>
                         <div class="stat-content">
                             <h3 class="stat-label">Antall ordre</h3>
-                            <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${filteredOrders.length}</p>
+                            <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${totalOrderCount}</p>
                             <span class="stat-meta">Totalt i valgt periode</span>
                         </div>
                     </div>
