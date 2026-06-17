@@ -17528,7 +17528,7 @@ class AdminManager {
                         <div style="display:flex; align-items:center; gap:12px;">
                             <div style="position:relative; width:220px;">
                                 <span class="material-symbols-outlined" style="position:absolute; left:10px; top:50%; transform:translateY(-50%) !important; font-size:18px; color:#64748b; pointer-events:none;">search</span>
-                                <input id="wix-search" class="form-control" type="search" placeholder="Søk etter kunde..." style="padding-left:36px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;" oninput="window.adminManager.filterWixOrders()">
+                                <input id="wix-search" class="form-control" type="search" placeholder="Søk etter kunde..." style="padding-left:36px !important; padding-top:0px !important; padding-bottom:0px !important; height:40px; font-size:13px; border-radius:8px; border:1px solid #cbd5e1; width:100%; margin:0;" oninput="window.adminManager.filterWixOrders()">
                             </div>
                             <button type="button" class="btn-secondary" onclick="window.adminManager.renderWixStats()" style="display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:8px; font-weight:600; height:40px; border: 1px solid #cbd5e1; background: #fff; cursor: pointer;">
                                 <span class="material-symbols-outlined" style="font-size:20px;">refresh</span>
@@ -17541,7 +17541,7 @@ class AdminManager {
                         <div style="display:flex; flex-wrap:wrap; gap:16px; padding: 16px 32px; border-bottom: 1px solid #f1f5f9; background: #fafafa;">
                             <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Betalingsstatus</label>
-                                <select id="wix-payment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-payment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:36px !important;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="PAID">Betalt</option>
                                     <option value="PENDING">Venter</option>
@@ -17552,7 +17552,7 @@ class AdminManager {
                             </div>
                             <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Ordrestatus</label>
-                                <select id="wix-order-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-order-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:36px !important;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="COMPLETED">Fullført</option>
                                     <option value="APPROVED">Godkjent</option>
@@ -17562,7 +17562,7 @@ class AdminManager {
                             </div>
                             <div class="form-group" style="margin:0; flex:1 1 180px; min-width: 140px;">
                                 <label style="font-weight:700; color:#1B4965; font-size:12px; text-transform:uppercase; letter-spacing:0.05em; display:block; margin-bottom:6px;">Utsendelse</label>
-                                <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%;" onchange="window.adminManager.filterWixOrders()">
+                                <select id="wix-fulfillment-status-filter" class="form-control" style="height:40px; font-size:13px; border-radius:8px; font-weight:600; width: 100%; padding-top:0px !important; padding-bottom:0px !important; padding-left:12px !important; padding-right:36px !important;" onchange="window.adminManager.filterWixOrders()">
                                     <option value="all">Alle statuser</option>
                                     <option value="FULFILLED">Sendt</option>
                                     <option value="NOT_FULFILLED">Ikke sendt</option>
