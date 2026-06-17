@@ -17370,7 +17370,7 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Antall ordre</h3>
                             <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${filteredOrders.length}</p>
-                            <span class="stat-meta">${paidCount} betalte ordre</span>
+                            <span class="stat-meta">Totalt i valgt periode</span>
                         </div>
                     </div>
 
@@ -17381,7 +17381,18 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Snittordre</h3>
                             <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${this.formatDonationCurrency(avgOrder)}</p>
-                            <span class="stat-meta">Gjennomsnittlig ordreverdi</span>
+                            <span class="stat-meta">Snitt per bestilling</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card modern">
+                        <div class="stat-icon-wrap mint">
+                            <span class="material-symbols-outlined">check_circle</span>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Mottatt betaling</h3>
+                            <p class="stat-value" style="font-size: 24px; font-weight: 800; color: #0f172a; margin: 4px 0 0;">${this.formatDonationCurrency(paidSales)}</p>
+                            <span class="stat-meta">${paidCount} betalte ordre</span>
                         </div>
                     </div>
                 </div>
