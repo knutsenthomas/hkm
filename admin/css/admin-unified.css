@@ -2123,7 +2123,7 @@ body.admin-body .welcome-subtitle {
 }
 
 .automation-tab {
-  padding: 20px 24px;
+  padding: 16px 24px 8px 24px;
   font-size: 14px;
   font-weight: 700;
   color: var(--admin-text-muted, #64748b);
