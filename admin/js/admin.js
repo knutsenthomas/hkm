@@ -16182,7 +16182,7 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Fullført i perioden</h3>
                             <p class="stat-value" id="donation-total-amount">${formattedTotal}</p>
-                            <p class="stat-trend" id="donation-total-subtitle">Fullførte gaver i perioden</p>
+                            <p class="stat-trend" id="donation-total-subtitle" style="padding-left: 0 !important; margin-left: 0 !important;">Fullførte gaver i perioden</p>
                         </div>
                     </div>
 
@@ -16850,7 +16850,7 @@ class AdminManager {
                         <div class="stat-content">
                             <h3 class="stat-label">Omsetning i perioden</h3>
                             <p class="stat-value" id="shop-total-amount">0 kr</p>
-                            <p class="stat-trend">Fullførte butikkjøp i perioden</p>
+                            <p class="stat-trend" style="padding-left: 0 !important; margin-left: 0 !important;">Fullførte butikkjøp i perioden</p>
                         </div>
                     </div>
 
