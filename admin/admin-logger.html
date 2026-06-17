@@ -582,7 +582,8 @@
             const logsBody = document.getElementById('logs-body');
             const logCount = document.getElementById('log-count');
 
-
+            let logSortField = 'timestamp';
+            let logSortDir = 'desc';
 
             // Fetch logs from Firestore
             let logs = [];
@@ -620,7 +621,26 @@
             };
 
             const renderLogs = (filter = 'all') => {
-                const filtered = logs.filter(log => filter === 'all' || log.level === filter);
+                let filtered = logs.filter(log => filter === 'all' || log.level === filter);
+
+                if (logSortField) {
+                    filtered.sort((a, b) => {
+                        let comp = 0;
+                        if (logSortField === 'timestamp') {
+                            const timeA = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+                            const timeB = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+                            comp = timeA - timeB;
+                        } else if (logSortField === 'level') {
+                            comp = (a.level || '').localeCompare(b.level || '', 'no');
+                        } else if (logSortField === 'message') {
+                            comp = (a.message || '').localeCompare(b.message || '', 'no');
+                        } else if (logSortField === 'source') {
+                            comp = (a.source || '').localeCompare(b.source || '', 'no');
+                        }
+                        return logSortDir === 'desc' ? -comp : comp;
+                    });
+                }
+
                 logCount.textContent = filtered.length;
 
                 if (filtered.length === 0) {
@@ -636,6 +656,63 @@
                         <td style="font-size: 13px; color: #64748b;">${log.source}</td>
                     </tr>
                 `).join('');
+
+                // Update Sorting UI indicators and event listeners on the headers
+                const table = logsBody.closest('table');
+                if (table) {
+                    const headers = table.querySelectorAll('thead th');
+                    const fields = ['timestamp', 'level', 'message', 'source'];
+                    headers.forEach((header, index) => {
+                        const field = fields[index];
+                        if (field) {
+                            header.style.cursor = 'pointer';
+                            header.style.userSelect = 'none';
+                            header.style.position = 'relative';
+
+                            if (!header.dataset.sortBound) {
+                                header.dataset.sortBound = 'true';
+                                header.addEventListener('mouseover', () => {
+                                    header.style.backgroundColor = '#e2e8f0';
+                                    header.style.color = '#1b4965';
+                                });
+                                header.addEventListener('mouseout', () => {
+                                    header.style.backgroundColor = '';
+                                    header.style.color = '';
+                                });
+                                header.addEventListener('click', () => {
+                                    if (logSortField === field) {
+                                        logSortDir = logSortDir === 'asc' ? 'desc' : 'asc';
+                                    } else {
+                                        logSortField = field;
+                                        logSortDir = (field === 'timestamp') ? 'desc' : 'asc';
+                                    }
+                                    const currentFilter = document.querySelector('.log-filter-btn.active')?.dataset.filter || 'all';
+                                    renderLogs(currentFilter);
+                                });
+                            }
+
+                            // Add/update sort indicator
+                            let icon = header.querySelector('.sort-icon');
+                            if (!icon) {
+                                icon = document.createElement('span');
+                                icon.className = 'material-symbols-outlined sort-icon';
+                                icon.style.fontSize = '14px';
+                                icon.style.verticalAlign = 'middle';
+                                icon.style.marginLeft = '4px';
+                                icon.style.lineHeight = '1';
+                                header.appendChild(icon);
+                            }
+
+                            if (field === logSortField) {
+                                icon.style.display = 'inline-flex';
+                                icon.textContent = logSortDir === 'asc' ? 'arrow_upward' : 'arrow_downward';
+                                icon.style.color = '#d17d39';
+                            } else {
+                                icon.style.display = 'none';
+                            }
+                        }
+                    });
+                }
             };
 
             // Initial load

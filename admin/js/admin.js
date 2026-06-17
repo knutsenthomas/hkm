@@ -91,6 +91,10 @@ class AdminManager {
         this.inkindSortField = 'date';
         this.inkindSortDir = 'desc';
 
+        // Donations Sorting State
+        this.donationSortField = 'date';
+        this.donationSortDir = 'desc';
+
         this.widgetLibrary = {
             'visitors': { id: 'visitors', label: 'Sidevisninger', icon: 'visibility', color: 'purple', default: true },
             'status': { id: 'status', label: 'Systemstatus', icon: 'check_circle', color: 'green', default: true },
@@ -12859,6 +12863,38 @@ class AdminManager {
     renderDonationAdminViews() {
         const records = this.getFilteredDonationRecords();
         const userMap = this.adminUserMap || new Map();
+
+        // Apply sorting to donation records
+        records.sort((a, b) => {
+            let comp = 0;
+            if (this.donationSortField === 'date') {
+                const dateA = this.getDonationDate(a) || new Date(0);
+                const dateB = this.getDonationDate(b) || new Date(0);
+                comp = dateA.getTime() - dateB.getTime();
+            } else if (this.donationSortField === 'giver') {
+                const nameA = this.getDonationDonorName(a, userMap) || '';
+                const nameB = this.getDonationDonorName(b, userMap) || '';
+                comp = nameA.localeCompare(nameB, 'no');
+            } else if (this.donationSortField === 'method') {
+                const methodA = this.getDonationMethodLabel(a.method) || '';
+                const methodB = this.getDonationMethodLabel(b.method) || '';
+                comp = methodA.localeCompare(methodB, 'no');
+            } else if (this.donationSortField === 'status') {
+                const statusA = this.getDonationStatusLabel(a.status) || '';
+                const statusB = this.getDonationStatusLabel(b.status) || '';
+                comp = statusA.localeCompare(statusB, 'no');
+            } else if (this.donationSortField === 'profile') {
+                const profA = a.userId ? 1 : 0;
+                const profB = b.userId ? 1 : 0;
+                comp = profA - profB;
+            } else if (this.donationSortField === 'amount') {
+                const amountA = this.normalizeDonationAmountNok(a);
+                const amountB = this.normalizeDonationAmountNok(b);
+                comp = amountA - amountB;
+            }
+            return this.donationSortDir === 'asc' ? comp : -comp;
+        });
+
         const todayRange = this.buildDonationDateRange('today');
         
         // 1. Calculations for donations tab
@@ -12980,6 +13016,62 @@ class AdminManager {
                     this.openLinkProfileModal(donationId, currentUserId);
                 });
             });
+
+            // Setup sorting for table headers dynamically
+            const table = transactionsBody.closest('table');
+            if (table) {
+                const headers = table.querySelectorAll('thead th');
+                const fields = ['date', 'giver', 'method', 'status', 'profile', 'amount'];
+                headers.forEach((header, index) => {
+                    const field = fields[index];
+                    if (field) {
+                        header.style.cursor = 'pointer';
+                        header.style.userSelect = 'none';
+                        header.style.position = 'relative';
+
+                        if (!header.dataset.sortBound) {
+                            header.dataset.sortBound = 'true';
+                            header.addEventListener('mouseover', () => {
+                                header.style.backgroundColor = '#f1f5f9';
+                                header.style.color = '#1b4965';
+                            });
+                            header.addEventListener('mouseout', () => {
+                                header.style.backgroundColor = '';
+                                header.style.color = '';
+                            });
+                            header.addEventListener('click', () => {
+                                if (this.donationSortField === field) {
+                                    this.donationSortDir = this.donationSortDir === 'asc' ? 'desc' : 'asc';
+                                } else {
+                                    this.donationSortField = field;
+                                    this.donationSortDir = (field === 'date' || field === 'amount') ? 'desc' : 'asc';
+                                }
+                                this.renderDonationAdminViews();
+                            });
+                        }
+
+                        // Add/update sort indicator
+                        let icon = header.querySelector('.sort-icon');
+                        if (!icon) {
+                            icon = document.createElement('span');
+                            icon.className = 'material-symbols-outlined sort-icon';
+                            icon.style.fontSize = '14px';
+                            icon.style.verticalAlign = 'middle';
+                            icon.style.marginLeft = '4px';
+                            icon.style.lineHeight = '1';
+                            header.appendChild(icon);
+                        }
+
+                        if (field === this.donationSortField) {
+                            icon.style.display = 'inline-flex';
+                            icon.textContent = this.donationSortDir === 'asc' ? 'arrow_upward' : 'arrow_downward';
+                            icon.style.color = '#d17d39';
+                        } else {
+                            icon.style.display = 'none';
+                        }
+                    }
+                });
+            }
         }
 
         // 2. Calculations for shop tab
@@ -14957,9 +15049,23 @@ class AdminManager {
         let inKindDonations = allRecords.filter(r => r.isInKind);
 
         inKindDonations.sort((a, b) => {
-            const aDate = this.getDonationDate(a)?.getTime?.() || 0;
-            const bDate = this.getDonationDate(b)?.getTime?.() || 0;
-            return bDate - aDate;
+            let comp = 0;
+            if (this.inkindSortField === 'date') {
+                const aDate = this.getDonationDate(a)?.getTime?.() || 0;
+                const bDate = this.getDonationDate(b)?.getTime?.() || 0;
+                comp = aDate - bDate;
+            } else if (this.inkindSortField === 'description') {
+                comp = (a.description || '').localeCompare(b.description || '', 'no');
+            } else if (this.inkindSortField === 'giver') {
+                comp = (a.donorName || '').localeCompare(b.donorName || '', 'no');
+            } else if (this.inkindSortField === 'fund') {
+                comp = (a.fund || '').localeCompare(b.fund || '', 'no');
+            } else if (this.inkindSortField === 'acknowledgment') {
+                comp = (a.acknowledgmentSent ? 1 : 0) - (b.acknowledgmentSent ? 1 : 0);
+            } else if (this.inkindSortField === 'value') {
+                comp = (a.amount || 0) - (b.amount || 0);
+            }
+            return this.inkindSortDir === 'desc' ? -comp : comp;
         });
 
         const filters = this.donationFilters || {};
@@ -15058,6 +15164,61 @@ class AdminManager {
         `;
 
         document.getElementById('add-manual-inkind-btn')?.addEventListener('click', () => this.openManualInKindModal());
+
+        const table = document.getElementById('inkind-transactions-body')?.closest('table');
+        if (table) {
+            const headers = table.querySelectorAll('thead th');
+            const fields = ['date', 'description', 'giver', 'fund', 'acknowledgment', 'value'];
+            headers.forEach((header, index) => {
+                const field = fields[index];
+                if (field) {
+                    header.style.cursor = 'pointer';
+                    header.style.userSelect = 'none';
+                    header.style.position = 'relative';
+
+                    if (!header.dataset.sortBound) {
+                        header.dataset.sortBound = 'true';
+                        header.addEventListener('mouseover', () => {
+                            header.style.backgroundColor = '#f1f5f9';
+                            header.style.color = '#1b4965';
+                        });
+                        header.addEventListener('mouseout', () => {
+                            header.style.backgroundColor = '';
+                            header.style.color = '';
+                        });
+                        header.addEventListener('click', () => {
+                            if (this.inkindSortField === field) {
+                                this.inkindSortDir = this.inkindSortDir === 'asc' ? 'desc' : 'asc';
+                            } else {
+                                this.inkindSortField = field;
+                                this.inkindSortDir = (field === 'date' || field === 'value') ? 'desc' : 'asc';
+                            }
+                            this.renderInKindDonations();
+                        });
+                    }
+
+                    // Add/update sort indicator
+                    let icon = header.querySelector('.sort-icon');
+                    if (!icon) {
+                        icon = document.createElement('span');
+                        icon.className = 'material-symbols-outlined sort-icon';
+                        icon.style.fontSize = '14px';
+                        icon.style.verticalAlign = 'middle';
+                        icon.style.marginLeft = '4px';
+                        icon.style.lineHeight = '1';
+                        header.appendChild(icon);
+                    }
+
+                    if (field === this.inkindSortField) {
+                        icon.style.display = 'inline-flex';
+                        icon.textContent = this.inkindSortDir === 'asc' ? 'arrow_upward' : 'arrow_downward';
+                        icon.style.color = '#d17d39';
+                    } else {
+                        icon.style.display = 'none';
+                    }
+                }
+            });
+        }
 
         container.querySelectorAll('.delete-inkind-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
