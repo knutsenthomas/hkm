@@ -14470,6 +14470,8 @@ class AdminManager {
                 
                 if (target === 'dashboard') {
                     this.renderGiftsDashboard();
+                } else if (target === 'causes') {
+                    this.loadCauses();
                 } else if (target === 'inkind') {
                     this.renderInKindDonations();
                 }
@@ -16031,6 +16033,7 @@ class AdminManager {
             <div class="causes-tabs-container" style="margin-bottom: 24px;">
                 <div class="automation-tabs" style="border-bottom: 2px solid #e2e8f0; background: #fff; border-radius: 12px 12px 0 0; padding: 0 16px; display: flex; gap: 8px;">
                     <button class="automation-tab active" data-tab="dashboard">Dashboard</button>
+                    <button class="automation-tab" data-tab="causes">Innsamlinger</button>
                     <button class="automation-tab" data-tab="donations">Pr. gave</button>
                     <button class="automation-tab" data-tab="donors">Pr. giver</button>
                     <button class="automation-tab" data-tab="shop">Butikk</button>
@@ -16086,8 +16089,11 @@ class AdminManager {
                         <div class="loader">Laster dashboard...</div>
                     </div>
                 </div>
-                
-                <div class="card" style="margin-top: 24px;">
+            </div>
+
+            <!-- Tab: Innsamlinger Content -->
+            <div id="cause-tab-content-causes" class="cause-tab-pane" style="display: none;">
+                <div class="card">
                     <div class="card-header flex-between">
                         <div>
                             <h3 class="card-title">Aktive innsamlingsaksjoner</h3>
