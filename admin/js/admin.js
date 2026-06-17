@@ -14924,6 +14924,32 @@ class AdminManager {
                         <span>${footerEndLabel}</span>
                     </div>
                 </div>
+
+                <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; align-items:center; justify-content:center;">
+                    <div style="width:100%; text-align:left; margin-bottom:12px;">
+                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Donasjonsfordeling</span>
+                    </div>
+                    <div style="position:relative; width:100px; height:100px;">
+                        <div style="position:absolute; inset:0; border-radius:50%; background:#eff6ff; display:flex; align-items:center; justify-content:center; box-shadow: 0 4px 10px rgba(59,130,246,0.1);">
+                            <div style="width:68px; height:68px; border-radius:50%; background:#3b82f6; color:white; display:flex; align-items:center; justify-content:center;">
+                                <span class="material-symbols-outlined" style="color:#fff; font-size:28px;">volunteer_activism</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top:12px; font-size:12px; font-weight:600; color:#64748b; text-align:center;">
+                        Alle fullførte donasjoner
+                    </div>
+                </div>
+
+                <div class="card" style="grid-column: span 6; padding: 24px; min-height: 240px; display:flex; flex-direction:column; justify-content:space-between;">
+                    <div>
+                        <span style="font-size: 12px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em;">Aksjonsprogresjon</span>
+                        <h4 style="margin: 4px 0 0; font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom:16px;">Mål vs Innsamlet</h4>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:16px; flex:1; justify-content:center;">
+                        ${causesProgressHtml}
+                    </div>
+                </div>
             </div>
         `;
     }
