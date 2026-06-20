@@ -5607,7 +5607,7 @@ class AdminManager {
                 return stripText(data.text).length > 0;
             }
             if (type === 'image' || type === 'video' || type === 'youtubevideo') {
-                const url = data.file?.url || data.url || '';
+                const url = data.file?.url || data.url || data.fileUrl || '';
                 return url.length > 0;
             }
             if (type === 'list') {
@@ -5624,7 +5624,7 @@ class AdminManager {
             }
 
             if (type === 'youtubevideo') {
-                return String(data?.url || '').trim().length > 0;
+                return String(data?.url || data?.fileUrl || '').trim().length > 0;
             }
 
             return stripText(data.text).length > 0;
@@ -6886,6 +6886,415 @@ class AdminManager {
         };
 
         loadModalMedia();
+    }
+
+    /**
+     * Opens the video manager modal with YouTube search, direct link, and local upload tabs.
+     * @param {function} callback - Callback returning { type: 'youtube'|'file', url: string }
+     */
+    async openVideoManagerModal(callback) {
+        const settings = await firebaseService.getPageContent('settings_integrations') || {};
+        const apiKey = (settings.youtube?.apiKey || settings.googleCalendar?.apiKey || settings.googleAI?.apiKey || settings.googleAi?.apiKey || settings.geminiApiKey || '').trim();
+
+        const modal = document.createElement('div');
+        modal.className = 'admin-modal';
+        modal.style.zIndex = '10000';
+        modal.innerHTML = `
+            <div class="admin-modal-content" style="max-width: 900px; height: 85vh; display: flex; flex-direction: column;">
+                <div class="admin-modal-header" style="flex-shrink: 0; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; background: #ffffff; display: flex; justify-content: space-between; align-items: center;">
+                    <div class="header-left" style="display: flex; align-items: center; gap: 10px; color: #1B4965;">
+                        <span class="material-symbols-outlined" style="font-size: 28px;">video_library</span>
+                        <h2 style="font-size: 20px; font-weight: 700; margin: 0;">Video-behandler</h2>
+                    </div>
+                    <button class="close-modal-btn" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #94a3b8; transition: color 0.2s;">&times;</button>
+                </div>
+                <!-- Tabs Header -->
+                <div class="modal-tabs-header" style="display: flex; border-bottom: 1px solid #e2e8f0; background: #f8fafc; flex-shrink: 0; padding: 0 16px;">
+                    <button class="modal-tab-btn active" data-tab="search" style="padding: 14px 20px; font-weight: 600; font-size: 14px; border: none; background: none; border-bottom: 3px solid #1B4965; color: #1B4965; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">search</span> Søk på YouTube
+                    </button>
+                    <button class="modal-tab-btn" data-tab="upload" style="padding: 14px 20px; font-weight: 600; font-size: 14px; border: none; background: none; border-bottom: 3px solid transparent; color: #64748b; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">upload_file</span> Lenke / Last opp
+                    </button>
+                </div>
+                <!-- Body -->
+                <div class="admin-modal-body" style="flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; background: #ffffff;">
+                    <!-- Tab 1 Content: Search -->
+                    <div id="tab-content-search" class="tab-content" style="display: flex; flex-direction: column; gap: 16px; height: 100%;">
+                        <div class="search-bar-wrap" style="display: flex; gap: 12px; align-items: center; flex-shrink: 0;">
+                            <div class="search-input-container" style="position: relative; flex: 1;">
+                                <span class="material-symbols-outlined" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; font-size: 20px;">search</span>
+                                <input type="text" id="yt-search-query" class="admin-input" placeholder="Søk etter videoer på YouTube..." style="padding-left: 40px; width: 100%; height: 42px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 14px; outline: none; transition: border-color 0.2s;">
+                            </div>
+                            <button id="yt-search-btn" class="btn-primary" style="height: 42px; padding: 0 24px; font-weight: 600; border-radius: 8px; background: #1B4965; color: white; border: none; cursor: pointer; transition: background-color 0.2s;">Søk</button>
+                        </div>
+                        <!-- API Key warning banner -->
+                        <div id="yt-api-warning" class="api-warning-banner" style="display: none; padding: 16px; background: #fef3c7; border-left: 4px solid #d97706; border-radius: 6px; color: #92400e; font-size: 13px; align-items: flex-start; gap: 12px; line-height: 1.5;">
+                            <span class="material-symbols-outlined" style="color: #d97706; flex-shrink: 0;">warning</span>
+                            <div>
+                                <strong>YouTube-søk er utilgjengelig:</strong> Ingen Google API-nøkkel ble funnet. 
+                                Gå til <em>Innstillinger -> Integrasjoner</em> for å legge inn en API-nøkkel, eller bruk "Lenke / Last opp" i steden.
+                            </div>
+                        </div>
+                        <!-- Results Area -->
+                        <div id="yt-results-container" style="flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; padding: 4px 0;">
+                            <div style="grid-column: 1/-1; text-align: center; color: #94a3b8; padding: 40px;">
+                                <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1;">play_circle</span>
+                                <p style="margin-top: 8px; font-size: 14px;">Søk etter en video for å se resultater her.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Tab 2 Content: Upload -->
+                    <div id="tab-content-upload" class="tab-content" style="display: none; flex-direction: column; gap: 24px;">
+                        <!-- Section 1: Paste Link -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
+                            <h3 style="font-size: 15px; font-weight: 600; color: #1e293b; margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="color: #1B4965;">link</span>
+                                Lim inn YouTube-lenke
+                            </h3>
+                            <div style="display: flex; gap: 12px;">
+                                <input type="url" id="direct-yt-url" class="admin-input" placeholder="F.eks. https://www.youtube.com/watch?v=..." style="flex: 1; height: 42px; border-radius: 8px; border: 1px solid #cbd5e1; padding: 0 12px; font-size: 14px; outline: none;">
+                                <button id="direct-yt-btn" class="btn-primary" style="height: 42px; padding: 0 20px; font-weight: 600; background: #1B4965; border: none; color: white; border-radius: 8px; cursor: pointer; transition: background-color 0.2s;">Legg til</button>
+                            </div>
+                        </div>
+                        <!-- Section 2: Upload File -->
+                        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px;">
+                            <h3 style="font-size: 15px; font-weight: 600; color: #1e293b; margin-top: 0; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="color: #1B4965;">upload</span>
+                                Last opp videofil
+                            </h3>
+                            <div id="video-drop-zone" style="border: 2px dashed #cbd5e1; border-radius: 8px; background: #ffffff; padding: 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background-color 0.2s;">
+                                <span class="material-symbols-outlined" style="font-size: 40px; color: #94a3b8; margin-bottom: 8px;">movie</span>
+                                <p style="font-size: 14px; font-weight: 600; color: #475569; margin: 0 0 4px;">Dra og slipp videofil her</p>
+                                <p style="font-size: 12px; color: #94a3b8; margin: 0 0 16px;">Eller klikk for å velge fil fra enheten</p>
+                                <button class="btn-outline" style="pointer-events: none; border: 1px solid #cbd5e1; color: #475569; font-size: 13px; height: 36px; padding: 0 16px; background: white; border-radius: 6px;">Velg fil</button>
+                                <input type="file" id="video-file-input" style="display: none;" accept="video/*">
+                            </div>
+                            <div id="upload-progress-container" style="display: none; margin-top: 16px;">
+                                <div style="display: flex; justify-content: space-between; font-size: 12px; color: #475569; margin-bottom: 6px;">
+                                    <span id="upload-progress-status">Laster opp video...</span>
+                                    <span id="upload-progress-percent">0%</span>
+                                </div>
+                                <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                                    <div id="upload-progress-bar" style="height: 100%; width: 0%; background: #d17d39; border-radius: 3px; transition: width 0.2s;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <style>
+                .yt-video-card {
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                    overflow: hidden;
+                    background: #ffffff;
+                    cursor: pointer;
+                    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+                    display: flex;
+                    flex-direction: column;
+                }
+                .yt-video-card:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.06);
+                    border-color: #1B4965;
+                }
+                .yt-video-card-img {
+                    position: relative;
+                    padding-bottom: 56.25%; /* 16:9 */
+                    background: #000;
+                }
+                .yt-video-card-img img {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+                .yt-video-card-info {
+                    padding: 12px;
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: space-between;
+                }
+                .yt-video-card-title {
+                    font-size: 13px;
+                    font-weight: 600;
+                    color: #1e293b;
+                    margin-bottom: 6px;
+                    line-height: 1.4;
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+                .yt-video-card-channel {
+                    font-size: 11px;
+                    color: #64748b;
+                }
+                .close-modal-btn:hover {
+                    color: #1e293b !important;
+                }
+                .modal-tab-btn:hover {
+                    color: #1B4965 !important;
+                }
+                #video-drop-zone.dragover {
+                    border-color: #1B4965 !important;
+                    background-color: #f0f9ff !important;
+                }
+            </style>
+        `;
+
+        document.body.appendChild(modal);
+        requestAnimationFrame(() => modal.classList.add('is-active'));
+
+        const closeBtn = modal.querySelector('.close-modal-btn');
+        const closeModal = () => {
+            modal.classList.remove('is-active');
+            setTimeout(() => modal.remove(), 300);
+        };
+        closeBtn.onclick = closeModal;
+        modal.onclick = (e) => { if (e.target === modal) closeModal(); };
+
+        // API Key logic and Warning
+        const apiWarning = modal.querySelector('#yt-api-warning');
+        const searchTabBtn = modal.querySelector('.modal-tab-btn[data-tab="search"]');
+        const uploadTabBtn = modal.querySelector('.modal-tab-btn[data-tab="upload"]');
+        
+        if (!apiKey) {
+            apiWarning.style.display = 'flex';
+            // Force select upload/link tab since key is missing
+            setTimeout(() => {
+                uploadTabBtn.click();
+            }, 50);
+        }
+
+        // Tab Switching Logic
+        const tabs = modal.querySelectorAll('.modal-tab-btn');
+        const contents = modal.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.onclick = () => {
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                    t.style.borderBottomColor = 'transparent';
+                    t.style.color = '#64748b';
+                });
+                tab.classList.add('active');
+                tab.style.borderBottomColor = '#1B4965';
+                tab.style.color = '#1B4965';
+                
+                contents.forEach(c => c.style.display = 'none');
+                const targetContent = modal.querySelector(`#tab-content-${tab.dataset.tab}`);
+                if (targetContent) targetContent.style.display = 'flex';
+            };
+        });
+
+        // Search YouTube logic
+        const ytSearchBtn = modal.querySelector('#yt-search-btn');
+        const ytSearchInput = modal.querySelector('#yt-search-query');
+        const ytResultsContainer = modal.querySelector('#yt-results-container');
+
+        const performYtSearch = async () => {
+            const query = ytSearchInput.value.trim();
+            if (!query) return;
+            if (!apiKey) {
+                this.showToast('Du må legge til en API-nøkkel i innstillingene for å søke.', 'warning');
+                return;
+            }
+            
+            ytResultsContainer.innerHTML = `
+                <div style="grid-column: 1/-1; text-align: center; padding: 40px;">
+                    <div class="spinner" style="margin: 0 auto 12px;"></div>
+                    <p style="color: #64748b; font-size: 14px;">Søker på YouTube...</p>
+                </div>
+            `;
+            
+            try {
+                const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
+                const res = await fetch(url);
+                if (!res.ok) {
+                    throw new Error(`YouTube API returned status ${res.status}`);
+                }
+                const data = await res.json();
+                const items = data.items || [];
+                
+                ytResultsContainer.innerHTML = '';
+                if (items.length === 0) {
+                    ytResultsContainer.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #64748b;">
+                            <span class="material-symbols-outlined" style="font-size: 48px; color: #cbd5e1;">search_off</span>
+                            <p style="margin-top: 8px; font-size: 14px;">Ingen videoer funnet for "${query}".</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                items.forEach(item => {
+                    const videoId = item.id?.videoId;
+                    if (!videoId) return;
+                    const snippet = item.snippet || {};
+                    const title = snippet.title || '';
+                    const channel = snippet.channelTitle || '';
+                    const thumbUrl = snippet.thumbnails?.medium?.url || snippet.thumbnails?.high?.url || '';
+                    
+                    // Escape HTML entities to prevent rendering issues
+                    const cleanTitle = title
+                        .replace(/&quot;/g, '"')
+                        .replace(/&amp;/g, '&')
+                        .replace(/&#39;/g, "'")
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>');
+                    
+                    const card = document.createElement('div');
+                    card.className = 'yt-video-card';
+                    card.innerHTML = `
+                        <div class="yt-video-card-img">
+                            <img src="${thumbUrl}" alt="${cleanTitle}" loading="lazy">
+                        </div>
+                        <div class="yt-video-card-info">
+                            <div class="yt-video-card-title" title="${cleanTitle}">${cleanTitle}</div>
+                            <div class="yt-video-card-channel">${channel}</div>
+                        </div>
+                    `;
+                    card.onclick = () => {
+                        callback({
+                            type: 'youtube',
+                            url: `https://www.youtube.com/watch?v=${videoId}`
+                        });
+                        closeModal();
+                    };
+                    ytResultsContainer.appendChild(card);
+                });
+            } catch (err) {
+                console.error('YouTube Search error:', err);
+                ytResultsContainer.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: #ef4444;">
+                        <span class="material-symbols-outlined" style="font-size: 48px;">error</span>
+                        <p style="margin-top: 8px; font-size: 14px;">Feil under YouTube-søk. Sjekk integrasjonsinnstillingene.</p>
+                    </div>
+                `;
+            }
+        };
+
+        ytSearchBtn.onclick = performYtSearch;
+        ytSearchInput.onkeydown = (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performYtSearch();
+            }
+        };
+
+        // Fane 2 logic: Direct URL Paste
+        const directYtInput = modal.querySelector('#direct-yt-url');
+        const directYtBtn = modal.querySelector('#direct-yt-btn');
+        directYtBtn.onclick = () => {
+            const urlVal = directYtInput.value.trim();
+            if (!urlVal) return;
+            
+            const getYouTubeId = (url) => {
+                if (!url) return null;
+                const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                return m ? m[1] : null;
+            };
+            
+            if (getYouTubeId(urlVal)) {
+                callback({
+                    type: 'youtube',
+                    url: urlVal
+                });
+                closeModal();
+            } else {
+                this.showToast('Ugyldig YouTube-URL.', 'error');
+            }
+        };
+
+        // Fane 2 logic: Upload File & Drag/Drop
+        const dropZone = modal.querySelector('#video-drop-zone');
+        const videoFileInput = modal.querySelector('#video-file-input');
+        const progressContainer = modal.querySelector('#upload-progress-container');
+        const progressBar = modal.querySelector('#upload-progress-bar');
+        const progressPercent = modal.querySelector('#upload-progress-percent');
+        const progressStatus = modal.querySelector('#upload-progress-status');
+
+        const handleVideoFile = async (file) => {
+            if (!file) return;
+            if (!file.type.startsWith('video/')) {
+                this.showToast('Vennligst velg en gyldig videofil.', 'error');
+                return;
+            }
+            
+            dropZone.style.pointerEvents = 'none';
+            progressContainer.style.display = 'block';
+            progressBar.style.width = '0%';
+            progressPercent.innerText = '0%';
+            progressStatus.innerText = 'Laster opp video...';
+            
+            try {
+                const path = `editor/video-uploads/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
+                const fileUrl = await firebaseService.uploadFile(
+                    file, 
+                    path, 
+                    ['video/'], 
+                    500, // maxSizeMB
+                    (percent) => {
+                        progressBar.style.width = `${percent}%`;
+                        progressPercent.innerText = `${percent}%`;
+                    }
+                );
+                
+                if (fileUrl) {
+                    callback({
+                        type: 'file',
+                        url: fileUrl
+                    });
+                    closeModal();
+                } else {
+                    this.showToast('Opplasting feilet.', 'error');
+                    resetUploadUI();
+                }
+            } catch (err) {
+                console.error('Video upload error:', err);
+                this.showToast('Feil under opplasting av video.', 'error');
+                resetUploadUI();
+            }
+        };
+
+        const resetUploadUI = () => {
+            dropZone.style.pointerEvents = 'auto';
+            progressContainer.style.display = 'none';
+        };
+
+        // Click on dropzone triggers input
+        dropZone.onclick = () => videoFileInput.click();
+        videoFileInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) handleVideoFile(file);
+        };
+
+        // Drag/Drop Listeners
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const file = dt.files[0];
+            if (file) handleVideoFile(file);
+        }, false);
     }
 
     async _loadIntegrationsSettings() {
@@ -9681,47 +10090,29 @@ class AdminManager {
                     },
                     quote: () => exec('formatBlock', 'blockquote'),
                     video: () => {
-                        const getYouTubeId = (url) => {
-                            if (!url) return null;
-                            const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                            return m ? m[1] : null;
-                        };
-                        const url = window.prompt('Lim inn YouTube-video-URL (eller klikk OK med tomt felt for å laste opp videofil fra din enhet):');
-                        
-                        if (url && url.trim()) {
-                            const videoId = getYouTubeId(url.trim());
-                            if (videoId) {
-                                const embedHtml = `<div class="youtube-embed" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin:16px 0;"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div><p></p>`;
-                                exec('insertHTML', embedHtml);
-                                this.showToast('YouTube-video lagt til!', 'success');
-                            } else {
-                                this.showToast('Ugyldig YouTube-URL.', 'error');
-                            }
-                        } else if (url === '') {
-                            const fileInput = document.createElement('input');
-                            fileInput.type = 'file';
-                            fileInput.accept = 'video/*';
-                            fileInput.onchange = async (e) => {
-                                const file = e.target.files[0];
-                                if (!file) return;
-                                try {
-                                    this.showToast('Laster opp video...', 'info');
-                                    const path = `editor/video-uploads/${Date.now()}_${file.name.replace(/\s+/g, '_')}`;
-                                    const fileUrl = await firebaseService.uploadFile(file, path, ['video/'], 500);
-                                    if (fileUrl) {
-                                        const videoHtml = `<video src="${fileUrl}" controls style="width:100%; max-height:480px; border-radius:8px; margin:16px 0; display:block; background:#000;"></video><p></p>`;
-                                        exec('insertHTML', videoHtml);
-                                        this.showToast('Video lastet opp!', 'success');
+                        this.openVideoManagerModal((selection) => {
+                            if (selection) {
+                                if (selection.type === 'youtube') {
+                                    const getYouTubeId = (url) => {
+                                        if (!url) return null;
+                                        const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+                                        return m ? m[1] : null;
+                                    };
+                                    const videoId = getYouTubeId(selection.url);
+                                    if (videoId) {
+                                        const embedHtml = `<div class="youtube-embed" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:8px; margin:16px 0;"><iframe src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen style="position:absolute; top:0; left:0; width:100%; height:100%;"></iframe></div><p></p>`;
+                                        exec('insertHTML', embedHtml);
+                                        this.showToast('YouTube-video lagt til!', 'success');
                                     } else {
-                                        this.showToast('Opplasting feilet.', 'error');
+                                        this.showToast('Ugyldig YouTube-URL.', 'error');
                                     }
-                                } catch (err) {
-                                    this.showToast('Kunne ikke laste opp video.', 'error');
-                                    console.error(err);
+                                } else if (selection.type === 'file') {
+                                    const videoHtml = `<video src="${selection.url}" controls style="width:100%; max-height:480px; border-radius:8px; margin:16px 0; display:block; background:#000;"></video><p></p>`;
+                                    exec('insertHTML', videoHtml);
+                                    this.showToast('Video lagt til!', 'success');
                                 }
-                            };
-                            fileInput.click();
-                        }
+                            }
+                        });
                     }
                 } : {
                     ...commonHandlers,
@@ -9745,8 +10136,28 @@ class AdminManager {
                     },
                     quote: () => editor.blocks.insert('quote', { text: '', caption: '' }, undefined, undefined, true),
                     delimiter: () => editor.blocks.insert('delimiter', {}, undefined, undefined, true),
-                    youtubeVideo: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true),
-                    video: () => editor.blocks.insert('youtubeVideo', { url: '' }, undefined, undefined, true)
+                    youtubeVideo: () => {
+                        this.openVideoManagerModal((selection) => {
+                            if (selection) {
+                                if (selection.type === 'youtube') {
+                                    editor.blocks.insert('youtubeVideo', { url: selection.url }, undefined, undefined, true);
+                                } else {
+                                    editor.blocks.insert('youtubeVideo', { fileUrl: selection.url }, undefined, undefined, true);
+                                }
+                            }
+                        });
+                    },
+                    video: () => {
+                        this.openVideoManagerModal((selection) => {
+                            if (selection) {
+                                if (selection.type === 'youtube') {
+                                    editor.blocks.insert('youtubeVideo', { url: selection.url }, undefined, undefined, true);
+                                } else {
+                                    editor.blocks.insert('youtubeVideo', { fileUrl: selection.url }, undefined, undefined, true);
+                                }
+                            }
+                        });
+                    }
                 };
 
                 // --- High-Reliability Event Delegation for Toolbar ---
@@ -23230,6 +23641,10 @@ class AdminManager {
                 case 'youtubevideo':
                 case 'youtubeVideo': {
                     const ytUrl = data.url || '';
+                    const fileUrl = data.fileUrl || '';
+                    if (fileUrl) {
+                        return `<div class="block-video" style="margin-bottom:10px;"><video src="${fileUrl}" controls style="width:100%; max-height:480px; border-radius:8px; display:block; background:#000;"></video></div>`;
+                    }
                     if (!ytUrl) return '';
                     const ytMatch = ytUrl.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
                     if (ytMatch) {
