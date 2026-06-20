@@ -17,17 +17,25 @@ const firebaseConfig = {
 
 firebase.initializeApp(firebaseConfig);
 
-const messaging = firebase.messaging();
+let messaging = null;
+try {
+    if (firebase.messaging.isSupported()) {
+        messaging = firebase.messaging();
+        // Handler for background messages
+        messaging.onBackgroundMessage((payload) => {
+            console.log('[firebase-messaging-sw.js] Received background message ', payload);
 
-// Handler for background messages
-messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message ', payload);
+            const notificationTitle = payload.notification.title;
+            const notificationOptions = {
+                body: payload.notification.body,
+                icon: payload.notification.image || '/img/logo-hkm.png'
+            };
 
-    const notificationTitle = payload.notification.title;
-    const notificationOptions = {
-        body: payload.notification.body,
-        icon: payload.notification.image || '/img/logo-hkm.png'
-    };
-
-    self.registration.showNotification(notificationTitle, notificationOptions);
-});
+            self.registration.showNotification(notificationTitle, notificationOptions);
+        });
+    } else {
+        console.warn('[firebase-messaging-sw.js] Firebase Messaging er ikke støttet i denne nettleseren.');
+    }
+} catch (e) {
+    console.warn('[firebase-messaging-sw.js] Kunne ikke initialisere Firebase Messaging i Service Worker:', e);
+}

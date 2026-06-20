@@ -146,18 +146,26 @@ firebase.initializeApp({
     appId: "1:791237361706:web:63516ba3d74436f23ac353"
 });
 
-const messaging = firebase.messaging();
-
-// Handle background push messages
-messaging.onBackgroundMessage((payload) => {
-    console.log('[sw.js] Bakgrunnsmelding mottatt:', payload);
-    const title = payload.notification?.title || 'Ny oppdatering';
-    const options = {
-        body: payload.notification?.body || '',
-        icon: payload.notification?.image || '/img/logo-hkm.png',
-        badge: '/icons/icon-192.png',
-        data: payload.data
-    };
-    self.registration.showNotification(title, options);
-});
+let messaging = null;
+try {
+    if (firebase.messaging.isSupported()) {
+        messaging = firebase.messaging();
+        // Handle background push messages
+        messaging.onBackgroundMessage((payload) => {
+            console.log('[sw.js] Bakgrunnsmelding mottatt:', payload);
+            const title = payload.notification?.title || 'Ny oppdatering';
+            const options = {
+                body: payload.notification?.body || '',
+                icon: payload.notification?.image || '/img/logo-hkm.png',
+                badge: '/icons/icon-192.png',
+                data: payload.data
+            };
+            self.registration.showNotification(title, options);
+        });
+    } else {
+        console.warn('[sw.js] Firebase Messaging er ikke støttet i denne nettleseren.');
+    }
+} catch (e) {
+    console.warn('[sw.js] Kunne ikke initialisere Firebase Messaging i Service Worker:', e);
+}
 
