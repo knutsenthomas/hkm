@@ -339,6 +339,10 @@ class BibleReader {
                     container.querySelectorAll('.book-item').forEach(el => el.classList.remove('active'));
                     item.classList.add('active');
                     await this.selectBook(item.dataset.id);
+                    // Automatically load the first chapter of this book so the screen isn't blank
+                    if (this.chapters && this.chapters.length > 0) {
+                        await this.selectChapter(this.chapters[0].id);
+                    }
                 });
             });
         };
@@ -643,17 +647,7 @@ class BibleReader {
                 if (resources.length === 0) {
                     dictRelatedBox.innerHTML = '<div style="font-size: 12px; color: var(--text-muted); padding: 8px 0;">Ingen direkte treff på nettstedets blogger eller videoer for dette ordet.</div>';
                 } else {
-                    dictRelatedBox.innerHTML = resources.slice(0, 4).map(res => `
-                        <a href="${res.link}" target="${res.isYoutube ? '_blank' : '_self'}" class="related-resource-item">
-                            <div class="related-resource-icon ${res.isYoutube ? 'youtube' : ''}">
-                                <span class="material-symbols-outlined" style="font-size: 16px;">${res.icon}</span>
-                            </div>
-                            <div class="related-resource-info">
-                                <h5 class="related-resource-title" style="margin: 0; font-size: 12px;" title="${res.title}">${res.title}</h5>
-                                <span class="related-resource-type" style="font-size: 9px;">${res.type}</span>
-                            </div>
-                        </a>
-                    `).join('');
+                    dictRelatedBox.innerHTML = resources.slice(0, 4).map(res => this.renderResourceCard(res)).join('');
                 }
             }
         } catch (e) {
@@ -809,6 +803,31 @@ class BibleReader {
         });
     }
 
+    renderResourceCard(res) {
+        return `
+            <a href="${res.link}" target="${res.isYoutube ? '_blank' : '_self'}" class="related-resource-item">
+                ${res.thumbnail ? `
+                    <div class="related-resource-thumbnail">
+                        <img src="${res.thumbnail}" alt="${res.title}">
+                        ${res.isYoutube ? `
+                            <div class="related-resource-play-overlay">
+                                <span class="material-symbols-outlined">play_arrow</span>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : `
+                    <div class="related-resource-icon ${res.isYoutube ? 'youtube' : ''}">
+                        <span class="material-symbols-outlined" style="font-size: 20px;">${res.icon}</span>
+                    </div>
+                `}
+                <div class="related-resource-info">
+                    <span class="related-resource-type ${res.isYoutube ? 'youtube' : ''}">${res.type}</span>
+                    <h4 class="related-resource-title" title="${res.title}">${res.title}</h4>
+                </div>
+            </a>
+        `;
+    }
+
     async searchLocalResources(query) {
         if (!query) return [];
         const term = query.toLowerCase().trim();
@@ -828,7 +847,8 @@ class BibleReader {
                             title: item.title,
                             type: 'Blogg',
                             icon: 'article',
-                            link: `/blogg-post.html?id=${encodeURIComponent(item.__stableId || item.id || '')}`
+                            link: `/blogg-post.html?id=${encodeURIComponent(item.__stableId || item.id || '')}`,
+                            thumbnail: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
                         });
                     }
                 });
@@ -847,7 +867,8 @@ class BibleReader {
                             title: item.title,
                             type: 'Undervisning',
                             icon: 'school',
-                            link: `/media.html?id=${encodeURIComponent(item.__stableId || item.id || '')}`
+                            link: `/media.html?id=${encodeURIComponent(item.__stableId || item.id || '')}`,
+                            thumbnail: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1504052434569-70ad5836ab65?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80'
                         });
                     }
                 });
@@ -870,7 +891,8 @@ class BibleReader {
                         type: 'YouTube',
                         icon: 'play_circle',
                         link: `https://www.youtube.com/watch?v=${item.id.videoId}`,
-                        isYoutube: true
+                        isYoutube: true,
+                        thumbnail: item.snippet.thumbnails?.default?.url || item.snippet.thumbnails?.medium?.url || ''
                     });
                 });
             }
@@ -906,17 +928,7 @@ class BibleReader {
             return;
         }
 
-        relatedList.innerHTML = resources.map(res => `
-            <a href="${res.link}" target="${res.isYoutube ? '_blank' : '_self'}" class="related-resource-item">
-                <div class="related-resource-icon ${res.isYoutube ? 'youtube' : ''}">
-                    <span class="material-symbols-outlined" style="font-size: 16px;">${res.icon}</span>
-                </div>
-                <div class="related-resource-info">
-                    <h4 class="related-resource-title" title="${res.title}">${res.title}</h4>
-                    <span class="related-resource-type">${res.type}</span>
-                </div>
-            </a>
-        `).join('');
+        relatedList.innerHTML = resources.map(res => this.renderResourceCard(res)).join('');
     }
 }
 
