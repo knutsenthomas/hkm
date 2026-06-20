@@ -380,45 +380,108 @@
         </div>
     </header>
 
-    <!-- Mega Menu -->
-    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu" id="mega-menu" aria-hidden="true">
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/es/../index" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/../en/index"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
                     <!-- Column 1: Involúcrate -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Involúcrate</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Involúcrate</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/es/donaciones">Apoyar el trabajo</a></li>
-                            <li><a href="/es/donantes-regulares">Convertirse en donante regular</a></li>
-                            <li><a href="/es/para-iglesias">Para iglesias</a></li>
-                            <li><a href="/es/para-empresas">Para empresas</a></li>
-                            <li><a href="/es/bnn">Business Network</a></li>
+                            <li><a href="/es/donaciones" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Apoya la obra</a></li>
+                            <li><a href="/es/donantes-regulares" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Hazte donante mensual</a></li>
+                            <li><a href="/es/para-iglesias" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">Para iglesias</a></li>
+                            <li><a href="/es/para-empresas" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">Para empresas</a></li>
+                            <li><a href="/es/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Conócenos -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Conócenos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Conócenos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/es/sobre-nosotros">Sobre nosotros</a></li>
-                            <li><a href="/es/contacto">Contacto</a></li>
+                            <li><a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Sobre nosotros</a></li>
+                            <li><a href="/es/contacto" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Contáctanos</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Recursos -->
+                    <!-- Column 3: Recursos & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Recursos</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Recursos</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/es/bibel">Leer la Biblia</a></li>
-                            <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer">Tienda</a></li>
-                            <li><a href="/es/eventos">Eventos</a></li>
-                            <li><a href="/es/media">Medios & Podcast</a></li>
-                            <li><a href="/es/blog">Noticias & Blog</a></li>
-                            <li><a href="/es/ensenanza">Cursos</a></li>
-                            <li><a href="/es/leseplaner.html">Planes de lectura</a></li>
-                            <li><a href="/minside/index.html">Mi Página</a></li>
+                            <li><a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Biblia</a></li>
+                            <li><a href="/es/../butikk" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Tienda</a></li>
+                            <li><a href="/es/eventos" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Eventos</a></li>
+                            <li><a href="/es/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="/es/blog" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Noticias y Blog</a></li>
+                            <li><a href="/es/ensenanza" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Cursos</a></li>
+                            <li><a href="/es/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Planes de lectura</a></li>
+                            <li><a href="/es/../minside/index" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Mi página</a></li>
                         </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/es/donaciones" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Apoya ahora</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="/es/../butikk" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Tienda</a>
+                        <a href="/es/donaciones" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Deducción fiscal</a>
+                        <a href="/es/sobre-nosotros" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Sobre nosotros</a>
+                        <a href="/es/privacidad" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Privacidad</a>
                     </div>
                 </div>
             </div>
@@ -509,9 +572,11 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <!-- Footer -->
+    <footer class="footer" id="contacto">
         <div class="container">
             <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
                     <div class="footer-brand">
                         <a href="/es/" class="logo">
@@ -520,26 +585,30 @@
                             </div>
                             <span class="logo-text">His Kingdom Ministry</span>
                         </a>
-                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro dedicada al crecimiento espiritual a través de la enseñanza, el podcast y las misiones.</p>
+                        <p class="brand-description">His Kingdom Ministry es una organización sin fines de lucro
+                            dedicada al crecimiento espiritual a través de la enseñanza, el podcast y los viajes
+                            misioneros.</p>
                     </div>
 
                     <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4>Conócenos</h4>
+                            <h4>Sobre nosotros</h4>
                             <ul>
-                                <li><a href="/es/">Inicio</a></li>
-                                <li><a href="/es/sobre-nosotros">Sobre nosotros</a></li>
-                                <li><a href="/es/contacto">Contacto</a></li>
+                                <li><a href="/es">Inicio</a></li>
+                                <li><a href="/es/sobre-nosotros">¿Quiénes somos?</a></li>
+                                <li><a href="/es/sobre-nosotros">Nuestra visión</a></li>
+                                <li><a href="/es/contacto">Contáctanos</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
                             <h4>Recursos</h4>
                             <ul>
-                                <li><a href="/es/bibel">Leer la Biblia</a></li>
+                                <li><a href="/bibel">Biblia</a></li>
                                 <li><a href="/es/media">Enseñanza</a></li>
-                                <li><a href="/es/eventos">Eventos</a></li>
-                                <li><a href="/es/leseplaner.html">Planes de lectura</a></li>
+                                <li><a href="/es/eventos">Cursos en línea</a></li>
+                                <li><a href="/es/blog">Libros & Blog</a></li>
+                                <li><a href="/es/../minside/index">Mi Página</a></li>
                             </ul>
                         </div>
 
@@ -547,33 +616,58 @@
                             <h4>Media</h4>
                             <ul>
                                 <li><a href="/es/media">Podcast</a></li>
-                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a></li>
+                                <li><a href="/es/media">Videos</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4>Participación</h4>
+                            <ul>
+                                <li><a href="/es/eventos">Calendario</a></li>
+                                <li><a href="/es/donaciones">Haz un donativo</a></li>
+                                <li><a href="/es/privacidad">Privacidad</a></li>
+                                <li><a href="/es/accesibilidad">Accesibilidad</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
+                <!-- Right Section: Cards -->
                 <div class="footer-right">
                     <div class="footer-card">
                         <h3>Síguenos</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i class="fab fa-instagram"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i class="fab fa-youtube"></i></a>
+                            <a href="https://www.facebook.com/hiskingdomministry777" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
                     <div class="footer-card contact-card">
-                        <h3>Contacto</h3>
+                        <h3>Contáctanos</h3>
                         <a href="/es/contacto" class="btn btn-primary btn-block btn-sm">Formulario de Contacto</a>
+
                         <div class="contact-details">
                             <div class="detail-item">
-                                <strong>Correo:</strong>
+                                <strong>Email:</strong>
                                 <p>post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
                                 <strong>Teléfono:</strong>
                                 <p>+47 930 94 615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Vipps:</strong>
+                                <p>938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong>Nº de cuenta:</strong>
+                                <p>3000.66.08759</p>
                             </div>
                         </div>
                     </div>
@@ -581,8 +675,8 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Todos los derechos reservados.</p>
-                <a href="/admin/login.html" class="admin-link">Admin</a>
+                <p>&copy; 2026 His Kingdom Ministry. Todos los derechos reservados.</p>
+                <a href="/es/../admin/login" class="admin-link">Admin</a>
             </div>
         </div>
     </footer>
@@ -600,29 +694,33 @@
     <!-- Fetch & Render Logic -->
     <script type="module">
         (async function () {
-            // Wait for firebase init
-            await new Promise(resolve => {
-                const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
-                check();
-            });
+            // Wait for firebaseService to be registered on window
+            let service = window.firebaseService;
+            if (!service) {
+                let count = 0;
+                while (!window.firebaseService && count < 80) {
+                    await new Promise(r => setTimeout(r, 50));
+                    count++;
+                }
+                service = window.firebaseService;
+            }
 
-            const db = firebase.firestore();
             const urlParams = new URLSearchParams(window.location.search);
             const planId = urlParams.get('id');
 
-            if (!planId) {
+            if (!planId || !service) {
                 showErrorState();
                 return;
             }
 
             try {
-                const doc = await db.collection('reading_plans').doc(planId).get();
-                if (!doc.exists) {
+                const planData = await service.getDoc('reading_plans', planId);
+                if (!planData) {
                     showErrorState();
                     return;
                 }
 
-                const plan = { id: doc.id, ...doc.data() };
+                const plan = { id: planId, ...planData };
                 renderPlanDetails(plan);
             } catch (err) {
                 console.error("Error loading plan details:", err);

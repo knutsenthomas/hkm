@@ -478,6 +478,40 @@ class FirebaseService {
         return fetchRes;
     }
 
+    async getDoc(collectionId, docId, options = {}) {
+        if (!collectionId || !docId) return null;
+
+        try {
+            if (this._shouldPreferRestPublicReads()) {
+                const restData = await this._fetchDocViaRest(collectionId, docId);
+                return restData ?? null;
+            }
+
+            if (!this.isInitialized) {
+                await this.waitForInitialization();
+            }
+            if (!this.isInitialized) return null;
+
+            const docRef = this.db.collection(collectionId).doc(docId);
+            const fetchRes = await this._readWithRetry(() => docRef.get(), `${collectionId}/${docId}`);
+            if (fetchRes.timedOut) {
+                throw new Error(`Fetch timeout for ${collectionId}/${docId}`);
+            }
+            const docSnap = fetchRes.value;
+            if (docSnap.exists) {
+                return docSnap.data();
+            }
+            return null;
+        } catch (error) {
+            const restFallback = await this._tryRestDocFallback(collectionId, docId, error);
+            if (restFallback.used) {
+                return restFallback.data ?? null;
+            }
+            console.error(`Error fetching document ${collectionId}/${docId}:`, error);
+            return null;
+        }
+    }
+
     async getPageContent(pageId, options = {}) {
         if (!pageId) return null;
 

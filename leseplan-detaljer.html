@@ -380,45 +380,109 @@
         </div>
     </header>
 
-    <!-- Mega Menu -->
-    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu" id="mega-menu" aria-hidden="true">
+    <!-- Full-screen Mega Menu Overlay -->
+    <div class="fixed inset-0 bg-white z-[10000] opacity-0 invisible transition-all duration-300 flex flex-col overflow-y-auto mega-menu"
+        id="mega-menu" aria-hidden="true">
         <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 w-full pt-[100px] flex flex-col gap-6 justify-start">
+            <!-- Menu Top Controls (Search & Mobile Lang) -->
+            <div class="flex flex-col gap-6">
+                <div class="relative w-full md:hidden">
+                    <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" placeholder="Søk..." data-content-doc="settings_global"
+                        data-content-key="menu.searchPlaceholder"
+                        class="w-full pl-12 pr-4 py-4 bg-gray-100 rounded-2xl border-none focus:outline-none focus:ring-0 transition-all text-gray-800">
+                </div>
+
+                <!-- Mobile Language Selector (Pill Style) -->
+                <div class="flex md:hidden">
+                    <div class="flex items-center gap-4 px-5 py-3 border border-gray-100 rounded-full bg-gray-50/50">
+                        <i class="fas fa-globe text-gray-400"></i>
+                        <div class="flex gap-4 items-center">
+                            <a href="/" class="text-sm font-bold text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.no">NO</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/en/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.en">EN</a>
+                            <div class="w-px h-3 bg-gray-300"></div>
+                            <a href="/es/"
+                                class="text-sm font-semibold text-gray-500 hover:text-primary-orange"
+                                data-content-doc="settings_global" data-content-key="menu.mobileLanguages.es">ES</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="mega-menu-body">
+                <!-- Menu Content Grid -->
                 <div class="mega-menu-grid">
                     <!-- Column 1: Engasjer deg -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Engasjer deg</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.engage.title">Engasjer deg</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/donasjoner">Støtt arbeidet</a></li>
-                            <li><a href="/bli-fast-giver">Bli fast giver</a></li>
-                            <li><a href="/for-menigheter">For menigheter</a></li>
-                            <li><a href="/for-bedrifter">For bedrifter</a></li>
-                            <li><a href="/bnn">Business Network</a></li>
+                            <li><a href="/donasjoner" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.supportWork">Støtt arbeidet</a></li>
+                            <li><a href="/bli-fast-giver" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.regularDonor">Bli fast giver</a></li>
+                            <li><a href="/for-menigheter" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.churches">For menigheter</a></li>
+                            <li><a href="/for-bedrifter" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.businesses">For bedrifter</a></li>
+                            <li><a href="/bnn" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.engage.network">Business Network</a></li>
                         </ul>
                     </div>
 
                     <!-- Column 2: Bli kjent med oss -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Bli kjent med oss</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.about.title">Bli kjent med oss</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/om-oss">Om oss</a></li>
-                            <li><a href="/kontakt">Kontakt oss</a></li>
+                            <li><a href="/om-oss" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.about">Om oss</a></li>
+                            <li><a href="/kontakt" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.about.contact">Kontakt oss</a></li>
                         </ul>
                     </div>
 
-                    <!-- Column 3: Ressurser -->
+                    <!-- Column 3: Ressurser & Media -->
                     <div class="menu-col">
-                        <h3 class="menu-section-title">Ressurser</h3>
+                        <h3 class="menu-section-title" data-content-doc="settings_global"
+                            data-content-key="menu.sections.resources.title">Ressurser</h3>
                         <ul class="mega-nav-list">
-                            <li><a href="/bibel">Les Bibelen</a></li>
-                            <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer">Butikk</a></li>
-                            <li><a href="/arrangementer">Arrangementer</a></li>
-                            <li><a href="/media">Media & Podcast</a></li>
-                            <li><a href="/blogg">Nyheter & Blogg</a></li>
-                            <li><a href="/kurs">Kurs</a></li>
-                            <li><a href="/leseplaner.html">Leseplaner</a></li>
-                            <li><a href="/minside/index.html">Min Side</a></li>
+                            <li><a href="/bibel" data-content-doc="settings_global" data-content-key="menu.sections.resources.bible">Les Bibelen</a></li>
+                            <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.store">Butikk</a></li>
+                            <li><a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.events">Arrangementer</a></li>
+                            <li><a href="/media" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.media">Media & Podcast</a></li>
+                            <li><a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.blog">Nyheter & Blogg</a></li>
+                            <li><a href="/kurs" data-content-doc="settings_global" data-content-key="menu.sections.resources.courses">Kurs</a></li>
+                            <li><a href="/leseplaner.html" data-content-key="menu.sections.resources.readingPlans">Leseplaner</a></li>
+                            <li><a href="/minside/index.html" data-content-doc="settings_global"
+                                    data-content-key="menu.sections.resources.myPage">Min Side</a></li>
                         </ul>
+                    </div>
+                </div>
+
+                <!-- Menu Footer -->
+                <div class="mega-menu-footer">
+                    <a href="/donasjoner" class="btn btn-primary btn-large btn-block footer-donate-btn"><span
+                            data-content-doc="settings_global" data-content-key="menu.footer.cta">Støtt nå</span><i
+                            class="fas fa-heart heart"></i></a>
+                    <div class="menu-footer-links">
+                        <a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                            data-content-key="menu.footer.store">Butikk</a>
+                        <a href="/donasjoner" data-content-doc="settings_global"
+                            data-content-key="menu.footer.taxDeduction">Skattefradrag</a>
+                        <a href="/om-oss" data-content-doc="settings_global"
+                            data-content-key="menu.footer.about">Om oss</a>
+                        <a href="/personvern" data-content-doc="settings_global"
+                            data-content-key="menu.footer.privacy">Personvern</a>
+                        <a href="/betingelser" data-content-doc="settings_global" data-content-key="menu.footer.terms">Betingelser</a>
                     </div>
                 </div>
             </div>
@@ -509,71 +573,144 @@
     </main>
 
     <!-- Footer -->
-    <footer class="footer">
+    <footer class="footer" id="kontakt">
         <div class="container">
             <div class="footer-layout-v2">
+                <!-- Left Section: Brand + Links -->
                 <div class="footer-left">
+                    <!-- Brand / Intro -->
                     <div class="footer-brand">
                         <a href="/" class="logo">
                             <div class="logo-icon">
-                                <img src="/img/logo-hkm.png" alt="His Kingdom Ministry Logo">
+                                <img src="img/logo-hkm.png" alt="His Kingdom Ministry Logo"
+                                    data-content-doc="settings_global" data-content-key="brand.logoAlt"
+                                    data-content-attr="alt">
                             </div>
-                            <span class="logo-text">His Kingdom Ministry</span>
+                            <span class="logo-text" data-content-doc="settings_global" data-content-key="brand.name">His
+                                Kingdom Ministry</span>
                         </a>
-                        <p class="brand-description">His Kingdom Ministry er en non-profit organisasjon dedikert til åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
+                        <p class="brand-description" data-content-doc="settings_global"
+                            data-content-key="footer.description">His Kingdom Ministry er en
+                            non-profit organisasjon dedikert til
+                            åndelig vekst gjennom undervisning, podcast og reisevirksomhet.</p>
                     </div>
 
+                    <!-- Links Grid -->
                     <div class="footer-nav-grid">
                         <div class="nav-col">
-                            <h4>Om oss</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_about">Om oss</h4>
                             <ul>
-                                <li><a href="/">Hjem</a></li>
-                                <li><a href="/om-oss">Om oss</a></li>
-                                <li><a href="/kontakt">Kontakt oss</a></li>
+                                <li><a href="/" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.home">Hjem</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.about">Om oss</a></li>
+                                <li><a href="/om-oss" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.vision">Vår visjon</a></li>
+                                <li><a href="/kontakt" data-content-doc="settings_global"
+                                        data-content-key="footer.links.about.contact">Kontakt oss</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Ressurser</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_resources">Ressurser
+                            </h4>
                             <ul>
-                                <li><a href="/bibel">Les Bibelen</a></li>
-                                <li><a href="/media">Undervisning</a></li>
-                                <li><a href="/arrangementer">Arrangementer</a></li>
-                                <li><a href="/leseplaner.html">Leseplaner</a></li>
+                                <li><a href="/bibel" data-content-doc="settings_global" data-content-key="footer.links.resources.bible">Les Bibelen</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.teaching">Undervisning</a></li>
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.courses">Arrangementer</a></li>
+                                <li><a href="/blogg" data-content-doc="settings_global"
+                                    data-content-key="footer.links.resources.blog">Nyheter & blogg</a></li>
+                                <li><a href="https://www.hiskingdomdesigns.no/" target="_blank" rel="noopener noreferrer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.store">Butikk</a></li>
+                                <li><a href="/minside/index.html" target="_blank" data-content-doc="settings_global"
+                                        data-content-key="footer.links.resources.myPage">Min Side</a></li>
                             </ul>
                         </div>
 
                         <div class="nav-col">
-                            <h4>Media</h4>
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_media">Media</h4>
                             <ul>
-                                <li><a href="/media">Podcast</a></li>
-                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank">YouTube</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.podcast">Podcast</a></li>
+                                <li><a href="/media" data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.videos">Videoer</a></li>
+                                <li><a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.media.youtube">YouTube</a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="nav-col">
+                            <h4 data-content-doc="settings_global" data-content-key="footer.title_involvement">
+                                Involvering</h4>
+                            <ul>
+                                <li><a href="/arrangementer" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.calendar">Kalender</a></li>
+                                <li><a href="/donasjoner" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.donate">Gi en gave</a></li>
+                                <li><a href="/personvern" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.privacy">Personvern</a></li>
+                                <li><a href="/betingelser">Vilkår og betingelser</a></li>
+                                <li><a href="/tilgjengelighet" data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.accessibility">Tilgjengelighet</a>
+                                </li>
+                                <li><a href="javascript:void(0)"
+                                        onclick="localStorage.removeItem('hkm_cookie_consent'); location.reload(); return false;"
+                                        data-content-doc="settings_global"
+                                        data-content-key="footer.links.involvement.cookies">Cookies</a>
+                                </li>
                             </ul>
                         </div>
                     </div>
                 </div>
 
+                <!-- Right Section: Cards -->
                 <div class="footer-right">
+                    <!-- Follow Us Card -->
                     <div class="footer-card">
-                        <h3>Følg oss</h3>
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_follow">Følg oss</h3>
                         <div class="footer-social-icons">
-                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i class="fab fa-facebook-f"></i></a>
-                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i class="fab fa-instagram"></i></a>
-                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i class="fab fa-youtube"></i></a>
+                            <a href="https://www.facebook.com/hiskingdomministry777?locale=nb_NO" target="_blank"><i
+                                    class="fab fa-facebook-f"></i></a>
+                            <a href="https://www.instagram.com/hiskingdomdesigns/" target="_blank"><i
+                                    class="fab fa-instagram"></i></a>
+                            <a href="https://www.youtube.com/@HisKingdomMinistry" target="_blank"><i
+                                    class="fab fa-youtube"></i></a>
                         </div>
                     </div>
 
+                    <!-- Contact Us Card -->
                     <div class="footer-card contact-card">
-                        <h3>Kontakt oss</h3>
-                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm">Kontaktskjema</a>
+                        <h3 data-content-doc="settings_global" data-content-key="footer.title_contact">Kontakt oss</h3>
+                        <a href="/kontakt" class="btn btn-primary btn-block btn-sm" data-content-doc="settings_global"
+                            data-content-key="footer.contactButton">Kontaktskjema</a>
+
                         <div class="contact-details">
                             <div class="detail-item">
-                                <strong>E-post:</strong>
-                                <p>post@hiskingdomministry.no</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.emailLabel">E-post:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.email">
+                                    post@hiskingdomministry.no</p>
                             </div>
                             <div class="detail-item">
-                                <strong>Telefon:</strong>
-                                <p>+47 930 94 615</p>
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.phoneLabel">Telefon:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.phone">+47 930 94
+                                    615</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.vippsLabel">Vipps:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.vipps">938361</p>
+                            </div>
+                            <div class="detail-item">
+                                <strong data-content-doc="settings_global"
+                                    data-content-key="footer.contact.accountLabel">Konto nr.:</strong>
+                                <p data-content-doc="settings_global" data-content-key="contact.account">3000.66.08759
+                                </p>
                             </div>
                         </div>
                     </div>
@@ -581,8 +718,10 @@
             </div>
 
             <div class="footer-bottom">
-                <p>&copy; <span id="copyright-year">2026</span> His Kingdom Ministry. Alle rettigheter reservert.</p>
-                <a href="/admin/login.html" class="admin-link">Admin</a>
+                <p>&copy; <span id="copyright-year">2026</span> <span data-content-doc="settings_global"
+                        data-content-key="footer.copyright">His Kingdom Ministry. Alle rettigheter reservert.</span></p>
+                <a href="/admin/login.html" class="admin-link" id="admin-link" data-content-doc="settings_global"
+                    data-content-key="footer.adminLink">Admin</a>
             </div>
         </div>
     </footer>
@@ -600,29 +739,33 @@
     <!-- Fetch & Render Logic -->
     <script type="module">
         (async function () {
-            // Wait for firebase init
-            await new Promise(resolve => {
-                const check = () => typeof firebase !== 'undefined' && firebase.apps.length ? resolve() : setTimeout(check, 100);
-                check();
-            });
+            // Wait for firebaseService to be registered on window
+            let service = window.firebaseService;
+            if (!service) {
+                let count = 0;
+                while (!window.firebaseService && count < 80) {
+                    await new Promise(r => setTimeout(r, 50));
+                    count++;
+                }
+                service = window.firebaseService;
+            }
 
-            const db = firebase.firestore();
             const urlParams = new URLSearchParams(window.location.search);
             const planId = urlParams.get('id');
 
-            if (!planId) {
+            if (!planId || !service) {
                 showErrorState();
                 return;
             }
 
             try {
-                const doc = await db.collection('reading_plans').doc(planId).get();
-                if (!doc.exists) {
+                const planData = await service.getDoc('reading_plans', planId);
+                if (!planData) {
                     showErrorState();
                     return;
                 }
 
-                const plan = { id: doc.id, ...doc.data() };
+                const plan = { id: planId, ...planData };
                 renderPlanDetails(plan);
             } catch (err) {
                 console.error("Error loading plan details:", err);
