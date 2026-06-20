@@ -134,18 +134,40 @@
 
         .search-container input {
             width: 100%;
-            padding: 8px 12px 8px 34px;
+            height: 40px !important;
+            padding: 0 12px 0 36px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             background: var(--bg-base);
             color: var(--text-base);
-            font-size: 13px;
+            font-size: 14px;
             outline: none;
-            transition: border-color 0.2s;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .search-container input:focus {
             border-color: var(--bible-primary);
+            box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.1);
+        }
+
+        .bible-control-input {
+            height: 40px !important;
+            padding: 0 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-base);
+            color: var(--text-base);
+            font-size: 14px;
+            outline: none;
+            width: 160px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .bible-control-input:focus {
+            border-color: var(--bible-primary);
+            box-shadow: 0 0 0 2px rgba(27, 73, 101, 0.1);
         }
 
         .books-list-wrapper {
@@ -220,17 +242,19 @@
         }
 
         .select-wrapper select {
-            padding: 8px 30px 8px 12px;
+            height: 40px !important;
+            padding: 0 32px 0 12px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             background: var(--bg-base);
             color: var(--text-base);
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             outline: none;
             appearance: none;
             -webkit-appearance: none;
+            box-sizing: border-box;
         }
 
         .select-wrapper {
@@ -260,21 +284,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 36px;
-            height: 36px;
+            width: 40px !important;
+            height: 40px !important;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
 
         .settings-popover-trigger:hover {
-            background: var(--active-bg);
+            border-color: var(--bible-primary);
+            color: var(--bible-primary);
+            transform: scale(1.05);
         }
 
         .settings-dropdown {
             position: absolute;
-            top: 60px;
+            top: 64px;
             right: 24px;
             width: 280px;
             background: var(--bg-sidebar);
@@ -371,21 +397,42 @@
         .reference-header {
             margin-bottom: 32px;
             text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
         }
 
-        .reference-header h2 {
-            font-size: 32px;
-            font-weight: 700;
-            color: var(--bible-primary);
-            margin-bottom: 4px;
-        }
-
-        .reference-header .translation-badge {
-            font-size: 11px;
-            text-transform: uppercase;
-            font-weight: 700;
-            letter-spacing: 0.1em;
+        .book-badge {
+            display: inline-block;
+            padding: 6px 16px;
+            background: var(--active-bg);
             color: var(--text-muted);
+            border-radius: 9999px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            line-height: 1;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .chapter-number {
+            font-size: 64px;
+            font-weight: 800;
+            color: var(--text-base);
+            margin: 0;
+            line-height: 1;
+            font-family: Georgia, Cambria, "Times New Roman", Times, serif;
+            text-align: center;
+            transition: color 0.3s;
+        }
+
+        @media (min-width: 768px) {
+            .chapter-number {
+                font-size: 80px;
+            }
         }
 
         .bible-reading-pane {
@@ -434,7 +481,7 @@
         /* Chapter selectors overlay */
         .chapter-selector-overlay {
             position: absolute;
-            top: 60px;
+            top: 64px;
             left: 24px;
             width: 320px;
             max-height: 400px;
@@ -499,10 +546,12 @@
         }
 
         .nav-btn {
-            display: flex;
+            display: inline-flex;
             align-items: center;
+            justify-content: center;
             gap: 8px;
-            padding: 10px 20px;
+            height: 40px !important;
+            padding: 0 16px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             background: var(--bg-card);
@@ -512,6 +561,7 @@
             cursor: pointer;
             transition: all 0.2s;
             outline: none;
+            box-sizing: border-box;
         }
 
         .nav-btn:hover:not(:disabled) {
@@ -708,24 +758,24 @@
         /* Gå (Submit) Button Style */
         .btn-bible-go {
             padding: 0 16px;
-            font-size: 13px;
+            font-size: 14px;
             font-weight: 600;
             border-radius: 8px;
             background: var(--bible-primary);
             color: white;
             border: none;
             cursor: pointer;
-            height: 34px;
+            height: 40px !important;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
         }
 
         .btn-bible-go:hover {
             background: #15394f;
-            transform: scale(1.05);
-            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.25);
+            transform: scale(1.03);
+            box-shadow: 0 4px 12px rgba(27, 73, 101, 0.2);
         }
 
         .btn-bible-go:active {
@@ -742,9 +792,10 @@
             outline: none;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            width: 36px;
-            height: 36px;
+            width: 40px !important;
+            height: 40px !important;
             transition: all 0.25s ease;
+            box-sizing: border-box;
         }
         
         .btn-mobile-sidebar:hover {
@@ -928,7 +979,7 @@
                     </div>
 
                     <!-- Book / Chapter triggers for quick overlay select -->
-                    <button class="nav-btn" id="trigger-book-chapter" style="padding: 8px 16px; display: flex; align-items: center; gap: 8px;" onclick="document.getElementById('chapter-selector-overlay').classList.toggle('active')">
+                    <button class="nav-btn" id="trigger-book-chapter" onclick="document.getElementById('chapter-selector-overlay').classList.toggle('active')">
                         <span class="material-symbols-outlined" style="font-size: 18px;">grid_view</span>
                         <span>Kapittel</span>
                     </button>
@@ -947,8 +998,8 @@
 
                 <div class="controls-right">
                     <!-- Quick Reference Search -->
-                    <form id="bible-quick-search-form" style="margin: 0; display: flex; gap: 8px;">
-                        <input type="text" id="bible-quick-search" placeholder="f.eks. Johannes 3:16" style="padding: 8px 12px; font-size: 13px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-base); color: var(--text-base); outline: none; width: 160px;">
+                    <form id="bible-quick-search-form" style="margin: 0; display: flex; gap: 8px; align-items: center;">
+                        <input type="text" id="bible-quick-search" placeholder="f.eks. Johannes 3:16" class="bible-control-input">
                         <button type="submit" class="btn-bible-go">Gå</button>
                     </form>
 
@@ -999,8 +1050,9 @@
             <div class="bible-content-pane">
                 <div class="bible-text-container">
                     <div class="reference-header">
-                        <h2 id="current-reference-title">Matteus 1</h2>
-                        <span class="translation-badge" id="current-translation-abbr">OTB-NB</span>
+                        <div class="book-badge" id="current-book-badge">MATTEUS</div>
+                        <h1 class="chapter-number" id="current-chapter-number">1</h1>
+                        <span class="translation-badge" id="current-translation-abbr" style="display: none;">OTB-NB</span>
                     </div>
 
                     <!-- The Actual Bible Text -->

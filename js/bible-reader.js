@@ -72,6 +72,8 @@ class BibleReader {
             readingPane: document.getElementById('bible-reading-pane'),
             currentReferenceTitle: document.getElementById('current-reference-title'),
             currentTranslationAbbr: document.getElementById('current-translation-abbr'),
+            currentBookBadge: document.getElementById('current-book-badge'),
+            currentChapterNumber: document.getElementById('current-chapter-number'),
             prevChapterBtn: document.getElementById('prev-chapter-btn'),
             nextChapterBtn: document.getElementById('next-chapter-btn'),
             
@@ -473,6 +475,12 @@ class BibleReader {
         const currentBook = this.books.find(b => b.id === this.selectedBookId);
         const chapterNum = this.selectedChapterId.split('_')[1];
         
+        if (this.dom.currentBookBadge) {
+            this.dom.currentBookBadge.innerText = currentBook ? currentBook.name.toUpperCase() : '';
+        }
+        if (this.dom.currentChapterNumber) {
+            this.dom.currentChapterNumber.innerText = chapterNum;
+        }
         if (this.dom.currentReferenceTitle) {
             this.dom.currentReferenceTitle.innerText = `${currentBook ? currentBook.name : ''} ${chapterNum}`;
         }
