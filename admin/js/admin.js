@@ -6900,6 +6900,7 @@ class AdminManager {
         const mediaSettings = await firebaseService.getPageContent('settings_media') || {};
         const settings = await firebaseService.getPageContent('settings_integrations') || {};
         const apiKey = (mediaSettings.youtubeApiKey || settings.youtube?.apiKey || settings.googleCalendar?.apiKey || '').trim();
+        const channelId = (mediaSettings.youtubeChannelId || '').trim();
 
         const modal = document.createElement('div');
         modal.className = 'admin-modal';
@@ -6933,6 +6934,12 @@ class AdminManager {
                             </div>
                             <button id="yt-search-btn" class="btn-primary" style="height: 42px; padding: 0 24px; font-weight: 600; border-radius: 8px; background: #1B4965; color: white; border: none; cursor: pointer; transition: background-color 0.2s;">Søk</button>
                         </div>
+                        ${channelId ? `
+                        <div style="display: flex; align-items: center; gap: 8px; margin-top: -8px; flex-shrink: 0;">
+                            <input type="checkbox" id="yt-search-channel-only" checked style="cursor: pointer; width: 16px !important; height: 16px !important; min-height: auto !important; margin: 0;">
+                            <label for="yt-search-channel-only" style="font-size: 13px; color: #475569; cursor: pointer; font-weight: 500; user-select: none;">Søk kun i egen YouTube-kanal</label>
+                        </div>
+                        ` : ''}
                         <!-- API Key warning banner -->
                         <div id="yt-api-warning" class="api-warning-banner" style="display: none; padding: 16px; background: #fef3c7; border-left: 4px solid #d97706; border-radius: 6px; color: #92400e; font-size: 13px; align-items: flex-start; gap: 12px; line-height: 1.5;">
                             <span class="material-symbols-outlined" style="color: #d97706; flex-shrink: 0;">warning</span>
@@ -7145,7 +7152,13 @@ class AdminManager {
             
             try {
                 const ytMatch = query.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
-                let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=12&q=${encodeURIComponent(query)}&type=video&key=${apiKey}`;
+                let url = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=25&q=${encodeURIComponent(query)}&type=video&regionCode=NO&relevanceLanguage=no&key=${apiKey}`;
+                
+                const channelOnlyCheckbox = modal.querySelector('#yt-search-channel-only');
+                if (channelOnlyCheckbox && channelOnlyCheckbox.checked && channelId) {
+                    url += `&channelId=${channelId}`;
+                }
+
                 if (ytMatch) {
                     url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&id=${ytMatch[1]}&key=${apiKey}`;
                 }
