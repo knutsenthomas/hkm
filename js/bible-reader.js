@@ -154,6 +154,8 @@ class BibleReader {
             // Cross references
             dictCrossRefsSection: document.getElementById('dict-cross-refs-section'),
             dictCrossRefsList: document.getElementById('dict-cross-references'),
+            dictOriginalWordsSection: document.getElementById('dict-original-words-section'),
+            dictOriginalWordsList: document.getElementById('dict-original-words-list'),
             chapterCrossRefsSection: document.getElementById('chapter-cross-references-section'),
             chapterCrossRefsList: document.getElementById('chapter-cross-references')
         };
@@ -1245,8 +1247,32 @@ class BibleReader {
 
             this.dom.dictWordTitle.innerText = dictRes.word || word;
             this.dom.dictCategory.innerText = dictRes.category || 'Ordbok';
-            this.dom.dictDefinition.innerText = dictRes.definition || '';
-            this.dom.dictContextualNote.innerText = dictRes.contextualNote || '';
+            this.dom.dictDefinition.innerHTML = dictRes.definition || '';
+            this.dom.dictContextualNote.innerHTML = dictRes.contextualNote || '';
+
+            // Render original words (grunntekst) in dictionary drawer
+            if (this.dom.dictOriginalWordsSection && this.dom.dictOriginalWordsList) {
+                if (dictRes.originalWords && dictRes.originalWords.length > 0) {
+                    this.dom.dictOriginalWordsList.innerHTML = dictRes.originalWords.map(w => `
+                        <div class="dict-original-term-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <span class="language-badge ${w.language.toLowerCase() === 'hebraisk' ? 'hebrew' : ''}">${w.language}</span>
+                                <span class="${w.language.toLowerCase() === 'hebraisk' ? 'hebrew-word' : 'greek-word'}">${w.word}</span>
+                            </div>
+                            <div style="font-size: 14px; color: var(--text-base); line-height: 1.4; display: flex; flex-direction: column; gap: 2px;">
+                                <div><strong>Translitterasjon:</strong> <em>${w.transliteration}</em></div>
+                                <div><strong>Uttale:</strong> <span>${w.pronunciation}</span></div>
+                                <div style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed var(--border-color); font-size: 13px; color: var(--text-muted);">
+                                    <strong>Betydning:</strong> ${w.meaning}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    this.dom.dictOriginalWordsSection.style.display = 'block';
+                } else {
+                    this.dom.dictOriginalWordsSection.style.display = 'none';
+                }
+            }
 
             // Render cross references in dictionary drawer
             if (this.dom.dictCrossRefsSection && this.dom.dictCrossRefsList) {
@@ -1298,11 +1324,14 @@ class BibleReader {
             if (this.dom.dictCrossRefsSection) {
                 this.dom.dictCrossRefsSection.style.display = 'none';
             }
+            if (this.dom.dictOriginalWordsSection) {
+                this.dom.dictOriginalWordsSection.style.display = 'none';
+            }
             this.dom.dictSpinner.style.display = 'none';
             this.dom.dictContentWrap.style.display = 'block';
             this.dom.dictCategory.innerText = 'Feil';
-            this.dom.dictDefinition.innerText = 'Kunne ikke kontakte ordbok-tjenesten. Kontroller nettforbindelsen din.';
-            this.dom.dictContextualNote.innerText = '';
+            this.dom.dictDefinition.innerHTML = 'Kunne ikke kontakte ordbok-tjenesten. Kontroller nettforbindelsen din.';
+            this.dom.dictContextualNote.innerHTML = '';
         }
     }
 

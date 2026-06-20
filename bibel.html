@@ -859,6 +859,55 @@
             color: var(--text-muted);
         }
 
+        .greek-word {
+            font-family: 'Gentium Plus', 'Times New Roman', serif;
+            font-weight: 700;
+            color: var(--bible-primary);
+            background: rgba(209, 125, 57, 0.08);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 1.05em;
+        }
+
+        .hebrew-word {
+            font-family: 'SBL Hebrew', 'Ezra SIL', 'Times New Roman', serif;
+            font-weight: 700;
+            color: #bd4f2a;
+            background: rgba(189, 79, 42, 0.08);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 1.25em;
+            display: inline-block;
+        }
+
+        .dict-original-term-card {
+            padding: 12px 14px;
+            background: var(--bg-base);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .dict-original-term-card .language-badge {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(209, 125, 57, 0.1);
+            color: var(--bible-primary);
+            letter-spacing: 0.05em;
+        }
+
+        .dict-original-term-card .language-badge.hebrew {
+            background: rgba(189, 79, 42, 0.1);
+            color: #bd4f2a;
+        }
+
         .close-dict-btn {
             background: none;
             border: none;
@@ -1456,6 +1505,21 @@
                 .dictionary-drawer #dict-spinner p {
                     font-size: 16px !important;
                 }
+                .dictionary-drawer .dict-original-term-card {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-original-term-card div {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-original-term-card span {
+                    font-size: 16px !important;
+                }
+                .dictionary-drawer .dict-original-term-card .hebrew-word {
+                    font-size: 24px !important;
+                }
+                .dictionary-drawer .dict-original-term-card .greek-word {
+                    font-size: 19px !important;
+                }
 
                 /* Bookmarks & History sidebar (bible-nav-right) adjustments on mobile */
                 .bible-nav-right .nav-sidebar-item {
@@ -1903,6 +1967,14 @@
                         <div class="dict-section-title">Definisjon / Belysning</div>
                         <div class="dict-definition-text" id="dict-definition">
                             Dette er definisjonen...
+                        </div>
+
+                        <!-- Grunntekst (Originalspråk) Section -->
+                        <div id="dict-original-words-section" style="display: none; margin-top: 20px; margin-bottom: 24px;">
+                            <div class="dict-section-title">Grunntekst (Originalspråk)</div>
+                            <div id="dict-original-words-list" style="display: flex; flex-direction: column; gap: 10px;">
+                                <!-- Loaded dynamically -->
+                            </div>
                         </div>
 
                         <div class="dict-section-title">Kontekst</div>

@@ -252,7 +252,7 @@ Dersom ordet ER relevant for Bibelen eller teologi, skal du tilpasse svaret og l
 1. Hvis brukeren søker etter bibelvers om noe (f.eks. "bibelvers om Jesus", "vers om håp", "skrifter om kjærlighet"), skal du liste opp flere (gjerne 4 til 8 eller flere) svært relevante bibelvers med tydelige kapittel- og versangivelser (f.eks. 'Johannes 3:16') og sitere teksten, samt gjerne legge til korte, inspirerende teologiske kommentarer til hvert vers eller samlet.
 2. Hvis brukeren søker etter handlinger eller historier om en bibelsk skikkelse (f.eks. "hva gjorde Josef", "fortellingen om Moses", "historien om Maria"), skal du skrive en levende, spennende og fyldig fortellende beretning (en slags dyp fortelling) om hva personen gjorde, deres reise, utfordringer, rolle i Guds frelsesplan og den evige teologiske betydningen av deres liv.
 3. For ordinære begreper (f.eks. "nåde", "sabbat", "frelse"), lag en forklaring som er nøyaktig, klar, lærerik, dyp og historisk presis på flytende og varmt norsk, tilpasset bibelstudium.
-4. Strong's Concordance og Grunntekst: Du har også tilgang til hele Strong's Concordance (gresk og hebraisk grunntekstleksikon). Dersom søkeordet er et Strong-nummer (f.eks. "G3056", "H7225") eller spørsmål knyttet til greske eller hebraiske grunntekstord, skal du gi en grundig forklaring på det opprinnelige ordet, dets betydning, etymologi, uttale, og hvordan det oversettes og brukes i Bibelen. For vanlige bibelske ord (som f.eks. "nåde", "kjærlighet", "begynnelse"), oppgi gjerne det tilsvarende greske (f.eks. Charis, Agape, Logos) eller hebraiske (f.eks. Chesed, Reshith) ordet og tilhørende Strong-nummer i forklaringen slik at brukeren kan lære grunnteksten å kjenne.
+4. Grunntekst (originalspråk): Dersom søkeordet eller emnet har et tilsvarende ord på gresk eller hebraisk/arameisk (f.eks. for ord som "nåde", "kjærlighet", "begynnelse"), eller hvis det søkes etter et gresk eller hebraisk begrep, skal du ALLTID populere listen "originalWords". Du skal ALDRI henvise til, navngi eller inkludere Strong-numre eller Strong's Concordance (f.eks. skal du ALDRI skrive "Strong's G5485" eller lignende). I stedet skal du kun oppgi det opprinnelige ordet med greske eller hebraiske tegn, dets forenklede translitterasjon til latinske bokstaver, en klar uttaleveiledning (f.eks. "uttales: ..."), språket det tilhører (gresk eller hebraisk), og ordets direkte norske betydning.
 5. Kapittelforklaring: Dersom brukeren søker etter et spesifikt kapittel (f.eks. "Johannes 1", "Salmene 23", "Første Mosebok 1"), skal du skrive en grundig, lærerik og teologisk forklaring av dette kapittelet. Beskriv kapittelets hovedtemaer, historiske og litterære kontekst, de viktigste versene (som du gjerne kan sitere og kommentere), og dets overordnede betydning for bibelhistorien.
 
 ${scriptureRef ? `Ordet ble markert av brukeren i bibelteksten referert som: ${scriptureRef}.` : ""}
@@ -264,6 +264,15 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
   "definition": "En definisjon eller forklaring her...",
   "category": "Kategori her...",
   "contextualNote": "Kort oppsummering...",
+  "originalWords": [
+    {
+      "word": "χάρις eller חֶסֶד",
+      "transliteration": "charis eller chesed",
+      "pronunciation": "ka'-ris eller kche'-sed",
+      "language": "gresk eller hebraisk",
+      "meaning": "nåde, gunst, trofast kjærlighet"
+    }
+  ],
   "crossReferences": [
     {
       "ref": "Standard bibelreferanse (f.eks. Johannes 3:16)",
@@ -284,6 +293,20 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
                   definition: { type: Type.STRING },
                   category: { type: Type.STRING },
                   contextualNote: { type: Type.STRING },
+                  originalWords: {
+                    type: Type.ARRAY,
+                    items: {
+                      type: Type.OBJECT,
+                      properties: {
+                        word: { type: Type.STRING },
+                        transliteration: { type: Type.STRING },
+                        pronunciation: { type: Type.STRING },
+                        language: { type: Type.STRING },
+                        meaning: { type: Type.STRING }
+                      },
+                      required: ["word", "transliteration", "pronunciation", "language", "meaning"]
+                    }
+                  },
                   crossReferences: {
                     type: Type.ARRAY,
                     items: {
@@ -296,7 +319,7 @@ Returner nøyaktig JSON i henhold til dette skjemaet:
                     }
                   }
                 },
-                required: ["word", "definition", "category", "contextualNote", "crossReferences"]
+                required: ["word", "definition", "category", "contextualNote", "crossReferences", "originalWords"]
               }
             }
           });
